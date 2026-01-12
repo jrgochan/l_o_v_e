@@ -1,0 +1,261 @@
+{
+  "description": "Bridge Emotions - Gateway emotions that enable otherwise psychologically impossible transitions. These emotions serve as pivot points in the emotional landscape, particularly when moving from negative to positive connection, from high to low arousal requiring perspective shift, or when crossing category boundaries that normally prohibit direct transition.",
+  "source": "Brown, B. (2021). Atlas of the Heart; Keltner, D. & Haidt, J. (2003). Approaching awe: A moral, spiritual, and aesthetic emotion.",
+  "version": "1.0",
+  "created": "2025-12-05",
+  
+  "bridge_emotions": [
+    {
+      "emotion_name": "Vulnerability",
+      "vac_coordinates": [0.0, 0.3, 0.6],
+      "category": "Places We Go When We Search for Connection",
+      "description": "The willingness to show up and be seen when you have no control over the outcome. The birthplace of love, belonging, joy, courage, empathy, and creativity.",
+      "gateway_function": "CRITICAL BRIDGE for shame → connection transitions. The only path from extreme negative connection (shame) to positive connection (belonging, worthiness) MUST pass through vulnerability.",
+      "bridges_from_categories": [
+        "Places We Go When We Fall Short (Shame)",
+        "Places We Go When Things Are Uncertain or Too Much (Fear)",
+        "Places We Go When We Search for Connection (Loneliness)"
+      ],
+      "bridges_to_categories": [
+        "Places We Go With Others (Belonging, Connection, Compassion)",
+        "Places We Go When The Heart Is Open (Love, Trust)",
+        "Places We Go When Life Is Good (Joy, Happiness)"
+      ],
+      "why_required": "Shame involves hiding, isolation, belief in unworthiness. Cannot heal in isolation - requires being seen. Vulnerability is the act of showing yourself despite fear of rejection. When met with empathy (not shame), connection repairs. This is THE gateway for connection axis repair.",
+      "brene_brown_quote": "Vulnerability is not winning or losing; it's having the courage to show up and be seen when we have no control over the outcome. Vulnerability is not weakness; it's our greatest measure of courage.",
+      "typical_expressions": [
+        "I'm scared to share this but...",
+        "This is hard to admit but...",
+        "I need help",
+        "I don't have it all figured out",
+        "I made a mistake",
+        "I'm struggling"
+      ],
+      "recommended_strategies": [
+        "Self-Compassion Break (Kristin Neff)",
+        "Shame Resilience: Speak Shame",
+        "Authentic Relating: Sharing What's Alive",
+        "Asking for Help/Support"
+      ],
+      "caution": "Vulnerability requires a SAFE person. Don't be vulnerable with unsafe people - that's not courage, that's harm. Discernment about who is safe is essential."
+    },
+    {
+      "emotion_name": "Awe",
+      "vac_coordinates": [0.7, 0.5, 0.8],
+      "category": "Places We Go When It's Beyond Us",
+      "description": "The feeling of being in the presence of something vast that transcends your current understanding of the world. Overwhelmingly large, beautiful, or powerful.",
+      "gateway_function": "UNIVERSAL BRIDGE - Can be accessed from almost any emotional state. Provides perspective shift that interrupts negative patterns, reduces self-focus, and creates sense of connection to something larger.",
+      "bridges_from_categories": [
+        "Places We Go When We Fall Short (even Shame can access Awe)",
+        "Places We Go When We're Hurting (Grief → Awe possible)",
+        "Places We Go When Things Are Uncertain or Too Much (Anxiety → Wonder)",
+        "Places We Go When Life Is Good (Joy → Awe)"
+      ],
+      "bridges_to_categories": [
+        "Places We Go When Life Is Good (Gratitude, Joy)",
+        "Places We Go When The Heart Is Open (Love, Inspiration)",
+        "Places We Go When It's Beyond Us (Wonder, Surprise)",
+        "Places We Go To Self-Assess (Humility)"
+      ],
+      "why_required": "Awe shifts perspective outside the self - diminishes rumination, reduces shame (you're part of something vast, not alone in badness), interrupts anxiety (current worries seem smaller in cosmic context). The 'vastness' component creates cognitive accommodation - must update understanding of world.",
+      "research_note": "Keltner & Haidt show awe has unique properties: decreases sense of self-importance (but not self-worth), increases prosocial behavior, shifts time perception, promotes humility. fMRI shows awe activates same regions as spiritual experiences.",
+      "typical_triggers": [
+        "Nature (vast landscapes, starry sky, ocean)",
+        "Art/Music (transcendent beauty)",
+        "Human excellence (witnessing extraordinary skill/courage)",
+        "Birth/Death (life's mysteries)",
+        "Scientific concepts (vastness of universe)",
+        "Spiritual/Religious experiences"
+      ],
+      "recommended_strategies": [
+        "Nature Exposure",
+        "Mindfulness of Beauty",
+        "Perspective-Taking exercises",
+        "Gratitude for vastness"
+      ],
+      "caution": "Some awe can be terrifying (e.g., natural disasters). Typically awe is positive but can have fear component. Bittersweet awe possible in grief."
+    },
+    {
+      "emotion_name": "Compassion",
+      "vac_coordinates": [0.5, 0.2, 0.9],
+      "category": "Places We Go With Others",
+      "description": "The feeling that arises when you are confronted with another's suffering and feel motivated to relieve it. Feeling WITH someone, not FOR them.",
+      "gateway_function": "HEALING BRIDGE - Repairs shame, builds connection, transforms pity/condescension to genuine connection. The distinction between compassion (WITH) vs pity (FOR) is the Connection axis signature.",
+      "bridges_from_categories": [
+        "Places We Go When We Fall Short (Self-Compassion heals shame)",
+        "Places We Go When We Feel Wronged (Compassion softens anger)",
+        "Places We Go When We're Hurting (Compassion received soothes pain)",
+        "Places We Go When We Compare (Compassion replaces envy)"
+      ],
+      "bridges_to_categories": [
+        "Places We Go With Others (Empathy, Boundaries)",
+        "Places We Go When The Heart Is Open (Love, Kindness)",
+        "Places We Go When Life Is Good (Contentment, Gratitude)"
+      ],
+      "why_required": "Compassion is connection in the presence of suffering. Self-compassion (treating yourself with same kindness you'd show a friend) directly counters shame's message of unworthiness. Compassion for others builds connection, softens anger, interrupts judgment. Key: feeling WITH not FOR (Connection axis positive, not negative like pity).",
+      "connection_axis_note": "Compassion has POSITIVE connection (+0.9) - feeling WITH. Pity has NEGATIVE connection (-0.4) - feeling FOR, implies separation/superiority. This is a critical VAC model distinction.",
+      "typical_expressions": [
+        "This is really hard for you",
+        "I see your pain",
+        "May I be kind to myself" (self-compassion),
+        "We're in this together",
+        "Your suffering matters",
+        "I care about your well-being"
+      ],
+      "recommended_strategies": [
+        "Self-Compassion Break (Kristin Neff)",
+        "Loving-Kindness Meditation (Metta)",
+        "Perspective-Taking: Friend's Advice",
+        "GIVE (Relationship Maintenance)"
+      ],
+      "neff_components": "Self-compassion has three parts: 1) Self-kindness vs. self-judgment, 2) Common humanity vs. isolation, 3) Mindfulness vs. over-identification. All three necessary for shame healing."
+    },
+    {
+      "emotion_name": "Curiosity",
+      "vac_coordinates": [0.5, 0.6, 0.3],
+      "category": "Places We Go When It's Beyond Us",
+      "description": "A strong desire to learn or know something. The feeling of wanting to investigate, explore, or understand.",
+      "gateway_function": "RUMINATION INTERRUPTER - Shifts from repetitive negative thought loops (worry, rumination, catastrophizing) to open exploration. Moves from threat-focus to learning-focus.",
+      "bridges_from_categories": [
+        "Places We Go When Things Are Uncertain or Too Much (Anxiety → Wonder)",
+        "Places We Go When We Feel Wronged (Anger → Interest in understanding)",
+        "Places We Go When We're Hurting (Sadness → Exploration)",
+        "Places We Go When We Compare (Envy → Fascination)"
+      ],
+      "bridges_to_categories": [
+        "Places We Go When It's Beyond Us (Wonder, Surprise)",
+        "Places We Go When Life Is Good (Interest, Excitement)",
+        "Places We Go To Self-Assess (Introspection)"
+      ],
+      "why_required": "Curiosity activates approach motivation (vs. avoidance in anxiety). Transforms 'threat to avoid' into 'mystery to explore.' Opens cognitive flexibility - necessary for reappraisal. Interrupts amygdala activation with prefrontal engagement. Key bridge from anxious rumination to engaged interest.",
+      "approach_vs_avoidance": "Anxiety = avoidance motivation (threat detection). Curiosity = approach motivation (exploration). This shift is neurologically significant - different brain circuits, different autonomic states.",
+      "typical_expressions": [
+        "I wonder what would happen if...",
+        "That's interesting...",
+        "I'm curious about...",
+        "What if I looked at this differently?",
+        "Tell me more",
+        "How does that work?"
+      ],
+      "recommended_strategies": [
+        "Cognitive Defusion techniques (ACT)",
+        "Beginner's Mind (Mindfulness)",
+        "Values Clarification (exploring)",
+        "Wise Mind (DBT)"
+      ],
+      "note": "Curiosity is incompatible with judgment. You cannot be simultaneously curious and certain. This makes it powerful for softening rigid thinking."
+    },
+    {
+      "emotion_name": "Acceptance",
+      "vac_coordinates": [0.3, -0.2, 0.4],
+      "category": "Places We Go When Things Don't Go As Planned",
+      "description": "Acknowledging reality as it is, without resistance or struggle. Not approval, but recognition of what is.",
+      "gateway_function": "RESISTANCE RELEASER - Enables movement from fighting reality (anger, bargaining) to peace. The shift from 'should be different' to 'is as it is' reduces suffering caused by resistance.",
+      "bridges_from_categories": [
+        "Places We Go When We Feel Wronged (Anger, Resentment)",
+        "Places We Go When Things Don't Go As Planned (Disappointment)",
+        "Places We Go When We're Hurting (Grief's bargaining stage)",
+        "Places We Go When We Fall Short (Guilt)"
+      ],
+      "bridges_to_categories": [
+        "Places We Go When Life Is Good (Peace, Tranquility, Contentment)",
+        "Places We Go When The Heart Is Open (Forgiveness, Letting Go)",
+        "Places We Go When It's Beyond Us (Surrender, Humility)"
+      ],
+      "why_required": "Carl Rogers: 'The curious paradox is that when I accept myself just as I am, then I can change.' Acceptance is not resignation - it's releasing the struggle with reality so energy can go toward response. Radical Acceptance (DBT) teaches: Pain × Resistance = Suffering. Reduce resistance, reduce suffering.",
+      "acceptance_vs_resignation": "Acceptance = 'It is as it is' + 'What can I do from here?' Active. Resignation = 'It is as it is' + 'I give up.' Passive. Acceptance enables effective action; resignation paralyzes.",
+      "typical_expressions": [
+        "It is what it is",
+        "I can't change this, but I can change my response",
+        "This is hard AND I'm going to be okay",
+        "I accept this is real",
+        "I let go of how I thought it should be",
+        "I'm willing to be with this"
+      ],
+      "recommended_strategies": [
+        "Radical Acceptance (DBT)",
+        "Willingness (ACT)",
+        "Serenity Prayer approach",
+        "Grief work (accepting loss)"
+      ],
+      "related_concepts": "Surrender (spiritual), Letting Go, Willingness (ACT), Non-resistance (mindfulness)"
+    },
+    {
+      "emotion_name": "Gratitude",
+      "vac_coordinates": [0.8, 0.3, 0.9],
+      "category": "Places We Go When Life Is Good",
+      "description": "The feeling of appreciation and thankfulness for something or someone. Recognizing the good in your life.",
+      "gateway_function": "POSITIVITY AMPLIFIER - Counteracts foreboding joy, builds connection, increases valence. Gratitude practice one of most robust positive psychology interventions. Transforms what you have into enough.",
+      "bridges_from_categories": [
+        "Places We Go When Life Is Good (Foreboding Joy → Real Joy)",
+        "Places We Go When We're Hurting (Bittersweet gratitude in grief)",
+        "Places We Go When We Compare (Envy → Appreciation)",
+        "Places We Go When Things Don't Go As Planned (Disappointment → Silver Linings)"
+      ],
+      "bridges_to_categories": [
+        "Places We Go When Life Is Good (Joy, Happiness, Contentment)",
+        "Places We Go When The Heart Is Open (Love, Appreciation)",
+        "Places We Go When It's Beyond Us (Awe - gratitude for vastness)"
+      ],
+      "why_required": "Gratitude shifts attention from what's missing to what's present, from complaint to appreciation. Brown: 'Gratitude is the antidote to foreboding joy.' Research shows gratitude practice increases happiness, life satisfaction, relationships quality, physical health. One of most evidence-backed interventions.",
+      "research_base": "Emmons & McCullough, Seligman, Lyubomirsky - extensive RCT evidence. Effect sizes medium to large. Benefits: increased happiness, better sleep, more exercise, reduced depression, stronger relationships, increased resilience.",
+      "typical_expressions": [
+        "I'm grateful for...",
+        "I appreciate...",
+        "Thank you",
+        "I don't take this for granted",
+        "What a gift",
+        "I'm lucky to have..."
+      ],
+      "recommended_strategies": [
+        "Three Good Things (Gratitude Practice)",
+        "Gratitude Expression to Others",
+        "Gratitude Journal",
+        "Silver Linings Journal (with timing caution)"
+      ],
+      "caution": "Toxic positivity alert: Don't use gratitude to bypass genuine pain or force positivity. 'At least' statements can invalidate. Gratitude works best alongside, not instead of, acknowledging difficulty. Bittersweet gratitude (grateful AND sad) is valid and powerful."
+    }
+  ],
+  
+  "usage_in_path_planning": {
+    "detection_rules": {
+      "shame_to_positive_connection": {
+        "if_condition": "start.connection < -0.5 AND goal.connection > 0.5",
+        "then_action": "MUST include Vulnerability as waypoint",
+        "reasoning": "Psychologically impossible to go from shame-level disconnection to positive connection without vulnerability bridge"
+      },
+      "high_arousal_to_compassion": {
+        "if_condition": "start.arousal > 0.7 AND goal requires perspective-taking (compassion, empathy)",
+        "then_action": "First reduce arousal, THEN access compassion",
+        "reasoning": "Elevated sympathetic arousal impairs prefrontal cortex function needed for perspective-taking"
+      },
+      "foreboding_joy_pattern": {
+        "if_condition": "start is positive but guarded, goal is open joy",
+        "then_action": "Route through Gratitude",
+        "reasoning": "Gratitude is antidote to foreboding joy, enables full positive emotion"
+      },
+      "rumination_to_positive": {
+        "if_condition": "start involves rumination (worry, catastrophizing) AND goal is positive",
+        "then_action": "Route through Curiosity or Awe",
+        "reasoning": "Need pattern interrupt - awe/curiosity shifts from threat-focus to exploration"
+      }
+    },
+    
+    "automatic_insertion": {
+      "description": "Path planner should automatically detect when bridge is required and insert it, with explanation to user",
+      "user_message_template": "We're routing your path through {BRIDGE_EMOTION} because {REASON}. This is a psychologically necessary step for this transition.",
+      "example": "We're routing your path through Vulnerability because healing shame requires connection, and connection requires being seen. This is a psychologically necessary step for moving from shame to self-compassion."
+    }
+  },
+  
+  "meta": {
+    "total_bridges": 6,
+    "critical_bridge": "Vulnerability (required for shame work)",
+    "most_versatile": "Awe (can access from almost anywhere)",
+    "connection_builders": ["Vulnerability", "Compassion", "Gratitude"],
+    "perspective_shifters": ["Awe", "Curiosity", "Acceptance"],
+    "evidence_base": "Bridge emotions identified through: Brown's shame/vulnerability research, Keltner's awe research, Neff's compassion research, gratitude meta-analyses, ACT/DBT emotion regulation models, and analysis of the 13-category emotional landscape.",
+    "vac_model_significance": "Bridge emotions occupy strategic positions in VAC space: Vulnerability is the zero-crossing on Connection axis. Awe is high on all axes. Acceptance is low-arousal neutral. Each serves unique geometric function in emotional transitions.",
+    "implementation_priority": "Vulnerability mapping is CRITICAL - without it, shame pathways fail. Awe is HIGHLY VALUABLE - opens many paths. Others are ENHANCING - improve path quality but not strictly required."
+  }
+}

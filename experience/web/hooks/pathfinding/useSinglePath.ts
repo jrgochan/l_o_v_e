@@ -1,0 +1,57 @@
+import { useCallback } from "react";
+import { useAtlasAdminStore } from "@/stores/useAtlasAdminStore";
+import type { EmotionPath, PathComputationResult, AtlasEmotion } from "@/types/atlas-admin";
+import { logger } from "@/utils/logger";
+
+const OBSERVER_API_URL = process.env.NEXT_PUBLIC_OBSERVER_API_URL || "http://localhost:8000";
+
+export function useSinglePath() {
+  const { addComputedPath } = useAtlasAdminStore();
+
+  const computePath = useCallback(
+    async (from: AtlasEmotion, to: AtlasEmotion): Promise<void> => {
+      try {
+        logger.debug("hooks", `Computing path: ${from.name} → ${to.name}`);
+
+        const response = await fetch(`${OBSERVER_API_URL}/observer/transition-path`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            user_id: "00000000-0000-0000-0000-000000000000",
+            current_vac: from.vac,
+            goal_vac: to.vac,
+            max_waypoints: 3,
+          }),
+        });
+
+        if (!response.ok) {
+          throw new Error(`Failed to compute path: ${response.statusText}`);
+        }
+
+        const data: PathComputationResult = await response.json();
+
+        const path: EmotionPath = {
+          id: `${from.id}-${to.id}`,
+          from,
+          to,
+          waypoints: data.waypoints || [],
+          total_distance: data.path_metrics.total_distance,
+          estimated_time: data.path_metrics.total_estimated_time,
+          difficulty: data.path_metrics.overall_difficulty as "easy" | "moderate" | "difficult",
+          requires_bridge: data.path_metrics.requires_bridge,
+          bridge_emotions: data.path_metrics.bridge_emotions,
+        };
+
+        addComputedPath(path);
+      } catch (err) {
+        logger.error("hooks", `Error computing path ${from.name} → ${to.name}`, err);
+        throw err;
+      }
+    },
+    [addComputedPath]
+  );
+
+  return { computePath };
+}

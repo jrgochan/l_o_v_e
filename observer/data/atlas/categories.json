@@ -1,0 +1,297 @@
+{
+  "version": "1.0",
+  "source": "Bren\u00e9 Brown - Atlas of the Heart (2021)",
+  "metadata": {
+    "total_categories": 13,
+    "total_emotions": 87,
+    "created": "2026-01-03"
+  },
+  "categories": [
+    {
+      "id": 1,
+      "name": "Places We Go When Things Are Uncertain or Too Much",
+      "short_name": "Uncertain",
+      "description": "Emotions from overwhelm, stress, anxiety, and uncertainty",
+      "color_hex": "#FF6B6B",
+      "typical_vac_range": {
+        "valence": [
+          -0.7,
+          0.7
+        ],
+        "arousal": [
+          0.2,
+          0.9
+        ],
+        "connection": [
+          -0.5,
+          0.6
+        ]
+      },
+      "emotion_count": 9
+    },
+    {
+      "id": 2,
+      "name": "Places We Go When We Compare",
+      "short_name": "Compare",
+      "description": "Emotions arising from social comparison",
+      "color_hex": "#FFB366",
+      "typical_vac_range": {
+        "valence": [
+          -0.7,
+          0.8
+        ],
+        "arousal": [
+          0.2,
+          0.5
+        ],
+        "connection": [
+          -0.8,
+          0.9
+        ]
+      },
+      "emotion_count": 7
+    },
+    {
+      "id": 3,
+      "name": "Places We Go When Things Don't Go As Planned",
+      "short_name": "Not As Planned",
+      "description": "Disappointment, regret, frustration, discouragement",
+      "color_hex": "#94D2BD",
+      "typical_vac_range": {
+        "valence": [
+          -0.6,
+          -0.2
+        ],
+        "arousal": [
+          -0.8,
+          0.7
+        ],
+        "connection": [
+          -0.5,
+          0.0
+        ]
+      },
+      "emotion_count": 6
+    },
+    {
+      "id": 4,
+      "name": "Places We Go When It's Beyond Us",
+      "short_name": "Beyond Us",
+      "description": "Awe, wonder, confusion, curiosity, surprise",
+      "color_hex": "#A8DADC",
+      "typical_vac_range": {
+        "valence": [
+          -0.2,
+          0.7
+        ],
+        "arousal": [
+          0.3,
+          0.8
+        ],
+        "connection": [
+          -0.2,
+          0.8
+        ]
+      },
+      "emotion_count": 6
+    },
+    {
+      "id": 5,
+      "name": "Places We Go When Things Aren't What They Seem",
+      "short_name": "Not What Seems",
+      "description": "Bittersweetness, nostalgia, cognitive dissonance, irony",
+      "color_hex": "#E0B0FF",
+      "typical_vac_range": {
+        "valence": [
+          -0.4,
+          0.6
+        ],
+        "arousal": [
+          -0.2,
+          0.5
+        ],
+        "connection": [
+          -0.3,
+          0.5
+        ]
+      },
+      "emotion_count": 6
+    },
+    {
+      "id": 6,
+      "name": "Places We Go When We're Hurting",
+      "short_name": "Hurting",
+      "description": "Anguish, despair, sadness, grief, sorrow",
+      "color_hex": "#457B9D",
+      "typical_vac_range": {
+        "valence": [
+          -0.9,
+          -0.5
+        ],
+        "arousal": [
+          -0.6,
+          0.4
+        ],
+        "connection": [
+          -0.7,
+          0.5
+        ]
+      },
+      "emotion_count": 7
+    },
+    {
+      "id": 7,
+      "name": "Places We Go With Others",
+      "short_name": "With Others",
+      "description": "Compassion, empathy, pity, boundaries",
+      "color_hex": "#F1FAEE",
+      "typical_vac_range": {
+        "valence": [
+          -0.3,
+          0.5
+        ],
+        "arousal": [
+          -0.1,
+          0.2
+        ],
+        "connection": [
+          -0.7,
+          0.9
+        ]
+      },
+      "emotion_count": 6
+    },
+    {
+      "id": 8,
+      "name": "Places We Go When We Fall Short",
+      "short_name": "Fall Short",
+      "description": "Shame, guilt, embarrassment, humiliation, perfectionism",
+      "color_hex": "#6C757D",
+      "typical_vac_range": {
+        "valence": [
+          -0.9,
+          0.6
+        ],
+        "arousal": [
+          -0.2,
+          0.5
+        ],
+        "connection": [
+          -1.0,
+          0.9
+        ]
+      },
+      "emotion_count": 6
+    },
+    {
+      "id": 9,
+      "name": "Places We Go When We Search for Connection",
+      "short_name": "Search Connection",
+      "description": "Belonging, loneliness, disconnection, insecurity",
+      "color_hex": "#B8C0FF",
+      "typical_vac_range": {
+        "valence": [
+          -0.7,
+          0.8
+        ],
+        "arousal": [
+          -0.3,
+          0.4
+        ],
+        "connection": [
+          -0.9,
+          1.0
+        ]
+      },
+      "emotion_count": 6
+    },
+    {
+      "id": 10,
+      "name": "Places We Go When The Heart Is Open",
+      "short_name": "Heart Open",
+      "description": "Love, heartbreak, trust, betrayal, tenderness",
+      "color_hex": "#FFD6FF",
+      "typical_vac_range": {
+        "valence": [
+          -0.8,
+          0.9
+        ],
+        "arousal": [
+          -0.4,
+          0.9
+        ],
+        "connection": [
+          -0.9,
+          1.0
+        ]
+      },
+      "emotion_count": 11
+    },
+    {
+      "id": 11,
+      "name": "Places We Go When Life Is Good",
+      "short_name": "Life Is Good",
+      "description": "Joy, happiness, calm, contentment, gratitude",
+      "color_hex": "#FFE66D",
+      "typical_vac_range": {
+        "valence": [
+          0.5,
+          0.9
+        ],
+        "arousal": [
+          -0.8,
+          0.7
+        ],
+        "connection": [
+          -0.2,
+          0.9
+        ]
+      },
+      "emotion_count": 8
+    },
+    {
+      "id": 12,
+      "name": "Places We Go When We Feel Wronged",
+      "short_name": "Feel Wronged",
+      "description": "Anger, contempt, disgust, hate, dehumanization",
+      "color_hex": "#EF476F",
+      "typical_vac_range": {
+        "valence": [
+          -0.9,
+          0.3
+        ],
+        "arousal": [
+          0.3,
+          0.8
+        ],
+        "connection": [
+          -1.0,
+          -0.2
+        ]
+      },
+      "emotion_count": 6
+    },
+    {
+      "id": 13,
+      "name": "Places We Go To Self-Assess",
+      "short_name": "Self-Assess",
+      "description": "Pride, hubris, humility",
+      "color_hex": "#06FFA5",
+      "typical_vac_range": {
+        "valence": [
+          0.6,
+          0.7
+        ],
+        "arousal": [
+          -0.2,
+          0.6
+        ],
+        "connection": [
+          -0.8,
+          0.8
+        ]
+      },
+      "emotion_count": 3
+    }
+  ]
+}

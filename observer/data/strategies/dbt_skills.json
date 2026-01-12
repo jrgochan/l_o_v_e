@@ -1,0 +1,320 @@
+{
+  "category": "DBT Skills (Dialectical Behavior Therapy)",
+  "source": "Linehan, M.M. (2015). DBT Skills Training Manual. 2nd Edition.",
+  "description": "Evidence-based skills from Dialectical Behavior Therapy, designed for emotion regulation, distress tolerance, interpersonal effectiveness, and mindfulness.",
+  "strategies": [
+    {
+      "name": "DEAR MAN (Interpersonal Effectiveness)",
+      "type": "situation_modification",
+      "description": "DBT skill for asking for what you want or saying no effectively while maintaining relationships and self-respect.",
+      "steps": [
+        "D - DESCRIBE the situation objectively, stick to facts",
+        "E - EXPRESS your feelings and opinions about the situation",
+        "A - ASSERT yourself by asking clearly for what you want or saying no",
+        "R - REINFORCE by explaining positive effects of getting what you want",
+        "M - stay MINDFUL by focusing on your goal, ignore attacks",
+        "A - APPEAR confident through posture, tone, eye contact",
+        "N - NEGOTIATE by being willing to give to get, offer alternatives"
+      ],
+      "time_required": "10-20 minutes to prepare, varies for conversation",
+      "difficulty": 3,
+      "evidence": "rct",
+      "citations": [
+        {
+          "author": "Linehan, M.M.",
+          "year": 2015,
+          "title": "DBT Skills Training Manual",
+          "note": "Interpersonal Effectiveness Module"
+        }
+      ],
+      "contraindications": "Not appropriate during crisis; practice first in lower-stakes situations",
+      "best_for_vac_changes": {
+        "valence": "slight_increase",
+        "arousal": "maintain",
+        "connection": "increase"
+      }
+    },
+    {
+      "name": "GIVE (Relationship Maintenance)",
+      "type": "situation_modification",
+      "description": "DBT skill for maintaining positive relationships while handling difficult interactions.",
+      "steps": [
+        "G - be GENTLE: no attacks, threats, or judgments; be courteous and temperate",
+        "I - act INTERESTED: listen and be interested in the other person",
+        "V - VALIDATE: acknowledge the other person's feelings and difficulties",
+        "E - use an EASY manner: smile, use humor, be light-hearted when appropriate"
+      ],
+      "time_required": "Ongoing during conversation",
+      "difficulty": 3,
+      "evidence": "rct",
+      "citations": [
+        {
+          "author": "Linehan, M.M.",
+          "year": 2015,
+          "title": "DBT Skills Training Manual"
+        }
+      ],
+      "contraindications": "Not for abusive situations; maintain safety first",
+      "best_for_vac_changes": {
+        "valence": "increase",
+        "arousal": "decrease",
+        "connection": "major_increase"
+      }
+    },
+    {
+      "name": "FAST (Self-Respect Effectiveness)",
+      "type": "cognitive_reappraisal",
+      "description": "DBT skill for maintaining self-respect in interpersonal situations.",
+      "steps": [
+        "F - be FAIR to yourself and to the other person",
+        "A - no APOLOGIES for being alive, having an opinion, or making a request",
+        "S - STICK to your values; don't compromise values for mood or approval",
+        "T - be TRUTHFUL; don't lie, exaggerate, or act helpless when you're not"
+      ],
+      "time_required": "Ongoing during interactions",
+      "difficulty": 3,
+      "evidence": "rct",
+      "citations": [
+        {
+          "author": "Linehan, M.M.",
+          "year": 2015,
+          "title": "DBT Skills Training Manual"
+        }
+      ],
+      "contraindications": null,
+      "best_for_vac_changes": {
+        "valence": "increase",
+        "arousal": "slight_increase",
+        "connection": "increase"
+      }
+    },
+    {
+      "name": "STOP Skill (Crisis Intervention)",
+      "type": "response_modulation",
+      "description": "Immediate skill to prevent impulsive action when emotionally overwhelmed.",
+      "steps": [
+        "S - STOP: Freeze! Don't move a muscle. Stay in control",
+        "T - Take a step back: Take a breath. Don't let feelings make you act impulsively",
+        "O - OBSERVE: Notice what is going on inside and outside you",
+        "P - PROCEED mindfully: Act with awareness. Consider what will make the situation better or worse"
+      ],
+      "time_required": "1-5 minutes",
+      "difficulty": 2,
+      "evidence": "rct",
+      "citations": [
+        {
+          "author": "Linehan, M.M.",
+          "year": 2015,
+          "title": "DBT Skills Training Manual",
+          "note": "Distress Tolerance Module"
+        }
+      ],
+      "contraindications": null,
+      "best_for_vac_changes": {
+        "valence": "maintain",
+        "arousal": "major_decrease",
+        "connection": "maintain"
+      }
+    },
+    {
+      "name": "Opposite Action",
+      "type": "response_modulation",
+      "description": "Do the opposite of your emotion's action urge when the emotion doesn't fit the facts or acting on it would be harmful.",
+      "steps": [
+        "Identify the emotion and its action urge",
+        "Check if emotion fits the facts of the situation",
+        "Check if acting on the urge would be effective",
+        "If emotion doesn't fit facts or action won't help: Do the OPPOSITE",
+        "For fear: Approach what you're afraid of (when safe)",
+        "For anger: Gently avoid, be kind, empathize",
+        "For shame: Share with safe others, approach don't hide",
+        "For sadness: Get active, engage (opposite of withdrawal)",
+        "Do opposite action ALL THE WAY - with body language, facial expression, voice"
+      ],
+      "time_required": "15-60 minutes",
+      "difficulty": 4,
+      "evidence": "rct",
+      "citations": [
+        {
+          "author": "Linehan, M.M.",
+          "year": 2015,
+          "title": "DBT Skills Training Manual",
+          "note": "Emotion Regulation Module"
+        }
+      ],
+      "contraindications": "Don't use when emotion DOES fit the facts (e.g., real danger); requires skill to assess situation accurately",
+      "best_for_vac_changes": {
+        "valence": "increase",
+        "arousal": "variable",
+        "connection": "increase"
+      }
+    },
+    {
+      "name": "Check the Facts",
+      "type": "cognitive_reappraisal",
+      "description": "Reduce emotional intensity by checking whether your interpretations and assumptions fit the actual facts.",
+      "steps": [
+        "Ask: What is the emotion I want to change?",
+        "Ask: What is the prompting event for my emotion?",
+        "Ask: What are my interpretations, thoughts, and assumptions about the event?",
+        "Ask: Am I assuming a threat? What is the catastrophe?",
+        "Ask: Does my emotion and its intensity fit the actual facts?",
+        "List FACTS that support emotion",
+        "List FACTS that don't support emotion",
+        "Consider alternative interpretations",
+        "Practice looking at all sides of the situation",
+        "If emotion doesn't fit facts, use Opposite Action"
+      ],
+      "time_required": "15-30 minutes",
+      "difficulty": 3,
+      "evidence": "rct",
+      "citations": [
+        {
+          "author": "Linehan, M.M.",
+          "year": 2015,
+          "title": "DBT Skills Training Manual"
+        }
+      ],
+      "contraindications": null,
+      "best_for_vac_changes": {
+        "valence": "increase",
+        "arousal": "decrease",
+        "connection": "variable"
+      }
+    },
+    {
+      "name": "IMPROVE the Moment",
+      "type": "attentional_deployment",
+      "description": "Seven ways to improve a distressing moment using distraction and self-soothing.",
+      "steps": [
+        "I - IMAGERY: Imagine relaxing scenes, a safe place, or things going well",
+        "M - MEANING: Find or create meaning in the suffering (Viktor Frankl approach)",
+        "P - PRAYER: Open your heart to a greater wisdom (or universe, higher power)",
+        "R - RELAXATION: Relax muscles, breathe deeply, use half-smile",
+        "O - ONE thing in the moment: Focus attention on just what you're doing now",
+        "V - VACATION: Take a break from it all for a brief time",
+        "E - ENCOURAGEMENT: Cheer-lead yourself - 'I can stand this', 'It will pass'"
+      ],
+      "time_required": "5-20 minutes",
+      "difficulty": 2,
+      "evidence": "rct",
+      "citations": [
+        {
+          "author": "Linehan, M.M.",
+          "year": 2015,
+          "title": "DBT Skills Training Manual",
+          "note": "Distress Tolerance Module"
+        }
+      ],
+      "contraindications": null,
+      "best_for_vac_changes": {
+        "valence": "increase",
+        "arousal": "decrease",
+        "connection": "variable"
+      }
+    },
+    {
+      "name": "Self-Soothe with Five Senses",
+      "type": "response_modulation",
+      "description": "Comfort and nurture yourself through your five senses during distress.",
+      "steps": [
+        "VISION: Look at beautiful things - nature, art, candle flame, sunset",
+        "HEARING: Listen to soothing music, sounds of nature, singing birds",
+        "SMELL: Use pleasant scents - perfume, flowers, coffee, fresh air",
+        "TASTE: Enjoy flavors mindfully - tea, chocolate, a favorite food",
+        "TOUCH: Feel comforting textures - soft blanket, warm bath, pet's fur, massage",
+        "Be intentional and mindful with each sense",
+        "Notice what works best for you"
+      ],
+      "time_required": "10-30 minutes",
+      "difficulty": 1,
+      "evidence": "clinical",
+      "citations": [
+        {
+          "author": "Linehan, M.M.",
+          "year": 2015,
+          "title": "DBT Skills Training Manual"
+        }
+      ],
+      "contraindications": "Avoid if it leads to harmful behaviors (e.g., overeating, substance use)",
+      "best_for_vac_changes": {
+        "valence": "increase",
+        "arousal": "decrease",
+        "connection": "maintain"
+      }
+    },
+    {
+      "name": "Wise Mind",
+      "type": "attentional_deployment",
+      "description": "Access the integration of emotional mind and reasonable mind - your inner wisdom.",
+      "steps": [
+        "Find a quiet place and get comfortable",
+        "Close your eyes and focus on your breath",
+        "Ask: What does my Emotion Mind say? (feelings, urges)",
+        "Ask: What does my Reasonable Mind say? (logic, facts)",
+        "Breathe and drop into your center",
+        "Ask your Wise Mind: 'What is the wise thing to do here?'",
+        "Listen without forcing an answer",
+        "Trust the knowing that arises from your core",
+        "Notice: Wise Mind feels right in the gut, has a quality of 'just knowing'",
+        "Take action from this place of integrated wisdom"
+      ],
+      "time_required": "10-20 minutes",
+      "difficulty": 3,
+      "evidence": "rct",
+      "citations": [
+        {
+          "author": "Linehan, M.M.",
+          "year": 2015,
+          "title": "DBT Skills Training Manual",
+          "note": "Core Mindfulness Module"
+        }
+      ],
+      "contraindications": "May be difficult initially; becomes easier with practice",
+      "best_for_vac_changes": {
+        "valence": "slight_increase",
+        "arousal": "decrease",
+        "connection": "increase"
+      }
+    },
+    {
+      "name": "Accumulate Positive Emotions (Short-term)",
+      "type": "situation_selection",
+      "description": "Build positive experiences in the moment to reduce vulnerability to negative emotions.",
+      "steps": [
+        "Make a list of pleasant activities that are possible now",
+        "Examples: listen to music, take a walk, call a friend, watch comedy, read, cook",
+        "Choose one activity you can do right now",
+        "Do the activity MINDFULLY - be fully present",
+        "Let go of multitasking",
+        "Focus on positive sensations and emotions as they arise",
+        "Repeat daily to build emotional resilience",
+        "Notice what activities work best for your mood"
+      ],
+      "time_required": "15-60 minutes",
+      "difficulty": 2,
+      "evidence": "rct",
+      "citations": [
+        {
+          "author": "Linehan, M.M.",
+          "year": 2015,
+          "title": "DBT Skills Training Manual",
+          "note": "Emotion Regulation Module"
+        }
+      ],
+      "contraindications": null,
+      "best_for_vac_changes": {
+        "valence": "increase",
+        "arousal": "variable",
+        "connection": "increase"
+      }
+    }
+  ],
+  "meta": {
+    "version": "1.0",
+    "created": "2025-12-04",
+    "evidence_base": "All strategies are from evidence-based DBT protocol, supported by multiple RCTs showing effectiveness for emotion regulation, interpersonal effectiveness, and distress tolerance.",
+    "target_populations": "Originally developed for Borderline Personality Disorder, now widely used for depression, anxiety, PTSD, eating disorders, and general emotion dysregulation.",
+    "training_note": "While these strategies can be used independently, formal DBT training provides optimal skill development and includes individual therapy, group skills training, phone coaching, and therapist consultation team."
+  }
+}

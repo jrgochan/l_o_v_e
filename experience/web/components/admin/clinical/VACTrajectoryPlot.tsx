@@ -1,0 +1,387 @@
+/**
+ * VAC Trajectory Plot Component
+ *
+ * Shows the historical movement of emotional states through VAC space
+ * Helps clinicians identify patterns and trends
+ * Enhanced with hover tooltips, directional arrows, and pattern detection
+ */
+
+"use client";
+
+import { useState } from "react";
+import type { VACHistoryPoint } from "@/types/chat";
+
+interface VACTrajectoryPlotProps {
+  vacHistory: VACHistoryPoint[];
+}
+
+export function VACTrajectoryPlot({ vacHistory }: VACTrajectoryPlotProps) {
+  const [hoveredPoint, setHoveredPoint] = useState<number | null>(null);
+
+  if (vacHistory.length < 2) return null;
+
+  // Normalize VAC values from [-1, 1] to [0, 100] for positioning
+  const normalizeToPercent = (value: number) => ((value + 1) / 2) * 100;
+
+  // Get points for the path
+  const points = vacHistory.map((point) => ({
+    x: normalizeToPercent(point.vac.valence),
+    y: 100 - normalizeToPercent(point.vac.arousal), // Invert Y
+    emotion: point.emotion,
+    confidence: point.confidence,
+    timestamp: point.timestamp,
+    connection: point.vac.connection,
+  }));
+
+  // Create SVG path string
+  const pathString = points
+    .map((point, index) => `${index === 0 ? "M" : "L"} ${point.x} ${point.y}`)
+    .join(" ");
+
+  // Get current (latest) point
+  const currentPoint = points[points.length - 1];
+  const startPoint = points[0];
+
+  // Calculate movement vectors for arrows
+  const getArrowPoints = () => {
+    const arrows = [];
+    for (let i = 0; i < points.length - 1; i++) {
+      const from = points[i];
+      const to = points[i + 1];
+      const midX = (from.x + to.x) / 2;
+      const midY = (from.y + to.y) / 2;
+
+      // Calculate angle for arrow rotation
+      const dx = to.x - from.x;
+      const dy = to.y - from.y;
+      const angle = Math.atan2(dy, dx) * (180 / Math.PI);
+
+      arrows.push({ x: midX, y: midY, angle });
+    }
+    return arrows;
+  };
+
+  const arrows = getArrowPoints();
+
+  // Detect clinical patterns
+  const detectPatterns = () => {
+    const patterns = [];
+
+    // Check for rapid movements (emotional instability)
+    let rapidMovements = 0;
+    for (let i = 0; i < vacHistory.length - 1; i++) {
+      const dist = Math.sqrt(
+        Math.pow(vacHistory[i + 1].vac.valence - vacHistory[i].vac.valence, 2) +
+          Math.pow(vacHistory[i + 1].vac.arousal - vacHistory[i].vac.arousal, 2)
+      );
+      if (dist > 0.5) rapidMovements++;
+    }
+
+    if (rapidMovements >= Math.floor(vacHistory.length / 2)) {
+      patterns.push({
+        type: "rapid_shifts",
+        icon: "⚡",
+        color: "text-orange-400",
+        message: "Rapid emotional shifts detected",
+      });
+    }
+
+    // Check for negative quadrant clustering
+    const negativeCount = vacHistory.filter((p) => p.vac.valence < -0.2).length;
+    if (negativeCount >= Math.ceil(vacHistory.length * 0.7)) {
+      patterns.push({
+        type: "negative_bias",
+        icon: "🔵",
+        color: "text-blue-400",
+        message: "Persistent negative emotional state",
+      });
+    }
+
+    // Check for overall positive trend
+    const valenceChange = vacHistory[vacHistory.length - 1].vac.valence - vacHistory[0].vac.valence;
+    if (valenceChange > 0.3 && vacHistory.length >= 3) {
+      patterns.push({
+        type: "positive_trend",
+        icon: "📈",
+        color: "text-green-400",
+        message: "Positive emotional progression",
+      });
+    }
+
+    // Check for arousal escalation
+    const arousalChange = vacHistory[vacHistory.length - 1].vac.arousal - vacHistory[0].vac.arousal;
+    if (arousalChange > 0.4) {
+      patterns.push({
+        type: "escalation",
+        icon: "⚠️",
+        color: "text-yellow-400",
+        message: "Arousal escalation detected",
+      });
+    }
+
+    return patterns;
+  };
+
+  const patterns = detectPatterns();
+
+  return (
+    <div className="bg-gray-700/50 rounded-lg p-4 border border-purple-500/30">
+      <div className="text-sm text-purple-300 mb-2 font-semibold flex items-center justify-between">
+        <span>📈 Emotional Journey</span>
+        <span className="text-xs text-gray-400">{vacHistory.length} points</span>
+      </div>
+
+      {/* Trajectory Plot */}
+      <div className="relative w-full aspect-square bg-gray-800 rounded border border-gray-600">
+        {/* Quadrant backgrounds */}
+        <div className="absolute inset-0 grid grid-cols-2 grid-rows-2">
+          <div className="border-r border-b border-gray-600 bg-purple-500/5"></div>
+          <div className="border-b border-gray-600 bg-green-500/5"></div>
+          <div className="border-r border-gray-600 bg-blue-500/5"></div>
+          <div className="bg-red-500/5"></div>
+        </div>
+
+        {/* Axis labels */}
+        <div className="absolute inset-0 pointer-events-none">
+          <div className="absolute top-1 left-1/2 -translate-x-1/2 text-xs text-gray-500 font-semibold">
+            High Energy (A+)
+          </div>
+          <div className="absolute bottom-1 left-1/2 -translate-x-1/2 text-xs text-gray-500 font-semibold">
+            Low Energy (A-)
+          </div>
+          <div className="absolute left-1 top-1/2 -translate-y-1/2 text-xs text-gray-500 font-semibold writing-mode-vertical">
+            Negative (V-)
+          </div>
+          <div className="absolute right-1 top-1/2 -translate-y-1/2 text-xs text-gray-500 font-semibold writing-mode-vertical">
+            Positive (V+)
+          </div>
+        </div>
+
+        {/* Quadrant labels */}
+        <div className="absolute inset-0 pointer-events-none">
+          {/* Top-left: Quadrant I - Calm/Content */}
+          <div className="absolute top-2 left-2 text-xs text-purple-400/60 font-semibold">
+            I: Calm
+          </div>
+
+          {/* Top-right: Quadrant IV - Excited/Joyful */}
+          <div className="absolute top-2 right-2 text-xs text-green-400/60 font-semibold">
+            IV: Joyful
+          </div>
+
+          {/* Bottom-left: Quadrant II - Sad/Depressed */}
+          <div className="absolute bottom-2 left-2 text-xs text-blue-400/60 font-semibold">
+            II: Sad
+          </div>
+
+          {/* Bottom-right: Quadrant III - Anxious/Angry */}
+          <div className="absolute bottom-2 right-2 text-xs text-red-400/60 font-semibold">
+            III: Distressed
+          </div>
+        </div>
+
+        {/* Center crosshair */}
+        <div className="absolute top-1/2 left-0 right-0 h-px bg-gray-600"></div>
+        <div className="absolute left-1/2 top-0 bottom-0 w-px bg-gray-600"></div>
+
+        {/* SVG for path */}
+        <svg
+          className="absolute inset-0 w-full h-full"
+          viewBox="0 0 100 100"
+          preserveAspectRatio="none"
+        >
+          {/* Gradient definition */}
+          <defs>
+            <linearGradient id="vac-trajectory-gradient" x1="0%" y1="0%" x2="100%" y2="0%">
+              <stop offset="0%" stopColor="#8B5CF6" stopOpacity="0.4" />
+              <stop offset="100%" stopColor="#8B5CF6" stopOpacity="1" />
+            </linearGradient>
+
+            {/* Arrow marker */}
+            <marker id="arrowhead" markerWidth="6" markerHeight="6" refX="3" refY="3" orient="auto">
+              <polygon points="0 0, 6 3, 0 6" fill="#A78BFA" opacity="0.7" />
+            </marker>
+          </defs>
+
+          {/* Trail path */}
+          <path
+            d={pathString}
+            fill="none"
+            stroke="url(#vac-trajectory-gradient)"
+            strokeWidth="0.8"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            opacity="0.6"
+          />
+
+          {/* Directional arrows */}
+          {arrows.map((arrow, index) => (
+            <g key={`arrow-${index}`} transform={`translate(${arrow.x}, ${arrow.y})`}>
+              <line
+                x1="0"
+                y1="0"
+                x2="3"
+                y2="0"
+                stroke="#A78BFA"
+                strokeWidth="0.5"
+                markerEnd="url(#arrowhead)"
+                transform={`rotate(${arrow.angle})`}
+                opacity="0.5"
+              />
+            </g>
+          ))}
+
+          {/* Start point */}
+          <circle
+            cx={startPoint.x}
+            cy={startPoint.y}
+            r="1.2"
+            fill="#6B7280"
+            stroke="#9CA3AF"
+            strokeWidth="0.3"
+          />
+
+          {/* Historical points with hover */}
+          {points.slice(1, -1).map((point, index) => {
+            const actualIndex = index + 1; // Account for slicing
+            const connectionSize = 0.8 + Math.abs(point.connection) * 0.8; // 0.8-1.6 range
+
+            return (
+              <g key={index}>
+                <circle
+                  cx={point.x}
+                  cy={point.y}
+                  r={connectionSize}
+                  fill="#8B5CF6"
+                  opacity={hoveredPoint === actualIndex ? "1" : "0.5"}
+                  style={{ cursor: "pointer", transition: "all 0.2s" }}
+                  onMouseEnter={() => setHoveredPoint(actualIndex)}
+                  onMouseLeave={() => setHoveredPoint(null)}
+                />
+              </g>
+            );
+          })}
+        </svg>
+
+        {/* Hover tooltips for historical points */}
+        {hoveredPoint !== null && points[hoveredPoint] && (
+          <div
+            className="absolute z-10 bg-gray-900 border border-purple-500 rounded px-2 py-1.5 text-xs text-white shadow-lg pointer-events-none"
+            style={{
+              left: `${points[hoveredPoint].x}%`,
+              top: `${points[hoveredPoint].y}%`,
+              transform: "translate(-50%, -120%)",
+            }}
+          >
+            <div className="font-semibold">{points[hoveredPoint].emotion}</div>
+            <div className="text-gray-400 text-xs mt-0.5">
+              {points[hoveredPoint].timestamp.toLocaleTimeString()}
+            </div>
+            <div className="text-gray-400 text-xs">
+              V: {vacHistory[hoveredPoint].vac.valence.toFixed(2)}, A:{" "}
+              {vacHistory[hoveredPoint].vac.arousal.toFixed(2)}
+            </div>
+            <div className="text-cyan-300 text-xs">
+              C: {vacHistory[hoveredPoint].vac.connection.toFixed(2)}
+            </div>
+          </div>
+        )}
+
+        {/* Start point tooltip (outside SVG) */}
+        <div
+          className="absolute w-3 h-3 -ml-1.5 -mt-1.5 rounded-full cursor-pointer"
+          style={{
+            left: `${startPoint.x}%`,
+            top: `${startPoint.y}%`,
+          }}
+          onMouseEnter={() => setHoveredPoint(0)}
+          onMouseLeave={() => setHoveredPoint(null)}
+        />
+
+        {/* Current point (outside SVG for better control) */}
+        <div
+          className="absolute w-4 h-4 -ml-2 -mt-2 rounded-full bg-purple-500 border-2 border-white shadow-lg shadow-purple-500/50 animate-pulse cursor-pointer"
+          style={{
+            left: `${currentPoint.x}%`,
+            top: `${currentPoint.y}%`,
+          }}
+          onMouseEnter={() => setHoveredPoint(points.length - 1)}
+          onMouseLeave={() => setHoveredPoint(null)}
+        />
+      </div>
+
+      {/* Legend */}
+      <div className="mt-3 flex items-center justify-between text-xs">
+        <div className="flex items-center gap-3">
+          <div className="flex items-center gap-1.5">
+            <div className="w-2 h-2 rounded-full bg-gray-500"></div>
+            <span className="text-gray-400">Start</span>
+          </div>
+          <div className="flex items-center gap-1.5">
+            <div className="w-2 h-2 rounded-full bg-purple-500"></div>
+            <span className="text-gray-400">Path</span>
+          </div>
+          <div className="flex items-center gap-1.5">
+            <div className="w-3 h-3 rounded-full bg-purple-500 border border-white animate-pulse"></div>
+            <span className="text-gray-400">Current</span>
+          </div>
+        </div>
+        <div className="text-gray-400">{currentPoint.emotion}</div>
+      </div>
+
+      {/* Pattern Detection */}
+      {patterns.length > 0 && (
+        <div className="mt-3 p-2 bg-gray-800/50 rounded border border-gray-600">
+          <div className="text-xs text-gray-400 mb-1.5 font-semibold">Clinical Patterns</div>
+          <div className="space-y-1">
+            {patterns.map((pattern, index) => (
+              <div key={index} className="flex items-center gap-2">
+                <span>{pattern.icon}</span>
+                <span className={`text-xs ${pattern.color}`}>{pattern.message}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Summary stats */}
+      <div className="mt-3 pt-3 border-t border-gray-600 grid grid-cols-2 gap-2 text-xs">
+        <div>
+          <span className="text-gray-400">Valence Change:</span>
+          <span
+            className={`ml-2 font-mono ${
+              vacHistory[vacHistory.length - 1].vac.valence > vacHistory[0].vac.valence
+                ? "text-green-400"
+                : "text-red-400"
+            }`}
+          >
+            {vacHistory[vacHistory.length - 1].vac.valence - vacHistory[0].vac.valence > 0
+              ? "+"
+              : ""}
+            {(vacHistory[vacHistory.length - 1].vac.valence - vacHistory[0].vac.valence).toFixed(2)}
+          </span>
+        </div>
+        <div>
+          <span className="text-gray-400">Arousal Change:</span>
+          <span
+            className={`ml-2 font-mono ${
+              vacHistory[vacHistory.length - 1].vac.arousal > vacHistory[0].vac.arousal
+                ? "text-orange-400"
+                : "text-blue-400"
+            }`}
+          >
+            {vacHistory[vacHistory.length - 1].vac.arousal - vacHistory[0].vac.arousal > 0
+              ? "+"
+              : ""}
+            {(vacHistory[vacHistory.length - 1].vac.arousal - vacHistory[0].vac.arousal).toFixed(2)}
+          </span>
+        </div>
+      </div>
+
+      {/* Hover instructions */}
+      <div className="mt-2 text-xs text-gray-500 text-center italic">
+        Hover over points to see emotion details • Larger points = stronger connection
+      </div>
+    </div>
+  );
+}

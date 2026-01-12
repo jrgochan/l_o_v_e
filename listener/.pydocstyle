@@ -1,0 +1,6 @@
+[pydocstyle]
+convention = google
+# Suppress Google style quirks and overly strict rules
+add_ignore = D100,D104,D106,D107,D200,D202,D205,D212,D214,D301,D403,D410,D411,D415
+match = (?!test_).*\.py
+match_dir = ^(?!tests|migrations|\.venv|venv).*

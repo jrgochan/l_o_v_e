@@ -1,0 +1,19 @@
+# Build artifacts
+.next
+dist
+build
+web-build
+out
+
+# Dependencies
+node_modules
+
+# Expo
+.expo
+
+# Coverage
+coverage
+
+# Generated
+next-env.d.ts
+*.d.ts

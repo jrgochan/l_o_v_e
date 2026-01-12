@@ -1,0 +1,238 @@
+{
+  "description": "Demo User Personas - Five realistic user profiles for testing, development, and demonstrations. Each persona represents different usage patterns and history to test various system features.",
+  "version": "1.0",
+  "created": "2025-12-05",
+  "purpose": "Development testing, UX validation, demo presentations, system feature testing",
+  
+  "personas": [
+    {
+      "user_id": "demo-alex-new-user",
+      "name": "Alex",
+      "persona_type": "New User",
+      "description": "Just started using the system. No journey history. Tests cold-start recommendations and onboarding experience.",
+      "demographics": {
+        "age_range": "25-35",
+        "context": "Young professional, new to emotional work, tech-savvy"
+      },
+      "emotional_profile": {
+        "primary_challenges": ["Anxiety", "Overwhelm", "Work stress"],
+        "starting_state": "High anxiety, moderate stress",
+        "goals": ["Learn to manage anxiety", "Better work-life balance"]
+      },
+      "journey_history": {
+        "total_journeys": 0,
+        "completed": 0,
+        "abandoned": 0,
+        "in_progress": 0
+      },
+      "strategy_history": {
+        "strategies_tried": 0,
+        "favorites": []
+      },
+      "test_cases": [
+        "Cold-start recommendations (no history)",
+        "First-time user onboarding",
+        "Bootstrap data effectiveness",
+        "Initial pattern matching"
+      ]
+    },
+    {
+      "user_id": "demo-jordan-active-user",
+      "name": "Jordan",
+      "persona_type": "Active User",
+      "description": "Regular user with moderate experience. Has completed several journeys with mixed results. Tests personalized recommendations and learning from history.",
+      "demographics": {
+        "age_range": "30-40",
+        "context": "Parent, balancing family and career, interested in personal growth"
+      },
+      "emotional_profile": {
+        "primary_challenges": ["Stress", "Guilt", "Perfectionism"],
+        "starting_state": "Fluctuating between overwhelm and contentment",
+        "goals": ["Reduce perfectionism", "Improve emotional regulation", "Be more present with family"]
+      },
+      "journey_history": {
+        "total_journeys": 3,
+        "completed": 2,
+        "abandoned": 1,
+        "in_progress": 0,
+        "completion_rate": 0.67
+      },
+      "strategy_preferences": {
+        "highly_effective": ["4-7-8 Breathing", "Task Chunking", "Self-Compassion Break"],
+        "tried_but_difficult": ["Progressive Muscle Relaxation", "Loving-Kindness Meditation"],
+        "not_tried_yet": ["TRE", "Expressive Dance", "Poetry"]
+      },
+      "test_cases": [
+        "Personalized recommendations based on success history",
+        "Strategy effectiveness tracking",
+        "Pattern recognition from past journeys",
+        "Moderate user engagement"
+      ]
+    },
+    {
+      "user_id": "demo-morgan-veteran-user",
+      "name": "Morgan",
+      "persona_type": "Veteran User",
+      "description": "Experienced user with extensive journey history and high success rate. Tests advanced features, pattern refinement, and expert-level guidance.",
+      "demographics": {
+        "age_range": "40-55",
+        "context": "Has done significant personal work, possibly therapy, committed to growth"
+      },
+      "emotional_profile": {
+        "primary_challenges": ["Grief integration", "Life transitions", "Deepening practice"],
+        "starting_state": "Generally well-regulated, working on deeper layers",
+        "goals": ["Integrate past loss", "Sustain well-being", "Help others"]
+      },
+      "journey_history": {
+        "total_journeys": 12,
+        "completed": 9,
+        "abandoned": 2,
+        "paused": 1,
+        "in_progress": 0,
+        "completion_rate": 0.75
+      },
+      "strategy_expertise": {
+        "mastered": [
+          "Mindfulness Meditation (Basic)",
+          "Self-Compassion Break (Kristin Neff)",
+          "Radical Acceptance (DBT)",
+          "Values Clarification Exercise",
+          "Body Scan Meditation"
+        ],
+        "practicing": [
+          "Loving-Kindness Meditation (Metta)",
+          "Wise Mind",
+          "Post-Traumatic Growth Inventory"
+        ],
+        "average_helpfulness_rating": 4.2
+      },
+      "test_cases": [
+        "Advanced recommendation algorithms",
+        "Long-term pattern analysis",
+        "Expert-level strategy suggestions",
+        "Success story patterns",
+        "High engagement user experience"
+      ]
+    },
+    {
+      "user_id": "demo-casey-struggling-user",
+      "name": "Casey",
+      "persona_type": "Struggling User",
+      "description": "User who starts journeys but has difficulty completing them. Tests support escalation, difficulty calibration, and intervention points.",
+      "demographics": {
+        "age_range": "20-30",
+        "context": "Dealing with significant challenges, may have clinical depression or anxiety, limited support"
+      },
+      "emotional_profile": {
+        "primary_challenges": ["Depression", "Shame", "Loneliness", "Hopelessness"],
+        "starting_state": "Frequently in negative emotional states, difficulty with motivation",
+        "goals": ["Feel less alone", "Reduce shame", "Find hope"]
+      },
+      "journey_history": {
+        "total_journeys": 5,
+        "completed": 0,
+        "abandoned": 3,
+        "paused": 1,
+        "in_progress": 1,
+        "completion_rate": 0.0,
+        "abandonment_reasons": [
+          "Too difficult",
+          "Lost motivation",
+          "Triggered and stopped"
+        ]
+      },
+      "strategy_challenges": {
+        "strategies_tried": 15,
+        "average_helpfulness_rating": 2.8,
+        "frequently_abandoned": [
+          "Intense Physical Exercise (too much energy required)",
+          "Join or Attend Community Activity (too scary)",
+          "Legacy Work: Writing Your Own Eulogy (too heavy)"
+        ],
+        "occasionally_helpful": [
+          "Music for Mood Regulation",
+          "Self-Soothe with Five Senses",
+          "Thank Your Mind"
+        ]
+      },
+      "test_cases": [
+        "Support escalation logic",
+        "Difficulty adjustment",
+        "Professional help recommendations",
+        "Low-barrier strategy suggestions",
+        "Re-engagement after abandonment"
+      ]
+    },
+    {
+      "user_id": "demo-riley-diverse-user",
+      "name": "Riley",
+      "persona_type": "Diverse Paths User",
+      "description": "User who has completed journeys across wide emotional range. Tests system flexibility, pattern variety, and comprehensive coverage.",
+      "demographics": {
+        "age_range": "35-45",
+        "context": "Emotionally aware, curious, experimental, tries different approaches"
+      },
+      "emotional_profile": {
+        "primary_challenges": ["Various - explores full emotional range"],
+        "starting_state": "Variable - intentionally explores different states",
+        "goals": ["Emotional fluency", "Expand capacity", "Self-understanding"]
+      },
+      "journey_history": {
+        "total_journeys": 8,
+        "completed": 6,
+        "abandoned": 1,
+        "paused": 1,
+        "in_progress": 0,
+        "completion_rate": 0.75,
+        "diversity_score": "HIGH"
+      },
+      "emotional_diversity": {
+        "categories_experienced": [
+          "Places We Go When Things Are Uncertain or Too Much",
+          "Places We Go When We Fall Short",
+          "Places We Go When We're Hurting",
+          "Places We Go With Others",
+          "Places We Go When Life Is Good"
+        ],
+        "transition_variety": "Anxiety→Calm, Shame→Self-Compassion, Grief→Peace, Loneliness→Connection, Foreboding Joy→Full Joy"
+      },
+      "strategy_exploration": {
+        "modalities_tried": ["Cognitive", "Somatic", "Creative", "Social", "Mindfulness"],
+        "favorites_per_modality": {
+          "cognitive": "Cognitive Defusion: Leaves on a Stream",
+          "somatic": "Ecstatic/Expressive Dance",
+          "creative": "Free-Form Art Making",
+          "social": "Authentic Relating",
+          "mindfulness": "Walking Meditation"
+        }
+      },
+      "test_cases": [
+        "System coverage across emotional landscape",
+        "Pattern variety",
+        "Strategy diversity",
+        "Multi-modal engagement",
+        "Sophisticated user experience"
+      ]
+    }
+  ],
+  
+  "usage_guidelines": {
+    "development_testing": "Use these personas to test different user journeys through the system. Each tests different features and edge cases.",
+    "demo_presentations": "Use Morgan (success story) for positive demos, Alex for onboarding demos, Casey for showing support features.",
+    "data_seeding": "These personas become the user_id for demo journeys in the database. Clear naming (demo-*) indicates test data.",
+    "deletion": "All demo data should be easily identifiable and deletable. Never mix with real user data in production."
+  },
+  
+  "meta": {
+    "total_personas": 5,
+    "persona_types": {
+      "new_user": 1,
+      "active_user": 1,
+      "veteran_user": 1,
+      "struggling_user": 1,
+      "diverse_user": 1
+    },
+    "coverage": "Tests cold-start, personalization, success patterns, support needs, and system flexibility",
+    "naming_convention": "demo-{name}-{type} for easy identification and cleanup"
+  }
+}

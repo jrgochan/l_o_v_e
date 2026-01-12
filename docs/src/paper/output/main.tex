@@ -1,0 +1,109 @@
+\documentclass[10pt,twocolumn]{article}
+
+% Essential packages
+\usepackage[utf8]{inputenc}
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath,amssymb}
+\usepackage{graphicx}
+\usepackage{cite}
+\usepackage{url}
+\usepackage{hyperref}
+\usepackage{booktabs}
+\usepackage{xcolor}
+\usepackage{listings}
+\usepackage{caption}
+\usepackage{subcaption}
+
+% Hyperref configuration
+\hypersetup{
+    colorlinks=true,
+    linkcolor=blue,
+    citecolor=blue,
+    urlcolor=blue
+}
+
+% Listings configuration for code blocks
+\lstset{
+    basicstyle=\ttfamily\small,
+    breaklines=true,
+    frame=single,
+    captionpos=b
+}
+
+% Title and authors
+\title{Beyond Valence-Arousal: The L.O.V.E. Stack and the Connection Axis for Computational Emotion Recognition in Mental Health Applications}
+
+\author{
+    [Your Name] \\
+    Independent Researcher \\
+    \texttt{your.email@example.com}
+    \and
+    Claude (Anthropic) \\
+    AI Research Collaborator \\
+    \texttt{Anthropic AI}
+}
+
+\date{\today}
+
+\begin{document}
+
+\maketitle
+
+% Abstract
+\begin{abstract}
+\input{sections/abstract}
+\end{abstract}
+
+\noindent
+\textbf{Keywords:} Emotion recognition, affective computing, mental health technology, VAC model, dimensional emotion models, speech processing, connection axis, compassion, pity
+
+% Main sections
+\section{Introduction}
+\label{sec:introduction}
+\input{sections/introduction}
+
+\section{Related Work}
+\label{sec:related-work}
+\input{sections/related-work}
+
+\section{The VAC Model}
+\label{sec:vac-model}
+\input{sections/vac-model}
+
+\section{System Architecture}
+\label{sec:architecture}
+\input{sections/architecture}
+
+\section{VAC Extraction from Speech and Text}
+\label{sec:vac-extraction}
+\input{sections/vac-extraction}
+
+\section{Validation}
+\label{sec:validation}
+\input{sections/validation}
+
+\section{Mental Health Applications}
+\label{sec:mental-health-apps}
+\input{sections/mental-health-apps}
+
+\section{Implementation and Performance}
+\label{sec:implementation}
+\input{sections/implementation}
+
+\section{Discussion}
+\label{sec:discussion}
+\input{sections/discussion}
+
+\section{Conclusion}
+\label{sec:conclusion}
+\input{sections/conclusion}
+
+% Acknowledgments
+\section*{Acknowledgments}
+This work was inspired by Brené Brown's research on relational emotions. We thank the open-source community for tools that enabled privacy-first implementation (Ollama, pgvector, FastAPI, React Three Fiber). We particularly invite collaboration with Prof. Emily Mower Provost and the University of Michigan CHAI Lab on multimodal emotion recognition.
+
+% References
+\bibliographystyle{plain}
+\bibliography{../12-references}
+
+\end{document}

@@ -1,0 +1,297 @@
+{
+  "category": "Mindfulness Practices",
+  "source": "Kabat-Zinn, J. (1990). Full Catastrophe Living: Using the Wisdom of Your Body and Mind to Face Stress, Pain, and Illness.",
+  "description": "Evidence-based mindfulness meditation practices from the MBSR (Mindfulness-Based Stress Reduction) tradition and related approaches. These practices cultivate present-moment awareness, non-judgmental acceptance, and compassionate attention.",
+  "strategies": [
+    {
+      "name": "Body Scan Meditation",
+      "type": "attentional_deployment",
+      "description": "Systematically bring awareness to each part of the body, cultivating present-moment awareness and releasing physical tension.",
+      "steps": [
+        "Lie down on your back or sit comfortably",
+        "Close your eyes and take three deep breaths",
+        "Bring attention to your left foot - notice any sensations without trying to change them",
+        "Breathe into the left foot, imagining breath flowing to and from that area",
+        "Move attention to left ankle, calf, knee, thigh - spending 30 seconds with each",
+        "Repeat with right leg",
+        "Continue through: pelvis, lower back, abdomen, chest, upper back, shoulders",
+        "Move through left arm: hand, forearm, elbow, upper arm, shoulder",
+        "Repeat with right arm",
+        "Scan through: neck, jaw, face, back of head, top of head",
+        "Expand awareness to the whole body as one complete, breathing organism",
+        "Rest in this full-body awareness for several minutes",
+        "When ready, gently wiggle fingers and toes, slowly open eyes"
+      ],
+      "time_required": "20-45 minutes (can be shortened to 10 minutes)",
+      "difficulty": 2,
+      "evidence": "meta_analysis",
+      "citations": [
+        {
+          "author": "Kabat-Zinn, J.",
+          "year": 1990,
+          "title": "Full Catastrophe Living"
+        },
+        {
+          "author": "Goldberg et al.",
+          "year": 2018,
+          "title": "Mindfulness-based interventions for psychiatric disorders: A systematic review and meta-analysis"
+        }
+      ],
+      "contraindications": "May be uncomfortable initially; some people find it difficult to lie still",
+      "best_for_vac_changes": {
+        "valence": "increase",
+        "arousal": "major_decrease",
+        "connection": "maintain"
+      }
+    },
+    {
+      "name": "Loving-Kindness Meditation (Metta)",
+      "type": "cognitive_reappraisal",
+      "description": "Cultivate feelings of goodwill, kindness, and warmth toward self and others.",
+      "steps": [
+        "Sit comfortably, close your eyes, take a few deep breaths",
+        "Begin with yourself: 'May I be safe. May I be healthy. May I be happy. May I live with ease.'",
+        "Repeat these phrases slowly, letting the meaning sink in",
+        "Notice any warmth, resistance, or other feelings that arise",
+        "Bring to mind someone you love: picture them, feel their presence",
+        "Offer them the phrases: 'May you be safe. May you be healthy. May you be happy. May you live with ease.'",
+        "Next, a neutral person (someone you see but don't know well)",
+        "Offer them the same phrases with genuine goodwill",
+        "Then, if ready, a difficult person (start with mildly difficult)",
+        "Extend the phrases to them, noticing any resistance",
+        "Finally, expand to all beings: 'May all beings be safe, healthy, happy, and live with ease'",
+        "Rest in the feeling of universal kindness",
+        "Gently return attention to your breath and slowly open eyes"
+      ],
+      "time_required": "15-30 minutes",
+      "difficulty": 3,
+      "evidence": "rct",
+      "citations": [
+        {
+          "author": "Salzberg, S.",
+          "year": 1995,
+          "title": "Lovingkindness: The Revolutionary Art of Happiness"
+        },
+        {
+          "author": "Hofmann et al.",
+          "year": 2011,
+          "title": "Loving-Kindness and Compassion Meditation: Potential for Psychological Interventions"
+        }
+      ],
+      "contraindications": "Can be emotionally challenging if self-compassion is difficult; may bring up grief or loss",
+      "best_for_vac_changes": {
+        "valence": "major_increase",
+        "arousal": "decrease",
+        "connection": "major_increase"
+      }
+    },
+    {
+      "name": "RAIN Practice (Recognize, Allow, Investigate, Nurture)",
+      "type": "response_modulation",
+      "description": "Mindful approach to working with difficult emotions, developed by Michele McDonald and Tara Brach.",
+      "steps": [
+        "R - RECOGNIZE: Name what you're experiencing - 'This is anxiety' or 'This is hurt'",
+        "Acknowledge it's present without trying to fix it",
+        "A - ALLOW: Let the experience be there. Say 'yes' to what is",
+        "Stop fighting, resisting, or trying to make it different",
+        "You don't have to like it, just allow it to be present",
+        "I - INVESTIGATE: Get curious about the experience with kindness",
+        "Where do you feel it in your body? What's the dominant sensation?",
+        "What beliefs or stories come with this feeling?",
+        "What does this vulnerable place need?",
+        "N - NURTURE: Offer yourself compassion and care",
+        "Place hand on heart or other comforting gesture",
+        "Say what you need to hear: 'It's okay', 'I'm here', 'This is hard'",
+        "Notice any shift in the experience after completing RAIN"
+      ],
+      "time_required": "10-20 minutes",
+      "difficulty": 3,
+      "evidence": "clinical",
+      "citations": [
+        {
+          "author": "Brach, T.",
+          "year": 2013,
+          "title": "True Refuge: Finding Peace and Freedom in Your Own Awakened Heart"
+        }
+      ],
+      "contraindications": "May be intense with severe trauma; proceed gently or with therapist support",
+      "best_for_vac_changes": {
+        "valence": "increase",
+        "arousal": "decrease",
+        "connection": "increase"
+      }
+    },
+    {
+      "name": "Mindful Noting Practice",
+      "type": "attentional_deployment",
+      "description": "Label experiences as they arise to maintain present-moment awareness and reduce reactivity.",
+      "steps": [
+        "Sit comfortably and close your eyes",
+        "Begin with attention on the breath",
+        "When something pulls your attention away, silently note it",
+        "For thoughts: 'thinking', 'planning', 'worrying', 'remembering'",
+        "For sensations: 'tingling', 'pressure', 'warmth', 'tension'",
+        "For emotions: 'anxiety', 'sadness', 'joy', 'irritation'",
+        "For sounds: 'hearing'",
+        "Note gently and return attention to breath",
+        "The note should be light - like touching a bubble without popping it",
+        "Don't analyze or elaborate - just note and return",
+        "If lost in thought for a while, that's okay - note 'thinking' and return",
+        "Practice for 10-20 minutes"
+      ],
+      "time_required": "10-20 minutes",
+      "difficulty": 2,
+      "evidence": "rct",
+      "citations": [
+        {
+          "author": "Mahasi Sayadaw",
+          "year": 1954,
+          "title": "The Progress of Insight (Visuddhi-nana-katha)"
+        },
+        {
+          "author": "Goldstein, J.",
+          "year": 2013,
+          "title": "Mindfulness: A Practical Guide to Awakening"
+        }
+      ],
+      "contraindications": null,
+      "best_for_vac_changes": {
+        "valence": "slight_increase",
+        "arousal": "decrease",
+        "connection": "maintain"
+      }
+    },
+    {
+      "name": "Choiceless Awareness",
+      "type": "attentional_deployment",
+      "description": "Open, panoramic awareness without focusing on any particular object - letting experience unfold naturally.",
+      "steps": [
+        "Sit comfortably, eyes closed or soft gaze",
+        "Begin with several minutes of breath awareness to settle",
+        "Now release the focus on breath",
+        "Open your awareness to receive whatever arises",
+        "Don't go looking for experiences - let them come to you",
+        "Sounds, sensations, thoughts, emotions - all welcome",
+        "Notice whatever is most prominent in awareness",
+        "When something becomes strong, let awareness rest there",
+        "When it fades, return to open, receptive awareness",
+        "You're not controlling attention - you're allowing it to be drawn naturally",
+        "Like sitting by a window watching the street - you don't make things happen",
+        "Practice this spacious, allowing awareness",
+        "If you get lost, return briefly to breath, then open again"
+      ],
+      "time_required": "15-30 minutes",
+      "difficulty": 4,
+      "evidence": "clinical",
+      "citations": [
+        {
+          "author": "Goldstein, J.",
+          "year": 2013,
+          "title": "Mindfulness: A Practical Guide to Awakening"
+        },
+        {
+          "author": "Kabat-Zinn, J.",
+          "year": 1994,
+          "title": "Wherever You Go, There You Are"
+        }
+      ],
+      "contraindications": "Advanced practice; start with more structured meditations first",
+      "best_for_vac_changes": {
+        "valence": "increase",
+        "arousal": "decrease",
+        "connection": "maintain"
+      }
+    },
+    {
+      "name": "Mountain Meditation",
+      "type": "cognitive_reappraisal",
+      "description": "Cultivate qualities of stability, groundedness, and equanimity through mountain imagery.",
+      "steps": [
+        "Sit in a stable, dignified posture",
+        "Close your eyes and take several deep breaths",
+        "Visualize a mountain - any mountain that speaks to you",
+        "See its base rooted deep in the earth",
+        "Notice its peak reaching toward the sky",
+        "The mountain sits with immovable stability through all seasons",
+        "In spring, new life emerges on its slopes",
+        "In summer, it basks in warmth and light",
+        "In fall, leaves change and fall - the mountain remains",
+        "In winter, it's buried in snow and ice - still the mountain sits",
+        "Storms rage, winds blow, weather changes - the mountain endures",
+        "Now bring that mountain into your body",
+        "Your head is the peak, your base solid and grounded",
+        "Become the mountain - dignified, rooted, enduring",
+        "Thoughts and emotions are like weather passing through",
+        "You remain - solid, stable, unshakeable essence",
+        "Rest in mountain awareness for 10-15 minutes"
+      ],
+      "time_required": "15-25 minutes",
+      "difficulty": 2,
+      "evidence": "clinical",
+      "citations": [
+        {
+          "author": "Kabat-Zinn, J.",
+          "year": 1994,
+          "title": "Wherever You Go, There You Are"
+        }
+      ],
+      "contraindications": null,
+      "best_for_vac_changes": {
+        "valence": "increase",
+        "arousal": "decrease",
+        "connection": "increase"
+      }
+    },
+    {
+      "name": "Walking Meditation",
+      "type": "attentional_deployment",
+      "description": "Bring mindful awareness to the simple act of walking, coordinating body and mind.",
+      "steps": [
+        "Find a path 10-20 paces long where you can walk back and forth",
+        "Stand at one end, feet hip-width apart, hands clasped in front or behind",
+        "Bring awareness to your whole body standing",
+        "Feel the contact of feet on ground, weight distribution",
+        "Begin walking very slowly",
+        "Note each component: 'lifting', 'moving', 'placing' the foot",
+        "Keep attention on the physical sensations of walking",
+        "When you reach the end, pause, turn mindfully, pause again",
+        "Continue walking back and forth",
+        "If mind wanders, gently bring attention back to the feet",
+        "You can walk at natural pace, noting 'left', 'right'",
+        "Or very slowly, noting each micro-movement",
+        "Practice for 10-30 minutes",
+        "End by standing still, noticing the stillness"
+      ],
+      "time_required": "10-30 minutes",
+      "difficulty": 1,
+      "evidence": "rct",
+      "citations": [
+        {
+          "author": "Thich Nhat Hanh",
+          "year": 1985,
+          "title": "A Guide to Walking Meditation"
+        },
+        {
+          "author": "Kabat-Zinn, J.",
+          "year": 1990,
+          "title": "Full Catastrophe Living"
+        }
+      ],
+      "contraindications": "Requires space to walk; may not be suitable for all mobility levels",
+      "best_for_vac_changes": {
+        "valence": "increase",
+        "arousal": "decrease",
+        "connection": "maintain"
+      }
+    }
+  ],
+  "meta": {
+    "version": "1.0",
+    "created": "2025-12-04",
+    "evidence_base": "Mindfulness-Based Stress Reduction (MBSR) and Mindfulness-Based Cognitive Therapy (MBCT) are supported by extensive research showing effectiveness for stress, anxiety, depression, chronic pain, and general well-being. Meta-analyses show medium to large effect sizes.",
+    "target_populations": "Widely applicable across clinical and non-clinical populations. Particularly effective for stress-related conditions, anxiety, depression, chronic pain, and those seeking to cultivate greater present-moment awareness and emotional regulation.",
+    "core_principles": "Non-judgmental awareness, present-moment focus, acceptance of what is, beginner's mind, non-striving, letting go, trust in one's own experience.",
+    "training_note": "While these practices can be learned independently, 8-week MBSR or MBCT programs provide structured learning with group support. Regular daily practice (even 10-15 minutes) is more beneficial than occasional longer sessions.",
+    "progression": "Start with Body Scan or Walking Meditation (easier, concrete anchor). Progress to Noting and RAIN (intermediate). Advanced practitioners can explore Choiceless Awareness and Loving-Kindness."
+  }
+}

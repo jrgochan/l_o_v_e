@@ -1,0 +1,81 @@
+\subsection{Dimensional Emotion Models}
+
+\textbf{Valence-Arousal (VA) Models}
+
+Russell's (1980) Circumplex Model revolutionized emotion research by proposing that all emotions could be positioned in a two-dimensional space defined by valence (pleasantness) and arousal (activation)~\cite{russell1980}. This model's elegance and empirical support made it the dominant framework in affective computing. Subsequent work has refined the circumplex, exploring whether the space is truly circular or has quadrants with different properties.
+
+However, VA models face fundamental limitations. Emotions that differ in relational quality but share similar valence and arousal are indistinguishable. For example, pity, sympathy, and compassion all occupy similar regions of VA space despite representing distinct interpersonal stances. This conflation limits therapeutic applications where relational quality is paramount.
+
+\textbf{Valence-Arousal-Dominance (VAD) Models}
+
+Mehrabian and Russell (1974) introduced the PAD model, adding Dominance as a third dimension~\cite{mehrabian1974}. Dominance captures the sense of control or power in an emotional experience:
+\begin{itemize}
+    \item High dominance: Anger, pride, contempt
+    \item Low dominance: Fear, shame, guilt
+\end{itemize}
+
+While PAD improves on VA by adding dimensionality, dominance measures power relationships rather than interpersonal alignment. High-dominance pity (condescension) and high-dominance compassion (protective care) would both score similarly, missing the crucial relational distinction.
+
+\textbf{Other Dimensional Approaches}
+
+The Pleasure-Arousal-Dominance space has been extended in various ways. Some researchers have proposed additional dimensions like ``approach-avoidance'' or ``certainty-uncertainty.'' However, none explicitly capture the quality of interpersonal connection that distinguishes relationally different emotional states.
+
+\subsection{Categorical Emotion Models}
+
+\textbf{Basic Emotions Theory}
+
+Ekman's (1992) basic emotions approach identifies universal emotional categories (happiness, sadness, fear, anger, surprise, disgust) based on facial expressions~\cite{ekman1992}. While empirically grounded and cross-culturally validated, categorical models lack the continuous structure needed for smooth emotional transitions in computational systems.
+
+\textbf{Complex Emotion Taxonomies}
+
+More recent work has expanded beyond basic emotions. Cowen and Keltner (2017) identified 27 distinct categories through semantic space analysis~\cite{cowen2017}. Brené Brown's (2021) ``Atlas of the Heart'' catalogues 87 emotional experiences organized into 13 categories~\cite{brown2021}. These rich taxonomies capture nuance but lack mathematical structure for computation.
+
+The VAC model bridges categorical and dimensional approaches: we map Brown's 87 emotions onto VAC coordinates, providing both categorical richness and dimensional continuity.
+
+\subsection{Speech-Based Emotion Recognition}
+
+\textbf{Acoustic Feature Extraction}
+
+Speech-based emotion recognition has focused primarily on acoustic features: prosody, pitch (F0), intensity, formant frequencies, speech rate, and voice quality. Provost et al. have demonstrated that these features can distinguish emotional states with reasonable accuracy. Most work targets VA space or discrete emotion categories.
+
+\textbf{Multimodal Approaches}
+
+Recent systems combine acoustic, linguistic, and visual channels for improved accuracy. Provost's work on multimodal emotion recognition has shown that semantic content complements acoustic features. However, most multimodal systems still target traditional VA or categorical representations.
+
+\textbf{Mental Health Applications}
+
+Speech analysis has shown promise for mental health monitoring. Studies have used speech features to detect depression, assess bipolar disorder symptom severity, and estimate suicide risk. Provost's work in this domain has emphasized the importance of naturalistic, real-world speech data.
+
+Our work extends this line of research by proposing that acoustic features might carry information about the Connection dimension—a hypothesis we leave for future investigation.
+
+\subsection{Mental Health Technology}
+
+\textbf{Mood Tracking Applications}: Numerous applications allow users to self-report emotional states. Apps like Daylio, MoodPath, and Bearable use simple emotion selectors or VA-based mood wheels. While useful for longitudinal tracking, these lack the relational dimension needed for therapeutic validity.
+
+\textbf{AI Chatbots and Therapy Apps}: Woebot, Wysa, and similar applications provide cognitive-behavioral therapy (CBT) interventions through conversational interfaces~\cite{fitzpatrick2017}. These systems typically use sentiment analysis to detect user emotional state. However, without the ability to distinguish pity from compassion or shame from guilt, they risk providing therapeutically inappropriate guidance.
+
+\textbf{Emotion Regulation Tools}: Some applications focus specifically on emotion regulation, providing evidence-based strategies from DBT, CBT, and mindfulness traditions. However, most lack sophisticated models of emotional transitions. The L.O.V.E. Stack's A* pathfinding with psychological constraints represents a more principled approach.
+
+\subsection{3D Emotional Visualization}
+
+\textbf{Affective Computing Visualizations}: Prior work has visualized emotions in 3D space, typically using VAD coordinates. These visualizations help users understand their emotional state spatially. However, without a meaningful third dimension (beyond dominance), the utility is limited.
+
+\textbf{Virtual Reality Emotion Experiences}: VR applications have explored immersive emotional experiences. Some use spatial positioning to represent emotional intensity or valence. The L.O.V.E. Stack's quaternion-based 3D visualization builds on this work but with a theoretically grounded third dimension (Connection).
+
+\textbf{Biofeedback and Wearables}: Systems integrating heart rate variability, galvanic skin response, and other physiological signals have created real-time emotional feedback loops. Future work could integrate these biometric signals with VAC coordinates to provide multimodal emotional assessment.
+
+\subsection{Gap Analysis: The Need for Connection}
+
+Existing emotion models face a common limitation: they cannot distinguish emotionally similar but relationally distinct states. This gap has several consequences:
+
+\begin{enumerate}
+    \item \textbf{Therapeutic Invalidity}: Mental health applications may guide users toward pity when compassion is needed, or fail to recognize that shame requires vulnerability before self-compassion can emerge.
+    
+    \item \textbf{Missed Opportunities in HCI}: Conversational AI systems cannot adjust their relational stance to match user needs. A system that recognizes when a user needs ``feeling WITH'' versus ``feeling FOR'' could provide more appropriate support.
+    
+    \item \textbf{Cultural Insensitivity}: Different cultures may emphasize connection differently. Without measuring this dimension, systems cannot adapt to cultural variations in emotional expression.
+    
+    \item \textbf{Incomplete Multimodal Models}: If Connection can be detected in speech prosody (a hypothesis supported by linguistic research on empathy), current systems are missing a valuable signal.
+\end{enumerate}
+
+The VAC model addresses this gap by operationalizing relational quality as a computational dimension. In the following sections, we demonstrate that this dimension can be extracted from language, validated experimentally, and implemented in a complete system for mental health applications.

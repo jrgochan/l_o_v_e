@@ -1,0 +1,42 @@
+"""Atlas Emotion Schemas."""
+
+from datetime import datetime
+from typing import List, Optional
+from uuid import UUID
+
+from pydantic import BaseModel, Field
+
+
+class AtlasEmotionBase(BaseModel):
+    """Base schema for atlas emotion."""
+
+    emotion_name: str
+    category: str
+    definition: str
+    vac_vector: List[float] = Field(..., min_length=3, max_length=3)
+    haptic_pattern_id: Optional[str] = None
+    color_hint: Optional[str] = None
+
+
+class AtlasEmotionUpdate(BaseModel):
+    """Schema for updating atlas emotion."""
+
+    category: Optional[str] = None
+    definition: Optional[str] = None
+    vac_vector: Optional[List[float]] = Field(None, min_length=3, max_length=3)
+    haptic_pattern_id: Optional[str] = None
+    color_hint: Optional[str] = None
+
+
+class AtlasEmotionResponse(AtlasEmotionBase):
+    """Schema for atlas emotion response."""
+
+    id: UUID
+    q_constant: List[float]
+    created_at: datetime
+    updated_at: datetime
+
+    class Config:
+        """Pydantic configuration."""
+
+        from_attributes = True

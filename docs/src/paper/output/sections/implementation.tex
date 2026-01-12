@@ -1,0 +1,138 @@
+\subsection{Technology Stack Overview}
+
+Table~\ref{tab:tech-stack} summarizes the L.O.V.E. Stack's technology choices.
+
+\begin{table*}[t]
+\centering
+\caption{Technology stack for the L.O.V.E. Stack}
+\label{tab:tech-stack}
+\small
+\begin{tabular}{llll}
+\toprule
+\textbf{Layer} & \textbf{Component} & \textbf{Technology} & \textbf{Rationale} \\
+\midrule
+Backend & Listener & Python 3.11 + FastAPI & Async I/O, fast LLM integration \\
+& Observer & Python 3.11 + FastAPI & Strong DB ecosystem (SQLAlchemy) \\
+& Versor & Python 3.11 + FastAPI & NumPy for quaternion math \\
+\midrule
+Database & Primary & PostgreSQL 16 + pgvector & Vector similarity search + ACID \\
+& Cache & Redis 7 & Fast job queuing (Arq) \\
+\midrule
+ML/AI & LLM & Ollama + Llama 3.1 8B & Local inference, privacy \\
+& Transcription & faster-whisper & Local STT, no API calls \\
+& NER & Spacy & PII scrubbing \\
+\midrule
+Frontend & Framework & Next.js 16 + React 19 & SSR, optimal performance \\
+& 3D Engine & Three.js + React Three Fiber & WebGL rendering \\
+& Shaders & GLSL (custom) & Full control over visuals \\
+& State & Zustand & Lightweight, performant \\
+\midrule
+DevOps & Containers & Podman/Docker & Reproducible deployment \\
+& Orchestration & Podman Compose & Multi-container management \\
+\bottomrule
+\end{tabular}
+\end{table*}
+
+\subsection{Performance Benchmarks}
+
+\subsubsection{End-to-End Latency}
+
+Table~\ref{tab:latency} shows latency measurements on M1 MacBook Pro (16GB RAM, no GPU acceleration).
+
+\begin{table}[h]
+\centering
+\caption{End-to-end pipeline latency}
+\label{tab:latency}
+\begin{tabular}{lccc}
+\toprule
+\textbf{Pipeline Stage} & \textbf{P50} & \textbf{P99} & \textbf{Notes} \\
+\midrule
+Audio Transcription (10s) & 450ms & 650ms & faster-whisper (CPU) \\
+LLM Semantic Analysis & 1.2s & 2.5s & Ollama Llama 3.1 8B \\
+PII Scrubbing & 50ms & 100ms & Spacy NER \\
+Observer State Recording & 30ms & 80ms & PostgreSQL + pgvector \\
+Versor Quaternion Calc & 10ms & 25ms & NumPy operations \\
+\midrule
+\textbf{Total Pipeline} & \textbf{1.74s} & \textbf{3.36s} & \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\textbf{Bottleneck}: LLM inference (CPU-bound, accounts for 69\% of total latency).
+
+\subsubsection{Optimization Potential}
+
+\begin{table}[h]
+\centering
+\caption{Optimization potential with GPU acceleration}
+\label{tab:optimization}
+\begin{tabular}{lccc}
+\toprule
+\textbf{Optimization} & \textbf{Current} & \textbf{Optimized} & \textbf{Speedup} \\
+\midrule
+LLM (GPU acceleration) & 1.2s & 150ms & 8$\times$ \\
+Transcription (GPU) & 450ms & 100ms & 4.5$\times$ \\
+Model Quantization (8-bit) & 1.2s & 600ms & 2$\times$ \\
+\midrule
+\textbf{Optimized Total} & \textbf{1.74s} & \textbf{$\sim$350ms} & \textbf{5$\times$} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\textbf{Implementation Note}: GPU acceleration requires CUDA-compatible GPU. For production deployment with high throughput, GPU instances are recommended.
+
+\subsubsection{Database Performance}
+
+pgvector similarity search with HNSW index on 1000 emotional states: Nearest neighbor (k=1) takes 15ms, nearest neighbors (k=10) takes 28ms, and range query (distance <0.5) takes 45ms. HNSW index parameters are $m = 16$ (number of connections per node, balancing speed/accuracy) and $\text{ef\_construction} = 64$ (search quality during index building).
+
+\subsubsection{3D Rendering Performance}
+
+Target: 60 FPS (16.67ms per frame). Performance on M1 MacBook Pro: 60 FPS idle and animating (smooth, no dropped frames). Intel i5 (integrated GPU): 60 FPS idle, 55-60 FPS animating (occasional drops during complex animations). Mobile (iPhone 12): 60 FPS idle, 58-60 FPS animating.
+
+\textbf{Optimization Techniques}: Instanced rendering (reuse geometry for multiple spheres), LOD/Level of Detail (reduce polygon count for distant objects), Frustum culling (don't render off-screen objects), and Shader optimization (minimize texture lookups, use built-in functions).
+
+\subsection{Scalability Analysis}
+
+\subsubsection{Current Capacity}
+
+Single instance (no GPU): $\sim$100 concurrent users, $\sim$50 requests/second (average request takes $\sim$2s), 20 database connections (connection pooling).
+
+\textbf{Bottlenecks}: (1) LLM Inference (CPU-bound, cannot parallelize single request), (2) Database Writes (can handle $\sim$1000 writes/second), (3) Memory (Ollama model requires $\sim$5GB RAM).
+
+\subsubsection{Horizontal Scaling Strategy}
+
+\textbf{Versor} (Stateless): Easy to scale with load balancer + multiple instances. Each instance handles quaternion calculations independently. Cost: \$5/month per instance (1 CPU, 1GB RAM).
+
+\textbf{Listener} (GPU-Accelerated): Workers pull jobs from Redis queue. Each worker runs on GPU instance. Cost: $\sim$\$50/month per GPU instance (AWS g4dn.xlarge). Throughput: $\sim$500 requests/minute per worker.
+
+\textbf{Observer} (Database Read Replicas): Writes go to primary, reads distributed across replicas. Cost: $\sim$\$30/month per replica.
+
+\textbf{Estimated Capacity (Scaled)}: 4 Listener workers (GPU) = 2000 req/min = $\sim$120,000/hour. 10 Versor instances = effectively unlimited (sub-ms operations). 3 Observer read replicas = $\sim$10,000 concurrent users.
+
+\textbf{Total Cost} (scaled to 10,000 users): Listener: 4 $\times$ \$50 = \$200/month. Versor: 10 $\times$ \$5 = \$50/month. Observer: 1 primary (\$50) + 3 replicas (\$90) = \$140/month. \textbf{Total: $\sim$\$400/month}.
+
+\subsection{Deployment Architecture}
+
+\subsubsection{Development Setup}
+
+Development requires: Python 3.11+, Node.js 18+, PostgreSQL 16 with pgvector, Redis 7, and Ollama (for local LLM). The setup script checks dependencies, creates virtual environments, and installs packages. Services are available at: Versor (http://localhost:8001/docs), Observer (http://localhost:8000/docs), Listener (http://localhost:8002/docs), and Experience (http://localhost:3000).
+
+\subsubsection{Production Deployment}
+
+Production deployment uses Podman Compose with containers for postgres (pgvector/pgvector:pg16), redis (redis:7-alpine), ollama (ollama/ollama), and all four L.O.V.E. services. Health checks ensure service availability. GPU support can be enabled for ollama container with nvidia runtime.
+
+\subsubsection{Cloud Deployment Options}
+
+\textbf{Option 1}: Self-hosted (DigitalOcean, Linode) provides full control and predictable costs ($\sim$\$50-200/month), with manual scaling and maintenance overhead.
+
+\textbf{Option 2}: Kubernetes (GKE, EKS, AKS) provides auto-scaling and high availability ($\sim$\$200-1000/month), with complexity and learning curve.
+
+\textbf{Option 3}: Hybrid (serverless frontend on Vercel/Netlify + self-hosted backend) provides global CDN for frontend with control over backend ($\sim$\$70/month).
+
+\subsection{Monitoring and Observability}
+
+All services expose \texttt{/health} endpoints returning status, version, uptime, and dependency checks (database, redis, ollama). Structured JSON logs enable integration with ELK stack. Future work includes Prometheus exporters on each service, Grafana dashboards for visualization, and alerts on high latency, errors, or resource usage.
+
+\subsection{Code Availability}
+
+The repository structure includes four independent modules (listener, observer, versor, experience) plus infrastructure (deployment scripts and docs). All code will be released under MIT License upon publication. Each module includes README with setup instructions, API documentation (auto-generated from OpenAPI), architecture diagrams, and testing guides.

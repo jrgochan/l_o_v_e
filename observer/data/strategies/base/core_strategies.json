@@ -1,0 +1,441 @@
+{
+  "category": "Core Emotion Regulation",
+  "source": "Evidence-based fundamentals from emotion regulation research",
+  "description": "Essential strategies from Gross Process Model and clinical research",
+  "strategies": [
+    {
+      "name": "4-7-8 Breathing Technique",
+      "type": "response_modulation",
+      "description": "Breathe in for 4 counts, hold for 7, exhale for 8. Activates parasympathetic nervous system to reduce arousal.",
+      "steps": [
+        "Find a comfortable seated position",
+        "Place tongue behind upper front teeth",
+        "Exhale completely through mouth making whoosh sound",
+        "Close mouth and inhale quietly through nose for 4 counts",
+        "Hold breath for 7 counts",
+        "Exhale completely through mouth for 8 counts making whoosh sound",
+        "Repeat cycle 4 times total",
+        "Return to normal breathing"
+      ],
+      "time_required": "5-10 minutes",
+      "difficulty": 1,
+      "evidence": "meta_analysis",
+      "citations": [
+        {
+          "author": "Weil, A.",
+          "year": 2015,
+          "title": "Breathing: The Master Key to Self Healing"
+        }
+      ]
+    },
+    {
+      "name": "5-4-3-2-1 Grounding Technique",
+      "type": "attentional_deployment",
+      "description": "Engage all five senses to anchor in the present moment and reduce rumination.",
+      "steps": [
+        "Acknowledge 5 things you can SEE around you",
+        "Acknowledge 4 things you can TOUCH (feel textures)",
+        "Acknowledge 3 things you can HEAR",
+        "Acknowledge 2 things you can SMELL",
+        "Acknowledge 1 thing you can TASTE"
+      ],
+      "time_required": "5-10 minutes",
+      "difficulty": 1,
+      "evidence": "clinical",
+      "citations": []
+    },
+    {
+      "name": "Progressive Muscle Relaxation",
+      "type": "response_modulation",
+      "description": "Systematically tense and release muscle groups to reduce physical tension and arousal.",
+      "steps": [
+        "Find comfortable position, close eyes",
+        "Tense feet/toes for 5 seconds, then release",
+        "Tense calves for 5 seconds, then release",
+        "Tense thighs for 5 seconds, then release",
+        "Tense stomach for 5 seconds, then release",
+        "Tense hands/fists for 5 seconds, then release",
+        "Tense arms for 5 seconds, then release",
+        "Tense shoulders for 5 seconds, then release",
+        "Tense face for 5 seconds, then release",
+        "Notice the difference between tension and relaxation"
+      ],
+      "time_required": "15-20 minutes",
+      "difficulty": 2,
+      "evidence": "rct",
+      "citations": [
+        {
+          "author": "Jacobson, E.",
+          "year": 1938,
+          "title": "Progressive Relaxation"
+        }
+      ]
+    },
+    {
+      "name": "Cognitive Reappraisal: Probability Estimation",
+      "type": "cognitive_reappraisal",
+      "description": "Challenge catastrophic thinking by estimating actual probability of feared outcomes.",
+      "steps": [
+        "Write down the specific worry or fear",
+        "Ask: What's the WORST that could realistically happen? (estimate probability 1-100%)",
+        "Ask: What's the BEST that could happen? (estimate probability 1-100%)",
+        "Ask: What's MOST LIKELY to happen? (estimate probability 1-100%)",
+        "List evidence supporting each scenario",
+        "Review: How have similar situations turned out before?",
+        "If worst happens, how would you cope? List 3-5 coping strategies"
+      ],
+      "time_required": "20-30 minutes",
+      "difficulty": 3,
+      "evidence": "rct",
+      "citations": [
+        {
+          "author": "Beck, A.T.",
+          "year": 1979,
+          "title": "Cognitive Therapy of Depression"
+        }
+      ]
+    },
+    {
+      "name": "Perspective-Taking: Friend's Advice",
+      "type": "cognitive_reappraisal",
+      "description": "Distance from the situation by imagining what you'd tell a friend.",
+      "steps": [
+        "Describe the situation as if it happened to a close friend",
+        "What would you tell them?",
+        "What compassionate advice would you give?",
+        "How would you reassure them?",
+        "Now apply that same compassion to yourself",
+        "Notice the difference in self-talk"
+      ],
+      "time_required": "10-15 minutes",
+      "difficulty": 2,
+      "evidence": "clinical",
+      "citations": [
+        {
+          "author": "Kross, E. & Ayduk, O.",
+          "year": 2011,
+          "title": "Making Meaning out of Negative Experiences"
+        }
+      ]
+    },
+    {
+      "name": "Self-Compassion Break (Kristin Neff)",
+      "type": "cognitive_reappraisal",
+      "description": "Three-part self-compassion practice for moments of suffering.",
+      "steps": [
+        "Acknowledge: 'This is a moment of suffering' or 'This hurts'",
+        "Common Humanity: 'Suffering is part of life' or 'I'm not alone in this'",
+        "Self-Kindness: Place hand on heart and say 'May I be kind to myself'",
+        "Optional: 'May I give myself the compassion I need'",
+        "Breathe with the difficulty for a few moments",
+        "Notice any softening or shift in perspective"
+      ],
+      "time_required": "5-10 minutes",
+      "difficulty": 2,
+      "evidence": "meta_analysis",
+      "citations": [
+        {
+          "author": "Neff, K.D.",
+          "year": 2011,
+          "title": "Self-Compassion: The Proven Power of Being Kind to Yourself"
+        }
+      ],
+      "contraindications": "May feel uncomfortable at first if unfamiliar with self-compassion"
+    },
+    {
+      "name": "Shame Resilience: Speak Shame",
+      "type": "situation_modification",
+      "description": "Bren\u00e9 Brown's practice of speaking shame to a trusted person to reduce its power.",
+      "steps": [
+        "Identify someone safe (therapist, close friend, partner)",
+        "Name the shame trigger: 'I feel ashamed about...'",
+        "Share with the trusted person",
+        "Allow them to witness without judgment",
+        "Notice shame's power decrease when spoken",
+        "Remember: Shame cannot survive empathy"
+      ],
+      "time_required": "20-60 minutes",
+      "difficulty": 5,
+      "evidence": "clinical",
+      "citations": [
+        {
+          "author": "Brown, B.",
+          "year": 2021,
+          "title": "Atlas of the Heart"
+        }
+      ],
+      "contraindications": "Requires a truly safe, non-judgmental person"
+    },
+    {
+      "name": "Mindfulness Meditation (Basic)",
+      "type": "attentional_deployment",
+      "description": "Focus attention on breath to anchor in present and reduce rumination.",
+      "steps": [
+        "Sit comfortably with eyes closed or soft gaze",
+        "Notice the sensation of breathing",
+        "When mind wanders (it will!), gently return to breath",
+        "Don't judge the wandering - it's natural",
+        "Start with 5 minutes, build up gradually",
+        "Remember: You can't stop thoughts, just notice them"
+      ],
+      "time_required": "10-20 minutes",
+      "difficulty": 3,
+      "evidence": "meta_analysis",
+      "citations": [
+        {
+          "author": "Kabat-Zinn, J.",
+          "year": 1990,
+          "title": "Full Catastrophe Living"
+        }
+      ]
+    },
+    {
+      "name": "Nature Exposure",
+      "type": "situation_selection",
+      "description": "Spend time in natural settings to reduce stress and increase well-being.",
+      "steps": [
+        "Go outside to a natural setting (park, trail, garden)",
+        "Leave phone behind or on airplane mode",
+        "Walk slowly, noticing surroundings",
+        "Engage senses: what do you see, hear, smell, feel?",
+        "Spend at least 20 minutes",
+        "Notice effect on mood and arousal"
+      ],
+      "time_required": "20-60 minutes",
+      "difficulty": 1,
+      "evidence": "rct",
+      "citations": [
+        {
+          "author": "Bratman et al.",
+          "year": 2015,
+          "title": "Nature experience reduces rumination"
+        }
+      ]
+    },
+    {
+      "name": "Reach Out: Text or Call",
+      "type": "situation_modification",
+      "description": "Combat loneliness by initiating connection with someone you trust.",
+      "steps": [
+        "Think of someone who makes you feel seen/valued",
+        "Lower the bar: it's ok to just say 'hi' or 'thinking of you'",
+        "Send text or make brief call",
+        "You don't need a reason - connection IS the reason",
+        "Be honest if you're struggling (vulnerability)",
+        "Accept whatever response they can give"
+      ],
+      "time_required": "10-30 minutes",
+      "difficulty": 3,
+      "evidence": "clinical",
+      "citations": []
+    },
+    {
+      "name": "Join or Attend Community Activity",
+      "type": "situation_selection",
+      "description": "Behavioral activation through social engagement.",
+      "steps": [
+        "Identify an activity aligned with your values or interests",
+        "Commit to attending once (no pressure to continue)",
+        "Go even if anxious - anxiety usually decreases after arrival",
+        "Focus on being present, not performing",
+        "One authentic connection is enough",
+        "Repeat weekly if it felt good"
+      ],
+      "time_required": "1-3 hours",
+      "difficulty": 4,
+      "evidence": "rct",
+      "citations": [
+        {
+          "author": "Cuijpers et al.",
+          "year": 2007,
+          "title": "Behavioral activation for depression"
+        }
+      ],
+      "contraindications": "May be difficult with social anxiety - start small"
+    },
+    {
+      "name": "Intense Physical Exercise",
+      "type": "response_modulation",
+      "description": "Use vigorous movement to discharge emotional energy and regulate mood.",
+      "steps": [
+        "Choose activity: running, dancing, boxing, etc.",
+        "Aim for intensity that increases heart rate",
+        "Duration: 20-40 minutes",
+        "Notice thoughts/emotions arising during exercise",
+        "Cool down with gentler movement",
+        "Notice mood shift after"
+      ],
+      "time_required": "30-60 minutes",
+      "difficulty": 2,
+      "evidence": "meta_analysis",
+      "citations": [
+        {
+          "author": "Schuch et al.",
+          "year": 2016,
+          "title": "Exercise as treatment for depression"
+        }
+      ]
+    },
+    {
+      "name": "Expressive Writing (Pennebaker Method)",
+      "type": "response_modulation",
+      "description": "Write about difficult emotions to process and release them.",
+      "steps": [
+        "Set timer for 15-20 minutes",
+        "Write continuously about the emotional experience",
+        "Don't worry about grammar, spelling, or coherence",
+        "Write for yourself only - you can destroy it after",
+        "Let all feelings come out onto the page",
+        "Repeat for 3-4 consecutive days if possible",
+        "Notice: emotions often shift by day 3-4"
+      ],
+      "time_required": "15-20 minutes per session, 3-4 days",
+      "difficulty": 2,
+      "evidence": "meta_analysis",
+      "citations": [
+        {
+          "author": "Pennebaker, J.W.",
+          "year": 1997,
+          "title": "Writing About Emotional Experiences"
+        }
+      ]
+    },
+    {
+      "name": "Task Chunking and Prioritization",
+      "type": "situation_modification",
+      "description": "Break overwhelming tasks into manageable pieces.",
+      "steps": [
+        "List all tasks causing overwhelm",
+        "Break each into smallest possible steps",
+        "Use Eisenhower Matrix: Urgent/Important",
+        "Choose ONE thing to do right now",
+        "Do only that one thing",
+        "Celebrate completion",
+        "Then choose next one thing"
+      ],
+      "time_required": "15-30 minutes",
+      "difficulty": 2,
+      "evidence": "clinical",
+      "citations": []
+    },
+    {
+      "name": "Permission to Say No / Set Boundaries",
+      "type": "situation_selection",
+      "description": "Practice declining requests that drain you to protect emotional energy.",
+      "steps": [
+        "Notice feeling of obligation or resentment",
+        "Ask: Is this a 'should' or a 'want'?",
+        "Remember: 'No' is a complete sentence",
+        "Softer alternatives: 'Not right now' or 'Let me check my capacity'",
+        "Practice phrase: 'I appreciate the offer, but I need to decline'",
+        "Notice relief after setting boundary"
+      ],
+      "time_required": "Varies by situation",
+      "difficulty": 4,
+      "evidence": "clinical",
+      "citations": [
+        {
+          "author": "Cloud & Townsend",
+          "year": 1992,
+          "title": "Boundaries"
+        }
+      ]
+    },
+    {
+      "name": "TIPP Skills for Crisis",
+      "type": "response_modulation",
+      "description": "DBT skills to rapidly reduce intense arousal: Temperature, Intense exercise, Paced breathing, Paired muscle relaxation.",
+      "steps": [
+        "T - Temperature: Splash cold water on face or hold ice cube",
+        "I - Intense exercise: 10 jumping jacks, run in place, vigorous movement",
+        "P - Paced breathing: Slow breathing to 5-6 breaths/minute",
+        "P - Paired muscle relaxation: Tense and release muscle groups",
+        "Use when emotional arousal is very high",
+        "Follow with gentler regulation once arousal decreases"
+      ],
+      "time_required": "10-15 minutes",
+      "difficulty": 1,
+      "evidence": "clinical",
+      "citations": [
+        {
+          "author": "Linehan, M.M.",
+          "year": 2015,
+          "title": "DBT Skills Training Manual"
+        }
+      ]
+    },
+    {
+      "name": "Radical Acceptance (DBT)",
+      "type": "cognitive_reappraisal",
+      "description": "Accept reality completely without fighting it - reduces suffering from resistance.",
+      "steps": [
+        "Notice what you're fighting against",
+        "Observe the pain that resistance causes",
+        "Remind yourself: 'It is as it is'",
+        "Acceptance \u2260 approval (you can accept AND work to change)",
+        "Let go of 'should' - replace with 'is'",
+        "Notice reduced suffering when you stop fighting reality"
+      ],
+      "time_required": "15-30 minutes, ongoing practice",
+      "difficulty": 5,
+      "evidence": "clinical",
+      "citations": [
+        {
+          "author": "Linehan, M.M.",
+          "year": 2015,
+          "title": "DBT Skills Training Manual"
+        }
+      ]
+    },
+    {
+      "name": "Values Clarification Exercise",
+      "type": "cognitive_reappraisal",
+      "description": "Reconnect with personal values to guide decision-making and reduce shame.",
+      "steps": [
+        "Write down 5-7 personal core values (what matters most to you)",
+        "For each value, write why it's important",
+        "Reflect: When did you last honor this value?",
+        "Distinguish: 'I acted against my values' vs 'I am bad'",
+        "Behavior can change - identity is more stable",
+        "Commit to one small action aligned with top value"
+      ],
+      "time_required": "30-45 minutes",
+      "difficulty": 3,
+      "evidence": "clinical",
+      "citations": [
+        {
+          "author": "Hayes, S.C.",
+          "year": 1999,
+          "title": "Acceptance and Commitment Therapy"
+        }
+      ]
+    },
+    {
+      "name": "Three Good Things (Gratitude Practice)",
+      "type": "attentional_deployment",
+      "description": "Shift attention to positive by noting three good things each day.",
+      "steps": [
+        "Each evening, write down 3 good things from the day",
+        "They can be small: good coffee, kind word, sunshine",
+        "For each, write WHY it was good or how it made you feel",
+        "Notice shift from foreboding joy to genuine appreciation",
+        "Continue daily for at least 1 week for effect"
+      ],
+      "time_required": "10-15 minutes daily",
+      "difficulty": 1,
+      "evidence": "rct",
+      "citations": [
+        {
+          "author": "Seligman et al.",
+          "year": 2005,
+          "title": "Positive psychology progress"
+        }
+      ]
+    }
+  ],
+  "meta": {
+    "version": "1.0",
+    "created": "2026-01-03",
+    "strategy_count": 19
+  }
+}

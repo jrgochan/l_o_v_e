@@ -1,0 +1,12 @@
+# ML Models Cache Directory
+
+This directory stores downloaded machine learning models to avoid re-downloading.
+
+Models are excluded from git via .gitignore but this directory structure is preserved.
+
+Directory structure:
+- sentence-transformers/  # Observer embedding models
+- whisper/                # Listener transcription models
+- ollama/                 # LLM models
+- spacy/                  # NLP models
+- torch/                  # PyTorch cache

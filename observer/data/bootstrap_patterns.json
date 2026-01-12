@@ -1,0 +1,536 @@
+{
+  "description": "Bootstrap Patterns - Cold-start data for new users with no journey history",
+  "version": "1.0",
+  "created": "2025-12-05",
+  "purpose": "Provide aggregate success patterns, path templates, and contextual recommendations for users without personalized data",
+  
+  "strategy_effectiveness": {
+    "description": "Synthetic aggregate effectiveness ratings based on research and theoretical foundations",
+    "note": "These ratings help new users by providing initial recommendations until personalized data accumulates",
+    
+    "ratings": [
+      {
+        "strategy_name": "4-7-8 Breathing",
+        "global_rating": 4.3,
+        "success_rate": 0.78,
+        "best_for_patterns": ["High Arousal to Low Arousal", "Anxiety Regulation"],
+        "avg_time_to_effect": "5-10 minutes",
+        "difficulty": 1,
+        "completion_rate": 0.85
+      },
+      {
+        "strategy_name": "Box Breathing (4-4-4-4)",
+        "global_rating": 4.2,
+        "success_rate": 0.76,
+        "best_for_patterns": ["High Arousal to Low Arousal", "Stress Regulation"],
+        "avg_time_to_effect": "5-10 minutes",
+        "difficulty": 1,
+        "completion_rate": 0.83
+      },
+      {
+        "strategy_name": "Self-Compassion Break (Kristin Neff)",
+        "global_rating": 4.5,
+        "success_rate": 0.82,
+        "best_for_patterns": ["Shame Resilience", "Self-Criticism to Self-Compassion"],
+        "avg_time_to_effect": "10-15 minutes",
+        "difficulty": 2,
+        "completion_rate": 0.79
+      },
+      {
+        "strategy_name": "Radical Acceptance (DBT)",
+        "global_rating": 4.4,
+        "success_rate": 0.75,
+        "best_for_patterns": ["Difficult Acceptance", "Grief Integration"],
+        "avg_time_to_effect": "15-30 minutes",
+        "difficulty": 3,
+        "completion_rate": 0.72
+      },
+      {
+        "strategy_name": "Body Scan Meditation",
+        "global_rating": 4.1,
+        "success_rate": 0.71,
+        "best_for_patterns": ["High Arousal to Low Arousal", "Grounding"],
+        "avg_time_to_effect": "15-20 minutes",
+        "difficulty": 2,
+        "completion_rate": 0.68
+      },
+      {
+        "strategy_name": "Loving-Kindness Meditation (Metta)",
+        "global_rating": 4.3,
+        "success_rate": 0.74,
+        "best_for_patterns": ["Connection Building", "Self-Compassion Cultivation"],
+        "avg_time_to_effect": "20-30 minutes",
+        "difficulty": 3,
+        "completion_rate": 0.65
+      },
+      {
+        "strategy_name": "Cognitive Defusion: Leaves on a Stream",
+        "global_rating": 4.0,
+        "success_rate": 0.73,
+        "best_for_patterns": ["Rumination Reduction", "Worry to Acceptance"],
+        "avg_time_to_effect": "10-15 minutes",
+        "difficulty": 2,
+        "completion_rate": 0.74
+      },
+      {
+        "strategy_name": "Progressive Muscle Relaxation",
+        "global_rating": 3.9,
+        "success_rate": 0.69,
+        "best_for_patterns": ["High Arousal to Low Arousal", "Physical Tension Release"],
+        "avg_time_to_effect": "15-25 minutes",
+        "difficulty": 2,
+        "completion_rate": 0.64
+      },
+      {
+        "strategy_name": "Mindfulness Meditation (Basic)",
+        "global_rating": 4.2,
+        "success_rate": 0.77,
+        "best_for_patterns": ["General Regulation", "Present Moment Awareness"],
+        "avg_time_to_effect": "10-20 minutes",
+        "difficulty": 2,
+        "completion_rate": 0.71
+      },
+      {
+        "strategy_name": "Gratitude Journal",
+        "global_rating": 4.4,
+        "success_rate": 0.81,
+        "best_for_patterns": ["Joy Cultivation", "Positive Emotion Enhancement"],
+        "avg_time_to_effect": "10-15 minutes",
+        "difficulty": 1,
+        "completion_rate": 0.88
+      },
+      {
+        "strategy_name": "Walking Meditation",
+        "global_rating": 4.1,
+        "success_rate": 0.75,
+        "best_for_patterns": ["Moderate Arousal Management", "Restlessness to Calm"],
+        "avg_time_to_effect": "15-30 minutes",
+        "difficulty": 2,
+        "completion_rate": 0.76
+      },
+      {
+        "strategy_name": "Ecstatic/Expressive Dance",
+        "global_rating": 4.2,
+        "success_rate": 0.72,
+        "best_for_patterns": ["Anger Release", "High Energy Discharge"],
+        "avg_time_to_effect": "10-20 minutes",
+        "difficulty": 2,
+        "completion_rate": 0.70
+      },
+      {
+        "strategy_name": "Expressive Writing",
+        "global_rating": 4.3,
+        "success_rate": 0.77,
+        "best_for_patterns": ["Grief Processing", "Emotional Clarification"],
+        "avg_time_to_effect": "20-30 minutes",
+        "difficulty": 2,
+        "completion_rate": 0.73
+      },
+      {
+        "strategy_name": "Self-Soothe with Five Senses",
+        "global_rating": 3.8,
+        "success_rate": 0.71,
+        "best_for_patterns": ["Distress Tolerance", "Overwhelm Management"],
+        "avg_time_to_effect": "5-15 minutes",
+        "difficulty": 1,
+        "completion_rate": 0.79
+      },
+      {
+        "strategy_name": "Music for Mood Regulation",
+        "global_rating": 4.0,
+        "success_rate": 0.74,
+        "best_for_patterns": ["Mood Enhancement", "Energy Regulation"],
+        "avg_time_to_effect": "10-20 minutes",
+        "difficulty": 1,
+        "completion_rate": 0.82
+      },
+      {
+        "strategy_name": "Values Clarification Exercise",
+        "global_rating": 4.1,
+        "success_rate": 0.70,
+        "best_for_patterns": ["Meaning-Making", "Life Direction"],
+        "avg_time_to_effect": "30-45 minutes",
+        "difficulty": 3,
+        "completion_rate": 0.66
+      },
+      {
+        "strategy_name": "Wise Mind (DBT)",
+        "global_rating": 4.2,
+        "success_rate": 0.72,
+        "best_for_patterns": ["Emotion-Logic Balance", "Decision Making"],
+        "avg_time_to_effect": "15-25 minutes",
+        "difficulty": 3,
+        "completion_rate": 0.68
+      },
+      {
+        "strategy_name": "Reach Out to Someone You Trust",
+        "global_rating": 4.5,
+        "success_rate": 0.83,
+        "best_for_patterns": ["Loneliness to Connection", "Support Seeking"],
+        "avg_time_to_effect": "30-60 minutes",
+        "difficulty": 2,
+        "completion_rate": 0.77
+      },
+      {
+        "strategy_name": "Thank Your Mind",
+        "global_rating": 3.7,
+        "success_rate": 0.68,
+        "best_for_patterns": ["Cognitive Defusion", "Rumination Reduction"],
+        "avg_time_to_effect": "5-10 minutes",
+        "difficulty": 2,
+        "completion_rate": 0.72
+      },
+      {
+        "strategy_name": "Mindfulness of Pleasant Events",
+        "global_rating": 4.3,
+        "success_rate": 0.79,
+        "best_for_patterns": ["Joy Cultivation", "Foreboding Joy to Full Joy"],
+        "avg_time_to_effect": "10-20 minutes",
+        "difficulty": 2,
+        "completion_rate": 0.76
+      }
+    ]
+  },
+  
+  "path_templates": {
+    "description": "Pre-computed optimal paths for common emotional transitions",
+    "note": "These templates provide starting points for path planning until user builds personalized data",
+    
+    "templates": [
+      {
+        "from_emotion": "Anxiety",
+        "to_emotion": "Calm",
+        "optimal_path": ["Anxiety", "Worry", "Contentment", "Calm"],
+        "difficulty": 0.6,
+        "estimated_time_minutes": 90,
+        "success_rate": 0.75,
+        "recommended_strategies": ["4-7-8 Breathing", "Box Breathing (4-4-4-4)", "Body Scan Meditation"]
+      },
+      {
+        "from_emotion": "Anger",
+        "to_emotion": "Calm",
+        "optimal_path": ["Anger", "Frustration", "Contentment", "Calm"],
+        "difficulty": 0.65,
+        "estimated_time_minutes": 75,
+        "success_rate": 0.71,
+        "recommended_strategies": ["Ecstatic/Expressive Dance", "Progressive Muscle Relaxation", "Walking Meditation"]
+      },
+      {
+        "from_emotion": "Shame",
+        "to_emotion": "Self-Compassion",
+        "optimal_path": ["Shame", "Embarrassment", "Self-Compassion"],
+        "difficulty": 0.8,
+        "estimated_time_minutes": 60,
+        "success_rate": 0.62,
+        "recommended_strategies": ["Self-Compassion Break (Kristin Neff)", "Radical Acceptance (DBT)", "Loving-Kindness Meditation (Metta)"]
+      },
+      {
+        "from_emotion": "Guilt",
+        "to_emotion": "Self-Compassion",
+        "optimal_path": ["Guilt", "Regret", "Self-Compassion"],
+        "difficulty": 0.7,
+        "estimated_time_minutes": 70,
+        "success_rate": 0.68,
+        "recommended_strategies": ["Self-Compassion Break (Kristin Neff)", "Radical Acceptance (DBT)"]
+      },
+      {
+        "from_emotion": "Sadness",
+        "to_emotion": "Acceptance",
+        "optimal_path": ["Sadness", "Acknowledgment", "Acceptance"],
+        "difficulty": 0.65,
+        "estimated_time_minutes": 80,
+        "success_rate": 0.70,
+        "recommended_strategies": ["Expressive Writing", "Radical Acceptance (DBT)", "Body Scan Meditation"]
+      },
+      {
+        "from_emotion": "Worry",
+        "to_emotion": "Contentment",
+        "optimal_path": ["Worry", "Calm", "Contentment"],
+        "difficulty": 0.55,
+        "estimated_time_minutes": 60,
+        "success_rate": 0.73,
+        "recommended_strategies": ["Cognitive Defusion: Leaves on a Stream", "Mindfulness Meditation (Basic)", "4-7-8 Breathing"]
+      },
+      {
+        "from_emotion": "Frustration",
+        "to_emotion": "Acceptance",
+        "optimal_path": ["Frustration", "Calm", "Acceptance"],
+        "difficulty": 0.6,
+        "estimated_time_minutes": 65,
+        "success_rate": 0.71,
+        "recommended_strategies": ["Progressive Muscle Relaxation", "Radical Acceptance (DBT)", "Walking Meditation"]
+      },
+      {
+        "from_emotion": "Foreboding Joy",
+        "to_emotion": "Joy",
+        "optimal_path": ["Foreboding Joy", "Joy"],
+        "difficulty": 0.5,
+        "estimated_time_minutes": 30,
+        "success_rate": 0.77,
+        "recommended_strategies": ["Mindfulness of Pleasant Events", "Gratitude Journal"]
+      },
+      {
+        "from_emotion": "Foreboding Joy",
+        "to_emotion": "Gratitude",
+        "optimal_path": ["Foreboding Joy", "Joy", "Gratitude"],
+        "difficulty": 0.4,
+        "estimated_time_minutes": 45,
+        "success_rate": 0.82,
+        "recommended_strategies": ["Mindfulness of Pleasant Events", "Gratitude Journal"]
+      },
+      {
+        "from_emotion": "Boredom",
+        "to_emotion": "Curiosity",
+        "optimal_path": ["Boredom", "Interest", "Curiosity"],
+        "difficulty": 0.45,
+        "estimated_time_minutes": 40,
+        "success_rate": 0.76,
+        "recommended_strategies": ["Free-Form Art Making", "Explore a New Interest"]
+      },
+      {
+        "from_emotion": "Loneliness",
+        "to_emotion": "Connection",
+        "optimal_path": ["Loneliness", "Longing", "Belonging", "Connection"],
+        "difficulty": 0.75,
+        "estimated_time_minutes": 90,
+        "success_rate": 0.66,
+        "recommended_strategies": ["Reach Out to Someone You Trust", "Loving-Kindness Meditation (Metta)", "Join or Attend Community Activity"]
+      },
+      {
+        "from_emotion": "Stress",
+        "to_emotion": "Calm",
+        "optimal_path": ["Stress", "Worry", "Contentment", "Calm"],
+        "difficulty": 0.6,
+        "estimated_time_minutes": 75,
+        "success_rate": 0.72,
+        "recommended_strategies": ["Progressive Muscle Relaxation", "Box Breathing (4-4-4-4)", "Walking Meditation"]
+      },
+      {
+        "from_emotion": "Overwhelm",
+        "to_emotion": "Calm",
+        "optimal_path": ["Overwhelm", "Stress", "Worry", "Contentment", "Calm"],
+        "difficulty": 0.75,
+        "estimated_time_minutes": 120,
+        "success_rate": 0.64,
+        "recommended_strategies": ["Self-Soothe with Five Senses", "4-7-8 Breathing", "Progressive Muscle Relaxation"]
+      },
+      {
+        "from_emotion": "Embarrassment",
+        "to_emotion": "Self-Compassion",
+        "optimal_path": ["Embarrassment", "Self-Compassion"],
+        "difficulty": 0.65,
+        "estimated_time_minutes": 45,
+        "success_rate": 0.69,
+        "recommended_strategies": ["Self-Compassion Break (Kristin Neff)", "Thank Your Mind"]
+      },
+      {
+        "from_emotion": "Envy",
+        "to_emotion": "Gratitude",
+        "optimal_path": ["Envy", "Admiration", "Gratitude"],
+        "difficulty": 0.7,
+        "estimated_time_minutes": 60,
+        "success_rate": 0.67,
+        "recommended_strategies": ["Gratitude Journal", "Values Clarification Exercise"]
+      },
+      {
+        "from_emotion": "Resentment",
+        "to_emotion": "Acceptance",
+        "optimal_path": ["Resentment", "Anger", "Frustration", "Calm", "Acceptance"],
+        "difficulty": 0.85,
+        "estimated_time_minutes": 120,
+        "success_rate": 0.58,
+        "recommended_strategies": ["Radical Acceptance (DBT)", "Expressive Writing", "Wise Mind (DBT)"]
+      },
+      {
+        "from_emotion": "Regret",
+        "to_emotion": "Self-Compassion",
+        "optimal_path": ["Regret", "Self-Compassion"],
+        "difficulty": 0.65,
+        "estimated_time_minutes": 50,
+        "success_rate": 0.71,
+        "recommended_strategies": ["Self-Compassion Break (Kristin Neff)", "Radical Acceptance (DBT)"]
+      },
+      {
+        "from_emotion": "Disappointment",
+        "to_emotion": "Acceptance",
+        "optimal_path": ["Disappointment", "Sadness", "Acceptance"],
+        "difficulty": 0.6,
+        "estimated_time_minutes": 70,
+        "success_rate": 0.72,
+        "recommended_strategies": ["Radical Acceptance (DBT)", "Expressive Writing"]
+      },
+      {
+        "from_emotion": "Fear",
+        "to_emotion": "Calm",
+        "optimal_path": ["Fear", "Anxiety", "Worry", "Contentment", "Calm"],
+        "difficulty": 0.75,
+        "estimated_time_minutes": 100,
+        "success_rate": 0.66,
+        "recommended_strategies": ["4-7-8 Breathing", "Self-Soothe with Five Senses", "Body Scan Meditation"]
+      },
+      {
+        "from_emotion": "Despair",
+        "to_emotion": "Hope",
+        "optimal_path": ["Despair", "Sadness", "Acknowledgment", "Hope"],
+        "difficulty": 0.9,
+        "estimated_time_minutes": 150,
+        "success_rate": 0.54,
+        "recommended_strategies": ["Reach Out to Someone You Trust", "Radical Acceptance (DBT)", "Values Clarification Exercise"],
+        "note": "High difficulty - consider professional support"
+      }
+    ]
+  },
+  
+  "context_modifiers": {
+    "description": "Contextual factors that influence strategy effectiveness",
+    "note": "These modifiers adjust recommendations based on situational factors",
+    
+    "time_of_day": {
+      "morning": {
+        "energy_boost": 0.2,
+        "recommended_categories": ["Somatic/Body-Based", "Social Connection"],
+        "avoid_categories": []
+      },
+      "afternoon": {
+        "energy_boost": 0.1,
+        "recommended_categories": ["Cognitive", "Creative Expression"],
+        "avoid_categories": []
+      },
+      "evening": {
+        "calming_boost": 0.3,
+        "recommended_categories": ["Mindfulness", "Creative Expression"],
+        "avoid_categories": ["High Intensity Somatic"]
+      },
+      "late_night": {
+        "calming_boost": 0.4,
+        "recommended_categories": ["Mindfulness", "Low Arousal Activities"],
+        "avoid_categories": ["High Intensity Somatic", "Social Connection"]
+      }
+    },
+    
+    "energy_level": {
+      "high": {
+        "recommended_categories": ["Somatic/Body-Based", "Creative Expression"],
+        "recommended_strategies": ["Ecstatic/Expressive Dance", "Intense Physical Exercise", "Free-Form Art Making"]
+      },
+      "moderate": {
+        "recommended_categories": ["Cognitive", "Mindfulness", "Social Connection"],
+        "recommended_strategies": ["Walking Meditation", "Cognitive Defusion", "Values Clarification Exercise"]
+      },
+      "low": {
+        "recommended_categories": ["Mindfulness", "Low-Effort Cognitive"],
+        "recommended_strategies": ["4-7-8 Breathing", "Self-Soothe with Five Senses", "Music for Mood Regulation"],
+        "avoid_strategies": ["Progressive Muscle Relaxation", "Intense Physical Exercise"]
+      }
+    },
+    
+    "location": {
+      "home": {
+        "privacy_level": "high",
+        "recommended_categories": ["All categories"],
+        "optimal_for": ["Deep emotional work", "Somatic practices", "Creative expression"]
+      },
+      "work": {
+        "privacy_level": "low",
+        "recommended_categories": ["Cognitive", "Brief Mindfulness"],
+        "recommended_strategies": ["4-7-8 Breathing", "Box Breathing (4-4-4-4)", "Thank Your Mind"],
+        "avoid_strategies": ["Ecstatic/Expressive Dance", "Intense Emotional Expression"]
+      },
+      "public": {
+        "privacy_level": "low",
+        "recommended_categories": ["Cognitive", "Walking/Movement"],
+        "recommended_strategies": ["Walking Meditation", "Thank Your Mind", "Music for Mood Regulation"],
+        "avoid_strategies": ["Expressive Writing", "Ecstatic/Expressive Dance"]
+      }
+    },
+    
+    "available_time": {
+      "5_minutes": {
+        "recommended_strategies": ["4-7-8 Breathing", "Box Breathing (4-4-4-4)", "Thank Your Mind", "Self-Soothe with Five Senses"],
+        "note": "Quick interventions for immediate relief"
+      },
+      "15_minutes": {
+        "recommended_strategies": ["Self-Compassion Break (Kristin Neff)", "Cognitive Defusion: Leaves on a Stream", "Gratitude Journal", "Mindfulness Meditation (Basic)"],
+        "note": "Short practices with meaningful impact"
+      },
+      "30_minutes": {
+        "recommended_strategies": ["Body Scan Meditation", "Walking Meditation", "Expressive Writing", "Progressive Muscle Relaxation"],
+        "note": "Standard practice duration for most strategies"
+      },
+      "60_plus_minutes": {
+        "recommended_strategies": ["Loving-Kindness Meditation (Metta)", "Values Clarification Exercise", "Reach Out to Someone You Trust"],
+        "note": "Deep work and sustained connection"
+      }
+    },
+    
+    "experience_level": {
+      "beginner": {
+        "difficulty_cap": 2,
+        "recommended_strategies": ["4-7-8 Breathing", "Gratitude Journal", "Music for Mood Regulation", "Self-Soothe with Five Senses"],
+        "start_with": "Simple, low-barrier practices",
+        "avoid_difficulty": [4, 5]
+      },
+      "intermediate": {
+        "difficulty_cap": 4,
+        "recommended_strategies": ["Self-Compassion Break (Kristin Neff)", "Cognitive Defusion: Leaves on a Stream", "Body Scan Meditation"],
+        "explore": "Range of modalities and approaches"
+      },
+      "advanced": {
+        "difficulty_cap": 5,
+        "recommended_strategies": ["Loving-Kindness Meditation (Metta)", "Radical Acceptance (DBT)", "Values Clarification Exercise"],
+        "focus_on": "Deep transformation and integration"
+      }
+    }
+  },
+  
+  "common_challenges": {
+    "description": "Common patterns and their recommended starting points",
+    
+    "challenges": [
+      {
+        "challenge_name": "High Anxiety/Stress",
+        "starting_emotions": ["Anxiety", "Stress", "Overwhelm", "Fear"],
+        "immediate_relief_strategies": ["4-7-8 Breathing", "Box Breathing (4-4-4-4)", "Self-Soothe with Five Senses"],
+        "sustained_work_strategies": ["Body Scan Meditation", "Progressive Muscle Relaxation", "Mindfulness Meditation (Basic)"],
+        "difficulty_progression": [1, 2, 2]
+      },
+      {
+        "challenge_name": "Self-Criticism/Shame",
+        "starting_emotions": ["Shame", "Guilt", "Self-Criticism", "Embarrassment"],
+        "immediate_relief_strategies": ["Self-Compassion Break (Kristin Neff)", "Thank Your Mind"],
+        "sustained_work_strategies": ["Radical Acceptance (DBT)", "Loving-Kindness Meditation (Metta)", "Values Clarification Exercise"],
+        "difficulty_progression": [2, 3, 3]
+      },
+      {
+        "challenge_name": "Anger/Frustration",
+        "starting_emotions": ["Anger", "Rage", "Frustration", "Resentment"],
+        "immediate_relief_strategies": ["Ecstatic/Expressive Dance", "Progressive Muscle Relaxation"],
+        "sustained_work_strategies": ["Walking Meditation", "Radical Acceptance (DBT)", "Expressive Writing"],
+        "difficulty_progression": [2, 3, 3]
+      },
+      {
+        "challenge_name": "Sadness/Grief",
+        "starting_emotions": ["Sadness", "Grief", "Heartbreak", "Disappointment"],
+        "immediate_relief_strategies": ["Music for Mood Regulation", "Self-Soothe with Five Senses"],
+        "sustained_work_strategies": ["Expressive Writing", "Radical Acceptance (DBT)", "Loving-Kindness Meditation (Metta)"],
+        "difficulty_progression": [1, 3, 3]
+      },
+      {
+        "challenge_name": "Loneliness/Disconnection",
+        "starting_emotions": ["Loneliness", "Isolation", "Longing"],
+        "immediate_relief_strategies": ["Loving-Kindness Meditation (Metta)", "Music for Mood Regulation"],
+        "sustained_work_strategies": ["Reach Out to Someone You Trust", "Join or Attend Community Activity"],
+        "difficulty_progression": [2, 3]
+      }
+    ]
+  },
+  
+  "meta": {
+    "total_strategy_ratings": 20,
+    "total_path_templates": 20,
+    "context_modifier_categories": 5,
+    "common_challenge_patterns": 5,
+    "coverage": "Provides comprehensive cold-start support for new users",
+    "update_frequency": "Should be refreshed quarterly based on aggregate user data"
+  }
+}

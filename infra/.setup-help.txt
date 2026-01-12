@@ -1,0 +1,143 @@
+L.O.V.E. Stack Setup Script
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+DESCRIPTION
+    Complete setup script for the L.O.V.E. Stack development environment.
+    Sets up all modules (Listener, Observer, Versor, Experience) from a fresh
+    clone with all dependencies, databases, and seed data.
+
+USAGE
+    ./setup-love-stack.sh [OPTIONS]
+
+OPTIONS
+    General:
+    -h, --help              Show this help message and exit
+    --version               Show script version information
+    -y, --yes               Auto-accept all prompts (non-interactive mode)
+    -v, --verbose           Show detailed output (not yet implemented)
+    -q, --quiet             Minimal output (not yet implemented)
+
+    Setup Control:
+    --skip-db               Skip database initialization (migrations and seeding)
+    --skip-deps             Skip system dependency installation
+    --skip-ollama           Skip Ollama model download (saves 4.7GB)
+    --update                Update mode: keep venvs, just update dependencies (fast!)
+    --minimal               Minimal mode: --skip-db --skip-ollama --update (fastest)
+
+WHAT IT DOES
+    1. Checks Python 3.11+
+       - Searches for python3.11 or higher
+       - Offers to install if missing
+       - Saves python command for module setup
+
+    2. Checks Development Tools
+       - Verifies Xcode Command Line Tools (macOS)
+       - Installs build-essential (Linux)
+
+    3. Checks System Dependencies
+       - PostgreSQL 14+ (auto-detects installed version)
+       - pgvector extension for PostgreSQL
+       - Redis (for Listener job queue)
+       - Ollama (for Listener LLM)
+       - ffmpeg (for Listener audio processing)
+       - Node.js 18+ (for Experience module)
+       - Offers to install missing dependencies
+
+    4. Sets up Python Modules
+       - Creates fresh virtual environments
+       - Installs dependencies from requirements.txt
+       - Verifies Python 3.11 in each venv
+       - Modules: Versor, Observer, Listener
+
+    5. Sets up Configuration Files
+       - Copies .env.example to .env for each module
+
+    6. Sets up Ollama LLM
+       - Starts Ollama service if not running
+       - Downloads llama3.1:8b-instruct model (4.7GB)
+
+    7. Initializes Database (unless --skip-db)
+       - Creates PostgreSQL database
+       - Installs extensions (vector, uuid-ossp, pg_trgm)
+       - Runs Alembic migrations
+       - Seeds all data:
+         • 87 emotions from Atlas of the Heart
+         • 69 transition strategies
+         • 18 transition patterns
+         • 169 category transition mappings
+
+REQUIREMENTS
+    Minimum Versions:
+    - Python: 3.11+
+    - PostgreSQL: 14.0+ (uses latest available)
+    - pgvector: 0.5.0+
+    - Node.js: 18.0+
+    - Redis: 6.0+
+
+    Installation:
+    macOS:    brew install postgresql pgvector redis ollama ffmpeg node
+    Ubuntu:   sudo apt install postgresql redis-server ffmpeg nodejs
+
+    See infra/PGVECTOR_SETUP.md for pgvector installation details.
+
+VERSION MANAGEMENT
+    Version requirements are centrally managed in:
+    - infra/TOOL_VERSIONS (single source of truth)
+    - Scripts read minimum versions dynamically
+    - Auto-detects installed versions
+    - Validates against minimum requirements
+
+EXAMPLES
+    Interactive setup (recommended for first-time):
+    $ ./setup-love-stack.sh
+
+    CI/CD automated setup (no prompts):
+    $ ./setup-love-stack.sh --yes
+
+    SPEED OPTIMIZATIONS:
+    
+    Fastest re-run (update mode, ~3-5 minutes):
+    $ ./setup-love-stack.sh --minimal
+
+    Update Python dependencies only (~2-3 minutes):
+    $ ./setup-love-stack.sh --update --skip-ollama --skip-db --skip-deps
+
+    Re-create venvs without downloads (~8-10 minutes):
+    $ ./setup-love-stack.sh --skip-ollama --skip-db
+
+    Production deployment (minimal):
+    $ ./setup-love-stack.sh --yes --skip-ollama --skip-db
+
+TROUBLESHOOTING
+    Python 3.11 not found:
+    - macOS: brew install python@3.11
+    - Ubuntu: sudo add-apt-repository ppa:deadsnakes/ppa && sudo apt install python3.11
+
+    PostgreSQL won't start:
+    - macOS: brew services restart postgresql
+    - Ubuntu: sudo systemctl restart postgresql
+
+    pgvector not found:
+    - See infra/PGVECTOR_SETUP.md for installation guide
+
+    Database seeding fails:
+    - Ensure Versor is running (auto-started by script)
+    - Check /tmp/versor.log for Versor errors
+    - Re-run: cd infra && ./init-database.sh
+
+FILES
+    Setup script:        infra/setup-love-stack.sh
+    Database init:       infra/init-database.sh
+    Version management:  infra/TOOL_VERSIONS
+    Documentation:       infra/README.md
+
+MORE INFORMATION
+    Project documentation:  docs/
+    Setup guide:            infra/STACK_SETUP.md
+    pgvector guide:         infra/PGVECTOR_SETUP.md
+    Cross-platform guide:   infra/CROSS_PLATFORM_GUIDE.md
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+L.O.V.E. Stack - Listener, Observer, Versor, Experience
+Emotional intelligence platform with quaternion-based state representation
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━

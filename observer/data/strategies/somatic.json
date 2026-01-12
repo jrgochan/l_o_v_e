@@ -1,0 +1,344 @@
+{
+  "category": "Somatic & Body-Based Practices",
+  "source": "Van der Kolk, B. (2014). The Body Keeps the Score: Brain, Mind, and Body in the Healing of Trauma.",
+  "description": "Body-centered practices for releasing stored tension, processing trauma, and reconnecting with physical sensations. Based on understanding that trauma and emotion are held in the body and can be released through movement, breath, and somatic awareness.",
+  "strategies": [
+    {
+      "name": "Tension Release Exercises (TRE)",
+      "type": "response_modulation",
+      "description": "Series of exercises that intentionally create muscle fatigue to trigger the body's natural tremoring mechanism for releasing deep muscular patterns of stress and tension.",
+      "steps": [
+        "Stand with feet hip-width apart",
+        "Exercise 1: Raise onto toes for 1-2 minutes (calf fatigue)",
+        "Exercise 2: Deep squat hold against wall for 1-2 minutes (leg fatigue)",
+        "Exercise 3: Gentle leg stretches to further activate tremor reflex",
+        "Lie on back, knees bent, feet together, knees apart (butterfly position)",
+        "Let legs gently tremor/shake - this is the body's natural release",
+        "Don't control or stop the tremoring - allow it",
+        "Tremors may spread through hips, pelvis, torso - this is normal",
+        "Practice for 5-15 minutes (build up gradually)",
+        "To stop: bring knees together, straighten legs, rest",
+        "Stay lying down for a few minutes after, notice how body feels",
+        "May feel tired, relaxed, emotional - all normal responses"
+      ],
+      "time_required": "20-30 min (exercises 10 min + tremoring 5-15 min)",
+      "difficulty": 2,
+      "evidence": "clinical",
+      "citations": [
+        {
+          "author": "Berceli, D.",
+          "year": 2005,
+          "title": "Trauma Releasing Exercises (TRE): A revolutionary new method for stress/trauma recovery"
+        },
+        {
+          "author": "Van der Kolk, B.",
+          "year": 2014,
+          "title": "The Body Keeps the Score"
+        }
+      ],
+      "contraindications": "Pregnancy, recent surgery, severe PTSD without therapist support. Start very gradually. Can be activating.",
+      "best_for_vac_changes": {
+        "valence": "increase",
+        "arousal": "major_decrease",
+        "connection": "maintain"
+      }
+    },
+    {
+      "name": "Shaking/Vibration Practice",
+      "type": "response_modulation",
+      "description": "Intentional full-body shaking to discharge stress, release stuck energy, and reset the nervous system.",
+      "steps": [
+        "Stand with feet hip-width apart, knees slightly bent and loose",
+        "Begin bouncing gently, letting knees be soft and springy",
+        "Let the bounce move through your whole body",
+        "Add gentle shaking of hands and arms",
+        "Gradually let the shaking intensify and spread",
+        "Shake arms, shoulders, torso, hips, legs - whole body",
+        "Let jaw be loose, facial muscles soft",
+        "Breath naturally - don't hold breath",
+        "Make sound if it wants to come out - sighs, groans, etc.",
+        "Continue for 3-10 minutes",
+        "Gradually slow down, come to stillness",
+        "Stand still and notice sensations: tingling, warmth, aliveness",
+        "Can be done to music for added energy"
+      ],
+      "time_required": "5-15 minutes",
+      "difficulty": 1,
+      "evidence": "clinical",
+      "citations": [
+        {
+          "author": "Levine, P.",
+          "year": 1997,
+          "title": "Waking the Tiger: Healing Trauma"
+        },
+        {
+          "author": "Bradford, K.",
+          "year": 2016,
+          "title": "The Shake: An Embodied Practice for Transformation"
+        }
+      ],
+      "contraindications": "May feel silly initially; some people find it activating. Listen to your body.",
+      "best_for_vac_changes": {
+        "valence": "increase",
+        "arousal": "variable",
+        "connection": "maintain"
+      }
+    },
+    {
+      "name": "Ecstatic/Expressive Dance",
+      "type": "response_modulation",
+      "description": "Free-form movement to music without choreography, allowing the body to express and release emotions through dance.",
+      "steps": [
+        "Choose a private space where you won't be interrupted",
+        "Select music that calls to you (start with something energizing)",
+        "Close eyes or soften gaze",
+        "Begin moving however your body wants to move",
+        "No right or wrong way - follow your body's impulses",
+        "Let movement be authentic, not 'pretty' or 'good'",
+        "Express whatever emotions arise through movement",
+        "Let arms swing, hips sway, feet stomp - whatever feels right",
+        "Build energy, then let it shift - soft to powerful, slow to fast",
+        "Include all body parts - even face, hands, fingers",
+        "Let sound come out if it wants to - sighs, grunts, cries",
+        "Dance for 15-45 minutes",
+        "End with slower music, gentle movements",
+        "Rest in stillness, notice what you feel"
+      ],
+      "time_required": "20-60 minutes",
+      "difficulty": 2,
+      "evidence": "clinical",
+      "citations": [
+        {
+          "author": "Roth, G.",
+          "year": 1997,
+          "title": "Sweat Your Prayers: The Five Rhythms of the Soul"
+        },
+        {
+          "author": "Van der Kolk, B.",
+          "year": 2014,
+          "title": "The Body Keeps the Score"
+        }
+      ],
+      "contraindications": "Requires privacy; may bring up strong emotions. Start with shorter sessions.",
+      "best_for_vac_changes": {
+        "valence": "major_increase",
+        "arousal": "variable",
+        "connection": "increase"
+      }
+    },
+    {
+      "name": "Trauma-Sensitive Yoga",
+      "type": "response_modulation",
+      "description": "Gentle yoga practice emphasizing interoception, choice, and safety to support trauma recovery.",
+      "steps": [
+        "Create a safe environment - dim lights, comfortable temperature",
+        "Begin in a comfortable position (seated or lying down)",
+        "Close eyes only if that feels safe; otherwise soft gaze",
+        "Take several breaths, noticing body sensations",
+        "Move into simple poses very slowly",
+        "Key principle: YOU are in charge - modify or skip any pose",
+        "Notice sensations without judgment: 'I notice tightness', 'I notice warmth'",
+        "Suggested poses: child's pose, cat-cow, gentle twists, legs up the wall",
+        "Hold each pose 5-10 breaths or until you want to change",
+        "If dissociation occurs, open eyes, look around room, feet on ground",
+        "End with savasana (corpse pose) or seated stillness",
+        "Notice: what parts of body can you feel? Any numbness?",
+        "Practice cultivating sense of body as home, as safe"
+      ],
+      "time_required": "20-45 minutes",
+      "difficulty": 2,
+      "evidence": "rct",
+      "citations": [
+        {
+          "author": "Emerson, D. & Hopper, E.",
+          "year": 2011,
+          "title": "Overcoming Trauma through Yoga: Reclaiming Your Body"
+        },
+        {
+          "author": "Van der Kolk, B., et al.",
+          "year": 2014,
+          "title": "Yoga as an adjunctive treatment for posttraumatic stress disorder"
+        }
+      ],
+      "contraindications": "Not regular yoga - must be trauma-sensitive. Traditional yoga can be retraumatizing.",
+      "best_for_vac_changes": {
+        "valence": "increase",
+        "arousal": "decrease",
+        "connection": "increase"
+      }
+    },
+    {
+      "name": "Bilateral Stimulation (Self-Applied)",
+      "type": "response_modulation",
+      "description": "Alternating left-right stimulation to activate both brain hemispheres, promoting processing and integration (EMDR-adjacent).",
+      "steps": [
+        "Choose a method: butterfly hug, alternating knee taps, or eye movements",
+        "BUTTERFLY HUG: Cross arms over chest, hands on opposite shoulders",
+        "Alternately tap left shoulder, right shoulder, in a rhythm",
+        "Continue tapping while thinking about a mildly distressing memory",
+        "KNEE TAPS: Sit with hands on knees, alternately tap left knee, right knee",
+        "EYE MOVEMENTS: Hold up two fingers, move them left-right, follow with eyes",
+        "Do about 30-40 cycles of bilateral stimulation",
+        "Pause, take a breath, notice what you feel",
+        "If distress decreases, memory becomes less vivid, or insights arise - good",
+        "Repeat sets of bilateral stimulation until feeling settles",
+        "Not a replacement for EMDR therapy, but helpful for self-regulation",
+        "Best used with low-to-moderate intensity material, not severe trauma"
+      ],
+      "time_required": "5-20 minutes",
+      "difficulty": 2,
+      "evidence": "rct",
+      "citations": [
+        {
+          "author": "Shapiro, F.",
+          "year": 1989,
+          "title": "Efficacy of the eye movement desensitization procedure in the treatment of traumatic memories"
+        },
+        {
+          "author": "Van der Kolk, B.",
+          "year": 2014,
+          "title": "The Body Keeps the Score"
+        }
+      ],
+      "contraindications": "Do not use with severe trauma without professional support. May be activating.",
+      "best_for_vac_changes": {
+        "valence": "increase",
+        "arousal": "decrease",
+        "connection": "maintain"
+      }
+    },
+    {
+      "name": "Cold/Heat Therapy for Regulation",
+      "type": "response_modulation",
+      "description": "Use temperature to rapidly shift physiological state and regulate nervous system.",
+      "steps": [
+        "COLD for high arousal/panic:",
+        "Splash cold water on face for 30 seconds",
+        "Or hold ice cube in hand/on forehead",
+        "Or take cold shower (start warm, end cold)",
+        "Cold activates 'dive reflex', rapidly calming nervous system",
+        "Breathe slowly while applying cold",
+        "HEAT for anxiety/disconnection:",
+        "Warm bath or shower",
+        "Heating pad on chest, abdomen, or back",
+        "Warm drink held in both hands",
+        "Heat promotes parasympathetic activation (rest & digest)",
+        "Notice body sensations with curiosity",
+        "Alternate cold and heat for resilience building",
+        "End with temperature that feels regulating for you"
+      ],
+      "time_required": "5-20 minutes",
+      "difficulty": 1,
+      "evidence": "rct",
+      "citations": [
+        {
+          "author": "Linehan, M.M.",
+          "year": 2015,
+          "title": "DBT Skills Training Manual (TIPP Skills)"
+        },
+        {
+          "author": "Buijze et al.",
+          "year": 2016,
+          "title": "The Effect of Cold Showering on Health and Work"
+        }
+      ],
+      "contraindications": "Not for people with Raynaud's or cardiovascular issues without medical clearance",
+      "best_for_vac_changes": {
+        "valence": "increase",
+        "arousal": "major_decrease",
+        "connection": "maintain"
+      }
+    },
+    {
+      "name": "Somatic Tracking (Pain/Tension)",
+      "type": "attentional_deployment",
+      "description": "Bring mindful, safe attention to areas of physical pain or tension to support nervous system reprocessing.",
+      "steps": [
+        "Find area of pain or tension in body",
+        "Instead of avoiding or bracing against it, turn toward it with curiosity",
+        "Rate intensity 0-10",
+        "Describe it without judgment: 'tight', 'hot', 'sharp', 'dull'",
+        "Remind yourself: 'This sensation is real, but I am safe'",
+        "Send breath to the area",
+        "Notice: does the sensation have edges? A center?",
+        "Notice: what happens if you imagine softening around it?",
+        "Stay with it for 1-2 minutes without trying to fix it",
+        "Notice any shifts: intensity changes, location moves, quality transforms",
+        "If intensity increases past 7/10, bring attention back to breath",
+        "Practice: sensation is information, not danger",
+        "Over time, nervous system learns it can be with sensation safely"
+      ],
+      "time_required": "5-15 minutes",
+      "difficulty": 3,
+      "evidence": "rct",
+      "citations": [
+        {
+          "author": "Schubiner, H. & Betzold, M.",
+          "year": 2016,
+          "title": "Unlearn Your Pain: A 28-Day Process to Reprogram Your Brain"
+        },
+        {
+          "author": "Gordon, A., et al.",
+          "year": 2021,
+          "title": "A psychological treatment for chronic back pain: a randomized trial"
+        }
+      ],
+      "contraindications": "Not for acute injury or medical pain requiring treatment. For chronic neuroplastic pain.",
+      "best_for_vac_changes": {
+        "valence": "increase",
+        "arousal": "decrease",
+        "connection": "increase"
+      }
+    },
+    {
+      "name": "Grounding through Sensory Input",
+      "type": "attentional_deployment",
+      "description": "Use strong sensory experiences to bring awareness into body and present moment during dissociation or panic.",
+      "steps": [
+        "Notice: Am I feeling spaced out, numb, or disconnected from my body?",
+        "Choose a STRONG sensory input:",
+        "TOUCH: Hold ice, snap rubber band on wrist, press feet firmly into floor",
+        "TASTE: Bite into lemon, eat strong mint, sour candy",
+        "SMELL: Strong scent - peppermint oil, coffee, vinegar",
+        "SOUND: Loud music, snap fingers near ears, clap hands",
+        "SIGHT: Look around room, name 5 objects and their colors",
+        "Engage the sense fully, with complete attention",
+        "Say out loud: 'I am here. I am in my body. This is now.'",
+        "Notice feet on ground, weight in chair, clothes on skin",
+        "Take 5 slow breaths, feeling breath move in and out",
+        "Check in: More present? Less spacey? If yes, you've grounded",
+        "If still dissociated, try a different sensory channel"
+      ],
+      "time_required": "3-10 minutes",
+      "difficulty": 1,
+      "evidence": "clinical",
+      "citations": [
+        {
+          "author": "Linehan, M.M.",
+          "year": 2015,
+          "title": "DBT Skills Training Manual"
+        },
+        {
+          "author": "Najavits, L.",
+          "year": 2002,
+          "title": "Seeking Safety: A Treatment Manual for PTSD and Substance Abuse"
+        }
+      ],
+      "contraindications": null,
+      "best_for_vac_changes": {
+        "valence": "increase",
+        "arousal": "variable",
+        "connection": "increase"
+      }
+    }
+  ],
+  "meta": {
+    "version": "1.0",
+    "created": "2025-12-04",
+    "evidence_base": "Somatic practices are increasingly supported by research in trauma treatment, chronic pain, and emotion regulation. Van der Kolk's work has demonstrated the necessity of body-based approaches for trauma recovery. Many somatic practices have clinical evidence; some have RCT support (trauma-sensitive yoga, cold therapy, somatic tracking).",
+    "target_populations": "Particularly valuable for trauma survivors, those with chronic pain, people who dissociate, and anyone who feels disconnected from their body. Also effective for stress, anxiety, and emotional dysregulation.",
+    "core_principle": "The body is not just where trauma is stored - it's also where healing happens. Developing a safe, friendly relationship with body sensations is foundational to emotional health.",
+    "safety_note": "Many somatic practices can be activating. Start slowly, have supports in place, and ideally work with a trauma-informed therapist when processing significant trauma. Always honor your body's signals to stop or slow down.",
+    "training_note": "While these can be practiced independently, training in Somatic Experiencing, Sensorimotor Psychotherapy, or trauma-sensitive yoga provides deeper understanding. TRE certification exists for practitioners."
+  }
+}

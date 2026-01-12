@@ -1,0 +1,93 @@
+{
+  "category": "Core Transition Patterns",
+  "source": "Based on CATEGORY_GRAPH.md and transition research",
+  "description": "Fundamental emotional transition patterns with difficulty assessments",
+  "patterns": [
+    {
+      "name": "High Arousal to Low Arousal",
+      "from_cat": "Places We Go When Things Are Uncertain or Too Much",
+      "to_cat": "Places We Go When Life Is Good",
+      "vac_change": {
+        "valence_change": "increase",
+        "arousal_change": "decrease",
+        "connection_change": "increase"
+      },
+      "difficulty": 0.6,
+      "reasoning": "Requires physiological downregulation before cognitive reappraisal",
+      "examples": [
+        "Anxiety \u2192 Calm",
+        "Panic \u2192 Tranquility",
+        "Overwhelm \u2192 Contentment"
+      ]
+    },
+    {
+      "name": "Negative Connection to Positive Connection",
+      "from_cat": "Places We Go When We Fall Short",
+      "to_cat": "Places We Go With Others",
+      "vac_change": {
+        "valence_change": "increase",
+        "arousal_change": "variable",
+        "connection_change": "major_increase"
+      },
+      "difficulty": 0.4,
+      "reasoning": "Requires vulnerability as bridge - connection heals shame",
+      "examples": [
+        "Shame \u2192 Self-Compassion",
+        "Guilt \u2192 Self-Forgiveness"
+      ]
+    },
+    {
+      "name": "Social Disconnection to Connection",
+      "from_cat": "Places We Go When We Search for Connection",
+      "to_cat": "Places We Go With Others",
+      "vac_change": {
+        "valence_change": "increase",
+        "arousal_change": "slight_increase",
+        "connection_change": "increase"
+      },
+      "difficulty": 0.3,
+      "reasoning": "Natural progression through vulnerability",
+      "examples": [
+        "Loneliness \u2192 Belonging",
+        "Insecurity \u2192 Connection"
+      ]
+    },
+    {
+      "name": "High Negative Valence to Acceptance",
+      "from_cat": "Places We Go When We Feel Wronged",
+      "to_cat": "Places We Go When Things Don't Go As Planned",
+      "vac_change": {
+        "valence_change": "slight_increase",
+        "arousal_change": "decrease",
+        "connection_change": "variable"
+      },
+      "difficulty": 0.5,
+      "reasoning": "Requires releasing blame and processing grief",
+      "examples": [
+        "Anger \u2192 Acceptance",
+        "Resentment \u2192 Forgiveness"
+      ]
+    },
+    {
+      "name": "Overwhelm to Regulated State",
+      "from_cat": "Places We Go When Things Are Uncertain or Too Much",
+      "to_cat": "Places We Go When Life Is Good",
+      "vac_change": {
+        "valence_change": "increase",
+        "arousal_change": "major_decrease",
+        "connection_change": "increase"
+      },
+      "difficulty": 0.6,
+      "reasoning": "Requires breaking down complexity and permission to rest",
+      "examples": [
+        "Overwhelm \u2192 Contentment",
+        "Stress \u2192 Calm"
+      ]
+    }
+  ],
+  "meta": {
+    "version": "1.0",
+    "created": "2026-01-03",
+    "pattern_count": 5
+  }
+}

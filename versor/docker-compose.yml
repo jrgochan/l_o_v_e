@@ -1,0 +1,27 @@
+version: '3.8'
+
+services:
+  versor:
+    build:
+      context: .
+      dockerfile: Containerfile
+    ports:
+      - "8001:8001"
+    environment:
+      - EPSILON=1e-6
+      - FLOODING_THRESHOLD=2.0
+      - DEFAULT_SLERP_STEPS=60
+      - LOG_LEVEL=INFO
+      - DEBUG=false
+    healthcheck:
+      test: ["CMD", "python3", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8001/health')"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+    restart: unless-stopped
+    networks:
+      - love-network
+
+networks:
+  love-network:
+    driver: bridge

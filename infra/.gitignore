@@ -1,0 +1,30 @@
+# Logs
+logs/
+.venv-dx/
+*.log
+
+# Process ID files
+.love-stack.pids
+
+# Python cache files
+.python_cmd
+
+# Environment files (may contain secrets)
+.env
+.env.local
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Temporary files
+*.tmp
+temp/
+tmp/

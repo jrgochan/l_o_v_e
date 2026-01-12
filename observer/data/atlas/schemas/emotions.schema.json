@@ -1,0 +1,108 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://love.observer/schemas/atlas/emotions.json",
+  "title": "Atlas Emotions Schema",
+  "description": "Validation schema for Atlas of the Heart emotions data",
+  "type": "object",
+  "required": ["version", "source", "metadata", "emotions"],
+  "properties": {
+    "version": {
+      "type": "string",
+      "pattern": "^\\d+\\.\\d+$",
+      "description": "Data version (semver style)"
+    },
+    "source": {
+      "type": "string",
+      "description": "Research source citation"
+    },
+    "metadata": {
+      "type": "object",
+      "required": ["total_emotions", "categories", "coordinate_system"],
+      "properties": {
+        "total_emotions": {
+          "type": "integer",
+          "const": 87,
+          "description": "Must be exactly 87 emotions"
+        },
+        "categories": {
+          "type": "integer",
+          "const": 13,
+          "description": "Must be exactly 13 categories"
+        },
+        "coordinate_system": {
+          "type": "string"
+        }
+      }
+    },
+    "emotions": {
+      "type": "array",
+      "minItems": 87,
+      "maxItems": 87,
+      "description": "Array of exactly 87 emotions",
+      "items": {
+        "type": "object",
+        "required": ["emotion_name", "category", "definition", "vac"],
+        "properties": {
+          "emotion_name": {
+            "type": "string",
+            "minLength": 2,
+            "maxLength": 100,
+            "description": "Name of the emotion"
+          },
+          "category": {
+            "type": "string",
+            "enum": [
+              "When Things Are Uncertain or Too Much",
+              "When We Compare",
+              "When Things Don't Go As Planned",
+              "When It's Beyond Us",
+              "When Things Aren't What They Seem",
+              "When We're Hurting",
+              "Places We Go With Others",
+              "When We Fall Short",
+              "When We Search for Connection",
+              "When the Heart Is Open",
+              "When Life Is Good",
+              "When We Feel Wronged",
+              "When We Self-Assess"
+            ],
+            "description": "Atlas category (must match one of 13 categories)"
+          },
+          "definition": {
+            "type": "string",
+            "minLength": 10,
+            "description": "Clinical definition of the emotion"
+          },
+          "vac": {
+            "type": "array",
+            "description": "VAC coordinates: [valence, arousal, connection]",
+            "minItems": 3,
+            "maxItems": 3,
+            "items": {
+              "type": "number",
+              "minimum": -1.0,
+              "maximum": 1.0,
+              "description": "Each dimension must be in range [-1.0, 1.0]"
+            }
+          },
+          "haptic_pattern_id": {
+            "type": "string",
+            "enum": [
+              "HEARTBEAT",
+              "TENSE_PULSE",
+              "GENTLE_PULSE",
+              "SHARP_STRIKE",
+              "HEAVY_THROB",
+              "LIGHT_PULSE",
+              "WARM_PULSE",
+              "RAPID_PULSE"
+            ],
+            "description": "Haptic feedback pattern identifier"
+          }
+        },
+        "additionalProperties": false
+      }
+    }
+  },
+  "additionalProperties": true
+}

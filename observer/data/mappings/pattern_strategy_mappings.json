@@ -1,0 +1,142 @@
+{
+  "version": "1.0",
+  "source": "Curated from clinical experience and effectiveness research",
+  "description": "Maps which strategies are most effective for which transition patterns",
+  "mappings": [
+    {
+      "pattern_name": "High Arousal to Low Arousal",
+      "strategies": [
+        {
+          "strategy_name": "4-7-8 Breathing Technique",
+          "recommendation_order": 1,
+          "effectiveness_rating": 4.5
+        },
+        {
+          "strategy_name": "5-4-3-2-1 Grounding Technique",
+          "recommendation_order": 2,
+          "effectiveness_rating": 4.3
+        },
+        {
+          "strategy_name": "Progressive Muscle Relaxation",
+          "recommendation_order": 3,
+          "effectiveness_rating": 4.2
+        },
+        {
+          "strategy_name": "TIPP Skills for Crisis",
+          "recommendation_order": 4,
+          "effectiveness_rating": 4.4
+        },
+        {
+          "strategy_name": "Mindfulness Meditation (Basic)",
+          "recommendation_order": 5,
+          "effectiveness_rating": 4.0
+        }
+      ]
+    },
+    {
+      "pattern_name": "Negative Connection to Positive Connection",
+      "strategies": [
+        {
+          "strategy_name": "Self-Compassion Break (Kristin Neff)",
+          "recommendation_order": 1,
+          "effectiveness_rating": 4.6
+        },
+        {
+          "strategy_name": "Shame Resilience: Speak Shame",
+          "recommendation_order": 2,
+          "effectiveness_rating": 4.5
+        },
+        {
+          "strategy_name": "Values Clarification Exercise",
+          "recommendation_order": 3,
+          "effectiveness_rating": 4.2
+        },
+        {
+          "strategy_name": "Perspective-Taking: Friend's Advice",
+          "recommendation_order": 4,
+          "effectiveness_rating": 4.0
+        }
+      ]
+    },
+    {
+      "pattern_name": "Social Disconnection to Connection",
+      "strategies": [
+        {
+          "strategy_name": "Reach Out: Text or Call",
+          "recommendation_order": 1,
+          "effectiveness_rating": 4.3
+        },
+        {
+          "strategy_name": "Join or Attend Community Activity",
+          "recommendation_order": 2,
+          "effectiveness_rating": 4.1
+        },
+        {
+          "strategy_name": "Self-Compassion Break (Kristin Neff)",
+          "recommendation_order": 3,
+          "effectiveness_rating": 4.2
+        }
+      ]
+    },
+    {
+      "pattern_name": "High Negative Valence to Acceptance",
+      "strategies": [
+        {
+          "strategy_name": "Radical Acceptance (DBT)",
+          "recommendation_order": 1,
+          "effectiveness_rating": 4.4
+        },
+        {
+          "strategy_name": "Cognitive Reappraisal: Probability Estimation",
+          "recommendation_order": 2,
+          "effectiveness_rating": 4.2
+        },
+        {
+          "strategy_name": "Expressive Writing (Pennebaker Method)",
+          "recommendation_order": 3,
+          "effectiveness_rating": 4.1
+        },
+        {
+          "strategy_name": "Intense Physical Exercise",
+          "recommendation_order": 4,
+          "effectiveness_rating": 4.0
+        }
+      ]
+    },
+    {
+      "pattern_name": "Overwhelm to Regulated State",
+      "strategies": [
+        {
+          "strategy_name": "Task Chunking and Prioritization",
+          "recommendation_order": 1,
+          "effectiveness_rating": 4.5
+        },
+        {
+          "strategy_name": "Permission to Say No / Set Boundaries",
+          "recommendation_order": 2,
+          "effectiveness_rating": 4.3
+        },
+        {
+          "strategy_name": "TIPP Skills for Crisis",
+          "recommendation_order": 3,
+          "effectiveness_rating": 4.4
+        },
+        {
+          "strategy_name": "4-7-8 Breathing Technique",
+          "recommendation_order": 4,
+          "effectiveness_rating": 4.2
+        },
+        {
+          "strategy_name": "Progressive Muscle Relaxation",
+          "recommendation_order": 5,
+          "effectiveness_rating": 4.1
+        }
+      ]
+    }
+  ],
+  "meta": {
+    "version": "1.0",
+    "created": "2026-01-03",
+    "total_patterns": 5
+  }
+}

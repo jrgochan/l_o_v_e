@@ -1,0 +1,101 @@
+import { useCallback } from "react";
+import { useAtlasAdminStore } from "@/stores/useAtlasAdminStore";
+import { useExperienceStore } from "@/stores/useExperienceStore";
+import { CommandPage } from "@/types/command-palette";
+
+interface UseLocalQuickActionsDependencies {
+  close: () => void;
+  setCurrentPage: (page: CommandPage) => void;
+  setSearch: (term: string) => void;
+}
+
+export function useLocalQuickActions({
+  close,
+  setCurrentPage,
+  setSearch,
+}: UseLocalQuickActionsDependencies) {
+  const clearSelection = useAtlasAdminStore((state) => state.clearSelection);
+  const selectMultiple = useAtlasAdminStore((state) => state.selectMultiple);
+  const updateSetting = useAtlasAdminStore((state) => state.updateSetting);
+  const toggleLayer = useAtlasAdminStore((state) => state.toggleLayer);
+  const settings = useAtlasAdminStore((state) => state.settings);
+
+  const executeLocalAction = useCallback(
+    (commandLower: string): boolean => {
+      switch (commandLower) {
+        case "/clear":
+          clearSelection();
+          close();
+          return true;
+        case "/bridge":
+          {
+            const bridgeNames = [
+              "Vulnerability",
+              "Awe",
+              "Compassion",
+              "Curiosity",
+              "Acceptance",
+              "Gratitude",
+            ];
+            const all = useAtlasAdminStore.getState().allEmotions;
+            const ids = all.filter((e) => bridgeNames.includes(e.name)).map((e) => e.id);
+            selectMultiple(ids);
+            close();
+          }
+          return true;
+        case "/reset":
+          clearSelection();
+          useExperienceStore.getState().reset();
+          close();
+          return true;
+        case "/help":
+          setCurrentPage("help");
+          setSearch("");
+          return true;
+        case "/debug":
+          updateSetting("dataVisualizationMode", !settings.dataVisualizationMode);
+          close();
+          return true;
+        case "/performance":
+          updateSetting("enableAnimations", !settings.enableAnimations);
+          close();
+          return true;
+        // Toggles
+        case "/toggle legend":
+          toggleLayer("legend");
+          close();
+          return true;
+        case "/toggle labels":
+          toggleLayer("emotionLabels");
+          close();
+          return true;
+        case "/toggle paths":
+          toggleLayer("transitionPaths");
+          close();
+          return true;
+        case "/toggle sphere":
+          toggleLayer("soulSphere");
+          close();
+          return true;
+        case "/toggle waypoints":
+          toggleLayer("waypoints");
+          close();
+          return true;
+        default:
+          return false;
+      }
+    },
+    [
+      clearSelection,
+      close,
+      selectMultiple,
+      settings,
+      toggleLayer,
+      updateSetting,
+      setCurrentPage,
+      setSearch,
+    ]
+  );
+
+  return { executeLocalAction };
+}

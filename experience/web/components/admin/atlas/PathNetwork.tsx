@@ -1,0 +1,279 @@
+/**
+ * Path Network Component
+ *
+ * Renders multiple transition paths between selected emotions.
+ * Each path is color-coded by difficulty and shows waypoints.
+ */
+
+"use client";
+
+import { useMemo, useRef } from "react";
+import { useFrame, ThreeEvent } from "@react-three/fiber";
+import * as THREE from "three";
+import { useAtlasAdminStore } from "@/stores/useAtlasAdminStore";
+import { DIFFICULTY_COLORS, CATEGORY_COLORS } from "@/types/atlas-admin";
+import type { EmotionPath } from "@/types/atlas-admin";
+import { PathParticles } from "../visualizations/PathParticles";
+import { PathCurveAnimated } from "../paths/PathCurveAnimated";
+
+export function PathNetwork() {
+  const computedPaths = useAtlasAdminStore((state) => state.computedPaths);
+  const selectedIds = useAtlasAdminStore((state) => state.selectedEmotionIds);
+  const layers = useAtlasAdminStore((state) => state.layers);
+  const settings = useAtlasAdminStore((state) => state.settings);
+
+  // Filter paths to only show those between selected emotions
+  const paths = Array.from(computedPaths.values()).filter((path) => {
+    return selectedIds.has(path.from.id) && selectedIds.has(path.to.id);
+  });
+
+  if (!layers.transitionPaths || paths.length === 0) {
+    return null;
+  }
+
+  return (
+    <group>
+      {paths.map((path) => (
+        <PathCurve
+          key={path.id}
+          path={path}
+          opacity={settings.pathOpacity}
+          showWaypoints={layers.waypoints}
+        />
+      ))}
+    </group>
+  );
+}
+
+interface PathCurveProps {
+  path: EmotionPath;
+  opacity: number;
+  showWaypoints: boolean;
+}
+
+function PathCurve({ path, opacity, showWaypoints }: PathCurveProps) {
+  const allEmotions = useAtlasAdminStore((state) => state.allEmotions);
+  const selectedPathId = useAtlasAdminStore((state) => state.selectedPathId);
+  const hoveredPathId = useAtlasAdminStore((state) => state.hoveredPathId);
+  const setHoveredPath = useAtlasAdminStore((state) => state.setHoveredPath);
+  const setSelectedPath = useAtlasAdminStore((state) => state.setSelectedPath);
+  const pathAnimationMode = useAtlasAdminStore((state) => state.settings.pathAnimationMode);
+
+  const isSelected = selectedPathId === path.id;
+  const isHovered = hoveredPathId === path.id;
+
+  // Dynamic opacity logic
+  const currentOpacity = useMemo(() => {
+    if (hoveredPathId) {
+      if (isHovered) return 1.0;
+      if (isSelected) return 0.2;
+      return 0.1;
+    }
+    return opacity;
+  }, [hoveredPathId, isHovered, isSelected, opacity]);
+
+  // Build path points: start → waypoints → end
+  const points = useMemo(() => {
+    const pathPoints: THREE.Vector3[] = [];
+
+    // Start
+    pathPoints.push(new THREE.Vector3(...path.from.vac));
+
+    // Waypoints
+    path.waypoints.forEach((wp) => {
+      pathPoints.push(new THREE.Vector3(...wp.vac));
+    });
+
+    // End
+    pathPoints.push(new THREE.Vector3(...path.to.vac));
+
+    return pathPoints;
+  }, [path]);
+
+  // Create smooth curve
+  const curve = useMemo(() => {
+    return new THREE.CatmullRomCurve3(points, false, "catmullrom", 0.5);
+  }, [points]);
+
+  // Create tube geometry (increased radius for easier clicking)
+  const tubeGeometry = useMemo(() => {
+    return new THREE.TubeGeometry(curve, 64, 0.04, 8, false);
+  }, [curve]);
+
+  // Color based on difficulty
+  const color = useMemo(() => {
+    const colorHex = DIFFICULTY_COLORS[path.difficulty];
+    return new THREE.Color(colorHex);
+  }, [path.difficulty]);
+
+  // Helper function to get category color for a waypoint emotion
+  const getWaypointCategoryColor = (emotionName: string): string => {
+    const emotion = allEmotions.find((e) => e.name === emotionName);
+    if (emotion && emotion.category && CATEGORY_COLORS[emotion.category]) {
+      return CATEGORY_COLORS[emotion.category];
+    }
+    return "#888888"; // Fallback gray if not found
+  };
+
+  // Hover handlers
+  const handlePointerEnter = (e: ThreeEvent<PointerEvent>) => {
+    e.stopPropagation();
+    setHoveredPath(path.id);
+    document.body.style.cursor = "pointer";
+  };
+
+  const handlePointerLeave = () => {
+    setHoveredPath(null);
+    document.body.style.cursor = "auto";
+  };
+
+  const handleClick = (e: ThreeEvent<MouseEvent>) => {
+    e.stopPropagation();
+    // Toggle selection: if already selected, clear it, otherwise select it
+    if (isSelected) {
+      setSelectedPath(null);
+    } else {
+      setSelectedPath(path.id);
+    }
+  };
+
+  return (
+    <group
+      onPointerEnter={handlePointerEnter}
+      onPointerLeave={handlePointerLeave}
+      onClick={handleClick}
+    >
+      {/* Animated path tube - mode-based animation */}
+      <PathCurveAnimated
+        mode={pathAnimationMode}
+        tubeGeometry={tubeGeometry}
+        color={color}
+        opacity={currentOpacity}
+        isSelected={isSelected}
+      />
+
+      {/* Waypoint markers */}
+      {showWaypoints &&
+        path.waypoints.map((waypoint, index) => (
+          <WaypointMarker
+            key={index}
+            position={waypoint.vac}
+            emotionName={waypoint.emotion}
+            categoryColor={getWaypointCategoryColor(waypoint.emotion)}
+            isHighlighted={isSelected || isHovered}
+            mode={pathAnimationMode}
+            opacity={currentOpacity}
+          />
+        ))}
+
+      {/* Animated particles showing directionality */}
+      <PathParticles
+        curve={curve}
+        color={color}
+        particleCount={10}
+        speed={0.3}
+        size={0.025}
+        opacity={currentOpacity}
+        isHighlighted={isSelected}
+        mode={pathAnimationMode}
+      />
+    </group>
+  );
+}
+
+interface WaypointMarkerProps {
+  position: [number, number, number];
+  emotionName: string;
+  categoryColor: string;
+  isHighlighted: boolean;
+  mode: "subtle" | "dynamic" | "mystical";
+  opacity: number;
+}
+
+function WaypointMarker({
+  position,
+  emotionName,
+  categoryColor,
+  isHighlighted,
+  mode,
+  opacity,
+}: WaypointMarkerProps) {
+  const meshRef = useRef<THREE.Mesh>(null);
+  const allEmotions = useAtlasAdminStore((state) => state.allEmotions);
+  const setHoveredEmotion = useAtlasAdminStore((state) => state.setHoveredEmotion);
+
+  const color = useMemo(() => {
+    return new THREE.Color(categoryColor);
+  }, [categoryColor]);
+
+  // Find the full emotion data for this waypoint
+  const emotion = useMemo(() => {
+    return allEmotions.find((e) => e.name === emotionName);
+  }, [allEmotions, emotionName]);
+
+  useFrame((state) => {
+    if (!meshRef.current) return;
+
+    const time = state.clock.elapsedTime;
+
+    // Mode-based pulsing animations
+    let pulse = 1.0;
+
+    switch (mode) {
+      case "subtle":
+        // Gentle pulsing (2.0 Hz, 10% amplitude)
+        pulse = 1.0 + Math.sin(time * 2.0) * 0.1;
+        break;
+
+      case "dynamic": {
+        // Bouncy pulsing (3.5 Hz, 20% amplitude with harmonic overshoot)
+        const base = Math.sin(time * 3.5) * 0.2;
+        const overshoot = Math.sin(time * 7.0) * 0.05; // Double frequency harmonic
+        pulse = 1.0 + base + overshoot;
+        break;
+      }
+
+      case "mystical": {
+        // Ethereal shimmer (variable frequency, quantum-like)
+        const wave1 = Math.sin(time * 1.7) * 0.12;
+        const wave2 = Math.sin(time * 2.3) * 0.08;
+        const wave3 = Math.sin(time * 3.1) * 0.05;
+        pulse = 1.0 + wave1 + wave2 + wave3;
+        break;
+      }
+    }
+
+    meshRef.current.scale.setScalar(pulse);
+  });
+
+  const handlePointerOver = (e: ThreeEvent<PointerEvent>) => {
+    e.stopPropagation();
+    if (emotion) {
+      setHoveredEmotion(emotion.id);
+    }
+    document.body.style.cursor = "pointer";
+  };
+
+  const handlePointerOut = () => {
+    setHoveredEmotion(null);
+    document.body.style.cursor = "auto";
+  };
+
+  return (
+    <mesh
+      ref={meshRef}
+      position={position}
+      onPointerOver={handlePointerOver}
+      onPointerOut={handlePointerOut}
+    >
+      <sphereGeometry args={[0.04, 12, 12]} />
+      <meshStandardMaterial
+        color={color}
+        emissive={color}
+        emissiveIntensity={isHighlighted ? 2.0 : 1.0}
+        transparent
+        opacity={opacity}
+      />
+    </mesh>
+  );
+}

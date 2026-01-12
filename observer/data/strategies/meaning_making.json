@@ -1,0 +1,244 @@
+{
+  "category": "Meaning-Making & Purpose",
+  "source": "Frankl, V. (1946). Man's Search for Meaning; White, M. & Epston, D. (1990). Narrative Means to Therapeutic Ends.",
+  "description": "Strategies for finding or creating meaning in suffering, connecting with purpose, and reauthoring life narratives. Based on logotherapy (meaning-centered therapy), narrative therapy, and post-traumatic growth research. These practices help transform pain into purpose and loss into legacy.",
+  "strategies": [
+    {
+      "name": "Narrative Therapy: Externalizing the Problem",
+      "type": "cognitive_reappraisal",
+      "description": "Separate yourself from the problem by giving it a name and exploring your relationship with it, developed by Michael White.",
+      "steps": [
+        "Identify the problem you're struggling with (depression, anxiety, grief, etc.)",
+        "Give it a name - externalize it: 'The Depression', 'Anxiety', 'The Critic'",
+        "Explore your relationship with it through questions:",
+        "- How long has [Problem] been in your life?",
+        "- What does [Problem] tell you about yourself?",
+        "- What does [Problem] want you to believe?",
+        "- When is [Problem] strongest? When is it weaker?",
+        "- What does [Problem] steal from you? (time, joy, relationships)",
+        "- Who are you when [Problem] is not around?",
+        "Now flip the script - YOU are not the problem, the Problem is the problem:",
+        "- 'I am not depressed. I am a person experiencing Depression.'",
+        "- 'This is not who I am. This is something visiting me.'",
+        "Write about times you've stood up to the Problem",
+        "What do these resistance stories say about who you really are?",
+        "Recruit allies: Who supports you against the Problem?",
+        "Notice: Creating space between you and the problem creates choice"
+      ],
+      "time_required": "30-60 minutes",
+      "difficulty": 3,
+      "evidence": "clinical",
+      "citations": [
+        {
+          "author": "White, M. & Epston, D.",
+          "year": 1990,
+          "title": "Narrative Means to Therapeutic Ends"
+        },
+        {
+          "author": "Freedman, J. & Combs, G.",
+          "year": 1996,
+          "title": "Narrative Therapy: The Social Construction of Preferred Realities"
+        }
+      ],
+      "contraindications": "Not a substitute for treating serious mental illness. Use alongside professional treatment.",
+      "best_for_vac_changes": {
+        "valence": "increase",
+        "arousal": "decrease",
+        "connection": "increase"
+      }
+    },
+    {
+      "name": "Post-Traumatic Growth Inventory",
+      "type": "cognitive_reappraisal",
+      "description": "Identify ways you've grown through adversity, based on Tedeschi and Calhoun's PTG research.",
+      "steps": [
+        "Think of a difficult experience or period in your life",
+        "Reflect on these five areas of potential growth:",
+        "1. PERSONAL STRENGTH: 'I learned that I am stronger than I thought'",
+        "   - What inner resources did you discover?",
+        "   - How did you surprise yourself?",
+        "2. NEW POSSIBILITIES: 'New paths opened that I wouldn't have found otherwise'",
+        "   - What new interests or paths emerged?",
+        "   - What would you not have done without this experience?",
+        "3. RELATING TO OTHERS: 'I learned who my real friends are' or 'I can ask for help now'",
+        "   - How did relationships deepen or change?",
+        "   - Did you develop more compassion?",
+        "4. APPRECIATION OF LIFE: 'I don't take things for granted anymore'",
+        "   - What do you appreciate more now?",
+        "   - How has your perspective shifted?",
+        "5. SPIRITUAL/EXISTENTIAL CHANGE: 'I understand what matters now'",
+        "   - Did your values or beliefs evolve?",
+        "   - What gives your life meaning now?",
+        "Write about each area where growth occurred",
+        "Note: Growth doesn't erase the pain, but it coexists with it"
+      ],
+      "time_required": "45-90 minutes",
+      "difficulty": 3,
+      "evidence": "rct",
+      "citations": [
+        {
+          "author": "Tedeschi, R.G. & Calhoun, L.G.",
+          "year": 1996,
+          "title": "The Posttraumatic Growth Inventory: Measuring the positive legacy of trauma"
+        },
+        {
+          "author": "Tedeschi, R.G. & Calhoun, L.G.",
+          "year": 2004,
+          "title": "Posttraumatic Growth: Conceptual Foundations and Empirical Evidence"
+        }
+      ],
+      "contraindications": "Should not be done too early after trauma. Allow time for processing and grieving first. Growth emerges organically, not through force.",
+      "best_for_vac_changes": {
+        "valence": "major_increase",
+        "arousal": "variable",
+        "connection": "increase"
+      }
+    },
+    {
+      "name": "Silver Linings Journal",
+      "type": "attentional_deployment",
+      "description": "Regular practice of identifying meaning, learning, or unexpected gifts in difficult experiences.",
+      "steps": [
+        "At end of day or week, reflect on challenges faced",
+        "For each difficulty, complete these prompts:",
+        "1. 'What this taught me...'",
+        "   (not what I wish I'd learned, but what actually emerged)",
+        "2. 'Because of this, I now...'",
+        "   (new habits, perspectives, boundaries, relationships)",
+        "3. 'A surprising gift was...'",
+        "   (something unexpected - compassion received, inner strength, clarity)",
+        "4. 'This helped me let go of...'",
+        "   (illusions, people-pleasing, false beliefs)",
+        "5. 'What I hope to carry forward...'",
+        "   (wisdom, values, practices)",
+        "Be honest - don't force positivity",
+        "Silver linings coexist with pain, they don't erase it",
+        "Sometimes the 'gift' is just: 'I survived this day'",
+        "Review entries monthly to see patterns of resilience",
+        "Notice: You are continuously being shaped by experience"
+      ],
+      "time_required": "15-30 minutes",
+      "difficulty": 2,
+      "evidence": "clinical",
+      "citations": [
+        {
+          "author": "Emmons, R.A. & McCullough, M.E.",
+          "year": 2003,
+          "title": "Counting blessings versus burdens: An experimental investigation of gratitude and subjective well-being"
+        },
+        {
+          "author": "Tedeschi, R.G. & Calhoun, L.G.",
+          "year": 2004,
+          "title": "Posttraumatic Growth"
+        }
+      ],
+      "contraindications": "Don't use to bypass genuine grief or pain. Toxic positivity is harmful. This is about meaning-making, not dismissing difficulty.",
+      "best_for_vac_changes": {
+        "valence": "increase",
+        "arousal": "slight_decrease",
+        "connection": "maintain"
+      }
+    },
+    {
+      "name": "Legacy Work: Writing Your Own Eulogy",
+      "type": "cognitive_reappraisal",
+      "description": "Clarify values and direction by writing what you hope will be said about you at life's end.",
+      "steps": [
+        "Find quiet time, get comfortable with the mortality of this exercise",
+        "Imagine you're at the end of a long, full life",
+        "Someone who loved you is speaking about your life",
+        "What do you hope they say about:",
+        "- WHO you were (character qualities)",
+        "- WHAT you stood for (values, principles)",
+        "- HOW you treated people",
+        "- WHAT you created or contributed",
+        "- HOW you handled adversity",
+        "- WHAT you loved and cherished",
+        "Write in third person: 'They were someone who...'",
+        "Don't focus on achievements - focus on being and relating",
+        "When complete, read it back",
+        "Ask: Is this the person I'm being now? If not, what needs to change?",
+        "Extract 3-5 core values from this eulogy",
+        "Use these as your North Star for decisions",
+        "Review annually - does it need updating? Are you living aligned?"
+      ],
+      "time_required": "45-90 minutes",
+      "difficulty": 4,
+      "evidence": "clinical",
+      "citations": [
+        {
+          "author": "Frankl, V.",
+          "year": 1946,
+          "title": "Man's Search for Meaning"
+        },
+        {
+          "author": "Covey, S.",
+          "year": 1989,
+          "title": "The 7 Habits of Highly Effective People (Habit 2: Begin with the End in Mind)"
+        }
+      ],
+      "contraindications": "Can be emotionally intense. May trigger existential anxiety initially - this often gives way to clarity.",
+      "best_for_vac_changes": {
+        "valence": "increase",
+        "arousal": "variable",
+        "connection": "major_increase"
+      }
+    },
+    {
+      "name": "Purpose Exploration: Ikigai Framework",
+      "type": "cognitive_reappraisal",
+      "description": "Japanese concept of finding purpose at intersection of what you love, what you're good at, what the world needs, and what you can be paid for.",
+      "steps": [
+        "Draw four overlapping circles (Venn diagram)",
+        "Circle 1: What do you LOVE? (passions, interests, what lights you up)",
+        "Circle 2: What are you GOOD AT? (skills, talents, natural abilities)",
+        "Circle 3: What does the WORLD NEED? (problems you care about solving)",
+        "Circle 4: What can you be PAID FOR? (market value, career options)",
+        "Explore the intersections:",
+        "- Love + Good At = PASSION",
+        "- Good At + Paid For = PROFESSION",
+        "- Paid For + World Needs = VOCATION",
+        "- World Needs + Love = MISSION",
+        "Center (all four) = IKIGAI (reason for being)",
+        "What sits in your center? That's your purpose",
+        "If center is empty, that's information:",
+        "  - What would need to shift to create alignment?",
+        "  - Can you adjust any circle?",
+        "Use this as a lens for life decisions",
+        "Revisit yearly - ikigai evolves with you"
+      ],
+      "time_required": "60-90 minutes",
+      "difficulty": 3,
+      "evidence": "clinical",
+      "citations": [
+        {
+          "author": "García, H. & Miralles, F.",
+          "year": 2016,
+          "title": "Ikigai: The Japanese Secret to a Long and Happy Life"
+        },
+        {
+          "author": "Frankl, V.",
+          "year": 1946,
+          "title": "Man's Search for Meaning"
+        }
+      ],
+      "contraindications": "Can highlight dissatisfaction with current life - be prepared for that awareness. May catalyze major life changes.",
+      "best_for_vac_changes": {
+        "valence": "increase",
+        "arousal": "slight_increase",
+        "connection": "increase"
+      }
+    }
+  ],
+  "meta": {
+    "version": "1.0",
+    "created": "2025-12-04",
+    "evidence_base": "Meaning-making is central to well-being and resilience. Frankl's logotherapy demonstrated that finding meaning in suffering is essential for psychological health. Post-traumatic growth research (Tedeschi & Calhoun) shows that meaning-making is key to positive change after adversity. Narrative therapy (White & Epston) provides practical methods for reshaping life stories. Strong empirical support for meaning and purpose correlating with longevity, life satisfaction, and resilience.",
+    "target_populations": "Universal but especially valuable for those facing loss, trauma, life transitions, chronic illness, or existential questions. Anyone asking 'Why did this happen?' or 'What am I here for?' benefits from meaning-making practices. Essential for healing from grief, trauma, and finding direction in midlife or after major changes.",
+    "core_philosophy": "Viktor Frankl: 'He who has a why to live can bear almost any how.' Meaning is not found, it's created. We can't always choose our circumstances, but we can choose our response and what we make of them. Suffering without meaning is unbearable; suffering with meaning becomes transformative. As Rumi wrote: 'The wound is the place where the Light enters you.'",
+    "integration_with_vac": "Meaning-making primarily affects Valence (increases positivity) and Connection (increases sense of belonging to something larger). It's the ultimate reappraisal strategy - changing how we see our experience changes our emotional relationship to it. Often the final step in processing difficult emotions: acknowledge → feel → process → integrate → find meaning.",
+    "caution": "Meaning-making should not be rushed or forced. Trauma requires time to process. 'Finding the silver lining' too early can be retraumatizing or invalidating. These practices work best after initial shock/grief has been honored. Also: meaning doesn't erase pain - they coexist. Growth through adversity doesn't make the adversity good or deserved.",
+    "when_to_use": "Use meaning-making strategies when: 1) You've processed the acute pain and are ready to integrate, 2) You're feeling stuck in victimhood and ready to reclaim agency, 3) You're facing mortality or existential questions, 4) You want to honor suffering by not letting it be meaningless, 5) You're ready to turn your pain into purpose.",
+    "training_note": "Logotherapy training, narrative therapy certification, and grief counseling training all provide deeper understanding of meaning-making. These practices can be self-guided but are often more powerful with a trained therapist who can ask the right questions and hold space for emergence."
+  }
+}

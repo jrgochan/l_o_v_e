@@ -1,0 +1,119 @@
+# GitLab CI/CD Pipeline for Observer Module
+# L.O.V.E. Project - Behavioral Intelligence Engine
+
+stages:
+  - test
+  - lint
+  - build
+  - deploy
+  - secret-detection
+
+variables:
+  PYTHON_VERSION: "3.11"
+  PIP_CACHE_DIR: "$CI_PROJECT_DIR/.cache/pip"
+  # Service Database Configuration
+  POSTGRES_DB: "test_observer_db"
+  POSTGRES_USER: "test_user"
+  POSTGRES_PASSWORD: "test_password"
+  POSTGRES_HOST: "postgres"
+  POSTGRES_PORT: "5432"
+  DATABASE_URL: "postgresql+asyncpg://test_user:test_password@postgres:5432/test_observer_db"
+  SECRET_DETECTION_ENABLED: 'true'
+
+include:
+  - template: Security/Secret-Detection.gitlab-ci.yml
+
+# Cache dependencies
+cache:
+  paths:
+    - .cache/pip
+    - venv/
+
+# Test job
+test:unit:
+  stage: test
+  image: python:3.11
+  services:
+    - name: pgvector/pgvector:pg16
+      alias: postgres
+  variables:
+    # Postgres service envs
+    POSTGRES_DB: "test_observer_db"
+    POSTGRES_USER: "test_user"
+    POSTGRES_PASSWORD: "test_password"
+  before_script:
+    - python -m venv venv
+    - source venv/bin/activate
+    - pip install --upgrade pip
+    - pip install -r requirements.txt
+    # Wait for DB? Usually pytest handles connection retry or we add a wait script.
+    # But let's assume asyncpg retry logic or fast enough startup.
+  script:
+    - pytest tests/unit/ -v --cov=app --cov-report=term --cov-report=html
+  coverage: '/TOTAL.*\s+(\d+%)$/'
+  artifacts:
+    reports:
+      coverage_report:
+        coverage_format: cobertura
+        path: coverage.xml
+    paths:
+      - htmlcov/
+    expire_in: 1 week
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+    - if: '$CI_COMMIT_BRANCH == "main"'
+
+# Linting
+lint:flake8:
+  stage: lint
+  image: python:3.11-slim
+  before_script:
+    - pip install flake8
+  script:
+    - flake8 app/ tests/ --max-line-length=100 --exclude=venv
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+    - if: '$CI_COMMIT_BRANCH == "main"'
+
+lint:mypy:
+  stage: lint
+  image: python:3.11-slim
+  before_script:
+    - python -m venv venv
+    - source venv/bin/activate
+    - pip install -r requirements.txt
+  script:
+    # Mypy might need the dependencies installed to check types correctly
+    - mypy app/ --ignore-missing-imports
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+    - if: '$CI_COMMIT_BRANCH == "main"'
+
+lint:black:
+  stage: lint
+  image: python:3.11-slim
+  before_script:
+    - pip install black
+  script:
+    - black app/ tests/ --check --line-length=100
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+    - if: '$CI_COMMIT_BRANCH == "main"'
+
+# Build
+build:container:
+  stage: build
+  image: docker:24
+  services:
+    - docker:24-dind
+  before_script:
+    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+  script:
+    - docker build -t $CI_REGISTRY_IMAGE/observer:$CI_COMMIT_SHORT_SHA -f Containerfile .
+    - docker build -t $CI_REGISTRY_IMAGE/observer:latest -f Containerfile .
+    - docker push $CI_REGISTRY_IMAGE/observer:$CI_COMMIT_SHORT_SHA
+    - docker push $CI_REGISTRY_IMAGE/observer:latest
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "main"'
+  tags:
+    - docker

@@ -1,0 +1,78 @@
+{
+  "category": "Joy Cultivation Patterns",
+  "source": "Brown, B. (2021). Atlas of the Heart; Fredrickson, B.L. (2009). Positivity: Top-Notch Research Reveals the Upside of Positive Emotions.",
+  "description": "Patterns for cultivating and sustaining joy, moving from states that block joy (foreboding joy, numbness) to genuine positive emotions. Based on Brené Brown's work on vulnerability and joy, and Barbara Fredrickson's broaden-and-build theory of positive emotions.",
+  "patterns": [
+    {
+      "name": "Foreboding Joy to Gratitude to Genuine Joy",
+      "from_category": "Places We Go When Life Is Good",
+      "to_category": "Places We Go When Life Is Good",
+      "vac_change_characteristics": {
+        "valence_change": "increase",
+        "arousal_change": "slight_decrease",
+        "connection_change": "increase"
+      },
+      "difficulty_score": 0.4,
+      "psychological_reasoning": "Foreboding joy is when we can't fully feel happiness because we're waiting for 'the other shoe to drop' - catastrophizing in moments of goodness. It's a protection mechanism but it steals joy. Moving through requires vulnerability (letting yourself feel good even knowing loss is possible) and gratitude (practicing appreciation without adding 'but what if'). Paradoxically, staying present with joy makes us MORE resilient to loss, not less.",
+      "example_transitions": [
+        "Foreboding Joy → Anxiety in Happiness → Vulnerability → Gratitude → Full Joy",
+        "Waiting for Disaster → Softening → Risk Feeling Good → Appreciation → Celebration",
+        "Guarded Happiness → Permission → Trust → Savoring → Delight"
+      ],
+      "minimum_waypoints": 2,
+      "estimated_time": "days to weeks (practice-dependent)",
+      "key_intermediate_states": [
+        "Vulnerability (choosing to feel good despite uncertainty)",
+        "Gratitude (appreciating what is without catastrophizing)",
+        "Savoring (full presence with positive experience)"
+      ],
+      "recommended_strategy_types": [
+        "cognitive_reappraisal",
+        "attentional_deployment",
+        "response_modulation"
+      ],
+      "clinical_notes": "Brené Brown: 'Gratitude is the antidote to foreboding joy.' The practice is: When joy arises and you feel the 'yes, but' or the fear, pause and practice gratitude for this moment. 'I'm grateful for this' NOT 'I'm grateful for this but scared I'll lose it.' Vulnerability means: 'I cannot control outcomes. This might not last. AND I'm going to let myself feel it fully anyway.' Dress rehearsing tragedy doesn't prepare us - it just robs us of joy. Present-moment practices (mindfulness, savoring) help stay WITH joy rather than future-tripping."
+    },
+    {
+      "name": "Numbness/Apathy to Interest to Engagement to Joy",
+      "from_category": "Places We Go When We're Hurting",
+      "to_category": "Places We Go When Life Is Good",
+      "vac_change_characteristics": {
+        "valence_change": "major_increase",
+        "arousal_change": "increase",
+        "connection_change": "increase"
+      },
+      "difficulty_score": 0.7,
+      "psychological_reasoning": "Numbness/apathy (anhedonia) is protective shutdown - inability to feel positive emotions, often from depression, burnout, or emotional exhaustion. Reawakening requires gradual re-engagement: curiosity → interest → active engagement → joy. Arousal must increase (from shutdown to activation) which can initially feel uncomfortable. Behavioral activation is key - action precedes motivation.",
+      "example_transitions": [
+        "Numbness → Apathy → Curiosity → Interest → Engagement → Joy",
+        "Flat/Empty → Boredom → Wonder → Fascination → Involvement → Delight",
+        "Shutdown → Detachment → Noticing → Attention → Participation → Happiness"
+      ],
+      "minimum_waypoints": 3,
+      "estimated_time": "weeks to months (gradual reawakening)",
+      "key_intermediate_states": [
+        "Curiosity (first spark of interest)",
+        "Interest (sustained attention)",
+        "Engagement (active participation)",
+        "Enthusiasm (arousal increasing, valence positive)"
+      ],
+      "recommended_strategy_types": [
+        "situation_selection",
+        "situation_modification",
+        "attentional_deployment"
+      ],
+      "clinical_notes": "Numbness/anhedonia common in depression, burnout, grief, trauma. Behavioral activation principle: Don't wait to feel motivated - act first, feeling follows. Start tiny: 5 minutes of an activity aligned with values. Build gradually. Pleasure vs. Meaning distinction: early stages may access meaning (values-driven action) before pleasure (hedonic joy). Both valid. Nature, music, creative expression, gentle movement can spark initial interest. Connection with others who feel enthusiasm can be contagious (mirror neurons). Important: If anhedonia persists, may signal clinical depression needing treatment."
+    }
+  ],
+  "meta": {
+    "version": "1.0",
+    "created": "2025-12-04",
+    "evidence_base": "Joy cultivation patterns based on Brené Brown's research on joy and vulnerability, Barbara Fredrickson's broaden-and-build theory showing positive emotions expand awareness and build resources, gratitude research (Emmons, Seligman), savoring research (Bryant & Veroff), and behavioral activation for anhedonia/depression.",
+    "positive_emotions_science": "Fredrickson's research shows positive emotions (joy, gratitude, serenity, interest, hope, pride, amusement, inspiration, awe, love) broaden thinking and build lasting resources. Unlike negative emotions (narrow focus for survival), positive emotions expand awareness, enhance creativity, strengthen relationships, and increase resilience.",
+    "joy_vs_happiness": "Joy is intense, short-lived, often social/shared. Happiness is more stable, contentment-based. Gratitude bridges them. Both are valuable and distinct emotional states within 'Places We Go When Life Is Good' category.",
+    "foreboding_joy_insight": "Brown's research reveals many people cannot fully feel joy because they're catastrophizing in the moment of goodness. This isn't random anxiety - it's specifically triggered BY joy. The vulnerability of allowing joy (knowing it could be lost) is what makes it feel dangerous. Armor against vulnerability robs us of joy.",
+    "anhedonia_as_protection": "Numbness/inability to feel joy serves protective function - if you can't feel good, you can't be disappointed. But it's costly protection. Reawakening requires safety (internal and external) and willingness to risk feeling, knowing both joy and pain are possible.",
+    "when_professional_help_needed": "Persistent anhedonia (>2 weeks) may indicate clinical depression - especially if combined with hopelessness, suicidal thoughts, significant functional impairment. Behavioral activation therapy, ACT, or antidepressants may be needed. Foreboding joy that significantly impairs ability to enjoy life may benefit from anxiety treatment or trauma therapy (if rooted in past loss)."
+  }
+}

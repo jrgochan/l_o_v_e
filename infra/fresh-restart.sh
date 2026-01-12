@@ -1,0 +1,1 @@
+cd infra && echo "🛑 Stopping all services..." && ./stop-love-stack.sh && sleep 3 && echo "🧹 Cleaning up..." && rm -rf logs/*.log && echo "🚀 Fresh restart starting..." && nohup ./run-love-stack.sh > /tmp/love-final-restart.log 2>&1 & sleep 25 && tail -30 /tmp/love-final-restart.log

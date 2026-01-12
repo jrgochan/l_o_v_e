@@ -1,0 +1,215 @@
+\subsection{Mathematical Definition}
+
+The VAC model represents emotional states as points in a three-dimensional continuous space:
+
+$$\text{Emotion} \in \mathbb{R}^3: (V, A, C) \text{ where } V, A, C \in [-1, +1]$$
+
+Each dimension captures a distinct aspect of emotional experience:
+
+\textbf{Valence (V)}: The hedonic quality of the emotion
+\begin{itemize}
+    \item $V = +1$: Maximum pleasantness (e.g., joy, ecstasy)
+    \item $V = 0$: Neutral hedonic tone
+    \item $V = -1$: Maximum unpleasantness (e.g., anguish, despair)
+\end{itemize}
+
+\textbf{Arousal (A)}: The physiological activation level
+\begin{itemize}
+    \item $A = +1$: Maximum activation (e.g., panic, excitement)
+    \item $A = 0$: Moderate activation
+    \item $A = -1$: Minimum activation (e.g., lethargy, calm)
+\end{itemize}
+
+\textbf{Connection (C)}: The interpersonal alignment quality
+\begin{itemize}
+    \item $C = +1$: Complete unity, ``feeling WITH'' (e.g., deep empathy, compassion)
+    \item $C = 0$: No relational component, or balanced
+    \item $C = -1$: Complete separation, ``feeling FOR/AT'' (e.g., pity, condescension)
+\end{itemize}
+
+The VAC space forms a unit cube $[-1, +1]^3$ containing $2^3 = 8$ corners representing archetypal emotional states. However, most emotions occupy interior positions, creating a continuous emotional landscape.
+
+\subsection{The Connection Dimension: Theoretical Foundation}
+
+\subsubsection{Etymology and Linguistic Evidence}
+
+The linguistic distinction between ``feeling WITH'' and ``feeling FOR'' appears across languages and cultures:
+
+\begin{itemize}
+    \item \textbf{Compassion}: From Latin \textit{com-} (with) + \textit{pati} (to suffer) = ``to suffer with''
+    \item \textbf{Sympathy}: From Greek \textit{syn-} (together) + \textit{pathos} (feeling) = ``feeling together'' (but often interpreted as ``feeling for'')
+    \item \textbf{Empathy}: From Greek \textit{en-} (in) + \textit{pathos} (feeling) = ``feeling into''
+    \item \textbf{Pity}: From Latin \textit{pietas} (piety, duty), implying distance and hierarchy
+\end{itemize}
+
+These etymological roots suggest that human emotional experience has always included a relational dimension.
+
+\subsubsection{Brené Brown's Empirical Framework}
+
+Brown's (2021) research on 87 emotions emphasizes relational quality as fundamental~\cite{brown2021}. She distinguishes:
+
+\begin{itemize}
+    \item \textbf{Pity}: ``A feeling that another's suffering is your good fortune'' (separates)
+    \item \textbf{Sympathy}: ``I feel for you'' (well-intentioned but maintains distance)
+    \item \textbf{Empathy}: ``I feel with you'' (requires vulnerability and connection)
+    \item \textbf{Compassion}: ``I recognize your suffering and I want to help'' (WITH, not FOR)
+\end{itemize}
+
+Brown's framework emerged from extensive qualitative research (12,000+ data pieces) and emphasizes that people commonly conflate these terms, yet they produce distinct relational outcomes.
+
+\subsubsection{Therapeutic Significance}
+
+The Connection dimension has direct therapeutic implications:
+
+\begin{enumerate}
+    \item \textbf{Shame vs. Guilt}: Brown distinguishes these as:
+    \begin{itemize}
+        \item Shame: ``I am bad'' (disconnection from self: $C < 0$)
+        \item Guilt: ``I did something bad'' (connection to values maintained: $C > 0$)
+    \end{itemize}
+    Shame is less amenable to change because it involves identity-level disconnection, while guilt allows for repair.
+    
+    \item \textbf{Grief vs. Despair}:
+    \begin{itemize}
+        \item Grief: ``I lost someone I love'' (love persists: $C > 0$)
+        \item Despair: ``I am alone in my suffering'' (isolation: $C < 0$)
+    \end{itemize}
+    Therapeutic approaches differ: grief benefits from connection-enhancing interventions, while despair requires first addressing isolation.
+    
+    \item \textbf{Compassion vs. Pity}:
+    \begin{itemize}
+        \item Compassion fosters healing and agency
+        \item Pity can reinforce victimhood and dependence
+    \end{itemize}
+    Mental health systems must distinguish these to avoid iatrogenic harm.
+\end{enumerate}
+
+\subsection{The 87-Emotion Atlas}
+
+We map all 87 emotions from Brown's ``Atlas of the Heart'' to VAC coordinates. This mapping was performed through: (1) Theoretical Analysis—examining Brown's descriptions of each emotion's relational quality, (2) Semantic Validation—testing LLM extraction on exemplar phrases, and (3) Iterative Refinement—adjusting coordinates to maintain geometric consistency.
+
+Table~\ref{tab:atlas-sample} presents key emotions from selected categories. The complete atlas is available in supplementary materials.
+
+\begin{table*}[t]
+\centering
+\caption{Sample emotions from the 87-emotion VAC atlas (selected categories)}
+\label{tab:atlas-sample}
+\small
+\begin{tabular}{llcccp{4cm}}
+\toprule
+\textbf{Category} & \textbf{Emotion} & \textbf{V} & \textbf{A} & \textbf{C} & \textbf{Interpretation} \\
+\midrule
+When Life Is Good & Joy & 0.9 & 0.7 & 0.8 & Energized, connected positivity \\
+& Gratitude & 0.8 & 0.3 & 0.9 & Warm appreciation WITH others \\
+& Contentment & 0.7 & $-0.2$ & 0.5 & Peaceful satisfaction \\
+\midrule
+When We Fall Short & \textbf{Shame} & $-0.7$ & $-0.2$ & \textbf{$-0.8$} & Deep self-disconnection \\
+& \textbf{Guilt} & $-0.5$ & 0.1 & \textbf{0.4} & Values-connected despite error \\
+& Humiliation & $-0.8$ & 0.3 & $-0.9$ & Public shaming \\
+\midrule
+When the Heart Is Open & \textbf{Compassion} & 0.5 & 0.2 & \textbf{0.9} & Suffering WITH \\
+& \textbf{Pity} & $-0.3$ & $-0.1$ & \textbf{$-0.7$} & Suffering FOR (distance) \\
+& Sympathy & 0.1 & 0.0 & 0.3 & Mild connection \\
+& \textbf{Empathy} & 0.0 & 0.3 & \textbf{0.95} & Pure resonance \\
+\midrule
+When Life Is Heartbreaking & \textbf{Grief} & $-0.8$ & $-0.3$ & \textbf{0.7} & Love persists through loss \\
+& \textbf{Despair} & $-0.9$ & $-0.4$ & \textbf{$-0.6$} & Isolated suffering \\
+& Sadness & $-0.6$ & $-0.2$ & 0.2 & General negative affect \\
+\bottomrule
+\end{tabular}
+\end{table*}
+
+\subsection{Critical Distinctions Enabled by Connection}
+
+The Connection axis enables computational systems to distinguish emotionally similar but relationally distinct states:
+
+\subsubsection{Distinction 1: Pity vs. Compassion}
+
+\textbf{Similarity in VA Space}: Both involve recognizing another's suffering (negative valence) and are relatively low-energy states (low arousal). VAD's dominance doesn't clearly separate them.
+
+\textbf{Distinction in VAC Space}: Pity $(-0.3, -0.1, -0.7)$ maintains hierarchical distance (``I'm fortunate not to be them''), while Compassion $(0.5, 0.2, 0.9)$ embodies shared humanity (``I'm with you in this'').
+
+\textbf{Distance}: $\Delta_{VAC} = \sqrt{(0.8)^2 + (0.3)^2 + (1.6)^2} = 1.83$
+
+The Connection axis contributes most to the distance (1.6 out of 1.83), confirming it's the primary distinguishing feature.
+
+\subsubsection{Distinction 2: Grief vs. Despair}
+
+\textbf{Similarity in VA Space}: Both are intensely negative (high negative valence) and involve low energy (low arousal).
+
+\textbf{Distinction in VAC Space}: Grief $(-0.8, -0.3, 0.7)$ maintains connection to the lost person/thing (love endures), while Despair $(-0.9, -0.4, -0.6)$ involves isolated suffering, disconnected from support.
+
+\textbf{Therapeutic Implication}: Grief requires honoring connection while allowing painful feelings. Despair requires first re-establishing connection (e.g., reaching out) before emotional processing can occur. Treating them identically risks therapeutic harm.
+
+\subsubsection{Distinction 3: Shame vs. Guilt}
+
+\textbf{Similarity in VA Space}: Both involve negative self-evaluation (negative valence) and may have similar arousal.
+
+\textbf{Distinction in VAC Space}: Shame $(-0.7, -0.2, -0.8)$ represents ``I am bad'' (identity-level disconnection), while Guilt $(-0.5, 0.1, 0.4)$ represents ``I did bad'' (values-connection maintained).
+
+\textbf{Therapeutic Implication}: Brown's research shows shame is far more correlated with psychopathology than guilt~\cite{brown2006}. The VAC model captures this: shame's severe negative Connection score ($C = -0.8$) indicates the need for vulnerability and reconnection before self-compassion is possible. Simply ``reframing'' shame doesn't work—connection must be rebuilt.
+
+\subsection{Distance Metrics and Similarity}
+
+To measure similarity between emotional states, we use weighted Euclidean distance:
+
+$$d(e_1, e_2) = \sqrt{w_V(V_1 - V_2)^2 + w_A(A_1 - A_2)^2 + w_C(C_1 - C_2)^2}$$
+
+where weights reflect psychological significance:
+\begin{itemize}
+    \item $w_V = 1.0$ (baseline importance)
+    \item $w_A = 1.2$ (arousal significantly impacts regulation difficulty)
+    \item $w_C = 1.5$ (Connection most psychologically significant)
+\end{itemize}
+
+\textbf{Rationale for Connection Weight}: Therapeutic literature suggests relational quality is the strongest predictor of outcomes. Transitions across the Connection axis (e.g., shame $\rightarrow$ self-compassion) are more psychologically demanding than equal-magnitude transitions in Valence or Arousal.
+
+\textbf{Example}: Distance from shame to guilt:
+\begin{align}
+d(\text{shame}, \text{guilt}) &= \sqrt{1.0(-0.7 - (-0.5))^2 + 1.2(-0.2 - 0.1)^2 + 1.5(-0.8 - 0.4)^2} \nonumber\\
+&= \sqrt{0.04 + 0.108 + 2.16} = 1.52
+\end{align}
+
+The Connection difference dominates (contributing 2.16 out of 2.31), confirming that shame $\rightarrow$ guilt transitions are primarily about reconnection.
+
+\subsection{Comparison with Existing 3D Models}
+
+Table~\ref{tab:model-comparison} compares the VAC model with existing dimensional approaches.
+
+\begin{table}[h]
+\centering
+\caption{Comparison of dimensional emotion models}
+\label{tab:model-comparison}
+\small
+\begin{tabular}{lcccc}
+\toprule
+\textbf{Model} & \textbf{Dims} & \textbf{3rd Dim} & \textbf{Relational?} & \textbf{Therapeutic} \\
+\midrule
+VA (Russell) & 2 & — & No & Low \\
+VAD (Mehrabian) & 3 & Dominance & No & Moderate \\
+\textbf{VAC (Ours)} & \textbf{3} & \textbf{Connection} & \textbf{Yes} & \textbf{High} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\textbf{Why Dominance Falls Short}: Dominance measures control but conflates different types of emotional experience:
+\begin{itemize}
+    \item High-dominance compassion (protective care) vs. high-dominance pity (condescension)
+    \item Low-dominance empathy (humble resonance) vs. low-dominance despair (helplessness)
+\end{itemize}
+
+Connection explicitly measures relational alignment, providing therapeutic clarity that dominance cannot.
+
+\subsection{Theoretical Predictions}
+
+The VAC model makes several testable predictions:
+
+\textbf{Prediction 1}: Prosodic features in speech will correlate with Connection scores. \textit{Hypothesis}: ``Feeling WITH'' involves different vocal patterns than ``feeling FOR.'' \textit{Proposed signals}: Pitch synchrony, warmth in voice quality, reduced vocal distance.
+
+\textbf{Prediction 2}: Connection scores predict therapeutic outcomes. \textit{Hypothesis}: Increasing Connection over therapy correlates with symptom reduction. \textit{Test}: Track VAC trajectories during treatment, correlate with PHQ-9/GAD-7 scores.
+
+\textbf{Prediction 3}: Connection is culturally universal but with different baselines. \textit{Hypothesis}: All cultures distinguish WITH/FOR, but collectivist cultures show higher average C. \textit{Test}: Cross-cultural validation of VAC extraction.
+
+\textbf{Prediction 4}: Biometric markers correlate with Connection. \textit{Hypothesis}: Positive Connection correlates with oxytocin, vagal tone, HRV; negative Connection with cortisol. \textit{Test}: Lab study measuring physiology during pity vs. compassion induction.
+
+These predictions provide a research agenda for validating the Connection dimension across modalities and populations.

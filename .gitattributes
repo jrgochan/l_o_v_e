@@ -1,0 +1,25 @@
+# Auto-detect text files and perform LF normalization
+* text=auto
+
+# Web files
+*.html text
+*.css text
+*.js text
+*.ts text
+*.tsx text
+*.json text
+*.md text
+*.svg text
+
+# Python
+*.py text
+
+# Shell scripts - force LF to avoid issues on Windows/Linux mix
+*.sh text eol=lf
+*.bash text eol=lf
+
+# Config
+*.yml text
+*.yaml text
+*.toml text
+*.lock binary

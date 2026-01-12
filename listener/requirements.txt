@@ -1,0 +1,49 @@
+# Listener Module - Dependencies
+# Python 3.11+
+
+# FastAPI & Server
+fastapi==0.109.0
+uvicorn[standard]==0.27.0
+python-multipart==0.0.6
+
+# Audio Transcription (Local)
+openai-whisper==20231117  # Official OpenAI Whisper (compatible with modern ffmpeg)
+ffmpeg-python==0.2.0  # Audio processing utilities
+
+# Prosody Analysis
+librosa==0.10.1
+soundfile==0.12.1
+praat-parselmouth==0.4.3
+
+# LLM & NLP (Local)
+langchain==0.1.20
+langchain-community==0.0.38
+ollama==0.1.6
+spacy==3.7.2
+
+# Task Queue
+arq==0.25.0
+redis==5.0.1
+
+# Data Models & Validation
+pydantic==2.5.3
+pydantic-settings==2.1.0
+
+# HTTP Client
+# httpx version managed by langchain dependency
+aiofiles==23.2.1
+
+# Testing
+pytest==7.4.4
+pytest-asyncio==0.23.3
+pytest-cov==4.1.0
+pytest-mock==3.12.0
+
+# Development
+python-dotenv==1.0.0
+
+# Dev dependencies
+flake8
+mypy
+
+https://github.com/explosion/spacy-models/releases/download/en_core_web_sm-3.7.1/en_core_web_sm-3.7.1-py3-none-any.whl

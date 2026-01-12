@@ -1,0 +1,276 @@
+{
+  "category": "ACT Techniques (Acceptance and Commitment Therapy)",
+  "source": "Hayes, S.C., Strosahl, K.D., & Wilson, K.G. (1999). Acceptance and Commitment Therapy: An experiential approach to behavior change.",
+  "description": "Evidence-based techniques from Acceptance and Commitment Therapy focusing on psychological flexibility through acceptance, defusion, present-moment awareness, self-as-context, values, and committed action.",
+  "strategies": [
+    {
+      "name": "Cognitive Defusion: Leaves on a Stream",
+      "type": "cognitive_reappraisal",
+      "description": "Create distance from thoughts by observing them as passing mental events rather than literal truths.",
+      "steps": [
+        "Find a quiet place, close your eyes, and take a few deep breaths",
+        "Imagine yourself sitting beside a gentle stream with leaves floating by",
+        "For each thought that arises, place it on a leaf and watch it float downstream",
+        "Don't try to make thoughts go away or push them downstream faster",
+        "Simply notice each thought, place it on a leaf, and let it drift",
+        "If thoughts come quickly, that's okay - put each one on its own leaf",
+        "If you get caught up in a thought, notice that and gently return to the stream",
+        "Practice for 5-10 minutes",
+        "Notice: You are the observer of thoughts, not the thoughts themselves"
+      ],
+      "time_required": "5-15 minutes",
+      "difficulty": 3,
+      "evidence": "rct",
+      "citations": [
+        {
+          "author": "Hayes, S.C., et al.",
+          "year": 2012,
+          "title": "Acceptance and Commitment Therapy: The Process and Practice of Mindful Change"
+        }
+      ],
+      "contraindications": "May be difficult for those with trauma-related intrusive thoughts; start with shorter sessions",
+      "best_for_vac_changes": {
+        "valence": "slight_increase",
+        "arousal": "decrease",
+        "connection": "maintain"
+      }
+    },
+    {
+      "name": "Cognitive Defusion: 'I'm Having the Thought That...'",
+      "type": "cognitive_reappraisal",
+      "description": "Add linguistic distance to reduce fusion with negative thoughts.",
+      "steps": [
+        "Notice a distressing thought (e.g., 'I'm worthless')",
+        "Say it out loud: 'I'm worthless'",
+        "Now say: 'I'm having the thought that I'm worthless'",
+        "Now say: 'I notice I'm having the thought that I'm worthless'",
+        "Now say: 'I notice my mind is telling me that I'm worthless'",
+        "Notice how each version creates more distance",
+        "The thought becomes just words your mind produces",
+        "You don't have to believe it or act on it",
+        "Practice with various difficult thoughts throughout the day"
+      ],
+      "time_required": "2-5 minutes per thought",
+      "difficulty": 2,
+      "evidence": "rct",
+      "citations": [
+        {
+          "author": "Hayes, S.C., et al.",
+          "year": 1999,
+          "title": "Acceptance and Commitment Therapy"
+        }
+      ],
+      "contraindications": null,
+      "best_for_vac_changes": {
+        "valence": "increase",
+        "arousal": "decrease",
+        "connection": "maintain"
+      }
+    },
+    {
+      "name": "Values Clarification: What Matters Most",
+      "type": "cognitive_reappraisal",
+      "description": "Identify your core values to guide decision-making and create meaning.",
+      "steps": [
+        "Consider these life domains: relationships, work/career, personal growth, health, leisure, spirituality, community",
+        "For each domain, ask: 'What kind of person do I want to be in this area?'",
+        "Write down qualities and directions (not goals): e.g., 'be loving', 'be curious', 'be honest'",
+        "Ask: 'If no one would ever know, what would I choose?'",
+        "Ask: 'On my deathbed, what would I want to have stood for?'",
+        "Narrow to your top 3-5 core values",
+        "For each value, write why it matters to you",
+        "Ask: 'Am I currently living aligned with these values?' Rate 1-10 for each",
+        "Identify one small action you can take today toward each value"
+      ],
+      "time_required": "30-60 minutes",
+      "difficulty": 3,
+      "evidence": "rct",
+      "citations": [
+        {
+          "author": "Hayes, S.C., et al.",
+          "year": 2012,
+          "title": "ACT: The Process and Practice of Mindful Change"
+        }
+      ],
+      "contraindications": "Can be emotionally challenging if there's large gap between values and current life",
+      "best_for_vac_changes": {
+        "valence": "increase",
+        "arousal": "variable",
+        "connection": "increase"
+      }
+    },
+    {
+      "name": "Committed Action: SMART Values Goals",
+      "type": "situation_modification",
+      "description": "Translate values into concrete, committed actions.",
+      "steps": [
+        "Choose one core value to work with",
+        "Ask: 'What would someone who deeply honors this value DO?'",
+        "Create a SMART goal (Specific, Measurable, Achievable, Relevant, Time-bound)",
+        "Break the goal into the smallest possible first step",
+        "Make it so small you'd be embarrassed NOT to do it",
+        "Commit to when you'll do it: Date, time, location",
+        "Identify barriers that might arise and plan for them",
+        "Do the action, even if you don't feel like it (willingness)",
+        "Notice: Values are directions, not destinations - there's no 'arriving'",
+        "After action, reflect: 'How did acting on my values feel?'"
+      ],
+      "time_required": "20-30 minutes planning, varies for action",
+      "difficulty": 3,
+      "evidence": "rct",
+      "citations": [
+        {
+          "author": "Hayes, S.C., et al.",
+          "year": 2012,
+          "title": "ACT: The Process and Practice of Mindful Change"
+        }
+      ],
+      "contraindications": null,
+      "best_for_vac_changes": {
+        "valence": "increase",
+        "arousal": "slight_increase",
+        "connection": "increase"
+      }
+    },
+    {
+      "name": "Observer Self: The Chessboard Metaphor",
+      "type": "attentional_deployment",
+      "description": "Access self-as-context: the part of you that observes but is not defined by thoughts, feelings, or roles.",
+      "steps": [
+        "Close your eyes and imagine a chessboard",
+        "The pieces (both black and white) are your thoughts, feelings, sensations, memories",
+        "They're constantly moving, fighting, some winning, some losing",
+        "Notice: You are not the pieces - you are the board",
+        "The board holds all the pieces but is not damaged by the battle",
+        "The board was there before the pieces and remains after",
+        "Practice this perspective: 'I am the space in which my experiences occur'",
+        "From this perspective, no single thought or feeling defines you",
+        "Ask: 'What have I been present for throughout my entire life?' (Answer: Everything)",
+        "You are the constant conscious presence, the observer"
+      ],
+      "time_required": "10-20 minutes",
+      "difficulty": 4,
+      "evidence": "rct",
+      "citations": [
+        {
+          "author": "Hayes, S.C., et al.",
+          "year": 1999,
+          "title": "Acceptance and Commitment Therapy"
+        }
+      ],
+      "contraindications": "Can be destabilizing for those with dissociative issues; use with caution",
+      "best_for_vac_changes": {
+        "valence": "increase",
+        "arousal": "decrease",
+        "connection": "increase"
+      }
+    },
+    {
+      "name": "Willingness: Expansion Practice",
+      "type": "response_modulation",
+      "description": "Make room for difficult emotions and sensations rather than fighting them.",
+      "steps": [
+        "Notice a difficult emotion or sensation in your body",
+        "Instead of trying to make it go away, get curious about it",
+        "Ask: 'Where exactly do I feel this in my body?'",
+        "Breathe into that area, imagine creating space around the sensation",
+        "Say to the feeling: 'I'm willing to feel you'",
+        "Not 'I want you' or 'I like you', but 'I'm willing to have you here'",
+        "Imagine the sensation as an object - what shape, color, temperature?",
+        "Practice: 'It's okay for this to be here'",
+        "Notice: Willingness reduces the struggle, which often reduces intensity",
+        "If emotion intensifies, that's okay - breathe and keep making space",
+        "Remember: You don't have to like it, just allow it"
+      ],
+      "time_required": "5-15 minutes",
+      "difficulty": 3,
+      "evidence": "rct",
+      "citations": [
+        {
+          "author": "Hayes, S.C., et al.",
+          "year": 2012,
+          "title": "ACT: The Process and Practice of Mindful Change"
+        }
+      ],
+      "contraindications": "Not for severe trauma symptoms without professional support",
+      "best_for_vac_changes": {
+        "valence": "increase",
+        "arousal": "variable",
+        "connection": "maintain"
+      }
+    },
+    {
+      "name": "Present Moment: Five Senses Grounding (ACT Version)",
+      "type": "attentional_deployment",
+      "description": "Anchor awareness in the present moment through sensory contact.",
+      "steps": [
+        "Pause and take a breath",
+        "Notice 3 things you can see right now - really look at details",
+        "Notice 3 things you can hear - even subtle sounds",
+        "Notice 3 things you can physically feel - texture, temperature, pressure",
+        "Say to yourself: 'Right here, right now, I am okay'",
+        "Notice: The present moment is the only place life actually happens",
+        "Past is memory, future is imagination - this moment is real",
+        "Practice throughout the day, especially when mind wanders to worry",
+        "Ask: 'Where am I?' 'What time is it?' Answer: 'Here. Now.'"
+      ],
+      "time_required": "3-5 minutes",
+      "difficulty": 1,
+      "evidence": "rct",
+      "citations": [
+        {
+          "author": "Hayes, S.C., et al.",
+          "year": 2012,
+          "title": "ACT: The Process and Practice of Mindful Change"
+        }
+      ],
+      "contraindications": null,
+      "best_for_vac_changes": {
+        "valence": "slight_increase",
+        "arousal": "decrease",
+        "connection": "maintain"
+      }
+    },
+    {
+      "name": "Thank Your Mind",
+      "type": "cognitive_reappraisal",
+      "description": "Develop a friendly, non-combative relationship with your thinking mind.",
+      "steps": [
+        "When your mind produces a difficult thought, notice it",
+        "Instead of fighting or believing it, say: 'Thank you, mind'",
+        "Recognize: your mind is trying to protect you (even if unhelpfully)",
+        "Say: 'Thanks for trying to keep me safe, mind'",
+        "Or: 'I appreciate your input, mind'",
+        "Don't argue with the thought, just acknowledge it",
+        "Then gently redirect: 'And right now, I'm choosing to...' (values-based action)",
+        "This creates space between you and your thoughts",
+        "Your mind becomes a companion, not a dictator",
+        "Practice this throughout the day with various thoughts"
+      ],
+      "time_required": "1-2 minutes per thought",
+      "difficulty": 2,
+      "evidence": "clinical",
+      "citations": [
+        {
+          "author": "Harris, R.",
+          "year": 2009,
+          "title": "ACT Made Simple"
+        }
+      ],
+      "contraindications": null,
+      "best_for_vac_changes": {
+        "valence": "increase",
+        "arousal": "decrease",
+        "connection": "maintain"
+      }
+    }
+  ],
+  "meta": {
+    "version": "1.0",
+    "created": "2025-12-04",
+    "evidence_base": "ACT is supported by over 300 RCTs showing effectiveness for anxiety, depression, chronic pain, substance abuse, and general psychological flexibility. Based on Relational Frame Theory and functional contextualism.",
+    "target_populations": "Applicable across diverse clinical and non-clinical populations. Particularly effective for those who struggle with experiential avoidance, cognitive fusion, and lack of values clarity.",
+    "core_processes": "ACT targets six core processes: Defusion, Acceptance, Present Moment, Self-as-Context, Values, and Committed Action. All strategies map to these processes.",
+    "training_note": "While these techniques can be practiced independently, working with an ACT-trained therapist or attending an ACT workshop enhances understanding and application of the contextual behavioral science principles."
+  }
+}

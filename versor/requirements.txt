@@ -1,0 +1,27 @@
+# Project L.O.V.E. - Versor Module Dependencies
+
+# FastAPI Framework
+fastapi==0.109.0
+uvicorn[standard]==0.27.0
+pydantic==2.5.3
+pydantic-settings==2.1.0
+
+# Scientific Computing
+numpy==1.26.3
+scipy==1.12.0
+
+# Utilities
+python-dotenv==1.0.0
+
+# Testing
+pytest==7.4.4
+pytest-asyncio==0.23.3
+pytest-cov==4.1.0
+pytest-benchmark==4.0.0
+hypothesis==6.98.0
+httpx==0.26.0
+
+# Development Tools
+black==23.12.1
+flake8==7.0.0
+mypy==1.8.0

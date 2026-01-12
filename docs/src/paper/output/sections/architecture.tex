@@ -1,0 +1,117 @@
+\subsection{Overview: The L.O.V.E. Stack}
+
+The L.O.V.E. Stack implements the VAC model as a microservices architecture designed for mental health applications. The acronym reflects the system's four independent modules:
+
+\begin{itemize}
+    \item \textbf{L}istener: Sensory input (speech/text $\rightarrow$ VAC extraction)
+    \item \textbf{O}bserver: Memory and context (data storage, pattern recognition, pathfinding)
+    \item \textbf{V}ersor: Mathematical engine (quaternion calculations, smooth transitions)
+    \item \textbf{E}xperience: Presentation layer (3D visualization, user interaction)
+\end{itemize}
+
+Each module is independently deployable, scalable, and maintainable, communicating via REST APIs.
+
+\subsection{Design Principles}
+
+\textbf{1. Privacy-First Architecture}: All sensitive processing occurs locally. No cloud LLM APIs (Ollama runs locally for semantic analysis), local transcription (faster-whisper for speech-to-text), PII scrubbing (Spacy NER removes personally identifiable information before storage), and user data control (users own their data, can export or delete at any time).
+
+\textbf{2. Evidence-Based Design}: Every therapeutic suggestion cites peer-reviewed research. 107 regulation strategies with evidence hierarchy (meta-analysis > RCT > clinical observation), pathfinding respects psychological constraints (e.g., shame $\rightarrow$ self-compassion requires vulnerability), and no ``toxic positivity'' (system detects and avoids inappropriate emotional shortcuts).
+
+\textbf{3. Interpretability}: VAC coordinates are human-understandable. $(V, A, C) = (0.5, 0.2, 0.9) \approx$ ``Compassion.'' Unlike neural network embeddings, VAC dimensions have clear semantic meaning. Users can see their emotional trajectory in 3D space.
+
+\textbf{4. Modularity}: Each service has a single responsibility (Listener: Extract VAC; Observer: Store and query; Versor: Calculate quaternions; Experience: Visualize). This separation enables independent development, testing, and scaling.
+
+\subsection{Module Details}
+
+\subsubsection{Listener: The Sensory Cortex}
+
+\textbf{Purpose}: Transform human expression (audio/text) into VAC coordinates.
+
+\textbf{Technology Stack}: Python 3.11 + FastAPI (async API), faster-whisper (local speech-to-text), Ollama + Llama 3.1 8B (local LLM for semantic analysis), Spacy (PII scrubbing), Redis + Arq (async job queuing).
+
+\textbf{Workflow}: (1) \textit{Transcription} (if audio): faster-whisper converts speech to text ($\sim$500ms for 10s audio), (2) \textit{Semantic Analysis}: LLM extracts VAC coordinates using few-shot prompt ($\sim$1-2s), (3) \textit{PII Scrubbing}: Spacy NER removes names, addresses, phone numbers, (4) \textit{Confidence Scoring}: LLM provides reasoning and confidence (0-1), (5) \textit{Return}: VAC coordinates + metadata.
+
+\textbf{Critical Innovation}: Teaching the LLM to recognize the Connection axis through prompt engineering (see Section~\ref{sec:vac-extraction}).
+
+\subsubsection{Observer: The Hippocampus}
+
+\textbf{Purpose}: Memory, context, and therapeutic guidance.
+
+\textbf{Technology Stack}: Python 3.11 + FastAPI, PostgreSQL 16 + pgvector~\cite{pgvector2023} (vector similarity search), SQLAlchemy (ORM), Alembic (migrations).
+
+\textbf{Data Model}: The Observer stores three primary entities:
+
+\begin{enumerate}
+    \item \textit{Canonical emotions} (87 emotions from Brown's atlas): Pre-seeded with VAC coordinates and pre-calculated quaternions
+    \item \textit{User emotional trajectory} (high-volume): Timestamped emotional states with pgvector indexing for similarity search
+    \item \textit{Evidence-based regulation strategies}: 107 strategies with citations, evidence levels, and applicability metadata
+\end{enumerate}
+
+The database uses HNSW (Hierarchical Navigable Small World) indexing for fast nearest-neighbor search ($\sim$30ms for 1000+ records).
+
+\textbf{Workflow}: (1) \textit{State Recording}: Store incoming VAC + timestamp, (2) \textit{Nearest Emotion}: pgvector similarity search finds closest atlas emotion, (3) \textit{Pathfinding}: A* algorithm finds therapeutic path from current to goal state, (4) \textit{Strategy Selection}: Filters 107 strategies by applicability and evidence level, (5) \textit{Pattern Recognition}: Detects recurring emotional states or stuck points.
+
+\textbf{Critical Innovation}: A* pathfinding with psychological constraints (see Section~\ref{sec:mental-health-apps}).
+
+\subsubsection{Versor: The Mathematical Engine}
+
+\textbf{Purpose}: Pure quaternion mathematics for smooth 3D transitions.
+
+\textbf{Technology Stack}: Python 3.11 + FastAPI, NumPy (numerical operations), No database (stateless microservice).
+
+\textbf{Algorithms}:
+
+\textit{VAC $\rightarrow$ Quaternion Conversion}:
+\begin{align}
+\theta &= \pi \cdot \frac{V + 1}{2}, \quad
+\phi = \pi \cdot \frac{A + 1}{2}, \quad
+\psi = \pi \cdot \frac{C + 1}{2} \\
+w &= \cos(\theta/2) \\
+x &= \sin(\theta/2) \cdot \cos(\phi) \cdot \sin(\psi) \\
+y &= \sin(\theta/2) \cdot \sin(\phi) \cdot \sin(\psi) \\
+z &= \sin(\theta/2) \cdot \cos(\psi)
+\end{align}
+
+Then normalize to unit quaternion: $q = \frac{(w, x, y, z)}{||(w, x, y, z)||}$
+
+\textit{SLERP (Spherical Linear Interpolation)}~\cite{shoemake1985}:
+$$q(t) = \frac{\sin((1-t)\Omega)}{\sin(\Omega)} q_1 + \frac{\sin(t\Omega)}{\sin(\Omega)} q_2$$
+
+where $\Omega = \cos^{-1}(q_1 \cdot q_2)$ is the angular distance.
+
+\textbf{Why Quaternions?} (1) No gimbal lock (Euler angles fail at certain orientations), (2) Smooth interpolation (SLERP maintains constant angular velocity), (3) Efficient (4 numbers vs. 9 for rotation matrix), (4) Composable (multiply to combine rotations).
+
+\textbf{Critical Innovation}: Mapping 3D emotional space to 4D rotational space enables smooth visualization and animation.
+
+\subsubsection{Experience: The Presentation Layer}
+
+\textbf{Purpose}: Real-time 3D visualization and user interaction.
+
+\textbf{Technology Stack}: TypeScript + Next.js 16, React 19 + React Three Fiber, Three.js (3D engine), Custom GLSL shaders, Zustand (state management).
+
+\textbf{Visual Mapping}:
+\begin{itemize}
+    \item \textbf{Valence $\rightarrow$ Color}: Crimson ($V = -1$) to Cyan ($V = +1$)
+    \item \textbf{Arousal $\rightarrow$ Geometry}: Smooth sphere ($A = -1$) to chaotic spikes ($A = +1$)
+    \item \textbf{Connection $\rightarrow$ Glow/Opacity}: Opaque ($C = -1$) to luminous ($C = +1$)
+\end{itemize}
+
+\textbf{Workflow}: (1) User Input (text or voice), (2) Call Listener (get VAC coordinates), (3) Call Observer (store state, get nearest emotion + path), (4) Call Versor (get quaternion + SLERP frames), (5) Render (animate Soul Sphere over 60 frames, 1 second), (6) Display (show emotion name, VAC coords, suggested strategies).
+
+\textbf{Critical Innovation}: Mapping abstract VAC coordinates to visceral 3D visual experience.
+
+\subsection{Data Flow: End-to-End Example}
+
+\textbf{Scenario}: User says ``I feel so ashamed of myself''
+
+The data flows through the system as follows: (1) User provides audio input, (2) Experience module calls Listener's \texttt{/listener/ingest} endpoint, (3) Listener transcribes audio (500ms), analyzes semantics to extract VAC = $(-0.7, -0.2, -0.8)$ (1.5s), sanitizes PII, and returns results with confidence 0.94, (4) Experience calls Observer's \texttt{/observer/state} endpoint, (5) Observer stores in database, performs pgvector similarity search identifying ``Shame'' as nearest emotion (30ms), detects high negative Connection ($C = -0.8$), calls Versor for quaternion conversion, and returns suggested therapeutic path, (6) Observer calls Versor's \texttt{/versor/calculate} endpoint, (7) Versor converts VAC to quaternion and generates SLERP animation path (10ms), (8) Experience renders Soul Sphere with dark red color ($V = -0.7$), slightly jagged geometry ($A = -0.2$), and very dim glow ($C = -0.8$), animating rotation using the quaternion, and displays ``Shame'' with suggested path (Shame $\rightarrow$ Vulnerability $\rightarrow$ Self-Compassion), (9) User sees the 3D visualization with emotion label and evidence-based strategy (``Name your feelings without judgment''~\cite{linehan2015}).
+
+\textbf{Total Latency}: $\sim$2.5 seconds (transcription: 500ms, LLM: 1500ms, rest: 500ms)
+
+\subsection{Scalability and Deployment}
+
+\textbf{Current Capacity}: $\sim$100 concurrent users per instance. The bottleneck is Ollama LLM inference (CPU-bound).
+
+\textbf{Scaling Strategy}: Versor (stateless) enables horizontal scaling with load balancer + multiple instances. Listener benefits from GPU acceleration for Ollama (10-100x speedup). Observer uses read replicas for PostgreSQL and Redis cache for frequent queries. Experience uses CDN for static assets and server-side rendering.
+
+\textbf{Future Optimizations}: GPU deployment, model quantization, and caching common queries could reduce latency to <500ms.

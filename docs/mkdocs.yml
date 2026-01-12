@@ -1,0 +1,304 @@
+site_name: L.O.V.E. Platform Documentation
+site_description: 'Listener-Observer-Versor-Experience: 3D Emotional Intelligence Platform'
+site_author: 'L.O.V.E. Project Team'
+site_url: https://love-platform.dev
+repo_url: https://gitlab.com/l_o_v_e/platform
+repo_name: 'GitLab'
+docs_dir: src
+site_dir: ../docs-build
+
+theme:
+  name: material
+  palette:
+    # Light mode
+    - scheme: default
+      primary: indigo
+      accent: cyan
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+    # Dark mode
+    - scheme: slate
+      primary: indigo
+      accent: cyan
+      toggle:
+        icon: material/brightness-4
+        name: Switch to light mode
+  features:
+    - navigation.tabs
+    - navigation.tabs.sticky
+    - navigation.sections
+    - navigation.expand
+    - navigation.indexes
+    - navigation.top
+    - search.suggest
+    - search.highlight
+    - content.code.copy
+    - content.code.annotate
+    - toc.follow
+  icon:
+    repo: fontawesome/brands/gitlab
+
+plugins:
+  - search
+  - mermaid2
+
+markdown_extensions:
+  - pymdownx.highlight:
+      anchor_linenums: true
+      line_spans: __span
+      pygments_lang_class: true
+  - pymdownx.inlinehilite
+  - pymdownx.snippets
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:mermaid2.fence_mermaid
+  - pymdownx.tabbed:
+      alternate_style: true
+  - pymdownx.tasklist:
+      custom_checkbox: true
+  - admonition
+  - pymdownx.details
+  - attr_list
+  - md_in_html
+  - tables
+  - footnotes
+  - pymdownx.emoji:
+      emoji_index: !!python/name:material.extensions.emoji.twemoji
+      emoji_generator: !!python/name:material.extensions.emoji.to_svg
+  - toc:
+      permalink: true
+      toc_depth: 3
+
+nav:
+  - Home: index.md
+  - Project Status: project-status.md
+  
+  - Getting Started:
+    - getting-started/index.md
+    - Installation: getting-started/installation.md
+    - Quick Start: getting-started/quick-start.md
+  
+  - Architecture:
+    - architecture/index.md
+    - System Overview: architecture/01-system-overview.md
+    - VAC Model: architecture/02-vac-model.md
+    - Architectural Review: architecture/03-architectural-review-dec-2025.md
+    - Settings Page: architecture/04-settings-page-architecture.md
+    - Integration Patterns: architecture/07-integration-patterns.md
+    - Data Architecture: architecture/08-data-architecture.md
+    - Technology Stack: architecture/09-technology-stack.md
+    - Deployment & Ops: architecture/10-deployment-operations.md
+    - Development Guide: architecture/11-development-guide.md
+    - Known Issues: architecture/12-known-issues.md
+  
+  - Modules:
+    - modules/index.md
+    - Listener:
+      - modules/listener/index.md
+      - Overview:
+        - Executive Summary: modules/listener/overview/01-executive-summary.md
+        - Business Value: modules/listener/overview/02-business-value.md
+        - Roadmap: modules/listener/overview/03-roadmap.md
+      - Architecture:
+        - High Level Overview: modules/listener/architecture/00-high-level-overview.md
+        - Deep Dive: modules/listener/architecture/01-deep-dive.md
+        - Semantic Analysis: modules/listener/architecture/02-semantic-analysis.md
+        - Prompt Engineering: modules/listener/architecture/03-prompt-engineering.md
+        - Performance: modules/listener/architecture/04-performance-optimization.md
+        - Extending Listener: modules/listener/architecture/05-extending-listener.md
+        - Troubleshooting: modules/listener/architecture/06-troubleshooting.md
+        - Decisions: modules/listener/architecture/07-architecture-decisions.md
+        - Integration Points: modules/listener/architecture/10-integration-points.md
+      - Operations:
+        - Monitoring: modules/listener/operations/01-monitoring.md
+        - Team Structure: modules/listener/operations/02-team-structure.md
+        - Incident Response: modules/listener/operations/03-incident-response.md
+      - Guides:
+        - Getting Started: modules/listener/guides/01-getting-started.md
+        - Codebase Tour: modules/listener/guides/02-codebase-tour.md
+        - Key Concepts: modules/listener/guides/03-key-concepts.md
+        - Common Tasks: modules/listener/guides/04-common-tasks.md
+        - Testing Guide: modules/listener/guides/05-testing-guide.md
+        - First Contribution: modules/listener/guides/06-first-contribution.md
+      - Reference:
+        - API Reference: modules/listener/reference/api-reference.md
+        - Configuration: modules/listener/reference/configuration.md
+        - Error Codes: modules/listener/reference/error-codes.md
+        - Glossary: modules/listener/reference/glossary.md
+    - Observer:
+      - modules/observer/index.md
+      - Overview:
+        - Executive Summary: modules/observer/overview/01-executive-summary.md
+        - Business Value: modules/observer/overview/02-business-value.md
+        - Roadmap: modules/observer/overview/03-roadmap.md
+      - Architecture:
+        - High Level Overview: modules/observer/architecture/00-high-level-overview.md
+        - Deep Dive: modules/observer/architecture/01-deep-dive.md
+        - Database Architecture: modules/observer/architecture/02-database-architecture.md
+        - Vector Search: modules/observer/architecture/03-vector-search.md
+        - Transition System: modules/observer/architecture/04-transition-system.md
+        - WebSocket/Realtime: modules/observer/architecture/05-websocket-realtime.md
+        - Performance: modules/observer/architecture/06-performance-optimization.md
+        - Extending Observer: modules/observer/architecture/07-extending-observer.md
+        - Troubleshooting: modules/observer/architecture/08-troubleshooting.md
+        - Decisions: modules/observer/architecture/09-architecture-decisions.md
+        - Integration Points: modules/observer/architecture/10-integration-points.md
+      - Operations:
+        - Monitoring: modules/observer/operations/01-monitoring.md
+        - Team Structure: modules/observer/operations/02-team-structure.md
+        - Incident Response: modules/observer/operations/03-incident-response.md
+      - Guides:
+        - Getting Started: modules/observer/guides/01-getting-started.md
+        - Codebase Tour: modules/observer/guides/02-codebase-tour.md
+        - Key Concepts: modules/observer/guides/03-key-concepts.md
+        - Common Tasks: modules/observer/guides/04-common-tasks.md
+        - Testing Guide: modules/observer/guides/05-testing-guide.md
+        - First Contribution: modules/observer/guides/06-first-contribution.md
+      - Reference:
+        - API Reference: modules/observer/reference/api-reference.md
+        - Configuration: modules/observer/reference/configuration.md
+        - Error Codes: modules/observer/reference/error-codes.md
+        - Glossary: modules/observer/reference/glossary.md
+    - Versor:
+      - modules/versor/index.md
+      - Overview:
+        - Executive Summary: modules/versor/overview/01-executive-summary.md
+        - Business Value: modules/versor/overview/02-business-value.md
+        - Roadmap: modules/versor/overview/03-roadmap.md
+      - Architecture:
+        - High Level Overview: modules/versor/architecture/00-high-level-overview.md
+        - Deep Dive: modules/versor/architecture/01-deep-dive.md
+        - Quaternion Math: modules/versor/architecture/02-quaternion-mathematics.md
+        - VAC Conversion: modules/versor/architecture/03-vac-conversion.md
+        - SLERP Interpolation: modules/versor/architecture/04-slerp-interpolation.md
+        - SciPy Integration: modules/versor/architecture/05-scipy-integration.md
+        - Performance: modules/versor/architecture/06-performance-optimization.md
+        - Extending Versor: modules/versor/architecture/07-extending-versor.md
+        - Troubleshooting: modules/versor/architecture/08-troubleshooting.md
+        - Decisions: modules/versor/architecture/09-architecture-decisions.md
+        - Integration Points: modules/versor/architecture/10-integration-points.md
+      - Operations:
+        - Monitoring: modules/versor/operations/01-monitoring.md
+        - Team Structure: modules/versor/operations/02-team-structure.md
+        - Incident Response: modules/versor/operations/03-incident-response.md
+      - Guides:
+        - Getting Started: modules/versor/guides/01-getting-started.md
+        - Codebase Tour: modules/versor/guides/02-codebase-tour.md
+        - Key Concepts: modules/versor/guides/03-key-concepts.md
+        - Common Tasks: modules/versor/guides/04-common-tasks.md
+        - Testing Guide: modules/versor/guides/05-testing-guide.md
+        - First Contribution: modules/versor/guides/06-first-contribution.md
+      - Reference:
+        - API Reference: modules/versor/reference/api-reference.md
+        - Configuration: modules/versor/reference/configuration.md
+        - Error Codes: modules/versor/reference/error-codes.md
+        - Glossary: modules/versor/reference/glossary.md
+    - Experience:
+      - modules/experience/index.md
+      - Soul Sphere Spec: modules/experience/04-soul-sphere-specification.md
+  
+  - Features:
+    - features/index.md
+    - AI Models:
+      - features/ai-models/00-OVERVIEW.md
+      - Ollama Integration: features/ai-models/01-OLLAMA-INTEGRATION.md
+      - Settings UI: features/ai-models/02-SETTINGS-UI.md
+      - Roadmap: features/ai-models/03-IMPLEMENTATION-ROADMAP.md
+    - Beautiful Insights: 
+        - Overview: features/beautiful-insights/00-OVERVIEW.md
+        - Warm Mode Spec: features/beautiful-insights/01-WARM-MODE-SPEC.md
+        - Clinical Mode Spec: features/beautiful-insights/02-CLINICAL-MODE-SPEC.md
+        - Deep Feeling Specs: features/beautiful-insights/03-DEEP-FEELING-ENHANCEMENTS.md
+        - Implementation Guide: features/beautiful-insights/04-IMPLEMENTATION-GUIDE.md
+    - Clinical Tools: 
+        - Dashboard: features/clinical-tools/DASHBOARD.md
+        - Alerts System: features/clinical-tools/ALERTS-SYSTEM.md
+        - UI Enhancements: features/clinical-tools/CLINICAL_MODE_UI_ENHANCEMENT.md
+    - Command Palette:
+        - Implementation: features/command-palette/IMPLEMENTATION_COMPLETE.md
+        - Vision: features/command-palette/FUTURE_VISION.md
+        - Cinematic Camera: features/command-palette/CINEMATIC_CAMERA_VISION.md
+        - Complex Actions: features/command-palette/COMPLEX_ACTIONS_VISION.md
+        - Keyboard Journeys: features/command-palette/KEYBOARD_DRIVEN_JOURNEYS.md
+        - Power User Workflows: features/command-palette/POWER_USER_WORKFLOWS.md
+    - Deep Feeling Mode: 
+        - Overview: features/deep-feeling/OVERVIEW.md
+        - UI/UX Design: features/deep-feeling/UI-UX-DESIGN.md
+    - Heartbeat Analyzer: 
+        - Specification: features/heartbeat-analyzer/SPECIFICATION.md
+        - Implementation Guide: features/heartbeat-analyzer/IMPLEMENTATION-GUIDE.md
+    - Logging Control: features/logging-control/IMPLEMENTATION_COMPLETE.md
+    - Settings Page:
+        - Architecture: architecture/04-settings-page-architecture.md
+        - Import/Export Guide: features/settings-page/IMPORT_EXPORT_GUIDE.md
+        - Testing Checklist: features/settings-page/MANUAL_TESTING_CHECKLIST.md
+    - Voice Analysis: 
+        - Three-Way Analysis: features/voice-analysis/THREE-WAY-ANALYSIS.md
+        - Prosody System: features/voice-analysis/PROSODY-SYSTEM.md
+    - Wibbly Paths: 
+        - Overview: features/wibbly-paths/00-OVERVIEW.md
+        - Subtle Mode: features/wibbly-paths/01-SUBTLE-ELEGANT.md
+        - Dynamic Mode: features/wibbly-paths/02-DYNAMIC-PLAYFUL.md
+        - Mystical Mode: features/wibbly-paths/03-MYSTICAL-ETHEREAL.md
+        - Data Visualization: features/wibbly-paths/04-DATA-VISUALIZATION-MODE.md
+        - Keyboard Navigation: features/wibbly-paths/04-KEYBOARD-NAVIGATION.md
+        - Settings Panel: features/wibbly-paths/05-SETTINGS-PANEL.md
+        - Implementation Guide: features/wibbly-paths/06-IMPLEMENTATION-GUIDE.md
+    - Zen Experience:
+        - Overview: features/zen-experience/00-OVERVIEW.md
+        - Implementation: features/zen-experience/01-IMPLEMENTATION.md
+    - Other Features:
+        - Atlas Mapping: features/other-features/ATLAS-MAPPING.md
+        - Axis Labels: features/other-features/AXIS_LABELS.md
+  
+  - Guides:
+    - Refactoring: guides/REFACTORING.md
+    - Clinical Alerts: guides/CLINICAL_ALERTS_IMPLEMENTATION.md
+    - Session Analytics: guides/SESSION_ANALYTICS_IMPLEMENTATION.md
+    - Path Helpers: guides/PATH_HELPERS_IMPLEMENTATION.md
+  
+  - Research:
+    - Research Paper:
+      - Abstract: paper/01-abstract.md
+      - Introduction: paper/02-introduction.md
+      - Related Work: paper/03-related-work.md
+      - VAC Model: paper/04-vac-model.md
+      - Architecture: paper/05-architecture.md
+      - VAC Extraction: paper/06-vac-extraction.md
+      - Validation: paper/07-validation.md
+      - Mental Health Apps: paper/08-mental-health-apps.md
+      - Implementation: paper/09-implementation.md
+      - Discussion: paper/10-discussion.md
+      - Conclusion: paper/11-conclusion.md
+    - Patent Application:
+      - Abstract: patent/01-ABSTRACT.md
+      - Background: patent/02-BACKGROUND.md
+      - Summary: patent/03-SUMMARY.md
+      - Claims: patent/05-CLAIMS.md
+
+  - Project Info:
+    - Roadmap (Dec 2025): ROADMAP_DECEMBER_2025.md
+    - Contributing: contributing.md
+    - References: REFERENCES.md
+  
+  - Reference:
+    - reference/index.md
+    - Glossary: reference/glossary.md
+    - API Reference:
+      - Listener: reference/api/listener.md
+      - Observer: reference/api/observer.md
+      - Versor: reference/api/versor.md
+
+extra:
+  social:
+    - icon: fontawesome/brands/gitlab
+      link: https://gitlab.com/l_o_v_e/platform
+  
+  version:
+    provider: mike
+
+extra_css:
+  - stylesheets/extra.css

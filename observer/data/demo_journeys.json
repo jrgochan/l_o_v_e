@@ -1,0 +1,663 @@
+{
+  "description": "Demo Journey Data - Sample emotional transition journeys for testing and demonstration",
+  "version": "1.0",
+  "created": "2025-12-05",
+  "purpose": "Testing, development, UX validation, demonstration of journey tracking and strategy recommendations",
+  
+  "journeys": [
+    {
+      "user_id": "demo-jordan-active-user",
+      "journey_type": "completed",
+      "start_emotion": "Anxiety",
+      "goal_emotion": "Calm",
+      "start_vac": [-0.4, 0.6, -0.2],
+      "goal_vac": [0.3, -0.4, 0.2],
+      "waypoints": [
+        {
+          "index": 0,
+          "emotion": "Anxiety",
+          "category": "Places We Go When Things Are Uncertain or Too Much",
+          "vac": [-0.4, 0.6, -0.2],
+          "reached": true,
+          "time_to_reach": "0 minutes"
+        },
+        {
+          "index": 1,
+          "emotion": "Worry",
+          "category": "Places We Go When Things Are Uncertain or Too Much",
+          "vac": [-0.3, 0.4, 0.0],
+          "reached": true,
+          "time_to_reach": "25 minutes"
+        },
+        {
+          "index": 2,
+          "emotion": "Contentment",
+          "category": "Places We Go When Life Is Good",
+          "vac": [0.2, -0.2, 0.1],
+          "reached": true,
+          "time_to_reach": "35 minutes"
+        },
+        {
+          "index": 3,
+          "emotion": "Calm",
+          "category": "Places We Go When Life Is Good",
+          "vac": [0.3, -0.4, 0.2],
+          "reached": true,
+          "time_to_reach": "20 minutes"
+        }
+      ],
+      "strategies_attempted": [
+        {
+          "waypoint_index": 0,
+          "strategy_name": "4-7-8 Breathing",
+          "helpful_rating": 5,
+          "time_spent": "10 minutes",
+          "notes": "Really helped calm the physical symptoms",
+          "completed": true
+        },
+        {
+          "waypoint_index": 1,
+          "strategy_name": "Cognitive Defusion: Leaves on a Stream",
+          "helpful_rating": 4,
+          "time_spent": "15 minutes",
+          "notes": "Helpful to watch worries float by",
+          "completed": true
+        },
+        {
+          "waypoint_index": 2,
+          "strategy_name": "Self-Compassion Break (Kristin Neff)",
+          "helpful_rating": 5,
+          "time_spent": "12 minutes",
+          "notes": "Exactly what I needed",
+          "completed": true
+        }
+      ],
+      "duration_minutes": 80,
+      "status": "completed",
+      "context": {
+        "time_of_day": "evening",
+        "trigger": "work deadline stress",
+        "location": "home"
+      }
+    },
+    
+    {
+      "user_id": "demo-jordan-active-user",
+      "journey_type": "completed",
+      "start_emotion": "Guilt",
+      "goal_emotion": "Self-Compassion",
+      "start_vac": [-0.5, 0.3, 0.4],
+      "goal_vac": [0.4, -0.2, 0.6],
+      "waypoints": [
+        {
+          "index": 0,
+          "emotion": "Guilt",
+          "category": "Places We Go When We Fall Short",
+          "vac": [-0.5, 0.3, 0.4],
+          "reached": true,
+          "time_to_reach": "0 minutes"
+        },
+        {
+          "index": 1,
+          "emotion": "Regret",
+          "category": "Places We Go When We Fall Short",
+          "vac": [-0.4, 0.1, 0.3],
+          "reached": true,
+          "time_to_reach": "30 minutes"
+        },
+        {
+          "index": 2,
+          "emotion": "Self-Compassion",
+          "category": "Places We Go When Life Is Good",
+          "vac": [0.4, -0.2, 0.6],
+          "reached": true,
+          "time_to_reach": "45 minutes"
+        }
+      ],
+      "strategies_attempted": [
+        {
+          "waypoint_index": 0,
+          "strategy_name": "Self-Compassion Break (Kristin Neff)",
+          "helpful_rating": 4,
+          "time_spent": "15 minutes",
+          "notes": "Helped but still felt stuck",
+          "completed": true
+        },
+        {
+          "waypoint_index": 1,
+          "strategy_name": "Radical Acceptance (DBT)",
+          "helpful_rating": 5,
+          "time_spent": "25 minutes",
+          "notes": "This was the breakthrough - accepting what happened",
+          "completed": true
+        }
+      ],
+      "duration_minutes": 75,
+      "status": "completed",
+      "context": {
+        "time_of_day": "afternoon",
+        "trigger": "missed child's event",
+        "location": "home"
+      }
+    },
+    
+    {
+      "user_id": "demo-jordan-active-user",
+      "journey_type": "abandoned",
+      "start_emotion": "Overwhelm",
+      "goal_emotion": "Focused",
+      "start_vac": [-0.6, 0.7, -0.3],
+      "goal_vac": [0.2, 0.3, 0.0],
+      "waypoints": [
+        {
+          "index": 0,
+          "emotion": "Overwhelm",
+          "category": "Places We Go When Things Are Uncertain or Too Much",
+          "vac": [-0.6, 0.7, -0.3],
+          "reached": true,
+          "time_to_reach": "0 minutes"
+        },
+        {
+          "index": 1,
+          "emotion": "Stress",
+          "category": "Places We Go When Things Are Uncertain or Too Much",
+          "vac": [-0.5, 0.5, 0.0],
+          "reached": false
+        },
+        {
+          "index": 2,
+          "emotion": "Focused",
+          "category": "Places We Go When Life Is Good",
+          "vac": [0.2, 0.3, 0.0],
+          "reached": false
+        }
+      ],
+      "strategies_attempted": [
+        {
+          "waypoint_index": 0,
+          "strategy_name": "Progressive Muscle Relaxation",
+          "helpful_rating": 2,
+          "time_spent": "5 minutes",
+          "notes": "Too much effort, abandoned",
+          "completed": false
+        }
+      ],
+      "duration_minutes": 15,
+      "status": "abandoned",
+      "abandonment_reason": "Too tired, will try again tomorrow",
+      "context": {
+        "time_of_day": "late_night",
+        "trigger": "multiple deadlines",
+        "location": "home"
+      }
+    },
+    
+    {
+      "user_id": "demo-morgan-veteran-user",
+      "journey_type": "completed",
+      "start_emotion": "Grief",
+      "goal_emotion": "Peace",
+      "start_vac": [-0.7, 0.2, 0.5],
+      "goal_vac": [0.3, -0.5, 0.4],
+      "waypoints": [
+        {
+          "index": 0,
+          "emotion": "Grief",
+          "category": "Places We Go When We're Hurting",
+          "vac": [-0.7, 0.2, 0.5],
+          "reached": true,
+          "time_to_reach": "0 minutes"
+        },
+        {
+          "index": 1,
+          "emotion": "Sadness",
+          "category": "Places We Go When We're Hurting",
+          "vac": [-0.6, 0.0, 0.4],
+          "reached": true,
+          "time_to_reach": "45 minutes"
+        },
+        {
+          "index": 2,
+          "emotion": "Acknowledgment",
+          "category": "Places We Go With Others",
+          "vac": [-0.2, -0.1, 0.6],
+          "reached": true,
+          "time_to_reach": "30 minutes"
+        },
+        {
+          "index": 3,
+          "emotion": "Acceptance",
+          "category": "Places We Go When Life Is Good",
+          "vac": [0.1, -0.3, 0.5],
+          "reached": true,
+          "time_to_reach": "40 minutes"
+        },
+        {
+          "index": 4,
+          "emotion": "Peace",
+          "category": "Places We Go When Life Is Good",
+          "vac": [0.3, -0.5, 0.4],
+          "reached": true,
+          "time_to_reach": "35 minutes"
+        }
+      ],
+      "strategies_attempted": [
+        {
+          "waypoint_index": 0,
+          "strategy_name": "Body Scan Meditation",
+          "helpful_rating": 4,
+          "time_spent": "20 minutes",
+          "notes": "Helped me ground in the present",
+          "completed": true
+        },
+        {
+          "waypoint_index": 1,
+          "strategy_name": "Expressive Writing About Loss",
+          "helpful_rating": 5,
+          "time_spent": "30 minutes",
+          "notes": "Powerful release",
+          "completed": true
+        },
+        {
+          "waypoint_index": 2,
+          "strategy_name": "Loving-Kindness Meditation (Metta)",
+          "helpful_rating": 5,
+          "time_spent": "25 minutes",
+          "notes": "Opened my heart again",
+          "completed": true
+        },
+        {
+          "waypoint_index": 3,
+          "strategy_name": "Post-Traumatic Growth Inventory",
+          "helpful_rating": 4,
+          "time_spent": "20 minutes",
+          "notes": "Found meaning in the loss",
+          "completed": true
+        }
+      ],
+      "duration_minutes": 150,
+      "status": "completed",
+      "context": {
+        "time_of_day": "morning",
+        "trigger": "anniversary of loss",
+        "location": "home"
+      }
+    },
+    
+    {
+      "user_id": "demo-morgan-veteran-user",
+      "journey_type": "completed",
+      "start_emotion": "Foreboding Joy",
+      "goal_emotion": "Gratitude",
+      "start_vac": [0.3, 0.4, 0.2],
+      "goal_vac": [0.6, 0.1, 0.7],
+      "waypoints": [
+        {
+          "index": 0,
+          "emotion": "Foreboding Joy",
+          "category": "Places We Go When Life Is Good",
+          "vac": [0.3, 0.4, 0.2],
+          "reached": true,
+          "time_to_reach": "0 minutes"
+        },
+        {
+          "index": 1,
+          "emotion": "Joy",
+          "category": "Places We Go When Life Is Good",
+          "vac": [0.7, 0.6, 0.5],
+          "reached": true,
+          "time_to_reach": "20 minutes"
+        },
+        {
+          "index": 2,
+          "emotion": "Gratitude",
+          "category": "Places We Go When Life Is Good",
+          "vac": [0.6, 0.1, 0.7],
+          "reached": true,
+          "time_to_reach": "25 minutes"
+        }
+      ],
+      "strategies_attempted": [
+        {
+          "waypoint_index": 0,
+          "strategy_name": "Mindfulness of Pleasant Events",
+          "helpful_rating": 5,
+          "time_spent": "15 minutes",
+          "notes": "Allowed myself to feel the joy fully",
+          "completed": true
+        },
+        {
+          "waypoint_index": 1,
+          "strategy_name": "Gratitude Journal",
+          "helpful_rating": 5,
+          "time_spent": "15 minutes",
+          "notes": "Perfect ending to the practice",
+          "completed": true
+        }
+      ],
+      "duration_minutes": 45,
+      "status": "completed",
+      "context": {
+        "time_of_day": "evening",
+        "trigger": "good news from family",
+        "location": "home"
+      }
+    },
+    
+    {
+      "user_id": "demo-casey-struggling-user",
+      "journey_type": "abandoned",
+      "start_emotion": "Shame",
+      "goal_emotion": "Self-Compassion",
+      "start_vac": [-0.8, 0.4, -0.6],
+      "goal_vac": [0.4, -0.2, 0.6],
+      "waypoints": [
+        {
+          "index": 0,
+          "emotion": "Shame",
+          "category": "Places We Go When We Fall Short",
+          "vac": [-0.8, 0.4, -0.6],
+          "reached": true,
+          "time_to_reach": "0 minutes"
+        },
+        {
+          "index": 1,
+          "emotion": "Embarrassment",
+          "category": "Places We Go When We Fall Short",
+          "vac": [-0.5, 0.3, 0.1],
+          "reached": false
+        },
+        {
+          "index": 2,
+          "emotion": "Self-Compassion",
+          "category": "Places We Go When Life Is Good",
+          "vac": [0.4, -0.2, 0.6],
+          "reached": false
+        }
+      ],
+      "strategies_attempted": [
+        {
+          "waypoint_index": 0,
+          "strategy_name": "Self-Soothe with Five Senses",
+          "helpful_rating": 3,
+          "time_spent": "8 minutes",
+          "notes": "Helped a little but feeling overwhelmed",
+          "completed": false
+        },
+        {
+          "waypoint_index": 0,
+          "strategy_name": "Music for Mood Regulation",
+          "helpful_rating": 2,
+          "time_spent": "10 minutes",
+          "notes": "Couldn't focus, too heavy",
+          "completed": false
+        }
+      ],
+      "duration_minutes": 20,
+      "status": "abandoned",
+      "abandonment_reason": "Too difficult, feeling worse",
+      "context": {
+        "time_of_day": "afternoon",
+        "trigger": "social situation went badly",
+        "location": "home"
+      }
+    },
+    
+    {
+      "user_id": "demo-casey-struggling-user",
+      "journey_type": "paused",
+      "start_emotion": "Despair",
+      "goal_emotion": "Hope",
+      "start_vac": [-0.9, 0.1, -0.7],
+      "goal_vac": [0.2, 0.2, 0.5],
+      "waypoints": [
+        {
+          "index": 0,
+          "emotion": "Despair",
+          "category": "Places We Go When We're Hurting",
+          "vac": [-0.9, 0.1, -0.7],
+          "reached": true,
+          "time_to_reach": "0 minutes"
+        },
+        {
+          "index": 1,
+          "emotion": "Sadness",
+          "category": "Places We Go When We're Hurting",
+          "vac": [-0.6, 0.0, 0.4],
+          "reached": false
+        },
+        {
+          "index": 2,
+          "emotion": "Hope",
+          "category": "Places We Go When Life Is Good",
+          "vac": [0.2, 0.2, 0.5],
+          "reached": false
+        }
+      ],
+      "strategies_attempted": [
+        {
+          "waypoint_index": 0,
+          "strategy_name": "Thank Your Mind",
+          "helpful_rating": 3,
+          "time_spent": "5 minutes",
+          "notes": "Made sense but hard to do",
+          "completed": false
+        }
+      ],
+      "duration_minutes": 10,
+      "status": "paused",
+      "abandonment_reason": "Will continue later, need a break",
+      "context": {
+        "time_of_day": "late_night",
+        "trigger": "depressive episode",
+        "location": "home"
+      }
+    },
+    
+    {
+      "user_id": "demo-riley-diverse-user",
+      "journey_type": "completed",
+      "start_emotion": "Loneliness",
+      "goal_emotion": "Connection",
+      "start_vac": [-0.5, 0.2, -0.8],
+      "goal_vac": [0.4, 0.3, 0.8],
+      "waypoints": [
+        {
+          "index": 0,
+          "emotion": "Loneliness",
+          "category": "Places We Go With Others",
+          "vac": [-0.5, 0.2, -0.8],
+          "reached": true,
+          "time_to_reach": "0 minutes"
+        },
+        {
+          "index": 1,
+          "emotion": "Longing",
+          "category": "Places We Go With Others",
+          "vac": [-0.3, 0.3, -0.4],
+          "reached": true,
+          "time_to_reach": "20 minutes"
+        },
+        {
+          "index": 2,
+          "emotion": "Belonging",
+          "category": "Places We Go With Others",
+          "vac": [0.3, 0.1, 0.7],
+          "reached": true,
+          "time_to_reach": "40 minutes"
+        },
+        {
+          "index": 3,
+          "emotion": "Connection",
+          "category": "Places We Go With Others",
+          "vac": [0.4, 0.3, 0.8],
+          "reached": true,
+          "time_to_reach": "30 minutes"
+        }
+      ],
+      "strategies_attempted": [
+        {
+          "waypoint_index": 0,
+          "strategy_name": "Loving-Kindness Meditation (Metta)",
+          "helpful_rating": 4,
+          "time_spent": "20 minutes",
+          "notes": "Felt connection to humanity",
+          "completed": true
+        },
+        {
+          "waypoint_index": 1,
+          "strategy_name": "Reach Out to Someone You Trust",
+          "helpful_rating": 5,
+          "time_spent": "45 minutes",
+          "notes": "Called friend, made plans to meet",
+          "completed": true
+        }
+      ],
+      "duration_minutes": 90,
+      "status": "completed",
+      "context": {
+        "time_of_day": "evening",
+        "trigger": "feeling isolated",
+        "location": "home"
+      }
+    },
+    
+    {
+      "user_id": "demo-riley-diverse-user",
+      "journey_type": "completed",
+      "start_emotion": "Anger",
+      "goal_emotion": "Calm",
+      "start_vac": [-0.6, 0.8, 0.2],
+      "goal_vac": [0.3, -0.4, 0.2],
+      "waypoints": [
+        {
+          "index": 0,
+          "emotion": "Anger",
+          "category": "Places We Go When Things Are Uncertain or Too Much",
+          "vac": [-0.6, 0.8, 0.2],
+          "reached": true,
+          "time_to_reach": "0 minutes"
+        },
+        {
+          "index": 1,
+          "emotion": "Frustration",
+          "category": "Places We Go When Things Are Uncertain or Too Much",
+          "vac": [-0.4, 0.5, 0.1],
+          "reached": true,
+          "time_to_reach": "15 minutes"
+        },
+        {
+          "index": 2,
+          "emotion": "Contentment",
+          "category": "Places We Go When Life Is Good",
+          "vac": [0.2, -0.2, 0.1],
+          "reached": true,
+          "time_to_reach": "30 minutes"
+        },
+        {
+          "index": 3,
+          "emotion": "Calm",
+          "category": "Places We Go When Life Is Good",
+          "vac": [0.3, -0.4, 0.2],
+          "reached": true,
+          "time_to_reach": "25 minutes"
+        }
+      ],
+      "strategies_attempted": [
+        {
+          "waypoint_index": 0,
+          "strategy_name": "Ecstatic/Expressive Dance",
+          "helpful_rating": 5,
+          "time_spent": "15 minutes",
+          "notes": "Released the physical energy of anger",
+          "completed": true
+        },
+        {
+          "waypoint_index": 1,
+          "strategy_name": "Walking Meditation",
+          "helpful_rating": 4,
+          "time_spent": "25 minutes",
+          "notes": "Continued calming down naturally",
+          "completed": true
+        }
+      ],
+      "duration_minutes": 70,
+      "status": "completed",
+      "context": {
+        "time_of_day": "afternoon",
+        "trigger": "unfair situation at work",
+        "location": "home"
+      }
+    },
+    
+    {
+      "user_id": "demo-riley-diverse-user",
+      "journey_type": "completed",
+      "start_emotion": "Boredom",
+      "goal_emotion": "Curiosity",
+      "start_vac": [-0.2, -0.5, 0.0],
+      "goal_vac": [0.3, 0.4, 0.3],
+      "waypoints": [
+        {
+          "index": 0,
+          "emotion": "Boredom",
+          "category": "Places We Go When Things Are Uncertain or Too Much",
+          "vac": [-0.2, -0.5, 0.0],
+          "reached": true,
+          "time_to_reach": "0 minutes"
+        },
+        {
+          "index": 1,
+          "emotion": "Interest",
+          "category": "Places We Go When Life Is Good",
+          "vac": [0.2, 0.3, 0.2],
+          "reached": true,
+          "time_to_reach": "20 minutes"
+        },
+        {
+          "index": 2,
+          "emotion": "Curiosity",
+          "category": "Places We Go When Life Is Good",
+          "vac": [0.3, 0.4, 0.3],
+          "reached": true,
+          "time_to_reach": "15 minutes"
+        }
+      ],
+      "strategies_attempted": [
+        {
+          "waypoint_index": 0,
+          "strategy_name": "Free-Form Art Making",
+          "helpful_rating": 5,
+          "time_spent": "30 minutes",
+          "notes": "Got absorbed in creative flow",
+          "completed": true
+        }
+      ],
+      "duration_minutes": 35,
+      "status": "completed",
+      "context": {
+        "time_of_day": "afternoon",
+        "trigger": "weekend with nothing planned",
+        "location": "home"
+      }
+    }
+  ],
+  
+  "meta": {
+    "total_journeys": 10,
+    "by_status": {
+      "completed": 7,
+      "abandoned": 2,
+      "paused": 1
+    },
+    "by_user": {
+      "demo-jordan-active-user": 3,
+      "demo-morgan-veteran-user": 2,
+      "demo-casey-struggling-user": 2,
+      "demo-riley-diverse-user": 3
+    },
+    "total_strategy_attempts": 32,
+    "avg_strategies_per_journey": 3.2,
+    "coverage": "Tests various journey patterns, success/failure scenarios, different user types"
+  }
+}

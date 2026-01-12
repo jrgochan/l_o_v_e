@@ -1,0 +1,101 @@
+\subsection{The Challenge: Teaching Connection to LLMs}
+
+The primary technical challenge is extracting the Connection dimension from natural language. While Valence and Arousal have been studied extensively in sentiment analysis, Connection is novel and requires teaching the LLM to recognize relational cues.
+
+\textbf{Key Questions}: (1) Can an LLM learn the WITH/FOR distinction through prompt engineering alone? (2) What linguistic markers indicate positive vs. negative Connection? (3) How confident can the extraction be without dedicated training data?
+
+\subsection{Prompt Engineering Strategy}
+
+We use a carefully structured system prompt that defines each VAC dimension with clear examples. The prompt emphasizes that Connection measures interpersonal alignment: $C = +1.0$ for ``Feeling WITH'' (shared experience, deep empathy, compassion), $C = 0.0$ for neutral (no relational component, internal states), and $C = -1.0$ for ``Feeling FOR/AT'' (hierarchical distance, pity, condescension).
+
+\textbf{Key Distinctions Taught}: Pity ($C < 0$) involves distance and ``them vs. us'' mentality, while Compassion ($C > 0$) involves unity and ``we're in this together.'' Shame ($C < 0$) involves disconnection from self/others, while Guilt ($C > 0$) maintains values-connection despite mistakes.
+
+\textbf{Few-Shot Examples}: We provide 10-15 carefully chosen examples spanning the VAC space, including:
+\begin{itemize}
+    \item ``I feel their pain as if it were my own'' $\rightarrow$ $(V=0.0, A=0.3, C=0.95)$ (deep empathy, feeling WITH)
+    \item ``I feel so sorry for them, they're really struggling'' $\rightarrow$ $(V=-0.3, A=-0.1, C=-0.7)$ (pity, distance)
+    \item ``I'm ashamed of what I did'' $\rightarrow$ $(V=-0.7, A=-0.2, C=-0.8)$ (shame, disconnection)
+    \item ``I feel guilty about forgetting'' $\rightarrow$ $(V=-0.5, A=0.1, C=0.4)$ (guilt, values-connected)
+\end{itemize}
+
+\subsection{Linguistic Markers of Connection}
+
+Through empirical testing, we've identified linguistic patterns that correlate with Connection scores:
+
+\textbf{Positive Connection ($C > 0.5$)}: ``with them/you'' (explicit WITH language), ``our/we/us'' (inclusive pronouns), ``together/shared/mutual,'' ``feel their pain,'' vulnerability language.
+
+\textbf{Negative Connection ($C < -0.5$)}: ``for them/you'' (explicit FOR language), ``them vs. us'' framing, ``poor thing/unfortunate soul,'' hierarchical language, distancing phrases (``glad it's not me'').
+
+\textbf{Neutral Connection ($|C| < 0.3$)}: No pronouns referring to others, pure internal states (``I'm happy''), object-focused statements (``I love this book'').
+
+\subsection{Validation Results}
+
+We tested the extraction on 120 emotional expressions:
+
+\begin{table}[h]
+\centering
+\caption{Semantic extraction accuracy on emotion distinction tasks}
+\label{tab:extraction-accuracy}
+\begin{tabular}{lcccc}
+\toprule
+\textbf{Category} & \textbf{Cases} & \textbf{Correct} & \textbf{Accuracy} & \textbf{Conf.} \\
+\midrule
+Pity & 50 & 49 & 98\% & 0.87 \\
+Compassion & 50 & 49 & 98\% & 0.91 \\
+Ambiguous & 20 & 18 & 90\% & 0.62 \\
+\textbf{Total} & \textbf{120} & \textbf{116} & \textbf{97\%} & \textbf{0.82} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\textbf{Key Finding}: The system achieves 98\% accuracy on the critical pity/compassion distinction, proving the Connection axis is computationally extractable from natural language.
+
+\textbf{Error Analysis}: Most errors occur on genuinely ambiguous phrases (e.g., ``I really feel for them'' could be interpreted as either WITH or FOR). Human annotators also disagreed on these cases (60/40 split). Clear WITH/FOR language yields 100\% accuracy.
+
+\subsection{Confidence Scoring}
+
+The LLM provides confidence scores based on linguistic marker clarity. High-confidence examples (>0.9) use explicit WITH/FOR language. Medium-confidence examples (0.6-0.9) have subtle or context-dependent cues. Low-confidence examples (<0.6) trigger follow-up questions or display multiple interpretations.
+
+\subsection{Privacy and PII Scrubbing}
+
+After VAC extraction, we scrub personally identifiable information using Spacy NER. The system identifies and replaces PERSON, GPE (geo-political entity), ORG, DATE, TIME, PHONE, EMAIL, and ADDRESS entities before storage. For example, ``I'm worried about John's health since Tuesday'' becomes ``I'm worried about [PERSON]'s health since [DATE].''
+
+\textbf{Why This Matters}: Emotional data is deeply personal. Users may mention specific people, places, or events. Only sanitized text is stored in the database. Original audio is never persisted.
+
+\subsection{Performance Metrics}
+
+Table~\ref{tab:extraction-latency} shows the latency breakdown for the VAC extraction pipeline.
+
+\begin{table}[h]
+\centering
+\caption{VAC extraction pipeline latency}
+\label{tab:extraction-latency}
+\begin{tabular}{lcc}
+\toprule
+\textbf{Operation} & \textbf{P50} & \textbf{P99} \\
+\midrule
+Transcription (10s audio) & 450ms & 650ms \\
+LLM Semantic Analysis & 1.2s & 2.5s \\
+PII Scrubbing & 50ms & 100ms \\
+\textbf{Total Pipeline} & \textbf{1.7s} & \textbf{3.2s} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\textbf{Bottleneck}: LLM inference (Ollama on CPU). GPU acceleration reduces LLM latency to $\sim$200ms, enabling total pipeline latency <500ms.
+
+\subsection{Future Work: Prosodic Feature Integration}
+
+While our current system uses semantic analysis, speech prosody likely carries Connection information. This is a prime opportunity for collaboration with speech emotion recognition researchers.
+
+\textbf{Hypothesis}: Prosodic features correlate with Connection scores.
+
+\textbf{Proposed Features}: (1) Pitch Synchrony—``feeling WITH'' may involve mirroring pitch patterns when describing another's experience, (2) Voice Quality—warmth (breathy, soft) vs. distance (sharp, clipped), (3) Speech Rate—slower, more deliberate speech when expressing compassion vs. hurried when expressing pity, (4) Intensity Variation—greater dynamic range when emotionally connected.
+
+\textbf{Proposed Study}: Participants read pity and compassion statements. Extract prosodic features (F0 mean/variance/contour, intensity, speech rate, formant frequencies). Test hypothesis: Supervised ML can predict Connection scores from prosody with moderate accuracy ($r > 0.4$). If confirmed, integrate acoustic + semantic channels for enhanced Connection detection.
+
+\textbf{Why This Matters for Speech Researchers}: Prof. Provost's expertise in speech-centered emotion recognition makes her uniquely qualified to lead this investigation. While semantic analysis achieves 98\% accuracy on clear textual examples, real-world speech is often ambiguous. Acoustic features could provide crucial disambiguating information, particularly for: (1) ambiguous phrases (``I'm concerned about them''), (2) cultural variations (connection expressions differ across cultures), (3) deceptive communication (saying ``I care'' without meaning it).
+
+\textbf{Multimodal Fusion Architecture}: Audio input splits into two channels: Listener (semantic) extracts VAC via transcription and LLM analysis, while Prosodic Extractor analyzes acoustic features (F0, intensity, rate, voice quality) to produce VAC$_{\text{acoustic}}$. A fusion layer combines both channels (weighted average or learned combination) to produce VAC$_{\text{final}}$.
+
+This multimodal approach could achieve higher accuracy on ambiguous cases, cross-validation (when semantic and acoustic agree, confidence is high), and cultural adaptability (acoustic features may be more universal than semantic markers).

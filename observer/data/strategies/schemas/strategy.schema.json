@@ -1,0 +1,93 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://love.observer/schemas/strategies/strategy.json",
+  "title": "Strategy Collection Schema",
+  "description": "Validation schema for emotion regulation strategy collections",
+  "type": "object",
+  "required": ["category", "source", "strategies"],
+  "properties": {
+    "category": {
+      "type": "string",
+      "description": "Strategy category name"
+    },
+    "source": {
+      "type": "string",
+      "description": "Research source or citation"
+    },
+    "description": {
+      "type": "string"
+    },
+    "strategies": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": ["name", "type", "description", "steps", "difficulty", "evidence"],
+        "properties": {
+          "name": {
+            "type": "string",
+            "minLength": 5
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "situation_selection",
+              "situation_modification",
+              "attentional_deployment",
+              "cognitive_reappraisal",
+              "response_modulation"
+            ],
+            "description": "Gross (1998) Process Model category"
+          },
+          "description": {
+            "type": "string",
+            "minLength": 20
+          },
+          "steps": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "type": "string"
+            }
+          },
+          "time_required": {
+            "type": "string"
+          },
+          "difficulty": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 5,
+            "description": "Difficulty level 1-5"
+          },
+          "evidence": {
+            "type": "string",
+            "enum": ["meta_analysis", "rct", "clinical", "theoretical"],
+            "description": "Evidence hierarchy level"
+          },
+          "citations": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "author": {"type": "string"},
+                "year": {"type": "integer"},
+                "title": {"type": "string"}
+              }
+            }
+          },
+          "contraindications": {
+            "type": ["string", "null"]
+          },
+          "best_for_vac_changes": {
+            "type": "object",
+            "properties": {
+              "valence": {"type": "string"},
+              "arousal": {"type": "string"},
+              "connection": {"type": "string"}
+            }
+          }
+        }
+      }
+    }
+  }
+}

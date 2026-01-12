@@ -1,0 +1,19 @@
+# Build output
+dist/
+*.d.ts
+*.d.ts.map
+*.js.map
+
+# Dependencies
+node_modules/
+
+# TypeScript cache
+*.tsbuildinfo
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db

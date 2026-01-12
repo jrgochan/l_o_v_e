@@ -1,0 +1,21 @@
+{
+    "plugins": {
+        "md013": {
+            "line_length": 999
+        },
+        "md024": {
+            "siblings_only": true
+        },
+        "md033": true,
+        "md041": true,
+        "md026": {
+            "punctuation": ".,;:!?"
+        },
+        "md036": false
+    },
+    "extensions": {
+        "front-matter": {
+            "enabled": true
+        }
+    }
+}

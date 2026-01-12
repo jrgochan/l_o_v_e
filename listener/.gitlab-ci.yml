@@ -1,0 +1,97 @@
+# GitLab CI/CD Pipeline for Listener Module
+# L.O.V.E. Project - Sensory Gateway
+
+stages:
+  - test
+  - lint
+  - build
+  - deploy
+  - secret-detection
+
+variables:
+  PYTHON_VERSION: "3.11"
+  PIP_CACHE_DIR: "$CI_PROJECT_DIR/.cache/pip"
+  # Service dependencies
+  REDIS_HOST: "redis"
+  REDIS_PORT: "6379"
+  SECRET_DETECTION_ENABLED: 'true'
+
+include:
+  - template: Security/Secret-Detection.gitlab-ci.yml
+
+# Cache dependencies
+cache:
+  paths:
+    - .cache/pip
+    - venv/
+
+# Test job
+test:unit:
+  stage: test
+  image: python:3.11
+  services:
+    - name: redis:7-alpine
+      alias: redis
+  before_script:
+    - python -m venv venv
+    - source venv/bin/activate
+    - pip install --upgrade pip
+    - pip install -r requirements.txt
+    # Redis is available at "redis" host
+  script:
+    - pytest tests/ -v --cov=app --cov-report=term --cov-report=html
+  coverage: '/TOTAL.*\s+(\d+%)$/'
+  artifacts:
+    reports:
+      coverage_report:
+        coverage_format: cobertura
+        path: coverage.xml
+    paths:
+      - htmlcov/
+    expire_in: 1 week
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+    - if: '$CI_COMMIT_BRANCH == "main"'
+
+# Linting
+lint:flake8:
+  stage: lint
+  image: python:3.11-slim
+  before_script:
+    - pip install flake8
+  script:
+    - flake8 app/ tests/ --max-line-length=100 --exclude=venv
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+    - if: '$CI_COMMIT_BRANCH == "main"'
+
+lint:mypy:
+  stage: lint
+  image: python:3.11-slim
+  before_script:
+    - python -m venv venv
+    - source venv/bin/activate
+    - pip install -r requirements.txt
+  script:
+    - mypy app/ --ignore-missing-imports
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+    - if: '$CI_COMMIT_BRANCH == "main"'
+
+# Build
+build:container:
+  stage: build
+  image: docker:24
+  services:
+    - docker:24-dind
+  before_script:
+    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+  script:
+    - docker build -t $CI_REGISTRY_IMAGE/listener:$CI_COMMIT_SHORT_SHA -f Containerfile .
+    - docker build -t $CI_REGISTRY_IMAGE/listener:latest -f Containerfile .
+    - docker push $CI_REGISTRY_IMAGE/listener:$CI_COMMIT_SHORT_SHA
+    - docker push $CI_REGISTRY_IMAGE/listener:latest
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "main"'
+  tags:
+    - docker

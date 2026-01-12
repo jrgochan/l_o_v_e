@@ -1,0 +1,111 @@
+{
+  "category": "Grief Integration Patterns",
+  "source": "Kübler-Ross, E. & Kessler, D. (2005). On Grief and Grieving; Worden, J.W. (2018). Grief Counseling and Grief Therapy.",
+  "description": "Patterns for processing loss and grief, moving from acute pain through adaptation to integration and meaning-making. Based on contemporary grief theory understanding that grief is not linear and has no timeline.",
+  "patterns": [
+    {
+      "name": "Denial through Stages to Acceptance",
+      "from_category": "Places We Go When We're Hurting",
+      "to_category": "Places We Go When Things Don't Go As Planned",
+      "vac_change_characteristics": {
+        "valence_change": "increase",
+        "arousal_change": "decrease",
+        "connection_change": "maintain_or_increase"
+      },
+      "difficulty_score": 0.6,
+      "psychological_reasoning": "Kübler-Ross stages (Denial, Anger, Bargaining, Depression, Acceptance) are not linear but represent common experiences in grief. Movement is fluid - people cycle through states multiple times. Acceptance doesn't mean 'being okay with it' but integrating the reality of loss into one's life. Connection often maintained or increased through grief (crying WITH others).",
+      "example_transitions": [
+        "Denial → Shock → Anger → Bargaining → Depression → Acceptance",
+        "Numbness → Disbelief → Rage → Pleading → Sadness → Integration",
+        "Shock → Protest → Yearning → Despair → Reorganization → Peace"
+      ],
+      "minimum_waypoints": 4,
+      "estimated_time": "months to years (no rushing grief)",
+      "key_intermediate_states": [
+        "Shock/Denial (protective numbness)",
+        "Anger (energy of protest - 'This shouldn't have happened')",
+        "Bargaining ('If only...' thinking)",
+        "Depression (the deep sadness of real loss)",
+        "Acceptance (integration, not 'getting over')"
+      ],
+      "recommended_strategy_types": [
+        "response_modulation",
+        "cognitive_reappraisal",
+        "situation_modification"
+      ],
+      "clinical_notes": "Modern grief theory (Worden, Neimeyer) emphasizes that these aren't stages you complete, but experiences you move through in non-linear fashion. The goal is not to 'get over' grief but to integrate loss and continue living meaningfully. Complicated grief (persisting beyond 12 months with significant impairment) may require professional grief therapy."
+    },
+    {
+      "name": "Acute Grief to Integrated Grief to Continuing Bonds",
+      "from_category": "Places We Go When We're Hurting",
+      "to_category": "Places We Go When The Heart Is Open",
+      "vac_change_characteristics": {
+        "valence_change": "increase",
+        "arousal_change": "decrease",
+        "connection_change": "major_increase"
+      },
+      "difficulty_score": 0.5,
+      "psychological_reasoning": "Acute grief (first weeks/months) is characterized by waves of intense pain, crying, yearning. Over time, grief integrates - not disappearing but becoming part of life's fabric. Modern grief theory supports 'continuing bonds' - maintaining connection to deceased through memory, legacy, internalized relationship. Love doesn't end with death.",
+      "example_transitions": [
+        "Acute Grief → Sadness → Longing → Remembrance → Love",
+        "Anguish → Sorrow → Yearning → Cherishing → Gratitude for Having Known Them",
+        "Devastation → Heartbreak → Tender Sadness → Honoring → Continuing Bond"
+      ],
+      "minimum_waypoints": 3,
+      "estimated_time": "6 months to 2+ years",
+      "key_intermediate_states": [
+        "Sadness (softening from acute anguish)",
+        "Longing (missing without being overwhelmed)",
+        "Remembrance (able to access good memories)",
+        "Cherishing (gratitude alongside pain)"
+      ],
+      "recommended_strategy_types": [
+        "cognitive_reappraisal",
+        "response_modulation",
+        "attentional_deployment"
+      ],
+      "clinical_notes": "Continuing bonds model (Klass, Silverman, Nickman) recognizes that healthy grief includes maintaining connection to the deceased. This isn't 'letting go' but transforming the relationship from physical to internal/memorial. Rituals, legacy work, and meaning-making help this process. Grief comes in waves (dual process model) - oscillating between loss-oriented and restoration-oriented coping."
+    },
+    {
+      "name": "Loss to Growth (Post-Traumatic Growth through Grief)",
+      "from_category": "Places We Go When We're Hurting",
+      "to_category": "Places We Go When The Heart Is Open",
+      "vac_change_characteristics": {
+        "valence_change": "major_increase",
+        "arousal_change": "variable",
+        "connection_change": "major_increase"
+      },
+      "difficulty_score": 0.6,
+      "psychological_reasoning": "Loss, while painful, can catalyze profound growth: deeper appreciation for life, clarified priorities, increased compassion, strengthened relationships, spiritual development. This is not about 'silver lining' the loss but acknowledging that we are transformed by grief - ideally in ways that honor both the pain and the learning.",
+      "example_transitions": [
+        "Grief → Sadness → Reflection → Meaning → Growth → Gratitude",
+        "Loss → Sorrow → Processing → Insight → Transformation → Appreciation",
+        "Devastation → Heartbreak → Integration → Purpose → Compassion → Love"
+      ],
+      "minimum_waypoints": 4,
+      "estimated_time": "1-3+ years (growth emerges, not forced)",
+      "key_intermediate_states": [
+        "Reflection (processing what happened)",
+        "Meaning (finding/creating significance)",
+        "Growth (recognizing changes)",
+        "Gratitude (for having loved, for lessons)"
+      ],
+      "recommended_strategy_types": [
+        "cognitive_reappraisal",
+        "situation_modification",
+        "attentional_deployment"
+      ],
+      "clinical_notes": "Post-traumatic growth (PTG) in grief context: 1) Personal strength discovered, 2) Closer relationships, 3) New possibilities, 4) Appreciation for life, 5) Spiritual development. IMPORTANT: Growth doesn't erase pain - they coexist. Don't push for growth too early - it emerges organically through processing. Meaning-making strategies helpful but only when ready. Legacy work can transform grief into living memorial."
+    }
+  ],
+  "meta": {
+    "version": "1.0",
+    "created": "2025-12-04",
+    "evidence_base": "Grief patterns based on Kübler-Ross stages, Worden's tasks of mourning, Neimeyer's meaning reconstruction, Klass's continuing bonds model, dual process model (Stroebe & Schut), and post-traumatic growth research (Tedeschi & Calhoun). Strong clinical and research support for all approaches.",
+    "critical_updates_to_field": "Contemporary grief theory has moved beyond: 1) Linear stages model, 2) 'Letting go' as goal, 3) Timeline expectations ('should be over it by now'), 4) Pathologizing continuing bonds. Current understanding: Grief is individual, non-linear, indefinite, and doesn't require severing connection to deceased.",
+    "normal_grief_vs_complicated": "Normal grief: Intense but gradually integrates. Complicated/Prolonged Grief Disorder (PGD): Intense yearning/preoccupation persisting beyond 12 months with significant functional impairment. PGD affects ~10% of bereaved and requires specialized treatment (Complicated Grief Treatment by Katherine Shear).",
+    "disenfranchised_grief": "Some losses aren't socially recognized (pet death, miscarriage, estranged relationships, job loss, identity loss). These require same processing but with less social support. Connection and validation become even more critical.",
+    "cultural_considerations": "Grief expressions vary widely by culture. Some cultures encourage open expression, others value restraint. Duration of mourning periods varies. Rituals differ. These patterns should adapt to cultural context while respecting universal human experiences of loss.",
+    "when_professional_help_needed": "Seek grief counseling/therapy if: suicidal thoughts, prolonged inability to function, substance abuse to cope, persistent guilt/self-blame, complicated by trauma, anniversary reactions that worsen over time, symptoms of PGD beyond one year."
+  }
+}

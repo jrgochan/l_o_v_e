@@ -1,0 +1,79 @@
+{
+  "category": "Shame Resilience Patterns",
+  "source": "Brown, B. (2021). Atlas of the Heart; Neff, K. (2011). Self-Compassion: The Proven Power of Being Kind to Yourself.",
+  "description": "Patterns for moving from shame (identity-level unworthiness) through vulnerability to connection, self-compassion, and worthiness. Based on Brené Brown's research on shame resilience and Kristin Neff's self-compassion work. These patterns specifically target the Connection axis of VAC model.",
+  "patterns": [
+    {
+      "name": "Shame to Vulnerability to Empathy to Self-Compassion to Worthiness",
+      "from_category": "Places We Go When We Fall Short",
+      "to_category": "Places We Go With Others",
+      "vac_change_characteristics": {
+        "valence_change": "major_increase",
+        "arousal_change": "decrease",
+        "connection_change": "CRITICAL_INCREASE_from_negative_to_positive"
+      },
+      "difficulty_score": 0.8,
+      "psychological_reasoning": "Shame is belief 'I am bad/unworthy' with extreme disconnection (connection -0.9 to -1.0). Cannot directly transition to positive states - psychologically impossible. MUST route through Vulnerability (gateway emotion where connection shifts from negative to neutral-positive). Vulnerability enables empathy from others and self-compassion, which repairs the disconnection. Only then can worthiness emerge.",
+      "example_transitions": [
+        "Shame → Vulnerability → Empathy Received → Self-Compassion → Worthiness",
+        "Humiliation → Exposure → Witness → Self-Kindness → Belonging → Authentic Pride",
+        "Unworthiness → Risk-Taking → Connection → Self-Acceptance → Inherent Value"
+      ],
+      "minimum_waypoints": 4,
+      "estimated_time": "weeks to months (deep identity work)",
+      "key_intermediate_states": [
+        "Vulnerability (THE GATEWAY - connection shifts positive here)",
+        "Empathy Received (someone sees you and doesn't shame you)",
+        "Self-Compassion (treating yourself with kindness)",
+        "Worthiness (inherent value, not performance-based)"
+      ],
+      "recommended_strategy_types": [
+        "situation_modification",
+        "cognitive_reappraisal",
+        "response_modulation"
+      ],
+      "clinical_notes": "Brené Brown: 'Shame cannot survive empathy.' Vulnerability is absolutely required - speaking shame to a safe person breaks its power. Self-compassion (Neff) has three components: self-kindness, common humanity, mindfulness. Connection is the antidote to shame, but requires vulnerability first. Perfectionism is shame-based - letting go of it is part of this journey. Values work helps distinguish 'I did something wrong' (guilt) from 'I am wrong' (shame)."
+    },
+    {
+      "name": "Perfectionism to Self-Criticism to Self-Kindness to Authenticity",
+      "from_category": "Places We Go When We Fall Short",
+      "to_category": "Places We Go When The Heart Is Open",
+      "vac_change_characteristics": {
+        "valence_change": "major_increase",
+        "arousal_change": "major_decrease",
+        "connection_change": "major_increase"
+      },
+      "difficulty_score": 0.7,
+      "psychological_reasoning": "Perfectionism is armor against shame - 'If I'm perfect, I can avoid judgment/rejection.' But it's impossible and exhausting, leading to chronic self-criticism. Moving to authenticity requires: 1) Recognizing perfectionism's cost, 2) Softening self-criticism with self-compassion, 3) Practicing vulnerability (showing imperfection), 4) Discovering that authenticity creates deeper connection than perfection ever could.",
+      "example_transitions": [
+        "Perfectionism → Self-Criticism → Self-Awareness → Self-Kindness → Self-Acceptance → Authenticity",
+        "Striving → Harsh Judgment → Noticing → Compassion → Permission to be Human → Real",
+        "Never Good Enough → Inner Critic → Mindfulness → Gentleness → Enough-ness → Whole"
+      ],
+      "minimum_waypoints": 3,
+      "estimated_time": "months to years (unlearning lifelong patterns)",
+      "key_intermediate_states": [
+        "Self-Awareness (recognizing the critic's voice)",
+        "Self-Kindness (responding with compassion instead of harshness)",
+        "Self-Acceptance (permission to be imperfect)",
+        "Authenticity (showing up as real self, not perfect self)"
+      ],
+      "recommended_strategy_types": [
+        "cognitive_reappraisal",
+        "situation_modification",
+        "response_modulation"
+      ],
+      "clinical_notes": "Perfectionism often masks shame - the belief that 'who I am is not enough.' Opposite Action (DBT) is powerful: Do imperfectly on purpose, let someone see you struggle. Self-compassion practice (Neff) directly counters the harsh inner critic. Values work helps distinguish 'being perfect' from 'living by my values.' Authenticity requires vulnerability but creates sustainable worthiness (not based on performance). Growth mindset (Dweck) supports this transition - mistakes are learning, not evidence of unworthiness."
+    }
+  ],
+  "meta": {
+    "version": "1.0",
+    "created": "2025-12-04",
+    "evidence_base": "Shame resilience based on Brené Brown's 20+ years researching shame, vulnerability, and worthiness; Kristin Neff's self-compassion research showing effectiveness for shame, self-criticism, and well-being; ACT work on values vs. fusion with evaluative thoughts; narrative therapy's externalization of self-criticism.",
+    "shame_vs_guilt": "CRITICAL DISTINCTION - Guilt: 'I did something bad' (behavior-focused, reparable). Shame: 'I am bad' (identity-focused, isolating). Guilt is adaptive and drives repair. Shame is maladaptive and drives hiding. The Connection axis distinguishes them: Guilt maintains some connection (C around 0), Shame has extreme disconnection (C = -0.9 to -1.0).",
+    "vulnerability_as_gateway": "Vulnerability is THE gateway emotion for shame work. VAC signature approximately [0.0, 0.3, 0.6] - neutral valence, moderate arousal, POSITIVE connection. This is the pivot point where connection shifts from negative (isolation) to positive (WITH others). Cannot heal shame in isolation - requires witnessed vulnerability.",
+    "connection_axis_focus": "These patterns specifically repair the Connection axis. Shame is extreme negative connection ('I am alone in my badness'). Worthiness is extreme positive connection ('I belong, I am enough'). The journey from -1.0 to +0.9 on Connection axis is one of the most difficult emotional transitions, hence high difficulty scores and required waypoints.",
+    "cultural_shame": "Shame is universal but shame triggers vary by culture (individualist vs. collectivist, honor cultures, family/community expectations). Some cultures emphasize group harmony over individual authenticity - these patterns may need adaptation. Core principle remains: Connection heals shame.",
+    "when_professional_help_needed": "Deep shame work often requires therapy, especially if rooted in childhood trauma, abuse, or chronic invalidation. IFS (Internal Family Systems), EMDR for shame memories, ACT for values clarity, and trauma-informed CBT all effective. Shame-based behaviors (addiction, eating disorders, self-harm) require professional treatment."
+  }
+}

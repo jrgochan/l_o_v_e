@@ -1,0 +1,109 @@
+\begin{thebibliography}{10}
+
+\bibitem{brown2006}
+Brené Brown.
+\newblock Shame resilience theory: A grounded theory study on women and shame.
+\newblock {\em Families in Society}, 87(1):43--52, 2006.
+
+\bibitem{brown2012}
+Brené Brown.
+\newblock Daring greatly: How the courage to be vulnerable transforms the way
+  we live, love, parent, and lead.
+\newblock 2012.
+
+\bibitem{brown2021}
+Brené Brown.
+\newblock {\em Atlas of the Heart: Mapping Meaningful Connection and the
+  Language of Human Experience}.
+\newblock Random House, New York, NY, 2021.
+
+\bibitem{cowen2017}
+Alan~S. Cowen and Dacher Keltner.
+\newblock Self-report captures 27 distinct categories of emotion bridged by
+  continuous gradients.
+\newblock {\em Proceedings of the National Academy of Sciences},
+  114(38):E7900--E7909, 2017.
+
+\bibitem{ekman1992}
+Paul Ekman.
+\newblock An argument for basic emotions.
+\newblock {\em Cognition and Emotion}, 6(3-4):169--200, 1992.
+
+\bibitem{ferrari2019}
+Marta Ferrari et~al.
+\newblock Self-compassion interventions and psychosocial outcomes: A
+  meta-analysis of rcts.
+\newblock {\em Mindfulness}, 10(8):1455--1473, 2019.
+
+\bibitem{fitzpatrick2017}
+Kathleen~Kara Fitzpatrick, Alison Darcy, and Molly Vierhile.
+\newblock Delivering cognitive behavior therapy to young adults with symptoms
+  of depression and anxiety using a fully automated conversational agent
+  (woebot): A randomized controlled trial.
+\newblock {\em JMIR Mental Health}, 4(2):e19, 2017.
+
+\bibitem{gottman2015}
+John~M. Gottman.
+\newblock The seven principles for making marriage work: A practical guide from
+  the country's foremost relationship expert.
+\newblock 2015.
+
+\bibitem{hart1968}
+Peter~E. Hart, Nils~J. Nilsson, and Bertram Raphael.
+\newblock A formal basis for the heuristic determination of minimum cost paths.
+\newblock {\em IEEE Transactions on Systems Science and Cybernetics},
+  4(2):100--107, 1968.
+
+\bibitem{hofmann2012}
+Stefan~G. Hofmann, Anu Asnaani, Imke J.~J. Vonk, Alice~T. Sawyer, and Angela
+  Fang.
+\newblock The efficacy of cognitive behavioral therapy: A review of
+  meta-analyses.
+\newblock {\em Cognitive Therapy and Research}, 36(5):427--440, 2012.
+
+\bibitem{pgvector2023}
+Andrew Johnson.
+\newblock pgvector: Open-source vector similarity search for postgres.
+\newblock 2023.
+\newblock Vector database extension for PostgreSQL.
+
+\bibitem{kessler2005}
+Elisabeth Kübler-Ross and David Kessler.
+\newblock {\em On Grief and Grieving: Finding the Meaning of Grief Through the
+  Five Stages of Loss}.
+\newblock Scribner, New York, NY, 2005.
+
+\bibitem{linehan2015}
+Marsha~M. Linehan.
+\newblock Dbt skills training manual, second edition.
+\newblock 2015.
+
+\bibitem{mehrabian1974}
+Albert Mehrabian and James~A. Russell.
+\newblock An approach to environmental psychology.
+\newblock 1974.
+
+\bibitem{neff2013}
+Kristin~D. Neff and Christopher~K. Germer.
+\newblock A pilot study and randomized controlled trial of the mindful
+  self-compassion program.
+\newblock {\em Journal of Clinical Psychology}, 69(1):28--44, 2013.
+
+\bibitem{russell1980}
+James~A. Russell.
+\newblock A circumplex model of affect.
+\newblock {\em Journal of Personality and Social Psychology}, 39(6):1161--1178,
+  1980.
+
+\bibitem{shoemake1985}
+Ken Shoemake.
+\newblock Animating rotation with quaternion curves.
+\newblock {\em ACM SIGGRAPH Computer Graphics}, 19(3):245--254, 1985.
+
+\bibitem{stroebe1999}
+Margaret Stroebe and Henk Schut.
+\newblock The dual process model of coping with bereavement: Rationale and
+  description.
+\newblock {\em Death Studies}, 23(3):197--224, 1999.
+
+\end{thebibliography}

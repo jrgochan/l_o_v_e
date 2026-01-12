@@ -1,0 +1,107 @@
+{
+  "category": "Anxiety Regulation Patterns",
+  "source": "Barlow, D.H. (2002). Anxiety and Its Disorders; Clark, D.A. & Beck, A.T. (2010). Cognitive Therapy of Anxiety Disorders.",
+  "description": "Patterns for managing and regulating anxiety, from acute panic through worry to calm and balanced states. Based on cognitive-behavioral models of anxiety and contemporary neuroscience understanding of fear/anxiety circuits.",
+  "patterns": [
+    {
+      "name": "Panic to Anxiety to Worry to Calm",
+      "from_category": "Places We Go When Things Are Uncertain or Too Much",
+      "to_category": "Places We Go When Life Is Good",
+      "vac_change_characteristics": {
+        "valence_change": "major_increase",
+        "arousal_change": "major_decrease",
+        "connection_change": "increase"
+      },
+      "difficulty_score": 0.6,
+      "psychological_reasoning": "Panic is acute sympathetic activation - fight/flight in full force. Moving to calm requires stepwise arousal reduction: Panic (arousal 0.9) → Anxiety (0.7) → Worry (0.5) → Calm (-0.7). Cannot skip steps - nervous system needs gradual downregulation. Physiological strategies first, then cognitive reappraisal once arousal decreases.",
+      "example_transitions": [
+        "Panic → Anxiety → Worry → Contentment → Calm",
+        "Terror → Fear → Apprehension → Relaxed → Tranquil",
+        "Overwhelm → Stress → Concern → Ease → Peaceful"
+      ],
+      "minimum_waypoints": 3,
+      "estimated_time": "45 minutes to 2 hours (acute episode)",
+      "key_intermediate_states": [
+        "Anxiety (arousal decreasing, thinking partially accessible)",
+        "Worry (rumination but manageable, arousal moderate)",
+        "Contentment (neutral-positive state before deep calm)"
+      ],
+      "recommended_strategy_types": [
+        "response_modulation",
+        "attentional_deployment",
+        "cognitive_reappraisal"
+      ],
+      "clinical_notes": "Key principle: Address physiology FIRST (breathing, grounding, TIPP skills), THEN address cognition (cognitive reappraisal, probability estimation). Panic attacks typically peak within 10 minutes then naturally decrease - riding the wave with grounding prevents escalation. Interoceptive exposure (deliberately inducing panic sensations in safe context) helps long-term but requires professional guidance."
+    },
+    {
+      "name": "Overwhelm to Focus to Completion to Relief",
+      "from_category": "Places We Go When Things Are Uncertain or Too Much",
+      "to_category": "Places We Go When Life Is Good",
+      "vac_change_characteristics": {
+        "valence_change": "major_increase",
+        "arousal_change": "decrease_then_increase_then_decrease",
+        "connection_change": "maintain"
+      },
+      "difficulty_score": 0.5,
+      "psychological_reasoning": "Overwhelm occurs when demands exceed perceived resources. Moving through requires: 1) Reduce arousal enough to think clearly, 2) Break tasks into manageable pieces, 3) Take action (arousal may increase with engagement), 4) Experience completion/relief. This pattern honors that productivity can reduce anxiety when tasks are right-sized.",
+      "example_transitions": [
+        "Overwhelm → Stress → Focus → Accomplishment → Relief → Satisfaction",
+        "Paralysis → Anxiety → Engagement → Progress → Completion → Contentment",
+        "Chaos → Tension → Organization → Achievement → Ease → Calm"
+      ],
+      "minimum_waypoints": 3,
+      "estimated_time": "2 hours to several days",
+      "key_intermediate_states": [
+        "Focus (arousal at optimal level for action)",
+        "Accomplishment (positive feedback from completing)",
+        "Relief (discharge of tension)"
+      ],
+      "recommended_strategy_types": [
+        "situation_modification",
+        "cognitive_reappraisal",
+        "response_modulation"
+      ],
+      "clinical_notes": "Task chunking is essential - breaking overwhelming projects into 'next single action.' Eisenhower Matrix helps prioritize. Sometimes anxiety is appropriate signal that action is needed - the solution is effective action, not just calming. Behavioral activation component (DO something) often more effective than pure relaxation for overwhelm."
+    },
+    {
+      "name": "Catastrophizing to Reality-Testing to Balanced Perspective",
+      "from_category": "Places We Go When Things Are Uncertain or Too Much",
+      "to_category": "Places We Go When Life Is Good",
+      "vac_change_characteristics": {
+        "valence_change": "major_increase",
+        "arousal_change": "major_decrease",
+        "connection_change": "slight_increase"
+      },
+      "difficulty_score": 0.4,
+      "psychological_reasoning": "Catastrophizing is cognitive distortion where mind jumps to worst-case scenario and treats it as fact. Anxiety amplifies this. Moving to balanced thinking requires: 1) Catching the catastrophic thought, 2) Reality-testing (probability, evidence), 3) Generating alternative scenarios, 4) Accepting uncertainty. Primarily cognitive work.",
+      "example_transitions": [
+        "Catastrophizing → Anxiety → Worry → Realistic Concern → Acceptance → Calm",
+        "Worst-Case Thinking → Fear → Doubt → Balanced View → Trust → Peace",
+        "Dread → Apprehension → Caution → Perspective → Equanimity → Tranquil"
+      ],
+      "minimum_waypoints": 2,
+      "estimated_time": "30 minutes to 2 hours (cognitive work)",
+      "key_intermediate_states": [
+        "Anxiety/Worry (acknowledging the fear)",
+        "Realistic Concern (evidence-based assessment)",
+        "Acceptance (of uncertainty, of inability to control all outcomes)"
+      ],
+      "recommended_strategy_types": [
+        "cognitive_reappraisal",
+        "response_modulation",
+        "attentional_deployment"
+      ],
+      "clinical_notes": "Cognitive techniques from CBT are highly effective: Check the Facts (DBT), Cognitive Reappraisal (probability estimation, evidence gathering), Defusion (ACT - 'I'm having the thought that...'). Key insight: Thoughts are not facts. Anxiety lies - it overestimates threat and underestimates coping resources. Developing tolerance for uncertainty is essential - many catastrophic worries are about needing certainty that's impossible to have."
+    }
+  ],
+  "meta": {
+    "version": "1.0",
+    "created": "2025-12-04",
+    "evidence_base": "Anxiety regulation patterns based on decades of CBT research (Beck, Barlow, Clark), contemporary neuroscience of fear circuits, interoceptive exposure research, and mindfulness-based approaches (MBCT). Extensive RCT support for CBT for anxiety disorders (GAD, panic, social anxiety, specific phobias).",
+    "anxiety_types_covered": "These patterns apply across: Generalized Anxiety Disorder (GAD), Panic Disorder, Social Anxiety, Specific Phobias, Health Anxiety, Performance Anxiety. Each has specific triggers but shares common regulation mechanisms.",
+    "key_principle": "Anxiety is future-oriented fear - worry about what MIGHT happen. This differs from fear (present danger) and panic (acute activation). Regulation requires: 1) Present-moment grounding, 2) Reality-testing catastrophic predictions, 3) Building distress tolerance, 4) Exposure to feared situations gradually.",
+    "avoidance_trap": "Anxiety is maintained by avoidance - the more we avoid what we fear, the stronger the fear grows. Exposure (gradually approaching feared situations while managing arousal) is the most effective long-term treatment. Short-term relief from avoidance creates long-term amplification of anxiety.",
+    "somatic_component": "Anxiety is felt in the body: racing heart, shallow breathing, muscle tension, stomach upset. Body-based interventions (breathing, progressive relaxation, movement) are essential, not optional. Interoceptive awareness (noticing body sensations without fear) helps.",
+    "when_medication_considered": "SSRIs, SNRIs, or benzodiazepines may be helpful adjuncts for severe anxiety, especially when anxiety prevents engagement with therapy. Medication alone less effective than medication + therapy. Benzodiazepines provide rapid relief but risk dependence - use sparingly, not as primary treatment."
+  }
+}

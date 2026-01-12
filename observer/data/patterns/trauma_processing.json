@@ -1,0 +1,105 @@
+{
+  "category": "Trauma Processing Patterns",
+  "source": "Van der Kolk, B. (2014). The Body Keeps the Score; Levine, P. (1997). Waking the Tiger.",
+  "description": "Patterns for processing traumatic experiences and moving from dysregulated trauma responses to safety, presence, and integration. Based on understanding that trauma is held in the body and nervous system, not just the mind.",
+  "patterns": [
+    {
+      "name": "Hypervigilance to Safety to Groundedness",
+      "from_category": "Places We Go When Things Are Uncertain or Too Much",
+      "to_category": "Places We Go When Life Is Good",
+      "vac_change_characteristics": {
+        "valence_change": "major_increase",
+        "arousal_change": "major_decrease",
+        "connection_change": "increase"
+      },
+      "difficulty_score": 0.7,
+      "psychological_reasoning": "Hypervigilance is the nervous system stuck in threat detection mode. Moving to safety requires downregulating the sympathetic nervous system, establishing environmental safety cues, and rebuilding sense of secure base. This is a long process requiring consistent nervous system retraining.",
+      "example_transitions": [
+        "Hypervigilance → Worry → Caution → Calm → Safe",
+        "Panic → Anxiety → Stress → Contentment → Tranquility",
+        "Fear → Apprehension → Vigilance → Relaxed → Peaceful"
+      ],
+      "minimum_waypoints": 3,
+      "estimated_time": "weeks to months",
+      "key_intermediate_states": [
+        "Worry (arousal decreasing but still alert)",
+        "Caution (appropriate vigilance, not hypervigilance)",
+        "Calm (nervous system regulating)"
+      ],
+      "recommended_strategy_types": [
+        "response_modulation",
+        "attentional_deployment"
+      ],
+      "clinical_notes": "Trauma survivors need to learn that safety is real, not just conceptual. This requires bottom-up (somatic) approaches more than top-down (cognitive). Polyvagal-informed practices (co-regulation, safe environment cues) are essential. Cannot be rushed - nervous system needs time to learn new patterns."
+    },
+    {
+      "name": "Dissociation to Present to Connected",
+      "from_category": "Places We Go When Things Are Uncertain or Too Much",
+      "to_category": "Places We Go With Others",
+      "vac_change_characteristics": {
+        "valence_change": "increase",
+        "arousal_change": "slight_increase",
+        "connection_change": "major_increase"
+      },
+      "difficulty_score": 0.6,
+      "psychological_reasoning": "Dissociation is the nervous system's protective shutdown in response to overwhelming threat. Coming back requires gentle re-engagement with body, sensory input, and eventually safe connection. The danger is re-traumatization if done too quickly - must titrate carefully.",
+      "example_transitions": [
+        "Dissociation → Numbness → Present Awareness → Curiosity → Connection",
+        "Depersonalization → Awareness → Embodiment → Interest → Belonging",
+        "Shutdown → Thaw → Sensation → Engagement → Co-Regulation"
+      ],
+      "minimum_waypoints": 3,
+      "estimated_time": "weeks to months",
+      "key_intermediate_states": [
+        "Numbness (transition state, not yet present)",
+        "Present Awareness (sensing body, environment)",
+        "Curiosity (safe engagement with experience)"
+      ],
+      "recommended_strategy_types": [
+        "attentional_deployment",
+        "response_modulation",
+        "situation_modification"
+      ],
+      "clinical_notes": "Grounding techniques are essential but must be gentle - harsh sensory input can be retraumatizing. Window of tolerance must be respected. Somatic tracking, gentle movement, and co-regulation with safe others help nervous system come back online. Connection is the ultimate antidote to dissociation."
+    },
+    {
+      "name": "Re-experiencing to Processing to Integration",
+      "from_category": "Places We Go When We're Hurting",
+      "to_category": "Places We Go When Things Don't Go As Planned",
+      "vac_change_characteristics": {
+        "valence_change": "increase",
+        "arousal_change": "decrease",
+        "connection_change": "increase"
+      },
+      "difficulty_score": 0.8,
+      "psychological_reasoning": "Intrusive re-experiencing (flashbacks, nightmares) requires memory reprocessing and integration. The trauma memory needs to be worked with in titrated doses within window of tolerance, with safe support. Moving from overwhelmed re-experiencing to integrated narrative is the core of trauma recovery.",
+      "example_transitions": [
+        "Flashback → Triggered → Processing → Reflection → Acceptance",
+        "Nightmare → Fear → Exploration → Understanding → Integration",
+        "Intrusive Memory → Distress → Titrated Exposure → Meaning-Making → Peace"
+      ],
+      "minimum_waypoints": 3,
+      "estimated_time": "months to years",
+      "key_intermediate_states": [
+        "Triggered (awareness of activation)",
+        "Processing (working with material safely)",
+        "Reflection (making sense of experience)"
+      ],
+      "recommended_strategy_types": [
+        "response_modulation",
+        "attentional_deployment",
+        "cognitive_reappraisal"
+      ],
+      "clinical_notes": "This pattern typically requires professional trauma therapy (EMDR, SE, IFS, CPT). Self-work should be supplemental. Bilateral stimulation, narrative work, and somatic processing are key. The goal isn't to 'get over it' but to integrate it into life story without being overwhelmed. Requires dual awareness: one foot in past, one in present safety."
+    }
+  ],
+  "meta": {
+    "version": "1.0",
+    "created": "2025-12-04",
+    "evidence_base": "Trauma processing patterns based on research in trauma neurobiology, polyvagal theory, somatic experiencing, and evidence-based trauma therapies (EMDR, CPT, PE). Van der Kolk's work demonstrates that trauma is stored in body and nervous system, requiring body-based interventions alongside cognitive work.",
+    "critical_principle": "Trauma processing cannot be rushed. Window of tolerance must be respected - not too numb, not too overwhelmed. Titration (working in small doses) and pendulation (moving between distress and resource) are essential. Safety first - both external (safe environment) and internal (regulated nervous system).",
+    "when_professional_help_required": "All trauma processing patterns ideally should involve trauma-informed therapy. Self-work can support but not replace professional treatment, especially for complex trauma, childhood trauma, or when experiencing severe symptoms (dissociation, flashbacks, suicidality).",
+    "recommended_therapies": "EMDR (Eye Movement Desensitization and Reprocessing), SE (Somatic Experiencing), Sensorimotor Psychotherapy, IFS (Internal Family Systems), CPT (Cognitive Processing Therapy), PE (Prolonged Exposure - with caution), Trauma-Focused CBT, TFCBT for children.",
+    "polyvagal_context": "Porges' Polyvagal Theory explains why trauma survivors experience hypervigilance (sympathetic), dissociation (dorsal vagal), and difficulty with connection (social engagement). Healing involves bringing ventral vagal (safe and social) back online through co-regulation, safety cues, and nervous system retraining."
+  }
+}

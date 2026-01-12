@@ -1,0 +1,85 @@
+# GitLab CI/CD Pipeline for Experience Module (Shared + Web)
+# L.O.V.E. Project - UI/UX Layer
+
+stages:
+  - lint
+  - test
+  - build
+  - deploy
+  - secret-detection
+
+variables:
+  NODE_VERSION: "18"
+  # Cache optimization for npm
+  npm_config_cache: "$CI_PROJECT_DIR/.npm"
+  SECRET_DETECTION_ENABLED: 'true'
+
+include:
+  - template: Security/Secret-Detection.gitlab-ci.yml
+
+# Cache dependencies
+cache:
+  key: ${CI_COMMIT_REF_SLUG}
+  paths:
+    - .npm
+    - node_modules/
+    - web/.next/cache/
+
+# Linting
+lint:
+  stage: lint
+  image: node:18-alpine
+  script:
+    - npm ci
+    # Run lint for everything
+    - npm run lint
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+    - if: '$CI_COMMIT_BRANCH == "main"'
+
+# Unit Tests
+test:unit:
+  stage: test
+  image: node:18-alpine
+  script:
+    - npm ci
+    - npm run test:shared
+    - npm run test --workspace=web
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+    - if: '$CI_COMMIT_BRANCH == "main"'
+
+# Build Container
+build:container:
+  stage: build
+  image: docker:24
+  services:
+    - docker:24-dind
+  before_script:
+    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+  script:
+    - docker build -t $CI_REGISTRY_IMAGE/experience:$CI_COMMIT_SHORT_SHA -f Containerfile .
+    - docker build -t $CI_REGISTRY_IMAGE/experience:latest -f Containerfile .
+    - docker push $CI_REGISTRY_IMAGE/experience:$CI_COMMIT_SHORT_SHA
+    - docker push $CI_REGISTRY_IMAGE/experience:latest
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "main"'
+  tags:
+    - docker
+
+# Deploy to Staging (Manual)
+deploy:staging:
+  stage: deploy
+  image: alpine:latest
+  before_script:
+    - apk add --no-cache curl
+  script:
+    - echo "Deploying Experience to staging..."
+    - curl -X POST $STAGING_WEBHOOK_URL -H "Content-Type:application/json" -d "{\"image\":\"$CI_REGISTRY_IMAGE/experience:$CI_COMMIT_SHORT_SHA\"}"
+  environment:
+    name: staging
+    url: https://staging-experience.love.app
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "main"'
+      when: manual
+  needs: ["build:container"]

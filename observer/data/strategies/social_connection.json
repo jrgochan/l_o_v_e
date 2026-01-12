@@ -1,0 +1,256 @@
+{
+  "category": "Social Connection & Interpersonal Strategies",
+  "source": "Brown, B. (2021). Atlas of the Heart: Mapping Meaningful Connection and the Language of Human Experience.",
+  "description": "Evidence-based strategies for building authentic connection, practicing vulnerability, improving communication, and nurturing relationships. Based on Brené Brown's research on vulnerability, shame resilience, and connection, plus Nonviolent Communication and relational practices.",
+  "strategies": [
+    {
+      "name": "Authentic Relating: Sharing What's Alive",
+      "type": "situation_modification",
+      "description": "Practice revealing your authentic present-moment experience to build deeper connection.",
+      "steps": [
+        "Choose a safe person or setting (trusted friend, relating circle)",
+        "Check in with yourself: What am I feeling right now?",
+        "Share from 'I' statements: 'I feel...', 'I notice...', 'I'm aware of...'",
+        "Reveal something true that feels slightly vulnerable",
+        "Examples: 'I notice I'm nervous sharing this', 'I feel warmth toward you', 'I'm afraid of being judged'",
+        "Don't perform or present a polished version - share what's messy and real",
+        "Notice the other person's response",
+        "Allow silence - don't fill every gap",
+        "Practice: 'The more real I am, the more connection I feel'",
+        "Reciprocate - listen deeply when they share",
+        "Thank them for witnessing you"
+      ],
+      "time_required": "15-45 minutes (conversation)",
+      "difficulty": 4,
+      "evidence": "clinical",
+      "citations": [
+        {
+          "author": "Brown, B.",
+          "year": 2012,
+          "title": "Daring Greatly: How the Courage to Be Vulnerable Transforms the Way We Live"
+        },
+        {
+          "author": "Tatkin, S.",
+          "year": 2011,
+          "title": "Wired for Love"
+        }
+      ],
+      "contraindications": "Requires a safe, trustworthy person. Not for unsafe or judgmental relationships.",
+      "best_for_vac_changes": {
+        "valence": "increase",
+        "arousal": "variable",
+        "connection": "major_increase"
+      }
+    },
+    {
+      "name": "Nonviolent Communication (NVC) Framework",
+      "type": "situation_modification",
+      "description": "Four-step communication process to express needs and hear others with compassion, developed by Marshall Rosenberg.",
+      "steps": [
+        "1. OBSERVATION: State facts without evaluation or judgment",
+        "Bad: 'You're always late'  Good: 'You arrived at 7:30, we agreed on 7:00'",
+        "2. FEELING: Express how you feel about it (emotion words)",
+        "Bad: 'I feel like you don't care'  Good: 'I feel hurt and worried'",
+        "3. NEED: Identify the universal human need beneath the feeling",
+        "Examples: need for consideration, reliability, respect, connection",
+        "'I value punctuality because I need to feel respected and valued'",
+        "4. REQUEST: Make a specific, doable request (not a demand)",
+        "Bad: 'Don't be late again'  Good: 'Would you be willing to text me if you'll be more than 10 minutes late?'",
+        "Full example: 'When you arrived 30 minutes late (observation), I felt anxious and hurt (feelings) because I need reliability and to feel valued (needs). Would you be willing to call me if you're running late? (request)'",
+        "Practice with minor issues first"
+      ],
+      "time_required": "5-10 minutes to formulate, varies for conversation",
+      "difficulty": 3,
+      "evidence": "clinical",
+      "citations": [
+        {
+          "author": "Rosenberg, M.",
+          "year": 2003,
+          "title": "Nonviolent Communication: A Language of Life"
+        }
+      ],
+      "contraindications": "Not for abusive situations. Takes practice - feels clunky at first.",
+      "best_for_vac_changes": {
+        "valence": "increase",
+        "arousal": "decrease",
+        "connection": "major_increase"
+      }
+    },
+    {
+      "name": "Co-Regulation Practice (with trusted other)",
+      "type": "response_modulation",
+      "description": "Use the nervous system of a safe other person to help regulate your own nervous system.",
+      "steps": [
+        "Identify when you're dysregulated (anxious, panicked, shutdown)",
+        "Reach out to a person who feels safe and regulating",
+        "Be physically present if possible (or video call)",
+        "Sit or stand near them - close enough to feel their presence",
+        "Match your breathing to theirs if they're calm",
+        "Make gentle eye contact if that feels safe",
+        "You might hold hands, hug, or just be near",
+        "Let their calm nervous system 'lend' regulation to yours",
+        "This is biology - mirror neurons and social engagement system",
+        "Don't force conversation - presence is enough",
+        "Stay for 10-20 minutes",
+        "Notice if you feel calmer, heart rate slows, breathing deepens",
+        "Thank them for being your anchor"
+      ],
+      "time_required": "10-30 minutes",
+      "difficulty": 2,
+      "evidence": "rct",
+      "citations": [
+        {
+          "author": "Porges, S.",
+          "year": 2011,
+          "title": "The Polyvagal Theory: Neurophysiological Foundations of Emotions"
+        },
+        {
+          "author": "Coan, J. & Sbarra, D.",
+          "year": 2015,
+          "title": "Social Baseline Theory: The Social Regulation of Risk and Effort"
+        }
+      ],
+      "contraindications": "Requires a genuinely safe, regulated person. Not effective if both people are dysregulated.",
+      "best_for_vac_changes": {
+        "valence": "increase",
+        "arousal": "major_decrease",
+        "connection": "major_increase"
+      }
+    },
+    {
+      "name": "Asking for Help/Support",
+      "type": "situation_modification",
+      "description": "Structured approach to reaching out when you need support, overcoming barriers to asking.",
+      "steps": [
+        "Notice the need: 'I need help/support with...'",
+        "Identify the barrier: shame? 'I should handle this alone'? Fear of burdening?",
+        "Challenge it: 'Asking for help is human. People want to support me.'",
+        "Choose the right person: Who has capacity? Who is safe? Who might understand?",
+        "Be specific about what you need:",
+        "- 'Can you listen for 20 minutes while I process this?'",
+        "- 'I need help moving Saturday - can you spare 2 hours?'",
+        "- 'I'm struggling and just need to not be alone - can we sit together?'",
+        "Make it easy to say no: 'No pressure if you can't'",
+        "Ask: Text, call, or in person",
+        "Receive the help gratefully - let them give to you",
+        "Notice: Asking for help often strengthens relationships",
+        "Remember: You would help them - allow reciprocity"
+      ],
+      "time_required": "5-10 minutes to ask, varies for help received",
+      "difficulty": 4,
+      "evidence": "clinical",
+      "citations": [
+        {
+          "author": "Brown, B.",
+          "year": 2012,
+          "title": "Daring Greatly"
+        },
+        {
+          "author": "McGonigal, K.",
+          "year": 2015,
+          "title": "The Upside of Stress"
+        }
+      ],
+      "contraindications": "Requires having safe people in your life. Build support network first if isolated.",
+      "best_for_vac_changes": {
+        "valence": "increase",
+        "arousal": "slight_increase",
+        "connection": "major_increase"
+      }
+    },
+    {
+      "name": "Setting Boundaries with Compassion",
+      "type": "situation_modification",
+      "description": "Say no or set limits while maintaining connection and self-respect.",
+      "steps": [
+        "Notice when you need a boundary: resentment, exhaustion, 'should' feeling",
+        "Get clear: What am I not willing to do? What do I need?",
+        "Remind yourself: Boundaries are caring for the relationship long-term",
+        "Use simple, kind language:",
+        "- 'I'm not able to do that'",
+        "- 'That doesn't work for me'",
+        "- 'I need to take care of myself right now'",
+        "No need to over-explain or justify",
+        "Offer alternative if possible: 'I can't Friday, but I could Tuesday'",
+        "Tolerate their disappointment without rescuing",
+        "Stay firm and warm: 'I care about you AND I'm not available'",
+        "Notice: Good people respect boundaries",
+        "Practice: Boundaries are where I end and you begin",
+        "Remind yourself after: 'I honored my needs. That's good for everyone.'"
+      ],
+      "time_required": "Varies by situation",
+      "difficulty": 4,
+      "evidence": "clinical",
+      "citations": [
+        {
+          "author": "Brown, B.",
+          "year": 2021,
+          "title": "Atlas of the Heart"
+        },
+        {
+          "author": "Cloud, H. & Townsend, J.",
+          "year": 1992,
+          "title": "Boundaries: When to Say Yes, How to Say No"
+        }
+      ],
+      "contraindications": "May damage unhealthy relationships (which may be necessary). Safety first in abusive situations.",
+      "best_for_vac_changes": {
+        "valence": "increase",
+        "arousal": "slight_increase",
+        "connection": "increase"
+      }
+    },
+    {
+      "name": "Gratitude Expression to Others",
+      "type": "situation_modification",
+      "description": "Explicitly express appreciation and gratitude to strengthen relationships and increase positive emotions.",
+      "steps": [
+        "Think of someone who has positively impacted your life",
+        "Get specific about what they did and how it affected you",
+        "Choose method: in person (most powerful), call, text, letter",
+        "Express it clearly:",
+        "- 'I want you to know how much I appreciate...'",
+        "- 'When you [specific action], it made me feel...'",
+        "- 'You've impacted my life by...'",
+        "Be sincere and specific (not generic)",
+        "Allow them to receive it - don't minimize your words after",
+        "Notice their response - often deeply moved",
+        "Feel the warmth of connection that arises",
+        "Do this regularly, not just on special occasions",
+        "Research shows: expressing gratitude increases happiness in both people",
+        "Aim for one gratitude expression per week"
+      ],
+      "time_required": "5-20 minutes",
+      "difficulty": 2,
+      "evidence": "rct",
+      "citations": [
+        {
+          "author": "Seligman, M., et al.",
+          "year": 2005,
+          "title": "Positive Psychology Progress: Empirical Validation of Interventions"
+        },
+        {
+          "author": "Brown, B.",
+          "year": 2021,
+          "title": "Atlas of the Heart"
+        }
+      ],
+      "contraindications": null,
+      "best_for_vac_changes": {
+        "valence": "major_increase",
+        "arousal": "slight_increase",
+        "connection": "major_increase"
+      }
+    }
+  ],
+  "meta": {
+    "version": "1.0",
+    "created": "2025-12-04",
+    "evidence_base": "Connection strategies draw from multiple research streams: Brené Brown's 20+ years researching shame, vulnerability, and belonging; Porges' Polyvagal Theory; Rosenberg's NVC framework; and social neuroscience research on co-regulation. Strong evidence that authentic connection is protective against depression, anxiety, and increases overall well-being.",
+    "target_populations": "Universal need for connection, but particularly valuable for those experiencing loneliness, social anxiety, shame, or isolation. Essential component of healing from trauma, addiction, and depression. Supports the Connection axis of the VAC model.",
+    "core_principle": "Connection requires vulnerability. Brené Brown: 'Connection is why we're here; it's what gives purpose and meaning to our lives.' The opposite of connection is not solitude, but disconnection through shame and fear. We are neurobiologically wired for connection.",
+    "vac_axis_focus": "These strategies specifically target the Connection axis (C in VAC). Movement from negative to positive connection often requires vulnerability as the gateway emotion. Connection also tends to increase valence and can help regulate arousal through co-regulation.",
+    "safety_note": "All connection strategies require discernment about WHO to connect with. Not all people are safe. These practices are for developing healthy connections with trustworthy people. If you don't have safe people yet, therapy groups, support groups, and community activities can help build a support network.",
+    "progression": "Start with lower-vulnerability practices: Gratitude Expression, Co-Regulation. Progress to moderate: Setting Boundaries, NVC. Advanced: Authentic Relating and Asking for Help (require significant vulnerability)."
+  }
+}

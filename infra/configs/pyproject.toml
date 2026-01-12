@@ -1,0 +1,129 @@
+# L.O.V.E. Platform - Python Tool Configuration
+# Centralized configuration for code quality tools
+#
+# This is the canonical configuration maintained in infra/configs/
+# It is distributed to modules during setup
+
+[tool.black]
+line-length = 100
+target-version = ['py311']
+exclude = '''
+/(
+    \.git
+  | \.venv
+  | venv
+  | build
+  | dist
+  | migrations
+  | __pycache__
+  | \.pytest_cache
+  | htmlcov
+)/
+'''
+
+[tool.isort]
+profile = "black"
+line_length = 100
+multi_line_output = 3
+include_trailing_comma = true
+force_grid_wrap = 0
+use_parentheses = true
+ensure_newline_before_comments = true
+skip_glob = ["*/migrations/*", "*/__pycache__/*", "*/venv/*"]
+
+[tool.mypy]
+python_version = "3.11"
+strict = true
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = true
+disallow_any_unimported = false  # Too strict for libraries
+disallow_incomplete_defs = true
+check_untyped_defs = true
+no_implicit_optional = true
+warn_redundant_casts = true
+warn_unused_ignores = true
+warn_no_return = true
+warn_unreachable = true
+ignore_missing_imports = true  # Many third-party packages lack stubs
+
+# Per-module options if needed
+[[tool.mypy.overrides]]
+module = ["tests.*"]
+disallow_untyped_defs = false  # Tests can be less strict
+
+[tool.pytest.ini_options]
+minversion = "7.0"
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+asyncio_mode = "auto"
+addopts = [
+    "-v",
+    "--strict-markers",
+    "--cov=app",
+    "--cov-report=html",
+    "--cov-report=term-missing",
+    "--cov-branch",
+    "--cov-fail-under=100",
+    "-ra",
+]
+markers = [
+    "unit: Unit tests (no external dependencies)",
+    "integration: Integration tests (requires database/services)",
+    "semantic: Semantic validation tests (Connection axis)",
+    "slow: Slow-running tests",
+    "requires_ollama: Tests requiring Ollama",
+    "requires_redis: Tests requiring Redis",
+]
+
+[tool.coverage.run]
+source = ["app"]
+omit = [
+    "*/tests/*",
+    "*/migrations/*",
+    "*/__init__.py",
+    "*/conftest.py",
+]
+
+[tool.coverage.report]
+precision = 2
+skip_empty = true
+show_missing = true
+exclude_lines = [
+    "pragma: no cover",
+    "def __repr__",
+    "raise AssertionError",
+    "raise NotImplementedError",
+    "if __name__ == .__main__.:",
+    "if TYPE_CHECKING:",
+    "class .*\\bProtocol\\):",
+    "@(abc\\.)?abstractmethod",
+]
+
+[tool.pydocstyle]
+convention = "google"
+add-ignore = ["D100", "D104"]  # Missing docstring in public module/package (too strict)
+match = "(?!test_).*\\.py"  # Don't check test files
+
+[tool.pylint.messages_control]
+disable = [
+    "C0111",  # missing-docstring (pydocstyle handles this)
+    "R0903",  # too-few-public-methods (Pydantic models)
+    "R0913",  # too-many-arguments (common in constructors)
+    "W0212",  # protected-access (sometimes needed)
+    "W1203",  # logging-fstring-interpolation (intentional - readable and performant)
+    "C0415",  # import-outside-toplevel (intentional - avoid circular imports, lazy loading)
+    "W0603",  # global-statement (intentional - singleton pattern)
+    "C0103",  # invalid-name (intentional - _instance variables for singletons)
+    "W0718",  # broad-exception-caught (intentional - service resilience)
+    "W0707",  # raise-missing-from (nice-to-have but not critical)
+]
+
+[tool.pylint.format]
+max-line-length = 100
+
+[tool.bandit]
+exclude_dirs = ["tests", "migrations", "venv", ".venv"]
+skips = ["B101"]  # assert_used (common in tests, we exclude test dirs anyway)

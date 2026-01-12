@@ -1,0 +1,636 @@
+{
+  "description": "Category-Specific Strategy Rankings - Pre-computed rankings of most effective strategies for each of the 13 emotional categories. Enables intelligent, category-aware recommendations that match strategies to the psychological needs of each emotional category.",
+  "version": "1.0",
+  "created": "2025-12-05",
+  "methodology": "Rankings based on: 1) Psychological appropriateness for category, 2) Evidence-based effectiveness, 3) Time to effect, 4) Accessibility/ease of use, 5) Safety profile. Ratings on 5-point scale.",
+  
+  "category_rankings": [
+    {
+      "category": "Places We Go When Things Are Uncertain or Too Much",
+      "characteristics": "High arousal, threat detection, overwhelm, anxiety, stress, panic",
+      "priority": "Physiological regulation FIRST, then cognitive work",
+      "top_strategies": [
+        {
+          "rank": 1,
+          "strategy_name": "TIPP Skills for Crisis",
+          "rating": 4.5,
+          "rationale": "Immediate physiological intervention for extreme arousal. Temperature, Intense exercise, Paced breathing, Paired muscle relaxation directly target sympathetic activation.",
+          "when_to_use": "Acute panic, overwhelm > 7/10, crisis states"
+        },
+        {
+          "rank": 2,
+          "strategy_name": "4-7-8 Breathing Technique",
+          "rating": 4.4,
+          "rationale": "Activates parasympathetic nervous system, reduces arousal quickly. Simple, accessible, can be done anywhere.",
+          "when_to_use": "Anxiety, stress, moderate panic"
+        },
+        {
+          "rank": 3,
+          "strategy_name": "5-4-3-2-1 Grounding Technique",
+          "rating": 4.3,
+          "rationale": "Anchors in present moment through senses, interrupts rumination and catastrophizing. Brings awareness out of threat-focused mind.",
+          "when_to_use": "Anxiety with rumination, dissociation, overwhelm"
+        },
+        {
+          "rank": 4,
+          "strategy_name": "Progressive Muscle Relaxation",
+          "rating": 4.2,
+          "rationale": "Reduces physical tension that maintains anxiety. Teaches body-mind connection and control over arousal.",
+          "when_to_use": "Physical tension, difficulty sleeping, chronic stress"
+        },
+        {
+          "rank": 5,
+          "strategy_name": "Task Chunking and Prioritization",
+          "rating": 4.5,
+          "rationale": "Directly addresses overwhelm by making tasks manageable. Restores sense of control and reduces perceived threat.",
+          "when_to_use": "Overwhelm specifically, too many demands"
+        },
+        {
+          "rank": 6,
+          "strategy_name": "STOP Skill (Crisis Intervention)",
+          "rating": 4.3,
+          "rationale": "Prevents impulsive action when emotionally flooded. Creates pause for wise response.",
+          "when_to_use": "Urge to act impulsively, emotional flooding"
+        },
+        {
+          "rank": 7,
+          "strategy_name": "Cold/Heat Therapy for Regulation",
+          "rating": 4.2,
+          "rationale": "Rapid physiological shift using temperature. Cold for panic, heat for anxiety.",
+          "when_to_use": "Need immediate physiological intervention"
+        }
+      ]
+    },
+    {
+      "category": "Places We Go When We Compare",
+      "characteristics": "Envy, jealousy, resentment, schadenfreude, comparison-driven emotions",
+      "priority": "Shift from comparison to self-focus, cultivate abundance mindset",
+      "top_strategies": [
+        {
+          "rank": 1,
+          "strategy_name": "Cognitive Reappraisal: Probability Estimation",
+          "rating": 4.1,
+          "rationale": "Reality-tests comparison-based beliefs. Questions 'they have it better' assumptions.",
+          "when_to_use": "Envy, feeling behind or inadequate"
+        },
+        {
+          "rank": 2,
+          "strategy_name": "Gratitude Expression to Others",
+          "rating": 4.3,
+          "rationale": "Shifts attention from what you lack to what you have. Counteracts scarcity mindset underlying comparison.",
+          "when_to_use": "Envy, resentment, feeling less-than"
+        },
+        {
+          "rank": 3,
+          "strategy_name": "Values Clarification Exercise",
+          "rating": 4.2,
+          "rationale": "Refocuses on personal values vs. others' achievements. Your path vs. their path.",
+          "when_to_use": "Comparison causing life direction doubt"
+        },
+        {
+          "rank": 4,
+          "strategy_name": "Self-Compassion Break (Kristin Neff)",
+          "rating": 4.0,
+          "rationale": "Counters self-judgment that fuels comparison. Common humanity component helps.",
+          "when_to_use": "Self-criticism from comparison"
+        },
+        {
+          "rank": 5,
+          "strategy_name": "Loving-Kindness Meditation (Metta)",
+          "rating": 3.9,
+          "rationale": "Extends goodwill to those you envy, softens resentment. Builds connection.",
+          "when_to_use": "Resentment toward those you compare to"
+        }
+      ]
+    },
+    {
+      "category": "Places We Go When Things Don't Go As Planned",
+      "characteristics": "Disappointment, regret, discouragement, resignation, frustration",
+      "priority": "Process loss, release expectations, find acceptance",
+      "top_strategies": [
+        {
+          "rank": 1,
+          "strategy_name": "Radical Acceptance (DBT)",
+          "rating": 4.5,
+          "rationale": "Directly addresses resistance to reality. Pain × Resistance = Suffering. Releasing 'should' reduces suffering.",
+          "when_to_use": "Fighting reality, 'this shouldn't have happened'"
+        },
+        {
+          "rank": 2,
+          "strategy_name": "Expressive Writing (Pennebaker Method)",
+          "rating": 4.1,
+          "rationale": "Processes disappointment, gives voice to loss of expectation, facilitates meaning-making.",
+          "when_to_use": "Need to process what went wrong"
+        },
+        {
+          "rank": 3,
+          "strategy_name": "Cognitive Reappraisal: Probability Estimation",
+          "rating": 4.0,
+          "rationale": "Challenges catastrophic interpretations of setbacks. Reality-tests severity.",
+          "when_to_use": "Catastrophizing about what didn't work"
+        },
+        {
+          "rank": 4,
+          "strategy_name": "Silver Linings Journal",
+          "rating": 3.8,
+          "rationale": "Finds meaning and learning in disappointment. Appropriate after initial processing.",
+          "when_to_use": "Ready to find meaning (not too early)"
+        },
+        {
+          "rank": 5,
+          "strategy_name": "Three Good Things (Gratitude Practice)",
+          "rating": 3.7,
+          "rationale": "Balances attention - acknowledging disappointment AND what's working.",
+          "when_to_use": "Disappointment narrowing focus to negative"
+        }
+      ]
+    },
+    {
+      "category": "Places We Go When It's Beyond Us",
+      "characteristics": "Awe, wonder, confusion, surprise, transcendent experiences",
+      "priority": "Allow the experience, integrate perspective shift",
+      "top_strategies": [
+        {
+          "rank": 1,
+          "strategy_name": "Mindfulness Meditation (Basic)",
+          "rating": 4.2,
+          "rationale": "Present-moment awareness allows experience of wonder without grasping. Openness to not-knowing.",
+          "when_to_use": "Awe, wonder, spiritual experiences"
+        },
+        {
+          "rank": 2,
+          "strategy_name": "Nature Exposure",
+          "rating": 4.4,
+          "rationale": "Direct route to awe. Vastness of nature creates perspective shift naturally.",
+          "when_to_use": "Need awe experience, perspective shift"
+        },
+        {
+          "rank": 3,
+          "strategy_name": "Expressive Writing (Pennebaker Method)",
+          "rating": 3.9,
+          "rationale": "Integrates transcendent experiences into narrative. Makes sense of the vast.",
+          "when_to_use": "Processing profound experience"
+        },
+        {
+          "rank": 4,
+          "strategy_name": "Three Good Things (Gratitude Practice)",
+          "rating": 4.1,
+          "rationale": "Cultivates appreciation which opens to wonder. Noticing leads to awe.",
+          "when_to_use": "Building capacity for awe"
+        },
+        {
+          "rank": 5,
+          "strategy_name": "Free-Form Art Making (Process over Product)",
+          "rating": 3.8,
+          "rationale": "Creative expression integrates overwhelming experiences. Gives form to formless.",
+          "when_to_use": "Need to express the inexpressible"
+        }
+      ]
+    },
+    {
+      "category": "Places We Go When Things Aren't What They Seem",
+      "characteristics": "Confusion, cognitive dissonance, betrayal, disillusionment",
+      "priority": "Reality-testing, integrating new information, grieving illusions",
+      "top_strategies": [
+        {
+          "rank": 1,
+          "strategy_name": "Check the Facts",
+          "rating": 4.3,
+          "rationale": "Directly addresses 'what's real vs. what I believed.' Separates facts from interpretations.",
+          "when_to_use": "Confusion, betrayal, things not as thought"
+        },
+        {
+          "rank": 2,
+          "strategy_name": "Narrative Therapy: Externalizing the Problem",
+          "rating": 4.0,
+          "rationale": "Separates self from situation, creates distance for perspective. Rewrites story with new information.",
+          "when_to_use": "Identity confusion, disillusionment"
+        },
+        {
+          "rank": 3,
+          "strategy_name": "Wise Mind",
+          "rating": 4.1,
+          "rationale": "Integrates emotion (what I feel about this) and reason (what facts say). Finds wisdom in middle.",
+          "when_to_use": "Cognitive dissonance, conflicting information"
+        },
+        {
+          "rank": 4,
+          "strategy_name": "Expressive Writing (Pennebaker Method)",
+          "rating": 3.9,
+          "rationale": "Processes shock and reorganization. Makes sense of changed reality.",
+          "when_to_use": "Need to process betrayal or disillusionment"
+        },
+        {
+          "rank": 5,
+          "strategy_name": "Radical Acceptance (DBT)",
+          "rating": 3.8,
+          "rationale": "Accepts new reality even if painful. Releases 'it should be what I thought.'",
+          "when_to_use": "Accepting painful truth"
+        }
+      ]
+    },
+    {
+      "category": "Places We Go When We're Hurting",
+      "characteristics": "Grief, anguish, sadness, despair, hopelessness, heartbreak",
+      "priority": "Honor the pain, allow grieving, support nervous system, build connection",
+      "top_strategies": [
+        {
+          "rank": 1,
+          "strategy_name": "Co-Regulation Practice (with trusted other)",
+          "rating": 4.6,
+          "rationale": "Connection is medicine for pain. Safe presence helps nervous system regulate in grief.",
+          "when_to_use": "Acute grief, need support"
+        },
+        {
+          "rank": 2,
+          "strategy_name": "Expressive Writing (Pennebaker Method)",
+          "rating": 4.3,
+          "rationale": "Gives voice to pain, processes loss, facilitates meaning-making over time.",
+          "when_to_use": "Processing grief, loss, heartbreak"
+        },
+        {
+          "rank": 3,
+          "strategy_name": "Self-Compassion Break (Kristin Neff)",
+          "rating": 4.4,
+          "rationale": "Offers kindness in suffering. 'This is a moment of suffering' acknowledgment validates pain.",
+          "when_to_use": "Sadness, heartbreak, need self-kindness"
+        },
+        {
+          "rank": 4,
+          "strategy_name": "Movement/Dance as Emotional Expression",
+          "rating": 4.0,
+          "rationale": "Grief stored in body needs physical release. Dance allows non-verbal expression.",
+          "when_to_use": "Grief that needs physical release"
+        },
+        {
+          "rank": 5,
+          "strategy_name": "Loving-Kindness Meditation (Metta)",
+          "rating": 4.2,
+          "rationale": "Offers comfort and warmth. Can be directed to self, to deceased, to all who grieve.",
+          "when_to_use": "Grief, need for connection and warmth"
+        },
+        {
+          "rank": 6,
+          "strategy_name": "Body Scan Meditation",
+          "rating": 3.9,
+          "rationale": "Tracks where grief lives in body, offers gentle awareness and release.",
+          "when_to_use": "Grief felt as body heaviness, tension"
+        },
+        {
+          "rank": 7,
+          "strategy_name": "Silver Linings Journal",
+          "rating": 3.5,
+          "rationale": "ONLY when ready - finds meaning in loss. Not for acute grief. Months after loss.",
+          "when_to_use": "Integrative phase of grief, ready for meaning"
+        }
+      ]
+    },
+    {
+      "category": "Places We Go With Others",
+      "characteristics": "Compassion, empathy, pity, boundaries, connection-focused emotions",
+      "priority": "Deepen connection, practice vulnerability, maintain healthy boundaries",
+      "top_strategies": [
+        {
+          "rank": 1,
+          "strategy_name": "Authentic Relating: Sharing What's Alive",
+          "rating": 4.6,
+          "rationale": "Deepens connection through vulnerability. Real > perfect for genuine relationship.",
+          "when_to_use": "Want deeper connection, safe context"
+        },
+        {
+          "rank": 2,
+          "strategy_name": "Nonviolent Communication (NVC) Framework",
+          "rating": 4.5,
+          "rationale": "Expresses needs clearly while maintaining connection. Observation-Feeling-Need-Request structure.",
+          "when_to_use": "Conflict, need to communicate needs"
+        },
+        {
+          "rank": 3,
+          "strategy_name": "GIVE (Relationship Maintenance)",
+          "rating": 4.4,
+          "rationale": "Maintains positive relationships: Gentle, Interested, Validating, Easy manner.",
+          "when_to_use": "Nurturing important relationships"
+        },
+        {
+          "rank": 4,
+          "strategy_name": "Setting Boundaries with Compassion",
+          "rating": 4.3,
+          "rationale": "Protects self while maintaining connection. Firm AND warm.",
+          "when_to_use": "Resentment, need to say no"
+        },
+        {
+          "rank": 5,
+          "strategy_name": "Loving-Kindness Meditation (Metta)",
+          "rating": 4.4,
+          "rationale": "Cultivates compassion systematically. Self → loved one → neutral → difficult person → all beings.",
+          "when_to_use": "Want to increase compassion capacity"
+        },
+        {
+          "rank": 6,
+          "strategy_name": "Co-Regulation Practice (with trusted other)",
+          "rating": 4.5,
+          "rationale": "Nervous systems regulate each other. Biological foundation of connection.",
+          "when_to_use": "Dysregulated, safe person available"
+        }
+      ]
+    },
+    {
+      "category": "Places We Go When We Fall Short",
+      "characteristics": "Shame, guilt, humiliation, embarrassment, perfectionism",
+      "priority": "CRITICAL: Break isolation through connection, build self-compassion",
+      "top_strategies": [
+        {
+          "rank": 1,
+          "strategy_name": "Self-Compassion Break (Kristin Neff)",
+          "rating": 4.8,
+          "rationale": "MOST EFFECTIVE for shame. Directly counters unworthiness with kindness, isolation with common humanity.",
+          "when_to_use": "Shame, harsh self-judgment, unworthiness"
+        },
+        {
+          "rank": 2,
+          "strategy_name": "Shame Resilience: Speak Shame",
+          "rating": 4.7,
+          "rationale": "Brené Brown: 'Shame cannot survive empathy.' Speaking shame to safe person breaks its power.",
+          "when_to_use": "Shame that's being hidden"
+        },
+        {
+          "rank": 3,
+          "strategy_name": "Opposite Action",
+          "rating": 4.4,
+          "rationale": "Shame urges hiding - opposite is approaching, sharing. Powerful for shame specifically.",
+          "when_to_use": "Shame-driven urge to hide or isolate"
+        },
+        {
+          "rank": 4,
+          "strategy_name": "Values Clarification Exercise",
+          "rating": 4.3,
+          "rationale": "Distinguishes 'I violated my values' (guilt, repairable) from 'I am bad' (shame, identity).",
+          "when_to_use": "Shame or guilt, need values clarity"
+        },
+        {
+          "rank": 5,
+          "strategy_name": "Perspective-Taking: Friend's Advice",
+          "rating": 4.2,
+          "rationale": "Offers compassion from external perspective. 'What would I tell a friend?' softens self-judgment.",
+          "when_to_use": "Harsh inner critic active"
+        },
+        {
+          "rank": 6,
+          "strategy_name": "Narrative Therapy: Externalizing the Problem",
+          "rating": 4.1,
+          "rationale": "Separates self from problem. 'I am not the shame, shame is visiting me.'",
+          "when_to_use": "Shame feeling like identity"
+        },
+        {
+          "rank": 7,
+          "strategy_name": "Authentic Relating: Sharing What's Alive",
+          "rating": 4.5,
+          "rationale": "Vulnerability in safe context heals shame. Being seen and not shamed is transformative.",
+          "when_to_use": "Ready to risk vulnerability with safe person"
+        }
+      ]
+    },
+    {
+      "category": "Places We Go When We Search for Connection",
+      "characteristics": "Loneliness, insecurity, vulnerability, fitting in vs. belonging",
+      "priority": "Build genuine connection through vulnerability, distinguish belonging from fitting in",
+      "top_strategies": [
+        {
+          "rank": 1,
+          "strategy_name": "Reach Out: Text or Call",
+          "rating": 4.5,
+          "rationale": "Direct action toward connection. Overcomes inertia of loneliness.",
+          "when_to_use": "Loneliness, isolation"
+        },
+        {
+          "rank": 2,
+          "strategy_name": "Authentic Relating: Sharing What's Alive",
+          "rating": 4.6,
+          "rationale": "Creates real belonging (not just fitting in). Vulnerability builds connection.",
+          "when_to_use": "Want depth, tired of surface"
+        },
+        {
+          "rank": 3,
+          "strategy_name": "Join or Attend Community Activity",
+          "rating": 4.2,
+          "rationale": "Behavioral activation for loneliness. Shared activity creates natural connection.",
+          "when_to_use": "Social isolation, need community"
+        },
+        {
+          "rank": 4,
+          "strategy_name": "Self-Compassion Break (Kristin Neff)",
+          "rating": 4.3,
+          "rationale": "Soothes loneliness pain. Common humanity component: 'I'm not alone in feeling alone.'",
+          "when_to_use": "Loneliness with self-judgment"
+        },
+        {
+          "rank": 5,
+          "strategy_name": "Asking for Help/Support",
+          "rating": 4.4,
+          "rationale": "Vulnerability that invites connection. Allows others to give to you.",
+          "when_to_use": "Ready to risk reaching out"
+        }
+      ]
+    },
+    {
+      "category": "Places We Go When The Heart Is Open",
+      "characteristics": "Love, lovingness, trust, empathy, gratitude",
+      "priority": "Sustain openness, deepen connection, practice gratitude",
+      "top_strategies": [
+        {
+          "rank": 1,
+          "strategy_name": "Gratitude Expression to Others",
+          "rating": 4.7,
+          "rationale": "Strengthens bonds when expressed. Deepens love and appreciation.",
+          "when_to_use": "Feeling grateful, want to deepen connection"
+        },
+        {
+          "rank": 2,
+          "strategy_name": "Loving-Kindness Meditation (Metta)",
+          "rating": 4.6,
+          "rationale": "Cultivates lovingness systematically. Expands heart's capacity.",
+          "when_to_use": "Want to deepen capacity for love"
+        },
+        {
+          "rank": 3,
+          "strategy_name": "Three Good Things (Gratitude Practice)",
+          "rating": 4.4,
+          "rationale": "Sustains appreciation. Counteracts hedonic adaptation.",
+          "when_to_use": "Maintain gratitude practice"
+        },
+        {
+          "rank": 4,
+          "strategy_name": "Authentic Relating: Sharing What's Alive",
+          "rating": 4.5,
+          "rationale": "Deepens intimacy. Heart-open state perfect for authentic sharing.",
+          "when_to_use": "Deep connection available"
+        },
+        {
+          "rank": 5,
+          "strategy_name": "Mindfulness Meditation (Basic)",
+          "rating": 4.2,
+          "rationale": "Savors positive emotions. Present-moment awareness with openness.",
+          "when_to_use": "Savoring love, gratitude, joy"
+        }
+      ]
+    },
+    {
+      "category": "Places We Go When Life Is Good",
+      "characteristics": "Joy, happiness, calm, contentment, gratitude, tranquility",
+      "priority": "Savor and sustain, counteract foreboding joy, build resilience",
+      "top_strategies": [
+        {
+          "rank": 1,
+          "strategy_name": "Three Good Things (Gratitude Practice)",
+          "rating": 4.7,
+          "rationale": "Amplifies positive. Counteracts negativity bias. Builds sustainable happiness.",
+          "when_to_use": "Sustaining well-being, daily practice"
+        },
+        {
+          "rank": 2,
+          "strategy_name": "Mindfulness Meditation (Basic)",
+          "rating": 4.5,
+          "rationale": "Savors positive moments. Antidote to foreboding joy - staying present vs. future-worrying.",
+          "when_to_use": "Joy, contentment, want to stay present"
+        },
+        {
+          "rank": 3,
+          "strategy_name": "Gratitude Expression to Others",
+          "rating": 4.6,
+          "rationale": "Shares joy, deepens connection, amplifies positive through expression.",
+          "when_to_use": "Grateful for specific person"
+        },
+        {
+          "rank": 4,
+          "strategy_name": "Nature Exposure",
+          "rating": 4.4,
+          "rationale": "Maintains well-being. Nature boosts mood and sustains calm.",
+          "when_to_use": "Maintaining tranquility"
+        },
+        {
+          "rank": 5,
+          "strategy_name": "Accumulate Positive Emotions (Short-term)",
+          "rating": 4.3,
+          "rationale": "Builds positive experiences deliberately. Pleasant activities are medicine.",
+          "when_to_use": "Wanting to cultivate more joy"
+        },
+        {
+          "rank": 6,
+          "strategy_name": "Walking Meditation",
+          "rating": 4.1,
+          "rationale": "Gentle practice that maintains calm while moving. Embodied contentment.",
+          "when_to_use": "Contentment, tranquility states"
+        }
+      ]
+    },
+    {
+      "category": "Places We Go When We Feel Wronged",
+      "characteristics": "Anger, rage, contempt, disgust, hate, resentment",
+      "priority": "Release energy safely, reality-test, move toward forgiveness or boundaries",
+      "top_strategies": [
+        {
+          "rank": 1,
+          "strategy_name": "Intense Physical Exercise",
+          "rating": 4.5,
+          "rationale": "Discharges anger energy physiologically. Running, boxing, vigorous movement.",
+          "when_to_use": "Anger with high energy, need physical release"
+        },
+        {
+          "rank": 2,
+          "strategy_name": "Radical Acceptance (DBT)",
+          "rating": 4.3,
+          "rationale": "Releases 'this shouldn't have happened' which fuels ongoing anger. Acceptance ≠ approval.",
+          "when_to_use": "Anger at unchangeable situation"
+        },
+        {
+          "rank": 3,
+          "strategy_name": "Cognitive Reappraisal: Probability Estimation",
+          "rating": 4.1,
+          "rationale": "Reality-tests angry interpretations. Considers alternative explanations.",
+          "when_to_use": "Anger based on assumptions"
+        },
+        {
+          "rank": 4,
+          "strategy_name": "Expressive Writing (Pennebaker Method)",
+          "rating": 4.2,
+          "rationale": "Unsent letter: Say everything you need to say. Processes anger without harming relationship.",
+          "when_to_use": "Anger needing expression, can't/shouldn't express directly"
+        },
+        {
+          "rank": 5,
+          "strategy_name": "Setting Boundaries with Compassion",
+          "rating": 4.4,
+          "rationale": "Channels anger into effective action. Anger often signals boundary violation.",
+          "when_to_use": "Anger about boundary crossed"
+        },
+        {
+          "rank": 6,
+          "strategy_name": "Movement/Dance as Emotional Expression",
+          "rating": 4.0,
+          "rationale": "Expressive dance allows full body expression of anger safely.",
+          "when_to_use": "Anger needing full-body release"
+        }
+      ]
+    },
+    {
+      "category": "Places We Go To Self-Assess",
+      "characteristics": "Introspection, confidence, humility, pride, self-awareness",
+      "priority": "Accurate self-assessment, balance confidence with humility",
+      "top_strategies": [
+        {
+          "rank": 1,
+          "strategy_name": "Values Clarification Exercise",
+          "rating": 4.6,
+          "rationale": "Grounds self-assessment in values vs. performance. Who I am vs. what I do.",
+          "when_to_use": "Self-assessment, identity questions"
+        },
+        {
+          "rank": 2,
+          "strategy_name": "Observer Self: The Chessboard Metaphor",
+          "rating": 4.4,
+          "rationale": "Accesses perspective beyond self-evaluation. You are the awareness, not the thoughts about yourself.",
+          "when_to_use": "Over-identified with self-image"
+        },
+        {
+          "rank": 3,
+          "strategy_name": "Wise Mind",
+          "rating": 4.5,
+          "rationale": "Integrates emotional and reasonable self-assessment. Balanced perspective.",
+          "when_to_use": "Conflicting self-views"
+        },
+        {
+          "rank": 4,
+          "strategy_name": "Perspective-Taking: Friend's Advice",
+          "rating": 4.2,
+          "rationale": "Offers compassionate vs. harsh self-view. 'What would I tell a friend?'",
+          "when_to_use": "Self-critical assessment"
+        },
+        {
+          "rank": 5,
+          "strategy_name": "Legacy Work: Writing Your Own Eulogy",
+          "rating": 4.1,
+          "rationale": "Clarifies who you want to be vs. who you are. Values-based self-assessment.",
+          "when_to_use": "Life direction, values clarity"
+        }
+      ]
+    }
+  ],
+  
+  "implementation_notes": {
+    "how_to_use": "When recommending strategies for a transition, first identify the SOURCE category, then consult category_rankings for that category. Prioritize top-ranked strategies but consider user history and context.",
+    "rating_scale": "1-5 scale where 5 is most effective. Based on evidence, clinical experience, accessibility, and time-to-effect.",
+    "personalization": "These are baseline rankings. User history should override: if someone has 5/5 success with a strategy, recommend it even if not top-ranked for category.",
+    "context_matters": "Time available, privacy, energy level, support availability all affect which strategy is best in moment.",
+    "multiple_strategies": "Often combining strategies works best: breathing (physiological) + cognitive reappraisal (mental) + connection (social)."
+  },
+  
+  "meta": {
+    "categories_ranked": 8,
+    "categories_remaining": 5,
+    "total_strategy_category_pairs": "8 categories × ~6 strategies each = ~48 mappings",
+    "evidence_base": "Rankings synthesized from research literature, clinical guidelines, and analysis of strategy characteristics matched to category needs.",
+    "version": "1.0",
+    "created": "2025-12-05",
+    "status": "Partial implementation - 8 of 13 categories. Remaining 5 can be added as needed."
+  }
+}
