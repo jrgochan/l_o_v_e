@@ -11,6 +11,8 @@ import { useEffect, useRef } from "react";
 import { useFrame, useThree } from "@react-three/fiber";
 import * as THREE from "three";
 import { useAtlasAdminStore } from "@/stores/useAtlasAdminStore";
+import { useExperienceStore } from "@/stores/useExperienceStore";
+import { TransitionPathResponse } from "@love/experience-shared";
 
 import { useAmbientAudio } from "@/hooks/useAmbientAudio";
 
@@ -24,6 +26,44 @@ export function PathFlyover() {
   const hoveredEmotionId = useAtlasAdminStore((state) => state.hoveredEmotionId);
   const allEmotions = useAtlasAdminStore((state) => state.allEmotions);
 
+  // Experience Store Sync (for PathDetailsOverlay)
+  const setTransitionPath = useExperienceStore((state) => state.setTransitionPath);
+  const setFlyoverProgress = useExperienceStore((state) => state.setFlyoverProgress);
+  const flyoverSpeed = useExperienceStore((state) => state.flyoverSpeed);
+  const setExperienceIsFlying = useExperienceStore((state) => state.setIsFlying);
+  const expIsFlying = useExperienceStore((state) => state.isFlying);
+
+  // Sync Experience -> Admin (Overlay controls Admin)
+  useEffect(() => {
+    if (expIsFlying !== isFlying) {
+      setIsFlying(expIsFlying);
+    }
+  }, [expIsFlying, setIsFlying]); // removed isFlying from dep to avoid echo? No, we need it for check.
+  // Actually, if we include isFlying in dep, it loops.
+  // If we don't, we might miss external updates?
+  // Correct pattern:
+  // useEffect(() => { setIsFlying(expIsFlying) }, [expIsFlying])
+  // useEffect(() => { setExpIsFlying(isFlying) }, [isFlying])
+  // Infinite loop if they ping pong.
+  // We need a source of truth.
+  // Let's assume Admin is Truth. behavior.
+  // When logic ends (line 153), setIsFlying(false).
+  // Then [isFlying] effect runs -> setExp(false). Correct.
+  // When User clicks Overlay: setExp(true).
+  // [expIsFlying] effect runs -> setIsAdmin(true).
+  // [isFlying] effect runs -> setExp(true) (No change). Stabilizes.
+  // The Error was "Maximum update depth".
+  // This likely means they are toggling each other in the same render cycle?
+  // I will try removing the sync from the main effect first.
+
+  // Sync Admin -> Experience (Admin engine updates Overlay UI)
+  useEffect(() => {
+    if (isFlying !== expIsFlying) {
+      setExperienceIsFlying(isFlying);
+    }
+  }, [isFlying, setExperienceIsFlying]); // Read expIsFlying from store, don't trigger on it.
+
+
   // SFX
   const { playWhoosh } = useAmbientAudio();
 
@@ -33,31 +73,42 @@ export function PathFlyover() {
   const pathCurveRef = useRef<THREE.CatmullRomCurve3 | null>(null);
   const lookAtRef = useRef(new THREE.Vector3());
   const initialCameraPosRef = useRef(new THREE.Vector3());
-  // const initialCameraTargetRef = useRef(new THREE.Vector3());
 
   // Waypoint tracking for labels
   const waypointsRef = useRef<Array<{ id: string; vec: THREE.Vector3 }>>([]);
 
   // Tuning parameters
-  // Duration scales with path length? Fixed for now.
-  const FLY_DURATION = 12.0; // Seconds
-  const LOOK_AHEAD = 0.05; // 5% ahead of current position
+  const BASE_DURATION = 12.0; // Seconds at 1x speed
+  const LOOK_AHEAD = 0.05;
 
-  // Setup flyover when triggered
+  // Setup path curve when selection changes
   useEffect(() => {
-    if (!isFlying || !selectedPathId) {
+    if (!selectedPathId) {
       pathCurveRef.current = null;
       startTimeRef.current = null;
       progressRef.current = 0;
+      setFlyoverProgress(0);
       return;
     }
 
     const path = computedPaths.get(selectedPathId);
     if (!path) {
       console.warn("PathFlyover: Selected path not found");
-      setIsFlying(false);
       return;
     }
+
+    // MAP AND SYNC PATH TO EXPERIENCE STORE
+    const mappedPath: any = {
+      path_id: path.id,
+      current_state: { emotion: path.from.name, vac: path.from.vac },
+      goal_state: { emotion: path.to.name, vac: path.to.vac },
+      waypoints: path.waypoints.map(wp => ({
+        emotion: wp.emotion,
+        vac: wp.vac,
+        reasoning: wp.reasoning
+      }))
+    };
+    setTransitionPath(mappedPath);
 
     // Build the curve dynamically from path waypoints
     const points: THREE.Vector3[] = [];
@@ -72,7 +123,6 @@ export function PathFlyover() {
     path.waypoints.forEach((wp) => {
       const vec = new THREE.Vector3(...wp.vac);
       points.push(vec);
-      // Lookup ID by name (PathWaypoint.emotion is name)
       const emotion = allEmotions.find((e) => e.name === wp.emotion);
       if (emotion) {
         activeWaypoints.push({ id: emotion.id, vec });
@@ -87,23 +137,37 @@ export function PathFlyover() {
     // Cache Waypoints for proximity check
     waypointsRef.current = activeWaypoints;
 
-    // Create curve matching PathNetwork visual
+    // Create curve matches PathNetwork visual
     pathCurveRef.current = new THREE.CatmullRomCurve3(points, false, "catmullrom", 0.5);
 
-    // Store initial state to possibly smoothly transition? (For now simplified reset)
-    initialCameraPosRef.current.copy(camera.position);
+    // Reset progress on new path
+    progressRef.current = 0;
+    setFlyoverProgress(0);
+    startTimeRef.current = null; // Will calculate on next frame
 
-    // Play SFX
-    playWhoosh(3.0);
+    // Note: We do NOT playSFX here automatically anymore, unless we want to separate "Select" from "Play".
+    // Director mode usually starts immediately? 
+    // If we want "Play Journey" button to start it, we shouldn't start automatically. 
+    // But currently `selectedPathId` is set by clicking the list.
+    // We probably want to wait for "Play". 
+    // So valid.
+
   }, [
-    isFlying,
     selectedPathId,
     computedPaths,
-    setIsFlying,
-    camera.position,
-    playWhoosh,
     allEmotions,
+    setTransitionPath,
+    setFlyoverProgress
   ]);
+
+  // SFX Trigger on Fly Start (only when toggling from false to true)
+  useEffect(() => {
+    if (isFlying) {
+      playWhoosh(3.0);
+      // Ensure we force a "resume" calc by clearing active ref if it was stale, but actually we use null to signal "recalc start time"
+      startTimeRef.current = null;
+    }
+  }, [isFlying, playWhoosh]);
 
   // Cleanup: Clear hover states when unmounting or stopping flight
   useEffect(() => {
@@ -116,11 +180,20 @@ export function PathFlyover() {
     if (!isFlying || !pathCurveRef.current) return;
 
     if (startTimeRef.current === null) {
-      startTimeRef.current = state.clock.elapsedTime;
+      // Resume from current progress
+      // t = elapsed / duration  =>  elapsed = t * duration
+      // startTime = now - elapsed
+      const duration = BASE_DURATION / flyoverSpeed; // Need this here for calc
+      const accruedTime = progressRef.current * duration;
+      startTimeRef.current = state.clock.elapsedTime - accruedTime;
     }
 
+    // Dynamic duration based on speed
+    const duration = BASE_DURATION / flyoverSpeed;
     const elapsed = state.clock.elapsedTime - startTimeRef.current;
-    const rawProgress = elapsed / FLY_DURATION;
+
+    // Calculate progress (0 to 1)
+    const rawProgress = elapsed / duration;
 
     // Ease-in-out cubic manually
     // t < .5 ? 4 * t * t * t : (t - 1) * (2 * t - 2) * (2 * t - 2) + 1
@@ -128,6 +201,7 @@ export function PathFlyover() {
     const easedProgress = t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
 
     progressRef.current = easedProgress;
+    setFlyoverProgress(easedProgress);
 
     // Get position on curve
     const currentPos = pathCurveRef.current.getPointAt(easedProgress);
@@ -149,7 +223,7 @@ export function PathFlyover() {
     camera.lookAt(lookAtRef.current);
 
     // End condition
-    if (elapsed >= FLY_DURATION) {
+    if (elapsed >= duration) {
       setIsFlying(false);
       setHoveredEmotion(null);
       // Optional: Snap to final view or drift

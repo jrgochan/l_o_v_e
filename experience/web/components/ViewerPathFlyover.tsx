@@ -1,11 +1,7 @@
-"use client";
-
 import { useRef, useEffect, useState } from "react";
 import { useFrame, useThree } from "@react-three/fiber";
 import * as THREE from "three";
 import { useExperienceStore } from "@/stores/useExperienceStore";
-import { Html } from "@react-three/drei";
-import { useSpring, animated } from "@react-spring/web";
 
 export function ViewerPathFlyover() {
   const { camera } = useThree();
@@ -13,17 +9,15 @@ export function ViewerPathFlyover() {
   const isFlying = useExperienceStore((state) => state.isFlying);
   const setIsFlying = useExperienceStore((state) => state.setIsFlying);
 
+  // Read settings from store
+  const flyoverSpeed = useExperienceStore((state) => state.flyoverSpeed);
+  const setFlyoverProgress = useExperienceStore((state) => state.setFlyoverProgress);
+  const setFlyoverCurrentWaypointIndex = useExperienceStore((state) => state.setFlyoverCurrentWaypointIndex);
+
   // Local state for flyover
   const [progress, setProgress] = useState(0);
-  const [currentLabel, setCurrentLabel] = useState<string | null>(null);
+  // label state removed in favor of PathDetailsOverlay
   const splineRef = useRef<THREE.CatmullRomCurve3 | null>(null);
-
-  // Animation springs for label UI
-  const [springs, api] = useSpring(() => ({
-    opacity: 0,
-    y: 20,
-    config: { tension: 280, friction: 60 },
-  }));
 
   // Initialize spline when path changes
   useEffect(() => {
@@ -37,103 +31,86 @@ export function ViewerPathFlyover() {
 
       splineRef.current = new THREE.CatmullRomCurve3(points);
       splineRef.current.tension = 0.5; // Smooth curve
+
+      // Reset progress when path changes
+      setProgress(0);
+      setFlyoverProgress(0);
+      setFlyoverCurrentWaypointIndex(-1);
     }
   }, [transitionPath]);
 
   // Reset when starting flight
   useEffect(() => {
     if (isFlying) {
-      setTimeout(() => {
+      // On start (or restart), we don't necessarily reset progress to 0 if pausing/resuming
+      // But per current logic, it seems to want to run a full path. 
+      // Let's keep existing behavior of reset on mount/start for now, but strictly speaking 
+      // if we pause we might want to resume. 
+      // The previous code had:
+      // setTimeout(() => { setProgress(0); ... }, 0);
+      // Let's only reset if progress is 1 (completed)
+      if (progress >= 1) {
         setProgress(0);
-        setCurrentLabel("Departing: " + transitionPath?.current_state.emotion);
-      }, 0);
-      api.start({ opacity: 1, y: 0 });
-    } else {
-      api.start({ opacity: 0, y: 20 });
+        setFlyoverProgress(0);
+      }
     }
-  }, [isFlying, transitionPath, api]);
+  }, [isFlying]);
 
   useFrame(() => {
-    if (!isFlying || !splineRef.current) return;
+    if (!isFlying || !splineRef.current || !transitionPath) return;
 
-    // Advance progress (matching Admin speed/duration approx)
-    const SPEED = 0.002; // Slightly faster than before
-    const rawProgress = progress + SPEED;
+    // Advance progress
+    // Base speed modifiable by store
+    const BASE_SPEED = 0.002;
+    const step = BASE_SPEED * flyoverSpeed;
 
-    // Easing for cinematic feel (Ease-in-out cubic)
-    // t < .5 ? 4 * t * t * t : (t - 1) * (2 * t - 2) * (2 * t - 2) + 1
-    // actually, let's just stick to linear progress for now unless we refactor to time-based
-    // keeping it simple but strictly adhering to path
+    const rawProgress = progress + step;
 
     if (rawProgress >= 1) {
       // Arrived
       setProgress(1);
+      setFlyoverProgress(1);
       setIsFlying(false);
 
       // Position at goal
       const point = splineRef.current.getPointAt(1);
       camera.position.copy(point);
-      // Look slightly down/center
       camera.lookAt(0, 0, 0);
     } else {
       setProgress(rawProgress);
+      setFlyoverProgress(rawProgress);
 
       // Get exact position on curve
       const point = splineRef.current.getPointAt(rawProgress);
-
-      // "Through the path" mode: Stick strictly to the rail
-      // Admin uses: camera.position.copy(currentPos);
       camera.position.copy(point);
 
       // Look ahead
-      // We look slightly ahead to steer the camera
       const lookAtProgress = Math.min(rawProgress + 0.05, 1);
       const lookAtPoint = splineRef.current.getPointAt(lookAtProgress);
       camera.lookAt(lookAtPoint);
+      // Update store index if changed
+      const totalPoints = transitionPath.waypoints.length + 2;
+      const continuousIndex = rawProgress * (totalPoints - 1);
+      const currentIndex = Math.floor(continuousIndex + 0.1);
 
-      // Update labels based on progress zones
-      if (transitionPath) {
-        // Approximate waypoint indices
-        const totalPoints = transitionPath.waypoints.length + 2; // start, end, + waypoints
-        const segmentSize = 1 / (totalPoints - 1);
-
-        transitionPath.waypoints.forEach((wp, index) => {
-          // waypoints are at indices 1..N
-          const wpProgress = (index + 1) * segmentSize;
-          if (Math.abs(rawProgress - wpProgress) < 0.05) {
-            if (currentLabel !== wp.emotion) {
-              setCurrentLabel(wp.emotion);
-            }
-          }
-        });
-
-        if (rawProgress > 0.95 && currentLabel !== transitionPath.goal_state.emotion) {
-          setCurrentLabel("Arriving: " + transitionPath.goal_state.emotion);
-        }
+      // Check against current store value (or local ref if we had one, but strict equality check in setter might handle it)
+      // To be safe/performant, we rely on the fact that we are already updating progress every frame. 
+      // But let's only call if changed to minimize noise if we split components later.
+      // Actually we don't have access to the previous value easily without a ref.
+      // We'll trust zustand's equality check or just fire it. 
+      // But let's use a ref for local optimization if acceptable, or just fire it.
+      // Given we fire setFlyoverProgress every frame, one more set isn't huge, but let's be nice.
+      if (currentIndex !== flyoverCurrentWaypointIndexRef.current) {
+        flyoverCurrentWaypointIndexRef.current = currentIndex;
+        setFlyoverCurrentWaypointIndex(currentIndex);
       }
     }
   });
 
-  if (!isFlying) return null;
+  // Ref to track last index to avoid store thrashing
+  const flyoverCurrentWaypointIndexRef = useRef(-1);
 
-  return (
-    <Html center position={[0, -0.5, 0]} style={{ pointerEvents: "none" }}>
-      <animated.div
-        style={{
-          ...springs,
-          background: "rgba(0,0,0,0.6)",
-          backdropFilter: "blur(8px)",
-          padding: "12px 24px",
-          borderRadius: "24px",
-          color: "white",
-          border: "1px solid rgba(255,255,255,0.2)",
-          fontFamily: "Inter, sans-serif",
-          fontSize: "14px",
-          whiteSpace: "nowrap",
-        }}
-      >
-        {currentLabel}
-      </animated.div>
-    </Html>
-  );
+  // No visual rendering from this component anymore, purely a camera controller
+  // UI is handled by PathDetailsOverlay
+  return null;
 }

@@ -41,8 +41,10 @@ import { useCommandPalette } from "@/hooks/useCommandPalette";
 import { PathFlyover } from "@/components/admin/atlas/PathFlyover";
 import { IntroSequence } from "@/components/admin/atlas/IntroSequence";
 import { useAmbientAudio } from "@/hooks/useAmbientAudio";
+import { ComponentType } from "react";
 import { VACAnimator } from "@/components/VACAnimator";
 import { DebugBroadcaster } from "@/components/DebugBroadcaster";
+import { PathDetailsOverlay } from "@/components/PathDetailsOverlay";
 
 const AtlasAdminContent = () => {
   // Load emotions and set up path calculator
@@ -177,13 +179,131 @@ const AtlasAdminContent = () => {
   useEffect(() => {
     const handleKeyPress = (e: KeyboardEvent) => {
       if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) return;
-      if (e.key.toLowerCase() === "d" && !e.ctrlKey && !e.metaKey) {
+
+      const key = e.key.toLowerCase();
+
+      // Debug Toggle (D)
+      if (key === "d" && !e.ctrlKey && !e.metaKey) {
         setShowDebug((prev) => !prev);
+      }
+
+      // Play/Pause Journey (Space)
+      if (key === " " && !e.ctrlKey && !e.metaKey) {
+        e.preventDefault(); // Prevent scrolling
+        if (transitionPath) {
+          // Auto-enable paths layer if hidden
+          if (!layers.transitionPaths) {
+            useAtlasAdminStore.getState().updateLayer("transitionPaths", true);
+          }
+          // Toggle flying state
+          // Note: We need to update the AtlasAdminStore which syncs to ExperienceStore
+          useAtlasAdminStore.getState().setIsFlying(!isFlying);
+        }
+      }
+
+      // Next Emotion Category Path (ArrowRight)
+      if (key === "arrowright" && !e.ctrlKey && !e.metaKey) {
+        e.preventDefault();
+
+        const state = useAtlasAdminStore.getState();
+        const emotions = state.allEmotions;
+
+        // 1. Get unique categories
+        const categories = Array.from(new Set(emotions.map(e => e.category))).sort();
+        if (categories.length === 0) return;
+
+        // 2. Find current category index
+        const currentCat = transitionPath?.current_state.emotion ?
+          emotions.find(e => e.name === transitionPath.current_state.emotion)?.category :
+          categories[0];
+
+        let nextIdx = (categories.indexOf(currentCat || "") + 1) % categories.length;
+        const nextCat = categories[nextIdx];
+
+        // 3. Pick 2 random emotions
+        const catEmotions = emotions.filter(e => e.category === nextCat);
+        if (catEmotions.length >= 2) {
+          const start = catEmotions[Math.floor(Math.random() * catEmotions.length)];
+          let end = catEmotions[Math.floor(Math.random() * catEmotions.length)];
+          while (end.id === start.id) {
+            end = catEmotions[Math.floor(Math.random() * catEmotions.length)];
+          }
+
+          // 4. Generate & Set Path
+          const newPath: any = {
+            current_state: { emotion: start.name, vac: start.vac },
+            goal_state: { emotion: end.name, vac: end.vac },
+            waypoints: [
+              {
+                emotion: "Transition",
+                vac: [
+                  (start.vac[0] + end.vac[0]) / 2,
+                  (start.vac[1] + end.vac[1]) / 2,
+                  (start.vac[2] + end.vac[2]) / 2
+                ],
+                reasoning: `Exploring ${nextCat}`
+              }
+            ]
+          };
+          // Update Experience Store (broadcasts to viewer)
+          useExperienceStore.getState().setTransitionPath(newPath);
+          state.setIsFlying(false); // Pause to allow browsing
+        }
+      }
+
+      // Prev Emotion Category Path (ArrowLeft)
+      if (key === "arrowleft" && !e.ctrlKey && !e.metaKey) {
+        e.preventDefault();
+
+        const state = useAtlasAdminStore.getState();
+        const emotions = state.allEmotions;
+
+        // 1. Get unique categories
+        const categories = Array.from(new Set(emotions.map(e => e.category))).sort();
+        if (categories.length === 0) return;
+
+        // 2. Find current category index
+        const currentCat = transitionPath?.current_state.emotion ?
+          emotions.find(e => e.name === transitionPath.current_state.emotion)?.category :
+          categories[0];
+
+        let prevIdx = (categories.indexOf(currentCat || "") - 1 + categories.length) % categories.length;
+        const prevCat = categories[prevIdx];
+
+        // 3. Pick 2 random emotions
+        const catEmotions = emotions.filter(e => e.category === prevCat);
+        if (catEmotions.length >= 2) {
+          const start = catEmotions[Math.floor(Math.random() * catEmotions.length)];
+          let end = catEmotions[Math.floor(Math.random() * catEmotions.length)];
+          while (end.id === start.id) {
+            end = catEmotions[Math.floor(Math.random() * catEmotions.length)];
+          }
+
+          // 4. Generate & Set Path
+          const newPath: any = {
+            current_state: { emotion: start.name, vac: start.vac },
+            goal_state: { emotion: end.name, vac: end.vac },
+            waypoints: [
+              {
+                emotion: "Transition",
+                vac: [
+                  (start.vac[0] + end.vac[0]) / 2,
+                  (start.vac[1] + end.vac[1]) / 2,
+                  (start.vac[2] + end.vac[2]) / 2
+                ],
+                reasoning: `Exploring ${prevCat}`
+              }
+            ]
+          };
+          // Update Experience Store
+          useExperienceStore.getState().setTransitionPath(newPath);
+          state.setIsFlying(false); // Pause to allow browsing
+        }
       }
     };
     window.addEventListener("keydown", handleKeyPress);
     return () => window.removeEventListener("keydown", handleKeyPress);
-  }, []);
+  }, [transitionPath, layers, isFlying]);
 
   // View Mode Logic
   // Hide header in "Zen" mode ONLY. Show in "Default" and "Cinema".
@@ -234,11 +354,10 @@ const AtlasAdminContent = () => {
                 toggleMute();
                 playClickSound();
               }}
-              className={`px-3 py-2 rounded transition flex items-center gap-2 text-sm ${
-                isMuted
-                  ? "bg-red-900/50 text-red-200 hover:bg-red-800/50"
-                  : "bg-gray-700 text-white hover:bg-gray-600"
-              }`}
+              className={`px-3 py-2 rounded transition flex items-center gap-2 text-sm ${isMuted
+                ? "bg-red-900/50 text-red-200 hover:bg-red-800/50"
+                : "bg-gray-700 text-white hover:bg-gray-600"
+                }`}
               title={isMuted ? "Unmute Audio" : "Mute Audio"}
             >
               {isMuted ? "🔇" : "🔊"}
@@ -351,9 +470,8 @@ const AtlasAdminContent = () => {
         {!isInfoPanelExpanded && areSidebarsVisible && (
           <div
             onMouseDown={handleMouseDown}
-            className={`w-2 flex-shrink-0 bg-gray-700 hover:bg-cyan-500 cursor-col-resize transition flex items-center justify-center ${
-              isResizing ? "bg-cyan-500" : ""
-            }`}
+            className={`w-2 flex-shrink-0 bg-gray-700 hover:bg-cyan-500 cursor-col-resize transition flex items-center justify-center ${isResizing ? "bg-cyan-500" : ""
+              }`}
             style={{ touchAction: "none" }}
           >
             <div className="w-px h-8 bg-gray-500" />
@@ -402,8 +520,8 @@ const AtlasAdminContent = () => {
       {/* Command Palette (CMD+L) */}
       <CommandPalette />
 
-      {/* Zen HUD (Visible in Zen or Cinema modes) */}
-      {viewMode !== "default" && <ZenHUD />}
+      {/* Zen HUD (Visible in Zen or Cinema modes) - Replaced by Beautiful UX Overlay */}
+      {viewMode !== "default" && layers.transitionPaths && <PathDetailsOverlay />}
 
       {/* Debug Broadcaster */}
       {showDebug && <DebugBroadcaster />}

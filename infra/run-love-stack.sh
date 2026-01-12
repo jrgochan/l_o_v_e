@@ -369,6 +369,18 @@ if [ "$ALL_HEALTHY" = true ]; then
     if [ ! -d "$EXPERIENCE_DIR" ]; then
         print_error "Experience web directory not found"
     else
+        # Ensure dependencies are installed in monorepo root
+        EXPERIENCE_ROOT="$SCRIPT_DIR/../experience"
+        if [ -d "$EXPERIENCE_ROOT" ]; then
+             if [ ! -d "$EXPERIENCE_ROOT/node_modules" ]; then
+                 print_info "Experience dependencies not found. Installing..."
+                 cd "$EXPERIENCE_ROOT"
+                 npm install || print_warning "npm install failed"
+                 cd - > /dev/null
+                 print_success "Experience dependencies installed"
+             fi
+        fi
+
         cd "$EXPERIENCE_DIR"
         
         # Start Next.js dev server in background

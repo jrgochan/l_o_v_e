@@ -61,7 +61,14 @@ interface ExperienceStore {
   setIsAnimating: (animating: boolean) => void;
   // Flyover mode
   isFlying: boolean;
+  flyoverSpeed: number; // multiplier, default 1.0
+  flyoverProgress: number; // 0-1
+  flyoverCurrentWaypointIndex: number;
   setIsFlying: (flying: boolean) => void;
+  setFlyoverSpeed: (speed: number) => void;
+  setFlyoverProgress: (progress: number) => void;
+  setFlyoverCurrentWaypointIndex: (index: number) => void;
+
   setTransitionPath: (path: TransitionPathResponse | null) => void;
   setShowPath: (show: boolean) => void;
   startJourney: (journey_id: string, path_id: string, total_waypoints: number) => void;
@@ -119,8 +126,24 @@ export const useExperienceStore = create<ExperienceStore>((set) => ({
 
   // Flyover mode
   isFlying: false,
+  flyoverSpeed: 1.0,
+  flyoverProgress: 0,
+  flyoverCurrentWaypointIndex: -1,
+
   setIsFlying: (flying) => {
     set({ isFlying: flying });
+  },
+
+  setFlyoverSpeed: (speed) => {
+    set({ flyoverSpeed: speed });
+  },
+
+  setFlyoverProgress: (progress) => {
+    set({ flyoverProgress: progress });
+  },
+
+  setFlyoverCurrentWaypointIndex: (index) => {
+    set({ flyoverCurrentWaypointIndex: index });
   },
 
   // Set transition path for 3D visualization
@@ -311,6 +334,9 @@ export const useExperienceStore = create<ExperienceStore>((set) => ({
       showPath: false,
       activeJourney: null,
       activeSession: null,
+      flyoverSpeed: 1.0,
+      flyoverProgress: 0,
+      flyoverCurrentWaypointIndex: -1,
     });
   },
 }));

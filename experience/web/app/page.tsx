@@ -30,6 +30,7 @@ import { useSphereSync } from "@/hooks/useSphereSync";
 import { useEmotionAtlas } from "@/hooks/useEmotionAtlas";
 import { useAtlasAdminStore } from "@/stores/useAtlasAdminStore";
 import { useAmbientAudio } from "@/hooks/useAmbientAudio";
+import { PathDetailsOverlay } from "@/components/PathDetailsOverlay";
 
 // Helper Component to isolate VAC updates/re-renders
 function LiveVACDisplay() {
@@ -163,7 +164,7 @@ export default function ZenExperience() {
           }
           break;
         case "t":
-          // Toggle Flyover
+          // Toggle Flyover (Alternative)
           if (!e.ctrlKey && !e.metaKey && transitionPath) {
             setIsFlying(!isFlying);
           }
@@ -198,17 +199,144 @@ export default function ZenExperience() {
             settings.updateLayer("emotionLabels", !settings.layers.emotionLabels);
           }
           break;
+        case "p":
+          // Toggle Paths
+          if (!e.ctrlKey && !e.metaKey) {
+            settings.updateLayer("transitionPaths", !settings.layers.transitionPaths);
+          }
+          break;
         case " ":
-          // Toggle Paths (Space)
+          // Play/Pause Journey (Space)
           if (!e.ctrlKey && !e.metaKey) {
             e.preventDefault(); // Prevent scrolling
-            settings.updateLayer("transitionPaths", !settings.layers.transitionPaths);
+            // If a path exists, toggle play/pause regardless of layer visibility
+            if (transitionPath) {
+              // Optional: Auto-show paths if they are hidden?
+              if (!settings.layers.transitionPaths) {
+                settings.updateLayer("transitionPaths", true);
+              }
+              setIsFlying(!isFlying);
+            }
+          }
+          break;
+        case "arrowright":
+          // Next Emotion Category Path
+          if (!e.ctrlKey && !e.metaKey && settings.layers.transitionPaths) {
+            e.preventDefault();
+
+            // 1. Get unique categories
+            const categories = Array.from(new Set(emotions.map(e => e.category))).sort();
+            if (categories.length === 0) return;
+
+            // 2. Find current category index (from current path or default)
+            const currentCat = transitionPath?.current_state.emotion ?
+              emotions.find(e => e.name === transitionPath.current_state.emotion)?.category :
+              categories[0];
+
+            let nextIdx = (categories.indexOf(currentCat || "") + 1) % categories.length;
+            const nextCat = categories[nextIdx];
+
+            // 3. Pick 2 random emotions from this category
+            const catEmotions = emotions.filter(e => e.category === nextCat);
+            if (catEmotions.length >= 2) {
+              const start = catEmotions[Math.floor(Math.random() * catEmotions.length)];
+              let end = catEmotions[Math.floor(Math.random() * catEmotions.length)];
+              while (end.id === start.id) {
+                end = catEmotions[Math.floor(Math.random() * catEmotions.length)];
+              }
+
+              // 4. Generate & Set Path
+              const newPath: any = {
+                current_state: { emotion: start.name, vac: start.vac },
+                goal_state: { emotion: end.name, vac: end.vac },
+                waypoints: [
+                  {
+                    emotion: "Transition",
+                    vac: [
+                      (start.vac[0] + end.vac[0]) / 2,
+                      (start.vac[1] + end.vac[1]) / 2,
+                      (start.vac[2] + end.vac[2]) / 2
+                    ],
+                    reasoning: `Exploring ${nextCat}`
+                  }
+                ]
+              };
+              useExperienceStore.getState().setTransitionPath(newPath);
+
+              // Pause when switching to allow browsing
+              if (isFlying) useExperienceStore.getState().setIsFlying(false);
+            }
+          }
+          break;
+        case "arrowleft":
+          // Prev Emotion Category Path
+          if (!e.ctrlKey && !e.metaKey && settings.layers.transitionPaths) {
+            e.preventDefault();
+
+            // 1. Get unique categories
+            const categories = Array.from(new Set(emotions.map(e => e.category))).sort();
+            if (categories.length === 0) return;
+
+            // 2. Find current category index
+            const currentCat = transitionPath?.current_state.emotion ?
+              emotions.find(e => e.name === transitionPath.current_state.emotion)?.category :
+              categories[0];
+
+            let prevIdx = (categories.indexOf(currentCat || "") - 1 + categories.length) % categories.length;
+            const prevCat = categories[prevIdx];
+
+            // 3. Pick 2 random emotions
+            const catEmotions = emotions.filter(e => e.category === prevCat);
+            if (catEmotions.length >= 2) {
+              const start = catEmotions[Math.floor(Math.random() * catEmotions.length)];
+              let end = catEmotions[Math.floor(Math.random() * catEmotions.length)];
+              while (end.id === start.id) {
+                end = catEmotions[Math.floor(Math.random() * catEmotions.length)];
+              }
+
+              // 4. Generate & Set Path
+              const newPath: any = {
+                current_state: { emotion: start.name, vac: start.vac },
+                goal_state: { emotion: end.name, vac: end.vac },
+                waypoints: [
+                  {
+                    emotion: "Transition",
+                    vac: [
+                      (start.vac[0] + end.vac[0]) / 2,
+                      (start.vac[1] + end.vac[1]) / 2,
+                      (start.vac[2] + end.vac[2]) / 2
+                    ],
+                    reasoning: `Exploring ${prevCat}`
+                  }
+                ]
+              };
+              useExperienceStore.getState().setTransitionPath(newPath);
+
+              // Pause when switching
+              if (isFlying) useExperienceStore.getState().setIsFlying(false);
+            }
           }
           break;
         case "d":
           // Toggle Debug Overlay
           if (!e.ctrlKey && !e.metaKey) {
             setShowDebug((prev) => !prev);
+          }
+          break;
+        case "j":
+          // MOCK JOURNEY (Debug/Verification)
+          if (!e.ctrlKey && !e.metaKey) {
+            // Create a mock path
+            const mockPath: any = {
+              current_state: { emotion: "Anxiety", vac: [0.8, 0.8, -0.5] },
+              goal_state: { emotion: "Serenity", vac: [-0.8, -0.5, 0.8] },
+              waypoints: [
+                { emotion: "Acceptance", vac: [0.2, 0.2, 0.2], reasoning: "Acknowledging the feeling." },
+                { emotion: "Calm", vac: [-0.5, -0.2, 0.5], reasoning: "Finding ground." }
+              ]
+            };
+            useExperienceStore.getState().setTransitionPath(mockPath);
+            useExperienceStore.getState().setIsFlying(true);
           }
           break;
       }
@@ -252,6 +380,9 @@ export default function ZenExperience() {
           debugLog={debugLog}
         />
       )}
+
+      {/* Zen Mode Path Details Overlay (Beautiful UX) */}
+      {settings.layers.transitionPaths && <PathDetailsOverlay />}
     </div>
   );
 }

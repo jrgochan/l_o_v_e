@@ -9,14 +9,7 @@ export function useLayerActionMap() {
   const getActions = useCallback(
     (e: KeyboardEvent) => {
       const actions: Record<string, () => void> = {
-        " ": () => {
-          e.preventDefault();
-          settings.updateLayer("transitionPaths", !settings.layers.transitionPaths);
-          logger.info(
-            "user-interaction",
-            `Paths: ${!settings.layers.transitionPaths ? "ON" : "OFF"}`
-          );
-        },
+
         l: () => {
           settings.updateLayer("emotionLabels", !settings.layers.emotionLabels);
           logger.info(
