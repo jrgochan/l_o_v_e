@@ -78,6 +78,11 @@ for module in $MODULES; do
     fi
     
     print_header "Testing $module"
+
+    # Skip non-python modules in this loop
+    if [ "$module" = "experience" ]; then
+        continue
+    fi
     
     # Determine test markers
     if [ $QUICK_MODE -eq 1 ]; then

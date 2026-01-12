@@ -15,6 +15,7 @@
     "build:all": "npm run build --workspaces",
     "build": "npm run build:all",
     "test:shared": "jest --projects shared",
+    "test": "npm test --workspaces",
     "clean": "rm -rf shared/dist shared/node_modules web/node_modules web/.next node_modules",
     "reinstall": "npm run clean && npm install",
     "lint": "eslint .",

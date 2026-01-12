@@ -1,0 +1,45 @@
+name: Build Images
+
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - 'observer/**'
+      - 'listener/**'
+      - 'versor/**'
+      - 'experience/**'
+      - '.github/workflows/build.yml'
+  pull_request:
+    branches: [ main ]
+    paths:
+      - 'observer/**'
+      - 'listener/**'
+      - 'versor/**'
+      - 'experience/**'
+      - '.github/workflows/build.yml'
+
+jobs:
+  build-images:
+    name: Build ${{ matrix.module }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        module: [observer, listener, versor, experience]
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build and Export (Check Only)
+        uses: docker/build-push-action@v5
+        with:
+          context: ./${{ matrix.module }}
+          file: ./${{ matrix.module }}/Containerfile
+          push: false
+          tags: ${{ matrix.module }}:latest
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
