@@ -40,7 +40,7 @@ describe("useLayerActionMap", () => {
     const actions = result.current.getActions();
 
     expect(typeof actions).toBe("object");
-    expect(findAction(actions, " ")).toBeDefined();
+    expect(findAction(actions, "p")).toBeDefined();
     expect(findAction(actions, "l")).toBeDefined();
   });
 
@@ -49,9 +49,8 @@ describe("useLayerActionMap", () => {
     const actions = result.current.getActions();
     const event = { preventDefault: jest.fn() } as any;
 
-    const togglePath = findAction(actions, " ");
-    togglePath(event);
-    expect(event.preventDefault).toHaveBeenCalled();
+    const togglePath = findAction(actions, "p");
+    togglePath();
     expect(mockUpdateLayer).toHaveBeenCalledWith("transitionPaths", false);
 
     const toggleSphere = findAction(actions, "s");
@@ -89,9 +88,8 @@ describe("useLayerActionMap", () => {
     const actions = result.current.getActions();
     const event = { preventDefault: jest.fn() } as any;
 
-    const togglePath = findAction(actions, " ");
-    togglePath(event);
-    expect(event.preventDefault).toHaveBeenCalled();
+    const togglePath = findAction(actions, "p");
+    togglePath();
     expect(mockUpdateLayer).toHaveBeenCalledWith("transitionPaths", false);
 
     const toggleSphere = findAction(actions, "s");

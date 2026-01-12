@@ -92,6 +92,7 @@ export function PathFlyover() {
     const path = computedPaths.get(selectedPathId);
     if (!path) {
       console.warn("PathFlyover: Selected path not found");
+      setIsFlying(false);
       return;
     }
 

@@ -45,7 +45,7 @@ describe("useCommandPaletteState", () => {
     const { result } = renderHook(() => useCommandPaletteState());
 
     act(() => {
-      result.current.setPage("home");
+      result.current.setPage("emotions");
       result.current.setCategory("Joy");
     });
 

@@ -60,7 +60,7 @@ fi
 
 # === 1. TypeScript Compiler (Type Checking) ===
 print_info "Running tsc (TypeScript compiler)..."
-if run_in_module "experience" "npm run type-check 2>/dev/null || tsc --noEmit"; then
+if run_in_module "experience" "npm run type-check"; then
     print_success "tsc: No type errors"
 else
     print_error "tsc: Type errors found"
@@ -70,14 +70,14 @@ fi
 # === 2. ESLint (Linting) ===
 print_info "Running eslint (linter)..."
 if [ $FIX_MODE -eq 1 ]; then
-    if run_in_module "experience" "npm run lint:fix 2>/dev/null || eslint . --ext .ts,.tsx,.js,.jsx --fix"; then
+    if run_in_module "experience" "npm run lint:fix"; then
         print_success "eslint: Code linted and fixed"
     else
         print_error "eslint: Linting errors remain after fix"
         total_failures=$((total_failures + 1))
     fi
 else
-    if run_in_module "experience" "npm run lint 2>/dev/null || eslint . --ext .ts,.tsx,.js,.jsx"; then
+    if run_in_module "experience" "npm run lint"; then
         print_success "eslint: No linting errors"
     else
         print_error "eslint: Linting errors found (run with --fix)"
@@ -88,14 +88,14 @@ fi
 # === 3. Prettier (Code Formatting) ===
 print_info "Running prettier (formatter)..."
 if [ $FIX_MODE -eq 1 ]; then
-    if run_in_module "experience" "npm run format 2>/dev/null || prettier --write '**/*.{ts,tsx,js,jsx,json,md}'"; then
+    if run_in_module "experience" "npm run format"; then
         print_success "prettier: Code formatted"
     else
         print_error "prettier: Formatting failed"
         total_failures=$((total_failures + 1))
     fi
 else
-    if run_in_module "experience" "npm run format:check 2>/dev/null || prettier --check '**/*.{ts,tsx,js,jsx,json,md}'"; then
+    if run_in_module "experience" "npm run format:check"; then
         print_success "prettier: Code is formatted correctly"
     else
         print_error "prettier: Code needs formatting (run with --fix)"
@@ -105,16 +105,21 @@ fi
 
 # === 4. Package Audit (Security) ===
 print_info "Running npm audit (security check)..."
-if run_in_module "experience" "npm audit --audit-level=moderate 2>/dev/null"; then
+# We allow audit to fail if issues are found, but we want to see them. 
+# We don't increment failure count for audit warnings unless it returns a very bad code, 
+# but usually 'npm audit' returns non-zero if ANY vulnerability is found.
+# For now, we print valid output and don't count it as a blocking failure for 'quality check' 
+# unless we decide critical vulns block deployment. 
+# The current script logic didn't count it. We'll keep it that way but show output.
+if run_in_module "experience" "npm audit --audit-level=moderate"; then
     print_success "npm audit: No security vulnerabilities"
 else
     print_warning "npm audit: Vulnerabilities found (run 'npm audit fix')"
-    # Don't fail on audit issues - can be fixed separately
 fi
 
 # === 5. Build Test ===
 print_info "Running build test..."
-if run_in_module "experience" "npm run build 2>/dev/null"; then
+if run_in_module "experience" "npm run build"; then
     print_success "Build: Success"
 else
     print_error "Build: Failed"

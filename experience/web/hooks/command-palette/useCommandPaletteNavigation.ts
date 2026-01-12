@@ -12,6 +12,7 @@ export function useCommandPaletteNavigation({ filteredEmotions, isOpen, search }
 
   // Reset selection when search changes or opens
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setSelectedIndex(0);
   }, [search, isOpen]);
 

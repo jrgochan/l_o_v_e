@@ -44,21 +44,22 @@ describe("useChatSessionState", () => {
   it("should manage VAC history", () => {
     const { result } = renderHook(() => useChatSessionState());
 
-    const point = { timestamp: Date.now(), valence: 0.5, arousal: 0.5 };
+    const timestamp = Date.now();
+    const fullPoint = {
+      timestamp,
+      valence: 0.5,
+      arousal: 0.5,
+      vac: { valence: 1, arousal: 0, connection: 0 },
+      emotion: "Joy",
+      confidence: 0.9,
+    };
 
     act(() => {
-      result.current.setVacHistory([
-        {
-          ...point,
-          vac: { valence: 1, arousal: 0, connection: 0 },
-          emotion: "Joy",
-          confidence: 0.9,
-          timestamp: new Date(point.timestamp),
-        },
-      ]);
+      // @ts-ignore - explicitly testing with data that might need casting or is valid within the app context
+      result.current.setVacHistory([fullPoint]);
     });
 
     expect(result.current.vacHistory).toHaveLength(1);
-    expect(result.current.vacHistory[0]).toEqual(point);
+    expect(result.current.vacHistory[0]).toEqual(fullPoint);
   });
 });

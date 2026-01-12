@@ -12,7 +12,7 @@ export function useSphereReceiver(
   const staleCheckRef = useRef<NodeJS.Timeout | null>(null);
 
   // Local state to track updates for UI
-  const [lastUpdate, setLastUpdate] = useState(0);
+  const [lastUpdate, setLastUpdate] = useState(lastMessageTime);
 
   const handleMessage = useCallback(
     (message: SphereStateMessage) => {

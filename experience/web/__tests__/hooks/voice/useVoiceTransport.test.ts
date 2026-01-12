@@ -9,7 +9,13 @@ jest.mock("@/hooks/voice/useMediaRecorder");
 describe("useVoiceTransport", () => {
   const mockState = { isRecording: false, isProcessing: false };
   const mockActions = { startRecording: jest.fn(), stopRecording: jest.fn() };
-  const mockRecorder = { start: jest.fn(), stop: jest.fn(), pause: jest.fn(), resume: jest.fn() };
+  const mockRecorder = {
+    startMediaRecorder: jest.fn(),
+    stopMediaRecorder: jest.fn(),
+    pauseMediaRecorder: jest.fn(),
+    resumeMediaRecorder: jest.fn(),
+    cancelMediaRecorder: jest.fn(),
+  };
 
   beforeEach(() => {
     (useVoiceState as jest.Mock).mockReturnValue({ state: mockState, actions: mockActions });

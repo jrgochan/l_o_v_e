@@ -168,6 +168,7 @@ export function BaseSphere({
       {}
       {}
       {}
+      {/* eslint-disable-next-line react-hooks/refs */}
       {typeof children === "function" ? children(meshRef, materialRef) : children}
     </group>
   );

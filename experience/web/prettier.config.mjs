@@ -1,7 +1,7 @@
 /**
  * Prettier configuration for L.O.V.E. platform
  * Canonical configuration maintained in infra/configs/
- * 
+ *
  * This is the ES module version (alternative to .prettierrc.json)
  * Use this format when you need to add custom logic or plugins
  */
@@ -19,7 +19,7 @@ const config = {
   bracketSpacing: true,
   proseWrap: "preserve",
   quoteProps: "as-needed",
-  
+
   // Language-specific overrides
   overrides: [
     {

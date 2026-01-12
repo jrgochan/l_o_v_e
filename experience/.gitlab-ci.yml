@@ -12,7 +12,7 @@ variables:
   NODE_VERSION: "18"
   # Cache optimization for npm
   npm_config_cache: "$CI_PROJECT_DIR/.npm"
-  SECRET_DETECTION_ENABLED: 'true'
+  SECRET_DETECTION_ENABLED: "true"
 
 include:
   - template: Security/Secret-Detection.gitlab-ci.yml

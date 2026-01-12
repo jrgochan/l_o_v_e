@@ -43,7 +43,8 @@ body {
 
 /* Heartbeat Analyzer Animations */
 @keyframes pulse-slow {
-  0%, 100% {
+  0%,
+  100% {
     transform: scale(1);
     opacity: 1;
   }
@@ -54,7 +55,8 @@ body {
 }
 
 @keyframes pulse-medium {
-  0%, 100% {
+  0%,
+  100% {
     transform: scale(1);
     opacity: 1;
   }
@@ -65,7 +67,8 @@ body {
 }
 
 @keyframes pulse-fast {
-  0%, 100% {
+  0%,
+  100% {
     transform: scale(1);
     opacity: 1;
   }
@@ -80,7 +83,8 @@ body {
     transform: scale(1);
     opacity: 1;
   }
-  75%, 100% {
+  75%,
+  100% {
     transform: scale(1.5);
     opacity: 0;
   }

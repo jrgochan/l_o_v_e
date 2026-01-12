@@ -67,6 +67,7 @@ export function useBatchJob(onComplete?: () => void, onFail?: (error: string) =>
       return;
     }
 
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     pollProgress();
     pollIntervalRef.current = setInterval(pollProgress, POLL_INTERVAL);
 

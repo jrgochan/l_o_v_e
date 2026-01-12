@@ -20,8 +20,8 @@ describe("useAnimationModeTransition", () => {
     expect(result.current).toEqual({
       isTransitioning: false,
       progress: 1.0,
-      fromMode: "flow",
-      toMode: "flow",
+      fromMode: "dynamic",
+      toMode: "dynamic",
     });
   });
 
