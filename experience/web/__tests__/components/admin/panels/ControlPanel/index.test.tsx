@@ -1,7 +1,7 @@
-import { ControlPanel } from '../../../../../components/admin/panels/ControlPanel';
+import { ControlPanel } from "../../../../../components/admin/panels/ControlPanel";
 
-describe('ControlPanel', () => {
-    it('should be defined', () => {
-        expect(ControlPanel).toBeDefined();
-    });
+describe("ControlPanel", () => {
+  it("should be defined", () => {
+    expect(ControlPanel).toBeDefined();
+  });
 });

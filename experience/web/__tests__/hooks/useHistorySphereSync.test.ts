@@ -7,103 +7,103 @@ jest.mock("@/stores/useEmotionHistoryStore");
 jest.mock("@/stores/useAtlasAdminStore");
 
 describe("useHistorySphereSync", () => {
-    const mockSelectEmotion = jest.fn();
-    const mockDeselectEmotion = jest.fn();
-    const mockSetVisibility = jest.fn();
+  const mockSelectEmotion = jest.fn();
+  const mockDeselectEmotion = jest.fn();
+  const mockSetVisibility = jest.fn();
 
-    // Stable References
-    const joyId = "e1";
-    const joyHistoryId = "h1";
-    const joyName = "Joy";
-    const joyEmotion = { id: joyId, name: joyName };
+  // Stable References
+  const joyId = "e1";
+  const joyHistoryId = "h1";
+  const joyName = "Joy";
+  const joyEmotion = { id: joyId, name: joyName };
 
-    let currentAtlasState: any;
-    let currentHistoryState: any;
+  let currentAtlasState: any;
+  let currentHistoryState: any;
 
-    beforeEach(() => {
-        jest.clearAllMocks();
-        jest.useFakeTimers();
+  beforeEach(() => {
+    jest.clearAllMocks();
+    jest.useFakeTimers();
 
-        // Default State: Consistent (Hidden in both)
-        currentAtlasState = {
-            allEmotions: [joyEmotion],
-            selectedEmotionIds: new Set(),
-            selectEmotion: mockSelectEmotion,
-            deselectEmotion: mockDeselectEmotion
-        };
+    // Default State: Consistent (Hidden in both)
+    currentAtlasState = {
+      allEmotions: [joyEmotion],
+      selectedEmotionIds: new Set(),
+      selectEmotion: mockSelectEmotion,
+      deselectEmotion: mockDeselectEmotion,
+    };
 
-        currentHistoryState = {
-            entries: [{ id: joyHistoryId, emotion: joyName, isVisibleInSphere: false }],
-            setVisibility: mockSetVisibility
-        };
+    currentHistoryState = {
+      entries: [{ id: joyHistoryId, emotion: joyName, isVisibleInSphere: false }],
+      setVisibility: mockSetVisibility,
+    };
 
-        (useAtlasAdminStore as unknown as jest.Mock).mockImplementation((selector) => {
-            return selector(currentAtlasState);
-        });
-
-        (useEmotionHistoryStore as unknown as jest.Mock).mockImplementation((selector) => {
-            return selector(currentHistoryState);
-        });
+    (useAtlasAdminStore as unknown as jest.Mock).mockImplementation((selector) => {
+      return selector(currentAtlasState);
     });
 
-    afterEach(() => {
-        jest.useRealTimers();
+    (useEmotionHistoryStore as unknown as jest.Mock).mockImplementation((selector) => {
+      return selector(currentHistoryState);
     });
+  });
 
-    it("should sync visible history entry to sphere selection", () => {
-        // Init with default (Hidden/Hidden)
-        const { rerender } = renderHook(() => useHistorySphereSync());
+  afterEach(() => {
+    jest.useRealTimers();
+  });
 
-        // Update: User toggles Joy VISIBLE in history (History change)
-        // Keep Atlas State ref same (implied no change)
-        currentHistoryState = {
-            ...currentHistoryState,
-            entries: [{ id: joyHistoryId, emotion: joyName, isVisibleInSphere: true }]
-        };
+  it("should sync visible history entry to sphere selection", () => {
+    // Init with default (Hidden/Hidden)
+    const { rerender } = renderHook(() => useHistorySphereSync());
 
-        // Force rerender
-        rerender();
+    // Update: User toggles Joy VISIBLE in history (History change)
+    // Keep Atlas State ref same (implied no change)
+    currentHistoryState = {
+      ...currentHistoryState,
+      entries: [{ id: joyHistoryId, emotion: joyName, isVisibleInSphere: true }],
+    };
 
-        expect(mockSelectEmotion).toHaveBeenCalledWith(joyId);
-    });
+    // Force rerender
+    rerender();
 
-    it("should sync sphere selection back to history visibility (enable)", () => {
-        // Init with default (Hidden/Hidden)
-        const { rerender } = renderHook(() => useHistorySphereSync());
+    expect(mockSelectEmotion).toHaveBeenCalledWith(joyId);
+  });
 
-        // Update: User Selects Joy in Sphere (Sphere change)
-        // Keep History State ref same (implied no change)
-        currentAtlasState = {
-            ...currentAtlasState,
-            selectedEmotionIds: new Set([joyId])
-        };
+  it("should sync sphere selection back to history visibility (enable)", () => {
+    // Init with default (Hidden/Hidden)
+    const { rerender } = renderHook(() => useHistorySphereSync());
 
-        rerender();
+    // Update: User Selects Joy in Sphere (Sphere change)
+    // Keep History State ref same (implied no change)
+    currentAtlasState = {
+      ...currentAtlasState,
+      selectedEmotionIds: new Set([joyId]),
+    };
 
-        expect(mockSetVisibility).toHaveBeenCalledWith(joyHistoryId, true);
-    });
+    rerender();
 
-    it("should sync sphere deselection back to history visibility (disable)", () => {
-        // Start consistent (Selected/Visible)
-        currentAtlasState = {
-            ...currentAtlasState,
-            selectedEmotionIds: new Set([joyId])
-        };
-        currentHistoryState = {
-            ...currentHistoryState,
-            entries: [{ id: joyHistoryId, emotion: joyName, isVisibleInSphere: true }]
-        };
+    expect(mockSetVisibility).toHaveBeenCalledWith(joyHistoryId, true);
+  });
 
-        const { rerender } = renderHook(() => useHistorySphereSync());
+  it("should sync sphere deselection back to history visibility (disable)", () => {
+    // Start consistent (Selected/Visible)
+    currentAtlasState = {
+      ...currentAtlasState,
+      selectedEmotionIds: new Set([joyId]),
+    };
+    currentHistoryState = {
+      ...currentHistoryState,
+      entries: [{ id: joyHistoryId, emotion: joyName, isVisibleInSphere: true }],
+    };
 
-        // Update: User Deselects Joy in Sphere
-        currentAtlasState = {
-            ...currentAtlasState,
-            selectedEmotionIds: new Set()
-        };
+    const { rerender } = renderHook(() => useHistorySphereSync());
 
-        rerender();
+    // Update: User Deselects Joy in Sphere
+    currentAtlasState = {
+      ...currentAtlasState,
+      selectedEmotionIds: new Set(),
+    };
 
-        expect(mockSetVisibility).toHaveBeenCalledWith(joyHistoryId, false);
-    });
+    rerender();
+
+    expect(mockSetVisibility).toHaveBeenCalledWith(joyHistoryId, false);
+  });
 });

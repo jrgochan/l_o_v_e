@@ -609,7 +609,7 @@ export class ObserverPollingManager {
     this.onUpdate = onUpdate;
     this.onError =
       onError ||
-      ((_error) => {
+      (() => {
         /* Silent error */
       });
     this.isPolling = true;

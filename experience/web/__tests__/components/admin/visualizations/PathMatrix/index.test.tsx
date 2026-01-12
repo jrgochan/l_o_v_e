@@ -1,7 +1,7 @@
-import { PathMatrixGrid } from '../../../../../components/admin/visualizations/PathMatrix';
+import { PathMatrixGrid } from "../../../../../components/admin/visualizations/PathMatrix";
 
-describe('PathMatrixGrid', () => {
-    it('should be defined', () => {
-        expect(PathMatrixGrid).toBeDefined();
-    });
+describe("PathMatrixGrid", () => {
+  it("should be defined", () => {
+    expect(PathMatrixGrid).toBeDefined();
+  });
 });

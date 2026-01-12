@@ -13,20 +13,20 @@ describe("useAudioModulation", () => {
     ctx: mockCtx,
     bass: {
       osc: { detune: { linearRampToValueAtTime: mockRamp } },
-      lfo: { frequency: { linearRampToValueAtTime: mockRamp } }
+      lfo: { frequency: { linearRampToValueAtTime: mockRamp } },
     },
     mid: {
       osc: { frequency: { linearRampToValueAtTime: mockRamp } },
-      lfo: { frequency: { linearRampToValueAtTime: mockRamp } }
+      lfo: { frequency: { linearRampToValueAtTime: mockRamp } },
     },
     high: {
       osc: { frequency: { linearRampToValueAtTime: mockRamp } },
       lfo: { frequency: { linearRampToValueAtTime: mockRamp } },
-      gain: { gain: { linearRampToValueAtTime: mockRamp } }
+      gain: { gain: { linearRampToValueAtTime: mockRamp } },
     },
     filter: {
-      frequency: { linearRampToValueAtTime: mockRamp }
-    }
+      frequency: { linearRampToValueAtTime: mockRamp },
+    },
   };
 
   beforeEach(() => {

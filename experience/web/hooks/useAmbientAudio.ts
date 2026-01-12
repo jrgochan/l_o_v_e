@@ -19,12 +19,10 @@ import { useAudioSfx } from "./audio/useAudioSfx";
 
 export function useAmbientAudio() {
   // Sync local state with global audio state for UI updates
-  const [isMuted, setIsMuted] = useState(true);
+  // Initialize with current global state to avoid effect sync
+  const [isMuted, setIsMuted] = useState(() => isAudioMuted());
 
   useEffect(() => {
-    // Initial sync
-    setIsMuted(isAudioMuted());
-
     // Subscribe to changes
     return subscribeToAudioState(() => {
       setIsMuted(isAudioMuted());

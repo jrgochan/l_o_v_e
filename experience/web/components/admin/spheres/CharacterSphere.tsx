@@ -11,7 +11,7 @@
 
 "use client";
 
-import { useRef, useMemo, useState } from "react";
+import { useRef, useMemo } from "react";
 import { Canvas, useFrame } from "@react-three/fiber";
 import { StandardLighting } from "./BaseSphere";
 import * as THREE from "three";
@@ -183,17 +183,12 @@ export function CharacterSphere({
     [emotion, animationMode]
   );
 
-  const [isHovered, setIsHovered] = useState(false);
-
   const motionLabels = {
     stable: "Stable (Core)",
     orbital: "Orbital (Social)",
     recoil: "Recoil (Self-conscious)",
     reaching: "Reaching (Growth)",
   };
-
-  // Safe fallback color if category is missing
-  const color = CATEGORY_COLORS[emotion.category] || "#888888";
 
   return (
     <div className="flex flex-col items-center gap-2">

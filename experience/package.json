@@ -18,7 +18,7 @@
     "test": "npm test --workspaces",
     "clean": "rm -rf shared/dist shared/node_modules web/node_modules web/.next node_modules",
     "reinstall": "npm run clean && npm install",
-    "lint": "eslint .",
+    "lint": "npm run lint --workspaces",
     "type-check": "tsc -b"
   },
   "devDependencies": {

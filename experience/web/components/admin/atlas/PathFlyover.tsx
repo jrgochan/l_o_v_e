@@ -12,7 +12,7 @@ import { useFrame, useThree } from "@react-three/fiber";
 import * as THREE from "three";
 import { useAtlasAdminStore } from "@/stores/useAtlasAdminStore";
 import { useExperienceStore } from "@/stores/useExperienceStore";
-import { TransitionPathResponse } from "@love/experience-shared";
+import { TransitionPathResponse, WaypointInfo } from "@love/experience-shared";
 
 import { useAmbientAudio } from "@/hooks/useAmbientAudio";
 
@@ -38,7 +38,7 @@ export function PathFlyover() {
     if (expIsFlying !== isFlying) {
       setIsFlying(expIsFlying);
     }
-  }, [expIsFlying, setIsFlying]); // removed isFlying from dep to avoid echo? No, we need it for check.
+  }, [expIsFlying, setIsFlying, isFlying]);
   // Actually, if we include isFlying in dep, it loops.
   // If we don't, we might miss external updates?
   // Correct pattern:
@@ -61,8 +61,7 @@ export function PathFlyover() {
     if (isFlying !== expIsFlying) {
       setExperienceIsFlying(isFlying);
     }
-  }, [isFlying, setExperienceIsFlying]); // Read expIsFlying from store, don't trigger on it.
-
+  }, [isFlying, setExperienceIsFlying, expIsFlying]);
 
   // SFX
   const { playWhoosh } = useAmbientAudio();
@@ -72,7 +71,6 @@ export function PathFlyover() {
   const startTimeRef = useRef<number | null>(null);
   const pathCurveRef = useRef<THREE.CatmullRomCurve3 | null>(null);
   const lookAtRef = useRef(new THREE.Vector3());
-  const initialCameraPosRef = useRef(new THREE.Vector3());
 
   // Waypoint tracking for labels
   const waypointsRef = useRef<Array<{ id: string; vec: THREE.Vector3 }>>([]);
@@ -98,15 +96,46 @@ export function PathFlyover() {
     }
 
     // MAP AND SYNC PATH TO EXPERIENCE STORE
-    const mappedPath: any = {
+    const mappedPath: TransitionPathResponse = {
       path_id: path.id,
-      current_state: { emotion: path.from.name, vac: path.from.vac },
-      goal_state: { emotion: path.to.name, vac: path.to.vac },
-      waypoints: path.waypoints.map(wp => ({
-        emotion: wp.emotion,
-        vac: wp.vac,
-        reasoning: wp.reasoning
-      }))
+      current_state: {
+        emotion: path.from.name,
+        vac: path.from.vac,
+        category: path.from.category,
+        quaternion: [0, 0, 0, 1],
+      },
+      goal_state: {
+        emotion: path.to.name,
+        vac: path.to.vac,
+        category: path.to.category,
+        quaternion: [0, 0, 0, 1],
+      },
+      waypoints: path.waypoints.map((wp, i): WaypointInfo => {
+        const wpEmotion = allEmotions.find((e) => e.name === wp.emotion);
+        return {
+          emotion: wp.emotion,
+          vac: wp.vac,
+          reasoning: wp.reasoning,
+          category: wpEmotion?.category || "Neutral",
+          quaternion: [0, 0, 0, 1],
+          order: i,
+          distance_from_previous: 0,
+          estimated_time: "0s",
+          difficulty: "0",
+          strategies: [],
+        };
+      }),
+      created_at: new Date().toISOString(),
+      visualization_data: {},
+      path_metrics: {
+        total_distance: 0,
+        total_estimated_time: "0s",
+        overall_difficulty: "0",
+        success_probability: 1,
+        requires_external_support: false,
+      },
+      alternatives: [],
+      personalization_notes: [],
     };
     setTransitionPath(mappedPath);
 
@@ -146,19 +175,12 @@ export function PathFlyover() {
     startTimeRef.current = null; // Will calculate on next frame
 
     // Note: We do NOT playSFX here automatically anymore, unless we want to separate "Select" from "Play".
-    // Director mode usually starts immediately? 
-    // If we want "Play Journey" button to start it, we shouldn't start automatically. 
+    // Director mode usually starts immediately?
+    // If we want "Play Journey" button to start it, we shouldn't start automatically.
     // But currently `selectedPathId` is set by clicking the list.
-    // We probably want to wait for "Play". 
+    // We probably want to wait for "Play".
     // So valid.
-
-  }, [
-    selectedPathId,
-    computedPaths,
-    allEmotions,
-    setTransitionPath,
-    setFlyoverProgress
-  ]);
+  }, [selectedPathId, computedPaths, allEmotions, setTransitionPath, setFlyoverProgress]);
 
   // SFX Trigger on Fly Start (only when toggling from false to true)
   useEffect(() => {

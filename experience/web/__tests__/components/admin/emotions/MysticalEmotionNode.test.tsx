@@ -1,7 +1,7 @@
-import { MysticalEmotionNode } from '../../../../components/admin/emotions/MysticalEmotionNode';
+import { MysticalEmotionNode } from "../../../../components/admin/emotions/MysticalEmotionNode";
 
-describe('MysticalEmotionNode', () => {
-    it('should be defined', () => {
-        expect(MysticalEmotionNode).toBeDefined();
-    });
+describe("MysticalEmotionNode", () => {
+  it("should be defined", () => {
+    expect(MysticalEmotionNode).toBeDefined();
+  });
 });

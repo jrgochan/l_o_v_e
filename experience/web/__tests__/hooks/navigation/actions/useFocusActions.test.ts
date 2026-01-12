@@ -7,64 +7,67 @@ jest.mock("@/stores/useAtlasAdminStore");
 jest.mock("@/utils/logger");
 
 describe("useFocusActions", () => {
-    const mockSetFocusedEmotion = jest.fn();
-    const mockFindEmotionByName = jest.fn();
-    const mockOnNavigate = jest.fn();
+  const mockSetFocusedEmotion = jest.fn();
+  const mockFindEmotionByName = jest.fn();
+  const mockOnNavigate = jest.fn();
 
-    beforeEach(() => {
-        jest.clearAllMocks();
-        (useAtlasAdminStore as unknown as jest.Mock).mockImplementation((selector) => {
-            return selector({ setFocusedEmotion: mockSetFocusedEmotion });
-        });
+  beforeEach(() => {
+    jest.clearAllMocks();
+    (useAtlasAdminStore as unknown as jest.Mock).mockImplementation((selector) => {
+      return selector({ setFocusedEmotion: mockSetFocusedEmotion });
     });
+  });
 
-    const getHook = (props: any = {}) => renderHook(() => useFocusActions({
+  const getHook = (props: any = {}) =>
+    renderHook(() =>
+      useFocusActions({
         findEmotionByName: mockFindEmotionByName,
         onNavigate: mockOnNavigate,
-        ...props
-    }));
+        ...props,
+      })
+    );
 
-    it("should focus emotion if found", () => {
-        const mockEmotion = { id: "e1", name: "Joy" };
-        mockFindEmotionByName.mockReturnValue(mockEmotion);
+  it("should focus emotion if found", () => {
+    const mockEmotion = { id: "e1", name: "Joy" };
+    mockFindEmotionByName.mockReturnValue(mockEmotion);
 
-        const { result } = getHook();
-        const success = result.current.focusEmotion("Joy");
+    const { result } = getHook();
+    const success = result.current.focusEmotion("Joy");
 
-        expect(success).toBe(true);
-        expect(mockFindEmotionByName).toHaveBeenCalledWith("Joy");
-        expect(mockSetFocusedEmotion).toHaveBeenCalledWith("e1");
-        expect(mockOnNavigate).not.toHaveBeenCalled(); // navigate false by default
-    });
+    expect(success).toBe(true);
+    expect(mockFindEmotionByName).toHaveBeenCalledWith("Joy");
+    expect(mockSetFocusedEmotion).toHaveBeenCalledWith("e1");
+    expect(mockOnNavigate).not.toHaveBeenCalled(); // navigate false by default
+  });
 
-    it("should fail if emotion not found", () => {
-        mockFindEmotionByName.mockReturnValue(null);
+  it("should fail if emotion not found", () => {
+    mockFindEmotionByName.mockReturnValue(null);
 
-        const { result } = getHook();
-        const success = result.current.focusEmotion("Unknown");
+    const { result } = getHook();
+    const success = result.current.focusEmotion("Unknown");
 
-        expect(success).toBe(false);
-        expect(logger.warn).toHaveBeenCalled();
-        expect(mockSetFocusedEmotion).not.toHaveBeenCalled();
-    });
+    expect(success).toBe(false);
+    expect(logger.warn).toHaveBeenCalled();
+    expect(mockSetFocusedEmotion).not.toHaveBeenCalled();
+  });
 
-    it("should trigger onNavigate if requested", () => {
-        const mockEmotion = { id: "e1", name: "Joy" };
-        mockFindEmotionByName.mockReturnValue(mockEmotion);
+  it("should trigger onNavigate if requested", () => {
+    const mockEmotion = { id: "e1", name: "Joy" };
+    mockFindEmotionByName.mockReturnValue(mockEmotion);
 
-        const { result } = getHook();
-        result.current.focusEmotion("Joy", true);
+    const { result } = getHook();
+    result.current.focusEmotion("Joy", true);
 
-        expect(mockOnNavigate).toHaveBeenCalled();
-    });
+    expect(mockOnNavigate).toHaveBeenCalled();
+  });
 
-    it("should auto-focus emotion", () => {
-        const mockEmotion = { id: "e1", name: "Joy" };
-        mockFindEmotionByName.mockReturnValue(mockEmotion);
+  it("should auto-focus emotion", () => {
+    const mockEmotion = { id: "e1", name: "Joy" };
+    mockFindEmotionByName.mockReturnValue(mockEmotion);
 
-        const { result } = getHook();
-        result.current.autoFocusEmotion("Joy");
+    const { result } = getHook();
+    result.current.autoFocusEmotion("Joy");
 
-        expect(mockSetFocusedEmotion).toHaveBeenCalledWith("e1");
-    });
+    expect(mockSetFocusedEmotion).toHaveBeenCalledWith("e1");
+  });
 });

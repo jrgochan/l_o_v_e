@@ -1,7 +1,7 @@
-import { useModelAssignments } from '../../hooks/useModelAssignments';
+import { useModelAssignments } from "../../hooks/useModelAssignments";
 
-describe('useModelAssignments', () => {
-    it('should be defined', () => {
-        expect(useModelAssignments).toBeDefined();
-    });
+describe("useModelAssignments", () => {
+  it("should be defined", () => {
+    expect(useModelAssignments).toBeDefined();
+  });
 });

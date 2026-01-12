@@ -1,7 +1,7 @@
-import { AnalysisPanel } from '../../../../components/admin/panels/AnalysisPanel';
+import { AnalysisPanel } from "../../../../components/admin/panels/AnalysisPanel";
 
-describe('AnalysisPanel', () => {
-    it('should be defined', () => {
-        expect(AnalysisPanel).toBeDefined();
-    });
+describe("AnalysisPanel", () => {
+  it("should be defined", () => {
+    expect(AnalysisPanel).toBeDefined();
+  });
 });

@@ -41,7 +41,9 @@ export function useHistorySphereSync() {
 
         if (entry.isVisibleInSphere && !isSelectedInSphere) {
           // History says Show, Sphere says Hide -> Show in Sphere
-          logger.debug("state", `Adding ${entry.emotion} to sphere from history`, { entryId: entry.id });
+          logger.debug("state", `Adding ${entry.emotion} to sphere from history`, {
+            entryId: entry.id,
+          });
           syncingEmotionsRef.current.add(entry.id);
           selectEmotion(atlasEmotion.id);
           setTimeout(() => syncingEmotionsRef.current.delete(entry.id), 100);
@@ -52,7 +54,9 @@ export function useHistorySphereSync() {
           );
 
           if (otherVisibleEntries.length === 0) {
-            logger.debug("state", `Removing ${entry.emotion} from sphere (no visible history)`, { entryId: entry.id });
+            logger.debug("state", `Removing ${entry.emotion} from sphere (no visible history)`, {
+              entryId: entry.id,
+            });
             syncingEmotionsRef.current.add(entry.id);
             deselectEmotion(atlasEmotion.id);
             setTimeout(() => syncingEmotionsRef.current.delete(entry.id), 100);
@@ -75,10 +79,14 @@ export function useHistorySphereSync() {
         // If Sphere matches history, nothing to do.
         // If Sphere mismatches history, update history to match Sphere
         if (isSelectedInSphere && !entry.isVisibleInSphere) {
-          logger.debug("state", `Syncing ${entry.emotion} visibility to true from sphere`, { entryId: entry.id });
+          logger.debug("state", `Syncing ${entry.emotion} visibility to true from sphere`, {
+            entryId: entry.id,
+          });
           setVisibility(entry.id, true);
         } else if (!isSelectedInSphere && entry.isVisibleInSphere) {
-          logger.debug("state", `Syncing ${entry.emotion} visibility to false from sphere`, { entryId: entry.id });
+          logger.debug("state", `Syncing ${entry.emotion} visibility to false from sphere`, {
+            entryId: entry.id,
+          });
           setVisibility(entry.id, false);
         }
       });

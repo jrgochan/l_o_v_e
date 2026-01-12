@@ -1,7 +1,7 @@
-import { InsightCard } from '../../../../components/admin/shared/InsightCard';
+import { InsightCard } from "../../../../components/admin/shared/InsightCard";
 
-describe('InsightCard', () => {
-    it('should be defined', () => {
-        expect(InsightCard).toBeDefined();
-    });
+describe("InsightCard", () => {
+  it("should be defined", () => {
+    expect(InsightCard).toBeDefined();
+  });
 });

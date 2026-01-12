@@ -436,7 +436,7 @@ export const useAtlasAdminStore = create<AtlasAdminState>()(
         set({ computedPaths: new Map(paths) });
       },
 
-      fetchPathFromBackend: async (_fromId, _toId) => {
+      fetchPathFromBackend: async () => {
         return null; // Placeholder, real implementation removed for simplicity
       },
     }),

@@ -1,7 +1,7 @@
-import { EmotionCard } from '../../../../components/admin/emotion-display/EmotionCard';
+import { EmotionCard } from "../../../../components/admin/emotion-display/EmotionCard";
 
-describe('EmotionCard', () => {
-    it('should be defined', () => {
-        expect(EmotionCard).toBeDefined();
-    });
+describe("EmotionCard", () => {
+  it("should be defined", () => {
+    expect(EmotionCard).toBeDefined();
+  });
 });

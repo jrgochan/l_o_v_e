@@ -1,7 +1,7 @@
-import { CharacterSphere } from '../../../../components/admin/spheres/CharacterSphere';
+import { CharacterSphere } from "../../../../components/admin/spheres/CharacterSphere";
 
-describe('CharacterSphere', () => {
-    it('should be defined', () => {
-        expect(CharacterSphere).toBeDefined();
-    });
+describe("CharacterSphere", () => {
+  it("should be defined", () => {
+    expect(CharacterSphere).toBeDefined();
+  });
 });

@@ -1,7 +1,7 @@
-import { ChatInputBar } from '../../../../components/admin/chat/ChatInputBar';
+import { ChatInputBar } from "../../../../components/admin/chat/ChatInputBar";
 
-describe('ChatInputBar', () => {
-    it('should be defined', () => {
-        expect(ChatInputBar).toBeDefined();
-    });
+describe("ChatInputBar", () => {
+  it("should be defined", () => {
+    expect(ChatInputBar).toBeDefined();
+  });
 });

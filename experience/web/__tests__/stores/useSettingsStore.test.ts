@@ -29,7 +29,7 @@ describe("useSettingsStore (Deep Coverage)", () => {
 
     const validSettings = result.current.exportSettings();
     // Modify a value to verify import works
-    const modifiedJson = validSettings.replace('"pollInterval":3000', '"pollInterval":5000'); // Wait, key is pollingInterval
+
     // Let's modify object safely
     const obj = JSON.parse(validSettings);
     obj.settings.visual.pathOpacity = 0.5;
@@ -204,7 +204,7 @@ describe("useSettingsStore (Deep Coverage)", () => {
     const { result } = renderHook(() => useSettingsStore());
 
     // Mock logger methods if they are imported singleton
-    // But logger is imported from utils/logger. 
+    // But logger is imported from utils/logger.
     // I can't easily mock the logger singleton methods unless I mock the module.
     // The test file didn't mock utils/logger.
     // But I can verification side effects on state.
@@ -228,7 +228,7 @@ describe("useSettingsStore (Deep Coverage)", () => {
 
     // JSDOM throws "Not implemented: navigation" on reload(), which creates a console.error
     // We suppress it for this test.
-    const consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation(() => { });
+    const consoleErrorSpy = jest.spyOn(console, "error").mockImplementation(() => {});
 
     act(() => {
       result.current.setUserId("data-to-clear");
@@ -240,5 +240,4 @@ describe("useSettingsStore (Deep Coverage)", () => {
 
     consoleErrorSpy.mockRestore();
   });
-
 });

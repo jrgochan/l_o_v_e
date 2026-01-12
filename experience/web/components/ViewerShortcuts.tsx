@@ -33,8 +33,9 @@ export function ViewerShortcuts() {
 
   return (
     <div
-      className={`absolute bottom-6 left-6 z-40 transition-opacity duration-1000 ${visible ? "opacity-100" : "opacity-30 hover:opacity-100"
-        }`}
+      className={`absolute bottom-6 left-6 z-40 transition-opacity duration-1000 ${
+        visible ? "opacity-100" : "opacity-30 hover:opacity-100"
+      }`}
     >
       <div className="text-[10px] text-gray-500 font-mono tracking-wider space-y-1.5 uppercase">
         <div className="flex items-center gap-2">

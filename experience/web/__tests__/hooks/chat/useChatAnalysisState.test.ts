@@ -2,53 +2,57 @@ import { renderHook, act } from "@testing-library/react";
 import { useChatAnalysisState } from "@/hooks/chat/useChatAnalysisState";
 
 describe("useChatAnalysisState", () => {
-    it("should initialize with default states", () => {
-        const { result } = renderHook(() => useChatAnalysisState());
+  it("should initialize with default states", () => {
+    const { result } = renderHook(() => useChatAnalysisState());
 
-        expect(result.current.currentAnalysis.emotion).toBeNull();
-        expect(result.current.multiEmotionAnalysis).toBeNull();
-        expect(result.current.threeWayAnalysis).toBeNull();
+    expect(result.current.currentAnalysis.emotion).toBeNull();
+    expect(result.current.multiEmotionAnalysis).toBeNull();
+    expect(result.current.threeWayAnalysis).toBeNull();
+  });
+
+  it("should update current analysis directly", () => {
+    const { result } = renderHook(() => useChatAnalysisState());
+
+    act(() => {
+      result.current.setCurrentAnalysis((prev) => ({ ...prev, emotion: "Joy" }));
     });
 
-    it("should update current analysis directly", () => {
-        const { result } = renderHook(() => useChatAnalysisState());
+    expect(result.current.currentAnalysis.emotion).toBe("Joy");
+  });
 
-        act(() => {
-            result.current.setCurrentAnalysis((prev) => ({ ...prev, emotion: "Joy" }));
-        });
+  it("should update multi-emotion analysis", () => {
+    const { result } = renderHook(() => useChatAnalysisState());
+    const mockMulti = {
+      emotions: [],
+      relationships: [],
+      aggregate_state: { vac: [0, 0, 0], category: "test" },
+    };
 
-        expect(result.current.currentAnalysis.emotion).toBe("Joy");
+    act(() => {
+      // @ts-ignore - mock minimal
+      result.current.setMultiEmotionAnalysis(mockMulti);
     });
 
-    it("should update multi-emotion analysis", () => {
-        const { result } = renderHook(() => useChatAnalysisState());
-        const mockMulti = { emotions: [], relationships: [], aggregate_state: { vac: [0, 0, 0], category: "test" } };
+    expect(result.current.multiEmotionAnalysis).toBe(mockMulti);
+  });
 
-        act(() => {
-            // @ts-ignore - mock minimal
-            result.current.setMultiEmotionAnalysis(mockMulti);
-        });
+  it("should clear analysis with optional blob", () => {
+    const { result } = renderHook(() => useChatAnalysisState());
 
-        expect(result.current.multiEmotionAnalysis).toBe(mockMulti);
+    // Set dirty state
+    act(() => {
+      result.current.setCurrentAnalysis((prev) => ({ ...prev, emotion: "Joy" }));
+      // @ts-ignore
+      result.current.setMultiEmotionAnalysis({});
     });
 
-    it("should clear analysis with optional blob", () => {
-        const { result } = renderHook(() => useChatAnalysisState());
-
-        // Set dirty state
-        act(() => {
-            result.current.setCurrentAnalysis((prev) => ({ ...prev, emotion: "Joy" }));
-            // @ts-ignore
-            result.current.setMultiEmotionAnalysis({});
-        });
-
-        const mockBlob = new Blob([]);
-        act(() => {
-            result.current.clearAnalysis(mockBlob);
-        });
-
-        expect(result.current.currentAnalysis.emotion).toBeNull();
-        expect(result.current.currentAnalysis.audioBlob).toBe(mockBlob);
-        expect(result.current.multiEmotionAnalysis).toBeNull();
+    const mockBlob = new Blob([]);
+    act(() => {
+      result.current.clearAnalysis(mockBlob);
     });
+
+    expect(result.current.currentAnalysis.emotion).toBeNull();
+    expect(result.current.currentAnalysis.audioBlob).toBe(mockBlob);
+    expect(result.current.multiEmotionAnalysis).toBeNull();
+  });
 });

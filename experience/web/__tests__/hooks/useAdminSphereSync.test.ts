@@ -7,9 +7,9 @@ jest.mock("@/hooks/sync/useSelectionSync");
 jest.mock("@/hooks/sync/usePathSync");
 
 describe("useAdminSphereSync", () => {
-    it("should call sync hooks", () => {
-        renderHook(() => useAdminSphereSync());
-        expect(useSelectionSync).toHaveBeenCalled();
-        expect(usePathSync).toHaveBeenCalled();
-    });
+  it("should call sync hooks", () => {
+    renderHook(() => useAdminSphereSync());
+    expect(useSelectionSync).toHaveBeenCalled();
+    expect(usePathSync).toHaveBeenCalled();
+  });
 });

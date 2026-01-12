@@ -3,14 +3,13 @@ import { ChatInput } from "@/components/admin/chat/ChatInput";
 
 // Mock VoiceRecorder to test integration
 jest.mock("@/components/admin/shared/VoiceRecorder", () => ({
-  VoiceRecorder: ({ isOpen, onClose, onSend }: any) => (
+  VoiceRecorder: ({ isOpen, onClose, onSend }: any) =>
     isOpen ? (
       <div data-testid="voice-recorder-modal">
         <button onClick={onClose}>Close</button>
         <button onClick={() => onSend("Transcribed text")}>Send Voice</button>
       </div>
-    ) : null
-  )
+    ) : null,
 }));
 
 describe("ChatInput", () => {

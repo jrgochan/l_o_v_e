@@ -17,7 +17,7 @@ export function useVoiceVisualizer(stream: MediaStream | null) {
         cancelAnimationFrame(animationFrameRef.current);
         animationFrameRef.current = null;
       }
-      setAudioLevel(0);
+      setTimeout(() => setAudioLevel(0), 0);
       return;
     }
 

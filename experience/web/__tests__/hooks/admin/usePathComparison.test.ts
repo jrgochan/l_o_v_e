@@ -12,7 +12,7 @@ describe("usePathComparison", () => {
       requires_bridge: false,
       from: { id: "a" } as any,
       to: { id: "b" } as any,
-      estimated_time: 1
+      estimated_time: "5m",
     },
     {
       id: "p2",
@@ -22,8 +22,8 @@ describe("usePathComparison", () => {
       requires_bridge: true,
       from: { id: "a" } as any,
       to: { id: "c" } as any,
-      estimated_time: 2
-    }
+      estimated_time: "10m",
+    },
   ];
 
   it("should calculate metrics correctly", () => {

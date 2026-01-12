@@ -1,7 +1,7 @@
-import { ConfirmDialog } from '../../../../components/admin/settings/ConfirmDialog';
+import { ConfirmDialog } from "../../../../components/admin/settings/ConfirmDialog";
 
-describe('ConfirmDialog', () => {
-    it('should be defined', () => {
-        expect(ConfirmDialog).toBeDefined();
-    });
+describe("ConfirmDialog", () => {
+  it("should be defined", () => {
+    expect(ConfirmDialog).toBeDefined();
+  });
 });

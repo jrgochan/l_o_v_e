@@ -1,7 +1,7 @@
-import { NetworkSettings } from '../../../../components/admin/settings/NetworkSettings';
+import { NetworkSettings } from "../../../../components/admin/settings/NetworkSettings";
 
-describe('NetworkSettings', () => {
-    it('should be defined', () => {
-        expect(NetworkSettings).toBeDefined();
-    });
+describe("NetworkSettings", () => {
+  it("should be defined", () => {
+    expect(NetworkSettings).toBeDefined();
+  });
 });

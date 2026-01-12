@@ -11,6 +11,7 @@ import { Suspense, useState, useEffect } from "react";
 import Link from "next/link";
 import { Canvas } from "@react-three/fiber";
 import { OrbitControls as DreiOrbitControls } from "@react-three/drei";
+import type { TransitionPathResponse } from "@love/experience-shared";
 import { useEmotionAtlas } from "@/hooks/useEmotionAtlas";
 import { usePathCalculator } from "@/hooks/usePathCalculator";
 import { useKeyboardShortcuts } from "@/hooks/useKeyboardShortcuts";
@@ -30,7 +31,7 @@ import {
   EmotionLabelTracker,
   type LabelPosition,
 } from "@/components/admin/atlas/EmotionLabelTracker";
-import { ZenHUD } from "@/components/admin/atlas/ZenHUD";
+
 import { PathMatrixGrid } from "@/components/admin/visualizations/PathMatrix";
 import { HelpModal } from "@/components/admin/modals/HelpModal";
 import { ChatPanel } from "@/components/admin/ChatPanel";
@@ -41,7 +42,6 @@ import { useCommandPalette } from "@/hooks/useCommandPalette";
 import { PathFlyover } from "@/components/admin/atlas/PathFlyover";
 import { IntroSequence } from "@/components/admin/atlas/IntroSequence";
 import { useAmbientAudio } from "@/hooks/useAmbientAudio";
-import { ComponentType } from "react";
 import { VACAnimator } from "@/components/VACAnimator";
 import { DebugBroadcaster } from "@/components/DebugBroadcaster";
 import { PathDetailsOverlay } from "@/components/PathDetailsOverlay";
@@ -209,19 +209,19 @@ const AtlasAdminContent = () => {
         const emotions = state.allEmotions;
 
         // 1. Get unique categories
-        const categories = Array.from(new Set(emotions.map(e => e.category))).sort();
+        const categories = Array.from(new Set(emotions.map((e) => e.category))).sort();
         if (categories.length === 0) return;
 
         // 2. Find current category index
-        const currentCat = transitionPath?.current_state.emotion ?
-          emotions.find(e => e.name === transitionPath.current_state.emotion)?.category :
-          categories[0];
+        const currentCat = transitionPath?.current_state.emotion
+          ? emotions.find((e) => e.name === transitionPath.current_state.emotion)?.category
+          : categories[0];
 
-        let nextIdx = (categories.indexOf(currentCat || "") + 1) % categories.length;
+        const nextIdx = (categories.indexOf(currentCat || "") + 1) % categories.length;
         const nextCat = categories[nextIdx];
 
         // 3. Pick 2 random emotions
-        const catEmotions = emotions.filter(e => e.category === nextCat);
+        const catEmotions = emotions.filter((e) => e.category === nextCat);
         if (catEmotions.length >= 2) {
           const start = catEmotions[Math.floor(Math.random() * catEmotions.length)];
           let end = catEmotions[Math.floor(Math.random() * catEmotions.length)];
@@ -230,20 +230,49 @@ const AtlasAdminContent = () => {
           }
 
           // 4. Generate & Set Path
-          const newPath: any = {
-            current_state: { emotion: start.name, vac: start.vac },
-            goal_state: { emotion: end.name, vac: end.vac },
+          const newPath: TransitionPathResponse = {
+            path_id: "generated-" + Date.now().toString(),
+            created_at: new Date().toISOString(),
+            current_state: {
+              emotion: start.name,
+              category: start.category,
+              vac: start.vac,
+              quaternion: [0, 0, 0, 1],
+            },
+            goal_state: {
+              emotion: end.name,
+              category: end.category,
+              vac: end.vac,
+              quaternion: [0, 0, 0, 1],
+            },
             waypoints: [
               {
+                order: 1,
                 emotion: "Transition",
+                category: nextCat,
                 vac: [
                   (start.vac[0] + end.vac[0]) / 2,
                   (start.vac[1] + end.vac[1]) / 2,
-                  (start.vac[2] + end.vac[2]) / 2
+                  (start.vac[2] + end.vac[2]) / 2,
                 ],
-                reasoning: `Exploring ${nextCat}`
-              }
-            ]
+                quaternion: [0, 0, 0, 1],
+                distance_from_previous: 0.5,
+                estimated_time: "10s",
+                difficulty: "easy",
+                reasoning: `Exploring ${nextCat}`,
+                strategies: [],
+              },
+            ],
+            visualization_data: {},
+            path_metrics: {
+              total_distance: 0,
+              total_estimated_time: "20s",
+              overall_difficulty: "easy",
+              success_probability: 0.9,
+              requires_external_support: false,
+            },
+            alternatives: [],
+            personalization_notes: [],
           };
           // Update Experience Store (broadcasts to viewer)
           useExperienceStore.getState().setTransitionPath(newPath);
@@ -259,19 +288,20 @@ const AtlasAdminContent = () => {
         const emotions = state.allEmotions;
 
         // 1. Get unique categories
-        const categories = Array.from(new Set(emotions.map(e => e.category))).sort();
+        const categories = Array.from(new Set(emotions.map((e) => e.category))).sort();
         if (categories.length === 0) return;
 
         // 2. Find current category index
-        const currentCat = transitionPath?.current_state.emotion ?
-          emotions.find(e => e.name === transitionPath.current_state.emotion)?.category :
-          categories[0];
+        const currentCat = transitionPath?.current_state.emotion
+          ? emotions.find((e) => e.name === transitionPath.current_state.emotion)?.category
+          : categories[0];
 
-        let prevIdx = (categories.indexOf(currentCat || "") - 1 + categories.length) % categories.length;
+        const prevIdx =
+          (categories.indexOf(currentCat || "") - 1 + categories.length) % categories.length;
         const prevCat = categories[prevIdx];
 
         // 3. Pick 2 random emotions
-        const catEmotions = emotions.filter(e => e.category === prevCat);
+        const catEmotions = emotions.filter((e) => e.category === prevCat);
         if (catEmotions.length >= 2) {
           const start = catEmotions[Math.floor(Math.random() * catEmotions.length)];
           let end = catEmotions[Math.floor(Math.random() * catEmotions.length)];
@@ -280,20 +310,49 @@ const AtlasAdminContent = () => {
           }
 
           // 4. Generate & Set Path
-          const newPath: any = {
-            current_state: { emotion: start.name, vac: start.vac },
-            goal_state: { emotion: end.name, vac: end.vac },
+          const newPath: TransitionPathResponse = {
+            path_id: "generated-" + Date.now().toString(),
+            created_at: new Date().toISOString(),
+            current_state: {
+              emotion: start.name,
+              category: start.category,
+              vac: start.vac,
+              quaternion: [0, 0, 0, 1],
+            },
+            goal_state: {
+              emotion: end.name,
+              category: end.category,
+              vac: end.vac,
+              quaternion: [0, 0, 0, 1],
+            },
             waypoints: [
               {
+                order: 1,
                 emotion: "Transition",
+                category: prevCat,
                 vac: [
                   (start.vac[0] + end.vac[0]) / 2,
                   (start.vac[1] + end.vac[1]) / 2,
-                  (start.vac[2] + end.vac[2]) / 2
+                  (start.vac[2] + end.vac[2]) / 2,
                 ],
-                reasoning: `Exploring ${prevCat}`
-              }
-            ]
+                quaternion: [0, 0, 0, 1],
+                distance_from_previous: 0.5,
+                estimated_time: "10s",
+                difficulty: "easy",
+                reasoning: `Exploring ${prevCat}`,
+                strategies: [],
+              },
+            ],
+            visualization_data: {},
+            path_metrics: {
+              total_distance: 0,
+              total_estimated_time: "20s",
+              overall_difficulty: "easy",
+              success_probability: 0.9,
+              requires_external_support: false,
+            },
+            alternatives: [],
+            personalization_notes: [],
           };
           // Update Experience Store
           useExperienceStore.getState().setTransitionPath(newPath);
@@ -302,7 +361,6 @@ const AtlasAdminContent = () => {
       }
       // Next Path Variation in Category (ArrowUp/Down)
       if ((key === "arrowup" || key === "arrowdown") && !e.ctrlKey && !e.metaKey) {
-        console.log("[DEBUG] Admin ArrowUp/Down Handler Fired", key);
         e.preventDefault();
         e.stopPropagation(); // Try to stop OrbitControls from hijacking
 
@@ -312,12 +370,14 @@ const AtlasAdminContent = () => {
         // 1. Identify current category
         let currentCat = "Joy"; // Default
         if (transitionPath?.current_state.emotion) {
-          const currentEmotion = emotions.find(e => e.name === transitionPath.current_state.emotion);
+          const currentEmotion = emotions.find(
+            (e) => e.name === transitionPath.current_state.emotion
+          );
           if (currentEmotion) currentCat = currentEmotion.category;
         }
 
         // 2. Get all emotions in this category
-        const catEmotions = emotions.filter(e => e.category === currentCat);
+        const catEmotions = emotions.filter((e) => e.category === currentCat);
 
         // 3. Generate New Random Path
         if (catEmotions.length >= 2) {
@@ -328,20 +388,49 @@ const AtlasAdminContent = () => {
           }
 
           // 4. Generate & Set Path
-          const newPath: any = {
-            current_state: { emotion: start.name, vac: start.vac },
-            goal_state: { emotion: end.name, vac: end.vac },
+          const newPath: TransitionPathResponse = {
+            path_id: "generated-" + Date.now().toString(),
+            created_at: new Date().toISOString(),
+            current_state: {
+              emotion: start.name,
+              category: start.category,
+              vac: start.vac,
+              quaternion: [0, 0, 0, 1],
+            },
+            goal_state: {
+              emotion: end.name,
+              category: end.category,
+              vac: end.vac,
+              quaternion: [0, 0, 0, 1],
+            },
             waypoints: [
               {
+                order: 1,
                 emotion: "Transition",
+                category: currentCat,
                 vac: [
                   (start.vac[0] + end.vac[0]) / 2,
                   (start.vac[1] + end.vac[1]) / 2,
-                  (start.vac[2] + end.vac[2]) / 2
+                  (start.vac[2] + end.vac[2]) / 2,
                 ],
-                reasoning: `Exploring ${currentCat} Variation`
-              }
-            ]
+                quaternion: [0, 0, 0, 1],
+                distance_from_previous: 0.5,
+                estimated_time: "10s",
+                difficulty: "easy",
+                reasoning: `Exploring ${currentCat} Variation`,
+                strategies: [],
+              },
+            ],
+            visualization_data: {},
+            path_metrics: {
+              total_distance: 0,
+              total_estimated_time: "20s",
+              overall_difficulty: "easy",
+              success_probability: 0.9,
+              requires_external_support: false,
+            },
+            alternatives: [],
+            personalization_notes: [],
           };
           // Update Experience Store
           useExperienceStore.getState().setTransitionPath(newPath);
@@ -403,10 +492,11 @@ const AtlasAdminContent = () => {
                 toggleMute();
                 playClickSound();
               }}
-              className={`px-3 py-2 rounded transition flex items-center gap-2 text-sm ${isMuted
-                ? "bg-red-900/50 text-red-200 hover:bg-red-800/50"
-                : "bg-gray-700 text-white hover:bg-gray-600"
-                }`}
+              className={`px-3 py-2 rounded transition flex items-center gap-2 text-sm ${
+                isMuted
+                  ? "bg-red-900/50 text-red-200 hover:bg-red-800/50"
+                  : "bg-gray-700 text-white hover:bg-gray-600"
+              }`}
               title={isMuted ? "Unmute Audio" : "Mute Audio"}
             >
               {isMuted ? "🔇" : "🔊"}
@@ -519,8 +609,9 @@ const AtlasAdminContent = () => {
         {!isInfoPanelExpanded && areSidebarsVisible && (
           <div
             onMouseDown={handleMouseDown}
-            className={`w-2 flex-shrink-0 bg-gray-700 hover:bg-cyan-500 cursor-col-resize transition flex items-center justify-center ${isResizing ? "bg-cyan-500" : ""
-              }`}
+            className={`w-2 flex-shrink-0 bg-gray-700 hover:bg-cyan-500 cursor-col-resize transition flex items-center justify-center ${
+              isResizing ? "bg-cyan-500" : ""
+            }`}
             style={{ touchAction: "none" }}
           >
             <div className="w-px h-8 bg-gray-500" />

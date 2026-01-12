@@ -1,8 +1,4 @@
-import {
-  SETTINGS_PRESETS,
-  getPresetById,
-  getPresetNames
-} from "@/utils/settingsPresets";
+import { SETTINGS_PRESETS, getPresetById, getPresetNames } from "@/utils/settingsPresets";
 
 describe("settingsPresets", () => {
   it("should define core presets", () => {
@@ -12,7 +8,7 @@ describe("settingsPresets", () => {
   });
 
   it("should parse valid JSON settings", () => {
-    SETTINGS_PRESETS.forEach(preset => {
+    SETTINGS_PRESETS.forEach((preset) => {
       const parsed = JSON.parse(preset.settings);
       expect(parsed.version).toBe("1.0");
       expect(parsed.settings.visual).toBeDefined();

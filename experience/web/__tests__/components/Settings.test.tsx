@@ -32,7 +32,7 @@ describe("Settings Component", () => {
       setAnimationSpeed: jest.fn(),
       toggleDebugInfo: jest.fn(),
       resetToDefaults: jest.fn(),
-      clearAllData: jest.fn()
+      clearAllData: jest.fn(),
     });
   });
 
@@ -56,7 +56,7 @@ describe("Settings Component", () => {
     mockTestConnection.mockResolvedValue({
       observer: { connected: true },
       listener: { connected: false },
-      versor: { connected: false }
+      versor: { connected: false },
     });
 
     render(<Settings />);
@@ -74,7 +74,7 @@ describe("Settings Component", () => {
     const mockSetSpeed = jest.fn();
     (useSettingsStore as unknown as jest.Mock).mockReturnValue({
       ...useSettingsStore(),
-      setAnimationSpeed: mockSetSpeed
+      setAnimationSpeed: mockSetSpeed,
     });
 
     render(<Settings />);

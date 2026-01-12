@@ -165,6 +165,9 @@ export function BaseSphere({
       {/* Render children (for custom additions like rings, particles, etc.) */}
       {}
       {}
+      {}
+      {}
+      {}
       {typeof children === "function" ? children(meshRef, materialRef) : children}
     </group>
   );

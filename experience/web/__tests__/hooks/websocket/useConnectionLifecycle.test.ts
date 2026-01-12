@@ -95,7 +95,7 @@ describe("useConnectionLifecycle", () => {
   it("should handle errors (onError)", () => {
     renderHook(() => useConnectionLifecycle(props));
 
-    const mockEvent = { type: 'error' } as Event;
+    const mockEvent = { type: "error" } as Event;
     act(() => {
       capturedCallbacks.onError(mockEvent);
     });
@@ -120,11 +120,13 @@ describe("useConnectionLifecycle", () => {
   });
 
   it("should maintain stable connect function reference", () => {
-    const { result, rerender } = renderHook((p) => useConnectionLifecycle(p), { initialProps: props });
+    const { result, rerender } = renderHook((p) => useConnectionLifecycle(p), {
+      initialProps: props,
+    });
     const firstConnect = result.current.connect;
 
     // Rerender with new props
-    rerender({ ...props, onMessage: () => { } });
+    rerender({ ...props, onMessage: () => {} });
 
     expect(result.current.connect).toBe(firstConnect);
   });
@@ -160,7 +162,7 @@ describe("useConnectionLifecycle", () => {
     });
 
     // Manually modify the mock ref to simulate OPEN state check
-    // Since wsRef is internal to hook, we can't easily set readyState on it from outside 
+    // Since wsRef is internal to hook, we can't easily set readyState on it from outside
     // without access to the ws object returned by createWebSocketConnection.
     // The mockWebSocket defined above has readyState: WebSocket.OPEN.
 
@@ -168,7 +170,7 @@ describe("useConnectionLifecycle", () => {
     (createWebSocketConnection as jest.Mock).mockClear();
 
     // Call connect again (exposed via result)
-    const { result } = renderHook(() => useConnectionLifecycle({ ...props, enabled: false })); // Disabled initially to control connect manually
+    renderHook(() => useConnectionLifecycle({ ...props, enabled: false })); // Disabled initially to control connect manually
 
     // But wait, we need to share the same hook instance.
     // Rerendering approach:
@@ -201,13 +203,15 @@ describe("useConnectionLifecycle", () => {
   });
 
   it("should clear disconnect timeout on disconnect", () => {
-    // We need to simulate the timeout ref being set. 
+    // We need to simulate the timeout ref being set.
     // `handleSocketClose` sets usage of the timeout ref passed to it.
     // Since `handleSocketClose` is mocked, we can simulate it setting the ref using the args passed to it.
 
     // Mock handleSocketClose to set the timeout
-    (require("@/hooks/websocket/utils/socketHelpers").handleSocketClose as jest.Mock).mockImplementationOnce((e, options) => {
-      options.timeoutRef.current = setTimeout(() => { }, 1000);
+    (
+      require("@/hooks/websocket/utils/socketHelpers").handleSocketClose as jest.Mock
+    ).mockImplementationOnce((e, options) => {
+      options.timeoutRef.current = setTimeout(() => {}, 1000);
     });
 
     const { result } = renderHook(() => useConnectionLifecycle(props));
@@ -229,4 +233,3 @@ describe("useConnectionLifecycle", () => {
     expect(props.setIsConnected).toHaveBeenCalledWith(false);
   });
 });
-

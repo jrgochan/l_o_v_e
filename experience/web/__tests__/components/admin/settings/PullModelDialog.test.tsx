@@ -1,7 +1,7 @@
-import { PullModelDialog } from '../../../../components/admin/settings/PullModelDialog';
+import { PullModelDialog } from "../../../../components/admin/settings/PullModelDialog";
 
-describe('PullModelDialog', () => {
-    it('should be defined', () => {
-        expect(PullModelDialog).toBeDefined();
-    });
+describe("PullModelDialog", () => {
+  it("should be defined", () => {
+    expect(PullModelDialog).toBeDefined();
+  });
 });

@@ -56,7 +56,7 @@ export const useEmotionHistoryStore = create<EmotionHistoryState>((set, get) => 
     };
 
     set((state) => {
-      // Limit history to 50 
+      // Limit history to 50
       const updatedEntries = [...state.entries, newEntry];
       if (updatedEntries.length > 50) {
         return { entries: updatedEntries.slice(updatedEntries.length - 50) };

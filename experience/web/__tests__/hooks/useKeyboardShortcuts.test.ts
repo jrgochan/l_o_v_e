@@ -7,27 +7,27 @@ const mockNavigationShortcuts = jest.fn();
 const mockSiteShortcuts = jest.fn();
 
 jest.mock("../../hooks/shortcuts/useLayerShortcuts", () => ({
-    useLayerShortcuts: () => mockLayerShortcuts()
+  useLayerShortcuts: () => mockLayerShortcuts(),
 }));
 
 jest.mock("../../hooks/shortcuts/useNavigationShortcuts", () => ({
-    useNavigationShortcuts: () => mockNavigationShortcuts()
+  useNavigationShortcuts: () => mockNavigationShortcuts(),
 }));
 
 jest.mock("../../hooks/shortcuts/useSiteShortcuts", () => ({
-    useSiteShortcuts: () => mockSiteShortcuts()
+  useSiteShortcuts: () => mockSiteShortcuts(),
 }));
 
 describe("useKeyboardShortcuts", () => {
-    beforeEach(() => {
-        jest.clearAllMocks();
-    });
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
 
-    it("should initialize all shortcut groups", () => {
-        renderHook(() => useKeyboardShortcuts());
+  it("should initialize all shortcut groups", () => {
+    renderHook(() => useKeyboardShortcuts());
 
-        expect(mockLayerShortcuts).toHaveBeenCalled();
-        expect(mockNavigationShortcuts).toHaveBeenCalled();
-        expect(mockSiteShortcuts).toHaveBeenCalled();
-    });
+    expect(mockLayerShortcuts).toHaveBeenCalled();
+    expect(mockNavigationShortcuts).toHaveBeenCalled();
+    expect(mockSiteShortcuts).toHaveBeenCalled();
+  });
 });

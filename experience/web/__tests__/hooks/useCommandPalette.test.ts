@@ -10,97 +10,97 @@ const mockExecuteAction = jest.fn();
 
 // Mock sub-hooks
 jest.mock("../../hooks/command-palette/useCommandPaletteState", () => ({
-    useCommandPaletteState: () => ({
-        isOpen: true,
-        currentPage: "home",
-        selectedCategory: "all",
-        search: "",
-        open: mockOpen,
-        close: mockClose,
-        toggle: mockToggle,
-        setPage: jest.fn(),
-        setCategory: jest.fn(),
-        setSearch: mockSetSearch,
-    })
+  useCommandPaletteState: () => ({
+    isOpen: true,
+    currentPage: "home",
+    selectedCategory: "all",
+    search: "",
+    open: mockOpen,
+    close: mockClose,
+    toggle: mockToggle,
+    setPage: jest.fn(),
+    setCategory: jest.fn(),
+    setSearch: mockSetSearch,
+  }),
 }));
 
 jest.mock("../../hooks/command-palette/useCommandPaletteData", () => ({
-    useCommandPaletteData: () => ({
-        recentEmotions: [],
-        favoriteEmotions: [],
-        addToRecent: jest.fn(),
-        toggleFavorite: jest.fn(),
-        isRecent: () => false,
-        isFavorite: () => false,
-    })
+  useCommandPaletteData: () => ({
+    recentEmotions: [],
+    favoriteEmotions: [],
+    addToRecent: jest.fn(),
+    toggleFavorite: jest.fn(),
+    isRecent: () => false,
+    isFavorite: () => false,
+  }),
 }));
 
 jest.mock("../../hooks/command-palette/useCommandPaletteActions", () => ({
-    useCommandPaletteActions: () => ({
-        executeAction: mockExecuteAction,
-        executeQuickAction: jest.fn(),
-    })
+  useCommandPaletteActions: () => ({
+    executeAction: mockExecuteAction,
+    executeQuickAction: jest.fn(),
+  }),
 }));
 
 jest.mock("../../hooks/command-palette/useCommandPaletteFilter", () => ({
-    useCommandPaletteFilter: () => ({
-        filteredEmotions: [{ id: "1", name: "Joy" }],
-    })
+  useCommandPaletteFilter: () => ({
+    filteredEmotions: [{ id: "1", name: "Joy" }],
+  }),
 }));
 
 jest.mock("../../hooks/command-palette/useCommandPaletteNavigation", () => ({
-    useCommandPaletteNavigation: () => ({
-        selectedIndex: 0,
-        setSelectedIndex: jest.fn(),
-        handleKeyDown: jest.fn(),
-    })
+  useCommandPaletteNavigation: () => ({
+    selectedIndex: 0,
+    setSelectedIndex: jest.fn(),
+    handleKeyDown: jest.fn(),
+  }),
 }));
 
 jest.mock("@/stores/useAtlasAdminStore", () => ({
-    useAtlasAdminStore: () => []
+  useAtlasAdminStore: () => [],
 }));
 
 describe("useCommandPalette", () => {
-    beforeEach(() => {
-        jest.clearAllMocks();
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
+
+  it("should initialize and return state/actions", () => {
+    const { result } = renderHook(() => useCommandPalette());
+
+    expect(result.current.isOpen).toBe(true);
+    expect(result.current.filteredEmotions).toHaveLength(1);
+    expect(result.current.filteredEmotions[0].name).toBe("Joy");
+  });
+
+  it("should handle global keyboard shortcut (Cmd+K)", () => {
+    renderHook(() => useCommandPalette());
+
+    const event = new KeyboardEvent("keydown", {
+      key: "k",
+      metaKey: true,
+      bubbles: true,
     });
 
-    it("should initialize and return state/actions", () => {
-        const { result } = renderHook(() => useCommandPalette());
+    // Spy on preventDefault since we are mocking the event
+    const preventDefaultSpy = jest.spyOn(event, "preventDefault");
 
-        expect(result.current.isOpen).toBe(true);
-        expect(result.current.filteredEmotions).toHaveLength(1);
-        expect(result.current.filteredEmotions[0].name).toBe("Joy");
+    window.dispatchEvent(event);
+
+    expect(mockToggle).toHaveBeenCalled();
+    // expect(preventDefaultSpy).toHaveBeenCalled(); // Dispatching manually doesn't always trigger spy properly on preventDefault unless setup perfectly, but the handler call is enough.
+  });
+
+  it("should handle global Escape key", () => {
+    renderHook(() => useCommandPalette());
+
+    const event = new KeyboardEvent("keydown", {
+      key: "Escape",
+      bubbles: true,
     });
 
-    it("should handle global keyboard shortcut (Cmd+K)", () => {
-        renderHook(() => useCommandPalette());
+    window.dispatchEvent(event);
 
-        const event = new KeyboardEvent("keydown", {
-            key: "k",
-            metaKey: true,
-            bubbles: true
-        });
-
-        // Spy on preventDefault since we are mocking the event
-        const preventDefaultSpy = jest.spyOn(event, "preventDefault");
-
-        window.dispatchEvent(event);
-
-        expect(mockToggle).toHaveBeenCalled();
-        // expect(preventDefaultSpy).toHaveBeenCalled(); // Dispatching manually doesn't always trigger spy properly on preventDefault unless setup perfectly, but the handler call is enough.
-    });
-
-    it("should handle global Escape key", () => {
-        renderHook(() => useCommandPalette());
-
-        const event = new KeyboardEvent("keydown", {
-            key: "Escape",
-            bubbles: true
-        });
-
-        window.dispatchEvent(event);
-
-        expect(mockClose).toHaveBeenCalled();
-    });
+    expect(mockClose).toHaveBeenCalled();
+  });
 });

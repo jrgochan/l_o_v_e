@@ -22,7 +22,11 @@ jest.mock("cmdk", () => {
   const List = ({ children }: any) => <div>{children}</div>;
 
   // Main component
-  const Command = ({ children, onKeyDown }: any) => <div data-testid="command-root" onKeyDown={onKeyDown}>{children}</div>;
+  const Command = ({ children, onKeyDown }: any) => (
+    <div data-testid="command-root" onKeyDown={onKeyDown}>
+      {children}
+    </div>
+  );
 
   // Assign statics
   Command.Input = Input;
@@ -34,19 +38,19 @@ jest.mock("cmdk", () => {
 jest.mock("@/hooks/useCommandPalette");
 jest.mock("@/hooks/command-palette/useCommandPaletteFilter");
 jest.mock("@/stores/useAtlasAdminStore", () => ({
-  useAtlasAdminStore: jest.fn(() => [])
+  useAtlasAdminStore: jest.fn(() => []),
 }));
 jest.mock("@/stores/useExperienceStore", () => ({
-  useExperienceStore: jest.fn(() => null)
+  useExperienceStore: jest.fn(() => null),
 }));
 jest.mock("@/components/command-palette/ActiveJourneyStatus", () => ({
-  ActiveJourneyStatus: () => <div>Status</div>
+  ActiveJourneyStatus: () => <div>Status</div>,
 }));
 jest.mock("@/components/command-palette/PaletteResults", () => ({
-  PaletteResults: () => <div>Results</div>
+  PaletteResults: () => <div>Results</div>,
 }));
 jest.mock("@/components/command-palette/PaletteHelp", () => ({
-  PaletteHelp: () => <div>Help</div>
+  PaletteHelp: () => <div>Help</div>,
 }));
 
 describe("CommandPalette", () => {
@@ -64,7 +68,7 @@ describe("CommandPalette", () => {
       close: mockClose,
       open: mockOpen,
       setSearch: mockSetSearch,
-      currentPage: "home"
+      currentPage: "home",
     });
 
     (useCommandPaletteFilter as jest.Mock).mockReturnValue({
@@ -72,7 +76,7 @@ describe("CommandPalette", () => {
       filteredPaths: [],
       recentEmotionsList: [],
       favoriteEmotionsList: [],
-      emotionsByCategory: {}
+      emotionsByCategory: {},
     });
   });
 

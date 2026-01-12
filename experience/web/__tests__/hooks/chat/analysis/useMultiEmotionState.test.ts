@@ -2,99 +2,135 @@ import { renderHook, act } from "@testing-library/react";
 import { useMultiEmotionState } from "@/hooks/chat/analysis/useMultiEmotionState";
 
 describe("useMultiEmotionState", () => {
-    const sessionId = "session-123";
+  const sessionId = "session-123";
 
-    it("should initialize with null states", () => {
-        const { result } = renderHook(() => useMultiEmotionState(sessionId));
+  it("should initialize with null states", () => {
+    const { result } = renderHook(() => useMultiEmotionState(sessionId));
 
-        expect(result.current.multiEmotionAnalysis).toBeNull();
-        expect(result.current.threeWayAnalysis).toBeNull();
+    expect(result.current.multiEmotionAnalysis).toBeNull();
+    expect(result.current.threeWayAnalysis).toBeNull();
+  });
+
+  it("should add multi-emotion analysis", () => {
+    const { result } = renderHook(() => useMultiEmotionState(sessionId));
+
+    act(() => {
+      result.current.addMultiEmotion(
+        "joy",
+        "happiness",
+        { valence: 0.8, arousal: 0.5, connection: 0.5 },
+        0.9,
+        "primary"
+      );
     });
 
-    it("should add multi-emotion analysis", () => {
-        const { result } = renderHook(() => useMultiEmotionState(sessionId));
+    expect(result.current.multiEmotionAnalysis).not.toBeNull();
+    expect(result.current.multiEmotionAnalysis?.emotions).toHaveLength(1);
+    expect(result.current.multiEmotionAnalysis?.emotions[0].emotion_name).toBe("joy");
+    expect(result.current.multiEmotionAnalysis?.session_id).toBe(sessionId);
+  });
 
-        act(() => {
-            result.current.addMultiEmotion(
-                "joy",
-                "happiness",
-                { valence: 0.8, arousal: 0.5, dominance: 0.5 },
-                0.9,
-                "dominant"
-            );
-        });
+  it("should add multiple emotions", () => {
+    const { result } = renderHook(() => useMultiEmotionState(sessionId));
 
-        expect(result.current.multiEmotionAnalysis).not.toBeNull();
-        expect(result.current.multiEmotionAnalysis?.emotions).toHaveLength(1);
-        expect(result.current.multiEmotionAnalysis?.emotions[0].emotion_name).toBe("joy");
-        expect(result.current.multiEmotionAnalysis?.session_id).toBe(sessionId);
+    act(() => {
+      result.current.addMultiEmotion(
+        "joy",
+        "happiness",
+        { valence: 0.8, arousal: 0.5, connection: 0.5 },
+        0.9,
+        "primary"
+      );
     });
 
-    it("should add multiple emotions", () => {
-        const { result } = renderHook(() => useMultiEmotionState(sessionId));
-
-        act(() => {
-            result.current.addMultiEmotion("joy", "happiness", { valence: 0.8, arousal: 0.5, dominance: 0.5 }, 0.9, "dominant");
-        });
-
-        act(() => {
-            result.current.addMultiEmotion("surprise", "surprise", { valence: 0.5, arousal: 0.8, dominance: 0.5 }, 0.8, "secondary");
-        });
-
-        expect(result.current.multiEmotionAnalysis?.emotions).toHaveLength(2);
+    act(() => {
+      result.current.addMultiEmotion(
+        "surprise",
+        "surprise",
+        { valence: 0.5, arousal: 0.8, connection: 0.5 },
+        0.8,
+        "secondary"
+      );
     });
 
-    it("should add relationships", () => {
-        const { result } = renderHook(() => useMultiEmotionState(sessionId));
+    expect(result.current.multiEmotionAnalysis?.emotions).toHaveLength(2);
+  });
 
-        act(() => {
-            result.current.addMultiEmotion("joy", "happiness", { valence: 0.8, arousal: 0.5, dominance: 0.5 }, 0.9, "dominant");
-            result.current.addRelationship("joy", "surprise", "triggers", 0.8, " Joy leads to surprise");
-        });
+  it("should add relationships", () => {
+    const { result } = renderHook(() => useMultiEmotionState(sessionId));
 
-        expect(result.current.multiEmotionAnalysis?.relationships).toHaveLength(1);
-        expect(result.current.multiEmotionAnalysis?.relationships[0].emotion_a).toBe("joy");
+    act(() => {
+      result.current.addMultiEmotion(
+        "joy",
+        "happiness",
+        { valence: 0.8, arousal: 0.5, connection: 0.5 },
+        0.9,
+        "primary"
+      );
+      result.current.addRelationship(
+        "joy",
+        "surprise",
+        "sequential",
+        0.8,
+        " Joy leads to surprise"
+      );
     });
 
-    it("should update aggregate state", () => {
-        const { result } = renderHook(() => useMultiEmotionState(sessionId));
+    expect(result.current.multiEmotionAnalysis?.relationships).toHaveLength(1);
+    expect(result.current.multiEmotionAnalysis?.relationships[0].emotion_a).toBe("joy");
+  });
 
-        act(() => {
-            // Must init first
-            result.current.addMultiEmotion("joy", "happiness", { valence: 0.8, arousal: 0.5, dominance: 0.5 }, 0.9, "dominant");
-        });
+  it("should update aggregate state", () => {
+    const { result } = renderHook(() => useMultiEmotionState(sessionId));
 
-        act(() => {
-            result.current.updateAggregateState({
-                complexity_score: 0.8,
-                emotional_clarity: 0.9
-            });
-        });
-
-        expect(result.current.multiEmotionAnalysis?.aggregate.complexity_score).toBe(0.8);
+    act(() => {
+      // Must init first
+      result.current.addMultiEmotion(
+        "joy",
+        "happiness",
+        { valence: 0.8, arousal: 0.5, connection: 0.5 },
+        0.9,
+        "primary"
+      );
     });
 
-    it("should update three way analysis", () => {
-        const { result } = renderHook(() => useMultiEmotionState(sessionId));
-
-        const mockAnalysis: any = { id: "123" };
-
-        act(() => {
-            result.current.updateThreeWayAnalysis(mockAnalysis);
-        });
-
-        expect(result.current.threeWayAnalysis).toEqual(mockAnalysis);
+    act(() => {
+      result.current.updateAggregateState({
+        complexity_score: 0.8,
+        emotional_clarity: 0.9,
+      });
     });
 
-    it("should clear state", () => {
-        const { result } = renderHook(() => useMultiEmotionState(sessionId));
+    expect(result.current.multiEmotionAnalysis?.aggregate.complexity_score).toBe(0.8);
+  });
 
-        act(() => {
-            result.current.addMultiEmotion("joy", "happiness", { valence: 0.8, arousal: 0.5, dominance: 0.5 }, 0.9, "dominant");
-            result.current.clearMultiEmotionState();
-        });
+  it("should update three way analysis", () => {
+    const { result } = renderHook(() => useMultiEmotionState(sessionId));
 
-        expect(result.current.multiEmotionAnalysis).toBeNull();
-        expect(result.current.threeWayAnalysis).toBeNull();
+    const mockAnalysis: any = { id: "123" };
+
+    act(() => {
+      result.current.updateThreeWayAnalysis(mockAnalysis);
     });
+
+    expect(result.current.threeWayAnalysis).toEqual(mockAnalysis);
+  });
+
+  it("should clear state", () => {
+    const { result } = renderHook(() => useMultiEmotionState(sessionId));
+
+    act(() => {
+      result.current.addMultiEmotion(
+        "joy",
+        "happiness",
+        { valence: 0.8, arousal: 0.5, connection: 0.5 },
+        0.9,
+        "primary"
+      );
+      result.current.clearMultiEmotionState();
+    });
+
+    expect(result.current.multiEmotionAnalysis).toBeNull();
+    expect(result.current.threeWayAnalysis).toBeNull();
+  });
 });

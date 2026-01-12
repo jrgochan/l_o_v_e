@@ -7,25 +7,25 @@ jest.mock("@/hooks/ollama/useOllamaCRUD");
 jest.mock("@/hooks/ollama/useOllamaPull");
 
 describe("useOllamaModels", () => {
-    beforeEach(() => {
-        jest.clearAllMocks();
-        (useOllamaCRUD as jest.Mock).mockReturnValue({
-            localModels: [],
-            loading: false,
-            fetchLocalModels: jest.fn()
-        });
-        (useOllamaPull as jest.Mock).mockReturnValue({
-            pulling: {},
-            pullModel: jest.fn()
-        });
+  beforeEach(() => {
+    jest.clearAllMocks();
+    (useOllamaCRUD as jest.Mock).mockReturnValue({
+      localModels: [],
+      loading: false,
+      fetchLocalModels: jest.fn(),
     });
-
-    it("should compose CRUD and Pull hooks", () => {
-        const { result } = renderHook(() => useOllamaModels());
-
-        expect(useOllamaCRUD).toHaveBeenCalled();
-        expect(useOllamaPull).toHaveBeenCalled();
-        expect(result.current.localModels).toEqual([]);
-        expect(result.current.pulling).toEqual({});
+    (useOllamaPull as jest.Mock).mockReturnValue({
+      pulling: {},
+      pullModel: jest.fn(),
     });
+  });
+
+  it("should compose CRUD and Pull hooks", () => {
+    const { result } = renderHook(() => useOllamaModels());
+
+    expect(useOllamaCRUD).toHaveBeenCalled();
+    expect(useOllamaPull).toHaveBeenCalled();
+    expect(result.current.localModels).toEqual([]);
+    expect(result.current.pulling).toEqual({});
+  });
 });

@@ -9,7 +9,7 @@ interface TransportOptions {
 
 export function useSyncTransport({ mode, onMessage }: TransportOptions) {
   const channelRef = useRef<BroadcastChannel | null>(null);
-  const lastMessageRef = useRef<number>(0);
+  const [lastMessageTime, setLastMessageTime] = useState<number>(0);
   const [isConnected, setIsConnected] = useState(true);
 
   // Use ref for callback to make it stable
@@ -43,8 +43,8 @@ export function useSyncTransport({ mode, onMessage }: TransportOptions) {
       if (mode === "listener" && e.key === CHANNEL_NAME && e.newValue) {
         try {
           const msg = JSON.parse(e.newValue);
-          if (msg.timestamp > lastMessageRef.current) {
-            lastMessageRef.current = msg.timestamp;
+          if (msg.timestamp > lastMessageTime) {
+            setLastMessageTime(msg.timestamp);
             callbackRef.current?.(msg);
           }
         } catch (err) {
@@ -75,7 +75,7 @@ export function useSyncTransport({ mode, onMessage }: TransportOptions) {
         if (mode === "listener") {
           channelRef.current.onmessage = (event) => {
             const msg = event.data;
-            lastMessageRef.current = msg.timestamp;
+            setLastMessageTime(msg.timestamp);
             callbackRef.current?.(msg);
           };
         }
@@ -92,7 +92,7 @@ export function useSyncTransport({ mode, onMessage }: TransportOptions) {
       channelRef.current?.close();
       setIsConnected(false);
     };
-  }, [mode]);
+  }, [mode, lastMessageTime]);
 
-  return { sendMessage, isConnected, lastMessageTime: lastMessageRef.current };
+  return { sendMessage, isConnected, lastMessageTime };
 }

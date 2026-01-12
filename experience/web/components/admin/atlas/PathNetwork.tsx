@@ -26,10 +26,11 @@ export function PathNetwork() {
 
   // Identify active path from experience store (Browsing Mode)
   const activePathDetails = useMemo(() => {
-    if (!transitionPath?.current_state?.emotion || !transitionPath?.goal_state?.emotion) return null;
+    if (!transitionPath?.current_state?.emotion || !transitionPath?.goal_state?.emotion)
+      return null;
     return {
       from: transitionPath.current_state.emotion,
-      to: transitionPath.goal_state.emotion
+      to: transitionPath.goal_state.emotion,
     };
   }, [transitionPath]);
 
@@ -37,7 +38,7 @@ export function PathNetwork() {
   const paths = Array.from(computedPaths.values()).filter((path) => {
     const isSelected = selectedIds.has(path.from.id) && selectedIds.has(path.to.id);
     const isActive = activePathDetails
-      ? (path.from.name === activePathDetails.from && path.to.name === activePathDetails.to)
+      ? path.from.name === activePathDetails.from && path.to.name === activePathDetails.to
       : false;
 
     return isSelected || isActive;
@@ -79,13 +80,12 @@ function PathCurve({ path, opacity, showWaypoints, activePathDetails }: PathCurv
 
   // Check if this specific path matches the active transition details
   const isActive = activePathDetails
-    ? (path.from.name === activePathDetails.from && path.to.name === activePathDetails.to)
+    ? path.from.name === activePathDetails.from && path.to.name === activePathDetails.to
     : false;
 
   const isSelected = selectedPathId === path.id || isActive;
   const isHovered = hoveredPathId === path.id;
   const isGlobalDimmed = !!hoveredPathId || !!activePathDetails;
-
 
   // Dynamic opacity logic
   const currentOpacity = useMemo(() => {

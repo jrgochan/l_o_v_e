@@ -1,7 +1,7 @@
-import { PathCurveAnimated } from '../../../../components/admin/paths/PathCurveAnimated';
+import { PathCurveAnimated } from "../../../../components/admin/paths/PathCurveAnimated";
 
-describe('PathCurveAnimated', () => {
-    it('should be defined', () => {
-        expect(PathCurveAnimated).toBeDefined();
-    });
+describe("PathCurveAnimated", () => {
+  it("should be defined", () => {
+    expect(PathCurveAnimated).toBeDefined();
+  });
 });

@@ -17,15 +17,15 @@ describe("useSphereSync", () => {
     jest.clearAllMocks();
     (useSphereReceiver as jest.Mock).mockReturnValue({
       handleMessage: mockHandleMessage,
-      lastUpdate: { type: "test" }
+      lastUpdate: { type: "test" },
     });
     (useSyncTransport as jest.Mock).mockReturnValue({
       sendMessage: mockSendMessage,
       isConnected: true,
-      lastMessageTime: 123
+      lastMessageTime: 123,
     });
     (useSphereSender as jest.Mock).mockReturnValue({
-      broadcast: mockBroadcast
+      broadcast: mockBroadcast,
     });
   });
 
@@ -33,10 +33,12 @@ describe("useSphereSync", () => {
     const { result } = renderHook(() => useSphereSync({ mode: "broadcaster" })); // Use 'broadcaster' which is valid
 
     expect(useSphereReceiver).toHaveBeenCalledWith("broadcaster", 0, undefined, undefined);
-    expect(useSyncTransport).toHaveBeenCalledWith(expect.objectContaining({
-      mode: "broadcaster",
-      onMessage: mockHandleMessage
-    }));
+    expect(useSyncTransport).toHaveBeenCalledWith(
+      expect.objectContaining({
+        mode: "broadcaster",
+        onMessage: mockHandleMessage,
+      })
+    );
     expect(useSphereSender).toHaveBeenCalledWith("broadcaster", mockSendMessage);
 
     expect(result.current.isConnected).toBe(true);

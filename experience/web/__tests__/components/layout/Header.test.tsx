@@ -1,7 +1,7 @@
-import { Header } from '../../../components/layout/Header';
+import { Header } from "../../../components/layout/Header";
 
-describe('Header', () => {
-    it('should be defined', () => {
-        expect(Header).toBeDefined();
-    });
+describe("Header", () => {
+  it("should be defined", () => {
+    expect(Header).toBeDefined();
+  });
 });

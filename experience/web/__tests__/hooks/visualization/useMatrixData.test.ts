@@ -15,19 +15,21 @@ describe("useMatrixData", () => {
       getPathForPair: jest.fn(),
       getCellColor: jest.fn(),
       getCategoryAverageDifficulty: jest.fn(),
-      getCategoryCellColor: jest.fn()
+      getCategoryCellColor: jest.fn(),
     });
     (useMatrixStats as jest.Mock).mockReturnValue({
       totalPaths: 10,
-      avgCost: 0.5
+      avgCost: 0.5,
     });
   });
 
   it("should aggregate data from processing and stats hooks", () => {
-    const { result } = renderHook(() => useMatrixData({
-      allEmotions: [],
-      computedPaths: new Map()
-    }));
+    const { result } = renderHook(() =>
+      useMatrixData({
+        allEmotions: [],
+        computedPaths: new Map(),
+      })
+    );
 
     expect(result.current.sortedEmotions).toEqual(["Joy", "Sadness"]);
     expect(result.current.stats).toEqual({ totalPaths: 10, avgCost: 0.5 });

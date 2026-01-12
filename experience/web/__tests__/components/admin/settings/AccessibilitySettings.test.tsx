@@ -1,7 +1,7 @@
-import { AccessibilitySettings } from '../../../../components/admin/settings/AccessibilitySettings';
+import { AccessibilitySettings } from "../../../../components/admin/settings/AccessibilitySettings";
 
-describe('AccessibilitySettings', () => {
-    it('should be defined', () => {
-        expect(AccessibilitySettings).toBeDefined();
-    });
+describe("AccessibilitySettings", () => {
+  it("should be defined", () => {
+    expect(AccessibilitySettings).toBeDefined();
+  });
 });

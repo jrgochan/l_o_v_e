@@ -21,7 +21,7 @@ describe("useEmotionNavigation", () => {
       viewInSphere: jest.fn(),
       addToSelection: jest.fn(),
       viewMultipleInSphere: jest.fn(),
-      autoFocusEmotion: jest.fn()
+      autoFocusEmotion: jest.fn(),
     });
     (useAtlasAdminStore as unknown as jest.Mock).mockReturnValue(() => []);
   });
@@ -30,7 +30,9 @@ describe("useEmotionNavigation", () => {
     const { result } = renderHook(() => useEmotionNavigation());
 
     expect(useEmotionResolution).toHaveBeenCalled();
-    expect(useNavigationActions).toHaveBeenCalledWith(expect.objectContaining({ findEmotionByName: mockFind }));
+    expect(useNavigationActions).toHaveBeenCalledWith(
+      expect.objectContaining({ findEmotionByName: mockFind })
+    );
 
     expect(result.current.focusEmotion).toBe(mockFocus);
   });

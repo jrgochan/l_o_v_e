@@ -1,7 +1,7 @@
-import { EmotionBadge } from '../../../../components/admin/emotion-display/EmotionBadge';
+import { EmotionBadge } from "../../../../components/admin/emotion-display/EmotionBadge";
 
-describe('EmotionBadge', () => {
-    it('should be defined', () => {
-        expect(EmotionBadge).toBeDefined();
-    });
+describe("EmotionBadge", () => {
+  it("should be defined", () => {
+    expect(EmotionBadge).toBeDefined();
+  });
 });

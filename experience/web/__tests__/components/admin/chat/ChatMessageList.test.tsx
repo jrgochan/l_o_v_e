@@ -1,7 +1,7 @@
-import { ChatMessageList } from '../../../../components/admin/chat/ChatMessageList';
+import { ChatMessageList } from "../../../../components/admin/chat/ChatMessageList";
 
-describe('ChatMessageList', () => {
-    it('should be defined', () => {
-        expect(ChatMessageList).toBeDefined();
-    });
+describe("ChatMessageList", () => {
+  it("should be defined", () => {
+    expect(ChatMessageList).toBeDefined();
+  });
 });

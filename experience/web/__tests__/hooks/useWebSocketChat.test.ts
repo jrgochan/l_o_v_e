@@ -25,13 +25,13 @@ describe("useWebSocketChat", () => {
       isConnected: true,
       isConnecting: false,
       disconnect: mockDisconnect,
-      reconnect: mockReconnect
+      reconnect: mockReconnect,
     });
     (useWebSocketSender as jest.Mock).mockReturnValue({
       sendMessage: mockSendMessage,
       sendAudio: mockSendAudio,
       updateTonePreference: mockUpdateTone,
-      updateDeepFeelingMode: mockUpdateDeep
+      updateDeepFeelingMode: mockUpdateDeep,
     });
   });
 
@@ -39,8 +39,12 @@ describe("useWebSocketChat", () => {
     const options = { sessionId: "sess-1" };
     const { result } = renderHook(() => useWebSocketChat(options));
 
-    expect(useWebSocketMessageHandler).toHaveBeenCalledWith(expect.objectContaining({ sessionId: "sess-1" }));
-    expect(useWebSocketConnection).toHaveBeenCalledWith(expect.objectContaining({ sessionId: "sess-1", onMessage: mockHandleMessage }));
+    expect(useWebSocketMessageHandler).toHaveBeenCalledWith(
+      expect.objectContaining({ sessionId: "sess-1" })
+    );
+    expect(useWebSocketConnection).toHaveBeenCalledWith(
+      expect.objectContaining({ sessionId: "sess-1", onMessage: mockHandleMessage })
+    );
     expect(useWebSocketSender).toHaveBeenCalled();
 
     expect(result.current.isConnected).toBe(true);

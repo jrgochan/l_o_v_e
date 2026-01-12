@@ -5,7 +5,7 @@ import { getObserverClient } from "@love/experience-shared";
 // Mock API
 jest.mock("@love/experience-shared", () => ({
   getObserverClient: jest.fn(),
-  UserContext: {}
+  UserContext: {},
 }));
 
 describe("ContextualRecommendations", () => {
@@ -15,7 +15,7 @@ describe("ContextualRecommendations", () => {
   beforeEach(() => {
     jest.clearAllMocks();
     (getObserverClient as jest.Mock).mockReturnValue({
-      getContextRecommendations: mockGetContextRecommendations
+      getContextRecommendations: mockGetContextRecommendations,
     });
   });
 
@@ -29,7 +29,11 @@ describe("ContextualRecommendations", () => {
 
     // Open
     fireEvent.click(toggleBtn);
-    expect(screen.getByText("Tell us about your current situation for personalized strategy suggestions:")).toBeInTheDocument();
+    expect(
+      screen.getByText(
+        "Tell us about your current situation for personalized strategy suggestions:"
+      )
+    ).toBeInTheDocument();
 
     // Close
     fireEvent.click(toggleBtn);
@@ -45,7 +49,7 @@ describe("ContextualRecommendations", () => {
 
     // fireEvent.click(getBtn); // Can't click disabled.
     // But let's verify error if validation logic runs (logic says disabled condition).
-    // Let's force enable or test logic via direct interaction? 
+    // Let's force enable or test logic via direct interaction?
     // Logic: disabled={isLoading || Object.keys(context).length === 0}
     // So clicking shouldn't fire.
   });
@@ -53,7 +57,7 @@ describe("ContextualRecommendations", () => {
   it("should fetch recommendations", async () => {
     mockGetContextRecommendations.mockResolvedValue({
       recommended_strategies: ["Breathe", "Connect"],
-      avoid_strategies: ["Stress"]
+      avoid_strategies: ["Stress"],
     });
 
     render(<ContextualRecommendations onRecommendationsReceived={mockOnRecommendationsReceived} />);
@@ -76,9 +80,11 @@ describe("ContextualRecommendations", () => {
       expect(screen.getByText("Stress")).toBeInTheDocument();
     });
 
-    expect(mockGetContextRecommendations).toHaveBeenCalledWith(expect.objectContaining({
-      time_of_day: "morning"
-    }));
+    expect(mockGetContextRecommendations).toHaveBeenCalledWith(
+      expect.objectContaining({
+        time_of_day: "morning",
+      })
+    );
     expect(mockOnRecommendationsReceived).toHaveBeenCalledWith(["Breathe", "Connect"]);
   });
 

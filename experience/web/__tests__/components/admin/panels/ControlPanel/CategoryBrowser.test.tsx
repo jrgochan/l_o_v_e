@@ -1,7 +1,7 @@
-import { CategoryBrowser } from '../../../../../components/admin/panels/ControlPanel/CategoryBrowser';
+import { CategoryBrowser } from "../../../../../components/admin/panels/ControlPanel/CategoryBrowser";
 
-describe('CategoryBrowser', () => {
-    it('should be defined', () => {
-        expect(CategoryBrowser).toBeDefined();
-    });
+describe("CategoryBrowser", () => {
+  it("should be defined", () => {
+    expect(CategoryBrowser).toBeDefined();
+  });
 });

@@ -59,10 +59,5 @@ export function useSphereReceiver(
     };
   }, [mode, lastUpdate, onStale]);
 
-  // Also update lastUpdate when lastMessageTime from prop changes (transport update)
-  useEffect(() => {
-    if (lastMessageTime > 0) setLastUpdate(lastMessageTime);
-  }, [lastMessageTime]);
-
   return { handleMessage, lastUpdate };
 }

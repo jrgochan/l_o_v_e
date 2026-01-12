@@ -166,7 +166,6 @@ class Logger {
     const formatted = this.formatMessage(category, message);
     const categoryColor = CATEGORY_CONFIG[category].color;
 
-    // eslint-disable-next-line no-console
     console.log(`%c${formatted}`, `color: ${categoryColor}`, ...args);
   }
 
@@ -189,7 +188,6 @@ class Logger {
     const formatted = this.formatMessage(category, message);
     const categoryColor = CATEGORY_CONFIG[category].color;
 
-    // eslint-disable-next-line no-console
     console.log(`%c${formatted}`, `color: ${categoryColor}; font-weight: bold`, ...args);
   }
 

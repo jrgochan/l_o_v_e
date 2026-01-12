@@ -1,7 +1,7 @@
-import { GraphNodeDetails } from '../../../../../components/admin/visualizations/graph/GraphNodeDetails';
+import { GraphNodeDetails } from "../../../../../components/admin/visualizations/graph/GraphNodeDetails";
 
-describe('GraphNodeDetails', () => {
-    it('should be defined', () => {
-        expect(GraphNodeDetails).toBeDefined();
-    });
+describe("GraphNodeDetails", () => {
+  it("should be defined", () => {
+    expect(GraphNodeDetails).toBeDefined();
+  });
 });

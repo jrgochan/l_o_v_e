@@ -56,7 +56,6 @@ export function DevelopmentSettings() {
   };
 
   const handleClearConsole = () => {
-    // eslint-disable-next-line no-console
     console.clear();
     logger.clearBuffer();
     alert("Console and log buffer cleared");

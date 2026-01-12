@@ -1,7 +1,7 @@
-import { ChatSettings } from '../../../../components/admin/settings/ChatSettings';
+import { ChatSettings } from "../../../../components/admin/settings/ChatSettings";
 
-describe('ChatSettings', () => {
-    it('should be defined', () => {
-        expect(ChatSettings).toBeDefined();
-    });
+describe("ChatSettings", () => {
+  it("should be defined", () => {
+    expect(ChatSettings).toBeDefined();
+  });
 });

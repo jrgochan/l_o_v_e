@@ -22,7 +22,7 @@ describe("useStatistics", () => {
   it("should fetch statistics on mount", async () => {
     (global.fetch as jest.Mock).mockResolvedValue({
       ok: true,
-      json: async () => ({ total_cached: 100 })
+      json: async () => ({ total_cached: 100 }),
     });
 
     const { result } = renderHook(() => useStatistics());
@@ -53,7 +53,10 @@ describe("useStatistics", () => {
     });
 
     expect(window.confirm).toHaveBeenCalled();
-    expect(global.fetch).toHaveBeenCalledWith(expect.stringContaining("/cache"), expect.objectContaining({ method: "DELETE" }));
+    expect(global.fetch).toHaveBeenCalledWith(
+      expect.stringContaining("/cache"),
+      expect.objectContaining({ method: "DELETE" })
+    );
     expect(window.alert).toHaveBeenCalledWith(expect.stringContaining("50"));
   });
 

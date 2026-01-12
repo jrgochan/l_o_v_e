@@ -3,17 +3,17 @@ import { useJourneyActions } from "@/hooks/command-palette/actions/useJourneyAct
 
 // Mock sub-hooks
 jest.mock("@/hooks/command-palette/actions/useJourneyCommands", () => ({
-    useJourneyCommands: () => ({ executeJourneyCommand: "mockJourneyCommand" })
+  useJourneyCommands: () => ({ executeJourneyCommand: "mockJourneyCommand" }),
 }));
 jest.mock("@/hooks/command-palette/actions/useWaypointCommands", () => ({
-    useWaypointCommands: () => ({ executeWaypointCommand: "mockWaypointCommand" })
+  useWaypointCommands: () => ({ executeWaypointCommand: "mockWaypointCommand" }),
 }));
 
 describe("useJourneyActions", () => {
-    it("should return composed commands", () => {
-        const { result } = renderHook(() => useJourneyActions({ close: jest.fn() }));
+  it("should return composed commands", () => {
+    const { result } = renderHook(() => useJourneyActions({ close: jest.fn() }));
 
-        expect(result.current.executeJourneyCommand).toBe("mockJourneyCommand");
-        expect(result.current.executeWaypointCommand).toBe("mockWaypointCommand");
-    });
+    expect(result.current.executeJourneyCommand).toBe("mockJourneyCommand");
+    expect(result.current.executeWaypointCommand).toBe("mockWaypointCommand");
+  });
 });

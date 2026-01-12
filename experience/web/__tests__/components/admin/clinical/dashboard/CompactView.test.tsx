@@ -1,7 +1,7 @@
-import { CompactView } from '../../../../../components/admin/clinical/dashboard/CompactView';
+import { CompactView } from "../../../../../components/admin/clinical/dashboard/CompactView";
 
-describe('CompactView', () => {
-    it('should be defined', () => {
-        expect(CompactView).toBeDefined();
-    });
+describe("CompactView", () => {
+  it("should be defined", () => {
+    expect(CompactView).toBeDefined();
+  });
 });

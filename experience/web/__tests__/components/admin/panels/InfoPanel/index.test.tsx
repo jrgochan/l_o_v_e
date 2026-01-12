@@ -1,7 +1,7 @@
-import { InfoPanel } from '../../../../../components/admin/panels/InfoPanel';
+import { InfoPanel } from "../../../../../components/admin/panels/InfoPanel";
 
-describe('InfoPanel', () => {
-    it('should be defined', () => {
-        expect(InfoPanel).toBeDefined();
-    });
+describe("InfoPanel", () => {
+  it("should be defined", () => {
+    expect(InfoPanel).toBeDefined();
+  });
 });
