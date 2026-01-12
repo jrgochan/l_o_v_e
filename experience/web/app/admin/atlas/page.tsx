@@ -300,9 +300,58 @@ const AtlasAdminContent = () => {
           state.setIsFlying(false); // Pause to allow browsing
         }
       }
+      // Next Path Variation in Category (ArrowUp/Down)
+      if ((key === "arrowup" || key === "arrowdown") && !e.ctrlKey && !e.metaKey) {
+        console.log("[DEBUG] Admin ArrowUp/Down Handler Fired", key);
+        e.preventDefault();
+        e.stopPropagation(); // Try to stop OrbitControls from hijacking
+
+        const state = useAtlasAdminStore.getState();
+        const emotions = state.allEmotions;
+
+        // 1. Identify current category
+        let currentCat = "Joy"; // Default
+        if (transitionPath?.current_state.emotion) {
+          const currentEmotion = emotions.find(e => e.name === transitionPath.current_state.emotion);
+          if (currentEmotion) currentCat = currentEmotion.category;
+        }
+
+        // 2. Get all emotions in this category
+        const catEmotions = emotions.filter(e => e.category === currentCat);
+
+        // 3. Generate New Random Path
+        if (catEmotions.length >= 2) {
+          const start = catEmotions[Math.floor(Math.random() * catEmotions.length)];
+          let end = catEmotions[Math.floor(Math.random() * catEmotions.length)];
+          while (end.id === start.id) {
+            end = catEmotions[Math.floor(Math.random() * catEmotions.length)];
+          }
+
+          // 4. Generate & Set Path
+          const newPath: any = {
+            current_state: { emotion: start.name, vac: start.vac },
+            goal_state: { emotion: end.name, vac: end.vac },
+            waypoints: [
+              {
+                emotion: "Transition",
+                vac: [
+                  (start.vac[0] + end.vac[0]) / 2,
+                  (start.vac[1] + end.vac[1]) / 2,
+                  (start.vac[2] + end.vac[2]) / 2
+                ],
+                reasoning: `Exploring ${currentCat} Variation`
+              }
+            ]
+          };
+          // Update Experience Store
+          useExperienceStore.getState().setTransitionPath(newPath);
+          state.setIsFlying(false); // Pause to allow browsing
+        }
+      }
     };
-    window.addEventListener("keydown", handleKeyPress);
-    return () => window.removeEventListener("keydown", handleKeyPress);
+
+    window.addEventListener("keydown", handleKeyPress, { capture: true });
+    return () => window.removeEventListener("keydown", handleKeyPress, { capture: true });
   }, [transitionPath, layers, isFlying]);
 
   // View Mode Logic

@@ -11,6 +11,7 @@ import { useMemo, useRef } from "react";
 import { useFrame, ThreeEvent } from "@react-three/fiber";
 import * as THREE from "three";
 import { useAtlasAdminStore } from "@/stores/useAtlasAdminStore";
+import { useExperienceStore } from "@/stores/useExperienceStore";
 import { DIFFICULTY_COLORS, CATEGORY_COLORS } from "@/types/atlas-admin";
 import type { EmotionPath } from "@/types/atlas-admin";
 import { PathParticles } from "../visualizations/PathParticles";
@@ -21,10 +22,25 @@ export function PathNetwork() {
   const selectedIds = useAtlasAdminStore((state) => state.selectedEmotionIds);
   const layers = useAtlasAdminStore((state) => state.layers);
   const settings = useAtlasAdminStore((state) => state.settings);
+  const transitionPath = useExperienceStore((state) => state.transitionPath);
 
-  // Filter paths to only show those between selected emotions
+  // Identify active path from experience store (Browsing Mode)
+  const activePathDetails = useMemo(() => {
+    if (!transitionPath?.current_state?.emotion || !transitionPath?.goal_state?.emotion) return null;
+    return {
+      from: transitionPath.current_state.emotion,
+      to: transitionPath.goal_state.emotion
+    };
+  }, [transitionPath]);
+
+  // Filter paths: Show if both endpoints selected OR if it's the active browsing path
   const paths = Array.from(computedPaths.values()).filter((path) => {
-    return selectedIds.has(path.from.id) && selectedIds.has(path.to.id);
+    const isSelected = selectedIds.has(path.from.id) && selectedIds.has(path.to.id);
+    const isActive = activePathDetails
+      ? (path.from.name === activePathDetails.from && path.to.name === activePathDetails.to)
+      : false;
+
+    return isSelected || isActive;
   });
 
   if (!layers.transitionPaths || paths.length === 0) {
@@ -39,6 +55,7 @@ export function PathNetwork() {
           path={path}
           opacity={settings.pathOpacity}
           showWaypoints={layers.waypoints}
+          activePathDetails={activePathDetails}
         />
       ))}
     </group>
@@ -49,9 +66,10 @@ interface PathCurveProps {
   path: EmotionPath;
   opacity: number;
   showWaypoints: boolean;
+  activePathDetails: { from: string; to: string } | null;
 }
 
-function PathCurve({ path, opacity, showWaypoints }: PathCurveProps) {
+function PathCurve({ path, opacity, showWaypoints, activePathDetails }: PathCurveProps) {
   const allEmotions = useAtlasAdminStore((state) => state.allEmotions);
   const selectedPathId = useAtlasAdminStore((state) => state.selectedPathId);
   const hoveredPathId = useAtlasAdminStore((state) => state.hoveredPathId);
@@ -59,18 +77,23 @@ function PathCurve({ path, opacity, showWaypoints }: PathCurveProps) {
   const setSelectedPath = useAtlasAdminStore((state) => state.setSelectedPath);
   const pathAnimationMode = useAtlasAdminStore((state) => state.settings.pathAnimationMode);
 
-  const isSelected = selectedPathId === path.id;
+  // Check if this specific path matches the active transition details
+  const isActive = activePathDetails
+    ? (path.from.name === activePathDetails.from && path.to.name === activePathDetails.to)
+    : false;
+
+  const isSelected = selectedPathId === path.id || isActive;
   const isHovered = hoveredPathId === path.id;
+  const isGlobalDimmed = !!hoveredPathId || !!activePathDetails;
+
 
   // Dynamic opacity logic
   const currentOpacity = useMemo(() => {
-    if (hoveredPathId) {
-      if (isHovered) return 1.0;
-      if (isSelected) return 0.2;
-      return 0.1;
-    }
+    if (isHovered) return 1.0;
+    if (isSelected) return 0.8; // Active/Selected paths stay bright
+    if (isGlobalDimmed) return 0.05; // Others fade out deeply
     return opacity;
-  }, [hoveredPathId, isHovered, isSelected, opacity]);
+  }, [isHovered, isSelected, isGlobalDimmed, opacity]);
 
   // Build path points: start → waypoints → end
   const points = useMemo(() => {
