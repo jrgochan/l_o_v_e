@@ -71,4 +71,46 @@ describe("useComputeAllPaths", () => {
     expect(window.alert).toHaveBeenCalledWith(expect.stringContaining("Error"));
     expect(mockSetProgress).toHaveBeenCalledWith(expect.objectContaining({ total: 0 }));
   });
+
+  it("should load cached paths on job complete", async () => {
+    // 1. Capture the callback passed to useBatchJob
+    let capturedOnComplete: () => Promise<void>;
+    (useBatchJob as jest.Mock).mockImplementation((onComplete, onFail) => {
+      capturedOnComplete = onComplete;
+      return {
+        startJob: mockStartJob,
+        isComputing: false,
+        progress: {},
+        estimatedTimeRemaining: 0,
+        setProgress: mockSetProgress,
+      };
+    });
+
+    // 2. Mock getCachedPaths with matching emotions
+    const mockPaths = [
+      {
+        from_emotion: { id: "e1" },
+        to_emotion: { id: "e2" },
+        waypoints: [],
+        distance: 10,
+        estimated_time: "10m",
+        difficulty: "easy",
+        requires_bridge: false
+      }
+    ];
+    (atlasService.getCachedPaths as jest.Mock).mockResolvedValue({ paths: mockPaths });
+
+    renderHook(() => useComputeAllPaths());
+
+    // 3. Manually trigger callback
+    await capturedOnComplete!();
+
+    // 4. Verify addComputedPath was called
+    expect(atlasService.getCachedPaths).toHaveBeenCalled();
+    expect(mockAddComputedPath).toHaveBeenCalledWith(expect.objectContaining({
+      id: "e1-e2",
+      total_distance: 10
+    }));
+    expect(window.alert).toHaveBeenCalledWith(expect.stringContaining("complete"));
+  });
 });

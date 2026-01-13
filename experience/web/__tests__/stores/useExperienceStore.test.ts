@@ -105,4 +105,54 @@ describe("useExperienceStore", () => {
     expect(result.current.isFlying).toBe(true);
     expect(result.current.showPath).toBe(true);
   });
+
+  it("should handle flyover details", () => {
+    const { result } = renderHook(() => useExperienceStore());
+
+    act(() => {
+      result.current.setFlyoverSpeed(2.0);
+      result.current.setFlyoverProgress(0.5);
+      result.current.setFlyoverCurrentWaypointIndex(2);
+    });
+
+    expect(result.current.flyoverSpeed).toBe(2.0);
+    expect(result.current.flyoverProgress).toBe(0.5);
+    expect(result.current.flyoverCurrentWaypointIndex).toBe(2);
+  });
+  it("should handle remaining setters", () => {
+    const { result } = renderHook(() => useExperienceStore());
+
+    act(() => {
+      result.current.updateCurrent([0, 0, 0], [0, 0, 0, 1]);
+      result.current.setAngularVelocity(5.0);
+      result.current.setIsAnimating(false);
+      result.current.setTransitionPath({} as any);
+    });
+
+    expect(result.current.currentVAC).toEqual([0, 0, 0]);
+    expect(result.current.angularVelocity).toBe(5.0);
+    expect(result.current.isAnimating).toBe(false);
+    expect(result.current.transitionPath).toBeDefined();
+    expect(result.current.showPath).toBe(true);
+  });
+
+  it("should abandon journey", () => {
+    const { result } = renderHook(() => useExperienceStore());
+    act(() => {
+      result.current.startJourney("j1", "p1", 5);
+      result.current.abandonJourney();
+    });
+    expect(result.current.activeJourney).toBeNull();
+    expect(localStorage.getItem("activeJourney")).toBeNull();
+  });
+
+  it("should set target with explicit quaternion", () => {
+    const { result } = renderHook(() => useExperienceStore());
+    const target: any = [1, 0, 0];
+    const quat: any = [0, 1, 0, 0];
+    act(() => {
+      result.current.setTarget(target, quat);
+    });
+    expect(result.current.targetQuaternion).toEqual(quat);
+  });
 });

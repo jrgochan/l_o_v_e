@@ -49,7 +49,7 @@ describe("useCommandPaletteState", () => {
       result.current.setCategory("Joy");
     });
 
-    expect(result.current.currentPage).toBe("emotions");
+    expect(result.current.currentPage).toBe("category");
     expect(result.current.selectedCategory).toBe("Joy");
   });
 

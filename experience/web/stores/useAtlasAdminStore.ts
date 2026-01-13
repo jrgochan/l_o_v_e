@@ -106,7 +106,7 @@ interface AtlasAdminState {
 }
 
 // Custom replacer for Map and Set serialization
-const replacer = (_key: string, value: unknown) => {
+export const replacer = (_key: string, value: unknown) => {
   if (value instanceof Set) {
     return { __type: "Set", value: Array.from(value) };
   }
@@ -117,7 +117,7 @@ const replacer = (_key: string, value: unknown) => {
 };
 
 // Custom reviver for Map and Set deserialization
-const reviver = (_key: string, value: unknown) => {
+export const reviver = (_key: string, value: unknown) => {
   if (value && typeof value === "object") {
     const obj = value as Record<string, unknown>;
     if (obj.__type === "Set" && Array.isArray(obj.value)) {
@@ -130,35 +130,39 @@ const reviver = (_key: string, value: unknown) => {
   return value;
 };
 
+export const getInitialAdminState = () => ({
+  allEmotions: [] as AtlasEmotion[],
+  selectedEmotionIds: new Set<string>(),
+  computedPaths: new Map<string, EmotionPath>(),
+  categoryFilters: new Map<string, CategoryFilter>(),
+
+  cacheStatus: {
+    loaded: false,
+    count: 0,
+    lastLoadTime: null,
+  },
+
+  hoveredEmotionId: null as string | null,
+  hoveredPathId: null as string | null,
+  selectedPathId: null as string | null,
+  focusedEmotionId: null as string | null,
+  viewMode: "default" as "default" | "zen" | "cinema",
+  isFlying: false,
+  isIntroActive: false,
+
+  settings: DEFAULT_SETTINGS,
+  layers: DEFAULT_LAYERS,
+
+  isLoadingEmotions: false,
+  isComputingPaths: false,
+  error: null as string | null,
+});
+
 export const useAtlasAdminStore = create<AtlasAdminState>()(
   persist(
     (set, get) => ({
       // Initial state
-      allEmotions: [],
-      selectedEmotionIds: new Set(),
-      computedPaths: new Map(),
-      categoryFilters: new Map(),
-
-      cacheStatus: {
-        loaded: false,
-        count: 0,
-        lastLoadTime: null,
-      },
-
-      hoveredEmotionId: null,
-      hoveredPathId: null,
-      selectedPathId: null,
-      focusedEmotionId: null,
-      viewMode: "default",
-      isFlying: false,
-      isIntroActive: false,
-
-      settings: DEFAULT_SETTINGS,
-      layers: DEFAULT_LAYERS,
-
-      isLoadingEmotions: false,
-      isComputingPaths: false,
-      error: null,
+      ...getInitialAdminState(),
 
       // Data actions
       setAllEmotions: (emotions) => {

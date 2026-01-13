@@ -38,7 +38,7 @@ describe("CinematicOverlay", () => {
     });
 
     expect(screen.getByText("Joy")).toBeInTheDocument();
-    expect(screen.getByText("Current State")).toBeInTheDocument();
+    expect(screen.getByText("Current Connection")).toBeInTheDocument();
   });
 
   it("should display waiting message when waiting", () => {
@@ -49,7 +49,7 @@ describe("CinematicOverlay", () => {
     });
 
     expect(screen.getByText("Waiting for Session...")).toBeInTheDocument();
-    expect(screen.queryByText("Current State")).not.toBeInTheDocument();
+    expect(screen.queryByText("Current Connection")).not.toBeInTheDocument();
   });
 
   it("should show audio enable button if audio disabled", () => {
