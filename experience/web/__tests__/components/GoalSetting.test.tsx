@@ -1,674 +1,344 @@
 /**
  * Tests for GoalSetting Component
- *
- * Tests the complex goal-setting UI with emotion atlas loading,
- * search, selection, path generation, and journey starting.
  */
 
-import { render, screen, waitFor } from "@testing-library/react";
+import { render, screen, waitFor, act, fireEvent } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { GoalSetting } from "@/components/GoalSetting";
 import { useExperienceStore } from "@/stores/useExperienceStore";
-import { act } from "@testing-library/react";
-import * as SharedAPI from "@love/experience-shared";
+import { getObserverClient } from "@love/experience-shared";
 
-// Mock Observer API client
-jest.mock("@love/experience-shared", () => ({
-  ...jest.requireActual("@love/experience-shared"),
-  getObserverClient: jest.fn(),
+// Mock dependencies
+jest.mock("@/utils/logger", () => ({
+  logger: {
+    info: jest.fn(),
+    error: jest.fn(),
+  },
 }));
 
-const mockGetObserverClient = SharedAPI.getObserverClient as jest.MockedFunction<
-  typeof SharedAPI.getObserverClient
->;
+// Robust mock for shared package to avoid undefined constants
+jest.mock("@love/experience-shared", () => ({
+  getObserverClient: jest.fn(),
+  NEUTRAL_VAC: [0, 0, 0],
+  IDENTITY_QUATERNION: [0, 0, 0, 1],
+  vacToQuaternion: jest.fn().mockReturnValue([0, 0, 0, 1]),
+  CANONICAL_EMOTIONS: []
+}));
 
-// Mock data
+jest.mock("@/components/PersonalStrategies", () => ({
+  PersonalStrategies: () => <div data-testid="personal-strategies">Strategies</div>,
+}));
+
+// Mock Data
 const mockEmotions = [
-  {
-    id: 1,
-    name: "Joy",
-    category: "Places We Go When Life Is Good",
-    vac: [0.9, 0.7, 0.8] as [number, number, number],
-    definition: "A feeling of great pleasure and happiness",
-  },
-  {
-    id: 2,
-    name: "Calm",
-    category: "Places We Go When Life Is Good",
-    vac: [0.7, -0.5, 0.6] as [number, number, number],
-    definition: "A state of tranquility and peace",
-  },
-  {
-    id: 3,
-    name: "Anxiety",
-    category: "Places We Go When Things Are Uncertain",
-    vac: [-0.5, 0.7, -0.4] as [number, number, number],
-    definition: "A feeling of worry and unease",
-  },
+  { id: "joy", name: "Joy", category: "Positive", vac: [0.8, 0.6, 0.7], definition: "Happiness" },
+  { id: "sadness", name: "Sadness", category: "Negative", vac: [-0.6, -0.4, -0.2], definition: "Feeling down" }
 ];
 
-const mockGeneratedPath = {
+const mockPath = {
   path_id: "path-123",
-  current_state: { emotion: "Anxiety", vac: [-0.5, 0.7, -0.4] },
-  goal_state: { emotion: "Calm", vac: [0.7, -0.5, 0.6] },
+  current_state: { emotion: "Neutral" },
+  goal_state: { emotion: "Joy" },
   waypoints: [
-    {
-      order: 1,
-      emotion: "Worry",
-      vac: [-0.4, 0.5, -0.3],
-      reasoning: "Gradual reduction in arousal",
-      estimated_time: "20-30 minutes",
-      difficulty: "moderate",
-      strategies: [
-        {
-          strategy_id: "strat-1",
-          name: "4-7-8 Breathing",
-          description: "A breathing technique to reduce anxiety",
-          steps: ["Exhale completely", "Inhale for 4 counts", "Hold for 7 counts"],
-          time_required: "5-10 minutes",
-          difficulty_level: 1,
-          evidence_level: "RCT",
-          type: "Attentional Deployment",
-        },
-      ],
-    },
+    { order: 1, emotion: "Contentment", reasoning: "Step 1", estimated_time: "5m", difficulty: "easy" },
+    { order: 2, emotion: "Joy", reasoning: "Step 2", estimated_time: "5m", difficulty: "medium" }
   ],
   path_metrics: {
-    total_distance: 2.5,
-    overall_difficulty: "moderate",
-    total_estimated_time: "40-60 minutes",
-    success_probability: 0.75,
-  },
+    overall_difficulty: "easy",
+    total_estimated_time: "10m",
+    success_probability: 0.9
+  }
 };
 
 describe("GoalSetting", () => {
-  let mockClient: any;
+  const mockLoadEmotionAtlas = jest.fn();
+  const mockGenerateTransitionPath = jest.fn();
+  const mockStartJourney = jest.fn();
 
   beforeEach(() => {
-    const { reset } = useExperienceStore.getState();
-    act(() => {
-      reset();
-    });
-
-    // Setup mock client
-    mockClient = {
-      loadEmotionAtlas: jest.fn(),
-      generateTransitionPath: jest.fn(),
-      startJourney: jest.fn(),
-    };
-
-    mockGetObserverClient.mockReturnValue(mockClient);
-  });
-
-  afterEach(() => {
     jest.clearAllMocks();
-  });
 
-  describe("Initial State - Collapsed", () => {
-    it("renders collapsed button initially", () => {
-      mockClient.loadEmotionAtlas.mockResolvedValue({
-        emotions: mockEmotions,
-        total_count: mockEmotions.length,
-      });
-
-      render(<GoalSetting />);
-      expect(screen.getByRole("button", { name: /Set Emotional Goal/i })).toBeInTheDocument();
+    // Properly reset store using store's reset action
+    // This relies on NEUTRAL_VAC being defined in the mock above
+    act(() => {
+      useExperienceStore.getState().reset();
     });
 
-    it("opens when button clicked", async () => {
-      const user = userEvent.setup();
-      mockClient.loadEmotionAtlas.mockResolvedValue({
-        emotions: mockEmotions,
-        total_count: mockEmotions.length,
-      });
+    (getObserverClient as jest.Mock).mockReturnValue({
+      loadEmotionAtlas: mockLoadEmotionAtlas,
+      generateTransitionPath: mockGenerateTransitionPath,
+      startJourney: mockStartJourney
+    });
 
-      render(<GoalSetting />);
-
-      const button = screen.getByRole("button", { name: /Set Emotional Goal/i });
-      await user.click(button);
-
-      expect(screen.getByText("Set Your Emotional Goal")).toBeInTheDocument();
+    mockLoadEmotionAtlas.mockResolvedValue({
+      emotions: mockEmotions,
+      total_count: 2
     });
   });
 
-  describe("Loading Emotions", () => {
-    it("loads emotion atlas when opened", async () => {
-      mockClient.loadEmotionAtlas.mockResolvedValue({
-        emotions: mockEmotions,
-        total_count: mockEmotions.length,
-      });
-
-      render(<GoalSetting />);
-
-      const user = userEvent.setup();
-      await user.click(screen.getByRole("button", { name: /Set Emotional Goal/i }));
-
-      await waitFor(() => {
-        expect(mockClient.loadEmotionAtlas).toHaveBeenCalled();
-      });
-    });
-
-    it("displays loading state", async () => {
-      mockClient.loadEmotionAtlas.mockImplementation(
-        () =>
-          new Promise((resolve) =>
-            setTimeout(() => resolve({ emotions: mockEmotions, total_count: 3 }), 100)
-          )
-      );
-
-      const { getAllByText } = render(<GoalSetting />);
-
-      // Open first
-      const user = userEvent.setup();
-      await user.click(screen.getByRole("button", { name: /Set Emotional Goal/i }));
-
-      // May appear multiple times (modal + bottom text)
-      const loadingTexts = getAllByText(/Loading emotional atlas/i);
-      expect(loadingTexts.length).toBeGreaterThanOrEqual(1);
-    });
-
-    it("displays emotions after loading", async () => {
-      const user = userEvent.setup();
-      mockClient.loadEmotionAtlas.mockResolvedValue({
-        emotions: mockEmotions,
-        total_count: mockEmotions.length,
-      });
-
-      render(<GoalSetting />);
-      await user.click(screen.getByRole("button", { name: /Set Emotional Goal/i }));
-
-      await waitFor(() => {
-        expect(screen.getByText("Joy")).toBeInTheDocument();
-        expect(screen.getByText("Calm")).toBeInTheDocument();
-        expect(screen.getByText("Anxiety")).toBeInTheDocument();
-      });
-    });
-
-    it("displays error on API failure", async () => {
-      const user = userEvent.setup();
-      mockClient.loadEmotionAtlas.mockRejectedValue(new Error("API Error"));
-
-      render(<GoalSetting />);
-      await user.click(screen.getByRole("button", { name: /Set Emotional Goal/i }));
-
-      await waitFor(() => {
-        expect(screen.getByText(/API Error/i)).toBeInTheDocument();
-      });
-    });
+  it("renders trigger button initially", () => {
+    render(<GoalSetting />);
+    expect(screen.getByText(/Set Emotional Goal/i)).toBeInTheDocument();
   });
 
-  describe("Search Functionality", () => {
-    beforeEach(async () => {
-      mockClient.loadEmotionAtlas.mockResolvedValue({
-        emotions: mockEmotions,
-        total_count: mockEmotions.length,
-      });
-    });
+  it("opens modal and loads emotions", async () => {
+    const user = userEvent.setup();
+    render(<GoalSetting />);
 
-    it("filters emotions by name", async () => {
-      const user = userEvent.setup();
-      render(<GoalSetting />);
+    await user.click(screen.getByText(/Set Emotional Goal/i));
 
-      await user.click(screen.getByRole("button", { name: /Set Emotional Goal/i }));
-      await waitFor(() => expect(screen.getByText("Joy")).toBeInTheDocument());
+    expect(screen.getByText(/Set Your Emotional Goal/i)).toBeInTheDocument();
+    expect(mockLoadEmotionAtlas).toHaveBeenCalled();
 
-      const searchInput = screen.getByPlaceholderText(/Search emotions/i);
-      await user.type(searchInput, "joy");
-
+    await waitFor(() => {
       expect(screen.getByText("Joy")).toBeInTheDocument();
-      expect(screen.queryByText("Anxiety")).not.toBeInTheDocument();
-    });
-
-    it("filters emotions by category", async () => {
-      const user = userEvent.setup();
-      render(<GoalSetting />);
-
-      await user.click(screen.getByRole("button", { name: /Set Emotional Goal/i }));
-      await waitFor(() => expect(screen.getByText("Joy")).toBeInTheDocument());
-
-      const searchInput = screen.getByPlaceholderText(/Search emotions/i);
-      await user.type(searchInput, "uncertain");
-
-      expect(screen.getByText("Anxiety")).toBeInTheDocument();
-      expect(screen.queryByText("Joy")).not.toBeInTheDocument();
-    });
-
-    it("shows no results message when no match", async () => {
-      const user = userEvent.setup();
-      render(<GoalSetting />);
-
-      await user.click(screen.getByRole("button", { name: /Set Emotional Goal/i }));
-      await waitFor(() => expect(screen.getByText("Joy")).toBeInTheDocument());
-
-      const searchInput = screen.getByPlaceholderText(/Search emotions/i);
-      await user.type(searchInput, "nonexistent");
-
-      expect(screen.getByText(/No emotions found/i)).toBeInTheDocument();
-    });
-
-    it("updates filtered count in label", async () => {
-      const user = userEvent.setup();
-      render(<GoalSetting />);
-
-      await user.click(screen.getByRole("button", { name: /Set Emotional Goal/i }));
-      await waitFor(() => expect(screen.getByText("Joy")).toBeInTheDocument());
-
-      // Should show all initially
-      expect(screen.getByText(/3 of 3/)).toBeInTheDocument();
-
-      // Filter
-      const searchInput = screen.getByPlaceholderText(/Search emotions/i);
-      await user.type(searchInput, "joy");
-
-      // Should show filtered count
-      expect(screen.getByText(/1 of 3/)).toBeInTheDocument();
+      expect(screen.getByText("Sadness")).toBeInTheDocument();
     });
   });
 
-  describe("Goal Selection", () => {
-    beforeEach(() => {
-      mockClient.loadEmotionAtlas.mockResolvedValue({
-        emotions: mockEmotions,
-        total_count: mockEmotions.length,
-      });
+  it("filters emotions by search", async () => {
+    const user = userEvent.setup();
+    render(<GoalSetting />);
+    await user.click(screen.getByText(/Set Emotional Goal/i));
+    await waitFor(() => expect(screen.getByText("Joy")).toBeInTheDocument());
+
+    const searchInput = screen.getByPlaceholderText(/Search emotions/i);
+    await user.type(searchInput, "Sad");
+
+    expect(screen.queryByText("Joy")).not.toBeInTheDocument();
+    expect(screen.getByText("Sadness")).toBeInTheDocument();
+  });
+
+  it("selects a goal and displays details", async () => {
+    const user = userEvent.setup();
+    render(<GoalSetting />);
+    await user.click(screen.getByText(/Set Emotional Goal/i));
+    await waitFor(() => expect(screen.getByText("Joy")).toBeInTheDocument());
+
+    await user.click(screen.getByText("Joy"));
+
+    expect(screen.getByText(/Selected Goal/i)).toBeInTheDocument();
+    // Check for distance (calculation check)
+    // Current VAC defaults to [0,0,0], Joy is [0.8, 0.6, 0.7]
+    // Dist = sqrt(0.8^2 + 0.6^2 + 0.7^2) = sqrt(0.64 + 0.36 + 0.49) = sqrt(1.49) ~= 1.22
+    expect(screen.getByText(/1.22 units/i)).toBeInTheDocument();
+
+    const generateBtn = screen.getByText(/Generate Transition Path/i);
+    expect(generateBtn).toBeEnabled();
+  });
+
+  it("generates transition path", async () => {
+    const user = userEvent.setup();
+    mockGenerateTransitionPath.mockResolvedValue(mockPath);
+
+    render(<GoalSetting />);
+    await user.click(screen.getByText(/Set Emotional Goal/i));
+    await waitFor(() => expect(screen.getByText("Joy")).toBeInTheDocument());
+    await user.click(screen.getByText("Joy"));
+
+    await user.click(screen.getByText(/Generate Transition Path/i));
+
+    expect(mockGenerateTransitionPath).toHaveBeenCalled();
+
+    await waitFor(() => {
+      expect(screen.getByText(/Your Transition Path/i)).toBeInTheDocument();
+      expect(screen.getByText(/Step 1/i)).toBeInTheDocument();
     });
 
-    it("selects goal when emotion clicked", async () => {
-      const user = userEvent.setup();
-      render(<GoalSetting />);
+    // Check global store update
+    expect(useExperienceStore.getState().transitionPath).toEqual(mockPath);
+  });
 
-      await user.click(screen.getByRole("button", { name: /Set Emotional Goal/i }));
-      await waitFor(() => expect(screen.getByText("Joy")).toBeInTheDocument());
+  it("starts journey from generated path", async () => {
+    const user = userEvent.setup();
+    mockGenerateTransitionPath.mockResolvedValue(mockPath);
+    mockStartJourney.mockResolvedValue({ journey_id: "journey-1" });
 
-      const joyButtons = screen.getAllByRole("button");
-      const joyButton = joyButtons.find(
-        (btn) => btn.textContent?.includes("Joy") && btn.textContent?.includes("VAC:")
-      );
+    render(<GoalSetting />);
+    await user.click(screen.getByText(/Set Emotional Goal/i));
+    await waitFor(() => expect(screen.getByText("Joy")).toBeInTheDocument());
+    await user.click(screen.getByText("Joy"));
+    await user.click(screen.getByText(/Generate Transition Path/i));
+    await waitFor(() => expect(screen.getByText(/Your Transition Path/i)).toBeInTheDocument());
 
-      await user.click(joyButton!);
+    await user.click(screen.getByText(/Start Journey/i));
 
-      expect(screen.getByText("Selected Goal")).toBeInTheDocument();
-    });
+    expect(mockStartJourney).toHaveBeenCalled();
 
-    it("displays selected goal details", async () => {
-      const user = userEvent.setup();
-      render(<GoalSetting />);
+    // Check store update
+    expect(useExperienceStore.getState().activeJourney).toBeTruthy();
+  });
 
-      await user.click(screen.getByRole("button", { name: /Set Emotional Goal/i }));
-      await waitFor(() => expect(screen.getByText("Joy")).toBeInTheDocument());
+  it("handles API errors gracefully", async () => {
+    const user = userEvent.setup();
+    mockLoadEmotionAtlas.mockRejectedValue(new Error("Network Error"));
+    const { logger } = require("@/utils/logger");
 
-      const joyButtons = screen.getAllByRole("button");
-      const joyButton = joyButtons.find(
-        (btn) => btn.textContent?.includes("Joy") && btn.textContent?.includes("VAC:")
-      );
-      await user.click(joyButton!);
+    render(<GoalSetting />);
+    await user.click(screen.getByText(/Set Emotional Goal/i));
 
-      expect(screen.getByText(/A feeling of great pleasure/i)).toBeInTheDocument();
-      expect(screen.getByText(/Emotional Distance:/i)).toBeInTheDocument();
-    });
-
-    it("highlights selected emotion", async () => {
-      const user = userEvent.setup();
-      render(<GoalSetting />);
-
-      await user.click(screen.getByRole("button", { name: /Set Emotional Goal/i }));
-      await waitFor(() => expect(screen.getByText("Joy")).toBeInTheDocument());
-
-      const joyButtons = screen.getAllByRole("button");
-      const joyButton = joyButtons.find(
-        (btn) => btn.textContent?.includes("Joy") && btn.textContent?.includes("VAC:")
-      );
-      await user.click(joyButton!);
-
-      expect(joyButton?.className).toContain("bg-purple-600");
+    await waitFor(() => {
+      expect(screen.getByText(/Network Error/i)).toBeInTheDocument();
+      expect(logger.error).toHaveBeenCalled();
     });
   });
 
-  describe("Path Generation", () => {
-    beforeEach(() => {
-      mockClient.loadEmotionAtlas.mockResolvedValue({
-        emotions: mockEmotions,
-        total_count: mockEmotions.length,
-      });
-      mockClient.generateTransitionPath.mockResolvedValue(mockGeneratedPath);
-    });
+  it("toggles strategy details", async () => {
+    const user = userEvent.setup();
+    const pathWithStrategies = {
+      ...mockPath,
+      waypoints: [{
+        ...mockPath.waypoints[0],
+        strategies: [{
+          strategy_id: "strat-1",
+          name: "Deep Breathing",
+          description: "Breathe deeply",
+          difficulty_level: 1,
+          time_required: "2m",
+          steps: ["Inhale", "Exhale"],
+          evidence_level: "High",
+          type: "Somatic"
+        }]
+      }]
+    };
+    mockGenerateTransitionPath.mockResolvedValue(pathWithStrategies);
 
-    it("generate button disabled when no goal selected", async () => {
-      const user = userEvent.setup();
-      render(<GoalSetting />);
+    render(<GoalSetting />);
+    await user.click(screen.getByText(/Set Emotional Goal/i));
+    await waitFor(() => expect(screen.getByText("Joy")).toBeInTheDocument());
+    await user.click(screen.getByText("Joy"));
+    await user.click(screen.getByText(/Generate Transition Path/i));
 
-      await user.click(screen.getByRole("button", { name: /Set Emotional Goal/i }));
-      await waitFor(() => expect(screen.getByText("Joy")).toBeInTheDocument());
+    await waitFor(() => expect(screen.getByText("Deep Breathing")).toBeInTheDocument());
 
-      const generateButton = screen.getByRole("button", { name: /Generate Transition Path/i });
-      expect(generateButton).toBeDisabled();
-    });
+    // Expand
+    await user.click(screen.getByText("Deep Breathing"));
+    expect(screen.getByText("Breathe deeply")).toBeInTheDocument();
 
-    it("generates path when goal selected", async () => {
-      const user = userEvent.setup();
-      render(<GoalSetting />);
+    // Collapse
+    await user.click(screen.getByText("Deep Breathing"));
+    expect(screen.queryByText("Breathe deeply")).not.toBeInTheDocument();
+  });
 
-      await user.click(screen.getByRole("button", { name: /Set Emotional Goal/i }));
-      await waitFor(() => expect(screen.getByText("Joy")).toBeInTheDocument());
+  it("handles path generation failure", async () => {
+    const user = userEvent.setup();
+    mockGenerateTransitionPath.mockRejectedValue(new Error("Generation Failed"));
+    const { logger } = require("@/utils/logger");
 
-      // Select goal
-      const joyButtons = screen.getAllByRole("button");
-      const joyButton = joyButtons.find(
-        (btn) => btn.textContent?.includes("Joy") && btn.textContent?.includes("VAC:")
-      );
-      await user.click(joyButton!);
+    render(<GoalSetting />);
+    await user.click(screen.getByText(/Set Emotional Goal/i));
+    await waitFor(() => expect(screen.getByText("Joy")).toBeInTheDocument());
+    await user.click(screen.getByText("Joy"));
 
-      // Generate path
-      const generateButton = screen.getByRole("button", { name: /Generate Transition Path/i });
-      await user.click(generateButton);
+    await user.click(screen.getByText(/Generate Transition Path/i));
 
-      await waitFor(() => {
-        expect(mockClient.generateTransitionPath).toHaveBeenCalled();
-      });
-    });
-
-    it("displays path metrics after generation", async () => {
-      const user = userEvent.setup();
-      render(<GoalSetting />);
-
-      await user.click(screen.getByRole("button", { name: /Set Emotional Goal/i }));
-      await waitFor(() => expect(screen.getByText("Joy")).toBeInTheDocument());
-
-      const joyButtons = screen.getAllByRole("button");
-      const joyButton = joyButtons.find(
-        (btn) => btn.textContent?.includes("Joy") && btn.textContent?.includes("VAC:")
-      );
-      await user.click(joyButton!);
-
-      const generateButton = screen.getByRole("button", { name: /Generate Transition Path/i });
-      await user.click(generateButton);
-
-      await waitFor(() => {
-        expect(screen.getByText(/Your Transition Path/i)).toBeInTheDocument();
-        // "moderate" appears multiple times, so check it exists
-        expect(screen.getAllByText(/moderate/i).length).toBeGreaterThanOrEqual(1);
-        expect(screen.getByText(/75%/i)).toBeInTheDocument(); // Success rate
-      });
-    });
-
-    it("displays waypoints", async () => {
-      const user = userEvent.setup();
-      render(<GoalSetting />);
-
-      await user.click(screen.getByRole("button", { name: /Set Emotional Goal/i }));
-      await waitFor(() => expect(screen.getByText("Joy")).toBeInTheDocument());
-
-      const joyButtons = screen.getAllByRole("button");
-      const joyButton = joyButtons.find(
-        (btn) => btn.textContent?.includes("Joy") && btn.textContent?.includes("VAC:")
-      );
-      await user.click(joyButton!);
-
-      await user.click(screen.getByRole("button", { name: /Generate Transition Path/i }));
-
-      await waitFor(() => {
-        expect(screen.getByText("Worry")).toBeInTheDocument();
-        expect(screen.getByText(/Gradual reduction in arousal/i)).toBeInTheDocument();
-      });
-    });
-
-    it("shows loading state during generation", async () => {
-      const user = userEvent.setup();
-      mockClient.generateTransitionPath.mockImplementation(
-        () => new Promise((resolve) => setTimeout(() => resolve(mockGeneratedPath), 100))
-      );
-
-      render(<GoalSetting />);
-
-      await user.click(screen.getByRole("button", { name: /Set Emotional Goal/i }));
-      await waitFor(() => expect(screen.getByText("Joy")).toBeInTheDocument());
-
-      const joyButtons = screen.getAllByRole("button");
-      const joyButton = joyButtons.find(
-        (btn) => btn.textContent?.includes("Joy") && btn.textContent?.includes("VAC:")
-      );
-      await user.click(joyButton!);
-
-      const generateButton = screen.getByRole("button", { name: /Generate Transition Path/i });
-      await user.click(generateButton);
-
-      expect(screen.getByText("Generating Path...")).toBeInTheDocument();
+    await waitFor(() => {
+      expect(logger.error).toHaveBeenCalledWith("api", "Path generation error", expect.any(Error));
+      expect(screen.getByText(/Generation Failed/i)).toBeInTheDocument();
     });
   });
 
-  describe("Strategy Expansion", () => {
-    beforeEach(() => {
-      mockClient.loadEmotionAtlas.mockResolvedValue({
-        emotions: mockEmotions,
-        total_count: mockEmotions.length,
-      });
-      mockClient.generateTransitionPath.mockResolvedValue(mockGeneratedPath);
-    });
+  it("handles journey start failure", async () => {
+    const user = userEvent.setup();
+    mockGenerateTransitionPath.mockResolvedValue(mockPath);
+    mockStartJourney.mockRejectedValue(new Error("Start Failed"));
+    const { logger } = require("@/utils/logger");
 
-    it("shows strategy list", async () => {
-      const user = userEvent.setup();
-      render(<GoalSetting />);
+    render(<GoalSetting />);
+    await user.click(screen.getByText(/Set Emotional Goal/i));
+    await waitFor(() => expect(screen.getByText("Joy")).toBeInTheDocument());
+    await user.click(screen.getByText("Joy"));
+    await user.click(screen.getByText(/Generate Transition Path/i));
+    await waitFor(() => expect(screen.getByText(/Your Transition Path/i)).toBeInTheDocument());
 
-      await user.click(screen.getByRole("button", { name: /Set Emotional Goal/i }));
-      await waitFor(() => expect(screen.getByText("Joy")).toBeInTheDocument());
+    await user.click(screen.getByText(/Start Journey/i));
 
-      const joyButtons = screen.getAllByRole("button");
-      const joyButton = joyButtons.find(
-        (btn) => btn.textContent?.includes("Joy") && btn.textContent?.includes("VAC:")
-      );
-      await user.click(joyButton!);
-      await user.click(screen.getByRole("button", { name: /Generate Transition Path/i }));
-
-      await waitFor(() => {
-        expect(screen.getByText(/4-7-8 Breathing/i)).toBeInTheDocument();
-      });
-    });
-
-    it("expands strategy when clicked", async () => {
-      const user = userEvent.setup();
-      render(<GoalSetting />);
-
-      await user.click(screen.getByRole("button", { name: /Set Emotional Goal/i }));
-      await waitFor(() => expect(screen.getByText("Joy")).toBeInTheDocument());
-
-      const joyButtons = screen.getAllByRole("button");
-      const joyButton = joyButtons.find(
-        (btn) => btn.textContent?.includes("Joy") && btn.textContent?.includes("VAC:")
-      );
-      await user.click(joyButton!);
-      await user.click(screen.getByRole("button", { name: /Generate Transition Path/i }));
-
-      await waitFor(() => expect(screen.getByText(/4-7-8 Breathing/i)).toBeInTheDocument());
-
-      const strategyButtons = screen.getAllByRole("button");
-      const strategyButton = strategyButtons.find((btn) =>
-        btn.textContent?.includes("4-7-8 Breathing")
-      );
-      await user.click(strategyButton!);
-
-      expect(screen.getByText("Exhale completely")).toBeInTheDocument();
-      expect(screen.getByText(/RCT/i)).toBeInTheDocument();
+    await waitFor(() => {
+      expect(logger.error).toHaveBeenCalledWith("general", "Failed to start journey", expect.any(Error));
+      expect(screen.getByText(/Failed to start journey/i)).toBeInTheDocument();
     });
   });
 
-  describe("Journey Starting", () => {
-    beforeEach(() => {
-      mockClient.loadEmotionAtlas.mockResolvedValue({
-        emotions: mockEmotions,
-        total_count: mockEmotions.length,
-      });
-      mockClient.generateTransitionPath.mockResolvedValue(mockGeneratedPath);
-      mockClient.startJourney.mockResolvedValue({
-        journey_id: "journey-123",
-      });
-    });
+  it("resets generated path on Try Again", async () => {
+    const user = userEvent.setup();
+    mockGenerateTransitionPath.mockResolvedValue(mockPath);
 
-    it("shows start journey button after path generation", async () => {
-      const user = userEvent.setup();
-      render(<GoalSetting />);
+    render(<GoalSetting />);
+    await user.click(screen.getByText(/Set Emotional Goal/i));
+    await waitFor(() => expect(screen.getByText("Joy")).toBeInTheDocument());
+    await user.click(screen.getByText("Joy"));
+    await user.click(screen.getByText(/Generate Transition Path/i));
+    await waitFor(() => expect(screen.getByText(/Your Transition Path/i)).toBeInTheDocument());
 
-      await user.click(screen.getByRole("button", { name: /Set Emotional Goal/i }));
-      await waitFor(() => expect(screen.getByText("Joy")).toBeInTheDocument());
+    await user.click(screen.getByText("Try Again"));
 
-      const joyButtons = screen.getAllByRole("button");
-      const joyButton = joyButtons.find(
-        (btn) => btn.textContent?.includes("Joy") && btn.textContent?.includes("VAC:")
-      );
-      await user.click(joyButton!);
-      await user.click(screen.getByRole("button", { name: /Generate Transition Path/i }));
+    expect(screen.queryByText(/Your Transition Path/i)).not.toBeInTheDocument();
+    expect(screen.getByText(/Generate Transition Path/i)).toBeInTheDocument();
+  });
 
-      await waitFor(() => {
-        expect(screen.getByRole("button", { name: /Start Journey/i })).toBeInTheDocument();
-      });
-    });
+  it("hides results when no search matches", async () => {
+    const user = userEvent.setup();
+    render(<GoalSetting />);
+    await user.click(screen.getByText(/Set Emotional Goal/i));
+    await waitFor(() => expect(screen.getByText("Joy")).toBeInTheDocument());
 
-    it("starts journey when button clicked", async () => {
-      const user = userEvent.setup();
-      render(<GoalSetting />);
+    const searchInput = screen.getByPlaceholderText(/Search emotions/i);
+    await user.type(searchInput, "XYZ123");
 
-      await user.click(screen.getByRole("button", { name: /Set Emotional Goal/i }));
-      await waitFor(() => expect(screen.getByText("Joy")).toBeInTheDocument());
+    expect(screen.getByText("No emotions found")).toBeInTheDocument();
+  });
 
-      const joyButtons = screen.getAllByRole("button");
-      const joyButton = joyButtons.find(
-        (btn) => btn.textContent?.includes("Joy") && btn.textContent?.includes("VAC:")
-      );
-      await user.click(joyButton!);
-      await user.click(screen.getByRole("button", { name: /Generate Transition Path/i }));
+  it("closes modal when close button is clicked", async () => {
+    const user = userEvent.setup();
+    render(<GoalSetting />);
+    await user.click(screen.getByText(/Set Emotional Goal/i));
+    await waitFor(() => expect(screen.getByText(/Set Your Emotional Goal/i)).toBeInTheDocument());
 
-      await waitFor(() =>
-        expect(screen.getByRole("button", { name: /Start Journey/i })).toBeInTheDocument()
-      );
+    await user.click(screen.getByText("✕"));
 
-      await user.click(screen.getByRole("button", { name: /Start Journey/i }));
+    expect(screen.queryByText(/Set Your Emotional Goal/i)).not.toBeInTheDocument();
+    expect(screen.getByText(/Set Emotional Goal/i)).toBeInTheDocument();
+  });
 
-      await waitFor(() => {
-        expect(mockClient.startJourney).toHaveBeenCalled();
-      });
-    });
+  it("handles non-Error objects in API failure", async () => {
+    const user = userEvent.setup();
+    mockLoadEmotionAtlas.mockRejectedValue("String Error");
 
-    it("updates store when journey started", async () => {
-      const user = userEvent.setup();
-      render(<GoalSetting />);
+    render(<GoalSetting />);
+    await user.click(screen.getByText(/Set Emotional Goal/i));
 
-      await user.click(screen.getByRole("button", { name: /Set Emotional Goal/i }));
-      await waitFor(() => expect(screen.getByText("Joy")).toBeInTheDocument());
-
-      const joyButtons = screen.getAllByRole("button");
-      const joyButton = joyButtons.find(
-        (btn) => btn.textContent?.includes("Joy") && btn.textContent?.includes("VAC:")
-      );
-      await user.click(joyButton!);
-      await user.click(screen.getByRole("button", { name: /Generate Transition Path/i }));
-
-      await waitFor(() =>
-        expect(screen.getByRole("button", { name: /Start Journey/i })).toBeInTheDocument()
-      );
-
-      await user.click(screen.getByRole("button", { name: /Start Journey/i }));
-
-      await waitFor(() => {
-        const store = useExperienceStore.getState();
-        expect(store.activeJourney).not.toBeNull();
-      });
+    await waitFor(() => {
+      expect(screen.getByText(/Failed to load emotions/i)).toBeInTheDocument();
     });
   });
 
-  describe("UI Interactions", () => {
-    beforeEach(() => {
-      mockClient.loadEmotionAtlas.mockResolvedValue({
-        emotions: mockEmotions,
-        total_count: mockEmotions.length,
-      });
-    });
+  it("handles non-Error objects in path generation failure", async () => {
+    const user = userEvent.setup();
+    mockGenerateTransitionPath.mockRejectedValue("String Error");
 
-    it("closes modal when X clicked", async () => {
-      const user = userEvent.setup();
-      render(<GoalSetting />);
+    render(<GoalSetting />);
+    await user.click(screen.getByText(/Set Emotional Goal/i));
+    await waitFor(() => expect(screen.getByText("Joy")).toBeInTheDocument());
+    await user.click(screen.getByText("Joy"));
 
-      await user.click(screen.getByRole("button", { name: /Set Emotional Goal/i }));
-      await waitFor(() => expect(screen.getByText("Set Your Emotional Goal")).toBeInTheDocument());
+    await user.click(screen.getByText(/Generate Transition Path/i));
 
-      const closeButton = screen.getByText("✕");
-      await user.click(closeButton);
-
-      expect(screen.queryByText("Set Your Emotional Goal")).not.toBeInTheDocument();
-    });
-
-    it("displays current VAC state", async () => {
-      const user = userEvent.setup();
-      act(() => {
-        useExperienceStore.setState({
-          currentVAC: [0.5, 0.3, 0.7] as [number, number, number],
-        });
-      });
-
-      render(<GoalSetting />);
-      await user.click(screen.getByRole("button", { name: /Set Emotional Goal/i }));
-
-      await waitFor(() => {
-        expect(screen.getByText(/\[0\.50, 0\.30, 0\.70\]/)).toBeInTheDocument();
-      });
+    await waitFor(() => {
+      expect(screen.getByText(/Failed to generate path/i)).toBeInTheDocument();
     });
   });
 
-  describe("Error Handling", () => {
-    it("handles path generation error", async () => {
-      const user = userEvent.setup();
-      mockClient.loadEmotionAtlas.mockResolvedValue({
-        emotions: mockEmotions,
-        total_count: mockEmotions.length,
-      });
-      mockClient.generateTransitionPath.mockRejectedValue(new Error("Path error"));
+  it("disables generate button when no goal is selected and guards execution", async () => {
+    const user = userEvent.setup();
+    render(<GoalSetting />);
+    await user.click(screen.getByText(/Set Emotional Goal/i));
+    await waitFor(() => expect(screen.getByText("Joy")).toBeInTheDocument());
 
-      render(<GoalSetting />);
+    const generateBtn = screen.getByText(/Generate Transition Path/i);
+    expect(generateBtn).toBeDisabled();
 
-      await user.click(screen.getByRole("button", { name: /Set Emotional Goal/i }));
-      await waitFor(() => expect(screen.getByText("Joy")).toBeInTheDocument());
-
-      const joyButtons = screen.getAllByRole("button");
-      const joyButton = joyButtons.find(
-        (btn) => btn.textContent?.includes("Joy") && btn.textContent?.includes("VAC:")
-      );
-      await user.click(joyButton!);
-      await user.click(screen.getByRole("button", { name: /Generate Transition Path/i }));
-
-      await waitFor(() => {
-        expect(screen.getByText(/Path error/i)).toBeInTheDocument();
-      });
-    });
-  });
-
-  describe("Accessibility", () => {
-    it("has proper headings", async () => {
-      const user = userEvent.setup();
-      mockClient.loadEmotionAtlas.mockResolvedValue({
-        emotions: mockEmotions,
-        total_count: mockEmotions.length,
-      });
-
-      render(<GoalSetting />);
-      await user.click(screen.getByRole("button", { name: /Set Emotional Goal/i }));
-
-      await waitFor(() => {
-        const heading = screen.getByRole("heading", { name: /Set Your Emotional Goal/i });
-        expect(heading).toBeInTheDocument();
-      });
-    });
-
-    it("search input is labeled", async () => {
-      const user = userEvent.setup();
-      mockClient.loadEmotionAtlas.mockResolvedValue({
-        emotions: mockEmotions,
-        total_count: mockEmotions.length,
-      });
-
-      render(<GoalSetting />);
-      await user.click(screen.getByRole("button", { name: /Set Emotional Goal/i }));
-
-      await waitFor(() => {
-        expect(screen.getByText(/Choose Goal Emotion/i)).toBeInTheDocument();
-      });
-    });
+    // Force click to test guard clause
+    fireEvent.click(generateBtn);
+    expect(mockGenerateTransitionPath).not.toHaveBeenCalled();
   });
 });

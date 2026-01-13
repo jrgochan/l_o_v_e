@@ -125,6 +125,101 @@ describe("StrategyFeedbackModal", () => {
     });
   });
 
+  it("clears data when strategy is deselected", () => {
+    render(
+      <StrategyFeedbackModal
+        waypoint={mockWaypoint}
+        onSubmit={mockOnSubmit}
+        onSkip={mockOnSkip}
+        onClose={mockOnClose}
+      />
+    );
+
+    // Select and fill data
+    fireEvent.click(screen.getByText("Deep Breathing"));
+    const notesInput = screen.getByPlaceholderText("Any thoughts or observations...");
+    fireEvent.change(notesInput, { target: { value: "Temporary note" } });
+
+    // Deselect
+    fireEvent.click(screen.getByText("Deep Breathing"));
+
+    // Reselect
+    fireEvent.click(screen.getByText("Deep Breathing"));
+
+    // Check clean state
+    const notesInputReopened = screen.getByPlaceholderText("Any thoughts or observations...") as HTMLTextAreaElement;
+    expect(notesInputReopened.value).toBe("");
+  });
+
+  it("toggles completion status off", () => {
+    render(
+      <StrategyFeedbackModal
+        waypoint={mockWaypoint}
+        onSubmit={mockOnSubmit}
+        onSkip={mockOnSkip}
+        onClose={mockOnClose}
+      />
+    );
+
+    fireEvent.click(screen.getByText("Deep Breathing"));
+    const checkbox = screen.getByLabelText("I completed this strategy fully");
+
+    // On
+    fireEvent.click(checkbox);
+    expect(checkbox).toBeChecked();
+
+    // Off
+    fireEvent.click(checkbox);
+    expect(checkbox).not.toBeChecked();
+  });
+
+  it("handles singular star rating label", () => {
+    render(
+      <StrategyFeedbackModal
+        waypoint={mockWaypoint}
+        onSubmit={mockOnSubmit}
+        onSkip={mockOnSkip}
+        onClose={mockOnClose}
+      />
+    );
+
+    fireEvent.click(screen.getByText("Deep Breathing"));
+
+    // Click 1st star
+    const stars = screen.getAllByText("★");
+    fireEvent.click(stars[0]);
+
+    expect(screen.getByText("1 star")).toBeInTheDocument();
+    expect(screen.queryByText("1 stars")).not.toBeInTheDocument();
+  });
+
+  it("handles invalid time input defaulting to 0", () => {
+    render(
+      <StrategyFeedbackModal
+        waypoint={mockWaypoint}
+        onSubmit={mockOnSubmit}
+        onSkip={mockOnSkip}
+        onClose={mockOnClose}
+      />
+    );
+
+    fireEvent.click(screen.getByText("Deep Breathing"));
+    const timeInput = screen.getByPlaceholderText("e.g., 15");
+
+    // First set a value so we can clear it
+    fireEvent.change(timeInput, { target: { value: "15" } });
+
+    // Now clear it (invalid input)
+    fireEvent.change(timeInput, { target: { value: "" } });
+
+    // We can verify this by submitting and checking the payload
+    const submitButton = screen.getByText(/Submit Feedback/);
+    fireEvent.click(submitButton);
+
+    const feedback = mockOnSubmit.mock.calls[0][0][0];
+    expect(feedback.time_spent).toBe(0);
+  });
+
   it("handles skip and close", () => {
     render(
       <StrategyFeedbackModal

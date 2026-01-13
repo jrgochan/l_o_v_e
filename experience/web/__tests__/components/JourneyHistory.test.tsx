@@ -52,7 +52,7 @@ describe("JourneyHistory", () => {
 
   it("renders loading state initially", async () => {
     // Return a promise that doesn't resolve immediately to check loading
-    mockGetUserJourneyHistory.mockReturnValue(new Promise(() => {}));
+    mockGetUserJourneyHistory.mockReturnValue(new Promise(() => { }));
     render(<JourneyHistory userId={mockUserId} />);
     expect(screen.getByText("Loading journey history...")).toBeInTheDocument();
   });
@@ -115,5 +115,85 @@ describe("JourneyHistory", () => {
       fireEvent.click(completedRow);
       expect(screen.getByText(/Waypoints: 2/)).toBeInTheDocument();
     }
+  });
+  it("renders correct duration and status visuals", async () => {
+    const edgeCaseData = {
+      ...mockHistoryData,
+      journeys: [
+        {
+          id: "long-journey",
+          status: "abandoned",
+          started_at: "2024-01-01T10:00:00Z",
+          completed_at: "2024-01-01T12:30:00Z", // 2h 30m
+          waypoints: {}, // 0 waypoints
+          current_waypoint: 0,
+        },
+        {
+          id: "unknown-status",
+          status: "unknown_status_type",
+          started_at: "2024-01-01T10:00:00Z",
+          completed_at: null,
+          waypoints: {},
+          current_waypoint: 0,
+        }
+      ],
+    };
+
+    mockGetUserJourneyHistory.mockResolvedValue(edgeCaseData);
+    render(<JourneyHistory userId={mockUserId} />);
+
+    await waitFor(() => {
+      expect(screen.getByText(/Journey History/)).toBeInTheDocument();
+    });
+    fireEvent.click(screen.getByText(/Journey History/));
+
+    // Check Long Duration (2h 30m)
+    expect(screen.getByText(/2h 30m/)).toBeInTheDocument();
+
+    // Check Abandoned Status Visuals
+    const abandonedRow = screen.getByText("abandoned").closest("div.border");
+    expect(abandonedRow).toHaveClass("bg-red-900/40");
+    expect(screen.getAllByText("✗").length).toBeGreaterThan(0);
+
+    // Check Unknown Status Fallback
+    const unknownRow = screen.getByText("unknown status_type").closest("div.border");
+    expect(unknownRow).toHaveClass("bg-gray-900/40");
+    expect(screen.getByText("?")).toBeInTheDocument();
+
+    // Check 0 Waypoints
+    // Expand the long journey
+    const longJourneyBtn = screen.getByText("abandoned").closest("button");
+    if (longJourneyBtn) {
+      fireEvent.click(longJourneyBtn);
+      expect(screen.getByText(/Waypoints: 0/)).toBeInTheDocument();
+
+      // Click again to collapse (cover toggle logic)
+      fireEvent.click(longJourneyBtn);
+      expect(screen.queryByText(/Waypoints: 0/)).not.toBeInTheDocument();
+    }
+  });
+
+  it("handles fallback for undefined current_waypoint", async () => {
+    const data = {
+      ...mockHistoryData,
+      journeys: [{
+        id: 'legacy',
+        status: 'completed',
+        started_at: '2023-01-01',
+        waypoints: { 'w1': {} },
+        current_waypoint: undefined
+      }]
+    };
+    mockGetUserJourneyHistory.mockResolvedValue(data);
+    render(<JourneyHistory userId={mockUserId} />);
+
+    await waitFor(() => expect(screen.getByText(/Journey History/)).toBeInTheDocument());
+    fireEvent.click(screen.getByText(/Journey History/));
+
+    const row = screen.getByText("completed").closest("button");
+    if (row) fireEvent.click(row);
+
+    // Should NOT show "Progress: Waypoint X"
+    expect(screen.queryByText(/Progress: Waypoint/)).not.toBeInTheDocument();
   });
 });

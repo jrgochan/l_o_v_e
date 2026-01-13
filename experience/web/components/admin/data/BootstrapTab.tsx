@@ -117,6 +117,12 @@ export default function BootstrapTab() {
           </div>
         </div>
 
+        {error && (
+          <div className="bg-red-500/10 border border-red-500/20 text-red-400 px-4 py-3 rounded-lg">
+            {error}
+          </div>
+        )}
+
         <div className="grid grid-cols-2 gap-4">
           <div>
             <label htmlFor="type-select" className="block text-sm font-medium text-gray-400 mb-1">

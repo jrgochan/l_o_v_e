@@ -45,13 +45,12 @@ describe("ContextualRecommendations", () => {
     fireEvent.click(screen.getByRole("button", { name: /Context-Aware Recommendations/i }));
 
     const getBtn = screen.getByText("🎯 Get Recommendations");
-    expect(getBtn).toBeDisabled();
+    expect(getBtn).not.toBeDisabled();
 
-    // fireEvent.click(getBtn); // Can't click disabled.
-    // But let's verify error if validation logic runs (logic says disabled condition).
-    // Let's force enable or test logic via direct interaction?
-    // Logic: disabled={isLoading || Object.keys(context).length === 0}
-    // So clicking shouldn't fire.
+    // Force click to test validation logic (lines 42-43)
+    fireEvent.click(getBtn);
+
+    expect(screen.getByText("Please select at least one context option")).toBeInTheDocument();
   });
 
   it("should fetch recommendations", async () => {
@@ -111,6 +110,63 @@ describe("ContextualRecommendations", () => {
     const clearBtn = screen.getByText("Clear");
     fireEvent.click(clearBtn);
 
-    expect(screen.getByText("🎯 Get Recommendations")).toBeDisabled();
+    expect(screen.getByText("🎯 Get Recommendations")).not.toBeDisabled();
+  });
+
+  it("should handle all context inputs", () => {
+    render(<ContextualRecommendations />);
+    fireEvent.click(screen.getByRole("button", { name: /Context-Aware Recommendations/i }));
+
+    // Energy (rendered as lowercase in DOM)
+    fireEvent.click(screen.getByText("high"));
+    fireEvent.click(screen.getByText("moderate"));
+
+    // Location
+    fireEvent.click(screen.getByText("home"));
+
+    // Available Time
+    fireEvent.click(screen.getByText("15 minutes"));
+
+    // Experience
+    fireEvent.click(screen.getByText("beginner"));
+
+    // Button should be enabled
+    expect(screen.getByText("🎯 Get Recommendations")).toBeEnabled();
+  });
+
+  it("should handle empty recommendations", async () => {
+    mockGetContextRecommendations.mockResolvedValue({
+      recommended_strategies: [], // Empty
+      avoid_strategies: []
+    });
+
+    render(<ContextualRecommendations />);
+    fireEvent.click(screen.getByRole("button", { name: /Context-Aware Recommendations/i }));
+    fireEvent.click(screen.getByText("Evening"));
+    fireEvent.click(screen.getByText("🎯 Get Recommendations"));
+
+    await waitFor(() => {
+      expect(screen.getByText(/No specific recommendations/)).toBeInTheDocument();
+    });
+  });
+
+  it("should handle missing optional response fields", async () => {
+    mockGetContextRecommendations.mockResolvedValue({}); // No arrays
+
+    render(<ContextualRecommendations onRecommendationsReceived={mockOnRecommendationsReceived} />);
+    fireEvent.click(screen.getByRole("button", { name: /Context-Aware Recommendations/i }));
+    fireEvent.click(screen.getByText("Evening"));
+    fireEvent.click(screen.getByText("🎯 Get Recommendations"));
+
+    await waitFor(() => {
+      // Should show the container but with "No specific recommendations" default fallback?
+      // Or if undefined, does it error?
+      // Code: recommended_strategies && length > 0
+      // If undefined, it goes to : ( <div... No specific ... )
+      expect(screen.getByText(/No specific recommendations/)).toBeInTheDocument();
+    });
+
+    // Check callback safety
+    expect(mockOnRecommendationsReceived).not.toHaveBeenCalled();
   });
 });

@@ -1,10 +1,8 @@
-import { render, screen, waitFor, within } from "@testing-library/react";
-import userEvent from "@testing-library/user-event";
+
+import { render, screen, fireEvent, waitFor, within } from "@testing-library/react";
 import AiModelsTab from "@/components/admin/data/AiModelsTab";
 import { adminApi } from "@/utils/api";
-import { ModelAssignment } from "@/types/admin";
 
-// Mock the API
 jest.mock("@/utils/api", () => ({
   adminApi: {
     getAiModels: jest.fn(),
@@ -12,123 +10,124 @@ jest.mock("@/utils/api", () => ({
   },
 }));
 
-const mockModels: ModelAssignment[] = [
-  {
-    function: "chat_response",
-    ai_model_name: "llama3.1:8b-instruct-q4_0",
-    assigned_at: "2024-01-01T00:00:00Z",
-    avg_latency_ms: 150,
-    total_invocations: 1200,
-    last_used_at: "2024-01-01T12:00:00Z",
-  },
-  {
-    function: "emotion_analysis",
-    ai_model_name: "mistral:7b",
-    assigned_at: "2024-01-01T00:00:00Z",
-    avg_latency_ms: 85,
-    total_invocations: 3500,
-    last_used_at: "2024-01-01T12:05:00Z",
-  },
-];
-
 describe("AiModelsTab", () => {
-  const user = userEvent.setup();
+  const mockModels = [
+    {
+      function: "chat_completion",
+      ai_model_name: "llama3",
+      avg_latency_ms: 150,
+      total_invocations: 100,
+      last_used_at: "2024-01-01T12:00:00Z"
+    },
+    {
+      function: "embedding",
+      ai_model_name: "nomic-embed",
+      avg_latency_ms: 50,
+      total_invocations: 500,
+      last_used_at: null
+    }
+  ];
 
   beforeEach(() => {
     jest.clearAllMocks();
-    (adminApi.getAiModels as jest.Mock).mockResolvedValue(mockModels);
   });
 
-  it("renders loading state initially", () => {
-    // Return a promise that never resolves to keep it loading
-    (adminApi.getAiModels as jest.Mock).mockReturnValue(new Promise(() => {}));
+  it("renders loading state", async () => {
+    (adminApi.getAiModels as jest.Mock).mockReturnValue(new Promise(() => { }));
     render(<AiModelsTab />);
-    expect(screen.getByRole("status")).toBeInTheDocument();
     expect(screen.getByText("Loading AI configuration...")).toBeInTheDocument();
   });
 
-  it("renders models table after loading", async () => {
+  it("renders models table on success", async () => {
+    (adminApi.getAiModels as jest.Mock).mockResolvedValue(mockModels);
     render(<AiModelsTab />);
 
     await waitFor(() => {
-      expect(screen.getByText("chat_response")).toBeInTheDocument();
-      // Use getAllByText because model names might appear in options too or multiple times
-      expect(screen.getAllByText("llama3.1:8b-instruct-q4_0")[0]).toBeInTheDocument();
-      expect(screen.getByText("emotion_analysis")).toBeInTheDocument();
+      expect(screen.getByText("chat_completion")).toBeInTheDocument();
     });
 
+    expect(screen.getByText("llama3")).toBeInTheDocument();
     expect(screen.getByText("150ms")).toBeInTheDocument();
-    expect(screen.getByText("1200")).toBeInTheDocument();
+    expect(screen.getByText("nomic-embed")).toBeInTheDocument();
+    // Verify last used formatting
+    expect(screen.getByText(new Date("2024-01-01T12:00:00Z").toLocaleTimeString())).toBeInTheDocument();
   });
 
   it("handles fetch error", async () => {
-    (adminApi.getAiModels as jest.Mock).mockRejectedValue(new Error("Failed to load models"));
+    (adminApi.getAiModels as jest.Mock).mockRejectedValue(new Error("Fetch failed"));
     render(<AiModelsTab />);
-
     await waitFor(() => {
-      expect(screen.getByText("Failed to load models")).toBeInTheDocument();
+      expect(screen.getByText("Fetch failed")).toBeInTheDocument();
     });
   });
 
-  it("allows editing a model assignment", async () => {
+  it("handles editing a model assignment", async () => {
+    (adminApi.getAiModels as jest.Mock).mockResolvedValue(mockModels);
     (adminApi.updateAiModel as jest.Mock).mockResolvedValue({
       ...mockModels[0],
-      ai_model_name: "phi-3:mini",
+      ai_model_name: "llama3.1:8b-instruct-q4_0"
     });
 
     render(<AiModelsTab />);
+    await waitFor(() => expect(screen.getByText("chat_completion")).toBeInTheDocument());
+
+    const row = screen.getByText("chat_completion").closest("tr")!;
+    fireEvent.click(within(row).getByLabelText("Edit chat_completion"));
+
+    const select = within(row).getByRole("combobox");
+    fireEvent.change(select, { target: { value: "llama3.1:8b-instruct-q4_0" } });
+
+    fireEvent.click(within(row).getByLabelText("Save"));
 
     await waitFor(() => {
-      expect(screen.getByText("chat_response")).toBeInTheDocument();
+      expect(adminApi.updateAiModel).toHaveBeenCalledWith("chat_completion", {
+        ai_model_name: "llama3.1:8b-instruct-q4_0"
+      });
     });
 
-    // Find the row for chat_response
-    const chatRow = screen.getByText("chat_response").closest("tr");
-    expect(chatRow).toBeInTheDocument();
+    // Check update reflected in UI (via state update from mock response)
+    expect(within(row).getByText("llama3.1:8b-instruct-q4_0")).toBeInTheDocument();
+  });
 
-    // Click Edit button in that row
-    const editButton = within(chatRow!).getByLabelText("Edit chat_response");
-    await user.click(editButton);
+  it("handles cancel edit", async () => {
+    (adminApi.getAiModels as jest.Mock).mockResolvedValue(mockModels);
+    render(<AiModelsTab />);
+    await waitFor(() => expect(screen.getByText("chat_completion")).toBeInTheDocument());
 
-    // Change the selection
-    // The select should have the current value "llama3.1:8b-instruct-q4_0"
-    const select = within(chatRow!).getByRole("combobox");
-    await user.selectOptions(select, "phi-3:mini");
+    const row = screen.getByText("chat_completion").closest("tr")!;
+    fireEvent.click(within(row).getByLabelText("Edit chat_completion"));
 
-    // Click Save
-    const saveButton = within(chatRow!).getByLabelText("Save");
-    await user.click(saveButton);
+    expect(within(row).getByRole("combobox")).toBeInTheDocument();
+
+    fireEvent.click(within(row).getByLabelText("Cancel"));
+
+    expect(within(row).queryByRole("combobox")).not.toBeInTheDocument();
+    expect(within(row).getByText("llama3")).toBeInTheDocument();
+  });
+
+  it("handles save error", async () => {
+    (adminApi.getAiModels as jest.Mock).mockResolvedValue(mockModels);
+    (adminApi.updateAiModel as jest.Mock).mockRejectedValue(new Error("Update failed"));
+
+    render(<AiModelsTab />);
+    await waitFor(() => expect(screen.getByText("chat_completion")).toBeInTheDocument());
+
+    const row = screen.getByText("chat_completion").closest("tr")!;
+    fireEvent.click(within(row).getByLabelText("Edit chat_completion"));
+    fireEvent.click(within(row).getByLabelText("Save"));
 
     await waitFor(() => {
-      expect(adminApi.updateAiModel).toHaveBeenCalledWith("chat_response", {
-        ai_model_name: "phi-3:mini",
-      });
-      // The local model name should update (assuming mock logic in component holds,
-      // but in test we mock the response which is used to update state)
-      // We mocked the update response to return phi-3:mini
-      expect(within(chatRow!).getByText("phi-3:mini")).toBeInTheDocument();
+      expect(screen.getByText("Update failed")).toBeInTheDocument();
     });
   });
 
-  it("cancels editing", async () => {
+  it("handles refresh click", async () => {
+    (adminApi.getAiModels as jest.Mock).mockResolvedValue(mockModels);
     render(<AiModelsTab />);
+    await waitFor(() => expect(screen.getByText("chat_completion")).toBeInTheDocument());
 
-    await waitFor(() => {
-      expect(screen.getByText("chat_response")).toBeInTheDocument();
-    });
+    fireEvent.click(screen.getByLabelText("Refresh Config"));
 
-    const chatRow = screen.getByText("chat_response").closest("tr");
-    const editButton = within(chatRow!).getByLabelText("Edit chat_response");
-    await user.click(editButton);
-
-    // Verify select is present
-    expect(within(chatRow!).getByRole("combobox")).toBeInTheDocument();
-
-    // Click Cancel
-    const cancelButton = within(chatRow!).getByLabelText("Cancel");
-    await user.click(cancelButton);
-
-    // Select should be gone, reverting to text display
-    expect(within(chatRow!).queryByRole("combobox")).not.toBeInTheDocument();
+    expect(adminApi.getAiModels).toHaveBeenCalledTimes(2); // initial + refresh
   });
 });

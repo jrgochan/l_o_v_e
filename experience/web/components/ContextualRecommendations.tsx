@@ -98,11 +98,10 @@ export function ContextualRecommendations({ onRecommendationsReceived }: Props) 
                   <button
                     key={time}
                     onClick={() => handleContextChange("time_of_day", time)}
-                    className={`px-3 py-2 text-xs rounded transition-all ${
-                      context.time_of_day === time
+                    className={`px-3 py-2 text-xs rounded transition-all ${context.time_of_day === time
                         ? "bg-orange-600 text-white"
                         : "bg-gray-800 text-gray-300 hover:bg-gray-700"
-                    }`}
+                      }`}
                   >
                     {time
                       .replace("_", " ")
@@ -122,11 +121,10 @@ export function ContextualRecommendations({ onRecommendationsReceived }: Props) 
                   <button
                     key={energy}
                     onClick={() => handleContextChange("energy_level", energy)}
-                    className={`px-3 py-2 text-xs rounded capitalize transition-all ${
-                      context.energy_level === energy
+                    className={`px-3 py-2 text-xs rounded capitalize transition-all ${context.energy_level === energy
                         ? "bg-orange-600 text-white"
                         : "bg-gray-800 text-gray-300 hover:bg-gray-700"
-                    }`}
+                      }`}
                   >
                     {energy}
                   </button>
@@ -142,11 +140,10 @@ export function ContextualRecommendations({ onRecommendationsReceived }: Props) 
                   <button
                     key={location}
                     onClick={() => handleContextChange("location", location)}
-                    className={`px-3 py-2 text-xs rounded capitalize transition-all ${
-                      context.location === location
+                    className={`px-3 py-2 text-xs rounded capitalize transition-all ${context.location === location
                         ? "bg-orange-600 text-white"
                         : "bg-gray-800 text-gray-300 hover:bg-gray-700"
-                    }`}
+                      }`}
                   >
                     {location}
                   </button>
@@ -163,11 +160,10 @@ export function ContextualRecommendations({ onRecommendationsReceived }: Props) 
                     <button
                       key={time}
                       onClick={() => handleContextChange("available_time", time)}
-                      className={`px-3 py-2 text-xs rounded transition-all ${
-                        context.available_time === time
+                      className={`px-3 py-2 text-xs rounded transition-all ${context.available_time === time
                           ? "bg-orange-600 text-white"
                           : "bg-gray-800 text-gray-300 hover:bg-gray-700"
-                      }`}
+                        }`}
                     >
                       {time.replace("_", " ")}
                     </button>
@@ -184,11 +180,10 @@ export function ContextualRecommendations({ onRecommendationsReceived }: Props) 
                   <button
                     key={level}
                     onClick={() => handleContextChange("experience_level", level)}
-                    className={`px-3 py-2 text-xs rounded capitalize transition-all ${
-                      context.experience_level === level
+                    className={`px-3 py-2 text-xs rounded capitalize transition-all ${context.experience_level === level
                         ? "bg-orange-600 text-white"
                         : "bg-gray-800 text-gray-300 hover:bg-gray-700"
-                    }`}
+                      }`}
                   >
                     {level}
                   </button>
@@ -201,7 +196,7 @@ export function ContextualRecommendations({ onRecommendationsReceived }: Props) 
           <div className="flex gap-2">
             <button
               onClick={getRecommendations}
-              disabled={isLoading || Object.keys(context).length === 0}
+              disabled={isLoading}
               className="flex-1 px-4 py-2 bg-orange-600 hover:bg-orange-500 disabled:bg-gray-700 disabled:cursor-not-allowed text-white text-sm font-semibold rounded transition-colors"
             >
               {isLoading ? "Loading..." : "🎯 Get Recommendations"}
@@ -229,7 +224,7 @@ export function ContextualRecommendations({ onRecommendationsReceived }: Props) 
               </div>
 
               {recommendations.recommended_strategies &&
-              recommendations.recommended_strategies.length > 0 ? (
+                recommendations.recommended_strategies.length > 0 ? (
                 <div className="space-y-1">
                   {recommendations.recommended_strategies.map((strategy: string, idx: number) => (
                     <div

@@ -1,10 +1,8 @@
-import { render, screen, waitFor } from "@testing-library/react";
-import userEvent from "@testing-library/user-event";
+
+import { render, screen, fireEvent, waitFor, within } from "@testing-library/react";
 import BootstrapTab from "@/components/admin/data/BootstrapTab";
 import { adminApi } from "@/utils/api";
-import { BootstrapData } from "@/types/admin";
 
-// Mock the API
 jest.mock("@/utils/api", () => ({
   adminApi: {
     getBootstrapData: jest.fn(),
@@ -14,143 +12,219 @@ jest.mock("@/utils/api", () => ({
   },
 }));
 
-const mockData: BootstrapData[] = [
-  {
-    id: "item-1",
-    data_type: "strategy_effectiveness",
-    data_category: "anxiety",
-    content: { score: 0.8 },
-    created_at: "2024-01-01T12:00:00Z",
-    updated_at: "2024-01-01T12:00:00Z",
-  },
-  {
-    id: "item-2",
-    data_type: "path_template",
-    data_category: "depression",
-    content: { steps: ["breath", "move"] },
-    created_at: "2024-01-02T12:00:00Z",
-    updated_at: "2024-01-02T12:00:00Z",
-  },
-];
-
 describe("BootstrapTab", () => {
-  const user = userEvent.setup();
+  const mockData = [
+    {
+      id: "b1",
+      data_type: "strategy_effectiveness",
+      data_category: "cat1",
+      content: { foo: "bar" },
+      created_at: "2024-01-01T00:00:00Z"
+    },
+    {
+      id: "b2",
+      data_type: "path_template",
+      data_category: null,
+      content: { baz: "qux" },
+      created_at: "2024-02-01T00:00:00Z"
+    }
+  ];
 
   beforeEach(() => {
     jest.clearAllMocks();
+  });
+
+  it("renders loading state", async () => {
+    (adminApi.getBootstrapData as jest.Mock).mockReturnValue(new Promise(() => { }));
+    const { container } = render(<BootstrapTab />);
+    expect(container.querySelector(".animate-spin")).toBeInTheDocument();
+  });
+
+  it("renders data list on success", async () => {
     (adminApi.getBootstrapData as jest.Mock).mockResolvedValue(mockData);
-    window.confirm = jest.fn(() => true);
-  });
-
-  it("renders loading state", () => {
-    (adminApi.getBootstrapData as jest.Mock).mockReturnValue(new Promise(() => {}));
-    render(<BootstrapTab />);
-    // Since I didn't add role="status" to the spinner specifically but the refresh button has it or similar?
-    // Wait, the Spinner is inside the Refresh button.
-    // The main loading logic for initial load:
-    // `if (loading && data.length === 0)` -> returns "No bootstrap data found" or spinner?
-    // Check file content: line 264.
-    // "No bootstrap data found" is shown if !loading.
-    // Initial loading state?
-    // There isn't an explicit full-screen loader returned. It just renders the empty list initially?
-    // Wait, line 263: `{data.length === 0 && !loading && ...}`
-    // So if loading is true, it just shows header + headers?
-    // Ah, line 203: `<RefreshCw className={... loading ? "animate-spin" ...} />`
-    // So the refresh button spins.
-
-    // Actually, look at useEffect. `loadData` sets loading=true.
-    // So initially `data` is empty and `loading` is true.
-    // The "No data" message is hidden.
-    // The list is empty.
-
-    // I should check that the API is called.
-    // To properly test "Loading", I should check if the refresh icon is spinning?
-    // Class check on SVG is tricky.
-    // Let's just verify it calls API and renders list.
-  });
-
-  it("renders data list after loading", async () => {
-    render(<BootstrapTab />);
-
-    // Wait for specific data that is ONLY present in the list, not in filters
-    await waitFor(() => {
-      const els3 = screen.getAllByText("anxiety");
-      expect(els3.length).toBeGreaterThan(0);
-    });
-  });
-
-  it("handles filtering", async () => {
     render(<BootstrapTab />);
 
     await waitFor(() => {
-      expect(screen.getAllByText("anxiety").length).toBeGreaterThan(0);
+      expect(screen.getByText("cat1")).toBeInTheDocument();
     });
 
-    const filterSelect = screen.getByLabelText("Filter by Type");
-    await user.selectOptions(filterSelect, "path_template");
+    expect(screen.getAllByText("strategy_effectiveness").length).toBeGreaterThan(0);
+    expect(screen.getAllByText("path_template").length).toBeGreaterThan(0);
+    // Verify JSON content display
+    expect(screen.getByText(/"foo": "bar"/)).toBeInTheDocument();
+  });
+
+  it("handles filter change", async () => {
+    (adminApi.getBootstrapData as jest.Mock).mockResolvedValue(mockData);
+    render(<BootstrapTab />);
+
+    await waitFor(() => {
+      expect(adminApi.getBootstrapData).toHaveBeenCalledWith(undefined);
+    });
+
+    const filter = screen.getByLabelText("Filter by Type");
+    fireEvent.change(filter, { target: { value: "path_template" } });
 
     await waitFor(() => {
       expect(adminApi.getBootstrapData).toHaveBeenCalledWith("path_template");
     });
   });
 
-  it("creates a new item", async () => {
+  it("handles item deletion", async () => {
+    (adminApi.getBootstrapData as jest.Mock).mockResolvedValue(mockData);
+    (adminApi.deleteBootstrapData as jest.Mock).mockResolvedValue({});
+
+    // Mock confirm
+    window.confirm = jest.fn(() => true);
+
     render(<BootstrapTab />);
-    await waitFor(() => expect(screen.getAllByText("anxiety").length).toBeGreaterThan(0));
+    await waitFor(() => expect(screen.getByText("cat1")).toBeInTheDocument());
 
-    const addButton = screen.getByLabelText("Add Item");
-    await user.click(addButton);
-
-    expect(screen.getByText("New Item")).toBeInTheDocument();
-
-    const saveButton = screen.getByLabelText("Save Item");
-    await user.click(saveButton);
-
-    await waitFor(() => {
-      expect(adminApi.createBootstrapData).toHaveBeenCalled();
-    });
-  });
-
-  it("edits an item", async () => {
-    render(<BootstrapTab />);
-    await waitFor(() => expect(screen.getAllByText("anxiety").length).toBeGreaterThan(0));
-
-    const editButtons = screen.getAllByTestId("edit-btn-item-1");
-    const editButton = editButtons[0];
-    await user.click(editButton);
-
-    expect(screen.getByText("Edit Item")).toBeInTheDocument();
-
-    // Use new label htmlFor
-    const input = screen.getByLabelText("Category (Optional)");
-    await user.clear(input);
-    await user.type(input, "updated-cat");
-
-    const saveButton = screen.getByLabelText("Save Item");
-    await user.click(saveButton);
-
-    await waitFor(() => {
-      expect(adminApi.updateBootstrapData).toHaveBeenCalledWith(
-        "item-1",
-        expect.objectContaining({
-          data_category: "updated-cat",
-        })
-      );
-    });
-  });
-
-  it("deletes an item", async () => {
-    render(<BootstrapTab />);
-    await waitFor(() => expect(screen.getAllByText("anxiety").length).toBeGreaterThan(0));
-
-    const deleteButtons = screen.getAllByTestId("delete-btn-item-1");
-    const deleteButton = deleteButtons[0];
-    await user.click(deleteButton);
+    const deleteBtn = screen.getByTestId("delete-btn-b1");
+    fireEvent.click(deleteBtn);
 
     expect(window.confirm).toHaveBeenCalled();
+    await waitFor(() => {
+      expect(adminApi.deleteBootstrapData).toHaveBeenCalledWith("b1");
+      expect(adminApi.getBootstrapData).toHaveBeenCalledTimes(2); // Reload triggered
+    });
+  });
+
+  it("cancels deletion if not confirmed", async () => {
+    (adminApi.getBootstrapData as jest.Mock).mockResolvedValue(mockData);
+    window.confirm = jest.fn(() => false);
+
+    render(<BootstrapTab />);
+    await waitFor(() => expect(screen.getByText("cat1")).toBeInTheDocument());
+
+    fireEvent.click(screen.getByTestId("delete-btn-b1"));
+    expect(adminApi.deleteBootstrapData).not.toHaveBeenCalled();
+  });
+
+  it("handles item creation flow", async () => {
+    (adminApi.getBootstrapData as jest.Mock).mockResolvedValue(mockData);
+    (adminApi.createBootstrapData as jest.Mock).mockResolvedValue({});
+
+    render(<BootstrapTab />);
+    await waitFor(() => expect(screen.getByText("cat1")).toBeInTheDocument());
+
+    fireEvent.click(screen.getByLabelText("Add Item"));
+
+    // Check form appears
+    expect(screen.getByText("New Item")).toBeInTheDocument();
+
+    // Fill form
+    fireEvent.change(screen.getByLabelText(/Category/), { target: { value: "New Cat" } });
+    fireEvent.change(screen.getByLabelText(/JSON Content/), { target: { value: '{"new": "val"}' } });
+
+    fireEvent.click(screen.getByLabelText("Save Item"));
 
     await waitFor(() => {
-      expect(adminApi.deleteBootstrapData).toHaveBeenCalledWith("item-1");
+      expect(adminApi.createBootstrapData).toHaveBeenCalledWith(expect.objectContaining({
+        data_category: "New Cat",
+        content: { new: "val" }
+      }));
+      expect(adminApi.getBootstrapData).toHaveBeenCalledTimes(2); // Reload
+    });
+
+    // Should return to list view
+    expect(screen.queryByText("New Item")).not.toBeInTheDocument();
+  });
+
+  it("handles item edit flow", async () => {
+    (adminApi.getBootstrapData as jest.Mock).mockResolvedValue(mockData);
+    (adminApi.updateBootstrapData as jest.Mock).mockResolvedValue({});
+
+    render(<BootstrapTab />);
+    await waitFor(() => expect(screen.getByText("cat1")).toBeInTheDocument());
+
+    fireEvent.click(screen.getByTestId("edit-btn-b1"));
+
+    expect(screen.getByText("Edit Item")).toBeInTheDocument();
+    expect(screen.getByDisplayValue("cat1")).toBeInTheDocument();
+
+    // Change value
+    fireEvent.change(screen.getByLabelText(/Category/), { target: { value: "Updated Cat" } });
+
+    fireEvent.click(screen.getByLabelText("Save Item"));
+
+    await waitFor(() => {
+      expect(adminApi.updateBootstrapData).toHaveBeenCalledWith("b1", expect.objectContaining({
+        data_category: "Updated Cat"
+      }));
+    });
+  });
+
+  it("handles invalid JSON in editor", async () => {
+    (adminApi.getBootstrapData as jest.Mock).mockResolvedValue(mockData);
+    render(<BootstrapTab />);
+    await waitFor(() => expect(screen.getByText("cat1")).toBeInTheDocument());
+
+    fireEvent.click(screen.getByLabelText("Add Item"));
+
+    const jsonInput = screen.getByLabelText(/JSON Content/);
+
+    // Invalid JSON input (component swallows error but doesn't update state)
+    // Or if component allows typing but doesn't update internal 'content' object?
+    // Let's see: `onChange` tries `JSON.parse`. If fails, catches. 
+    // It does NOT update `currentEdit.content`. 
+    // BUT since it's controlled `value={...JSON.stringify...}`, 
+    // if `currentEdit.content` doesn't update, the textarea value will revert to old valid json!
+    // This is a UI quirk in the component "Allow simple editing...".
+    // "For now, we rely on the user pasting valid JSON or careful editing"
+    // Actually if `currentEdit.content` is not updated, the textarea will rerender with the old value immediately, preventing typing invalid json!
+    // Wait, the component code is:
+    /*
+     value={JSON.stringify(currentEdit.content, null, 2)}
+     onChange={(e) => {
+       try {
+         const parsed = JSON.parse(e.target.value);
+         setCurrentEdit({ ...currentEdit, content: parsed });
+       } catch {}
+     }}
+    */
+    // YES, this component implementation prevents typing partial JSON. You can only type/paste VALID full JSON at once.
+    // This is a known issue/feature. 
+    // Testing this: if I fireChange with invalid JSON, the state won't update.
+
+    // However, Jest fireEvent/Simulate doesn't exactly simulate the "revert" visually unless we check what happens.
+    // If I fire "{" (invalid), state not updated. value remains `{}` (default).
+    // So let's test that protection.
+
+    const initialValue = jsonInput.textContent || jsonInput.value; // likely "{}"
+    fireEvent.change(jsonInput, { target: { value: "{" } });
+
+    // Since state didn't update, the rerender should show initialValue
+    expect(jsonInput).toHaveValue(initialValue);
+  });
+
+  it("handles save error", async () => {
+    (adminApi.getBootstrapData as jest.Mock).mockResolvedValue(mockData);
+    (adminApi.updateBootstrapData as jest.Mock).mockRejectedValue(new Error("Save failed"));
+
+    render(<BootstrapTab />);
+    await waitFor(() => expect(screen.getByText("cat1")).toBeInTheDocument());
+
+    fireEvent.click(screen.getByTestId("edit-btn-b1"));
+    fireEvent.click(screen.getByLabelText("Save Item"));
+
+    await waitFor(() => {
+      expect(screen.getByText(/Failed to save item/)).toBeInTheDocument();
+    });
+  });
+
+  it("handles delete error", async () => {
+    (adminApi.getBootstrapData as jest.Mock).mockResolvedValue(mockData);
+    (adminApi.deleteBootstrapData as jest.Mock).mockRejectedValue(new Error("Delete failed"));
+    window.confirm = jest.fn(() => true);
+
+    render(<BootstrapTab />);
+    await waitFor(() => expect(screen.getByText("cat1")).toBeInTheDocument());
+
+    fireEvent.click(screen.getByTestId("delete-btn-b1"));
+
+    await waitFor(() => {
+      expect(screen.getByText("Failed to delete item")).toBeInTheDocument();
     });
   });
 });
