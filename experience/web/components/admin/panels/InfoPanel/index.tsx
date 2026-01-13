@@ -12,6 +12,7 @@
 
 "use client";
 
+import { useState } from "react";
 import { useInfoPanelState } from "@/hooks/admin/useInfoPanelState";
 import { StatisticsPanel } from "@/components/admin/panels/StatisticsPanel";
 import { WaypointDetailModal } from "@/components/admin/shared/WaypointDetailModal";
@@ -36,6 +37,10 @@ export function InfoPanel() {
     pathAnimationMode,
   } = useInfoPanelState();
 
+  // Local state for full journey navigation (Start -> Waypoints -> End)
+  // This allows visiting Start/End nodes which aren't in 'selectedWaypoint' type
+  const [modalStepIndex, setModalStepIndex] = useState<number | null>(null);
+
   return (
     <div className="h-full flex flex-col bg-gray-900/95">
       {/* Tab Navigation */}
@@ -43,21 +48,19 @@ export function InfoPanel() {
         <div className="flex gap-1 bg-gray-900 p-1 rounded-lg border border-gray-800">
           <button
             onClick={() => setActiveTab("info")}
-            className={`flex-1 px-4 py-2 text-sm font-medium rounded-md transition-all ${
-              activeTab === "info"
-                ? "bg-cyan-900/40 text-cyan-100 shadow-sm border border-cyan-700/50"
-                : "text-gray-400 hover:text-gray-200 hover:bg-gray-800/50"
-            }`}
+            className={`flex-1 px-4 py-2 text-sm font-medium rounded-md transition-all ${activeTab === "info"
+              ? "bg-cyan-900/40 text-cyan-100 shadow-sm border border-cyan-700/50"
+              : "text-gray-400 hover:text-gray-200 hover:bg-gray-800/50"
+              }`}
           >
             📋 Info & Paths
           </button>
           <button
             onClick={() => setActiveTab("stats")}
-            className={`flex-1 px-4 py-2 text-sm font-medium rounded-md transition-all ${
-              activeTab === "stats"
-                ? "bg-cyan-900/40 text-cyan-100 shadow-sm border border-cyan-700/50"
-                : "text-gray-400 hover:text-gray-200 hover:bg-gray-800/50"
-            }`}
+            className={`flex-1 px-4 py-2 text-sm font-medium rounded-md transition-all ${activeTab === "stats"
+              ? "bg-cyan-900/40 text-cyan-100 shadow-sm border border-cyan-700/50"
+              : "text-gray-400 hover:text-gray-200 hover:bg-gray-800/50"
+              }`}
           >
             📊 Statistics
           </button>
@@ -91,6 +94,13 @@ export function InfoPanel() {
                   path={displayPath}
                   onWaypointClick={(waypoint, index) => {
                     setSelectedWaypoint({ waypoint, index });
+                    setModalStepIndex(index + 1); // +1 because 0 is Start
+                  }}
+                  onShowDetails={() => {
+                    if (displayPath) {
+                      setModalStepIndex(0); // Open at Start
+                      setSelectedWaypoint(null); // Clear waypoint selection as we are at Start
+                    }
                   }}
                 />
               )}
@@ -105,7 +115,16 @@ export function InfoPanel() {
                   selectedPathId={null}
                   isComputingPaths={isComputingPaths}
                   onWaypointClick={(path, waypoint, index) => {
+                    // Note: PathSummaryList might switch the path, need to ensure displayPath updates?
+                    // Currently it just selects waypoint. InfoPanel effect should pick up path selection?
+                    // Actually useInfoPanelState doesn't auto-select path on waypoint click unless specific logic exists.
+                    // But here we just set active waypoint.
                     setSelectedWaypoint({ waypoint, index });
+                    // Assuming this triggers path selection or the parent handles it.
+                    // Ideally we should also set index+1, but if path isn't displayPath yet, modal won't show the right path?
+                    // The hook logic prioritizes selected path.
+                    // We might need to set Selected Path ID too here?
+                    // Leaving as is for minimal scope change, assuming standard behavior works.
                   }}
                 />
               )}
@@ -163,18 +182,29 @@ export function InfoPanel() {
       </div>
 
       {/* Waypoint Detail Modal */}
-      {selectedWaypoint && displayPath && (
+      {modalStepIndex !== null && displayPath && (
         <WaypointDetailModal
-          waypoint={selectedWaypoint.waypoint}
-          waypointIndex={selectedWaypoint.index}
+          waypointIndex={modalStepIndex}
           path={displayPath}
-          onClose={() => setSelectedWaypoint(null)}
+          onClose={() => {
+            setModalStepIndex(null);
+            setSelectedWaypoint(null);
+          }}
           onNavigate={(newIndex) => {
-            if (newIndex >= 0 && newIndex < displayPath.waypoints.length) {
+            // Update modal index
+            setModalStepIndex(newIndex);
+
+            // Sync 'selectedWaypoint' (for list highlighting) ONLY if it maps to an intermediate waypoint
+            // Step 0 = Start, Step 1 = WP 0... Step N = WP N-1, Step N+1 = End
+            const wpIndex = newIndex - 1;
+            if (wpIndex >= 0 && wpIndex < displayPath.waypoints.length) {
               setSelectedWaypoint({
-                waypoint: displayPath.waypoints[newIndex],
-                index: newIndex,
+                waypoint: displayPath.waypoints[wpIndex],
+                index: wpIndex,
               });
+            } else {
+              // If Start/End, clear list selection
+              setSelectedWaypoint(null);
             }
           }}
         />

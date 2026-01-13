@@ -303,8 +303,8 @@ const AtlasAdminContent = () => {
                 playClickSound();
               }}
               className={`px-3 py-2 rounded transition flex items-center gap-2 text-sm ${isMuted
-                  ? "bg-red-900/50 text-red-200 hover:bg-red-800/50"
-                  : "bg-gray-700 text-white hover:bg-gray-600"
+                ? "bg-red-900/50 text-red-200 hover:bg-red-800/50"
+                : "bg-gray-700 text-white hover:bg-gray-600"
                 }`}
               title={isMuted ? "Unmute Audio" : "Mute Audio"}
             >
@@ -348,7 +348,7 @@ const AtlasAdminContent = () => {
 
       {/* Main Layout: Control Panel | 3D Scene | Info Panel */}
       <div
-        className={`absolute inset-0 flex ${!isHeaderVisible ? "top-0 bottom-0" : "top-[73px] bottom-[70px]"}`}
+        className={`absolute inset-0 flex ${!isHeaderVisible ? "top-0 bottom-0" : "top-[85px] bottom-[70px]"}`}
       >
         {/* Left Control Panel */}
         {areSidebarsVisible && (

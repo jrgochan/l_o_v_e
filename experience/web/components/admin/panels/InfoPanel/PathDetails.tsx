@@ -14,14 +14,15 @@
 
 import { useAtlasAdminStore } from "@/stores/useAtlasAdminStore";
 import { BRIDGE_EMOTIONS, DIFFICULTY_COLORS } from "@/types/atlas-admin";
-import type { EmotionPath, PathWaypoint } from "@/types/atlas-admin";
+import { Info } from "lucide-react";
 
 interface PathDetailsProps {
   path: EmotionPath;
   onWaypointClick: (waypoint: PathWaypoint, index: number) => void;
+  onShowDetails?: () => void;
 }
 
-export function PathDetails({ path, onWaypointClick }: PathDetailsProps) {
+export function PathDetails({ path, onWaypointClick, onShowDetails }: PathDetailsProps) {
   const setHoveredEmotion = useAtlasAdminStore((state) => state.setHoveredEmotion);
   const allEmotions = useAtlasAdminStore((state) => state.allEmotions);
 
@@ -34,15 +35,28 @@ export function PathDetails({ path, onWaypointClick }: PathDetailsProps) {
           <h3 className="text-sm font-bold text-white">
             {path.from.name} → {path.to.name}
           </h3>
-          <button
-            onClick={() =>
-              useAtlasAdminStore.getState().setIsFlying(!useAtlasAdminStore.getState().isFlying)
-            }
-            className="px-2 py-1 bg-cyan-900/50 hover:bg-cyan-800 text-cyan-200 text-xs rounded border border-cyan-700/50 flex items-center gap-1 transition"
-            title="Play Cinematic Journey"
-          >
-            <span>▶ Play</span>
-          </button>
+          <div className="flex gap-2">
+            <button
+              onClick={() =>
+                useAtlasAdminStore.getState().setIsFlying(!useAtlasAdminStore.getState().isFlying)
+              }
+              className="px-2 py-1 bg-cyan-900/50 hover:bg-cyan-800 text-cyan-200 text-xs rounded border border-cyan-700/50 flex items-center gap-1 transition"
+              title="Play Cinematic Journey"
+            >
+              <span>▶ Play</span>
+            </button>
+            {onShowDetails && (
+              <button
+                onClick={onShowDetails}
+                disabled={path.waypoints.length === 0}
+                className="px-2 py-1 bg-gray-700/50 hover:bg-gray-600 text-gray-200 text-xs rounded border border-gray-600/50 flex items-center gap-1 transition disabled:opacity-30 disabled:cursor-not-allowed"
+                title="View Journey Details"
+              >
+                <Info size={12} />
+                <span>Details</span>
+              </button>
+            )}
+          </div>
         </div>
 
         {/* Path Metrics */}

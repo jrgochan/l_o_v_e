@@ -56,7 +56,7 @@ export default function ZenExperience() {
   const settings = useSettingsStore();
 
   const [isWaiting, setIsWaiting] = useState(false);
-  const [activeEmotions, setActiveEmotions] = useState<string[]>([]);
+  const [activeEmotions, setActiveEmotions] = useState<AtlasEmotion[]>([]);
 
   // const currentVAC = useExperienceStore((state) => state.currentVAC); // Removed to prevent re-renders
   const targetVAC = useExperienceStore((state) => state.targetVAC);
@@ -85,18 +85,19 @@ export default function ZenExperience() {
       );
 
       if (message.selectedEmotionIds && emotions.length > 0) {
-        const names = message.selectedEmotionIds
-          .map((id: string) => emotions.find((e: AtlasEmotion) => e.id === id)?.name)
-          .filter((name: string | undefined): name is string => !!name);
+        // Find full emotion objects
+        const resolvedEmotions = message.selectedEmotionIds
+          .map((id: string) => emotions.find((e: AtlasEmotion) => e.id === id))
+          .filter((e: AtlasEmotion | undefined): e is AtlasEmotion => !!e);
 
         // Update local Admin store selection so components like EmotionCloud know what's selected
         selectMultiple(message.selectedEmotionIds);
 
         // If no emotions selected, show default state or nothing
-        if (names.length === 0 && message.vac) {
+        if (resolvedEmotions.length === 0 && message.vac) {
           setActiveEmotions([]);
         } else {
-          setActiveEmotions(names);
+          setActiveEmotions(resolvedEmotions);
         }
       } else {
         selectMultiple([]);
@@ -586,7 +587,7 @@ function DebugOverlay({
   isConnected: boolean;
   isWaiting: boolean;
   targetVAC: number[] | null;
-  activeEmotions: string[];
+  activeEmotions: AtlasEmotion[];
   debugLog: SyncMessage[];
 }) {
   // Subscribe to currentVAC locally so ONLY this component re-renders

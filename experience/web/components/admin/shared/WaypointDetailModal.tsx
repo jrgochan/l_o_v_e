@@ -3,6 +3,8 @@
  *
  * Comprehensive modal showing why a waypoint was chosen,
  * how to transition to it, and how it relates to other steps.
+ * 
+ * Styled to match the premium "Control Deck" aesthetic of HelpModal.
  */
 
 "use client";
@@ -21,42 +23,99 @@ interface WaypointDetailModalProps {
   onNavigate?: (index: number) => void;
 }
 
+// Helper for VAC Polarity Colors (consistent with Axis Labels)
+// Helper for VAC Polarity Colors (consistent with Axis Labels)
+function getVacColor(value: number, component: 'V' | 'A' | 'C'): string {
+  const colors = {
+    V: { positive: "text-cyan-400", neutral: "text-gray-400", negative: "text-red-400" },
+    A: { positive: "text-yellow-400", neutral: "text-gray-400", negative: "text-blue-400" },
+    C: { positive: "text-purple-400", neutral: "text-gray-400", negative: "text-gray-400" }, // Negative C is Gray/Disconnected
+  };
+  if (value > 0.05) return colors[component].positive;
+  if (value < -0.05) return colors[component].negative;
+  return colors[component].neutral;
+}
+
 export function WaypointDetailModal({
-  waypoint,
-  waypointIndex,
+  waypointIndex, // Now expects 0..totalLen-1 (where 0=Start, Last=End)
   path,
   onClose,
   onNavigate,
-}: WaypointDetailModalProps) {
+}: Omit<WaypointDetailModalProps, 'waypoint'> & { waypoint?: PathWaypoint }) {
   const [activeTab, setActiveTab] = useState<TabType>("why");
   const allEmotions = useAtlasAdminStore((state) => state.allEmotions);
   const setFocusedEmotion = useAtlasAdminStore((state) => state.setFocusedEmotion);
 
+  // Construct unified steps array [Start, ...Waypoints, End]
+  const allSteps = useMemo(() => {
+    const startStep = {
+      emotion: path.from.name,
+      vac: path.from.vac,
+      category: path.from.category,
+      reasoning: "Emotional Origin",
+      explanation: {
+        psychological_purpose: "The starting point of your emotional journey.",
+        vac_analysis: null,
+        research_citations: [],
+        readiness_signs: [],
+        warning_signs: []
+      },
+      strategies: [],
+      type: 'start'
+    };
+
+    const intermediateSteps = path.waypoints.map(wp => ({ ...wp, type: 'waypoint' }));
+
+    const endStep = {
+      emotion: path.to.name,
+      vac: path.to.vac,
+      category: path.to.category,
+      reasoning: "Emotional Destination",
+      explanation: {
+        psychological_purpose: "The desired end state of this transition.",
+        vac_analysis: null,
+        research_citations: [],
+        readiness_signs: [],
+        warning_signs: []
+      },
+      strategies: [],
+      type: 'end'
+    };
+
+    return [startStep, ...intermediateSteps, endStep];
+  }, [path]);
+
+  // Safe current step retrieval
+  const currentStep = allSteps[Math.max(0, Math.min(waypointIndex, allSteps.length - 1))];
+
   // Find and highlight the waypoint emotion in 3D when modal opens or navigates
   useEffect(() => {
-    const waypointEmotion = allEmotions.find((e) => e.name === waypoint.emotion);
-    if (waypointEmotion) {
-      setFocusedEmotion(waypointEmotion.id);
+    const emotionName = currentStep?.emotion;
+    if (emotionName) {
+      const emotionObj = allEmotions.find((e) => e.name === emotionName);
+      if (emotionObj) {
+        setFocusedEmotion(emotionObj.id);
+      }
     }
 
     // Clear focus when modal closes
     return () => {
       setFocusedEmotion(null);
     };
-  }, [waypoint, allEmotions, setFocusedEmotion]);
+  }, [currentStep, allEmotions, setFocusedEmotion]);
 
   // Handle keyboard navigation
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      // Allow standard Tab navigation, do not interfere
+      // Stop propagation so parent overlay (if active) doesn't hijack keys
+      e.stopPropagation();
 
-      // Arrow keys for Waypoint Navigation
       if (e.key === "ArrowLeft") {
         if (waypointIndex > 0) {
           onNavigate?.(waypointIndex - 1);
         }
       } else if (e.key === "ArrowRight") {
-        if (waypointIndex < path.waypoints.length - 1) {
+        if (waypointIndex < allSteps.length - 1) {
           onNavigate?.(waypointIndex + 1);
         }
       } else if (e.key === "Escape") {
@@ -66,39 +125,42 @@ export function WaypointDetailModal({
 
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [waypointIndex, path.waypoints.length, onNavigate, onClose]);
+  }, [waypointIndex, allSteps.length, onNavigate, onClose]);
 
   // Get previous and next emotions in the path
   const previousEmotion = useMemo(
-    () =>
-      waypointIndex === 0
-        ? path.from
-        : {
-            name: path.waypoints[waypointIndex - 1].emotion,
-            vac: path.waypoints[waypointIndex - 1].vac,
-          },
-    [waypointIndex, path.from, path.waypoints]
+    () => {
+      if (waypointIndex === 0) return null; // Start has no prev
+      return allSteps[waypointIndex - 1];
+    },
+    [waypointIndex, allSteps]
   );
 
   const nextEmotion = useMemo(
-    () =>
-      waypointIndex === path.waypoints.length - 1
-        ? path.to
-        : {
-            name: path.waypoints[waypointIndex + 1].emotion,
-            vac: path.waypoints[waypointIndex + 1].vac,
-          },
-    [waypointIndex, path.to, path.waypoints]
+    () => {
+      if (waypointIndex === allSteps.length - 1) return null; // End has no next
+      return allSteps[waypointIndex + 1];
+    },
+    [waypointIndex, allSteps]
   );
 
-  // Calculate VAC shifts
+  // Calculate VAC shifts (relative to previous, or neutral if start)
   const vacShifts = useMemo(() => {
+    if (!previousEmotion) {
+      // No shifts for start
+      return {
+        valence: { change: "0.000", rawDelta: 0, direction: "Origin Point" },
+        arousal: { change: "0.000", rawDelta: 0, direction: "Origin Point" },
+        connection: { change: "0.000", rawDelta: 0, direction: "Origin Point" }
+      };
+    }
     const prev = previousEmotion.vac;
-    const current = waypoint.vac;
+    const current = currentStep.vac;
 
     return {
       valence: {
         change: (current[0] - prev[0]).toFixed(3),
+        rawDelta: current[0] - prev[0],
         direction:
           current[0] > prev[0]
             ? "↑ More Positive"
@@ -108,6 +170,7 @@ export function WaypointDetailModal({
       },
       arousal: {
         change: (current[1] - prev[1]).toFixed(3),
+        rawDelta: current[1] - prev[1],
         direction:
           current[1] > prev[1]
             ? "↑ Higher Arousal"
@@ -117,6 +180,7 @@ export function WaypointDetailModal({
       },
       connection: {
         change: (current[2] - prev[2]).toFixed(3),
+        rawDelta: current[2] - prev[2],
         direction:
           current[2] > prev[2]
             ? "↑ More Connected"
@@ -125,24 +189,29 @@ export function WaypointDetailModal({
               : "→ No Change",
       },
     };
-  }, [previousEmotion, waypoint]);
-
-  const hasNavigation = path.waypoints.length > 1;
+  }, [previousEmotion, currentStep]);
 
   return (
     <div
-      className="fixed inset-0 z-50 bg-black/80 flex items-center justify-center p-8"
+      className="fixed inset-0 z-50 bg-black/80 flex items-center justify-center p-8 backdrop-blur-sm"
       role="dialog"
       aria-modal="true"
     >
-      <div className="bg-gray-900 rounded-lg shadow-2xl w-full max-w-3xl max-h-[90vh] flex flex-col border border-gray-700">
-        {/* Header */}
-        <div className="flex items-center justify-between p-6 border-b border-gray-700">
+      <div className="bg-gray-900 rounded-lg shadow-2xl w-full max-w-4xl max-h-[90vh] flex flex-col border-2 border-cyan-500/50">
+        {/* Header - Matches HelpModal Style */}
+        <div className="flex items-center justify-between p-6 border-b border-gray-700 bg-gray-900/50">
           <div>
-            <h2 className="text-xl font-bold text-white">Waypoint: {waypoint.emotion}</h2>
+            <div className="flex items-center gap-3">
+              <h2 className="text-2xl font-bold text-white max-w-2xl truncate">
+                {currentStep.emotion}
+              </h2>
+              {(currentStep as any).type === 'start' && <span className="text-xs bg-blue-900/50 text-blue-300 px-2 py-0.5 rounded border border-blue-500/30">ORIGIN</span>}
+              {(currentStep as any).type === 'end' && <span className="text-xs bg-green-900/50 text-green-300 px-2 py-0.5 rounded border border-green-500/30">GOAL</span>}
+            </div>
+
             <p className="text-sm text-gray-400 mt-1">
-              Step {waypointIndex + 2} of {path.waypoints.length + 2} in journey from{" "}
-              {path.from.name} → {path.to.name}
+              Step {waypointIndex + 1} of {allSteps.length} in journey from{" "}
+              <span className="text-gray-300">{path.from.name}</span> → <span className="text-gray-300">{path.to.name}</span>
             </p>
           </div>
           <button
@@ -160,11 +229,10 @@ export function WaypointDetailModal({
             onClick={() => setActiveTab("why")}
             role="tab"
             aria-selected={activeTab === "why"}
-            className={`flex-1 px-6 py-3 text-sm font-medium transition ${
-              activeTab === "why"
-                ? "text-white bg-gray-800 border-b-2 border-cyan-500"
-                : "text-gray-400 hover:text-gray-300 hover:bg-gray-800/50"
-            }`}
+            className={`flex-1 px-6 py-3 text-sm font-medium transition ${activeTab === "why"
+              ? "text-white bg-gray-800 border-b-2 border-cyan-500"
+              : "text-gray-400 hover:text-gray-300 hover:bg-gray-800/50"
+              }`}
           >
             💡 Why This Step
           </button>
@@ -172,11 +240,10 @@ export function WaypointDetailModal({
             onClick={() => setActiveTab("how")}
             role="tab"
             aria-selected={activeTab === "how"}
-            className={`flex-1 px-6 py-3 text-sm font-medium transition ${
-              activeTab === "how"
-                ? "text-white bg-gray-800 border-b-2 border-cyan-500"
-                : "text-gray-400 hover:text-gray-300 hover:bg-gray-800/50"
-            }`}
+            className={`flex-1 px-6 py-3 text-sm font-medium transition ${activeTab === "how"
+              ? "text-white bg-gray-800 border-b-2 border-cyan-500"
+              : "text-gray-400 hover:text-gray-300 hover:bg-gray-800/50"
+              }`}
           >
             🛤️ How to Transition
           </button>
@@ -184,11 +251,10 @@ export function WaypointDetailModal({
             onClick={() => setActiveTab("relations")}
             role="tab"
             aria-selected={activeTab === "relations"}
-            className={`flex-1 px-6 py-3 text-sm font-medium transition ${
-              activeTab === "relations"
-                ? "text-white bg-gray-800 border-b-2 border-cyan-500"
-                : "text-gray-400 hover:text-gray-300 hover:bg-gray-800/50"
-            }`}
+            className={`flex-1 px-6 py-3 text-sm font-medium transition ${activeTab === "relations"
+              ? "text-white bg-gray-800 border-b-2 border-cyan-500"
+              : "text-gray-400 hover:text-gray-300 hover:bg-gray-800/50"
+              }`}
           >
             🔗 Relation to Others
           </button>
@@ -201,123 +267,101 @@ export function WaypointDetailModal({
               {/* Psychological Purpose */}
               <section>
                 <h3 className="text-lg font-semibold text-white mb-3">Psychological Purpose</h3>
-                <div className="bg-gray-800 rounded-lg p-4">
-                  <p className="text-gray-300 leading-relaxed">
-                    {waypoint.explanation?.psychological_purpose ||
-                      waypoint.reasoning ||
-                      `${waypoint.emotion} serves as an intermediate state in this emotional transition.`}
+                <div className="bg-gray-800 rounded-lg p-4 border border-gray-700">
+                  <p className="text-gray-300 leading-relaxed font-serif text-lg">
+                    {/* Handle explanation access safely since Start/End use different struct or mocks */}
+                    {(currentStep as any).explanation?.psychological_purpose ||
+                      currentStep.reasoning ||
+                      `${currentStep.emotion} is a key state in this journey.`}
                   </p>
                 </div>
               </section>
 
-              {/* VAC Dimensional Analysis - Use backend data if available */}
-              <section>
-                <h3 className="text-lg font-semibold text-white mb-3">VAC Dimensional Shifts</h3>
-                <div className="bg-gray-800 rounded-lg p-4 space-y-3">
-                  {waypoint.explanation?.vac_analysis ? (
-                    // Use backend analysis
-                    <>
-                      <div>
+              {/* VAC Dimensional Analysis - Skip if Start (no shifts) */}
+              {(currentStep as any).type !== 'start' && (
+                <section>
+                  <h3 className="text-lg font-semibold text-white mb-3">VAC Dimensional Shifts</h3>
+                  <div className="bg-gray-800 rounded-lg p-4 space-y-4 border border-gray-700">
+                    {/* Using custom colors for V, A, C */}
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                      {/* Valence */}
+                      <div className="bg-gray-900/50 p-3 rounded border border-gray-700/50">
                         <div className="flex items-center justify-between mb-1">
-                          <span className="text-sm text-gray-400">
-                            Valence (Positive/Negative):
-                          </span>
-                          <span className="text-white font-mono">
-                            {waypoint.explanation.vac_analysis.valence_shift.delta}
+                          <span className="text-xs text-gray-400 uppercase tracking-wider">Valence</span>
+                          <span className={`font-mono font-bold ${getVacColor(vacShifts.valence.rawDelta, 'V')}`}>
+                            {vacShifts.valence.change}
                           </span>
                         </div>
-                        <p className="text-sm text-cyan-400">
-                          {waypoint.explanation.vac_analysis.valence_shift.interpretation}
+                        <p className={`text-sm ${getVacColor(vacShifts.valence.rawDelta, 'V')}`}>
+                          {vacShifts.valence.direction}
                         </p>
-                        <p className="text-xs text-gray-400 mt-1 italic">
-                          {waypoint.explanation.vac_analysis.valence_shift.psychological_meaning}
-                        </p>
+                        {/* Safely access explanation */}
+                        {(currentStep as any).explanation?.vac_analysis && (
+                          <p className="text-xs text-gray-500 mt-2 italic">
+                            "{(currentStep as any).explanation.vac_analysis.valence_shift.psychological_meaning}"
+                          </p>
+                        )}
                       </div>
 
-                      <div>
+                      {/* Arousal */}
+                      <div className="bg-gray-900/50 p-3 rounded border border-gray-700/50">
                         <div className="flex items-center justify-between mb-1">
-                          <span className="text-sm text-gray-400">Arousal (Energy Level):</span>
-                          <span className="text-white font-mono">
-                            {waypoint.explanation.vac_analysis.arousal_shift.delta}
+                          <span className="text-xs text-gray-400 uppercase tracking-wider">Arousal</span>
+                          <span className={`font-mono font-bold ${getVacColor(vacShifts.arousal.rawDelta, 'A')}`}>
+                            {vacShifts.arousal.change}
                           </span>
                         </div>
-                        <p className="text-sm text-cyan-400">
-                          {waypoint.explanation.vac_analysis.arousal_shift.interpretation}
+                        <p className={`text-sm ${getVacColor(vacShifts.arousal.rawDelta, 'A')}`}>
+                          {vacShifts.arousal.direction}
                         </p>
-                        <p className="text-xs text-gray-400 mt-1 italic">
-                          {waypoint.explanation.vac_analysis.arousal_shift.psychological_meaning}
-                        </p>
+                        {(currentStep as any).explanation?.vac_analysis && (
+                          <p className="text-xs text-gray-500 mt-2 italic">
+                            "{(currentStep as any).explanation.vac_analysis.arousal_shift.psychological_meaning}"
+                          </p>
+                        )}
                       </div>
 
-                      <div>
+                      {/* Connection */}
+                      <div className="bg-gray-900/50 p-3 rounded border border-gray-700/50">
                         <div className="flex items-center justify-between mb-1">
-                          <span className="text-sm text-gray-400">Connection (With Others):</span>
-                          <span className="text-white font-mono">
-                            {waypoint.explanation.vac_analysis.connection_shift.delta}
-                          </span>
-                        </div>
-                        <p className="text-sm text-cyan-400">
-                          {waypoint.explanation.vac_analysis.connection_shift.interpretation}
-                        </p>
-                        <p className="text-xs text-gray-400 mt-1 italic">
-                          {waypoint.explanation.vac_analysis.connection_shift.psychological_meaning}
-                        </p>
-                      </div>
-                    </>
-                  ) : (
-                    // Fallback to local calculation
-                    <>
-                      <div>
-                        <div className="flex items-center justify-between mb-1">
-                          <span className="text-sm text-gray-400">
-                            Valence (Positive/Negative):
-                          </span>
-                          <span className="text-white font-mono">{vacShifts.valence.change}</span>
-                        </div>
-                        <p className="text-sm text-cyan-400">{vacShifts.valence.direction}</p>
-                      </div>
-
-                      <div>
-                        <div className="flex items-center justify-between mb-1">
-                          <span className="text-sm text-gray-400">Arousal (Energy Level):</span>
-                          <span className="text-white font-mono">{vacShifts.arousal.change}</span>
-                        </div>
-                        <p className="text-sm text-cyan-400">{vacShifts.arousal.direction}</p>
-                      </div>
-
-                      <div>
-                        <div className="flex items-center justify-between mb-1">
-                          <span className="text-sm text-gray-400">Connection (With Others):</span>
-                          <span className="text-white font-mono">
+                          <span className="text-xs text-gray-400 uppercase tracking-wider">Connection</span>
+                          <span className={`font-mono font-bold ${getVacColor(vacShifts.connection.rawDelta, 'C')}`}>
                             {vacShifts.connection.change}
                           </span>
                         </div>
-                        <p className="text-sm text-cyan-400">{vacShifts.connection.direction}</p>
+                        <p className={`text-sm ${getVacColor(vacShifts.connection.rawDelta, 'C')}`}>
+                          {vacShifts.connection.direction}
+                        </p>
+                        {(currentStep as any).explanation?.vac_analysis && (
+                          <p className="text-xs text-gray-500 mt-2 italic">
+                            "{(currentStep as any).explanation.vac_analysis.connection_shift.psychological_meaning}"
+                          </p>
+                        )}
                       </div>
-                    </>
-                  )}
-                </div>
-              </section>
+                    </div>
+                  </div>
+                </section>
+              )}
 
               {/* Research Citations */}
-              {waypoint.explanation?.research_citations &&
-                waypoint.explanation.research_citations.length > 0 && (
+              {(currentStep as any).explanation?.research_citations &&
+                (currentStep as any).explanation.research_citations.length > 0 && (
                   <section>
                     <h3 className="text-lg font-semibold text-white mb-3">Research Foundation</h3>
                     <div className="space-y-3">
-                      {waypoint.explanation.research_citations.map((citation, idx) => (
+                      {(currentStep as any).explanation.research_citations.map((citation: any, idx: number) => (
                         <div
                           key={idx}
-                          className="bg-blue-900/20 border border-blue-500/30 rounded-lg p-3"
+                          className="bg-blue-900/10 border border-blue-500/20 rounded-lg p-4"
                         >
                           <p className="text-sm font-semibold text-blue-300">
                             {citation.author} ({citation.year})
                           </p>
-                          <p className="text-xs text-gray-400 italic mt-1">{citation.work}</p>
+                          <p className="text-xs text-gray-500 italic mt-0.5">{citation.work}</p>
                           <p className="text-sm text-gray-300 mt-2">{citation.key_finding}</p>
                           {citation.quote && (
-                            <p className="text-xs text-gray-400 mt-2 pl-3 border-l-2 border-blue-500">
-                              &quot;{citation.quote}&quot;
+                            <p className="text-xs text-gray-400 mt-3 pl-3 border-l-2 border-blue-500/50 italic">
+                              "{citation.quote}"
                             </p>
                           )}
                         </div>
@@ -329,32 +373,19 @@ export function WaypointDetailModal({
               {/* Position in Journey */}
               <section>
                 <h3 className="text-lg font-semibold text-white mb-3">Position in Journey</h3>
-                <div className="bg-gray-800 rounded-lg p-4 space-y-2 text-sm">
-                  <div className="flex justify-between">
-                    <span className="text-gray-400">Progress:</span>
-                    <span className="text-white">
-                      {Math.round(((waypointIndex + 1) / (path.waypoints.length + 1)) * 100)}%
-                      Complete
+                <div className="bg-gray-800 rounded-lg p-4 space-y-2 text-sm border border-gray-700/50">
+                  <div className="flex justify-between border-b border-gray-700 pb-2">
+                    <span className="text-gray-400">Progress</span>
+                    <span className="text-white font-mono">
+                      {Math.round(((waypointIndex) / (allSteps.length - 1)) * 100)}%
                     </span>
                   </div>
-                  <div className="flex justify-between">
-                    <span className="text-gray-400">Step:</span>
+                  <div className="flex justify-between pt-2">
+                    <span className="text-gray-400">Step</span>
                     <span className="text-white">
-                      {waypointIndex + 2} of {path.waypoints.length + 2}
+                      {waypointIndex + 1} / {allSteps.length}
                     </span>
                   </div>
-                  {waypoint.estimated_time && (
-                    <div className="flex justify-between">
-                      <span className="text-gray-400">Estimated Time:</span>
-                      <span className="text-white">{waypoint.estimated_time}</span>
-                    </div>
-                  )}
-                  {waypoint.difficulty && (
-                    <div className="flex justify-between">
-                      <span className="text-gray-400">Difficulty:</span>
-                      <span className="text-white capitalize">{waypoint.difficulty}</span>
-                    </div>
-                  )}
                 </div>
               </section>
             </div>
@@ -366,26 +397,26 @@ export function WaypointDetailModal({
               <section>
                 <h3 className="text-lg font-semibold text-white mb-3">
                   Recommended Strategies
-                  {waypoint.strategies && (
+                  {(currentStep as any).strategies && (
                     <span className="ml-2 text-sm text-gray-400">
-                      ({waypoint.strategies.length})
+                      ({(currentStep as any).strategies.length})
                     </span>
                   )}
                 </h3>
-                {waypoint.strategies && waypoint.strategies.length > 0 ? (
-                  <div className="space-y-3">
-                    {waypoint.strategies.map((strategy, index) => (
-                      <div key={index} className="bg-gray-800 rounded-lg p-4">
-                        <div className="flex items-start justify-between mb-2">
-                          <h4 className="text-white font-semibold">{strategy.name}</h4>
+                {(currentStep as any).strategies && (currentStep as any).strategies.length > 0 ? (
+                  <div className="grid grid-cols-1 gap-4">
+                    {(currentStep as any).strategies.map((strategy: any, index: number) => (
+                      <div key={index} className="bg-gray-800 rounded-lg p-5 border border-gray-700 hover:border-cyan-500/30 transition">
+                        <div className="flex items-start justify-between mb-3">
+                          <h4 className="text-white font-bold text-lg">{strategy.name}</h4>
                           {strategy.evidence_level && (
-                            <span className="text-xs bg-green-900/50 text-green-400 px-2 py-1 rounded">
+                            <span className="text-xs bg-green-900/30 text-green-400 px-2 py-1 rounded border border-green-500/20">
                               {strategy.evidence_level}
                             </span>
                           )}
                         </div>
-                        <p className="text-sm text-gray-300 mb-2">{strategy.description}</p>
-                        <div className="flex items-center gap-4 text-xs text-gray-400">
+                        <p className="text-sm text-gray-300 mb-4 leading-relaxed">{strategy.description}</p>
+                        <div className="flex items-center gap-4 text-xs text-gray-400 bg-gray-900/50 p-2 rounded">
                           {strategy.time_commitment && <span>⏱️ {strategy.time_commitment}</span>}
                           {strategy.category && <span>📂 {strategy.category}</span>}
                         </div>
@@ -393,43 +424,27 @@ export function WaypointDetailModal({
                     ))}
                   </div>
                 ) : (
-                  <div className="bg-gray-800 rounded-lg p-4">
-                    <p className="text-gray-400 text-sm">
-                      No specific strategies provided for this waypoint. General emotional
-                      regulation techniques may be helpful.
+                  <div className="bg-gray-800 rounded-lg p-6 border border-gray-700 text-center">
+                    <p className="text-gray-400">
+                      {(currentStep as any).type === 'start' ? "Begin by acknowledging your current emotional state." :
+                        (currentStep as any).type === 'end' ? "You have reached your destination. Reflect on the journey." :
+                          "No specific strategies provided for this waypoint."}
                     </p>
                   </div>
                 )}
               </section>
 
               {/* Readiness Signs */}
-              {waypoint.explanation?.readiness_signs &&
-                waypoint.explanation.readiness_signs.length > 0 && (
+              {(currentStep as any).explanation?.readiness_signs &&
+                (currentStep as any).explanation.readiness_signs.length > 0 && (
                   <section>
                     <h3 className="text-lg font-semibold text-white mb-3">✅ Signs of Readiness</h3>
-                    <div className="bg-green-900/20 border border-green-500/30 rounded-lg p-4">
-                      <ul className="space-y-2">
-                        {waypoint.explanation.readiness_signs.map((sign, idx) => (
-                          <li key={idx} className="flex items-start gap-2 text-sm text-gray-300">
-                            <span className="text-green-400 mt-0.5">✓</span>
+                    <div className="bg-green-900/10 border border-green-500/20 rounded-lg p-4">
+                      <ul className="space-y-3">
+                        {(currentStep as any).explanation.readiness_signs.map((sign: string, idx: number) => (
+                          <li key={idx} className="flex items-start gap-3 text-sm text-gray-300">
+                            <span className="text-green-400 mt-0.5 bg-green-900/50 rounded-full w-5 h-5 flex items-center justify-center text-xs">✓</span>
                             <span>{sign}</span>
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-                  </section>
-                )}
-
-              {/* Warning Signs */}
-              {waypoint.explanation?.warning_signs &&
-                waypoint.explanation.warning_signs.length > 0 && (
-                  <section>
-                    <h3 className="text-lg font-semibold text-white mb-3">⚠️ Important Warnings</h3>
-                    <div className="bg-yellow-900/20 border border-yellow-500/30 rounded-lg p-4">
-                      <ul className="space-y-2">
-                        {waypoint.explanation.warning_signs.map((warning, idx) => (
-                          <li key={idx} className="text-sm text-yellow-200">
-                            {warning}
                           </li>
                         ))}
                       </ul>
@@ -441,21 +456,15 @@ export function WaypointDetailModal({
 
           {activeTab === "relations" && (
             <div className="space-y-6">
-              {/* Previous Step - Use backend context if available */}
-              <section>
-                <h3 className="text-lg font-semibold text-white mb-3">
-                  From: {previousEmotion.name}
-                </h3>
-                <div className="bg-gray-800 rounded-lg p-4 space-y-2">
-                  <h4 className="text-sm font-semibold text-cyan-400">What Changed:</h4>
-                  {waypoint.explanation?.previous_context?.what_changed &&
-                  waypoint.explanation.previous_context.what_changed.length > 0 ? (
-                    <ul className="list-disc list-inside space-y-1 text-sm text-gray-300">
-                      {waypoint.explanation.previous_context.what_changed.map((change, idx) => (
-                        <li key={idx}>{change}</li>
-                      ))}
-                    </ul>
-                  ) : (
+              {/* Previous Step */}
+              {previousEmotion && (
+                <section className="relative pl-6 border-l-2 border-gray-700">
+                  <div className="absolute -left-[9px] top-0 w-4 h-4 rounded-full bg-gray-700 border-2 border-gray-900" />
+                  <h3 className="text-lg font-semibold text-gray-400 mb-2">
+                    From: <span className="text-white">{previousEmotion.emotion}</span>
+                  </h3>
+                  <div className="bg-gray-800 rounded-lg p-4 space-y-3 border border-gray-700">
+                    <h4 className="text-sm font-semibold text-cyan-400 uppercase tracking-wide">What Changed</h4>
                     <ul className="list-disc list-inside space-y-1 text-sm text-gray-300">
                       {Math.abs(parseFloat(vacShifts.valence.change)) > 0.1 && (
                         <li>Emotional tone: {vacShifts.valence.direction}</li>
@@ -467,96 +476,84 @@ export function WaypointDetailModal({
                         <li>Connection to others: {vacShifts.connection.direction}</li>
                       )}
                     </ul>
-                  )}
 
-                  <div className="mt-3 pt-3 border-t border-gray-700">
-                    <h4 className="text-sm font-semibold text-cyan-400 mb-1">
-                      Why This Order Matters:
-                    </h4>
-                    <p className="text-sm text-gray-300">
-                      {waypoint.explanation?.previous_context?.why_necessary ||
-                        waypoint.reasoning ||
-                        `${waypoint.emotion} provides a necessary intermediate step, preparing you for ${nextEmotion.name}.`}
-                    </p>
-                    {waypoint.explanation?.previous_context?.research && (
-                      <p className="text-xs text-blue-300 mt-2 italic">
-                        — {waypoint.explanation.previous_context.research.author} (
-                        {waypoint.explanation.previous_context.research.year})
+                    <div className="mt-4 pt-3 border-t border-gray-700/50">
+                      <p className="text-sm text-gray-400 italic">
+                        "{currentStep.reasoning}"
                       </p>
-                    )}
+                    </div>
                   </div>
+                </section>
+              )}
+
+              {/* Current Step (Visual Spacer) */}
+              <div className="pl-6 border-l-2 border-cyan-500 py-4">
+                <div className="bg-cyan-900/20 border border-cyan-500/30 p-3 rounded text-cyan-200 text-sm font-bold text-center">
+                  Current: {currentStep.emotion}
                 </div>
-              </section>
+              </div>
 
-              {/* Next Step - Use backend context if available */}
-              <section>
-                <h3 className="text-lg font-semibold text-white mb-3">To: {nextEmotion.name}</h3>
-                <div className="bg-gray-800 rounded-lg p-4 space-y-2">
-                  <h4 className="text-sm font-semibold text-green-400">
-                    What This Waypoint Enables:
-                  </h4>
-                  {waypoint.explanation?.next_context?.what_this_enables &&
-                  waypoint.explanation.next_context.what_this_enables.length > 0 ? (
-                    <ul className="list-disc list-inside space-y-1 text-sm text-gray-300">
-                      {waypoint.explanation.next_context.what_this_enables.map((item, idx) => (
-                        <li key={idx}>{item}</li>
-                      ))}
-                    </ul>
-                  ) : (
-                    <ul className="list-disc list-inside space-y-1 text-sm text-gray-300">
-                      <li>
-                        {waypoint.emotion} creates foundation for {nextEmotion.name}
-                      </li>
-                      {waypoint.vac[1] < 0.3 && (
-                        <li>Regulated arousal allows for complex emotional processing</li>
-                      )}
-                      {waypoint.vac[2] > 0.5 && (
-                        <li>Positive connection enables vulnerability and growth</li>
-                      )}
-                      {waypoint.vac[0] > 0 && (
-                        <li>Positive valence makes next step more accessible</li>
-                      )}
-                    </ul>
-                  )}
-
-                  <div className="mt-3 pt-3 border-t border-gray-700">
-                    <h4 className="text-sm font-semibold text-green-400 mb-1">
-                      How It Prepares You:
+              {/* Next Step */}
+              {nextEmotion && (
+                <section className="relative pl-6 border-l-2 border-gray-700">
+                  <div className="absolute -left-[9px] top-0 w-4 h-4 rounded-full bg-gray-700 border-2 border-gray-900" />
+                  <div className="absolute -left-[5px] bottom-0 w-2 h-2 rounded-full bg-gray-800" />
+                  <h3 className="text-lg font-semibold text-gray-400 mb-2">
+                    To: <span className="text-white">{nextEmotion.emotion}</span>
+                  </h3>
+                  <div className="bg-gray-800 rounded-lg p-4 space-y-3 border border-gray-700">
+                    <h4 className="text-sm font-semibold text-green-400 uppercase tracking-wide">
+                      Enables Transition
                     </h4>
-                    <p className="text-sm text-gray-300">
-                      {waypoint.explanation?.next_context?.preparation ||
-                        `By reaching ${waypoint.emotion}, you develop the emotional capacity needed for ${nextEmotion.name}. This step is psychologically necessary for the transition to succeed.`}
+                    <p className="text-sm text-gray-300 leading-relaxed">
+                      Looking forward to {nextEmotion.emotion}.
                     </p>
-                    {waypoint.explanation?.next_context?.research && (
-                      <p className="text-xs text-blue-300 mt-2 italic">
-                        — {waypoint.explanation.next_context.research.author} (
-                        {waypoint.explanation.next_context.research.year})
-                      </p>
-                    )}
                   </div>
-                </div>
-              </section>
+                </section>
+              )}
 
-              {/* Full Path Context */}
+              {/* Full Path Context - Enhanced with Labels */}
               <section>
-                <h3 className="text-lg font-semibold text-white mb-3">Full Journey Context</h3>
-                <div className="bg-gray-800 rounded-lg p-4">
-                  <div className="flex items-center gap-2 text-sm">
-                    <span className="text-blue-400">{path.from.name}</span>
-                    <span className="text-gray-500">→</span>
-                    {path.waypoints.map((wp, i) => (
-                      <span
-                        key={i}
-                        className={`${i === waypointIndex ? "text-cyan-400 font-bold" : "text-gray-400"}`}
-                      >
-                        {wp.emotion}
-                        {i < path.waypoints.length - 1 && (
-                          <span className="text-gray-600 mx-1">→</span>
+                <div className="bg-gray-900 rounded-xl p-6 border border-gray-800">
+                  {/* Centered Path Viz */}
+                  <div className="flex flex-wrap items-center gap-2 text-sm justify-center">
+                    {/* Render ALL steps using allSteps array */}
+                    {allSteps.map((step, i) => (
+                      <div key={i} className="contents">
+
+                        {/* Render Step Node */}
+                        <div className="flex flex-col items-center group relative">
+                          {/* Label above active/hover */}
+                          <span
+                            className={`absolute -top-6 text-[10px] uppercase font-bold tracking-wider transition-opacity whitespace-nowrap
+                                    ${i === waypointIndex ? "opacity-100 text-cyan-400" : "opacity-0 group-hover:opacity-100 text-gray-500"}
+                                `}
+                          >
+                            {(step as any).type === 'start' ? 'Origin' : (step as any).type === 'end' ? 'Goal' : `Step ${i}`}
+                          </span>
+
+                          <button
+                            onClick={() => onNavigate?.(i)}
+                            className={`
+                                    px-3 py-1 rounded-full border transition-all relative
+                                    ${i === waypointIndex
+                                ? "bg-cyan-900/40 text-cyan-200 border-cyan-500 shadow-[0_0_15px_rgba(34,211,238,0.3)] scale-110 z-10"
+                                : "bg-gray-800 text-gray-400 border-gray-700 hover:border-gray-500 hover:text-gray-200"
+                              }
+                                    ${(step as any).type === 'start' ? "ring-1 ring-blue-500/30" : ""}
+                                    ${(step as any).type === 'end' ? "ring-1 ring-green-500/30" : ""}
+                                `}
+                          >
+                            {step.emotion}
+                          </button>
+                        </div>
+
+                        {/* Arrow if not last */}
+                        {i < allSteps.length - 1 && (
+                          <span className="text-gray-700 mx-1">→</span>
                         )}
-                      </span>
+                      </div>
                     ))}
-                    <span className="text-gray-500">→</span>
-                    <span className="text-green-400">{path.to.name}</span>
                   </div>
                 </div>
               </section>
@@ -565,30 +562,35 @@ export function WaypointDetailModal({
         </div>
 
         {/* Footer Navigation */}
-        <div className="flex items-center justify-between p-4 border-t border-gray-700 bg-gray-800/50">
-          {hasNavigation ? (
-            <>
-              <button
-                onClick={() => onNavigate?.(waypointIndex - 1)}
-                disabled={waypointIndex === 0}
-                className="px-4 py-2 bg-gray-700 hover:bg-gray-600 disabled:bg-gray-800 disabled:text-gray-600 text-white rounded transition"
-              >
-                ← Previous Waypoint
-              </button>
-              <span className="text-sm text-gray-400">
-                Waypoint {waypointIndex + 1} of {path.waypoints.length}
-              </span>
-              <button
-                onClick={() => onNavigate?.(waypointIndex + 1)}
-                disabled={waypointIndex === path.waypoints.length - 1}
-                className="px-4 py-2 bg-gray-700 hover:bg-gray-600 disabled:bg-gray-800 disabled:text-gray-600 text-white rounded transition"
-              >
-                Next Waypoint →
-              </button>
-            </>
-          ) : (
-            <div className="text-sm text-gray-400 mx-auto">Only waypoint in this path</div>
-          )}
+        <div className="flex items-center justify-between p-4 border-t border-gray-700 bg-gray-900/80 backdrop-blur">
+          <>
+            <button
+              onClick={() => onNavigate?.(waypointIndex - 1)}
+              disabled={waypointIndex === 0}
+              className="px-4 py-2 bg-gray-800 hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed text-white rounded transition border border-gray-700"
+            >
+              ← Previous
+            </button>
+            <div className="flex flex-col items-center">
+              <span className="text-xs text-gray-500 uppercase tracking-widest">Navigation</span>
+              <div className="flex gap-1 mt-1">
+                {allSteps.map((_, i) => (
+                  <button
+                    key={i}
+                    onClick={() => onNavigate?.(i)}
+                    className={`w-2 h-2 rounded-full transition-all ${i === waypointIndex ? "bg-cyan-500 scale-125" : "bg-gray-700 hover:bg-gray-500"}`}
+                  />
+                ))}
+              </div>
+            </div>
+            <button
+              onClick={() => onNavigate?.(waypointIndex + 1)}
+              disabled={waypointIndex === allSteps.length - 1}
+              className="px-4 py-2 bg-gray-800 hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed text-white rounded transition border border-gray-700"
+            >
+              Next →
+            </button>
+          </>
         </div>
       </div>
     </div>
