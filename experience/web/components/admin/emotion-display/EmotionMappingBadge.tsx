@@ -25,8 +25,7 @@ export function EmotionMappingBadge({
   // Get icon and color based on match method
   const getMethodIcon = () => {
     switch (matchMethod) {
-      case "exact":
-        return "✓";
+
       case "fuzzy":
         return "≈";
       case "vac":
@@ -40,8 +39,6 @@ export function EmotionMappingBadge({
 
   const getMethodColor = () => {
     switch (matchMethod) {
-      case "exact":
-        return "bg-green-900/30 border-green-500/30 text-green-300";
       case "fuzzy":
         return "bg-yellow-900/30 border-yellow-500/30 text-yellow-300";
       case "vac":
@@ -55,8 +52,6 @@ export function EmotionMappingBadge({
 
   const getMethodLabel = () => {
     switch (matchMethod) {
-      case "exact":
-        return "Exact match";
       case "fuzzy":
         return "Fuzzy match";
       case "vac":

@@ -65,10 +65,7 @@ export function ExportControls() {
   const exportCSV = () => {
     const paths = Array.from(computedPaths.values());
 
-    if (paths.length === 0) {
-      alert("No paths to export. Select 2+ emotions first.");
-      return;
-    }
+
 
     const headers = [
       "From",
