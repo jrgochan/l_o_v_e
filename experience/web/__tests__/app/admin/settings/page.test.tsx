@@ -159,4 +159,43 @@ describe("SettingsPage", () => {
         // Cleanup
         Blob.prototype.text = originalText;
     });
+
+    it("handles import failure with invalid JSON", async () => {
+        render(<SettingsPage />);
+        const createElementSpy = jest.spyOn(document, "createElement");
+        const originalText = Blob.prototype.text;
+        // Mock importSettings to return false
+        mockImportSettings.mockReturnValue(false);
+        Blob.prototype.text = jest.fn().mockResolvedValue('invalid-json');
+
+        fireEvent.click(screen.getByRole("button", { name: /Import/i }));
+
+        const results = createElementSpy.mock.results;
+        const inputFn = results.find(r => r.value instanceof HTMLInputElement && r.value.type === "file");
+        const input = inputFn?.value as HTMLInputElement;
+        const file = new File(['invalid'], "settings.json", { type: "application/json" });
+        Object.defineProperty(input, 'files', { value: [file], writable: true });
+        fireEvent.change(input);
+
+        await waitFor(() => {
+            expect(screen.getByText("Invalid settings file")).toBeInTheDocument();
+        });
+        Blob.prototype.text = originalText;
+    });
+
+    it("handles export failure", () => {
+        const mockErrorExport = jest.fn(() => { throw new Error("Export failed"); });
+        (useSettingsStore as unknown as jest.Mock).mockImplementation((selector) => {
+            return selector({
+                resetToDefaults: jest.fn(),
+                exportSettings: mockErrorExport, // This will throw
+                importSettings: jest.fn(),
+            });
+        });
+
+        render(<SettingsPage />);
+        fireEvent.click(screen.getByRole("button", { name: /Export/i }));
+
+        expect(screen.getByText("Failed to export settings")).toBeInTheDocument();
+    });
 });

@@ -138,12 +138,18 @@ describe("ClinicalAlertsTab", () => {
   });
 
   it("handles refresh", async () => {
-    (adminApi.getClinicalAlerts as jest.Mock).mockResolvedValue(mockAlerts);
+    (adminApi.getClinicalAlerts as jest.Mock)
+      .mockResolvedValueOnce(mockAlerts)
+      .mockResolvedValueOnce({ ...mockAlerts, items: [{ ...mockAlerts.items[0], message: "Refreshed Alert" }] });
+
     render(<ClinicalAlertsTab />);
     await waitFor(() => expect(screen.getByText("High heart rate detected")).toBeInTheDocument());
 
     fireEvent.click(screen.getByLabelText("Refresh Alerts"));
-    expect(adminApi.getClinicalAlerts).toHaveBeenCalledTimes(2);
+
+    await waitFor(() => {
+      expect(screen.getByText("Refreshed Alert")).toBeInTheDocument();
+    });
   });
 
   it("handles fetch error", async () => {

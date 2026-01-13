@@ -205,10 +205,10 @@ describe("EmotionsTab", () => {
     const { container } = render(<EmotionsTab />);
     await waitFor(() => expect(screen.getByText("Joy")).toBeInTheDocument());
 
-    const input = container.querySelector('input[type="file"]');
+    const input = container.querySelector('input[type="file"]') as HTMLInputElement;
     expect(input).toBeInTheDocument();
 
-    const clickSpy = jest.spyOn(input!, 'click');
+    const clickSpy = jest.spyOn(input, 'click');
     fireEvent.click(screen.getByText("Import"));
 
     expect(clickSpy).toHaveBeenCalled();
@@ -227,9 +227,9 @@ describe("EmotionsTab", () => {
       value: jest.fn().mockResolvedValue(JSON.stringify({ some: "data" }))
     });
 
-    const input = container.querySelector('input[type="file"]');
+    const input = container.querySelector('input[type="file"]') as HTMLInputElement;
 
-    await userEvent.upload(input!, file);
+    await userEvent.upload(input, file);
 
     await waitFor(() => {
       expect(adminApi.importAtlasData).toHaveBeenCalled();
@@ -249,9 +249,9 @@ describe("EmotionsTab", () => {
       value: jest.fn().mockResolvedValue("{}")
     });
 
-    const input = container.querySelector('input[type="file"]');
+    const input = container.querySelector('input[type="file"]') as HTMLInputElement;
 
-    await userEvent.upload(input!, file);
+    await userEvent.upload(input, file);
 
     await waitFor(() => {
       expect(screen.getByText(/Imported with errors: Err1, Err2/)).toBeInTheDocument();
@@ -278,9 +278,9 @@ describe("EmotionsTab", () => {
       value: jest.fn().mockResolvedValue("{}")
     });
 
-    const input = container.querySelector('input[type="file"]');
+    const input = container.querySelector('input[type="file"]') as HTMLInputElement;
 
-    await userEvent.upload(input!, file);
+    await userEvent.upload(input, file);
 
     await waitFor(() => {
       expect(screen.getByText("Import crashed")).toBeInTheDocument();
