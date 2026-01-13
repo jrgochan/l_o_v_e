@@ -14,11 +14,13 @@ describe("LayerControls", () => {
   const mockUpdateSetting = jest.fn();
   const mockToggleLayer = jest.fn();
 
+  const partialFilters = new Map<string, CategoryFilter>([
+    ["Joy", { name: "Joy", enabled: true, color: "yellow", emotionCount: 10 }],
+    ["Sadness", { name: "Sadness", enabled: false, color: "blue", emotionCount: 5 }],
+  ]);
+
   const defaultProps = {
-    categoryFilters: new Map<string, CategoryFilter>([
-      ["Joy", { name: "Joy", enabled: true, color: "yellow" }],
-      ["Sadness", { name: "Sadness", enabled: false, color: "blue" }],
-    ]),
+    categoryFilters: partialFilters,
     layers: {
       soulSphere: true,
       emotionPoints: true,

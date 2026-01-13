@@ -1,325 +1,252 @@
-import { api, adminApi } from "../../utils/api";
-import { useAuthStore } from "../../stores/authStore";
-import fetchMock from "jest-fetch-mock";
+import { api, adminApi, API_BASE_URL } from "@/utils/api";
+import { useAuthStore } from "@/stores/authStore";
 
-// Enable fetch mocks
-fetchMock.enableMocks();
+// Mock fetch
+const mockFetch = jest.fn();
+global.fetch = mockFetch;
 
-// Mock store
-jest.mock("../../stores/authStore");
+// Mock Auth Store
+jest.mock("@/stores/authStore", () => ({
+  useAuthStore: {
+    getState: jest.fn(() => ({
+      token: "test-token",
+      logout: jest.fn(),
+    })),
+  },
+}));
 
-describe("API Utils", () => {
-  const mockToken = "test-token";
+describe("ApiClient", () => {
   const mockLogout = jest.fn();
 
   beforeEach(() => {
-    fetchMock.resetMocks();
-    jest.clearAllMocks();
-
-    // Setup store mock
+    mockFetch.mockReset();
+    mockLogout.mockReset();
     (useAuthStore.getState as jest.Mock).mockReturnValue({
-      token: mockToken,
+      token: "test-token",
       logout: mockLogout,
     });
   });
 
-  describe("ApiClient", () => {
-    it("should add authorization header when authenticated is true", async () => {
-      fetchMock.mockResponseOnce(JSON.stringify({ data: "test" }));
-
-      await api.get("/test-endpoint");
-
-      expect(fetchMock).toHaveBeenCalledWith(
-        expect.stringContaining("/test-endpoint"),
-        expect.objectContaining({
-          headers: expect.objectContaining({
-            Authorization: `Bearer ${mockToken}`,
-            "Content-Type": "application/json",
-          }),
-        })
-      );
+  it("performs GET request with auth header", async () => {
+    mockFetch.mockResolvedValueOnce({
+      ok: true,
+      json: async () => ({ data: "success" }),
     });
 
-    it("should NOT add authorization header when authenticated is false", async () => {
-      fetchMock.mockResponseOnce(JSON.stringify({ data: "test" }));
+    const result = await api.get("/test");
 
-      await api.get("/public-endpoint", false);
+    expect(mockFetch).toHaveBeenCalledWith(`${API_BASE_URL}/test`, expect.objectContaining({
+      method: "GET",
+      headers: expect.objectContaining({
+        "Authorization": "Bearer test-token",
+        "Content-Type": "application/json",
+      }),
+    }));
+    expect(result).toEqual({ data: "success" });
+  });
 
-      const call = fetchMock.mock.calls[0];
-      const options = call[1] as RequestInit;
-      const headers = options.headers as Record<string, string>;
-
-      expect(headers["Authorization"]).toBeUndefined();
+  it("performs POST request", async () => {
+    mockFetch.mockResolvedValueOnce({
+      ok: true,
+      json: async () => ({ id: 1 }),
     });
 
-    it("should handle 401 Unauthorized by calling logout", async () => {
-      fetchMock.mockResponseOnce(JSON.stringify({ detail: "Unauthorized" }), { status: 401 });
+    const payload = { name: "Test" };
+    await api.post("/create", payload);
 
-      await expect(api.get("/protected")).rejects.toThrow();
+    expect(mockFetch).toHaveBeenCalledWith(`${API_BASE_URL}/create`, expect.objectContaining({
+      method: "POST",
+      body: JSON.stringify(payload),
+    }));
+  });
 
-      expect(mockLogout).toHaveBeenCalled();
+  it("handles 401 Unauthorized by logging out", async () => {
+    mockFetch.mockResolvedValueOnce({
+      ok: false,
+      status: 401,
+      statusText: "Unauthorized",
+      json: async () => ({ detail: "Token expired" }),
     });
 
-    it("should return null for 204 No Content", async () => {
-      fetchMock.mockResponseOnce("", { status: 204 });
+    await expect(api.get("/secure")).rejects.toThrow("Token expired");
+    expect(mockLogout).toHaveBeenCalled();
+  });
 
-      const result = await api.del("/resource");
-
-      expect(result).toBeNull();
+  it("handles other errors", async () => {
+    mockFetch.mockResolvedValueOnce({
+      ok: false,
+      status: 500,
+      statusText: "Internal Server Error",
+      json: async () => ({}),
     });
 
-    it("should throw error with detail message on failure", async () => {
-      const errorMessage = "Custom error message";
-      fetchMock.mockResponseOnce(JSON.stringify({ detail: errorMessage }), { status: 400 });
+    await expect(api.get("/error")).rejects.toThrow("API Error: Internal Server Error");
+    expect(mockLogout).not.toHaveBeenCalled();
+  });
 
-      await expect(api.get("/error")).rejects.toThrow(errorMessage);
+  it("handles empty authorization (no token)", async () => {
+    (useAuthStore.getState as jest.Mock).mockReturnValue({
+      token: null,
+      logout: mockLogout,
     });
 
-    it("should throw generic error if no detail provided", async () => {
-      fetchMock.mockResponseOnce(JSON.stringify({}), {
-        status: 500,
-        statusText: "Internal Server Error",
-      });
+    mockFetch.mockResolvedValueOnce({
+      ok: true,
+      json: async () => ({}),
+    });
 
-      await expect(api.get("/error")).rejects.toThrow("API Error: Internal Server Error");
+    await api.get("/public");
+
+    expect(mockFetch).toHaveBeenCalledWith(expect.anything(), expect.objectContaining({
+      headers: expect.not.objectContaining({ "Authorization": expect.any(String) })
+    }));
+  });
+
+  it("handles request without leading slash", async () => {
+    mockFetch.mockResolvedValueOnce({
+      ok: true,
+      json: async () => ({}),
+    });
+    await api.get("no-slash");
+    expect(mockFetch).toHaveBeenCalledWith(`${API_BASE_URL}/no-slash`, expect.anything());
+  });
+
+  it("handles 204 No Content", async () => {
+    mockFetch.mockResolvedValueOnce({
+      ok: true,
+      status: 204,
+      json: async () => ({}) // Should not be called
+    });
+
+    const result = await api.del("/delete");
+    expect(result).toBeNull();
+  });
+});
+
+describe("Admin API Helpers", () => {
+  beforeEach(() => {
+    mockFetch.mockResolvedValue({
+      ok: true,
+      json: async () => ([]),
     });
   });
 
-  describe("REST Methods", () => {
-    it("should perform POST requests with body", async () => {
-      fetchMock.mockResponseOnce(JSON.stringify({ success: true }));
-      const payload = { name: "test" };
-
-      await api.post("/create", payload);
-
-      expect(fetchMock).toHaveBeenCalledWith(
-        expect.any(String),
-        expect.objectContaining({
-          method: "POST",
-          body: JSON.stringify(payload),
-        })
-      );
-    });
-
-    it("should perform PUT requests with body", async () => {
-      fetchMock.mockResponseOnce(JSON.stringify({ success: true }));
-      const payload = { name: "updated" };
-
-      await api.put("/update/1", payload);
-
-      expect(fetchMock).toHaveBeenCalledWith(
-        expect.any(String),
-        expect.objectContaining({
-          method: "PUT",
-          body: JSON.stringify(payload),
-        })
-      );
-    });
+  it("fetches sessions", async () => {
+    await adminApi.getSessions(0, 10);
+    expect(mockFetch).toHaveBeenCalledWith(expect.stringContaining("/admin/sessions?skip=0&limit=10"), expect.anything());
   });
 
-  describe("Admin API Helpers", () => {
-    it("getSessions should format query params correctly", async () => {
-      fetchMock.mockResponseOnce(JSON.stringify([]));
+  it("fetches atlas emotions", async () => {
+    await adminApi.getAtlasEmotions();
+    expect(mockFetch).toHaveBeenCalledWith(expect.stringContaining("/admin/atlas/emotions"), expect.anything());
+  });
 
-      await adminApi.getSessions(10, 20);
+  // Smoke tests for other methods to ensure URL construction
+  it("updateAtlasEmotion", async () => {
+    await adminApi.updateAtlasEmotion("1", {} as any);
+    expect(mockFetch).toHaveBeenCalledWith(expect.stringContaining("/admin/atlas/emotions/1"), expect.objectContaining({ method: "PUT" }));
+  });
 
-      expect(fetchMock).toHaveBeenCalledWith(
-        expect.stringContaining("/admin/sessions?skip=10&limit=20"),
-        expect.anything()
-      );
-    });
+  it("getClinicalAlerts with filters", async () => {
+    await adminApi.getClinicalAlerts(1, 50, "high");
+    expect(mockFetch).toHaveBeenCalledWith(expect.stringContaining("level=high"), expect.anything());
+  });
 
-    it("getClinicalAlerts should handle optional level param", async () => {
-      fetchMock.mockResponseOnce(JSON.stringify({ items: [], total: 0 }));
+  it("getBootstrapData with type", async () => {
+    await adminApi.getBootstrapData("emotions");
+    expect(mockFetch).toHaveBeenCalledWith(expect.stringContaining("type=emotions"), expect.anything());
+  });
 
-      await adminApi.getClinicalAlerts(1, 50, "critical");
+  // Strategies
+  it("getStrategies", async () => {
+    await adminApi.getStrategies();
+    expect(mockFetch).toHaveBeenCalledWith(expect.stringContaining("/admin/strategies"), expect.objectContaining({ method: "GET" }));
+  });
 
-      expect(fetchMock).toHaveBeenCalledWith(
-        expect.stringContaining("level=critical"),
-        expect.anything()
-      );
-    });
+  it("updateStrategy", async () => {
+    await adminApi.updateStrategy("1", {} as any);
+    expect(mockFetch).toHaveBeenCalledWith(expect.stringContaining("/admin/strategies/1"), expect.objectContaining({ method: "PUT" }));
+  });
 
-    it("getBootstrapData should handle optional type param", async () => {
-      fetchMock.mockResponseOnce(JSON.stringify([]));
+  it("exportStrategies", async () => {
+    await adminApi.exportStrategies();
+    expect(mockFetch).toHaveBeenCalledWith(expect.stringContaining("/admin/strategies/export"), expect.objectContaining({ method: "GET" }));
+  });
 
-      await adminApi.getBootstrapData("initial");
+  it("importStrategies", async () => {
+    await adminApi.importStrategies({ strategies: [] });
+    expect(mockFetch).toHaveBeenCalledWith(expect.stringContaining("/admin/strategies/import"), expect.objectContaining({ method: "POST" }));
+  });
 
-      expect(fetchMock).toHaveBeenCalledWith(
-        expect.stringContaining("type=initial"),
-        expect.anything()
-      );
-    });
+  // Bootstrap
+  it("createBootstrapData", async () => {
+    await adminApi.createBootstrapData({} as any);
+    expect(mockFetch).toHaveBeenCalledWith(expect.stringContaining("/admin/bootstrap"), expect.objectContaining({ method: "POST" }));
+  });
 
-    it("should call getSessionDetails with correct ID", async () => {
-      fetchMock.mockResponseOnce(JSON.stringify({}));
-      await adminApi.getSessionDetails("123");
-      expect(fetchMock).toHaveBeenCalledWith(
-        expect.stringContaining("/admin/sessions/123"),
-        expect.anything()
-      );
-    });
+  it("updateBootstrapData", async () => {
+    await adminApi.updateBootstrapData("1", {} as any);
+    expect(mockFetch).toHaveBeenCalledWith(expect.stringContaining("/admin/bootstrap/1"), expect.objectContaining({ method: "PUT" }));
+  });
 
-    it("should call getAtlasEmotions", async () => {
-      fetchMock.mockResponseOnce(JSON.stringify([]));
-      await adminApi.getAtlasEmotions();
-      expect(fetchMock).toHaveBeenCalledWith(
-        expect.stringContaining("/admin/atlas/emotions"),
-        expect.anything()
-      );
-    });
+  it("deleteBootstrapData", async () => {
+    await adminApi.deleteBootstrapData("1");
+    expect(mockFetch).toHaveBeenCalledWith(expect.stringContaining("/admin/bootstrap/1"), expect.objectContaining({ method: "DELETE" }));
+  });
 
-    it("should call updateAtlasEmotion", async () => {
-      fetchMock.mockResponseOnce(JSON.stringify({}));
-      await adminApi.updateAtlasEmotion("e1", { definition: "test" });
-      expect(fetchMock).toHaveBeenCalledWith(
-        expect.stringContaining("/admin/atlas/emotions/e1"),
-        expect.objectContaining({ method: "PUT", body: expect.stringContaining("test") })
-      );
-    });
+  // Prompts
+  it("getPromptTemplates", async () => {
+    await adminApi.getPromptTemplates();
+    expect(mockFetch).toHaveBeenCalledWith(expect.stringContaining("/admin/prompts"), expect.objectContaining({ method: "GET" }));
 
-    it("should call exportAtlasData", async () => {
-      fetchMock.mockResponseOnce(JSON.stringify({}));
-      await adminApi.exportAtlasData();
-      expect(fetchMock).toHaveBeenCalledWith(
-        expect.stringContaining("/admin/atlas/export"),
-        expect.anything()
-      );
-    });
+    await adminApi.getPromptTemplates("test-func");
+    expect(mockFetch).toHaveBeenCalledWith(expect.stringContaining("function_name=test-func"), expect.anything());
+  });
 
-    it("should call importAtlasData", async () => {
-      fetchMock.mockResponseOnce(JSON.stringify({}));
-      await adminApi.importAtlasData({ emotions: [] });
-      expect(fetchMock).toHaveBeenCalledWith(
-        expect.stringContaining("/admin/atlas/import"),
-        expect.objectContaining({ method: "POST" })
-      );
-    });
+  it("createPromptTemplate", async () => {
+    await adminApi.createPromptTemplate({} as any);
+    expect(mockFetch).toHaveBeenCalledWith(expect.stringContaining("/admin/prompts"), expect.objectContaining({ method: "POST" }));
+  });
 
-    it("should call getAiModels", async () => {
-      fetchMock.mockResponseOnce(JSON.stringify([]));
-      await adminApi.getAiModels();
-      expect(fetchMock).toHaveBeenCalledWith(
-        expect.stringContaining("/admin/ai-models"),
-        expect.anything()
-      );
-    });
+  it("updatePromptTemplate", async () => {
+    await adminApi.updatePromptTemplate("1", {} as any);
+    expect(mockFetch).toHaveBeenCalledWith(expect.stringContaining("/admin/prompts/1"), expect.objectContaining({ method: "PUT" }));
+  });
 
-    it("should call updateAiModel", async () => {
-      fetchMock.mockResponseOnce(JSON.stringify({}));
-      await adminApi.updateAiModel("chat", { ai_model_name: "gpt" });
-      expect(fetchMock).toHaveBeenCalledWith(
-        expect.stringContaining("/admin/ai-models/chat"),
-        expect.objectContaining({ method: "PUT" })
-      );
-    });
+  it("testPromptTemplate", async () => {
+    await adminApi.testPromptTemplate({} as any);
+    expect(mockFetch).toHaveBeenCalledWith(expect.stringContaining("/admin/prompts/test"), expect.objectContaining({ method: "POST" }));
+  });
 
-    it("should call getStrategies", async () => {
-      fetchMock.mockResponseOnce(JSON.stringify([]));
-      await adminApi.getStrategies();
-      expect(fetchMock).toHaveBeenCalledWith(
-        expect.stringContaining("/admin/strategies"),
-        expect.anything()
-      );
-    });
+  // AI Models
+  it("getAiModels", async () => {
+    await adminApi.getAiModels();
+    expect(mockFetch).toHaveBeenCalledWith(expect.stringContaining("/admin/ai-models"), expect.objectContaining({ method: "GET" }));
+  });
 
-    it("should call updateStrategy", async () => {
-      fetchMock.mockResponseOnce(JSON.stringify({}));
-      await adminApi.updateStrategy("s1", { description: "New" });
-      expect(fetchMock).toHaveBeenCalledWith(
-        expect.stringContaining("/admin/strategies/s1"),
-        expect.objectContaining({ method: "PUT" })
-      );
-    });
+  it("updateAiModel", async () => {
+    await adminApi.updateAiModel("func", {} as any);
+    expect(mockFetch).toHaveBeenCalledWith(expect.stringContaining("/admin/ai-models/func"), expect.objectContaining({ method: "PUT" }));
+  });
 
-    it("should call exportStrategies", async () => {
-      fetchMock.mockResponseOnce(JSON.stringify({}));
-      await adminApi.exportStrategies();
-      expect(fetchMock).toHaveBeenCalledWith(
-        expect.stringContaining("/admin/strategies/export"),
-        expect.anything()
-      );
-    });
+  // Missing specific ones
+  it("getSessionDetails", async () => {
+    await adminApi.getSessionDetails("1");
+    expect(mockFetch).toHaveBeenCalledWith(expect.stringContaining("/admin/sessions/1"), expect.anything());
+  });
 
-    it("should call importStrategies", async () => {
-      fetchMock.mockResponseOnce(JSON.stringify({}));
-      await adminApi.importStrategies({ strategies: [] });
-      expect(fetchMock).toHaveBeenCalledWith(
-        expect.stringContaining("/admin/strategies/import"),
-        expect.objectContaining({ method: "POST" })
-      );
-    });
+  it("exportAtlasData", async () => {
+    await adminApi.exportAtlasData();
+    expect(mockFetch).toHaveBeenCalledWith(expect.stringContaining("/admin/atlas/export"), expect.anything());
+  });
 
-    it("should call createBootstrapData", async () => {
-      fetchMock.mockResponseOnce(JSON.stringify({}));
-      await adminApi.createBootstrapData({ data_type: "test", content: {} });
-      expect(fetchMock).toHaveBeenCalledWith(
-        expect.stringContaining("/admin/bootstrap"),
-        expect.objectContaining({ method: "POST" })
-      );
-    });
+  it("importAtlasData", async () => {
+    await adminApi.importAtlasData({ emotions: [] });
+    expect(mockFetch).toHaveBeenCalledWith(expect.stringContaining("/admin/atlas/import"), expect.anything());
+  });
 
-    it("should call updateBootstrapData", async () => {
-      fetchMock.mockResponseOnce(JSON.stringify({}));
-      await adminApi.updateBootstrapData("b1", { content: { foo: "bar" } });
-      expect(fetchMock).toHaveBeenCalledWith(
-        expect.stringContaining("/admin/bootstrap/b1"),
-        expect.objectContaining({ method: "PUT" })
-      );
-    });
-
-    it("should call deleteBootstrapData", async () => {
-      fetchMock.mockResponseOnce(JSON.stringify({}));
-      await adminApi.deleteBootstrapData("b1");
-      expect(fetchMock).toHaveBeenCalledWith(
-        expect.stringContaining("/admin/bootstrap/b1"),
-        expect.objectContaining({ method: "DELETE" })
-      );
-    });
-
-    it("should call getPromptTemplates", async () => {
-      fetchMock.mockResponseOnce(JSON.stringify([]));
-      await adminApi.getPromptTemplates();
-      expect(fetchMock).toHaveBeenCalledWith(
-        expect.stringContaining("/admin/prompts"),
-        expect.anything()
-      );
-
-      fetchMock.mockResponseOnce(JSON.stringify([]));
-      await adminApi.getPromptTemplates("chat");
-      expect(fetchMock).toHaveBeenCalledWith(
-        expect.stringContaining("function_name=chat"),
-        expect.anything()
-      );
-    });
-
-    it("should call createPromptTemplate", async () => {
-      fetchMock.mockResponseOnce(JSON.stringify({}));
-      const data: any = { function_name: "test", template_type: "system", content: "test" };
-      await adminApi.createPromptTemplate(data);
-      expect(fetchMock).toHaveBeenCalledWith(
-        expect.stringContaining("/admin/prompts"),
-        expect.objectContaining({ method: "POST" })
-      );
-    });
-
-    it("should call updatePromptTemplate", async () => {
-      fetchMock.mockResponseOnce(JSON.stringify({}));
-      await adminApi.updatePromptTemplate("p1", { template_content: "updated" });
-      expect(fetchMock).toHaveBeenCalledWith(
-        expect.stringContaining("/admin/prompts/p1"),
-        expect.objectContaining({ method: "PUT" })
-      );
-    });
-
-    it("should call testPromptTemplate", async () => {
-      fetchMock.mockResponseOnce(JSON.stringify({}));
-      const req: any = { template_id: "p1", variables: {} };
-      await adminApi.testPromptTemplate(req);
-      expect(fetchMock).toHaveBeenCalledWith(
-        expect.stringContaining("/admin/prompts/test"),
-        expect.objectContaining({ method: "POST" })
-      );
-    });
+  it("getBootstrapData without type", async () => {
+    await adminApi.getBootstrapData();
+    expect(mockFetch).toHaveBeenCalledWith(expect.stringContaining("/admin/bootstrap"), expect.not.stringContaining("type="));
   });
 });
