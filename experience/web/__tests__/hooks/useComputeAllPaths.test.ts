@@ -113,4 +113,70 @@ describe("useComputeAllPaths", () => {
     }));
     expect(window.alert).toHaveBeenCalledWith(expect.stringContaining("complete"));
   });
+
+  it("should alert if no emotions loaded", async () => {
+    (useAtlasAdminStore as unknown as jest.Mock).mockImplementation((selector) => {
+      const state = { allEmotions: [], addComputedPath: mockAddComputedPath };
+      return selector(state);
+    });
+
+    const { result } = renderHook(() => useComputeAllPaths());
+    await result.current.computeAllPaths();
+
+    expect(window.alert).toHaveBeenCalledWith("No emotions loaded yet");
+    expect(atlasService.computeAllPaths).not.toHaveBeenCalled();
+  });
+
+  it("should handle job failure callback", () => {
+    let capturedOnFail: (msg: string) => void;
+    (useBatchJob as jest.Mock).mockImplementation((onComplete, onFail) => {
+      capturedOnFail = onFail;
+      return { startJob: mockStartJob, isComputing: false, progress: {}, setProgress: mockSetProgress };
+    });
+
+    renderHook(() => useComputeAllPaths());
+    capturedOnFail!("Server exploded");
+
+    expect(window.alert).toHaveBeenCalledWith("Computation failed: Server exploded");
+  });
+
+  it("should skip paths with unknown emotions and map waypoints", async () => {
+    let capturedOnComplete: () => Promise<void>;
+    (useBatchJob as jest.Mock).mockImplementation((onComplete) => {
+      capturedOnComplete = onComplete;
+      return { startJob: mockStartJob, isComputing: false, progress: {}, setProgress: mockSetProgress };
+    });
+
+    const mockPaths = [
+      {
+        from_emotion: { id: "unknown" }, // Mismatch
+        to_emotion: { id: "e2" },
+        waypoints: [],
+        distance: 0,
+        estimated_time: "0",
+        difficulty: "easy",
+        requires_bridge: false
+      },
+      {
+        from_emotion: { id: "e1" },
+        to_emotion: { id: "e2" },
+        waypoints: [{ emotion: "e_mid", vac: [1, 1, 1] }], // Non-empty waypoints
+        distance: 10,
+        estimated_time: "10m",
+        difficulty: "easy",
+        requires_bridge: false
+      }
+    ];
+    (atlasService.getCachedPaths as jest.Mock).mockResolvedValue({ paths: mockPaths });
+
+    renderHook(() => useComputeAllPaths());
+    await capturedOnComplete!();
+
+    // Should skip the first one
+    expect(mockAddComputedPath).toHaveBeenCalledTimes(1);
+    expect(mockAddComputedPath).toHaveBeenCalledWith(expect.objectContaining({
+      id: "e1-e2",
+      waypoints: expect.arrayContaining([expect.objectContaining({ emotion: "e_mid" })])
+    }));
+  });
 });

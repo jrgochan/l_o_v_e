@@ -131,6 +131,18 @@ describe("useGraphSimulation", () => {
     expect(mockSimulation.alphaTarget).toHaveBeenCalledWith(0);
     expect(mockSubject.fx).toBeNull();
     expect(mockSubject.fy).toBeNull();
+
+    // Test drag with active simulation (should not restart)
+    // Checking if branch (!event.active) false path is taken
+    mockSimulation.restart.mockClear();
+    mockSimulation.alphaTarget.mockClear();
+
+    startHandler({ ...mockEvent, active: 1 });
+    expect(mockSimulation.restart).not.toHaveBeenCalled();
+
+    endHandler({ ...mockEvent, active: 1 });
+    // Assuming alphaTarget(0) is only called if !active
+    expect(mockSimulation.alphaTarget).not.toHaveBeenCalled();
   });
 
   it("should return default drag if simulation is missing", () => {
@@ -166,11 +178,40 @@ describe("useGraphSimulation", () => {
 
     // Verify link force config
     expect(mockForceLink.id).toHaveBeenCalled();
+    const idFn = (mockForceLink.id as jest.Mock).mock.calls[0][0];
+    expect(idFn({ id: "test" })).toBe("test"); // Cover the ID accessor
+
     expect(mockForceLink.distance).toHaveBeenCalledWith(100);
 
     // Verify collide force radius accessor
     expect(d3.forceCollide).toHaveBeenCalled();
     const radiusFn = (mockForceCollide.radius as jest.Mock).mock.calls[0][0];
     expect(radiusFn({ radius: 10 })).toBe(20); // 10 + 10 constant
+  });
+
+  it("should stop existing simulation when re-initializing", () => {
+    const { rerender } = renderHook((props) => useGraphSimulation(props), {
+      initialProps: {
+        nodes: mockNodes,
+        links: mockLinks,
+        width: 800,
+        height: 600,
+      },
+    });
+
+    // Reset mocks to clear initial setup calls
+    jest.clearAllMocks();
+
+    // Rerender with different props to trigger effect re-run
+    rerender({
+      nodes: [...mockNodes, { id: "2" }],
+      links: mockLinks,
+      width: 800,
+      height: 600,
+    });
+
+    // Check if stop was called on the *previous* simulation instance
+    // Since mockSimulation is reused, we check if stop was called.
+    expect(mockSimulation.stop).toHaveBeenCalled();
   });
 });
