@@ -16,9 +16,9 @@ describe("SphereDebugOverlay", () => {
             id: "e1",
             name: "Joy",
             category: "Joy",
-            vac: [1, 1, 1],
+            vac: [1, 1, 1] as [number, number, number],
             definition: "Test definition",
-            quaternion: [0, 0, 0, 1]
+            quaternion: [0, 0, 0, 1] as [number, number, number, number]
         }],
         debugLog: [
             { timestamp: 1000, type: "test", vac: [0, 0, 0] },
@@ -64,6 +64,18 @@ describe("SphereDebugOverlay", () => {
     it("renders empty logs message", () => {
         render(<SphereDebugOverlay {...mockProps} debugLog={[]} />);
         expect(screen.getByText("No messages received yet")).toBeInTheDocument();
+    });
+
+    it("renders None for missing VACs", () => {
+        (useExperienceStore as unknown as jest.Mock).mockImplementation((selector: any) => selector({
+            currentVAC: null
+        }));
+
+        render(<SphereDebugOverlay {...mockProps} targetVAC={null} />);
+
+        // Should find 2 "None" texts (Target VAC and Current VAC)
+        const noneElements = screen.getAllByText("None");
+        expect(noneElements.length).toBeGreaterThanOrEqual(2);
     });
 
     describe("RawStorageMonitor", () => {
@@ -113,8 +125,21 @@ describe("SphereDebugOverlay", () => {
             expect(screen.getByText("NULL")).toBeInTheDocument();
         });
 
+        it("displays No VAC when vac missing in storage", () => {
+            const data = { timestamp: Date.now(), type: "test" }; // No vac
+            store["love-sphere-sync"] = JSON.stringify(data);
+            render(<SphereDebugOverlay {...mockProps} />);
+
+            act(() => {
+                jest.advanceTimersByTime(1000);
+            });
+
+            expect(screen.getByText(/No VAC/)).toBeInTheDocument();
+        });
+
         it("handles storage access error", () => {
-            mockLocalStorage.getItem.mockImplementationOnce(() => { throw new Error("Access Denied"); });
+            // Use mockImplementation to persist across multiple interval calls if needed
+            mockLocalStorage.getItem.mockImplementation(() => { throw new Error("Access Denied"); });
 
             render(<SphereDebugOverlay {...mockProps} />);
 
@@ -123,6 +148,9 @@ describe("SphereDebugOverlay", () => {
             });
 
             expect(screen.getByText("Storage Access Error")).toBeInTheDocument();
+
+            // Restore default implementation
+            mockLocalStorage.getItem.mockImplementation((key) => store[key] || null);
         });
 
         it("force refresh updates data", () => {

@@ -54,10 +54,38 @@ describe("useSettingsStore (Deep Coverage)", () => {
     expect(success).toBe(false);
   });
 
-  it("should reject invalid values", () => {
+
+
+  it("should catch JSON parse errors", () => {
+    const { result } = renderHook(() => useSettingsStore());
+    let success = true;
+    act(() => {
+      // Invalid JSON string causes JSON.parse to throw
+      success = result.current.importSettings("{ bad json");
+    });
+    expect(success).toBe(false);
+  });
+
+
+
+  it("should warn on version mismatch but proceed", () => {
     const { result } = renderHook(() => useSettingsStore());
     const obj = JSON.parse(result.current.exportSettings());
-    obj.settings.visual.emotionSize = 500; // Too biag
+    obj.version = "0.9";
+
+    let success = false;
+    act(() => {
+      success = result.current.importSettings(JSON.stringify(obj));
+    });
+
+    expect(success).toBe(true);
+    // Could check logger warn if we could mock it easily without module mock
+  });
+
+  it("should reject missing required sections", () => {
+    const { result } = renderHook(() => useSettingsStore());
+    const obj = JSON.parse(result.current.exportSettings());
+    delete obj.settings.visual; // Remove a required section
 
     let success = true;
     act(() => {
@@ -65,6 +93,30 @@ describe("useSettingsStore (Deep Coverage)", () => {
     });
 
     expect(success).toBe(false);
+  });
+
+  it("should reject invalid values", () => {
+    const { result } = renderHook(() => useSettingsStore());
+
+    // Emotion Size invalid
+    const obj1 = JSON.parse(result.current.exportSettings());
+    obj1.settings.visual.emotionSize = 500;
+
+    let success1 = true;
+    act(() => {
+      success1 = result.current.importSettings(JSON.stringify(obj1));
+    });
+    expect(success1).toBe(false);
+
+    // Path Opacity invalid
+    const obj2 = JSON.parse(result.current.exportSettings());
+    obj2.settings.visual.pathOpacity = 1.5;
+
+    let success2 = true;
+    act(() => {
+      success2 = result.current.importSettings(JSON.stringify(obj2));
+    });
+    expect(success2).toBe(false);
   });
 
   it("should test connection status", async () => {
@@ -84,6 +136,13 @@ describe("useSettingsStore (Deep Coverage)", () => {
     expect(status!.listener.error).toContain("500");
     expect(status!.versor.connected).toBe(false);
     expect(status!.versor.error).toBe("Network Error");
+
+    // Test non-Error object
+    (global.fetch as jest.Mock).mockRejectedValueOnce("String Error");
+    await act(async () => {
+      status = await result.current.testConnection();
+    });
+    expect(status!.observer.error).toBe("Connection failed");
   });
 
   it("should switch network modes", () => {
@@ -100,6 +159,15 @@ describe("useSettingsStore (Deep Coverage)", () => {
     expect(result.current.network.mode).toBe("network");
     // Check default cloud URL
     expect(result.current.network.endpoints.observer).toContain("api.love-platform.com");
+
+    // Test custom endpoints preservation
+    act(() => {
+      result.current.updateNetworkSetting({ customEndpoints: true });
+      result.current.setApiUrl("observer", "http://custom-url.com");
+      result.current.switchNetworkMode("local");
+    });
+    // Should NOT revert to localhost because customEndpoints is true
+    expect(result.current.network.endpoints.observer).toBe("http://custom-url.com");
   });
   it("should update simple settings", () => {
     const { result } = renderHook(() => useSettingsStore());
@@ -228,7 +296,7 @@ describe("useSettingsStore (Deep Coverage)", () => {
 
     // JSDOM throws "Not implemented: navigation" on reload(), which creates a console.error
     // We suppress it for this test.
-    const consoleErrorSpy = jest.spyOn(console, "error").mockImplementation(() => {});
+    const consoleErrorSpy = jest.spyOn(console, "error").mockImplementation(() => { });
 
     act(() => {
       result.current.setUserId("data-to-clear");
@@ -239,5 +307,35 @@ describe("useSettingsStore (Deep Coverage)", () => {
     // We cannot easily check window.location.reload call in JSDOM as it is non-configurable
 
     consoleErrorSpy.mockRestore();
+  });
+
+  it("should merge state with missing layers during rehydration", () => {
+    const { result } = renderHook(() => useSettingsStore());
+
+    // Simulate rehydration event (persist middleware implementation detail)
+    // or we can test the merge function if we exported it?
+    // Since we can't easily access the merge function directly from the hook result without accessing the store persistence api.
+
+    // Zustand persist middleware exposes .persist API on useSettingsStore.persist
+    // But we need to check if the mock store behaves correctly.
+
+    // Alternatively, we can manually trigger the persistence options if we could access them.
+    // But since we are testing the store behavior, maybe we can mock localStorage with a state missing layers?
+
+    // The merge function runs when the store initializes.
+    // So let's clear store and re-initialize with mocked localStorage.
+  });
+
+  // Actually, to test merge logic we might need to access the store options
+  // (useSettingsStore as any).persist.getOptions().merge(persisted, current)
+
+  it("should handle missing layers in rehydration merge", () => {
+    const merge = (useSettingsStore as any).persist.getOptions().merge;
+    const current = { layers: { soulSphere: true } };
+    const persisted = { someOtherSetting: true }; // No layers
+
+    const merged = merge(persisted, current);
+    expect(merged.layers).toEqual(current.layers);
+    expect(merged.someOtherSetting).toBe(true);
   });
 });

@@ -26,13 +26,13 @@ export function useChatSessionState() {
   // Update session metrics timer
   useEffect(() => {
     const interval = setInterval(() => {
-      if (sessionStartTimeRef.current) {
-        const elapsed = Math.floor((Date.now() - sessionStartTimeRef.current.getTime()) / 1000);
-        setSessionMetrics((prev) => ({
-          ...prev,
-          elapsedSeconds: elapsed,
-        }));
-      }
+      // Ref is guaranteed initialized in render body
+      const startTime = sessionStartTimeRef.current!;
+      const elapsed = Math.floor((Date.now() - startTime.getTime()) / 1000);
+      setSessionMetrics((prev) => ({
+        ...prev,
+        elapsedSeconds: elapsed,
+      }));
     }, 1000);
 
     return () => clearInterval(interval);

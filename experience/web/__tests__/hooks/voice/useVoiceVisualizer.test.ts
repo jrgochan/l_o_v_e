@@ -1,4 +1,4 @@
-import { renderHook } from "@testing-library/react";
+import { renderHook, act } from "@testing-library/react";
 import { useVoiceVisualizer } from "../../../hooks/voice/useVoiceVisualizer";
 
 // Mock Web Audio API
@@ -31,6 +31,16 @@ describe("useVoiceVisualizer", () => {
     jest.useRealTimers();
   });
 
+  beforeAll(() => {
+    jest.spyOn(window, 'requestAnimationFrame').mockImplementation((cb: any) => setTimeout(cb, 16) as unknown as number);
+    jest.spyOn(window, 'cancelAnimationFrame').mockImplementation((id: any) => clearTimeout(id));
+  });
+
+  afterAll(() => {
+    (window.requestAnimationFrame as jest.Mock).mockRestore();
+    (window.cancelAnimationFrame as jest.Mock).mockRestore();
+  });
+
   it("should initialize with 0 level when no stream", () => {
     const { result } = renderHook(() => useVoiceVisualizer(null));
     expect(result.current.audioLevel).toBe(0);
@@ -47,6 +57,28 @@ describe("useVoiceVisualizer", () => {
     // rAF usually runs immediately in some test environments or needs explicit trigger.
     // Let's assume rAF loop runs.
 
-    // Wait for rAF loop tick (simulated)
+    // Simulate rAF
+    act(() => {
+      jest.advanceTimersByTime(100);
+    });
+  });
+
+  it("should cleanup resources when stream is removed", () => {
+    const stream = {} as MediaStream;
+    const { result, rerender } = renderHook(
+      (s) => useVoiceVisualizer(s),
+      {
+        initialProps: stream as MediaStream | null,
+      }
+    );
+
+    // Verify setup
+    expect(mockCreateAnalyser).toHaveBeenCalled();
+
+    // Rerender with null
+    rerender(null);
+
+    // Verify cleanup
+    expect(mockClose).toHaveBeenCalled();
   });
 });

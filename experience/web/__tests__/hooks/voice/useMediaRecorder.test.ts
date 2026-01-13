@@ -41,7 +41,7 @@ class MockMediaRecorder {
   ondataavailable: Function | null = null;
   onstop: Function | null = null;
 
-  constructor(stream: any) {}
+  constructor(stream: any) { }
 }
 
 global.MediaRecorder = MockMediaRecorder as any;
@@ -88,6 +88,21 @@ describe("useMediaRecorder", () => {
 
     expect(mockActions.setError).toHaveBeenCalledWith("Permission denied");
     expect(onError).toHaveBeenCalledWith("Permission denied");
+    expect(mockActions.setError).toHaveBeenCalledWith("Permission denied");
+    expect(onError).toHaveBeenCalledWith("Permission denied");
+  });
+
+  it("should handle non-Error object rejection", async () => {
+    mockGetUserMedia.mockRejectedValueOnce("Unknown error string");
+    const { result } = renderHook(() =>
+      useMediaRecorder({ state: mockState, actions: mockActions })
+    );
+
+    await act(async () => {
+      await result.current.startMediaRecorder();
+    });
+
+    expect(mockActions.setError).toHaveBeenCalledWith("Failed to access microphone");
   });
 
   it("should handle data availability", async () => {
@@ -237,5 +252,43 @@ describe("useMediaRecorder Advanced", () => {
 
     expect(lastRecorderInstance.stop).toHaveBeenCalled();
     expect(mockActions.resetState).toHaveBeenCalled();
+  });
+
+  it("should update duration while recording", async () => {
+    const { result } = renderHook(() =>
+      useMediaRecorder({ state: mockState, actions: mockActions })
+    );
+
+    await act(async () => {
+      await result.current.startMediaRecorder();
+    });
+
+    act(() => {
+      jest.advanceTimersByTime(1100);
+    });
+
+    expect(mockActions.setDuration).toHaveBeenCalled();
+  });
+
+  it("should ignore actions when recorder is invalid or in wrong state", () => {
+    const { result } = renderHook(() =>
+      useMediaRecorder({ state: mockState, actions: mockActions })
+    );
+
+    // Stop without start
+    act(() => {
+      result.current.stopMediaRecorder();
+    });
+    // Pause without start
+    act(() => {
+      result.current.pauseMediaRecorder();
+    });
+    // Resume without start
+    act(() => {
+      result.current.resumeMediaRecorder();
+    });
+
+    expect(mockActions.setIsRecording).not.toHaveBeenCalled();
+    expect(mockActions.setIsPaused).not.toHaveBeenCalled();
   });
 });

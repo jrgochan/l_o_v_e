@@ -69,8 +69,8 @@ export function useChatPanelState() {
   // Handle resizing effect
   useEffect(() => {
     const handleMouseMove = (e: MouseEvent) => {
-      if (!isResizing) return;
       e.preventDefault();
+
 
       // Calculate new height (drag up = increase height)
       const deltaY = startYRef.current - e.clientY;

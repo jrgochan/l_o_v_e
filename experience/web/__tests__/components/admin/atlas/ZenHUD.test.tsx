@@ -87,4 +87,21 @@ describe("ZenHUD", () => {
     fireEvent.click(button);
     expect(mockSetIsFlying).toHaveBeenCalledWith(true);
   });
+
+  it("should render stop button when flying", () => {
+    mockUseAtlasAdminStore.mockReturnValue({
+      hoveredPathId: null,
+      selectedPathId: "p1",
+      computedPaths: new Map([["p1", mockPath]]),
+      isFlying: true, // Flying
+      setIsFlying: mockSetIsFlying,
+      hoveredEmotionId: null,
+      allEmotions: [],
+    });
+
+    render(<ZenHUD />);
+    expect(screen.getByText("Stop Journey")).toBeInTheDocument();
+    const button = screen.getByRole("button", { name: /stop journey/i });
+    expect(button.className).toContain("bg-red-500/20");
+  });
 });

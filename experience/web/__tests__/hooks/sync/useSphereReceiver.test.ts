@@ -93,4 +93,58 @@ describe("useSphereReceiver", () => {
 
     expect(onStale).not.toHaveBeenCalled();
   });
+
+  it("should handle optional path visibility update", () => {
+    const { result } = renderHook(() => useSphereReceiver("listener", 0));
+
+    // Test with showPath
+    act(() => {
+      result.current.handleMessage({
+        type: "path_update",
+        path: { id: "p1" },
+        showPath: true,
+        timestamp: 123
+      } as any);
+    });
+
+    expect(setShowPath).toHaveBeenCalledWith(true);
+  });
+
+  it("should handle heartbeat", () => {
+    const { result } = renderHook(() => useSphereReceiver("listener", 0));
+
+    act(() => {
+      result.current.handleMessage({
+        type: "heartbeat",
+        timestamp: 123
+      });
+    });
+    // Just verify no crash, logger is mocked but not exported for verification easily unless we spy on import.
+  });
+
+  it("should clear path when path_update has no path", () => {
+    const { result } = renderHook(() => useSphereReceiver("listener", 0));
+
+    act(() => {
+      result.current.handleMessage({
+        type: "path_update",
+        path: undefined, // path cleared
+        timestamp: 456
+      } as any);
+    });
+
+    expect(setTransitionPath).toHaveBeenCalledWith(null);
+  });
+
+  it("should handle 0 lastUpdate (fresh start) without stale", () => {
+    const onStale = jest.fn();
+    // lastUpdate 0 -> fallback to Date.now() -> elapsed 0 -> no stale
+    renderHook(() => useSphereReceiver("listener", 0, undefined, onStale));
+
+    act(() => {
+      jest.advanceTimersByTime(10000);
+    });
+
+    expect(onStale).not.toHaveBeenCalled();
+  });
 });

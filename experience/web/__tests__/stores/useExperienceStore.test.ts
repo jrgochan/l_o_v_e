@@ -119,6 +119,23 @@ describe("useExperienceStore", () => {
     expect(result.current.flyoverProgress).toBe(0.5);
     expect(result.current.flyoverCurrentWaypointIndex).toBe(2);
   });
+
+  it("should handle actions with no active session or journey", () => {
+    const { result } = renderHook(() => useExperienceStore());
+
+    act(() => {
+      // Should safely return state without error
+      result.current.markWaypointReached(0);
+      result.current.completeJourney();
+      result.current.pauseSession();
+      result.current.resumeSession();
+      result.current.addSessionNote("test");
+    });
+
+    expect(result.current.activeJourney).toBeNull();
+    expect(result.current.activeSession).toBeNull();
+  });
+
   it("should handle remaining setters", () => {
     const { result } = renderHook(() => useExperienceStore());
 
