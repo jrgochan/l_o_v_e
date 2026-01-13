@@ -29,6 +29,14 @@ describe("SessionTimeline", () => {
       confidence: 0.5,
       alertLevel: "warning",
     },
+    {
+      timestamp: new Date(baseTime.getTime() + 195000), // +3m 15s
+      emotion: "Slight Worry",
+      category: "Negative",
+      vac: { valence: -0.2, arousal: 0.3, connection: 0.4 },
+      confidence: 0.6,
+      alertLevel: "attention",
+    }
   ];
 
   it("renders nothing when timeline is empty", () => {
@@ -40,12 +48,13 @@ describe("SessionTimeline", () => {
     render(<SessionTimeline emotionTimeline={mockEvents} />);
 
     expect(screen.getByText(/Session Timeline/)).toBeInTheDocument();
-    expect(screen.getByText(/3 events/)).toBeInTheDocument();
+    expect(screen.getByText(/4 events/)).toBeInTheDocument();
 
     // Check emotions
     expect(screen.getByText(/Calm/)).toBeInTheDocument();
     expect(screen.getByText(/Anger/)).toBeInTheDocument();
     expect(screen.getByText(/Anxiety/)).toBeInTheDocument();
+    expect(screen.getByText(/Slight Worry/)).toBeInTheDocument();
   });
 
   it("calculates relative time correctly", () => {
@@ -57,18 +66,34 @@ describe("SessionTimeline", () => {
     expect(screen.getByText("+1:05")).toBeInTheDocument();
     // Third is +2:10
     expect(screen.getByText("+2:10")).toBeInTheDocument();
+    // Fourth +3:15
+    expect(screen.getByText("+3:15")).toBeInTheDocument();
+  });
+
+  it("formats single digit seconds correctly", () => {
+    const shortEvent = [{ ...mockEvents[0], timestamp: new Date(baseTime.getTime() + 6000) }]; // +0:06
+    render(<SessionTimeline emotionTimeline={[mockEvents[0], ...shortEvent]} />);
+    expect(screen.getByText("+0:06")).toBeInTheDocument();
   });
 
   it("displays correct alert indicators", () => {
     render(<SessionTimeline emotionTimeline={mockEvents} />);
 
     // Critical event (Anger)
-    // Should have red dot and "High distress detected"
     expect(screen.getByText("High distress detected")).toBeInTheDocument();
 
     // Warning event (Anxiety)
-    // Should have warning text
     expect(screen.getByText("Monitor closely")).toBeInTheDocument();
+
+    // Attention event (Slight Worry) - No specific text block in code?
+    // Checking code: only Critical and Warning have text blocks (lines 132-141).
+    // Attention just has yellow/orange Icon (line 98) and color logic (line 25).
+    // Let's verify the dot color class.
+    const attentionText = screen.getByText("Slight Worry");
+    // Find the marker. It's in the same parent structure.
+    // We can rely on visual verification or logic.
+    // The icon '🟡' should be present.
+    expect(screen.getByText("🟡")).toBeInTheDocument();
   });
 
   it("displays VAC scores", () => {

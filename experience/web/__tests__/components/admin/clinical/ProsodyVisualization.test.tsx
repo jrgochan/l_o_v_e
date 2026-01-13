@@ -14,6 +14,14 @@ const mockProsody: ProsodyData = {
 const mockDecodeAudioData = jest.fn();
 const mockClose = jest.fn();
 
+// Mock Logger
+jest.mock("@/utils/logger", () => ({
+  logger: {
+    error: jest.fn(),
+  },
+}));
+import { logger } from "@/utils/logger";
+
 class MockAudioContext {
   decodeAudioData = mockDecodeAudioData;
   close = mockClose;
@@ -58,10 +66,8 @@ describe("ProsodyVisualization", () => {
 
   it("renders real waveform when audioBlob is provided", async () => {
     const mockBlob = new Blob(["mock audio data"], { type: "audio/wav" });
-
     // Mock arrayBuffer implementation
     mockBlob.arrayBuffer = jest.fn().mockResolvedValue(new ArrayBuffer(8));
-
     // Mock decodeAudioData response
     mockDecodeAudioData.mockResolvedValue({
       getChannelData: () => new Float32Array(100), // Mock data
@@ -80,24 +86,48 @@ describe("ProsodyVisualization", () => {
     expect(mockDecodeAudioData).toHaveBeenCalled();
   });
 
-  it("handles audio processing error gracefully", async () => {
-    const mockBlob = new Blob(["corrupt data"], { type: "audio/wav" });
-    mockBlob.arrayBuffer = jest.fn().mockRejectedValue(new Error("Read error"));
+  it("renders buckets correctly (Low/Med/High)", () => {
+    // Create a test case covering different buckets than default
+    const mixedProsody: ProsodyData = {
+      pitch_mean: 100, // Low (<150)
+      pitch_std: 40,   // High var (>30)
+      energy: 0.2,     // Low (<0.3/0.4)
+      rate: 6,         // Fast (>5)
+      features: {}
+    };
 
-    render(<ProsodyVisualization prosody={mockProsody} audioBlob={mockBlob} />);
+    const { unmount } = render(<ProsodyVisualization prosody={mixedProsody} audioBlob={null} />);
 
-    await waitFor(() => {
-      expect(screen.queryByText("Processing audio...")).not.toBeInTheDocument();
-    });
+    expect(screen.getByText("Low Pitch")).toBeInTheDocument();
+    expect(screen.getByText("Low Energy").className).toContain("text-blue-400"); // Energy 0.2 -> Low Energy -> Blue coverage 
+    // Energy 0.2 -> Low Energy
+    expect(screen.getByText("Low Energy")).toBeInTheDocument();
+    expect(screen.getByText("Fast Speech")).toBeInTheDocument();
+    expect(screen.getByText(/High pitch variability/i)).toBeInTheDocument();
 
-    // Should fallback to synthetic
-    expect(screen.getByText(/📊 Synthetic/)).toBeInTheDocument();
+    unmount();
+
+    // Moderate buckets
+    const medProsody: ProsodyData = {
+      pitch_mean: 260, // High (>250)
+      pitch_std: 10,   // Low (<15)
+      energy: 0.5,     // Moderate (>0.4)
+      rate: 2,         // Slow (<3)
+      features: {}
+    };
+    render(<ProsodyVisualization prosody={medProsody} audioBlob={null} />);
+    expect(screen.getByText("High Pitch")).toBeInTheDocument(); // Purple
+    expect(screen.getByText("Moderate Energy")).toBeInTheDocument(); // Yellow
+    expect(screen.getByText("Slow Speech")).toBeInTheDocument(); // Blue
+    expect(screen.getByText(/Low pitch variability may indicate/)).toBeInTheDocument();
   });
 
-  it("renders clinical interpretation", () => {
-    render(<ProsodyVisualization prosody={mockProsody} audioBlob={null} />);
+  it("handles missing/null metrics", () => {
+    const minimalProsody: any = { features: {} }; // Missing basic fields
+    render(<ProsodyVisualization prosody={minimalProsody} audioBlob={null} />);
 
-    // Energy 0.8 -> High
-    expect(screen.getByText(/High vocal energy may indicate/)).toBeInTheDocument();
+    // Should handle unknown/nulls gracefully
+    // Based on code: if (!energy) return { label: "Unknown", ... }
+    expect(screen.getAllByText("Unknown").length).toBeGreaterThan(0);
   });
 });

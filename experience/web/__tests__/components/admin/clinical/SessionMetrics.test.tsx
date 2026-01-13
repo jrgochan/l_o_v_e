@@ -73,5 +73,32 @@ describe("SessionMetricsDisplay", () => {
       );
       expect(c2.querySelector(".bg-red-500")).toBeInTheDocument();
     });
+    it("should display attention alerts", () => {
+      const metrics = { ...MOCK_METRICS, alertCount: { critical: 0, warning: 0, attention: 3 } };
+      render(<SessionMetricsDisplay sessionMetrics={metrics} isExpanded={true} />);
+      expect(screen.getByText(/3 Attention/)).toBeInTheDocument();
+    });
+
+    it("should handle missing dominant category", () => {
+      const metrics = { ...MOCK_METRICS, dominantCategory: null };
+      render(<SessionMetricsDisplay sessionMetrics={metrics} isExpanded={true} />);
+      expect(screen.getByText("--")).toBeInTheDocument();
+    });
+
+    it("should handle low/zero confidence", () => {
+      const metrics = { ...MOCK_METRICS, averageConfidence: 0 };
+      render(<SessionMetricsDisplay sessionMetrics={metrics} isExpanded={true} />);
+      // Should show -- for percentage
+      const percentageElements = screen.getAllByText("--");
+      expect(percentageElements.length).toBeGreaterThan(0);
+      // Should not render p-bar
+      expect(screen.queryByRole("progressbar")).not.toBeInTheDocument();
+    });
+
+    it("should hide alert section if no alerts", () => {
+      const metrics = { ...MOCK_METRICS, alertCount: { critical: 0, warning: 0, attention: 0 } };
+      render(<SessionMetricsDisplay sessionMetrics={metrics} isExpanded={true} />);
+      expect(screen.queryByText(/Session Alerts:/)).not.toBeInTheDocument();
+    });
   });
 });

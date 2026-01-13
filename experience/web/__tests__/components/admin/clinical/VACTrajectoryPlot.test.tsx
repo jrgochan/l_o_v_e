@@ -36,103 +36,84 @@ describe("VACTrajectoryPlot", () => {
     expect(screen.getByText(/Emotional Journey/)).toBeInTheDocument();
     expect(screen.getByText("3 points")).toBeInTheDocument();
 
-    // Check summary stats
-    // Valence change: 0.8 - 0.1 = 0.7
-    // Use regex to be more resilient to whitespace splitting (HTML formatting)
-    expect(screen.getByText(/\+\s*0\.70/)).toBeInTheDocument();
-    // Arousal change: 0.7 - 0.2 = 0.5
-    expect(screen.getByText(/\+\s*0\.50/)).toBeInTheDocument();
-
-    // Check Pattern Detection (Positive Trend)
-    // Valence change > 0.3 should trigger "Positive emotional progression"
-    expect(screen.getByText("Positive emotional progression")).toBeInTheDocument();
+    // Check summary stats using regex for flexibility
+    expect(screen.getByText(/\+\s*0\.70/)).toBeInTheDocument(); // Valence 0.8 - 0.1
+    expect(screen.getByText(/\+\s*0\.50/)).toBeInTheDocument(); // Arousal 0.7 - 0.2
   });
 
-  it("detects rapid shifts pattern", () => {
-    // Creating erratic history
-    const erraticHistory: VACHistoryPoint[] = [
-      {
-        timestamp: new Date(),
-        vac: { valence: 0, arousal: 0, connection: 0 },
-        emotion: "A",
-        confidence: 1,
-      },
-      {
-        timestamp: new Date(),
-        vac: { valence: 0.9, arousal: 0.9, connection: 0 },
-        emotion: "B",
-        confidence: 1,
-      }, // massive jump
-      {
-        timestamp: new Date(),
-        vac: { valence: -0.9, arousal: -0.9, connection: 0 },
-        emotion: "C",
-        confidence: 1,
-      }, // massive jump
+  it("renders negative stats correctly", () => {
+    // Create decreasing trend
+    const decreaseHistory = [
+      { ...mockHistory[0], vac: { valence: 0.8, arousal: 0.8, connection: 0 } },
+      { ...mockHistory[1], vac: { valence: 0.5, arousal: 0.5, connection: 0 } },
+      { ...mockHistory[2], vac: { valence: 0.2, arousal: 0.3, connection: 0 } },
     ];
+    render(<VACTrajectoryPlot vacHistory={decreaseHistory} />);
+    // Valence: 0.2 - 0.8 = -0.6
+    expect(screen.getByText("-0.60")).toBeInTheDocument();
+    // Arousal: 0.3 - 0.8 = -0.5
+    expect(screen.getByText("-0.50")).toBeInTheDocument();
 
-    render(<VACTrajectoryPlot vacHistory={erraticHistory} />);
-    expect(screen.getByText("Rapid emotional shifts detected")).toBeInTheDocument();
+    // Should have red color class text-red-400
+    expect(screen.getByText("-0.60").className).toContain("text-red-400");
   });
 
-  it("shows tooltip on hover", () => {
-    // We need to render and interact with SVG elements.
-    // The component renders circles for points.
-    // However, they don't have roles or Aria labels by default.
-    // We can select them by generic tag or simple class checks if applied, but here styles are inline/tailwind.
+  describe("Pattern Detection", () => {
 
-    // Strategy: Render, get the SVG container, find circles inside.
+    it("detects rapid shifts", () => {
+      const jerkyHistory: VACHistoryPoint[] = [
+        { timestamp: new Date(), vac: { valence: 0, arousal: 0, connection: 0 }, emotion: "A", confidence: 1 },
+        { timestamp: new Date(), vac: { valence: 0.9, arousal: 0.9, connection: 0 }, emotion: "B", confidence: 1 }, // >0.5 diff
+        { timestamp: new Date(), vac: { valence: -0.9, arousal: -0.9, connection: 0 }, emotion: "C", confidence: 1 }, // >0.5 diff
+      ];
+      render(<VACTrajectoryPlot vacHistory={jerkyHistory} />);
+      expect(screen.getByText("Rapid emotional shifts detected")).toBeInTheDocument();
+    });
+
+    it("detects negative bias", () => {
+      // 3 points, 3 negative (< -0.2) -> 100% > 70%
+      const negativeHistory = mockHistory.map(p => ({
+        ...p,
+        vac: { ...p.vac, valence: -0.5 }
+      }));
+      render(<VACTrajectoryPlot vacHistory={negativeHistory} />);
+      expect(screen.getByText("Persistent negative emotional state")).toBeInTheDocument();
+    });
+
+    it("detects positive trend", () => {
+      // End - Start > 0.3
+      // 0.8 - 0.1 = 0.7 > 0.3
+      render(<VACTrajectoryPlot vacHistory={mockHistory} />);
+      expect(screen.getByText("Positive emotional progression")).toBeInTheDocument();
+    });
+
+    it("detects arousal escalation", () => {
+      // End - Start > 0.4
+      // 0.7 - 0.2 = 0.5 > 0.4
+      render(<VACTrajectoryPlot vacHistory={mockHistory} />);
+      expect(screen.getByText("Arousal escalation detected")).toBeInTheDocument();
+    });
+  });
+
+  it("shows tooltip on hover for all points", () => {
     const { container } = render(<VACTrajectoryPlot vacHistory={mockHistory} />);
 
-    // The "Start" point is one circle, plus historical points.
-    // The historical points have onMouseEnter.
-    // Let's find circles that are children of 'g' elements (based on code structure).
-
-    // Simplified selector strategy:
-    // The points are rendered as <circle> inside <g>.
-    const points = container.querySelectorAll("svg g circle");
-    expect(points.length).toBeGreaterThan(0);
-
-    // Hover over the first point (index 0 in points array corresponds to index 1 in history slice)
-    // Wait, slice(1, -1) logic in component:
-    // {points.slice(1, -1).map...}
-    // So the FIRST point and LAST point are rendered separately?
-    // Start point: circle (no g)
-    // Current point: div (outside SVG)
-    // Intermediate points: circle inside g
-
-    // Let's hover the START point div (outside SVG) first?
-    // Code: <div ... className="... rounded-full cursor-pointer" ... onMouseEnter={() => setHoveredPoint(0)} />
-    // It has specific styles. Left/Top inline styles.
-
-    // Let's try to verify the "Start" interaction.
-    // Actually, finding the element might be fragile without test-id.
-    // But we know 'Joy' is the last point (Current).
-    // 'Neutral' is start.
-    // 'Calm' is intermediate.
-
-    // Let's rely on text content not being visible initially.
-    expect(screen.queryByText("V: 0.10, A: 0.20")).not.toBeInTheDocument();
-
-    // Hover start point marker
-    // It's a div with w-3 h-3.
-    // Let's use a slightly fuzzy selector or add data-testid via code edit if this is too hard.
-    // BUT the prompt is to generate tests, I shouldn't modify code unless necessary.
-    // I can try to find by style? no.
-
-    // Let's find the 'Current' point (Joy). It has 'animate-pulse'.
-    // Class based selection is discouraged but functional here.
-    // Or we hover the intermediate point 'Calm'.
-
+    const divPoints = container.querySelectorAll("div.cursor-pointer");
     const circles = container.querySelectorAll("circle");
-    // Start circle is first usually in SVG order?
-    // svg > circle (start)
-    // svg > g > circle (intermediate)
+    const pointerCircles = Array.from(circles).filter(c => c.getAttribute("style")?.includes("cursor: pointer"));
 
-    if (circles.length > 0) {
-      // Try hovering any circle we find.
-      fireEvent.mouseEnter(circles[0]);
-      // Ideally checking for "Neutral" tooltip or whatever matches the point.
-    }
+    const allPoints = [...Array.from(divPoints), ...pointerCircles];
+    expect(allPoints.length).toBeGreaterThanOrEqual(3);
+
+    allPoints.forEach((point) => {
+      fireEvent.mouseEnter(point);
+      // Use refined regex to query ONLY the V: ... A: ... format 
+      // Default Quadrant label is "IV: Joyful" which matches /V:/.
+      const tooltips = screen.getAllByText(/V:.*A:/); // "V: 0.80, A: 0.70"
+      expect(tooltips.length).toBeGreaterThan(0);
+
+      fireEvent.mouseLeave(point);
+      expect(screen.queryByText(/V:.*A:/)).not.toBeInTheDocument();
+    });
   });
 });
