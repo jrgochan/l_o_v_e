@@ -133,4 +133,36 @@ describe("useMultiEmotionState", () => {
     expect(result.current.multiEmotionAnalysis).toBeNull();
     expect(result.current.threeWayAnalysis).toBeNull();
   });
+
+  it("should ignore relationship addition if state is null", () => {
+    const { result } = renderHook(() => useMultiEmotionState(sessionId));
+    act(() => {
+      result.current.addRelationship("a", "b", "sequential", 0.5, "desc");
+    });
+    expect(result.current.multiEmotionAnalysis).toBeNull();
+  });
+
+  it("should ignore aggregate update if state is null", () => {
+    const { result } = renderHook(() => useMultiEmotionState(sessionId));
+    act(() => {
+      result.current.updateAggregateState({ complexity_score: 1 });
+    });
+    expect(result.current.multiEmotionAnalysis).toBeNull();
+  });
+
+  it("should preserve VAC in aggregate update if not provided", () => {
+    const { result } = renderHook(() => useMultiEmotionState(sessionId));
+    const initialVAC = { valence: 0.1, arousal: 0.2, connection: 0.3 };
+
+    act(() => {
+      result.current.addMultiEmotion("joy", "cat", initialVAC, 1, "primary");
+    });
+
+    act(() => {
+      result.current.updateAggregateState({ complexity_score: 0.9 });
+    });
+
+    expect(result.current.multiEmotionAnalysis?.aggregate.vac).toEqual(initialVAC);
+    expect(result.current.multiEmotionAnalysis?.aggregate.complexity_score).toBe(0.9);
+  });
 });

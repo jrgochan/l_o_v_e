@@ -22,6 +22,7 @@ export function useZenKeyboardShortcuts({
     emotions,
 }: UseZenKeyboardShortcutsProps) {
     const settings = useSettingsStore();
+    // console.log("ZenShortcuts: Init", { layers: settings?.layers, emotionsLength: emotions?.length });
 
     const isFlying = useExperienceStore((state) => state.isFlying);
     const setIsFlying = useExperienceStore((state) => state.setIsFlying);
@@ -29,7 +30,6 @@ export function useZenKeyboardShortcuts({
 
     useEffect(() => {
         const handleKeyPress = (e: KeyboardEvent) => {
-            // Prevent triggering when typing in inputs/textareas
             if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) return;
 
             switch (e.key.toLowerCase()) {

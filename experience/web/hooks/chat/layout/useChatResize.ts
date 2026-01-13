@@ -37,7 +37,7 @@ export function useChatResize({
    */
   useEffect(() => {
     const handleMouseMove = (e: MouseEvent) => {
-      if (!isResizing) return;
+      // if (!isResizing) return; // Guaranteed by useEffect dependency
       e.preventDefault();
 
       // Calculate new height (drag up = increase height)

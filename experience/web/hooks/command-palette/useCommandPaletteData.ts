@@ -1,5 +1,6 @@
 import { useState, useCallback } from "react";
 import { logger } from "@/utils/logger";
+import { isSSR } from "@/utils/ssr";
 
 const RECENT_EMOTIONS_KEY = "love-recent-emotions";
 const FAVORITE_EMOTIONS_KEY = "love-favorite-emotions";
@@ -8,7 +9,7 @@ const MAX_RECENT = 10;
 export function useCommandPaletteData() {
   // Recent emotions (persisted to localStorage)
   const [recentEmotions, setRecentEmotions] = useState<string[]>(() => {
-    if (typeof window === "undefined") return [];
+    if (isSSR()) return [];
     try {
       const saved = localStorage.getItem(RECENT_EMOTIONS_KEY);
       return saved ? JSON.parse(saved) : [];
@@ -20,7 +21,7 @@ export function useCommandPaletteData() {
 
   // Favorite emotions (persisted to localStorage)
   const [favoriteEmotions, setFavoriteEmotions] = useState<string[]>(() => {
-    if (typeof window === "undefined") return [];
+    if (isSSR()) return [];
     try {
       const saved = localStorage.getItem(FAVORITE_EMOTIONS_KEY);
       return saved ? JSON.parse(saved) : [];
@@ -34,7 +35,7 @@ export function useCommandPaletteData() {
     setRecentEmotions((prev) => {
       const filtered = prev.filter((id) => id !== emotionId);
       const updated = [emotionId, ...filtered].slice(0, MAX_RECENT);
-      if (typeof window !== "undefined") {
+      if (!isSSR()) {
         localStorage.setItem(RECENT_EMOTIONS_KEY, JSON.stringify(updated));
       }
       return updated;
@@ -46,7 +47,7 @@ export function useCommandPaletteData() {
       const updated = prev.includes(emotionId)
         ? prev.filter((id) => id !== emotionId)
         : [...prev, emotionId];
-      if (typeof window !== "undefined") {
+      if (!isSSR()) {
         localStorage.setItem(FAVORITE_EMOTIONS_KEY, JSON.stringify(updated));
       }
       return updated;

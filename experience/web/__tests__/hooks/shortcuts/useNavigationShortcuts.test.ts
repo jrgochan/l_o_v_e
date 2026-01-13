@@ -230,4 +230,63 @@ describe("useNavigationShortcuts", () => {
 
     expect(mockSetSelectedPath).not.toHaveBeenCalled();
   });
+
+  it("should navigate via ArrowUp and wrap around", () => {
+    let currentState = {
+      computedPaths: new Map([
+        ["path1", { id: "path1", from: { id: "e1" }, to: { id: "e2" } }],
+        ["path2", { id: "path2", from: { id: "e1" }, to: { id: "e3" } }],
+        ["path3", { id: "path3", from: { id: "e1" }, to: { id: "e4" } }]
+      ]),
+      selectedPathId: "path1", // Start at first
+      selectedEmotionIds: new Set(["e1", "e2", "e3", "e4"]),
+      setSelectedPath: mockSetSelectedPath,
+    };
+
+    (useAtlasAdminStore as unknown as jest.Mock).mockImplementation((selector) => {
+      return selector(currentState);
+    });
+
+    const { rerender } = renderHook(() => useNavigationShortcuts());
+
+    // Arrow Up (Prev) from path1 (index 0) -> Should wrap to path3 (last)
+    act(() => {
+      const event = new KeyboardEvent("keydown", { key: "ArrowUp" }); // lowercase check in hook
+      window.dispatchEvent(event);
+    });
+    expect(mockSetSelectedPath).toHaveBeenLastCalledWith("path3");
+
+    // Update state to path3
+    currentState = { ...currentState, selectedPathId: "path3" };
+    rerender();
+
+    // Arrow Up (Prev) from path3 -> Should go to path2
+    act(() => {
+      const event = new KeyboardEvent("keydown", { key: "ArrowUp" });
+      window.dispatchEvent(event);
+    });
+    expect(mockSetSelectedPath).toHaveBeenLastCalledWith("path2");
+
+    // Update state to path3 (actually let's simulate wrap forward from last)
+    currentState = { ...currentState, selectedPathId: "path3" };
+    rerender();
+
+    // Arrow Down (Next) from path3 (last) -> Should wrap to path1 (first)
+    act(() => {
+      const event = new KeyboardEvent("keydown", { key: "ArrowDown" });
+      window.dispatchEvent(event);
+    });
+    expect(mockSetSelectedPath).toHaveBeenLastCalledWith("path1");
+  });
+
+  it("should ignore invalid number indices", () => {
+    renderHook(() => useNavigationShortcuts());
+    act(() => {
+      // Press '9' but we only have 2 paths in default setup
+      const event = new KeyboardEvent("keydown", { key: "9" });
+      window.dispatchEvent(event);
+    });
+    // Should not call setSelectedPath for invalid index
+    expect(mockSetSelectedPath).not.toHaveBeenCalled();
+  });
 });

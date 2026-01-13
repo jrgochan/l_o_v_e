@@ -206,4 +206,61 @@ describe("useCommandPaletteFilter", () => {
     expect(groups.get("positive")).toHaveLength(2); // Joy, Peace
     expect(groups.get("negative")).toHaveLength(2); // Sadness, Anger
   });
+
+  it("should filter by selectedCategory with empty search", () => {
+    const { result } = renderHook(() =>
+      useCommandPaletteFilter({
+        search: "",
+        selectedCategory: "positive",
+        favoriteEmotions: [],
+        recentEmotions: [],
+        selectedEmotionIds: new Set(),
+      })
+    );
+    expect(result.current.filteredEmotions).toHaveLength(2);
+    expect(result.current.filteredEmotions.every((e) => e.category === "positive")).toBe(true);
+  });
+
+  it("should enforce selectedCategory during search", () => {
+    // "Sad" matches "Sadness" (negative) but we filter for "positive"
+    const { result } = renderHook(() =>
+      useCommandPaletteFilter({
+        search: "Sad",
+        selectedCategory: "positive",
+        favoriteEmotions: [],
+        recentEmotions: [],
+        selectedEmotionIds: new Set(),
+      })
+    );
+    expect(result.current.filteredEmotions).toHaveLength(0);
+  });
+
+  it("should handle invalid VAC operator gracefully (fallthrough)", () => {
+    // "===" is captured by regex but not in switch
+    const { result } = renderHook(() =>
+      useCommandPaletteFilter({
+        search: "valence === 1",
+        selectedCategory: null,
+        favoriteEmotions: [],
+        recentEmotions: [],
+        selectedEmotionIds: new Set(),
+      })
+    );
+    // Should match everything (default: return true)
+    expect(result.current.filteredEmotions).toHaveLength(MOCK_EMOTIONS.length);
+  });
+
+  it("should handle <= VAC operator", () => {
+    const { result } = renderHook(() =>
+      useCommandPaletteFilter({
+        search: "valence <= -0.5",
+        selectedCategory: null,
+        favoriteEmotions: [],
+        recentEmotions: [],
+        selectedEmotionIds: new Set(),
+      })
+    );
+    // Sadness (-1), Anger (-1)
+    expect(result.current.filteredEmotions).toHaveLength(2);
+  });
 });

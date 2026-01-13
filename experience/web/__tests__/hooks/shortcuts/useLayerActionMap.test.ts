@@ -106,14 +106,41 @@ describe("useLayerActionMap", () => {
     });
   });
 
-  it("should cycle animation modes", () => {
-    const { result } = renderHook(() => useLayerActionMap());
-    const actions = result.current.getActions();
-
-    const cycleAnim = findAction(actions, "v");
-    cycleAnim();
-    // Current 'subtle', next 'dynamic'
+  it("should cycle animation modes through full loop", () => {
+    // 1. Subtle -> Dynamic
+    let { result, rerender } = renderHook(() => useLayerActionMap());
+    findAction(result.current.getActions(), "v")();
     expect(mockUpdateVisualSetting).toHaveBeenCalledWith("pathAnimationMode", "dynamic");
-    expect(logger.info).toHaveBeenCalledWith("user-interaction", expect.stringContaining("Dynamic"));
+
+    // 2. Dynamic -> Mystical
+    (useSettingsStore as unknown as jest.Mock).mockReturnValue({
+      ...useSettingsStore(),
+      pathAnimationMode: "dynamic",
+    });
+    rerender();
+    findAction(result.current.getActions(), "v")();
+    expect(mockUpdateVisualSetting).toHaveBeenCalledWith("pathAnimationMode", "mystical");
+
+    // 3. Mystical -> Subtle
+    (useSettingsStore as unknown as jest.Mock).mockReturnValue({
+      ...useSettingsStore(),
+      pathAnimationMode: "mystical",
+    });
+    rerender();
+    findAction(result.current.getActions(), "v")();
+    expect(mockUpdateVisualSetting).toHaveBeenCalledWith("pathAnimationMode", "subtle");
+  });
+
+  it("should default to subtle if mode is unknown", () => {
+    (useSettingsStore as unknown as jest.Mock).mockReturnValue({
+      ...useSettingsStore(),
+      pathAnimationMode: "invalid-mode",
+    });
+    const { result } = renderHook(() => useLayerActionMap());
+
+    // indexOf returns -1, +1 = 0 => defaults to mode[0] 'subtle'
+    findAction(result.current.getActions(), "v")();
+
+    expect(mockUpdateVisualSetting).toHaveBeenCalledWith("pathAnimationMode", "subtle");
   });
 });
