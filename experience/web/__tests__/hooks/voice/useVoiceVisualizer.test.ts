@@ -25,23 +25,49 @@ describe("useVoiceVisualizer", () => {
   const originalRAF = window.requestAnimationFrame;
   const originalCAF = window.cancelAnimationFrame;
 
+  // Return non-zero ID
+  const mockRAF = jest.fn((cb: any) => {
+    setTimeout(cb, 16);
+    return 123;
+  });
+  const mockCAF = jest.fn((id: any) => clearTimeout(id));
+
   beforeEach(() => {
     jest.clearAllMocks();
     jest.useFakeTimers();
+    mockRAF.mockClear();
+    mockCAF.mockClear();
+
+    Object.defineProperty(window, 'requestAnimationFrame', {
+      writable: true,
+      value: mockRAF,
+    });
+    Object.defineProperty(window, 'cancelAnimationFrame', {
+      writable: true,
+      value: mockCAF,
+    });
   });
 
   afterEach(() => {
     jest.useRealTimers();
+    // Restore originals
+    Object.defineProperty(window, 'requestAnimationFrame', {
+      writable: true,
+      value: originalRAF,
+    });
+    Object.defineProperty(window, 'cancelAnimationFrame', {
+      writable: true,
+      value: originalCAF,
+    });
   });
 
   beforeAll(() => {
-    window.requestAnimationFrame = jest.fn((cb: any) => setTimeout(cb, 16) as unknown as number);
-    window.cancelAnimationFrame = jest.fn((id: any) => clearTimeout(id));
+    global.AudioContext = window.AudioContext; // Ensure global access
   });
 
   afterAll(() => {
-    window.requestAnimationFrame = originalRAF;
-    window.cancelAnimationFrame = originalCAF;
+    // @ts-ignore
+    delete global.AudioContext;
   });
 
   it("should initialize with 0 level when no stream", () => {
@@ -53,10 +79,35 @@ describe("useVoiceVisualizer", () => {
     const stream = {} as MediaStream;
     const { unmount } = renderHook(() => useVoiceVisualizer(stream));
 
+    // Verify initialization happened
+    expect(mockCreateAnalyser).toHaveBeenCalled();
+    const analyser = mockCreateAnalyser.mock.results[0].value;
+    expect(analyser).toBeDefined();
+
     unmount();
 
+    expect(mockRAF).toHaveBeenCalled(); // Debug check
     expect(mockClose).toHaveBeenCalled();
-    expect(window.cancelAnimationFrame).toHaveBeenCalled();
+    expect(mockCAF).toHaveBeenCalled();
+  });
+
+  it("should handle stream update to null", () => {
+    const stream = {} as MediaStream;
+    const { rerender } = renderHook((s) => useVoiceVisualizer(s), {
+      initialProps: stream as MediaStream | null,
+    });
+
+    // Mock that we have active resources
+    expect(mockCreateAnalyser).toHaveBeenCalled();
+    expect(mockRAF).toHaveBeenCalled();
+
+    // Rerender with null
+    rerender(null);
+
+    // Should trigger if (!stream) block
+    // Called twice: once by cleanup of previous effect, once by new effect body
+    expect(mockClose).toHaveBeenCalledTimes(2);
+    expect(mockCAF).toHaveBeenCalledTimes(2);
   });
 
   it("should handle error during context close", async () => {

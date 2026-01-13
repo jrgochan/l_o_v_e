@@ -172,4 +172,11 @@ describe("useExperienceStore", () => {
     });
     expect(result.current.targetQuaternion).toEqual(quat);
   });
+
+  it("should export CANONICAL_EMOTIONS", () => {
+    // Just verifying import to cover the re-export line
+    const { CANONICAL_EMOTIONS } = require("../../stores/useExperienceStore");
+    expect(CANONICAL_EMOTIONS).toBeDefined();
+  });
 });
+

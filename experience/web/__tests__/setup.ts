@@ -7,100 +7,81 @@ import "@testing-library/jest-dom";
 import "jest-canvas-mock";
 
 // Mock Three.js WebGL context
-HTMLCanvasElement.prototype.getContext = jest.fn((contextId: string) => {
-  if (contextId === "webgl" || contextId === "webgl2") {
-    return {
-      canvas: document.createElement("canvas"),
-      drawingBufferWidth: 800,
-      drawingBufferHeight: 600,
-      getExtension: jest.fn(() => ({})),
-      getParameter: jest.fn(),
-      getShaderPrecisionFormat: jest.fn(() => ({
-        rangeMin: 1,
-        rangeMax: 1,
-        precision: 1,
-      })),
-      createShader: jest.fn(),
-      shaderSource: jest.fn(),
-      compileShader: jest.fn(),
-      getShaderParameter: jest.fn(() => true),
-      createProgram: jest.fn(),
-      attachShader: jest.fn(),
-      linkProgram: jest.fn(),
-      getProgramParameter: jest.fn(() => true),
-      useProgram: jest.fn(),
-      createBuffer: jest.fn(),
-      bindBuffer: jest.fn(),
-      bufferData: jest.fn(),
-      enableVertexAttribArray: jest.fn(),
-      vertexAttribPointer: jest.fn(),
-      createTexture: jest.fn(),
-      bindTexture: jest.fn(),
-      texImage2D: jest.fn(),
-      texParameteri: jest.fn(),
-      clear: jest.fn(),
-      clearColor: jest.fn(),
-      enable: jest.fn(),
-      disable: jest.fn(),
-      depthFunc: jest.fn(),
-      viewport: jest.fn(),
-      drawArrays: jest.fn(),
-      drawElements: jest.fn(),
-    } as any;
-  }
-  if (contextId === "2d") {
-    return {
-      canvas: document.createElement("canvas"),
-      fillStyle: "",
-      fillRect: jest.fn(),
-      clearRect: jest.fn(),
-      getImageData: jest.fn(),
-      putImageData: jest.fn(),
-      createImageData: jest.fn(),
-      setTransform: jest.fn(),
-      drawImage: jest.fn(),
-      save: jest.fn(),
-      restore: jest.fn(),
-      beginPath: jest.fn(),
-      moveTo: jest.fn(),
-      lineTo: jest.fn(),
-      closePath: jest.fn(),
-      stroke: jest.fn(),
-      translate: jest.fn(),
-      scale: jest.fn(),
-      rotate: jest.fn(),
-      arc: jest.fn(),
-      fill: jest.fn(),
-      measureText: jest.fn(() => ({ width: 0 })),
-      transform: jest.fn(),
-      rect: jest.fn(),
-      clip: jest.fn(),
-    } as any;
-  }
-  return null;
-});
-
-// Mock window.matchMedia
-Object.defineProperty(window, "matchMedia", {
-  writable: true,
-  value: jest.fn().mockImplementation((query: string) => ({
-    matches: false,
-    media: query,
-    onchange: null,
-    addListener: jest.fn(), // Deprecated
-    removeListener: jest.fn(), // Deprecated
-    addEventListener: jest.fn(),
-    removeEventListener: jest.fn(),
-    dispatchEvent: jest.fn(),
-  })),
-});
-
-// Mock window.ResizeObserver
-global.ResizeObserver = jest.fn().mockImplementation(() => ({
-  observe: jest.fn(),
-  unobserve: jest.fn(),
-  disconnect: jest.fn(),
-}));
+if (typeof HTMLCanvasElement !== "undefined") {
+  HTMLCanvasElement.prototype.getContext = jest.fn((contextId: string) => {
+    if (contextId === "webgl" || contextId === "webgl2") {
+      return {
+        canvas: document.createElement("canvas"),
+        drawingBufferWidth: 800,
+        drawingBufferHeight: 600,
+        getExtension: jest.fn(() => ({})),
+        getParameter: jest.fn(),
+        getShaderPrecisionFormat: jest.fn(() => ({
+          rangeMin: 1,
+          rangeMax: 1,
+          precision: 1,
+        })),
+        createShader: jest.fn(),
+        shaderSource: jest.fn(),
+        compileShader: jest.fn(),
+        getShaderParameter: jest.fn(() => true),
+        createProgram: jest.fn(),
+        attachShader: jest.fn(),
+        linkProgram: jest.fn(),
+        getProgramParameter: jest.fn(() => true),
+        useProgram: jest.fn(),
+        createBuffer: jest.fn(),
+        bindBuffer: jest.fn(),
+        bufferData: jest.fn(),
+        enableVertexAttribArray: jest.fn(),
+        vertexAttribPointer: jest.fn(),
+        createTexture: jest.fn(),
+        bindTexture: jest.fn(),
+        texImage2D: jest.fn(),
+        texParameteri: jest.fn(),
+        clear: jest.fn(),
+        clearColor: jest.fn(),
+        enable: jest.fn(),
+        disable: jest.fn(),
+        depthFunc: jest.fn(),
+        viewport: jest.fn(),
+        drawArrays: jest.fn(),
+        drawElements: jest.fn(),
+      } as any;
+    }
+    if (contextId === "2d") {
+      return {
+        canvas: document.createElement("canvas"),
+        fillStyle: "",
+        fillRect: jest.fn(),
+        clearRect: jest.fn(),
+        getImageData: jest.fn(),
+        putImageData: jest.fn(),
+        createImageData: jest.fn(),
+        setTransform: jest.fn(),
+        drawImage: jest.fn(),
+        save: jest.fn(),
+        restore: jest.fn(),
+        beginPath: jest.fn(),
+        moveTo: jest.fn(),
+        lineTo: jest.fn(),
+        closePath: jest.fn(),
+        stroke: jest.fn(),
+        translate: jest.fn(),
+        scale: jest.fn(),
+        rotate: jest.fn(),
+        arc: jest.fn(),
+        fill: jest.fn(),
+        measureText: jest.fn(() => ({ width: 0 })),
+        transform: jest.fn(),
+        rect: jest.fn(),
+        clip: jest.fn(),
+        disable: jest.fn(),
+      } as any;
+    }
+    return null;
+  });
+}
 
 // Mock localStorage
 const localStorageMock = (() => {
@@ -120,9 +101,33 @@ const localStorageMock = (() => {
   };
 })();
 
-Object.defineProperty(window, "localStorage", {
-  value: localStorageMock,
-});
+if (typeof window !== "undefined") {
+  // Mock window.matchMedia
+  Object.defineProperty(window, "matchMedia", {
+    writable: true,
+    value: jest.fn().mockImplementation((query: string) => ({
+      matches: false,
+      media: query,
+      onchange: null,
+      addListener: jest.fn(), // Deprecated
+      removeListener: jest.fn(), // Deprecated
+      addEventListener: jest.fn(),
+      removeEventListener: jest.fn(),
+      dispatchEvent: jest.fn(),
+    })),
+  });
+
+  Object.defineProperty(window, "localStorage", {
+    value: localStorageMock,
+  });
+}
+
+// Mock window.ResizeObserver
+global.ResizeObserver = jest.fn().mockImplementation(() => ({
+  observe: jest.fn(),
+  unobserve: jest.fn(),
+  disconnect: jest.fn(),
+}));
 
 // Suppress console errors and warnings in tests (unless explicitly needed)
 const originalError = console.error;

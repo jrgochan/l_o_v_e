@@ -472,9 +472,7 @@ export const useAtlasAdminStore = create<AtlasAdminState>()(
 
         // 5. Select
         const nextPath = filteredPaths[nextIndex];
-        if (nextPath) {
-          set({ selectedPathId: nextPath.id });
-        }
+        set({ selectedPathId: nextPath.id });
       },
 
       fetchPathFromBackend: async () => {

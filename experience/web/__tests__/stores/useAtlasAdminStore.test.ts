@@ -340,6 +340,28 @@ describe("useAtlasAdminStore", () => {
       expect(visible).toHaveLength(1); // Only 'Joy' (Positive)
       expect(visible[0].name).toBe("Joy");
     });
+
+    it("should use default undefined category enabled state", () => {
+      const { setAllEmotions, getVisibleEmotions } = useAtlasAdminStore.getState();
+
+      const weirdEmotion = { ...mockEmotions[0], id: "99", category: "Unlisted" };
+      act(() => setAllEmotions([weirdEmotion]));
+
+      // Store cleans categories? No, it sets filters based on emotions. 
+      // Manually mess up filters to simulate mismatch?
+      // Actually setAllEmotions initializes filters.
+      // If we modify categoryFilters to delete "Unlisted"
+      act(() => {
+        useAtlasAdminStore.setState(prev => {
+          const newFilters = new Map(prev.categoryFilters);
+          newFilters.delete("Unlisted");
+          return { categoryFilters: newFilters };
+        });
+      });
+
+      const visible = getVisibleEmotions();
+      expect(visible).toHaveLength(1); // Should default to true
+    });
   });
 });
 
@@ -503,6 +525,37 @@ describe("Additional Actions & Helpers", () => {
       act(() => cycleSelectedPath("next"));
       expect(useAtlasAdminStore.getState().selectedPathId).toBeNull();
     });
+
+    it("should handle cycling when selected path is not in filtered list", () => {
+      const { setAllEmotions, addComputedPath, selectMultiple, cycleSelectedPath, setSelectedPath } = useAtlasAdminStore.getState();
+      // Setup
+      act(() => {
+        setAllEmotions(mockEmotions);
+        addComputedPath(mockPath);
+        selectMultiple(["1", "2"]);
+        setSelectedPath("invalid-id"); // Selected path ID exists in state but not in filtered set
+      });
+
+      // Cycle next -> should reset to first available
+      act(() => cycleSelectedPath("next"));
+      expect(useAtlasAdminStore.getState().selectedPathId).toBe("1-2");
+    });
+
+    it("should cycle correctly from null selection when paths exist", () => {
+      const { setAllEmotions, addComputedPath, selectMultiple, cycleSelectedPath, setSelectedPath } = useAtlasAdminStore.getState();
+      act(() => {
+        setAllEmotions(mockEmotions);
+        addComputedPath(mockPath);
+        selectMultiple(["1", "2"]);
+        setSelectedPath(null); // Explicitly null
+      });
+
+      // selectedPathId is null, filteredPaths has 1 item.
+      // currentIndex should be -1.
+      // nextIndex should be 0.
+      act(() => cycleSelectedPath("next"));
+      expect(useAtlasAdminStore.getState().selectedPathId).toBe("1-2");
+    });
   });
 
   describe("Persistence Logic", () => {
@@ -527,6 +580,36 @@ describe("Additional Actions & Helpers", () => {
       expect(revivedMap).toBeInstanceOf(Map);
       expect(revivedMap.get("key")).toBe("value");
       expect(reviver("other", "value")).toBe("value");
+    });
+
+    it("should handle invalid reviver data", () => {
+      const invalidSet = { __type: "Set", value: "not-an-array" };
+      const invalidMap = { __type: "Map", value: "not-an-array" };
+      const unknownType = { __type: "Unknown", value: [] };
+
+      // Should fall through and return the object reference or raw value
+      expect(reviver("set", invalidSet)).toBe(invalidSet);
+      expect(reviver("map", invalidMap)).toBe(invalidMap);
+      expect(reviver("unknown", unknownType)).toBe(unknownType);
+    });
+
+    it("should handle cycleViewMode safety fallback", () => {
+      act(() => {
+        useAtlasAdminStore.setState({ viewMode: "invalid" as any });
+        useAtlasAdminStore.getState().cycleViewMode();
+      });
+      // Should reset to default (index 0 implies next is index 1 => zen? No, logic: if -1, set to 0. Next is (0+1)%3 = 1 -> zen )
+      // Wait: `if (currentIdx === -1) currentIdx = 0;` Next is 1 ("zen").
+      expect(useAtlasAdminStore.getState().viewMode).toBe("zen");
+    });
+
+    it("should safely handle toggleCategoryFilter for unknown category", () => {
+      const { toggleCategoryFilter } = useAtlasAdminStore.getState();
+      // Should not crash
+      act(() => toggleCategoryFilter("Unknown Category"));
+      const state = useAtlasAdminStore.getState();
+      // Nothing happens, just validation
+      expect(state.categoryFilters.get("Unknown Category")).toBeUndefined();
     });
 
     it("should persist viewMode (admin check)", () => {
