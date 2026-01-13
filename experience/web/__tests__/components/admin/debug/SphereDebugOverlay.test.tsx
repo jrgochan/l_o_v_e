@@ -12,7 +12,14 @@ describe("SphereDebugOverlay", () => {
         isConnected: true,
         isWaiting: false,
         targetVAC: [0.5, 0.5, 0.5],
-        activeEmotions: [{ id: "e1", name: "Joy", category: "Joy", vac: [1, 1, 1] }],
+        activeEmotions: [{
+            id: "e1",
+            name: "Joy",
+            category: "Joy",
+            vac: [1, 1, 1],
+            definition: "Test definition",
+            quaternion: [0, 0, 0, 1]
+        }],
         debugLog: [
             { timestamp: 1000, type: "test", vac: [0, 0, 0] },
             { timestamp: 2000, type: "test2" }

@@ -16,8 +16,8 @@ describe("LayerControls", () => {
 
   const defaultProps = {
     categoryFilters: new Map<string, CategoryFilter>([
-      ["Joy", { name: "Joy", enabled: true, color: "yellow", emotionCount: 10, count: 10 }],
-      ["Sadness", { name: "Sadness", enabled: false, color: "blue", emotionCount: 5, count: 5 }],
+      ["Joy", { name: "Joy", enabled: true, color: "yellow" }],
+      ["Sadness", { name: "Sadness", enabled: false, color: "blue" }],
     ]),
     layers: {
       soulSphere: true,

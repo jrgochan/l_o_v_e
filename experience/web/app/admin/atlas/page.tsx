@@ -302,11 +302,10 @@ const AtlasAdminContent = () => {
                 toggleMute();
                 playClickSound();
               }}
-              className={`px-3 py-2 rounded transition flex items-center gap-2 text-sm ${
-                isMuted
+              className={`px-3 py-2 rounded transition flex items-center gap-2 text-sm ${isMuted
                   ? "bg-red-900/50 text-red-200 hover:bg-red-800/50"
                   : "bg-gray-700 text-white hover:bg-gray-600"
-              }`}
+                }`}
               title={isMuted ? "Unmute Audio" : "Mute Audio"}
             >
               {isMuted ? "🔇" : "🔊"}
@@ -418,10 +417,10 @@ const AtlasAdminContent = () => {
         {/* Resize Handle - Hidden when expanded */}
         {!isInfoPanelExpanded && areSidebarsVisible && (
           <div
+            data-testid="resize-handle"
             onMouseDown={handleMouseDown}
-            className={`w-2 flex-shrink-0 bg-gray-700 hover:bg-cyan-500 cursor-col-resize transition flex items-center justify-center ${
-              isResizing ? "bg-cyan-500" : ""
-            }`}
+            className={`w-2 flex-shrink-0 bg-gray-700 hover:bg-cyan-500 cursor-col-resize transition flex items-center justify-center ${isResizing ? "bg-cyan-500" : ""
+              }`}
             style={{ touchAction: "none" }}
           >
             <div className="w-px h-8 bg-gray-500" />
