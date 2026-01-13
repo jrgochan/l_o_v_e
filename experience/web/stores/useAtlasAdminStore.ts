@@ -484,29 +484,34 @@ export const useAtlasAdminStore = create<AtlasAdminState>()(
     {
       name: "love-atlas-admin", // unique name
       storage: createJSONStorage(() => localStorage, { replacer, reviver }), // Use properly configured storage support
-      partialize: (state) => {
-        // Safe check for window existence
-        const isClientViewer =
-          typeof window !== "undefined" && !window.location.pathname.startsWith("/admin");
-
-        if (isClientViewer) {
-          // Client Viewer should ONLY persist selection state
-          // This prevents overwriting Admin-computed paths with empty maps
-          return {
-            selectedEmotionIds: state.selectedEmotionIds,
-          } as unknown as Partial<AtlasAdminState>;
-        }
-
-        // Admin persists full relevant state
-        return {
-          selectedEmotionIds: state.selectedEmotionIds,
-          selectedPathId: state.selectedPathId,
-          // computedPaths: state.computedPaths, // Do NOT persist paths - too large for localStorage, let useLoadCachedPaths handle it
-          viewMode: state.viewMode,
-          focusedEmotionId: state.focusedEmotionId,
-          isFlying: state.isFlying,
-        };
-      },
+      partialize: (state) => adminPartialize(state),
     }
   )
 );
+
+export const adminPartialize = (state: AtlasAdminState) => {
+  // Safe check for window existence
+  const isClientViewer =
+    typeof window !== "undefined" && !window.location.pathname.startsWith("/admin");
+
+  console.log("DEBUG: partialize", { pathname: window.location.pathname, isClientViewer });
+
+
+  if (isClientViewer) {
+    // Client Viewer should ONLY persist selection state
+    // This prevents overwriting Admin-computed paths with empty maps
+    return {
+      selectedEmotionIds: state.selectedEmotionIds,
+    } as unknown as Partial<AtlasAdminState>;
+  }
+
+  // Admin persists full relevant state
+  return {
+    selectedEmotionIds: state.selectedEmotionIds,
+    selectedPathId: state.selectedPathId,
+    // computedPaths: state.computedPaths, // Do NOT persist paths - too large for localStorage, let useLoadCachedPaths handle it
+    viewMode: state.viewMode,
+    focusedEmotionId: state.focusedEmotionId,
+    isFlying: state.isFlying,
+  };
+};

@@ -298,6 +298,18 @@ describe("PathDetailsOverlay", () => {
 
         const { rerender } = render(<PathDetailsOverlay />);
         // Current index 0 -> start -> vac 0.2
+
+        // Force update to val < -0.1
+        // We can't easily force update via render without store change
+        // But we proved coverage for vac conditional in other tests?
+        // Logic: getEmotionColor(val)
+        // If val > 0.1 -> lime
+        // If val > -0.1 -> gray
+        // If val > -0.5 -> orange
+        // else -> red
+
+        // Start (0.2) -> lime.
+        // Goal (-0.2) -> orange.
         // We can't easily check color without checking style/class or knowing the component internals mapping.
         // But execution should cover the lines.
 
@@ -312,5 +324,25 @@ describe("PathDetailsOverlay", () => {
             setIsFlying: mockSetIsFlying,
         }));
         rerender(<PathDetailsOverlay />);
+    });
+
+    it("should handle out-of-sync waypoint index gracefully", () => {
+        (useExperienceStore as unknown as jest.Mock).mockImplementation((selector: any) => selector({
+            transitionPath: mockPath,
+            flyoverProgress: 3.0, // Force 300% progress -> Index > max
+            flyoverSpeed: 1.0,
+            isFlying: true,
+            flyoverCurrentWaypointIndex: 0, // Irrelevant for this calc
+            setFlyoverProgress: mockSetFlyoverProgress,
+            setFlyoverSpeed: mockSetFlyoverSpeed,
+            setIsFlying: mockSetIsFlying,
+        }));
+
+        render(<PathDetailsOverlay />);
+
+        // Should render nothing for active item
+        expect(screen.queryByTitle("Category Index")).not.toBeInTheDocument();
+        // But control deck should be visible because path exists (verify via title)
+        expect(screen.getByTitle("Start Flyover")).toBeInTheDocument();
     });
 });

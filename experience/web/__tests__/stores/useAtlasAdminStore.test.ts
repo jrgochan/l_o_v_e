@@ -1,5 +1,5 @@
 import { act } from "@testing-library/react";
-import { useAtlasAdminStore, getInitialAdminState, replacer, reviver } from "../../stores/useAtlasAdminStore";
+import { useAtlasAdminStore, adminPartialize, replacer, reviver, getInitialAdminState } from "../../stores/useAtlasAdminStore";
 import { AtlasEmotion, EmotionPath } from "../../types";
 
 jest.mock("zustand/middleware", () => ({
@@ -529,29 +529,36 @@ describe("Additional Actions & Helpers", () => {
       expect(reviver("other", "value")).toBe("value");
     });
 
+    it("should persist viewMode (admin check)", () => {
+      // Mock window location to assume admin
+      const originalPath = window.location.pathname;
+      window.history.pushState({}, "Admin", "/admin/atlas");
 
-  });
+      const mockState = useAtlasAdminStore.getState();
+      const persisted = adminPartialize(mockState) as any;
 
-  it("should persist viewMode (admin check)", () => {
-    // Mock window location to assume admin
-    const originalPath = window.location.pathname;
-    window.history.pushState({}, "Admin", "/admin/atlas");
+      // Should contain viewMode (Admin persistence)
+      expect(persisted.viewMode).toBeDefined();
+      // Should NOT contain computedPaths (explicitly excluded)
+      expect(persisted.computedPaths).toBeUndefined();
 
-    const { cycleViewMode } = useAtlasAdminStore.getState();
-    act(() => cycleViewMode());
+      // Restore
+      window.history.pushState({}, "Root", originalPath);
+    });
 
-    // Check persistence indirectly or by inspecting the calls?
-    // The partialize function logic is what we are testing.
-    // If it returns full object, viewMode is persisted.
-    // However, we can't easily check what was returned to localStorage internal logic without spying on JSON.stringify or localStorage.setItem
+    it("should restrict persistence for client viewer", () => {
+      const originalPath = window.location.pathname;
+      window.history.pushState({}, "Client", "/");
 
-    // But wait, the test "should persist viewMode (admin check)" seemingly passes if we don't crash?
-    // The original test didn't have assertions.
-    // Let's check state.
-    const state = useAtlasAdminStore.getState();
-    expect(state.viewMode).toBeDefined();
+      const mockState = useAtlasAdminStore.getState();
+      const persisted = adminPartialize(mockState) as any;
 
-    // Restore
-    window.history.pushState({}, "Root", originalPath);
+      // Should ONLY contain selectedEmotionIds
+      expect(persisted.viewMode).toBeUndefined();
+      expect(persisted.selectedEmotionIds).toBeDefined();
+
+      // Restore
+      window.history.pushState({}, "Root", originalPath);
+    });
   });
 });

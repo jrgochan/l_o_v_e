@@ -1,5 +1,6 @@
 import { renderHook, act } from "@testing-library/react";
 import { useCommandPaletteData } from "@/hooks/command-palette/useCommandPaletteData";
+import { logger } from "@/utils/logger";
 
 jest.mock("@/utils/logger", () => ({
   logger: { warn: jest.fn() },
@@ -74,5 +75,48 @@ describe("useCommandPaletteData", () => {
       result.current.toggleFavorite("joy"); // Remove
     });
     expect(result.current.isFavorite("joy")).toBe(false);
+  });
+
+  it("should handle corrupt local storage for recent emotions", () => {
+    // Mock getItem to return invalid JSON
+    mockGetItem.mockImplementation((key) => {
+      if (key.includes("recent")) return "{invalid json}";
+      return null;
+    });
+    const loggerWarnSpy = jest.spyOn(logger, "warn").mockImplementation();
+
+    const { result } = renderHook(() => useCommandPaletteData());
+    expect(result.current.recentEmotions).toEqual([]);
+    expect(loggerWarnSpy).toHaveBeenCalled();
+
+    loggerWarnSpy.mockRestore();
+  });
+
+  it("should handle corrupt local storage for favorite emotions", () => {
+    mockGetItem.mockImplementation((key) => {
+      if (key.includes("favorite")) return "{invalid json}";
+      return null;
+    });
+    const loggerWarnSpy = jest.spyOn(logger, "warn").mockImplementation();
+
+    const { result } = renderHook(() => useCommandPaletteData());
+    expect(result.current.favoriteEmotions).toEqual([]);
+    expect(loggerWarnSpy).toHaveBeenCalled();
+
+    loggerWarnSpy.mockRestore();
+  });
+
+  it("should correctly identify recent and favorite emotions", () => {
+    const { result } = renderHook(() => useCommandPaletteData());
+
+    act(() => {
+      result.current.addToRecent("joy");
+      result.current.toggleFavorite("sadness");
+    });
+
+    expect(result.current.isRecent("joy")).toBe(true);
+    expect(result.current.isRecent("unknown")).toBe(false);
+    expect(result.current.isFavorite("sadness")).toBe(true);
+    expect(result.current.isFavorite("unknown")).toBe(false);
   });
 });
