@@ -16,14 +16,18 @@ export function ViewerPathFlyover() {
     (state) => state.setFlyoverCurrentWaypointIndex
   );
 
-  // Local state for flyover
-  const [progress, setProgress] = useState(0);
-  // label state removed in favor of PathDetailsOverlay
+  // Animation state
+  const progressRef = useRef(0);
+  const startTimeRef = useRef<number | null>(null);
+  const lookAtRef = useRef(new THREE.Vector3());
   const splineRef = useRef<THREE.CatmullRomCurve3 | null>(null);
+
+  const BASE_DURATION = 12.0;
+  const LOOK_AHEAD = 0.05;
 
   // Initialize spline when path changes
   useEffect(() => {
-    if (transitionPath?.waypoints && transitionPath.waypoints.length >= 2) {
+    if (transitionPath) {
       // Create points array: Start -> Waypoints -> End
       const points = [
         new THREE.Vector3(...transitionPath.current_state.vac),
@@ -31,89 +35,91 @@ export function ViewerPathFlyover() {
         new THREE.Vector3(...transitionPath.goal_state.vac),
       ];
 
-      splineRef.current = new THREE.CatmullRomCurve3(points);
-      splineRef.current.tension = 0.5; // Smooth curve
+      // Only create spline if we have enough points (Start + End = 2 minimum)
+      if (points.length >= 2) {
+        splineRef.current = new THREE.CatmullRomCurve3(points, false, "catmullrom", 0.5);
 
-      // Reset progress when path changes
-      setProgress(0);
-      setFlyoverProgress(0);
-      setFlyoverCurrentWaypointIndex(-1);
+        // Reset progress when path changes
+        progressRef.current = 0;
+        setFlyoverProgress(0);
+        setFlyoverCurrentWaypointIndex(-1);
+      }
     }
   }, [transitionPath, setFlyoverProgress, setFlyoverCurrentWaypointIndex]);
 
-  // Reset when starting flight
+  // Sync isFlying state and handle restart logic
   useEffect(() => {
     if (isFlying) {
-      // On start (or restart), we don't necessarily reset progress to 0 if pausing/resuming
-      // But per current logic, it seems to want to run a full path.
-      // Let's keep existing behavior of reset on mount/start for now, but strictly speaking
-      // if we pause we might want to resume.
-      // The previous code had:
-      // setTimeout(() => { setProgress(0); ... }, 0);
-      // Let's only reset if progress is 1 (completed)
-      if (progress >= 1) {
-        setProgress(0);
+      // Check store for explicit reset (e.g. from Plane button)
+      // or if we are at the end (Auto-Restart)
+      const storeProgress = useExperienceStore.getState().flyoverProgress;
+
+      if (storeProgress === 0 && progressRef.current > 0.01) {
+        // External reset detected
+        progressRef.current = 0;
+      } else if (progressRef.current >= 0.99) {
+        // Auto-Restart at end of path
+        progressRef.current = 0;
         setFlyoverProgress(0);
       }
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isFlying]);
 
-  useFrame(() => {
+      startTimeRef.current = null;
+    }
+  }, [isFlying, setFlyoverProgress]);
+
+  useFrame((state) => {
     if (!isFlying || !splineRef.current || !transitionPath) return;
 
-    // Advance progress
-    // Base speed modifiable by store
-    const BASE_SPEED = 0.002;
-    const step = BASE_SPEED * flyoverSpeed;
+    if (startTimeRef.current === null) {
+      // Resume from current progress
+      const duration = BASE_DURATION / flyoverSpeed;
+      const accruedTime = progressRef.current * duration;
+      startTimeRef.current = state.clock.elapsedTime - accruedTime;
+    }
 
-    const rawProgress = progress + step;
+    const duration = BASE_DURATION / flyoverSpeed;
+    const elapsed = state.clock.elapsedTime - startTimeRef.current;
 
-    if (rawProgress >= 1) {
-      // Arrived
-      setProgress(1);
-      setFlyoverProgress(1);
+    // Calculate progress
+    const rawProgress = elapsed / duration;
+
+    // Easing (Standard Ease-In-Out Cubic)
+    const t = Math.min(Math.max(rawProgress, 0), 1);
+    const easedProgress = t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+
+    progressRef.current = easedProgress;
+    setFlyoverProgress(easedProgress);
+
+    // Position
+    const currentPos = splineRef.current.getPointAt(easedProgress);
+    camera.position.copy(currentPos);
+
+    // Look At
+    const lookAheadProgress = Math.min(easedProgress + LOOK_AHEAD, 1.0);
+    const targetPos = splineRef.current.getPointAt(lookAheadProgress);
+
+    // Smooth lookAt
+    lookAtRef.current.lerp(targetPos, 0.1);
+    camera.lookAt(lookAtRef.current);
+
+    // Waypoint Index Tracking
+    const totalPoints = transitionPath.waypoints.length + 2;
+    const continuousIndex = easedProgress * (totalPoints - 1);
+    const currentIndex = Math.floor(continuousIndex + 0.1);
+
+    if (currentIndex !== flyoverCurrentWaypointIndexRef.current) {
+      flyoverCurrentWaypointIndexRef.current = currentIndex;
+      setFlyoverCurrentWaypointIndex(currentIndex);
+    }
+
+    // End
+    if (elapsed >= duration) {
       setIsFlying(false);
-
-      // Position at goal
-      const point = splineRef.current.getPointAt(1);
-      camera.position.copy(point);
-      camera.lookAt(0, 0, 0);
-    } else {
-      setProgress(rawProgress);
-      setFlyoverProgress(rawProgress);
-
-      // Get exact position on curve
-      const point = splineRef.current.getPointAt(rawProgress);
-      camera.position.copy(point);
-
-      // Look ahead
-      const lookAtProgress = Math.min(rawProgress + 0.05, 1);
-      const lookAtPoint = splineRef.current.getPointAt(lookAtProgress);
-      camera.lookAt(lookAtPoint);
-      // Update store index if changed
-      const totalPoints = transitionPath.waypoints.length + 2;
-      const continuousIndex = rawProgress * (totalPoints - 1);
-      const currentIndex = Math.floor(continuousIndex + 0.1);
-
-      // Check against current store value (or local ref if we had one, but strict equality check in setter might handle it)
-      // To be safe/performant, we rely on the fact that we are already updating progress every frame.
-      // But let's only call if changed to minimize noise if we split components later.
-      // Actually we don't have access to the previous value easily without a ref.
-      // We'll trust zustand's equality check or just fire it.
-      // But let's use a ref for local optimization if acceptable, or just fire it.
-      // Given we fire setFlyoverProgress every frame, one more set isn't huge, but let's be nice.
-      if (currentIndex !== flyoverCurrentWaypointIndexRef.current) {
-        flyoverCurrentWaypointIndexRef.current = currentIndex;
-        setFlyoverCurrentWaypointIndex(currentIndex);
-      }
     }
   });
 
-  // Ref to track last index to avoid store thrashing
+  // Ref to track last index
   const flyoverCurrentWaypointIndexRef = useRef(-1);
 
-  // No visual rendering from this component anymore, purely a camera controller
-  // UI is handled by PathDetailsOverlay
   return null;
 }

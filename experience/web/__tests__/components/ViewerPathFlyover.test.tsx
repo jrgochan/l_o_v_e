@@ -4,17 +4,25 @@ import * as THREE from "three";
 
 // Mock Store
 const mockSetIsFlying = jest.fn();
+const mockState = {
+  transitionPath: {
+    current_state: { emotion: "Joy", vac: [0, 0, 0] },
+    goal_state: { emotion: "Peace", vac: [1, 1, 1] },
+    waypoints: [],
+  },
+  isFlying: true,
+  setIsFlying: mockSetIsFlying,
+  flyoverSpeed: 1.0,
+  setFlyoverProgress: jest.fn(),
+  setFlyoverCurrentWaypointIndex: jest.fn(),
+};
+
+const mockUseExperienceStore = jest.fn((selector: any) => selector(mockState));
+// Attach getState method
+(mockUseExperienceStore as any).getState = jest.fn(() => mockState);
+
 jest.mock("@/stores/useExperienceStore", () => ({
-  useExperienceStore: (selector: any) =>
-    selector({
-      transitionPath: {
-        current_state: { emotion: "Joy", vac: [0, 0, 0] },
-        goal_state: { emotion: "Peace", vac: [1, 1, 1] },
-        waypoints: [],
-      },
-      isFlying: true,
-      setIsFlying: mockSetIsFlying,
-    }),
+  useExperienceStore: mockUseExperienceStore,
 }));
 
 // Mock R3F
@@ -40,7 +48,13 @@ jest.mock("@react-spring/web", () => ({
 // We need CatmullRomCurve3
 jest.mock("three", () => {
   return {
-    Vector3: jest.fn(),
+    Vector3: jest.fn(() => ({
+      copy: jest.fn(),
+      lerp: jest.fn(),
+      x: 0,
+      y: 0,
+      z: 0,
+    })),
     CatmullRomCurve3: jest.fn(() => ({
       getPointAt: jest.fn(() => ({ x: 0, y: 0, z: 0 })),
       tension: 0.5,

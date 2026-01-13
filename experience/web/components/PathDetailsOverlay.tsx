@@ -11,6 +11,7 @@ import {
   ChevronDown,
   ChevronLeft,
   ChevronRight,
+  Plane,
 } from "lucide-react";
 
 import { useAtlasAdminStore } from "@/stores/useAtlasAdminStore";
@@ -133,20 +134,37 @@ export function PathDetailsOverlay() {
         {/* 1. Playback Controls */}
         <div className="flex items-center gap-3">
           {/* Play/Pause Main Button */}
-          <button
-            onClick={() => {
-              const newState = !isFlying;
-              setIsFlying(newState);
-              setAdminIsFlying(newState);
-            }}
-            className="w-12 h-12 rounded-full bg-white text-black flex items-center justify-center shadow-[0_0_15px_rgba(255,255,255,0.2)] hover:scale-105 hover:shadow-[0_0_20px_rgba(255,255,255,0.4)] transition-all active:scale-95"
-          >
-            {isFlying ? (
-              <Pause size={20} fill="currentColor" className="ml-0.5" />
-            ) : (
-              <Play size={20} fill="currentColor" className="ml-1" />
-            )}
-          </button>
+          <div className="relative">
+            <button
+              onClick={() => {
+                if (!isFlying && flyoverProgress >= 0.99) {
+                  setFlyoverProgress(0);
+                }
+                const newState = !isFlying;
+                setIsFlying(newState);
+                setAdminIsFlying(newState);
+              }}
+              className="w-12 h-12 rounded-full bg-white text-black flex items-center justify-center shadow-[0_0_15px_rgba(255,255,255,0.2)] hover:scale-105 hover:shadow-[0_0_20px_rgba(255,255,255,0.4)] transition-all active:scale-95"
+            >
+              {isFlying ? (
+                <Pause size={20} fill="currentColor" className="ml-0.5" />
+              ) : (
+                <Play size={20} fill="currentColor" className="ml-1" />
+              )}
+            </button>
+            {/* Secondary Flyover Button (Small Circular) */}
+            <button
+              onClick={() => {
+                setFlyoverProgress(0); // Reset to start
+                setIsFlying(true);
+                setAdminIsFlying(true);
+              }}
+              className="absolute -bottom-1 -right-1 w-6 h-6 rounded-full bg-white/20 backdrop-blur-md border border-white/40 flex items-center justify-center hover:bg-white hover:text-black transition-all shadow-lg z-10"
+              title="Start Flyover"
+            >
+              <Plane size={10} fill="currentColor" className="transform -rotate-45" />
+            </button>
+          </div>
 
           {/* Reset Button */}
           <button

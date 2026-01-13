@@ -54,7 +54,7 @@ export function OrbitControls({
   }, [enableDamping, dampingFactor, enablePan, enableZoom, minDistance, maxDistance, enabled]);
 
   useFrame(() => {
-    if (controlsRef.current && enableDamping) {
+    if (controlsRef.current && enableDamping && enabled) {
       controlsRef.current.update();
     }
   });
