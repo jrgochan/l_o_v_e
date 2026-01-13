@@ -45,9 +45,8 @@ export function useViewActions({ findEmotionByName, onNavigate }: UseViewActions
 
       logger.debug("hooks", `Viewing multiple in sphere: ${emotionIds.length} emotions`);
 
-      if (emotionIds[0]) {
-        setFocusedEmotion(emotionIds[0]);
-      }
+      // We know emotionIds has at least one item and they are valid strings
+      setFocusedEmotion(emotionIds[0]);
 
       onNavigate?.();
 

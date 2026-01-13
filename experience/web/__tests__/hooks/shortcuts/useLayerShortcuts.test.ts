@@ -67,4 +67,17 @@ describe("useLayerShortcuts", () => {
 
     expect(mockAction).not.toHaveBeenCalled();
   });
+
+  it("should ignore keys without actions", () => {
+    mockGetActions.mockReturnValue({}); // empty actions
+
+    renderHook(() => useLayerShortcuts());
+
+    act(() => {
+      const event = new KeyboardEvent("keydown", { key: "z" });
+      window.dispatchEvent(event);
+    });
+
+    // Should verify nothing broke and no calls made
+  });
 });

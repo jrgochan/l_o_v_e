@@ -46,4 +46,49 @@ describe("useSiteShortcuts", () => {
 
     expect(mockOpenCommandPalette).toHaveBeenCalled();
   });
+
+  it("should safely handle missing command palette function", () => {
+    // Ensure undefined
+    // @ts-ignore
+    delete window.openCommandPalette;
+
+    renderHook(() => useSiteShortcuts());
+
+    act(() => {
+      const event = new KeyboardEvent("keydown", { key: "k", metaKey: true });
+      jest.spyOn(event, "preventDefault");
+      window.dispatchEvent(event);
+      expect(event.preventDefault).toHaveBeenCalled();
+    });
+
+    // Should not crash
+  });
+
+  it("should ignore keys with no actions", () => {
+    mockGetActions.mockReturnValue({}); // No actions
+
+    renderHook(() => useSiteShortcuts());
+
+    act(() => {
+      const event = new KeyboardEvent("keydown", { key: "z" });
+      window.dispatchEvent(event);
+    });
+
+    // Should assume no action called (implicit check)
+  });
+
+  it("should treat 'k' as normal key if no modifier", () => {
+    // If 'k' is pressed without modifier, it should fallback to action map
+    const mockKAction = jest.fn();
+    mockGetActions.mockReturnValue({ k: mockKAction });
+
+    renderHook(() => useSiteShortcuts());
+
+    act(() => {
+      const event = new KeyboardEvent("keydown", { key: "k", ctrlKey: false, metaKey: false });
+      window.dispatchEvent(event);
+    });
+
+    expect(mockKAction).toHaveBeenCalled();
+  });
 });

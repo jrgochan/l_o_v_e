@@ -63,7 +63,25 @@ describe("AudioEngineState", () => {
     expect(getAudioEngine()).toBe(mockEngine);
   });
 
+  it("should handle initialization failure", () => {
+    // Reset state
+    // @ts-ignore
+    const { resetAudioEngineState } = require("@/hooks/audio/AudioEngineState");
+    resetAudioEngineState();
+
+    (createAudioEngineInstance as jest.Mock).mockReturnValue(null);
+    initAudioEngine();
+
+    expect(getAudioEngine()).toBeNull();
+    expect(logger.error).toHaveBeenCalledWith("rendering", "Audio Engine Init Failed");
+
+    // Restore mock for other tests
+    (createAudioEngineInstance as jest.Mock).mockReturnValue(mockEngine);
+  });
+
   it("should toggle mute", () => {
+    // Ensure initialized
+    initAudioEngine();
     const initialMute = isAudioMuted(); // Likely true by default
 
     const listener = jest.fn();
@@ -83,9 +101,52 @@ describe("AudioEngineState", () => {
     unsubscribe();
   });
 
-  it("should handle initialization through toggleMute", () => {
-    // This is hard to test if init already happened.
-    // We know init happened in the first test.
-    // We can skip this scenario or rely on coverage implicitly.
+  it("should initialize engine on toggle if missing", () => {
+    // Reset state
+    // @ts-ignore
+    const { resetAudioEngineState } = require("@/hooks/audio/AudioEngineState");
+    resetAudioEngineState();
+
+    toggleGlobalMute();
+    expect(createAudioEngineInstance).toHaveBeenCalled();
+  });
+
+  it("should handle toggle when engine remains null (init failure)", () => {
+    // Reset state
+    // @ts-ignore
+    const { resetAudioEngineState } = require("@/hooks/audio/AudioEngineState");
+    resetAudioEngineState();
+
+    (createAudioEngineInstance as jest.Mock).mockReturnValue(null);
+    toggleGlobalMute();
+
+    // Should not crash, and should not try to ramp gain
+    expect(mockGain.gain.linearRampToValueAtTime).not.toHaveBeenCalled();
+
+    // Restore
+    (createAudioEngineInstance as jest.Mock).mockReturnValue(mockEngine);
+  });
+
+  it("should not resume context if already running when unmuting", () => {
+    // Ensure initialized
+    initAudioEngine();
+
+    // Force mute state to true so we can unmute
+    // toggleGlobalMute toggles the module variable
+    // We can assume it starts muted or we toggle until it matches expectation?
+    if (!isAudioMuted()) {
+      toggleGlobalMute(); // Now muted
+    }
+
+    // Muted -> Unmuted
+    // Mock running state
+    mockCtx.state = "running";
+    mockCtx.resume.mockClear();
+
+    toggleGlobalMute(); // Now unmuted
+    expect(mockCtx.resume).not.toHaveBeenCalled();
+
+    // Reset state
+    mockCtx.state = "suspended";
   });
 });

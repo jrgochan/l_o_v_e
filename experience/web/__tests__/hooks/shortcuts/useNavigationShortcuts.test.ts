@@ -99,7 +99,9 @@ describe("useNavigationShortcuts", () => {
     // Arrow Down (Next) -> Should select path1 (index 0)
     act(() => {
       const event = new KeyboardEvent("keydown", { key: "ArrowDown" });
+      jest.spyOn(event, "preventDefault");
       window.dispatchEvent(event);
+      expect(event.preventDefault).toHaveBeenCalled();
     });
 
     expect(mockSetSelectedPath).toHaveBeenLastCalledWith("path1");
@@ -118,5 +120,114 @@ describe("useNavigationShortcuts", () => {
       window.dispatchEvent(event);
     });
     expect(mockSetSelectedPath).toHaveBeenLastCalledWith("path2");
+  });
+
+  it("should not navigate if paths are empty", () => {
+    (useAtlasAdminStore as unknown as jest.Mock).mockImplementation((selector) => {
+      return selector({
+        computedPaths: new Map(),
+        selectedPathId: null,
+        selectedEmotionIds: new Set(["e1", "e2"]),
+        setSelectedPath: mockSetSelectedPath,
+      });
+    });
+
+    renderHook(() => useNavigationShortcuts());
+
+    act(() => {
+      const event = new KeyboardEvent("keydown", { key: "ArrowDown" });
+      window.dispatchEvent(event);
+    });
+
+    expect(mockSetSelectedPath).not.toHaveBeenCalled();
+  });
+
+  it("should not navigate if selection is insufficient", () => {
+    (useAtlasAdminStore as unknown as jest.Mock).mockImplementation((selector) => {
+      return selector({
+        computedPaths: new Map([["p1", { id: "p1", from: { id: "e1" }, to: { id: "e2" } }]]),
+        selectedPathId: null,
+        selectedEmotionIds: new Set(["e1"]), // Only 1 selected
+        setSelectedPath: mockSetSelectedPath,
+      });
+    });
+
+    renderHook(() => useNavigationShortcuts());
+
+    act(() => {
+      const event = new KeyboardEvent("keydown", { key: "ArrowDown" });
+      window.dispatchEvent(event);
+    });
+
+    expect(mockSetSelectedPath).not.toHaveBeenCalled();
+  });
+
+  it("should not jump if invalid number key", () => {
+    (useAtlasAdminStore as unknown as jest.Mock).mockImplementation((selector) => {
+      return selector({
+        computedPaths: new Map([["p1", { id: "p1", from: { id: "e1" }, to: { id: "e2" } }]]),
+        selectedPathId: null,
+        selectedEmotionIds: new Set(["e1", "e2"]),
+        setSelectedPath: mockSetSelectedPath,
+      });
+    });
+
+    renderHook(() => useNavigationShortcuts());
+
+    act(() => {
+      // "9" is out of bounds for size 1
+      const event = new KeyboardEvent("keydown", { key: "9" });
+      window.dispatchEvent(event);
+    });
+
+    expect(mockSetSelectedPath).not.toHaveBeenCalled();
+  });
+
+  it("should navigate via ArrowUp (Previous)", () => {
+    (useAtlasAdminStore as unknown as jest.Mock).mockImplementation((selector) => {
+      return selector({
+        computedPaths: new Map([
+          ["p1", { id: "p1", from: { id: "e1" }, to: { id: "e2" } }],
+          ["p2", { id: "p2", from: { id: "e1" }, to: { id: "e3" } }],
+        ]),
+        selectedPathId: "p2",
+        selectedEmotionIds: new Set(["e1", "e2", "e3"]),
+        setSelectedPath: mockSetSelectedPath,
+      });
+    });
+
+    renderHook(() => useNavigationShortcuts());
+
+    act(() => {
+      const event = new KeyboardEvent("keydown", { key: "ArrowUp" });
+      jest.spyOn(event, "preventDefault");
+      window.dispatchEvent(event);
+      expect(event.preventDefault).toHaveBeenCalled();
+    });
+
+    expect(mockSetSelectedPath).toHaveBeenCalledWith("p1");
+  });
+
+  it("should ignore shortcuts if guard fails", () => {
+    mockShouldExecuteShortcut.mockReturnValue(false);
+
+    // Setup valid state so it WOULD navigate if not guarded
+    (useAtlasAdminStore as unknown as jest.Mock).mockImplementation((selector) => {
+      return selector({
+        computedPaths: new Map([["p1", { id: "p1", from: { id: "e1" }, to: { id: "e2" } }]]),
+        selectedPathId: null,
+        selectedEmotionIds: new Set(["e1", "e2"]),
+        setSelectedPath: mockSetSelectedPath,
+      });
+    });
+
+    renderHook(() => useNavigationShortcuts());
+
+    act(() => {
+      const event = new KeyboardEvent("keydown", { key: "ArrowDown" });
+      window.dispatchEvent(event);
+    });
+
+    expect(mockSetSelectedPath).not.toHaveBeenCalled();
   });
 });

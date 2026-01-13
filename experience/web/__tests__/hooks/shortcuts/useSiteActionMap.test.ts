@@ -211,6 +211,9 @@ describe("useSiteActionMap", () => {
     actions.b();
     expect(mockStore.selectMultiple).not.toHaveBeenCalled();
 
+    actions.z();
+    expect(mockStore.cycleViewMode).not.toHaveBeenCalled();
+
     // Reset guard
     (useShortcutGuards as jest.Mock).mockReturnValue({
       shouldExecuteShortcut: () => true

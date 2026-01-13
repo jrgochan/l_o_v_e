@@ -83,4 +83,19 @@ describe("useViewActions", () => {
     expect(mockSetFocusedEmotion).toHaveBeenCalledWith("id-joy");
     expect(mockOnNavigate).toHaveBeenCalled();
   });
+
+  it("should fail to view multiple if no emotions found", () => {
+    const { result } = renderHook(() =>
+      useViewActions({
+        findEmotionByName: mockFindEmotionByName,
+        onNavigate: mockOnNavigate,
+      })
+    );
+
+    // Pass known bad name that our mock returns empty for
+    const success = result.current.viewMultipleInSphere(["Unknown"]);
+
+    expect(success).toBe(false);
+    expect(mockOnNavigate).not.toHaveBeenCalled();
+  });
 });

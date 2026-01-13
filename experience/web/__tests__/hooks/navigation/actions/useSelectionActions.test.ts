@@ -77,6 +77,16 @@ describe("useSelectionActions", () => {
     expect(mockSetFocusedEmotion).not.toHaveBeenCalled();
   });
 
+  it("should fail to add to selection if emotion not found", () => {
+    mockFindEmotionByName.mockReturnValue(null);
+    const { result } = getHook();
+    const success = result.current.addToSelection("Unknown");
+
+    expect(success).toBe(false);
+    expect(logger.warn).toHaveBeenCalled();
+    expect(mockSelectEmotion).not.toHaveBeenCalled();
+  });
+
   it("should select multiple emotions", () => {
     mockFindEmotionByName.mockImplementation((name) => {
       if (name === "Joy") return { id: "e1", name: "Joy" };

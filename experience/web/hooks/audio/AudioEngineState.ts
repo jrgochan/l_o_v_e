@@ -51,5 +51,13 @@ export const toggleGlobalMute = () => {
   notifyListeners();
 };
 
+export const resetAudioEngineState = () => {
+  if (process.env.NODE_ENV === "test") {
+    globalAudioEngine = null;
+    globalIsMuted = true;
+    globalListeners.clear();
+  }
+};
+
 // Re-export types for backward compatibility
 export * from "@/types/audio";

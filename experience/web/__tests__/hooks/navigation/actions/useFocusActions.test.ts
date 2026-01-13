@@ -70,4 +70,15 @@ describe("useFocusActions", () => {
 
     expect(mockSetFocusedEmotion).toHaveBeenCalledWith("e1");
   });
+
+  it("should fail auto-focus if emotion not found", () => {
+    mockFindEmotionByName.mockReturnValue(null);
+
+    const { result } = getHook();
+    const success = result.current.autoFocusEmotion("Unknown");
+
+    expect(success).toBe(false);
+    expect(logger.warn).toHaveBeenCalled();
+    expect(mockSetFocusedEmotion).not.toHaveBeenCalled();
+  });
 });

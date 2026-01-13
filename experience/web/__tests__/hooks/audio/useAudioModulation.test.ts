@@ -57,9 +57,22 @@ describe("useAudioModulation", () => {
   });
 
   it("should handle null VAC gracefully", () => {
-    (useExperienceStore as unknown as jest.Mock).mockReturnValue(null);
+    (useExperienceStore as unknown as jest.Mock).mockImplementation((selector) =>
+      selector ? selector({ currentVAC: null }) : null
+    );
     renderHook(() => useAudioModulation());
     // Should return early
     expect(mockRamp).not.toHaveBeenCalled();
+  });
+
+  it("should handle partial VAC arrays", () => {
+    // Return empty array to trigger default values in array access
+    (useExperienceStore as unknown as jest.Mock).mockImplementation((selector) =>
+      selector ? selector({ currentVAC: [] }) : []
+    );
+    renderHook(() => useAudioModulation());
+
+    // Should still modulate with defaults (0.5)
+    expect(mockRamp).toHaveBeenCalled();
   });
 });
