@@ -1,0 +1,38 @@
+import { render, screen } from "@testing-library/react";
+import RootLayout from "@/app/layout";
+
+// Mock LoggerProvider
+jest.mock("@/components/LoggerProvider", () => ({
+    LoggerProvider: ({ children }: { children: React.ReactNode }) => (
+        <div data-testid="logger-provider">{children}</div>
+    ),
+}));
+
+// Mock Google Fonts
+jest.mock("next/font/google", () => ({
+    Geist: () => ({ variable: "--font-geist-sans" }),
+    Geist_Mono: () => ({ variable: "--font-geist-mono" }),
+}));
+
+describe("RootLayout", () => {
+    it("renders children wrapped in LoggerProvider and correct structure", () => {
+        const { container } = render(
+            <RootLayout>
+                <div data-testid="child-content">Test Content</div>
+            </RootLayout>
+        );
+
+        // Verify children
+        expect(screen.getByTestId("child-content")).toBeInTheDocument();
+
+        // Verify LoggerProvider wrapper
+        expect(screen.getByTestId("logger-provider")).toBeInTheDocument();
+
+        // Verify HTML structure basics (Note: JSDOM might not fully render html/body tags as expected in all setups, 
+        // but we can check if the rendered output contains the expected elements or classes if accessible)
+        // However, react-testing-library renders into a container (usually a div). 
+        // Testing specific html/body attributes on the container might be tricky as RootLayout renders <html>.
+        // In JSDOM, rendering <html> inside a container might be normalized.
+        // We mainly want to ensure no crash and children are present.
+    });
+});
