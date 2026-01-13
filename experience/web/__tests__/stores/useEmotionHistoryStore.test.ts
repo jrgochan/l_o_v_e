@@ -3,7 +3,11 @@ import { useEmotionHistoryStore } from "../../stores/useEmotionHistoryStore";
 
 describe("useEmotionHistoryStore", () => {
   beforeEach(() => {
-    useEmotionHistoryStore.getState().clearHistory();
+    useEmotionHistoryStore.setState({
+      entries: [],
+      viewMode: "list",
+      isCollapsed: false,
+    });
   });
 
   it("should add entries", () => {
@@ -215,6 +219,53 @@ describe("useEmotionHistoryStore", () => {
       result.current.setVisibility(id, true);
     });
     expect(result.current.entries[0].isVisibleInSphere).toBe(true);
+  });
+
+  it("should handle non-matching IDs", () => {
+    const { result } = renderHook(() => useEmotionHistoryStore());
+
+    const mockEntry = {
+      emotion: "Test",
+      category: "neutral",
+      vac: { valence: 0, arousal: 0, connection: 0 },
+      confidence: 0.5,
+      timestamp: new Date(),
+      isVisibleInSphere: true,
+      messageId: "msg-test",
+    };
+
+    act(() => {
+      result.current.addEntry(mockEntry);
+    });
+
+    const initialEntry = result.current.entries[0];
+
+    // Toggle non-existent ID
+    act(() => {
+      result.current.toggleVisibility("non-existent");
+    });
+    expect(result.current.entries[0]).toBe(initialEntry); // Same ref
+
+    // Set visibility non-existent ID
+    act(() => {
+      result.current.setVisibility("non-existent", false);
+    });
+    expect(result.current.entries[0]).toBe(initialEntry);
+  });
+
+  it("should toggle view mode back to list", () => {
+    const { result } = renderHook(() => useEmotionHistoryStore());
+    expect(result.current.viewMode).toBe("list");
+
+    act(() => {
+      result.current.toggleViewMode();
+    });
+    expect(result.current.viewMode).toBe("timeline");
+
+    act(() => {
+      result.current.toggleViewMode();
+    });
+    expect(result.current.viewMode).toBe("list");
   });
 
   it("should return correct derived state (getters)", () => {

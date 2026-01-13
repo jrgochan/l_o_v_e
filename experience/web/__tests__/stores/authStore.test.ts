@@ -146,7 +146,7 @@ describe("useAuthStore", () => {
       });
 
       // Mock console.error
-      const mockError = jest.spyOn(console, "error").mockImplementation(() => {});
+      const mockError = jest.spyOn(console, "error").mockImplementation(() => { });
       (api.get as jest.Mock).mockRejectedValueOnce(new Error("Network"));
 
       await act(async () => {
@@ -189,6 +189,34 @@ describe("useAuthStore", () => {
 
       expect(result.current.error).toBe("Email taken");
       expect(result.current.isLoading).toBe(false);
+    });
+
+    it("should handle login with non-Error object", async () => {
+      const { result } = renderHook(() => useAuthStore());
+      (global.fetch as jest.Mock).mockRejectedValueOnce("String Error");
+
+      await act(async () => {
+        try {
+          await result.current.login("test", "pass");
+        } catch (e) {
+          expect(e).toBe("String Error");
+        }
+      });
+      expect(result.current.error).toBe("Login failed");
+    });
+
+    it("should handle registration with non-Error object", async () => {
+      const { result } = renderHook(() => useAuthStore());
+      (api.post as jest.Mock).mockRejectedValueOnce("String Error");
+
+      await act(async () => {
+        try {
+          await result.current.register("test", "pass");
+        } catch (e) {
+          expect(e).toBe("String Error");
+        }
+      });
+      expect(result.current.error).toBe("Registration failed");
     });
   });
 });
