@@ -161,4 +161,61 @@ describe("messageDispatcher", () => {
     dispatchMessage({ type: "transcription", text: "Test" } as any, partialHandlers);
     expect(partialHandlers.setError).not.toHaveBeenCalled();
   });
+
+  it("should handle multi_emotion with missing optional fields", () => {
+    const payload = {
+      type: "multi_emotion",
+      emotion: "Awe",
+      vac: { valence: 0.9 },
+      prominence: "primary",
+      // Missing category and confidence
+    };
+    dispatchMessage(payload as any, mockHandlers);
+    expect(mockHandlers.onMultiEmotion).toHaveBeenCalledWith(
+      "Awe",
+      "", // default category
+      payload.vac,
+      0,  // default confidence
+      "primary"
+    );
+  });
+
+  it("should handle emotion_relationship with missing optional fields", () => {
+    const payload = {
+      type: "emotion_relationship",
+      emotion_a: "A",
+      emotion_b: "B",
+      relationship_type: "sequential",
+      // Missing strength and description
+    };
+    dispatchMessage(payload as any, mockHandlers);
+    expect(mockHandlers.onRelationship).toHaveBeenCalledWith(
+      "A",
+      "B",
+      "sequential",
+      0,  // default strength
+      ""  // default description
+    );
+  });
+
+  it("should ignore aggregate_state without VAC", () => {
+    const payload = {
+      type: "aggregate_state",
+      complexity_score: 0.5,
+    };
+    dispatchMessage(payload as any, mockHandlers);
+    expect(mockHandlers.onAggregateState).not.toHaveBeenCalled();
+  });
+
+  it("should ignore three_way_analysis without data", () => {
+    const payload = { type: "three_way_analysis" };
+    dispatchMessage(payload as any, mockHandlers);
+    expect(mockHandlers.onThreeWayAnalysis).not.toHaveBeenCalled();
+  });
+
+  it("should ignore progress_update with missing fields", () => {
+    const payload = { type: "progress_update", stage: "init" };
+    dispatchMessage(payload as any, mockHandlers);
+    expect(mockHandlers.onProgressUpdate).not.toHaveBeenCalled();
+  });
 });

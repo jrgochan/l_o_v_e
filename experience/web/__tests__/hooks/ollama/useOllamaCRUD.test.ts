@@ -142,6 +142,28 @@ describe("useOllamaCRUD", () => {
     expect(result.current.error).toContain("Server Error");
   });
 
+  it("should handle non-Error object rejection in delete", async () => {
+    (global.fetch as any).mockRejectedValue("String Error");
+
+    const { result } = renderHook(() => useOllamaCRUD());
+    await act(async () => {
+      await result.current.deleteModel("foo");
+    });
+
+    expect(result.current.error).toBe("Failed to delete model");
+  });
+
+  it("should handle non-Error object rejection in fetch", async () => {
+    (global.fetch as any).mockRejectedValue("String Error");
+
+    const { result } = renderHook(() => useOllamaCRUD());
+    await act(async () => {
+      await result.current.fetchLocalModels();
+    });
+
+    expect(result.current.error).toBe("Failed to fetch models");
+  });
+
   it("should allow manual error setting", () => {
     const { result } = renderHook(() => useOllamaCRUD());
 

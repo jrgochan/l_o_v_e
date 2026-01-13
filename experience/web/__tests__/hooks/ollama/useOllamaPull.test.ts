@@ -14,7 +14,7 @@ class MockWebSocket {
     MockWebSocket.instances.push(this);
   }
 
-  send(data: string) {}
+  send(data: string) { }
   close() {
     if (this.onclose) this.onclose();
   }
@@ -26,7 +26,7 @@ class MockWebSocket {
     }
   }
 
-  onopen() {}
+  onopen() { }
 
   static instances: MockWebSocket[] = [];
   static clear() {
@@ -157,6 +157,24 @@ describe("useOllamaPull", () => {
     });
 
     expect(mockSetError).toHaveBeenCalledWith("Network Error");
+  });
+
+  it("should handle non-Error object rejection in pull", async () => {
+    (global.fetch as any).mockRejectedValue("String Error");
+
+    const { result } = renderHook(() =>
+      useOllamaPull({
+        localModels: [],
+        fetchLocalModels: mockFetchLocalModels,
+        setError: mockSetError,
+      })
+    );
+
+    await act(async () => {
+      await result.current.pullModel("llama3");
+    });
+
+    expect(mockSetError).toHaveBeenCalledWith("Failed to pull model");
   });
 
   it("should handle websocket connection error", async () => {

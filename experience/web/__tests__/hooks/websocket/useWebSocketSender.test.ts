@@ -95,6 +95,26 @@ describe("useWebSocketSender", () => {
     result.current.sendAudio("Fail", "warm");
 
     expect(setError).toHaveBeenCalledWith("Not connected to server");
+    expect(setError).toHaveBeenCalledWith("Not connected to server");
+    expect(wsMock.send).not.toHaveBeenCalled();
+  });
+
+  it("should handle disconnected state for tone update", () => {
+    wsRef.current = { readyState: WebSocket.CLOSED, send: jest.fn() };
+    const { result } = renderHook(() => useWebSocketSender({ wsRef, setError }));
+
+    result.current.updateTonePreference("warm");
+
+    // No setError defined for tone update in implementation, but logs error
+    expect(wsMock.send).not.toHaveBeenCalled();
+  });
+
+  it("should handle disconnected state for deep feeling update", () => {
+    wsRef.current = null;
+    const { result } = renderHook(() => useWebSocketSender({ wsRef, setError }));
+
+    result.current.updateDeepFeelingMode(true);
+
     expect(wsMock.send).not.toHaveBeenCalled();
   });
 });
