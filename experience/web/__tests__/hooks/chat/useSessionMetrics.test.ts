@@ -85,4 +85,14 @@ describe("useSessionMetrics", () => {
     expect(result.current.sessionMetrics.alertCount.critical).toBe(0);
     expect(result.current.sessionMetrics.elapsedSeconds).toBe(0);
   });
+
+  it("should update arbitrary metrics", () => {
+    const { result } = renderHook(() => useSessionMetrics());
+
+    act(() => {
+      result.current.updateMetrics({ emotionCount: 5 });
+    });
+
+    expect(result.current.sessionMetrics.emotionCount).toBe(5);
+  });
 });

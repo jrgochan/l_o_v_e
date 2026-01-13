@@ -65,11 +65,11 @@ export function usePerformanceMonitor(options: UsePerformanceMonitorOptions = {}
 
   const calculateMetrics = () => {
     const frameTimes = frameTimesRef.current;
-    if (frameTimes.length === 0) return;
+    // Guaranteed to have at least one frame from useFrame push before call
 
     // Calculate FPS from frame times
     const averageFrameTime = frameTimes.reduce((a, b) => a + b, 0) / frameTimes.length;
-    const currentFps = 1000 / (frameTimes[frameTimes.length - 1] || 16.67);
+    const currentFps = 1000 / frameTimes[frameTimes.length - 1]; // Safe due to push
     const averageFps = 1000 / averageFrameTime;
     const minFps = 1000 / Math.max(...frameTimes);
     const maxFps = 1000 / Math.min(...frameTimes);

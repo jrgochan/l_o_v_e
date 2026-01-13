@@ -9,8 +9,11 @@ const mockHandleToggleFullscreen = jest.fn();
 const mockHandleToggleExpansion = jest.fn();
 
 jest.mock("../../../hooks/chat/layout/useChatResize", () => ({
-  useChatResize: ({ defaultHeight }: any) => ({
-    height: defaultHeight === 70 ? 70 : 400,
+  useChatResize: ({ isExpanded }: any) => ({
+    // If isExpanded is true, we simulate height=400 (expanded).
+    // If false, height=70 (collapsed).
+    // The test logic relies on this to verify setPreviousHeight behavior.
+    height: isExpanded ? 400 : 70,
     setHeight: mockSetHeight,
     isResizing: false,
     handleMouseDown: mockHandleMouseDown,
@@ -18,7 +21,7 @@ jest.mock("../../../hooks/chat/layout/useChatResize", () => ({
 }));
 
 jest.mock("../../../hooks/chat/layout/useChatShortcuts", () => ({
-  useChatShortcuts: () => {}, // No-op, just verify integration
+  useChatShortcuts: () => { }, // No-op, just verify integration
 }));
 
 describe("useChatLayout", () => {
@@ -70,6 +73,32 @@ describe("useChatLayout", () => {
     });
     expect(result.current.isFullscreen).toBe(false);
     expect(mockSetHeight).toHaveBeenCalledWith(400); // Default previousHeight
+  });
+
+  it("should capture height when toggling fullscreen from expanded state", () => {
+    const { result, rerender } = renderHook(() => useChatLayout());
+
+    // Expand first
+    act(() => {
+      result.current.handleToggleExpand();
+    });
+    // Rerender to picking up new height from mock (which depends on isExpanded)
+    rerender();
+
+    // Now height should be 400 (mocked)
+    // Toggle fullscreen
+    act(() => {
+      result.current.handleToggleFullscreen();
+    });
+
+    expect(result.current.isFullscreen).toBe(true);
+    // Should have captured 400 as previous height?
+    // We can't inspect state directly easily, but we can verify restore.
+
+    act(() => {
+      result.current.handleToggleFullscreen();
+    });
+    expect(mockSetHeight).toHaveBeenCalledWith(400); // Restores captured height
   });
 
   it("should toggle analysis expansion", () => {

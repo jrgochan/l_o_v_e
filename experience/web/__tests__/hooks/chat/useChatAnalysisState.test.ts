@@ -55,4 +55,19 @@ describe("useChatAnalysisState", () => {
     expect(result.current.currentAnalysis.audioBlob).toBe(mockBlob);
     expect(result.current.multiEmotionAnalysis).toBeNull();
   });
+
+  it("should clear analysis with default arguments", () => {
+    const { result } = renderHook(() => useChatAnalysisState());
+
+    act(() => {
+      result.current.setCurrentAnalysis((prev) => ({ ...prev, emotion: "Joy" }));
+    });
+
+    act(() => {
+      result.current.clearAnalysis();
+    });
+
+    expect(result.current.currentAnalysis.emotion).toBeNull();
+    expect(result.current.currentAnalysis.audioBlob).toBeNull();
+  });
 });

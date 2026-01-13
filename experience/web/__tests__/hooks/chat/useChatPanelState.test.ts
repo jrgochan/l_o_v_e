@@ -103,8 +103,10 @@ describe("useChatPanelState", () => {
     // Simulate MouseMove (drag up by 50px -> dy = 500 - 450 = 50)
     // New height = initial + 50
     act(() => {
-      const moveEvent = new MouseEvent("mousemove", { clientY: 450, bubbles: true });
+      const moveEvent = new MouseEvent("mousemove", { clientY: 450, bubbles: true, cancelable: true });
+      jest.spyOn(moveEvent, 'preventDefault');
       document.dispatchEvent(moveEvent);
+      expect(moveEvent.preventDefault).toHaveBeenCalled();
     });
 
     // Height should increase
@@ -125,22 +127,27 @@ describe("useChatPanelState", () => {
 
     // Ctrl+Shift+A -> Analysis toggle
     act(() => {
-      const event = new KeyboardEvent("keydown", { key: "a", ctrlKey: true, shiftKey: true });
+      const event = new KeyboardEvent("keydown", { key: "a", ctrlKey: true, shiftKey: true, cancelable: true });
+      jest.spyOn(event, 'preventDefault');
       window.dispatchEvent(event);
+      expect(event.preventDefault).toHaveBeenCalled();
     });
     expect(result.current.analysisExpandState).toBe("expanded");
 
     // Toggle again -> fullscreen
     act(() => {
-      const event = new KeyboardEvent("keydown", { key: "a", ctrlKey: true, shiftKey: true });
+      const event = new KeyboardEvent("keydown", { key: "a", ctrlKey: true, shiftKey: true, cancelable: true });
       window.dispatchEvent(event);
     });
     expect(result.current.analysisExpandState).toBe("fullscreen");
 
     // Escape -> Exit fullscreen analysis
     act(() => {
-      const event = new KeyboardEvent("keydown", { key: "Escape" });
+      // Must be in analysis fullscreen
+      const event = new KeyboardEvent("keydown", { key: "Escape", cancelable: true });
+      jest.spyOn(event, 'preventDefault');
       window.dispatchEvent(event);
+      expect(event.preventDefault).toHaveBeenCalled();
     });
     expect(result.current.analysisExpandState).toBe("normal");
 
@@ -151,8 +158,10 @@ describe("useChatPanelState", () => {
     });
 
     act(() => {
-      const event = new KeyboardEvent("keydown", { key: "f", ctrlKey: true, shiftKey: true });
+      const event = new KeyboardEvent("keydown", { key: "f", ctrlKey: true, shiftKey: true, cancelable: true });
+      jest.spyOn(event, 'preventDefault');
       window.dispatchEvent(event);
+      expect(event.preventDefault).toHaveBeenCalled();
     });
     expect(result.current.isExpanded).toBe(true);
     expect(result.current.height).toBe(400);
@@ -161,15 +170,17 @@ describe("useChatPanelState", () => {
     // First, expand (already expanded)
 
     act(() => {
-      const event = new KeyboardEvent("keydown", { key: "f", ctrlKey: true, shiftKey: true });
+      const event = new KeyboardEvent("keydown", { key: "f", ctrlKey: true, shiftKey: true, cancelable: true });
       window.dispatchEvent(event);
     });
     expect(result.current.isFullscreen).toBe(true);
 
     // Escape -> Exit fullscreen
     act(() => {
-      const event = new KeyboardEvent("keydown", { key: "Escape" });
+      const event = new KeyboardEvent("keydown", { key: "Escape", cancelable: true });
+      jest.spyOn(event, 'preventDefault');
       window.dispatchEvent(event);
+      expect(event.preventDefault).toHaveBeenCalled();
     });
     expect(result.current.isFullscreen).toBe(false);
 

@@ -81,4 +81,66 @@ describe("usePerformanceMonitor", () => {
     expect(result.current.qualityRecommendation).toMatch(/medium|low/);
     expect(onQualityChange).toHaveBeenCalled();
   });
+
+  it("should recommend HIGH quality on good FPS", () => {
+    let currentTime = 1000;
+    jest.spyOn(performance, "now").mockImplementation(() => currentTime);
+
+    // Target ~50 FPS (20ms)
+    const { result } = renderHook(() => usePerformanceMonitor({ sampleSize: 5 }));
+    const frameCallback = (global as any).mockFrameCallback;
+
+    act(() => {
+      for (let i = 0; i < 35; i++) {
+        currentTime += 20;
+        frameCallback();
+      }
+    });
+
+    expect(result.current.qualityRecommendation).toBe("high");
+  });
+
+  it("should recommend MEDIUM quality on acceptable FPS", () => {
+    let currentTime = 1000;
+    jest.spyOn(performance, "now").mockImplementation(() => currentTime);
+
+    // Target ~40 FPS (25ms)
+    const { result } = renderHook(() => usePerformanceMonitor({ sampleSize: 5 }));
+    const frameCallback = (global as any).mockFrameCallback;
+
+    act(() => {
+      for (let i = 0; i < 35; i++) {
+        currentTime += 25;
+        frameCallback();
+      }
+    });
+
+    expect(result.current.qualityRecommendation).toBe("medium");
+  });
+
+  it("should NOT callback if autoAdjustQuality is false", () => {
+    const onQualityChange = jest.fn();
+    let currentTime = 1000;
+    jest.spyOn(performance, "now").mockImplementation(() => currentTime);
+
+    const { result } = renderHook(() =>
+      usePerformanceMonitor({
+        sampleSize: 5,
+        onQualityChange,
+        autoAdjustQuality: false
+      })
+    );
+    const frameCallback = (global as any).mockFrameCallback;
+
+    act(() => {
+      // Drop to Low FPS
+      for (let i = 0; i < 35; i++) {
+        currentTime += 50; // 20 FPS
+        frameCallback();
+      }
+    });
+
+    expect(result.current.qualityRecommendation).toBe("low");
+    expect(onQualityChange).not.toHaveBeenCalled();
+  });
 });

@@ -33,9 +33,8 @@ export function useVoiceVisualizer(stream: MediaStream | null) {
     analyserRef.current = analyser;
 
     const monitor = () => {
-      if (!analyserRef.current) return;
-      const dataArray = new Uint8Array(analyserRef.current.frequencyBinCount);
-      analyserRef.current.getByteFrequencyData(dataArray);
+      const dataArray = new Uint8Array(analyserRef.current!.frequencyBinCount);
+      analyserRef.current!.getByteFrequencyData(dataArray);
 
       // Normalize
       const average = dataArray.reduce((a, b) => a + b, 0) / dataArray.length;

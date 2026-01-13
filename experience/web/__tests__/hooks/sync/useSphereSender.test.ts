@@ -80,4 +80,61 @@ describe("useSphereSender", () => {
 
     expect(sendMessage).toHaveBeenCalled();
   });
+
+  it("should handle transitionPath serialization", () => {
+    (useExperienceStore.getState as jest.Mock).mockReturnValue({
+      targetVAC: [0, 0, 0],
+      transitionPath: { points: [] }, // Valid path
+      showPath: true,
+    });
+
+    const { result } = renderHook(() => useSphereSender("listener", sendMessage));
+    act(() => {
+      result.current.broadcast();
+    });
+
+    expect(sendMessage).toHaveBeenCalledWith(
+      expect.objectContaining({
+        path: { points: [] },
+        showPath: true
+      })
+    );
+  });
+
+  it("should safely handle serialization errors", () => {
+    const circular: any = {};
+    circular.myself = circular;
+
+    (useExperienceStore.getState as jest.Mock).mockReturnValue({
+      targetVAC: [0, 0, 0],
+      transitionPath: circular, // Invalid JSON
+      showPath: true,
+    });
+
+    // We expect logger.warn to be called and execution to proceed without crash
+    /* eslint-disable-next-line @typescript-eslint/no-var-requires */
+    const { logger } = require("@/utils/logger");
+
+    const { result } = renderHook(() => useSphereSender("listener", sendMessage));
+    act(() => {
+      result.current.broadcast();
+    });
+
+    expect(logger.warn).toHaveBeenCalledWith("hooks", "Path serialization failed", expect.any(Error));
+    expect(sendMessage).toHaveBeenCalled(); // Should still send partial message
+  });
+
+  it("should send debug pulse after 2000ms", () => {
+    renderHook(() => useSphereSender("broadcaster", sendMessage));
+
+    act(() => {
+      jest.advanceTimersByTime(2100);
+    });
+
+    expect(sendMessage).toHaveBeenCalledWith(
+      expect.objectContaining({
+        selectedEmotionIds: ["DEBUG_TEST"]
+      })
+    );
+  });
 });
