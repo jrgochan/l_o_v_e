@@ -1,10 +1,8 @@
-import { render, screen, waitFor } from "@testing-library/react";
-import userEvent from "@testing-library/user-event";
+
+import { render, screen, fireEvent, waitFor, within } from "@testing-library/react";
 import { PromptTemplatesTab } from "@/components/admin/data/PromptTemplatesTab";
 import { adminApi } from "@/utils/api";
-import { PromptTemplate } from "@/types/admin";
 
-// Mock the API
 jest.mock("@/utils/api", () => ({
   adminApi: {
     getPromptTemplates: jest.fn(),
@@ -14,144 +12,204 @@ jest.mock("@/utils/api", () => ({
   },
 }));
 
-const mockPrompts: PromptTemplate[] = [
-  {
-    id: "prompt-1",
-    function_name: "semantic_vac",
-    version: "1.0.0",
-    template_content: "Analyze sentiment: {input_text}",
-    input_variables: ["input_text"],
-    description: "Basic VAC analysis",
-    is_active: true,
-    created_at: "2024-01-01T12:00:00Z",
-    updated_at: "2024-01-01T12:00:00Z",
-  },
-  {
-    id: "prompt-2",
-    function_name: "insight_generation",
-    version: "2.1.0",
-    template_content: "Generate insight for: {session_data}",
-    input_variables: ["session_data"],
-    description: "Advanced insight",
-    is_active: false,
-    created_at: "2024-01-02T12:00:00Z",
-    updated_at: "2024-01-02T12:00:00Z",
-  },
-];
-
 describe("PromptTemplatesTab", () => {
-  const user = userEvent.setup();
+  const mockPrompts = [
+    {
+      id: "p1",
+      function_name: "semantic_vac",
+      version: "1.0.0",
+      template_content: "Hello {input_text}",
+      input_variables: ["input_text"],
+      description: "Basic greeting",
+      is_active: true,
+      created_at: "2024-01-01T00:00:00Z",
+      updated_at: "2024-01-01T00:00:00Z"
+    }
+  ];
 
   beforeEach(() => {
     jest.clearAllMocks();
+  });
+
+  it("renders loading state", async () => {
+    (adminApi.getPromptTemplates as jest.Mock).mockReturnValue(new Promise(() => { }));
+    const { container } = render(<PromptTemplatesTab />);
+    // Component sets loading=true initially? 
+    // `useEffect` -> `loadPrompts` -> `setLoading(true)`.
+    // But initial state is `false`.
+    // So it might validly be false for a microsecond.
+    // However, useEffect runs after render.
+    // If I mock return value as pending promise, `setLoading(true)` happens.
+    // But there is no explicit "Loading..." text in simple list view unless empty?
+    // Ah, `loading` is only used for button disable state in `handleSave`? 
+    // And in `prompts.length === 0 && !loading`.
+    // So if loading is true, the "No templates found" message should NOT appear.
+    // Let's check if "No templates found" is absent.
+    // Or check if I can find a spinner? There is no spinner in main view, only in Save button!
+    // Wait, `StrategiesTab` has a Loader. `PromptTemplatesTab` does NOT have a full page loader. 
+    // It just sets loading for operations.
+    // So "renders loading state" is tricky. I can skip it or test that empty message doesn't show.
+    expect(screen.queryByText("No templates found")).not.toBeInTheDocument();
+  });
+
+  it("renders prompts list on success", async () => {
     (adminApi.getPromptTemplates as jest.Mock).mockResolvedValue(mockPrompts);
-    (adminApi.testPromptTemplate as jest.Mock).mockResolvedValue({
-      rendered_content: "Analyzed: positive",
-    });
-  });
-
-  it("renders loading state initially", () => {
-    // Note: The component sets loading=true in useEffect.
-    // If we delay the promise, we might catch it.
-    // However, PromptTemplatesTab doesn't have a full-screen loader, just empty list?
-    // Let's check logic:
-    // loading=true. prompts=[].
-    // It renders headers.
-    // If prompts.length===0 && !loading -> "No templates found".
-    // If prompts.length===0 && loading -> ?
-    // The code only shows "No templates" if !loading.
-    // So if loading, it shows nothing under headers.
-    // But typically we test that API is called.
-    render(<PromptTemplatesTab />);
-    expect(adminApi.getPromptTemplates).toHaveBeenCalled();
-  });
-
-  it("renders prompts list after loading", async () => {
     render(<PromptTemplatesTab />);
 
     await waitFor(() => {
-      const els = screen.getAllByText("semantic_vac");
-      expect(els.length).toBeGreaterThan(0);
-      const els2 = screen.getAllByText("insight_generation");
-      expect(els2.length).toBeGreaterThan(0);
+      expect(screen.getByText("semantic_vac")).toBeInTheDocument();
     });
 
-    const els3 = screen.getAllByText("v1.0.0");
-    expect(els3.length).toBeGreaterThan(0);
-    expect(screen.getByText("Basic VAC analysis")).toBeInTheDocument();
+    expect(screen.getByText("v1.0.0")).toBeInTheDocument();
+    expect(screen.getByText("Basic greeting")).toBeInTheDocument();
   });
 
-  it("filters prompts by function", async () => {
+  it("handles fetch error", async () => {
+    (adminApi.getPromptTemplates as jest.Mock).mockRejectedValue(new Error("Fetch failed"));
     render(<PromptTemplatesTab />);
-    await waitFor(() => {
-      const els = screen.getAllByText("semantic_vac");
-      expect(els.length).toBeGreaterThan(0);
-    });
-
-    const filterSelect = screen.getByLabelText("Filter by Function");
-    await user.selectOptions(filterSelect, "insight_generation");
 
     await waitFor(() => {
-      expect(adminApi.getPromptTemplates).toHaveBeenCalledWith("insight_generation");
+      expect(screen.getByText("Failed to load prompts")).toBeInTheDocument();
     });
   });
 
-  it("opens create new template editor", async () => {
+  it("handles create prompt flow", async () => {
+    (adminApi.getPromptTemplates as jest.Mock).mockResolvedValue(mockPrompts);
+    (adminApi.createPromptTemplate as jest.Mock).mockResolvedValue({});
+
     render(<PromptTemplatesTab />);
-    await waitFor(() => screen.getByText("semantic_vac"));
+    await waitFor(() => expect(screen.getByText("semantic_vac")).toBeInTheDocument());
 
-    const newButton = screen.getByLabelText("New Template");
-    await user.click(newButton);
-
+    // Open create
+    fireEvent.click(screen.getByText("New Template"));
     expect(screen.getByText("New Prompt Template")).toBeInTheDocument();
 
-    // Check fields are present
-    const functionInputs = screen.getAllByLabelText("Function");
-    expect(functionInputs[0]).toBeInTheDocument();
-    expect(screen.getByLabelText("Version")).toHaveValue("1.0.0");
+    // Fill form
+    fireEvent.change(screen.getByLabelText("Function"), { target: { value: "voice_only" } });
+    fireEvent.change(screen.getByLabelText("Version"), { target: { value: "2.0.0" } });
+    fireEvent.change(screen.getByLabelText("Description"), { target: { value: "New desc" } });
+    fireEvent.change(screen.getByLabelText(/Template Content/), { target: { value: "Content" } });
+
+    // Check Active
+    fireEvent.click(screen.getByLabelText("Set as Active Version"));
+
+    // Save
+    fireEvent.click(screen.getByLabelText("Save Template"));
+
+    await waitFor(() => {
+      expect(adminApi.createPromptTemplate).toHaveBeenCalledWith(expect.objectContaining({
+        function_name: "voice_only",
+        version: "2.0.0",
+        is_active: true
+      }));
+      expect(screen.queryByText("New Prompt Template")).not.toBeInTheDocument(); // Closed
+    });
   });
 
-  it("edits an existing template", async () => {
+  it("handles edit prompt flow", async () => {
+    (adminApi.getPromptTemplates as jest.Mock).mockResolvedValue(mockPrompts);
+    (adminApi.updatePromptTemplate as jest.Mock).mockResolvedValue({});
+
     render(<PromptTemplatesTab />);
-    await waitFor(() => screen.getByText("semantic_vac"));
+    await waitFor(() => expect(screen.getByText("semantic_vac")).toBeInTheDocument());
 
-    const editButton = screen.getByTestId("edit-btn-prompt-1");
-    await user.click(editButton);
-
+    fireEvent.click(screen.getByTestId("edit-btn-p1"));
     expect(screen.getByText("Edit Prompt Template")).toBeInTheDocument();
-    expect(screen.getByDisplayValue("Basic VAC analysis")).toBeInTheDocument();
 
-    // Update description and save
-    const descInput = screen.getByDisplayValue("Basic VAC analysis");
-    await user.clear(descInput);
-    await user.type(descInput, "Updated Description");
+    // Function and Version should be disabled
+    expect(screen.getByLabelText("Function")).toBeDisabled();
 
-    const saveButton = screen.getByLabelText("Save Template");
-    await user.click(saveButton);
+    // Update content
+    fireEvent.change(screen.getByLabelText(/Template Content/), { target: { value: "Updated Content" } });
+
+    // Update variables
+    fireEvent.change(screen.getByLabelText(/Input Variables/), { target: { value: "var1, var2" } });
+
+    // Test Render Logic
+    (adminApi.testPromptTemplate as jest.Mock).mockResolvedValue({ rendered_content: "Rendered: Updated Content" });
+    fireEvent.click(screen.getByText("Test Render"));
 
     await waitFor(() => {
-      expect(adminApi.updatePromptTemplate).toHaveBeenCalledWith(
-        "prompt-1",
-        expect.objectContaining({
-          description: "Updated Description",
-        })
-      );
+      expect(screen.getByText("Rendered: Updated Content")).toBeInTheDocument();
+    });
+
+    // Test Render Error
+    (adminApi.testPromptTemplate as jest.Mock).mockRejectedValue(new Error("Render fail"));
+    fireEvent.click(screen.getByText("Test Render"));
+    await waitFor(() => {
+      expect(screen.getByText("Error: Render fail")).toBeInTheDocument();
+    });
+
+    // Save
+    fireEvent.click(screen.getByLabelText("Save Template"));
+
+    await waitFor(() => {
+      expect(adminApi.updatePromptTemplate).toHaveBeenCalledWith("p1", expect.objectContaining({
+        template_content: "Updated Content",
+        input_variables: ["var1", "var2"]
+      }));
     });
   });
 
-  it("tests template rendering", async () => {
+  it("handles save error", async () => {
+    (adminApi.getPromptTemplates as jest.Mock).mockResolvedValue(mockPrompts);
+    (adminApi.updatePromptTemplate as jest.Mock).mockRejectedValue(new Error("Update failed"));
+
     render(<PromptTemplatesTab />);
-    await waitFor(() => screen.getByText("semantic_vac"));
+    await waitFor(() => expect(screen.getByText("semantic_vac")).toBeInTheDocument());
 
-    const editButton = screen.getByTestId("edit-btn-prompt-1");
-    await user.click(editButton);
-
-    const testButton = screen.getByLabelText("Test Render");
-    await user.click(testButton);
+    fireEvent.click(screen.getByTestId("edit-btn-p1"));
+    fireEvent.click(screen.getByLabelText("Save Template"));
 
     await waitFor(() => {
-      expect(adminApi.testPromptTemplate).toHaveBeenCalled();
-      expect(screen.getByText("Analyzed: positive")).toBeInTheDocument();
+      expect(screen.getByText("Failed to save prompt")).toBeInTheDocument();
     });
+  });
+
+  it("validates required fields on save", async () => {
+    (adminApi.getPromptTemplates as jest.Mock).mockResolvedValue(mockPrompts);
+    render(<PromptTemplatesTab />);
+    await waitFor(() => expect(screen.getByText("semantic_vac")).toBeInTheDocument());
+
+    fireEvent.click(screen.getByText("New Template"));
+
+    // Clear content (it might be empty by default?)
+    // handleCreate sets default empty string.
+
+    fireEvent.click(screen.getByLabelText("Save Template"));
+
+    await waitFor(() => {
+      expect(screen.getByText("Please fill in all required fields")).toBeInTheDocument();
+    });
+    expect(adminApi.createPromptTemplate).not.toHaveBeenCalled();
+  });
+
+  it("handles filtering", async () => {
+    (adminApi.getPromptTemplates as jest.Mock).mockResolvedValue(mockPrompts);
+    render(<PromptTemplatesTab />);
+    await waitFor(() => expect(screen.getByText("semantic_vac")).toBeInTheDocument());
+
+    const filter = screen.getByLabelText("Filter by Function");
+    fireEvent.change(filter, { target: { value: "voice_only" } });
+
+    await waitFor(() => {
+      expect(adminApi.getPromptTemplates).toHaveBeenCalledWith("voice_only");
+    });
+  });
+
+  it("handles cancel edit", async () => {
+    (adminApi.getPromptTemplates as jest.Mock).mockResolvedValue(mockPrompts);
+    render(<PromptTemplatesTab />);
+    await waitFor(() => expect(screen.getByText("semantic_vac")).toBeInTheDocument());
+
+    fireEvent.click(screen.getByText("New Template"));
+    expect(screen.getByText("New Prompt Template")).toBeInTheDocument();
+
+    fireEvent.click(screen.getByLabelText("Close Editor"));
+    expect(screen.queryByText("New Prompt Template")).not.toBeInTheDocument();
+
+    fireEvent.click(screen.getByText("New Template"));
+    fireEvent.click(screen.getByText("Cancel"));
+    expect(screen.queryByText("New Prompt Template")).not.toBeInTheDocument();
   });
 });

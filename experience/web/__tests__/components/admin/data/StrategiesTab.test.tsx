@@ -1,9 +1,9 @@
-import { render, screen, waitFor } from "@testing-library/react";
-import userEvent from "@testing-library/user-event";
+
+import { render, screen, fireEvent, waitFor, within } from "@testing-library/react";
 import { StrategiesTab } from "@/components/admin/data/StrategiesTab";
 import { adminApi } from "@/utils/api";
+import userEvent from "@testing-library/user-event";
 
-// Mock the API
 jest.mock("@/utils/api", () => ({
   adminApi: {
     getStrategies: jest.fn(),
@@ -13,152 +13,218 @@ jest.mock("@/utils/api", () => ({
   },
 }));
 
-// Mock data
-const mockStrategies = [
-  {
-    id: "1",
-    strategy_name: "Deep Breathing",
-    strategy_type: "Somatic",
-    description: "Slow breathing technique",
-    time_required: "5 mins",
-    difficulty_level: 1,
-    energy_cost: 1,
-    evidence_level: "meta_analysis",
-    clinical_validity: 0.9,
-    contraindications: "None",
-    usage_count: 10,
-    success_rate: 0.8,
-    detailed_steps: ["Inhale", "Hold", "Exhale"],
-    created_at: "2024-01-01T00:00:00Z",
-    updated_at: "2024-01-01T00:00:00Z",
-  },
-  {
-    id: "2",
-    strategy_name: "Cognitive Reframing",
-    strategy_type: "Cognitive",
-    description: "Challenge negative thoughts",
-    time_required: "15 mins",
-    difficulty_level: 4,
-    energy_cost: 3,
-    evidence_level: "rct",
-    clinical_validity: 0.85,
-    contraindications: "Acute distress",
-    usage_count: 5,
-    success_rate: 0.7,
-    detailed_steps: ["Identify thought", "Analyze evidence", "Reframe"],
-    created_at: "2024-01-02T00:00:00Z",
-    updated_at: "2024-01-02T00:00:00Z",
-  },
-];
+// Mock URL for export
+global.URL.createObjectURL = jest.fn(() => "blob:test");
+global.URL.revokeObjectURL = jest.fn();
 
 describe("StrategiesTab", () => {
+  const mockStrategies = [
+    {
+      id: "s1",
+      strategy_name: "CBT Reframe",
+      strategy_type: "Cognitive",
+      description: "Reframe negative thoughts.",
+      detailed_steps: ["Identify thought", "Challenge it"],
+      time_required: "10 mins",
+      difficulty_level: 3,
+      evidence_level: "rct",
+      contraindications: "Acute distress",
+      created_at: "2024-01-01"
+    }
+  ];
+
   beforeEach(() => {
     jest.clearAllMocks();
+  });
+
+  it("renders loading state", async () => {
+    (adminApi.getStrategies as jest.Mock).mockReturnValue(new Promise(() => { }));
+    const { container } = render(<StrategiesTab />);
+    expect(container.querySelector(".animate-spin")).toBeInTheDocument();
+  });
+
+  it("renders strategies list on success", async () => {
     (adminApi.getStrategies as jest.Mock).mockResolvedValue(mockStrategies);
-  });
-
-  it("renders loading state initially", async () => {
-    // Return a promise that doesn't resolve immediately to check loading state
-    (adminApi.getStrategies as jest.Mock).mockReturnValue(new Promise(() => {}));
-
-    render(<StrategiesTab />);
-    expect(screen.getByRole("status")).toBeInTheDocument(); // Loader2 likely has a role or we can find by class if needed, but usually spinners use role="status" or visible text fallback
-  });
-
-  it("renders strategies table after loading", async () => {
     render(<StrategiesTab />);
 
     await waitFor(() => {
-      expect(screen.getByText("Deep Breathing")).toBeInTheDocument();
-      expect(screen.getByText("Cognitive Reframing")).toBeInTheDocument();
+      expect(screen.getByText("CBT Reframe")).toBeInTheDocument();
     });
 
-    expect(screen.getByText("Somatic")).toBeInTheDocument();
     expect(screen.getByText("Cognitive")).toBeInTheDocument();
+    // List shows: Name, Type, Evidence, Description.
+    expect(screen.getByText("rct")).toBeInTheDocument();
+    expect(screen.getByText("Reframe negative thoughts.")).toBeInTheDocument();
   });
 
   it("handles fetch error", async () => {
-    (adminApi.getStrategies as jest.Mock).mockRejectedValue(new Error("Failed fetching"));
+    (adminApi.getStrategies as jest.Mock).mockRejectedValue(new Error("Fetch failed"));
     render(<StrategiesTab />);
 
     await waitFor(() => {
-      expect(screen.getByText("Failed fetching")).toBeInTheDocument();
+      expect(screen.getByText("Fetch failed")).toBeInTheDocument();
     });
   });
 
-  it("expands strategy details on click", async () => {
-    const user = userEvent.setup();
+  it("handles expand/collapse", async () => {
+    (adminApi.getStrategies as jest.Mock).mockResolvedValue(mockStrategies);
     render(<StrategiesTab />);
+    await waitFor(() => expect(screen.getByText("CBT Reframe")).toBeInTheDocument());
 
-    await waitFor(() => {
-      expect(screen.getByText("Deep Breathing")).toBeInTheDocument();
-    });
+    // Details hidden initially
+    expect(screen.queryByText("Detailed Steps")).not.toBeInTheDocument();
 
-    // Find expand button using aria-label
-    const expandButtons = screen.getAllByRole("button", { name: "Expand details" });
-    await user.click(expandButtons[0]);
+    // Expand
+    fireEvent.click(screen.getByLabelText("Expand details"));
+    expect(screen.getByText("Detailed Steps")).toBeInTheDocument();
+    expect(screen.getByText("Identify thought")).toBeInTheDocument();
 
-    await waitFor(() => {
-      expect(screen.getByText("Detailed Steps")).toBeInTheDocument();
-      expect(screen.getByText("Inhale")).toBeInTheDocument();
-    });
+    // Collapse
+    fireEvent.click(screen.getByLabelText("Collapse details"));
+    expect(screen.queryByText("Detailed Steps")).not.toBeInTheDocument();
   });
 
-  it("enters edit mode and updates strategy", async () => {
-    const user = userEvent.setup();
-    (adminApi.updateStrategy as jest.Mock).mockResolvedValue({
-      ...mockStrategies[0],
-      description: "Updated Description",
-    });
+  it("handles inline edit flow", async () => {
+    (adminApi.getStrategies as jest.Mock).mockResolvedValue(mockStrategies);
+    (adminApi.updateStrategy as jest.Mock).mockResolvedValue({});
 
     render(<StrategiesTab />);
+    await waitFor(() => expect(screen.getByText("CBT Reframe")).toBeInTheDocument());
+
+    // Click Edit
+    fireEvent.click(screen.getByLabelText("Edit"));
+
+    // Should auto-expand
+    expect(screen.getByText("Detailed Steps")).toBeInTheDocument();
+
+    // Description becomes textarea
+    const descInput = screen.getByDisplayValue("Reframe negative thoughts.");
+    fireEvent.change(descInput, { target: { value: "Updated desc" } });
+
+    // Edit steps
+    const steps = screen.getAllByDisplayValue(/Identify thought|Challenge it/);
+    expect(steps).toHaveLength(2);
+    fireEvent.change(steps[0], { target: { value: "Step 1 Modified" } });
+
+    // Add step
+    fireEvent.click(screen.getByText("Add Step"));
+    const newStep = screen.getByPlaceholderText("Step 3");
+    fireEvent.change(newStep, { target: { value: "Step 3" } });
+
+    // Remove step
+    fireEvent.click(screen.getAllByTitle("Remove step")[1]); // Remove "Challenge it"
+
+    // Difficulty
+    const diffInput = screen.getByDisplayValue("3");
+    fireEvent.change(diffInput, { target: { value: "4" } });
+
+    // Save
+    fireEvent.click(screen.getByLabelText("Save"));
 
     await waitFor(() => {
-      expect(screen.getByText("Deep Breathing")).toBeInTheDocument();
-    });
-
-    // Click Edit button
-    const editButton = screen.getAllByRole("button", { name: "Edit" })[0];
-    await user.click(editButton);
-
-    // Check if inputs appear
-    const descriptionInput = screen.getByDisplayValue("Slow breathing technique");
-    await user.clear(descriptionInput);
-    await user.type(descriptionInput, "Updated Description");
-
-    // Click Save
-    const saveButton = screen.getByRole("button", { name: "Save" });
-    await user.click(saveButton);
-
-    await waitFor(() => {
-      expect(adminApi.updateStrategy).toHaveBeenCalledWith(
-        "1",
-        expect.objectContaining({
-          description: "Updated Description",
-        })
-      );
-      // Should exit edit mode and show updated text (mock returns updated)
-      expect(screen.getByText("Updated Description")).toBeInTheDocument();
+      expect(adminApi.updateStrategy).toHaveBeenCalledWith("s1", expect.objectContaining({
+        description: "Updated desc",
+        detailed_steps: ["Step 1 Modified", "Step 3"],
+        difficulty_level: 4
+      }));
+      expect(screen.getByText("Strategy updated successfully.")).toBeInTheDocument();
     });
   });
 
-  it("handles export json", async () => {
-    const user = userEvent.setup();
+  it("handles cancel edit", async () => {
+    (adminApi.getStrategies as jest.Mock).mockResolvedValue(mockStrategies);
+    render(<StrategiesTab />);
+    await waitFor(() => expect(screen.getByText("CBT Reframe")).toBeInTheDocument());
+
+    fireEvent.click(screen.getByLabelText("Edit"));
+    expect(screen.getByDisplayValue("3")).toBeInTheDocument();
+
+    fireEvent.click(screen.getByLabelText("Cancel"));
+    expect(screen.queryByDisplayValue("3")).not.toBeInTheDocument();
+  });
+
+  it("handles save error", async () => {
+    (adminApi.getStrategies as jest.Mock).mockResolvedValue(mockStrategies);
+    (adminApi.updateStrategy as jest.Mock).mockRejectedValue(new Error("Update error"));
+
+    render(<StrategiesTab />);
+    await waitFor(() => expect(screen.getByText("CBT Reframe")).toBeInTheDocument());
+
+    fireEvent.click(screen.getByLabelText("Edit"));
+    fireEvent.click(screen.getByLabelText("Save"));
+
+    await waitFor(() => {
+      expect(screen.getByText("Update error")).toBeInTheDocument();
+    });
+  });
+
+  it("handles export", async () => {
+    (adminApi.getStrategies as jest.Mock).mockResolvedValue(mockStrategies);
     (adminApi.exportStrategies as jest.Mock).mockResolvedValue(mockStrategies);
 
-    // Mock URL.createObjectURL since JSDOM doesn't implement it
-    global.URL.createObjectURL = jest.fn(() => "blob:http://localhost/mock");
-    global.URL.revokeObjectURL = jest.fn();
-
     render(<StrategiesTab />);
+    await waitFor(() => expect(screen.getByText("CBT Reframe")).toBeInTheDocument());
+
+    fireEvent.click(screen.getByText("Export JSON"));
 
     await waitFor(() => {
-      expect(screen.getByText("Deep Breathing")).toBeInTheDocument();
+      expect(adminApi.exportStrategies).toHaveBeenCalled();
+      expect(screen.getByText("Strategies export downloaded successfully.")).toBeInTheDocument();
+    });
+  });
+
+  it("handles import success", async () => {
+    (adminApi.getStrategies as jest.Mock).mockResolvedValue(mockStrategies);
+    (adminApi.importStrategies as jest.Mock).mockResolvedValue({ updated: 1, created: 0, errors: [] });
+
+    const { container } = render(<StrategiesTab />);
+    await waitFor(() => expect(screen.getByText("CBT Reframe")).toBeInTheDocument());
+
+    // Simulate file upload
+    const file = new File([JSON.stringify(mockStrategies)], "strategies.json", { type: "application/json" });
+    Object.defineProperty(file, 'text', {
+      value: jest.fn().mockResolvedValue(JSON.stringify(mockStrategies))
     });
 
-    const exportButton = screen.getByText("Export JSON");
-    await user.click(exportButton);
+    const input = container.querySelector('input[type="file"]');
+    await userEvent.upload(input!, file);
 
-    expect(adminApi.exportStrategies).toHaveBeenCalled();
+    await waitFor(() => {
+      expect(adminApi.importStrategies).toHaveBeenCalled();
+      expect(screen.getByText("Import complete: 1 updated, 0 created.")).toBeInTheDocument();
+    });
+  });
+
+  it("handles import error", async () => {
+    (adminApi.getStrategies as jest.Mock).mockResolvedValue(mockStrategies);
+    // Mock file read error or API error
+    (adminApi.importStrategies as jest.Mock).mockRejectedValue(new Error("Import failed API"));
+
+    const { container } = render(<StrategiesTab />);
+    await waitFor(() => expect(screen.getByText("CBT Reframe")).toBeInTheDocument());
+
+    const file = new File(["{}"], "strategies.json", { type: "application/json" });
+    Object.defineProperty(file, 'text', {
+      value: jest.fn().mockResolvedValue("{}")
+    });
+
+    const input = container.querySelector('input[type="file"]');
+    await userEvent.upload(input!, file);
+
+    await waitFor(() => {
+      expect(screen.getByText("Import failed API")).toBeInTheDocument();
+    });
+  });
+
+  it("triggers import click", async () => {
+    (adminApi.getStrategies as jest.Mock).mockResolvedValue(mockStrategies);
+    const { container } = render(<StrategiesTab />);
+    await waitFor(() => expect(screen.getByText("CBT Reframe")).toBeInTheDocument());
+
+    const input = container.querySelector('input[type="file"]');
+    const clickSpy = jest.spyOn(input!, 'click');
+
+    fireEvent.click(screen.getByText("Import"));
+    expect(clickSpy).toHaveBeenCalled();
   });
 });

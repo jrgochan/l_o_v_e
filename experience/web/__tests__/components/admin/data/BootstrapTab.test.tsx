@@ -155,6 +155,42 @@ describe("BootstrapTab", () => {
     });
   });
 
+  it("handles fetch error", async () => {
+    (adminApi.getBootstrapData as jest.Mock).mockRejectedValue(new Error("Fetch failed"));
+    render(<BootstrapTab />);
+
+    await waitFor(() => {
+      // It logs error but might not show UI error? 
+      // The component code: console.error(...); setError("Failed to load data");
+      expect(screen.getByText("Failed to load data")).toBeInTheDocument();
+    });
+  });
+
+  it("handles cancel edit", async () => {
+    (adminApi.getBootstrapData as jest.Mock).mockResolvedValue(mockData);
+    render(<BootstrapTab />);
+    await waitFor(() => expect(screen.getByText("cat1")).toBeInTheDocument());
+
+    fireEvent.click(screen.getByLabelText("Add Item"));
+    expect(screen.getByText("New Item")).toBeInTheDocument();
+
+    fireEvent.click(screen.getByLabelText("Cancel"));
+    expect(screen.queryByText("New Item")).not.toBeInTheDocument();
+  });
+
+  it("handles type change in edit", async () => {
+    (adminApi.getBootstrapData as jest.Mock).mockResolvedValue(mockData);
+    render(<BootstrapTab />);
+    await waitFor(() => expect(screen.getByText("cat1")).toBeInTheDocument());
+
+    fireEvent.click(screen.getByLabelText("Add Item"));
+
+    const select = screen.getByLabelText("Data Type");
+    fireEvent.change(select, { target: { value: "path_template" } });
+
+    expect(select).toHaveValue("path_template");
+  });
+
   it("handles invalid JSON in editor", async () => {
     (adminApi.getBootstrapData as jest.Mock).mockResolvedValue(mockData);
     render(<BootstrapTab />);

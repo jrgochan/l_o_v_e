@@ -152,6 +152,12 @@ export function PromptTemplatesTab() {
         </div>
 
         <div className="grid grid-cols-2 gap-6 mb-6">
+          {error && (
+            <div className="col-span-2 bg-red-900/20 border border-red-900 text-red-200 px-4 py-3 rounded flex items-center gap-2 mb-4">
+              <AlertCircle className="w-5 h-5" />
+              {error}
+            </div>
+          )}
           <div>
             <label htmlFor="func-select" className="block text-sm font-medium text-gray-400 mb-1">
               Function
@@ -330,9 +336,8 @@ export function PromptTemplatesTab() {
         {prompts.map((prompt) => (
           <div
             key={prompt.id}
-            className={`bg-gray-900/50 border rounded-lg p-4 transition-colors ${
-              prompt.is_active ? "border-purple-500/50" : "border-gray-800 hover:border-gray-700"
-            }`}
+            className={`bg-gray-900/50 border rounded-lg p-4 transition-colors ${prompt.is_active ? "border-purple-500/50" : "border-gray-800 hover:border-gray-700"
+              }`}
           >
             <div className="flex justify-between items-start">
               <div>

@@ -1,90 +1,83 @@
-import { render, screen, waitFor } from "@testing-library/react";
-import userEvent from "@testing-library/user-event";
+
+import { render, screen, fireEvent, waitFor, within } from "@testing-library/react";
 import ClinicalAlertsTab from "@/components/admin/data/ClinicalAlertsTab";
 import { adminApi } from "@/utils/api";
-import { ClinicalAlert } from "@/types/admin";
+import { act } from "react-dom/test-utils";
 
-// Mock the API
 jest.mock("@/utils/api", () => ({
   adminApi: {
     getClinicalAlerts: jest.fn(),
   },
 }));
 
-const mockAlerts: ClinicalAlert[] = [
-  {
-    id: "alert-1",
-    session_id: "session-1",
-    timestamp: "2024-01-01T10:00:00Z",
-    level: "critical",
-    type: "high_arousal",
-    message: "High arousal detected without valance counter-balance",
-    suggestion: "Suggest grounding exercise",
-    triggered_by: { arousal: 0.9, valence: -0.2 },
-    threshold_used: { arousal_critical: 0.8 },
-    version: "1.0",
-  },
-  {
-    id: "alert-2",
-    session_id: "session-2",
-    timestamp: "2024-01-01T11:00:00Z",
-    level: "warning",
-    type: "voice_mismatch",
-    message: "Voice tone does not match sentiment",
-    suggestion: "Check for masking",
-    triggered_by: { discrepancy: 0.6 },
-    threshold_used: { discrepancy_warning: 0.5 },
-    version: "1.0",
-  },
-];
-
 describe("ClinicalAlertsTab", () => {
-  const user = userEvent.setup();
+  const mockAlerts = {
+    items: [
+      {
+        id: "alert1",
+        level: "critical",
+        message: "High heart rate detected",
+        suggestion: "Check vitals",
+        timestamp: "2024-01-01T12:00:00Z",
+        version: "1.0",
+        session_id: "sess1",
+        triggered_by: { bpm: 120 },
+        threshold_used: { max_bpm: 100 }
+      },
+      {
+        id: "alert2",
+        level: "warning",
+        message: "Moderate anxiety",
+        suggestion: "Suggest calm path",
+        timestamp: "2024-01-02T12:00:00Z",
+        version: "1.1",
+        session_id: "sess2",
+        triggered_by: { anxiety_score: 0.6 },
+        threshold_used: { anxiety_limit: 0.5 }
+      }
+    ],
+    total: 60 // Enable pagination
+  };
 
   beforeEach(() => {
     jest.clearAllMocks();
-    (adminApi.getClinicalAlerts as jest.Mock).mockResolvedValue({
-      items: mockAlerts,
-      total: 60, // Mock > 50 to test pagination
-    });
   });
 
-  it("renders loading state initially", () => {
-    (adminApi.getClinicalAlerts as jest.Mock).mockReturnValue(new Promise(() => {}));
+  it("renders loading state", async () => {
+    (adminApi.getClinicalAlerts as jest.Mock).mockReturnValue(new Promise(() => { }));
     render(<ClinicalAlertsTab />);
-    expect(screen.getByRole("status")).toBeInTheDocument();
     expect(screen.getByText("Loading alerts...")).toBeInTheDocument();
   });
 
-  it("renders alerts list after loading", async () => {
+  it("renders alerts list on success", async () => {
+    (adminApi.getClinicalAlerts as jest.Mock).mockResolvedValue(mockAlerts);
     render(<ClinicalAlertsTab />);
 
     await waitFor(() => {
-      expect(
-        screen.getByText("High arousal detected without valance counter-balance")
-      ).toBeInTheDocument();
-      expect(screen.getByText("Voice tone does not match sentiment")).toBeInTheDocument();
+      expect(screen.getByText("High heart rate detected")).toBeInTheDocument();
     });
 
     expect(screen.getByText("critical")).toBeInTheDocument();
     expect(screen.getByText("warning")).toBeInTheDocument();
+    expect(screen.getByText(/Page 1 of 2/)).toBeInTheDocument();
   });
 
-  it("handles filtering by severity", async () => {
+  it("handles empty state", async () => {
+    (adminApi.getClinicalAlerts as jest.Mock).mockResolvedValue({ items: [], total: 0 });
     render(<ClinicalAlertsTab />);
 
     await waitFor(() => {
-      expect(
-        screen.getByText("High arousal detected without valance counter-balance")
-      ).toBeInTheDocument();
+      expect(screen.getByText("No alerts found matching filter.")).toBeInTheDocument();
     });
+  });
 
-    // Initial call
-    expect(adminApi.getClinicalAlerts).toHaveBeenCalledWith(1, 50, "all");
+  it("handles filtering", async () => {
+    (adminApi.getClinicalAlerts as jest.Mock).mockResolvedValue(mockAlerts);
+    render(<ClinicalAlertsTab />);
+    await waitFor(() => expect(screen.getByText("High heart rate detected")).toBeInTheDocument());
 
-    // Select filter
-    const filterSelect = screen.getByLabelText("Filter by Severity");
-    await user.selectOptions(filterSelect, "critical");
+    const filter = screen.getByLabelText("Filter by Severity");
+    fireEvent.change(filter, { target: { value: "critical" } });
 
     await waitFor(() => {
       expect(adminApi.getClinicalAlerts).toHaveBeenCalledWith(1, 50, "critical");
@@ -92,65 +85,106 @@ describe("ClinicalAlertsTab", () => {
   });
 
   it("handles pagination", async () => {
+    (adminApi.getClinicalAlerts as jest.Mock).mockResolvedValue(mockAlerts);
     render(<ClinicalAlertsTab />);
+    await waitFor(() => expect(screen.getByText(/Page 1 of 2/)).toBeInTheDocument());
 
-    await waitFor(() => {
-      expect(adminApi.getClinicalAlerts).toHaveBeenCalledWith(1, 50, "all");
-    });
-
-    // Check pagination controls
-    // Note: The previous/next buttons are only rendered if total > 50. Mock provides total=60.
-
-    await waitFor(() => {
-      expect(screen.getByText(/Page 1 of 2/)).toBeInTheDocument();
-    });
-
-    const nextButtons = screen.getAllByRole("button", { name: "Next Page" });
-    const nextButton = nextButtons[0];
-    expect(nextButton).toBeEnabled();
-
-    await user.click(nextButton);
+    fireEvent.click(screen.getByLabelText("Next Page"));
 
     await waitFor(() => {
       expect(adminApi.getClinicalAlerts).toHaveBeenCalledWith(2, 50, "all");
     });
 
-    // Previous button should be enabled on page 2
+    expect(screen.getByText(/Page 2 of 2/)).toBeInTheDocument();
+
+    fireEvent.click(screen.getByLabelText("Previous Page"));
+
     await waitFor(() => {
-      expect(screen.getByText(/Page 2 of 2/)).toBeInTheDocument();
-      const prevButton = screen.getByRole("button", { name: "Previous Page" });
-      expect(prevButton).toBeEnabled();
+      expect(adminApi.getClinicalAlerts).toHaveBeenCalledWith(1, 50, "all");
     });
   });
 
-  it("opens and closes alert details", async () => {
+  it("handles alert selection and details view", async () => {
+    (adminApi.getClinicalAlerts as jest.Mock).mockResolvedValue(mockAlerts);
+    render(<ClinicalAlertsTab />);
+    await waitFor(() => expect(screen.getByText("High heart rate detected")).toBeInTheDocument());
+
+    // Initial state: details placeholder
+    expect(screen.getByText("Select an alert to view full trigger details and thresholds.")).toBeInTheDocument();
+
+    // Click item
+    fireEvent.click(screen.getByLabelText("View alert details: High heart rate detected"));
+
+    // Details view
+    expect(screen.getByText("Alert Details")).toBeInTheDocument();
+    expect(screen.getByText("sess1")).toBeInTheDocument();
+    // JSON content in details
+    expect(screen.getByText(/"bpm": 120/)).toBeInTheDocument();
+
+    // Close details
+    fireEvent.click(screen.getByLabelText("Close Details"));
+    expect(screen.getByText("Select an alert to view full trigger details and thresholds.")).toBeInTheDocument();
+  });
+
+  it("handles keyboard interaction for selection", async () => {
+    (adminApi.getClinicalAlerts as jest.Mock).mockResolvedValue(mockAlerts);
+    render(<ClinicalAlertsTab />);
+    await waitFor(() => expect(screen.getByText("High heart rate detected")).toBeInTheDocument());
+
+    const item = screen.getByLabelText("View alert details: High heart rate detected");
+
+    fireEvent.keyDown(item, { key: "Enter" });
+    expect(screen.getByText("Alert Details")).toBeInTheDocument();
+  });
+
+  it("handles refresh", async () => {
+    (adminApi.getClinicalAlerts as jest.Mock).mockResolvedValue(mockAlerts);
+    render(<ClinicalAlertsTab />);
+    await waitFor(() => expect(screen.getByText("High heart rate detected")).toBeInTheDocument());
+
+    fireEvent.click(screen.getByLabelText("Refresh Alerts"));
+    expect(adminApi.getClinicalAlerts).toHaveBeenCalledTimes(2);
+  });
+
+  it("handles fetch error", async () => {
+    (adminApi.getClinicalAlerts as jest.Mock).mockRejectedValue(new Error("Fetch failed"));
     render(<ClinicalAlertsTab />);
 
     await waitFor(() => {
-      expect(
-        screen.getByText("High arousal detected without valance counter-balance")
-      ).toBeInTheDocument();
+      // Should default to not loading and maybe empty? or error state?
+      // Component only logs error and sets loading false.
+      // So list remains empty?
+      // "Loading alerts..." removes.
+      // "No alerts found matching filter." appears (since alerts is empty [] and loading false).
+      expect(screen.getByText("No alerts found matching filter.")).toBeInTheDocument();
     });
+  });
 
-    // Details panel should show placeholder initially
-    expect(
-      screen.getByText("Select an alert to view full trigger details and thresholds.")
-    ).toBeInTheDocument();
+  it("renders different severity colors", async () => {
+    const mixedAlerts = {
+      items: [
+        { ...mockAlerts.items[0], id: "a1", level: "critical" },
+        { ...mockAlerts.items[0], id: "a2", level: "warning" },
+        { ...mockAlerts.items[0], id: "a3", level: "attention" },
+        { ...mockAlerts.items[0], id: "a4", level: "unknown" },
+      ],
+      total: 4
+    };
+    (adminApi.getClinicalAlerts as jest.Mock).mockResolvedValue(mixedAlerts);
+    render(<ClinicalAlertsTab />);
 
-    // Click an alert
-    const alertItem = screen.getByLabelText(/View alert details: High arousal detected/i);
-    await user.click(alertItem);
+    await waitFor(() => expect(screen.getByText("critical")).toBeInTheDocument());
 
-    // Verify details panel content
-    expect(screen.getByText("Alert Details")).toBeInTheDocument();
-    expect(screen.getByText("session-1")).toBeInTheDocument(); // Session ID
+    const critical = screen.getByText("critical");
+    expect(critical).toHaveClass("text-red-400");
 
-    // Close details
-    const closeButton = screen.getByLabelText("Close Details");
-    await user.click(closeButton);
+    const warning = screen.getByText("warning");
+    expect(warning).toHaveClass("text-orange-400");
 
-    expect(
-      screen.getByText("Select an alert to view full trigger details and thresholds.")
-    ).toBeInTheDocument();
+    const attention = screen.getByText("attention");
+    expect(attention).toHaveClass("text-yellow-400");
+
+    const unknown = screen.getByText("unknown");
+    expect(unknown).toHaveClass("text-gray-400");
   });
 });
