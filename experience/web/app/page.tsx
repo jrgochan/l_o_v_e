@@ -532,8 +532,7 @@ export default function ZenExperience() {
       {/* Pure Soul Sphere Visualization */}
       <Scene />
 
-      {/* VAC Axis Labels (toggle with 'A' key) */}
-      <SimpleAxisLabels />
+      {/* VAC Axis Labels (toggle with 'A' key) - Now 3D in Scene */}
 
       {/* Cinematic Overlay (toggleable) */}
       <CinematicOverlay

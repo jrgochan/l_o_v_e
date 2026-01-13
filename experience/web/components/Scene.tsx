@@ -17,6 +17,7 @@ import { TransitionPathRenderer } from "./TransitionPathRenderer";
 import { WaypointTooltip } from "./WaypointTooltip";
 import { Stars } from "@react-three/drei";
 import { VACAnimator } from "@/components/VACAnimator";
+import { VACAxisLabels3D } from "@/components/VACAxisLabels3D";
 
 import { useExperienceStore } from "@/stores/useExperienceStore";
 import { useSettingsStore } from "@/stores/useSettingsStore";
@@ -115,6 +116,9 @@ export function Scene() {
           maxDistance={10}
           enabled={!isFlying}
         />
+
+        {/* 3D Axis Labels (Helper) */}
+        <VACAxisLabels3D />
       </Canvas>
 
       {/* Tooltip overlay */}
@@ -124,12 +128,12 @@ export function Scene() {
           position={hoveredWaypoint.screenPos}
           waypointState={
             hoveredWaypoint.state as
-              | "start"
-              | "goal"
-              | "reached"
-              | "current"
-              | "locked"
-              | "waypoint"
+            | "start"
+            | "goal"
+            | "reached"
+            | "current"
+            | "locked"
+            | "waypoint"
           }
         />
       )}

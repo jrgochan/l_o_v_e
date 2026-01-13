@@ -2,28 +2,28 @@ import { render } from "@testing-library/react";
 import { ViewerPathFlyover } from "../../components/ViewerPathFlyover";
 import * as THREE from "three";
 
-// Mock Store
 const mockSetIsFlying = jest.fn();
-const mockState = {
-  transitionPath: {
-    current_state: { emotion: "Joy", vac: [0, 0, 0] },
-    goal_state: { emotion: "Peace", vac: [1, 1, 1] },
-    waypoints: [],
-  },
-  isFlying: true,
-  setIsFlying: mockSetIsFlying,
-  flyoverSpeed: 1.0,
-  setFlyoverProgress: jest.fn(),
-  setFlyoverCurrentWaypointIndex: jest.fn(),
-};
+jest.mock("@/stores/useExperienceStore", () => {
+  const mockState = {
+    transitionPath: {
+      current_state: { emotion: "Joy", vac: [0, 0, 0] },
+      goal_state: { emotion: "Peace", vac: [1, 1, 1] },
+      waypoints: [],
+    },
+    isFlying: true,
+    setIsFlying: jest.fn(),
+    flyoverSpeed: 1.0,
+    setFlyoverProgress: jest.fn(),
+    setFlyoverCurrentWaypointIndex: jest.fn(),
+  };
 
-const mockUseExperienceStore = jest.fn((selector: any) => selector(mockState));
-// Attach getState method
-(mockUseExperienceStore as any).getState = jest.fn(() => mockState);
+  const useStore = jest.fn((selector) => selector(mockState));
+  (useStore as any).getState = jest.fn(() => mockState);
 
-jest.mock("@/stores/useExperienceStore", () => ({
-  useExperienceStore: mockUseExperienceStore,
-}));
+  return {
+    useExperienceStore: useStore,
+  };
+});
 
 // Mock R3F
 const mockUseThree = jest.fn();

@@ -25,6 +25,34 @@ function getEmotionColor(valence: number): string {
   return "#ef4444"; // red-500
 }
 
+// Helper to get color for V, A, C components matching AxisLabels
+function getVacComponentColor(value: number, component: 'V' | 'A' | 'C'): string {
+  // Colors generated from Tailwind 400 series for visibility on dark bg
+  const colors = {
+    V: {
+      positive: "#22d3ee", // cyan-400
+      neutral: "#94a3b8",  // slate-400 (near zero)
+      negative: "#f87171", // red-400
+    },
+    A: {
+      positive: "#facc15", // yellow-400
+      neutral: "#94a3b8",
+      negative: "#60a5fa", // blue-400
+    },
+    C: {
+      positive: "#c084fc", // purple-400
+      neutral: "#94a3b8",
+      negative: "#9ca3af", // gray-400
+    },
+  };
+
+  const componentColors = colors[component];
+
+  if (value > 0.05) return componentColors.positive;
+  if (value < -0.05) return componentColors.negative;
+  return componentColors.neutral;
+}
+
 export function PathDetailsOverlay() {
   const transitionPath = useExperienceStore((state) => state.transitionPath);
   const flyoverProgress = useExperienceStore((state) => state.flyoverProgress);
@@ -68,6 +96,7 @@ export function PathDetailsOverlay() {
         description: "Your emotional point of departure.",
         index: 0,
         color: getEmotionColor(transitionPath.current_state.vac[0]),
+        vac: transitionPath.current_state.vac,
       };
     } else if (currentIndex === totalPoints - 1) {
       return {
@@ -77,6 +106,7 @@ export function PathDetailsOverlay() {
         description: "Your desired emotional state.",
         index: totalPoints - 1,
         color: getEmotionColor(transitionPath.goal_state.vac[0]),
+        vac: transitionPath.goal_state.vac,
       };
     } else {
       const wp = waypoints[currentIndex - 1];
@@ -89,6 +119,7 @@ export function PathDetailsOverlay() {
           index: currentIndex,
           // Check if wp has vac, otherwise default to neutral logic or look it up (assuming it has vac per interface)
           color: wp.vac ? getEmotionColor(wp.vac[0]) : "#fbbf24",
+          vac: wp.vac,
         }
         : null;
     }
@@ -263,6 +294,13 @@ export function PathDetailsOverlay() {
                         <span className="text-[10px] text-white/40 uppercase tracking-wider hidden sm:inline-block">
                           {item.label}
                         </span>
+                        {item.vac && (
+                          <span className="text-[9px] font-mono ml-0.5 tracking-tight flex gap-1">
+                            <span style={{ color: getVacComponentColor(item.vac[0], 'V') }}>V:{item.vac[0].toFixed(2)}</span>
+                            <span style={{ color: getVacComponentColor(item.vac[1], 'A') }}>A:{item.vac[1].toFixed(2)}</span>
+                            <span style={{ color: getVacComponentColor(item.vac[2], 'C') }}>C:{item.vac[2].toFixed(2)}</span>
+                          </span>
+                        )}
                       </div>
                     </animated.div>
                   )
