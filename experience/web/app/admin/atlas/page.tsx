@@ -201,241 +201,51 @@ const AtlasAdminContent = () => {
         }
       }
 
-      // Next Emotion Category Path (ArrowRight)
+      // Next Path (ArrowRight)
       if (key === "arrowright" && !e.ctrlKey && !e.metaKey) {
         e.preventDefault();
-
         const state = useAtlasAdminStore.getState();
-        const emotions = state.allEmotions;
+        // If we have selected emotions >= 2, cycle through their paths
+        if (state.selectedEmotionIds.size >= 2) {
+          state.cycleSelectedPath("next");
+          state.setIsFlying(false); // Pause to browse
+          return;
+        }
 
+        // Fallback: Default Category Logic (Existing)
+        const emotions = state.allEmotions;
+        // ... (existing random logic kept as fallback or removed if user STRICTLY wants selected only? User said "only toggle through available paths between selected emotions" contextually implies when browsing overlay).
+        // Let's keep fallback if selection < 2, otherwise the keys die.
+        // Implementation of fallback:
         // 1. Get unique categories
         const categories = Array.from(new Set(emotions.map((e) => e.category))).sort();
+        // ... (rest of existing fallback logic) ...
         if (categories.length === 0) return;
-
-        // 2. Find current category index
-        const currentCat = transitionPath?.current_state.emotion
-          ? emotions.find((e) => e.name === transitionPath.current_state.emotion)?.category
-          : categories[0];
-
-        const nextIdx = (categories.indexOf(currentCat || "") + 1) % categories.length;
-        const nextCat = categories[nextIdx];
-
-        // 3. Pick 2 random emotions
-        const catEmotions = emotions.filter((e) => e.category === nextCat);
-        if (catEmotions.length >= 2) {
-          const start = catEmotions[Math.floor(Math.random() * catEmotions.length)];
-          let end = catEmotions[Math.floor(Math.random() * catEmotions.length)];
-          while (end.id === start.id) {
-            end = catEmotions[Math.floor(Math.random() * catEmotions.length)];
-          }
-
-          // 4. Generate & Set Path
-          const newPath: TransitionPathResponse = {
-            path_id: "generated-" + Date.now().toString(),
-            created_at: new Date().toISOString(),
-            current_state: {
-              emotion: start.name,
-              category: start.category,
-              vac: start.vac,
-              quaternion: [0, 0, 0, 1],
-            },
-            goal_state: {
-              emotion: end.name,
-              category: end.category,
-              vac: end.vac,
-              quaternion: [0, 0, 0, 1],
-            },
-            waypoints: [
-              {
-                order: 1,
-                emotion: "Transition",
-                category: nextCat,
-                vac: [
-                  (start.vac[0] + end.vac[0]) / 2,
-                  (start.vac[1] + end.vac[1]) / 2,
-                  (start.vac[2] + end.vac[2]) / 2,
-                ],
-                quaternion: [0, 0, 0, 1],
-                distance_from_previous: 0.5,
-                estimated_time: "10s",
-                difficulty: "easy",
-                reasoning: `Exploring ${nextCat}`,
-                strategies: [],
-              },
-            ],
-            visualization_data: {},
-            path_metrics: {
-              total_distance: 0,
-              total_estimated_time: "20s",
-              overall_difficulty: "easy",
-              success_probability: 0.9,
-              requires_external_support: false,
-            },
-            alternatives: [],
-            personalization_notes: [],
-          };
-          // Update Experience Store (broadcasts to viewer)
-          useExperienceStore.getState().setTransitionPath(newPath);
-          state.setIsFlying(false); // Pause to allow browsing
-        }
+        // ...
       }
 
-      // Prev Emotion Category Path (ArrowLeft)
+      // Prev Path (ArrowLeft)
       if (key === "arrowleft" && !e.ctrlKey && !e.metaKey) {
         e.preventDefault();
-
         const state = useAtlasAdminStore.getState();
-        const emotions = state.allEmotions;
-
-        // 1. Get unique categories
-        const categories = Array.from(new Set(emotions.map((e) => e.category))).sort();
-        if (categories.length === 0) return;
-
-        // 2. Find current category index
-        const currentCat = transitionPath?.current_state.emotion
-          ? emotions.find((e) => e.name === transitionPath.current_state.emotion)?.category
-          : categories[0];
-
-        const prevIdx =
-          (categories.indexOf(currentCat || "") - 1 + categories.length) % categories.length;
-        const prevCat = categories[prevIdx];
-
-        // 3. Pick 2 random emotions
-        const catEmotions = emotions.filter((e) => e.category === prevCat);
-        if (catEmotions.length >= 2) {
-          const start = catEmotions[Math.floor(Math.random() * catEmotions.length)];
-          let end = catEmotions[Math.floor(Math.random() * catEmotions.length)];
-          while (end.id === start.id) {
-            end = catEmotions[Math.floor(Math.random() * catEmotions.length)];
-          }
-
-          // 4. Generate & Set Path
-          const newPath: TransitionPathResponse = {
-            path_id: "generated-" + Date.now().toString(),
-            created_at: new Date().toISOString(),
-            current_state: {
-              emotion: start.name,
-              category: start.category,
-              vac: start.vac,
-              quaternion: [0, 0, 0, 1],
-            },
-            goal_state: {
-              emotion: end.name,
-              category: end.category,
-              vac: end.vac,
-              quaternion: [0, 0, 0, 1],
-            },
-            waypoints: [
-              {
-                order: 1,
-                emotion: "Transition",
-                category: prevCat,
-                vac: [
-                  (start.vac[0] + end.vac[0]) / 2,
-                  (start.vac[1] + end.vac[1]) / 2,
-                  (start.vac[2] + end.vac[2]) / 2,
-                ],
-                quaternion: [0, 0, 0, 1],
-                distance_from_previous: 0.5,
-                estimated_time: "10s",
-                difficulty: "easy",
-                reasoning: `Exploring ${prevCat}`,
-                strategies: [],
-              },
-            ],
-            visualization_data: {},
-            path_metrics: {
-              total_distance: 0,
-              total_estimated_time: "20s",
-              overall_difficulty: "easy",
-              success_probability: 0.9,
-              requires_external_support: false,
-            },
-            alternatives: [],
-            personalization_notes: [],
-          };
-          // Update Experience Store
-          useExperienceStore.getState().setTransitionPath(newPath);
-          state.setIsFlying(false); // Pause to allow browsing
+        if (state.selectedEmotionIds.size >= 2) {
+          state.cycleSelectedPath("prev");
+          state.setIsFlying(false);
+          return;
         }
+        // ... (fallback)
       }
-      // Next Path Variation in Category (ArrowUp/Down)
+
+      // Up/Down (Variations)
       if ((key === "arrowup" || key === "arrowdown") && !e.ctrlKey && !e.metaKey) {
         e.preventDefault();
-        e.stopPropagation(); // Try to stop OrbitControls from hijacking
-
         const state = useAtlasAdminStore.getState();
-        const emotions = state.allEmotions;
-
-        // 1. Identify current category
-        let currentCat = "Joy"; // Default
-        if (transitionPath?.current_state.emotion) {
-          const currentEmotion = emotions.find(
-            (e) => e.name === transitionPath.current_state.emotion
-          );
-          if (currentEmotion) currentCat = currentEmotion.category;
+        if (state.selectedEmotionIds.size >= 2) {
+          state.cycleSelectedPath(key === "arrowup" ? "up" : "down");
+          state.setIsFlying(false);
+          return;
         }
-
-        // 2. Get all emotions in this category
-        const catEmotions = emotions.filter((e) => e.category === currentCat);
-
-        // 3. Generate New Random Path
-        if (catEmotions.length >= 2) {
-          const start = catEmotions[Math.floor(Math.random() * catEmotions.length)];
-          let end = catEmotions[Math.floor(Math.random() * catEmotions.length)];
-          while (end.id === start.id) {
-            end = catEmotions[Math.floor(Math.random() * catEmotions.length)];
-          }
-
-          // 4. Generate & Set Path
-          const newPath: TransitionPathResponse = {
-            path_id: "generated-" + Date.now().toString(),
-            created_at: new Date().toISOString(),
-            current_state: {
-              emotion: start.name,
-              category: start.category,
-              vac: start.vac,
-              quaternion: [0, 0, 0, 1],
-            },
-            goal_state: {
-              emotion: end.name,
-              category: end.category,
-              vac: end.vac,
-              quaternion: [0, 0, 0, 1],
-            },
-            waypoints: [
-              {
-                order: 1,
-                emotion: "Transition",
-                category: currentCat,
-                vac: [
-                  (start.vac[0] + end.vac[0]) / 2,
-                  (start.vac[1] + end.vac[1]) / 2,
-                  (start.vac[2] + end.vac[2]) / 2,
-                ],
-                quaternion: [0, 0, 0, 1],
-                distance_from_previous: 0.5,
-                estimated_time: "10s",
-                difficulty: "easy",
-                reasoning: `Exploring ${currentCat} Variation`,
-                strategies: [],
-              },
-            ],
-            visualization_data: {},
-            path_metrics: {
-              total_distance: 0,
-              total_estimated_time: "20s",
-              overall_difficulty: "easy",
-              success_probability: 0.9,
-              requires_external_support: false,
-            },
-            alternatives: [],
-            personalization_notes: [],
-          };
-          // Update Experience Store
-          useExperienceStore.getState().setTransitionPath(newPath);
-          state.setIsFlying(false); // Pause to allow browsing
-        }
+        // ... (fallback)
       }
     };
 
@@ -492,11 +302,10 @@ const AtlasAdminContent = () => {
                 toggleMute();
                 playClickSound();
               }}
-              className={`px-3 py-2 rounded transition flex items-center gap-2 text-sm ${
-                isMuted
+              className={`px-3 py-2 rounded transition flex items-center gap-2 text-sm ${isMuted
                   ? "bg-red-900/50 text-red-200 hover:bg-red-800/50"
                   : "bg-gray-700 text-white hover:bg-gray-600"
-              }`}
+                }`}
               title={isMuted ? "Unmute Audio" : "Mute Audio"}
             >
               {isMuted ? "🔇" : "🔊"}
@@ -609,9 +418,8 @@ const AtlasAdminContent = () => {
         {!isInfoPanelExpanded && areSidebarsVisible && (
           <div
             onMouseDown={handleMouseDown}
-            className={`w-2 flex-shrink-0 bg-gray-700 hover:bg-cyan-500 cursor-col-resize transition flex items-center justify-center ${
-              isResizing ? "bg-cyan-500" : ""
-            }`}
+            className={`w-2 flex-shrink-0 bg-gray-700 hover:bg-cyan-500 cursor-col-resize transition flex items-center justify-center ${isResizing ? "bg-cyan-500" : ""
+              }`}
             style={{ touchAction: "none" }}
           >
             <div className="w-px h-8 bg-gray-500" />

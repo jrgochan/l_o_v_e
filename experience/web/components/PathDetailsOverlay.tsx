@@ -81,14 +81,14 @@ export function PathDetailsOverlay() {
       const wp = waypoints[currentIndex - 1];
       return wp
         ? {
-            id: `wp-${currentIndex}`,
-            label: `Step ${currentIndex + 1}`,
-            emotion: wp.emotion,
-            description: wp.reasoning || "Transitioning through this emotional state.",
-            index: currentIndex,
-            // Check if wp has vac, otherwise default to neutral logic or look it up (assuming it has vac per interface)
-            color: wp.vac ? getEmotionColor(wp.vac[0]) : "#fbbf24",
-          }
+          id: `wp-${currentIndex}`,
+          label: `Step ${currentIndex + 1}`,
+          emotion: wp.emotion,
+          description: wp.reasoning || "Transitioning through this emotional state.",
+          index: currentIndex,
+          // Check if wp has vac, otherwise default to neutral logic or look it up (assuming it has vac per interface)
+          color: wp.vac ? getEmotionColor(wp.vac[0]) : "#fbbf24",
+        }
         : null;
     }
   }, [currentIndex, totalPoints, waypoints, transitionPath]);
@@ -109,6 +109,12 @@ export function PathDetailsOverlay() {
     config: { tension: 280, friction: 60 },
   });
 
+  // Nav Actions
+  const cycleSelectedPath = useAtlasAdminStore((state) => state.cycleSelectedPath);
+
+  // Create a selector for Admin Store to avoid unnecessary re-renders
+  const setAdminIsFlying = useAtlasAdminStore((state) => state.setIsFlying);
+
   if (!transitionPath) {
     return (
       <div className="absolute top-8 left-1/2 -translate-x-1/2 px-6 py-3 rounded-full bg-black/30 backdrop-blur-md border border-white/10 text-white/40 text-xs uppercase tracking-widest font-medium pointer-events-none">
@@ -128,7 +134,11 @@ export function PathDetailsOverlay() {
         <div className="flex items-center gap-3">
           {/* Play/Pause Main Button */}
           <button
-            onClick={() => setIsFlying(!isFlying)}
+            onClick={() => {
+              const newState = !isFlying;
+              setIsFlying(newState);
+              setAdminIsFlying(newState);
+            }}
             className="w-12 h-12 rounded-full bg-white text-black flex items-center justify-center shadow-[0_0_15px_rgba(255,255,255,0.2)] hover:scale-105 hover:shadow-[0_0_20px_rgba(255,255,255,0.4)] transition-all active:scale-95"
           >
             {isFlying ? (
@@ -142,6 +152,7 @@ export function PathDetailsOverlay() {
           <button
             onClick={() => {
               setIsFlying(false);
+              setAdminIsFlying(false);
               setFlyoverProgress(0);
             }}
             className="w-10 h-10 rounded-full flex items-center justify-center text-white/30 hover:text-white hover:bg-white/10 transition-all"
@@ -250,11 +261,10 @@ export function PathDetailsOverlay() {
               onClick={() => setFlyoverSpeed(s)}
               className={`
                                 w-7 h-7 rounded-full flex items-center justify-center text-[10px] font-bold transition-all
-                                ${
-                                  flyoverSpeed === s
-                                    ? "bg-white text-black shadow-sm"
-                                    : "text-white/30 hover:bg-white/10 hover:text-white"
-                                }
+                                ${flyoverSpeed === s
+                  ? "bg-white text-black shadow-sm"
+                  : "text-white/30 hover:bg-white/10 hover:text-white"
+                }
                             `}
             >
               {s}x
@@ -266,33 +276,45 @@ export function PathDetailsOverlay() {
         <div className="w-px h-8 bg-white/10 mx-2" />
 
         <div className="flex items-center gap-4 mr-1">
-          {/* Category Nav */}
+          {/* Category Nav (Left/Right) - Maps to Prev/Next Path */}
           <div className="flex flex-col items-center gap-1 group">
             <div className="flex items-center gap-1">
-              <div className="w-5 h-5 rounded border border-white/10 flex items-center justify-center bg-white/5 text-white/50 shadow-sm group-hover:border-white/20 transition-colors">
+              <button
+                onClick={() => cycleSelectedPath("prev")}
+                className="w-5 h-5 rounded border border-white/10 flex items-center justify-center bg-white/5 text-white/50 shadow-sm hover:bg-white/20 hover:text-white transition-colors"
+              >
                 <ChevronLeft size={10} />
-              </div>
-              <div className="w-5 h-5 rounded border border-white/10 flex items-center justify-center bg-white/5 text-white/50 shadow-sm group-hover:border-white/20 transition-colors">
+              </button>
+              <button
+                onClick={() => cycleSelectedPath("next")}
+                className="w-5 h-5 rounded border border-white/10 flex items-center justify-center bg-white/5 text-white/50 shadow-sm hover:bg-white/20 hover:text-white transition-colors"
+              >
                 <ChevronRight size={10} />
-              </div>
+              </button>
             </div>
             <span className="text-[7px] text-white/20 uppercase tracking-widest font-semibold group-hover:text-white/40 transition-colors">
-              Category
+              Path
             </span>
           </div>
 
-          {/* Waypoint Nav */}
+          {/* Waypoint Nav (Up/Down) - Maps to Up/Down Path (or Variation) */}
           <div className="flex flex-col items-center gap-1 group">
             <div className="flex items-center gap-1">
-              <div className="w-5 h-5 rounded border border-white/10 flex items-center justify-center bg-white/5 text-white/50 shadow-sm group-hover:border-white/20 transition-colors">
+              <button
+                onClick={() => cycleSelectedPath("up")}
+                className="w-5 h-5 rounded border border-white/10 flex items-center justify-center bg-white/5 text-white/50 shadow-sm hover:bg-white/20 hover:text-white transition-colors"
+              >
                 <ChevronUp size={10} />
-              </div>
-              <div className="w-5 h-5 rounded border border-white/10 flex items-center justify-center bg-white/5 text-white/50 shadow-sm group-hover:border-white/20 transition-colors">
+              </button>
+              <button
+                onClick={() => cycleSelectedPath("down")}
+                className="w-5 h-5 rounded border border-white/10 flex items-center justify-center bg-white/5 text-white/50 shadow-sm hover:bg-white/20 hover:text-white transition-colors"
+              >
                 <ChevronDown size={10} />
-              </div>
+              </button>
             </div>
             <span className="text-[7px] text-white/20 uppercase tracking-widest font-semibold group-hover:text-white/40 transition-colors">
-              Step
+              Variation
             </span>
           </div>
         </div>

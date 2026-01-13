@@ -34,27 +34,9 @@ export function PathFlyover() {
   const expIsFlying = useExperienceStore((state) => state.isFlying);
 
   // Sync Experience -> Admin (Overlay controls Admin)
-  useEffect(() => {
-    if (expIsFlying !== isFlying) {
-      setIsFlying(expIsFlying);
-    }
-  }, [expIsFlying, setIsFlying, isFlying]);
-  // Actually, if we include isFlying in dep, it loops.
-  // If we don't, we might miss external updates?
-  // Correct pattern:
-  // useEffect(() => { setIsFlying(expIsFlying) }, [expIsFlying])
-  // useEffect(() => { setExpIsFlying(isFlying) }, [isFlying])
-  // Infinite loop if they ping pong.
-  // We need a source of truth.
-  // Let's assume Admin is Truth. behavior.
-  // When logic ends (line 153), setIsFlying(false).
-  // Then [isFlying] effect runs -> setExp(false). Correct.
-  // When User clicks Overlay: setExp(true).
-  // [expIsFlying] effect runs -> setIsAdmin(true).
-  // [isFlying] effect runs -> setExp(true) (No change). Stabilizes.
-  // The Error was "Maximum update depth".
-  // This likely means they are toggling each other in the same render cycle?
-  // I will try removing the sync from the main effect first.
+  // REMOVED: Bidirectional sync caused infinite loop.
+  // Admin Store is the Source of Truth for Director Mode.
+  // If we need Overlay to close Director Mode, it should call a specific action, not rely on store listening.
 
   // Sync Admin -> Experience (Admin engine updates Overlay UI)
   useEffect(() => {

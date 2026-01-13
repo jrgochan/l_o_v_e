@@ -68,6 +68,7 @@ interface AtlasAdminState {
   setHoveredPath: (id: string | null) => void;
   setFocusedEmotion: (id: string | null) => void;
   cycleViewMode: () => void;
+  cycleSelectedPath: (direction: "next" | "prev" | "up" | "down") => void;
   setIsFlying: (isFlying: boolean) => void;
   setIntroActive: (active: boolean) => void;
 
@@ -434,6 +435,44 @@ export const useAtlasAdminStore = create<AtlasAdminState>()(
 
       setComputedPaths: (paths) => {
         set({ computedPaths: new Map(paths) });
+      },
+
+      cycleSelectedPath: (direction: "next" | "prev" | "up" | "down") => {
+        const state = get();
+        const { computedPaths, selectedEmotionIds, selectedPathId } = state;
+
+        // 1. Filter paths to only those where BOTH ends are in selected set
+        const filteredPaths = Array.from(computedPaths.values()).filter((path) => {
+          return (
+            selectedEmotionIds.has(path.from.id) && selectedEmotionIds.has(path.to.id)
+          );
+        });
+
+        if (filteredPaths.length === 0) return;
+
+        // 2. Sort deterministically (by ID) to ensure stability
+        filteredPaths.sort((a, b) => a.id.localeCompare(b.id));
+
+        // 3. Find current index
+        const currentIndex = selectedPathId
+          ? filteredPaths.findIndex((p) => p.id === selectedPathId)
+          : -1;
+
+        // 4. Calculate next index
+        let nextIndex = 0;
+        if (currentIndex !== -1) {
+          if (direction === "next" || direction === "down") {
+            nextIndex = (currentIndex + 1) % filteredPaths.length;
+          } else {
+            nextIndex = (currentIndex - 1 + filteredPaths.length) % filteredPaths.length;
+          }
+        }
+
+        // 5. Select
+        const nextPath = filteredPaths[nextIndex];
+        if (nextPath) {
+          set({ selectedPathId: nextPath.id });
+        }
       },
 
       fetchPathFromBackend: async () => {
