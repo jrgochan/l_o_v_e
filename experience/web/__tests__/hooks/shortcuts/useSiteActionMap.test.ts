@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import { useAtlasAdminStore } from "@/stores/useAtlasAdminStore";
 import { useExperienceStore } from "@/stores/useExperienceStore";
 import { logger } from "@/utils/logger";
+import { useShortcutGuards } from "@/hooks/shortcuts/useShortcutUtils";
 
 jest.mock("next/navigation", () => ({
   useRouter: jest.fn(),
@@ -14,7 +15,7 @@ jest.mock("@/stores/useExperienceStore");
 jest.mock("@/utils/logger");
 
 jest.mock("@/hooks/shortcuts/useShortcutUtils", () => ({
-  useShortcutGuards: () => ({ shouldExecuteShortcut: () => true }),
+  useShortcutGuards: jest.fn(),
 }));
 
 describe("useSiteActionMap", () => {
@@ -32,7 +33,7 @@ describe("useSiteActionMap", () => {
   const mockExpStore = {
     setIsFlying: jest.fn(),
     isFlying: false,
-    transitionPath: null,
+    transitionPath: null as any,
   };
 
   beforeEach(() => {
@@ -44,6 +45,9 @@ describe("useSiteActionMap", () => {
     (useExperienceStore as unknown as jest.Mock).mockImplementation((selector) =>
       selector(mockExpStore)
     );
+    (useShortcutGuards as jest.Mock).mockReturnValue({
+      shouldExecuteShortcut: () => true
+    });
   });
 
   it("should handle escape for clear selection", () => {
@@ -88,14 +92,59 @@ describe("useSiteActionMap", () => {
     expect(mockRouter.push).toHaveBeenCalledWith("/admin/settings");
   });
 
-  it("should handle 't' for toggle flying (Admin)", () => {
-    // Setup state where selectedPathId is present
+  it("should handle 't' for toggle flying (Admin) with double toggle", () => {
+    // 1. Setup Admin Mode (selectedPathId, no transition)
     mockStore.selectedPathId = "path-1";
-    const { result } = renderHook(() => useSiteActionMap());
-    const actions = result.current.getActions({} as KeyboardEvent);
+    mockExpStore.transitionPath = null;
+    mockStore.isFlying = false;
 
+    const { result, rerender } = renderHook(() => useSiteActionMap());
+    let actions = result.current.getActions({} as KeyboardEvent);
+
+    // Toggle ON
     actions.t();
     expect(mockStore.setIsFlying).toHaveBeenCalledWith(true);
+    expect(logger.info).toHaveBeenCalledWith("user-interaction", expect.stringContaining("ON"));
+
+    // 2. Setup Admin Mode (isFlying = true)
+    mockStore.isFlying = true;
+    (logger.info as jest.Mock).mockClear();
+
+    // Rerender to picking up new store state
+    rerender();
+    actions = result.current.getActions({} as KeyboardEvent);
+
+    // Toggle OFF
+    actions.t();
+    expect(mockStore.setIsFlying).toHaveBeenCalledWith(false);
+    expect(logger.info).toHaveBeenCalledWith("user-interaction", expect.stringContaining("OFF"));
+  });
+
+  it("should handle 't' for toggle flying (Therapeutic) with double toggle", () => {
+    // 1. Setup Therapeutic Mode (transitionPath present)
+    mockStore.selectedPathId = null; // or "path-1", transition takes precedence
+    mockExpStore.transitionPath = { id: "p1" };
+    mockExpStore.isFlying = false;
+
+    const { result, rerender } = renderHook(() => useSiteActionMap());
+    let actions = result.current.getActions({} as KeyboardEvent);
+
+    // Toggle ON
+    actions.t();
+    expect(mockExpStore.setIsFlying).toHaveBeenCalledWith(true);
+    expect(logger.info).toHaveBeenCalledWith("user-interaction", expect.stringContaining("ON"));
+
+    // 2. Setup Therapeutic Mode (isFlying = true)
+    mockExpStore.isFlying = true;
+    (logger.info as jest.Mock).mockClear();
+
+    rerender();
+    actions = result.current.getActions({} as KeyboardEvent);
+
+    // Toggle OFF
+    actions.t();
+    expect(mockExpStore.setIsFlying).toHaveBeenCalledWith(false);
+    expect(logger.info).toHaveBeenCalledWith("user-interaction", expect.stringContaining("OFF"));
   });
 
   it("should handle 'm' for toggle audio", () => {
@@ -146,5 +195,103 @@ describe("useSiteActionMap", () => {
       "user-interaction",
       expect.stringContaining("Check Help Menu")
     );
+  });
+
+  it("should ignore shortcuts if guard returns false", () => {
+    (useShortcutGuards as jest.Mock).mockReturnValue({
+      shouldExecuteShortcut: () => false
+    });
+
+    const { result } = renderHook(() => useSiteActionMap());
+    const actions = result.current.getActions({} as KeyboardEvent);
+
+    actions.escape();
+    expect(mockStore.clearSelection).not.toHaveBeenCalled();
+
+    actions.b();
+    expect(mockStore.selectMultiple).not.toHaveBeenCalled();
+
+    // Reset guard
+    (useShortcutGuards as jest.Mock).mockReturnValue({
+      shouldExecuteShortcut: () => true
+    });
+  });
+
+  it("should ignore 't' if no path selected", () => {
+    mockStore.selectedPathId = null;
+    mockExpStore.transitionPath = null;
+    const { result } = renderHook(() => useSiteActionMap());
+    const actions = result.current.getActions({} as KeyboardEvent);
+
+    actions.t();
+    expect(mockStore.setIsFlying).not.toHaveBeenCalled();
+    expect(mockExpStore.setIsFlying).not.toHaveBeenCalled();
+  });
+
+  it("should ignore non-modifier actions if modifier keys are pressed", () => {
+    const { result } = renderHook(() => useSiteActionMap());
+
+    // Actions that should NOT run with Ctrl/Meta: b, t, m, i, ?
+    const nonModActions = ["b", "t", "m", "i", "?"];
+
+    // Test Ctrl
+    const ctrlEvent = { ctrlKey: true } as KeyboardEvent;
+    const actionsCtrl = result.current.getActions(ctrlEvent);
+
+    nonModActions.forEach(key => {
+      // Mock window functions to avoid errors if they are called (they shouldn't be)
+      (window as any).toggleAudio = jest.fn();
+      (window as any).toggleZenIndicator = jest.fn();
+      (window as any).toggleHelp = jest.fn();
+
+      actionsCtrl[key]();
+
+      expect(mockStore.selectMultiple).not.toHaveBeenCalled();
+      expect(mockStore.setIsFlying).not.toHaveBeenCalled();
+      expect((window as any).toggleAudio).not.toHaveBeenCalled();
+      expect((window as any).toggleZenIndicator).not.toHaveBeenCalled();
+      expect((window as any).toggleHelp).not.toHaveBeenCalled();
+    });
+
+    // Test Meta
+    const metaEvent = { metaKey: true } as KeyboardEvent;
+    const actionsMeta = result.current.getActions(metaEvent);
+
+    nonModActions.forEach(key => {
+      actionsMeta[key]();
+    });
+
+    expect(mockStore.selectMultiple).not.toHaveBeenCalled();
+    expect(mockStore.setIsFlying).not.toHaveBeenCalled();
+  });
+
+  it("should ignore modifier actions if modifier keys are missing", () => {
+    const { result } = renderHook(() => useSiteActionMap());
+
+    // Actions that REQUIRE Ctrl/Meta: ,
+    const modActions = [","];
+
+    const noModEvent = { ctrlKey: false, metaKey: false } as KeyboardEvent;
+    const actions = result.current.getActions(noModEvent);
+
+    actions[","]();
+
+    expect(mockRouter.push).not.toHaveBeenCalled();
+  });
+
+  it("should safely handle missing window functions for m and i", () => {
+    const { result } = renderHook(() => useSiteActionMap());
+    const actions = result.current.getActions({} as KeyboardEvent);
+
+    // Ensure window functions are undefined
+    delete (window as any).toggleAudio;
+    delete (window as any).toggleZenIndicator;
+
+    // Call actions - should not crash and not log "Toggled"
+    actions.m();
+    expect(logger.info).not.toHaveBeenCalledWith("user-interaction", "Toggled Audio");
+
+    actions.i();
+    expect(logger.info).not.toHaveBeenCalledWith("user-interaction", "Toggled Zen session indicator");
   });
 });

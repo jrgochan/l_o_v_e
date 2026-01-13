@@ -101,4 +101,63 @@ describe("usePathSync", () => {
     expect(mockSetShowPath).toHaveBeenCalledWith(false);
     expect(mockSetTransitionPath).toHaveBeenCalledWith(null);
   });
+  it("should handle multiple waypoints correctly", () => {
+    const multiPointPath = {
+      ...mockPath,
+      waypoints: [
+        { emotion: "Neutral", vac: [0, 0, 0], reasoning: "First" },
+        { emotion: "Joy", vac: [0.5, 0, 0], reasoning: "Second" }
+      ]
+    };
+
+    (useAtlasAdminStore as unknown as jest.Mock).mockImplementation((selector) => {
+      return selector({
+        selectedPathId: "e1-e2",
+        computedPaths: { get: () => multiPointPath },
+        allEmotions: mockEmotions,
+      });
+    });
+
+    renderHook(() => usePathSync());
+
+    expect(mockSetTransitionPath).toHaveBeenCalledWith(
+      expect.objectContaining({
+        waypoints: expect.arrayContaining([
+          expect.objectContaining({ order: 1 }),
+          expect.objectContaining({ order: 2, emotion: "Joy" })
+        ])
+      })
+    );
+  });
+
+  it("should handle unknown emotions in waypoints", () => {
+    const unknownPath = {
+      ...mockPath,
+      waypoints: [
+        { emotion: "Mystery", vac: [0, 0, 0], reasoning: "Unknown" }
+      ]
+    };
+
+    (useAtlasAdminStore as unknown as jest.Mock).mockImplementation((selector) => {
+      return selector({
+        selectedPathId: "e1-e2",
+        computedPaths: { get: () => unknownPath },
+        allEmotions: mockEmotions, // "Mystery" is missing
+      });
+    });
+
+    renderHook(() => usePathSync());
+
+    expect(mockSetTransitionPath).toHaveBeenCalledWith(
+      expect.objectContaining({
+        waypoints: expect.arrayContaining([
+          expect.objectContaining({
+            emotion: "Mystery",
+            category: "Unknown",
+            quaternion: [0, 0, 0, 1]
+          })
+        ])
+      })
+    );
+  });
 });

@@ -59,8 +59,6 @@ export function useSiteActionMap() {
                 "user-interaction",
                 `Therapeutic Flyover: ${!clientIsFlying ? "ON" : "OFF"}`
               );
-            } else if (selectedPathId) {
-              setAdminFlying(!adminIsFlying);
             }
           }
         },

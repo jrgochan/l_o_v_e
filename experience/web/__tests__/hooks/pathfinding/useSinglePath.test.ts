@@ -67,4 +67,53 @@ describe("useSinglePath", () => {
       })
     ).rejects.toThrow("API Error");
   });
+
+  it("should throw error if response is not ok", async () => {
+    const mockFrom = { id: "e1", name: "Joy", vac: { v: 1, a: 1, c: 1 } };
+    const mockTo = { id: "e2", name: "Trust", vac: { v: 0.8, a: 0.8, c: 0.8 } };
+
+    (global.fetch as any).mockResolvedValue({
+      ok: false,
+      statusText: "Internal Server Error",
+    });
+
+    const { result } = renderHook(() => useSinglePath());
+
+    await expect(
+      act(async () => {
+        await result.current.computePath(mockFrom as any, mockTo as any);
+      })
+    ).rejects.toThrow("Failed to compute path: Internal Server Error");
+  });
+
+  it("should handle missing waypoints in response", async () => {
+    const mockFrom = { id: "e1", name: "Joy", vac: { v: 1 } };
+    const mockTo = { id: "e2", name: "Trust", vac: { v: 0.8 } };
+
+    (global.fetch as any).mockResolvedValue({
+      ok: true,
+      json: async () => ({
+        path_metrics: {
+          total_distance: 5,
+          total_estimated_time: 10,
+          overall_difficulty: "easy",
+          requires_bridge: false,
+          bridge_emotions: [],
+        },
+        // waypoints missing
+      }),
+    });
+
+    const { result } = renderHook(() => useSinglePath());
+
+    await act(async () => {
+      await result.current.computePath(mockFrom as any, mockTo as any);
+    });
+
+    expect(mockAddComputedPath).toHaveBeenCalledWith(
+      expect.objectContaining({
+        waypoints: [],
+      })
+    );
+  });
 });

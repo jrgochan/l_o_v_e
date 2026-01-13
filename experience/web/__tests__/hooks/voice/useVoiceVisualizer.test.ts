@@ -22,6 +22,9 @@ window.AudioContext = class {
 } as any;
 
 describe("useVoiceVisualizer", () => {
+  const originalRAF = window.requestAnimationFrame;
+  const originalCAF = window.cancelAnimationFrame;
+
   beforeEach(() => {
     jest.clearAllMocks();
     jest.useFakeTimers();
@@ -32,18 +35,40 @@ describe("useVoiceVisualizer", () => {
   });
 
   beforeAll(() => {
-    jest.spyOn(window, 'requestAnimationFrame').mockImplementation((cb: any) => setTimeout(cb, 16) as unknown as number);
-    jest.spyOn(window, 'cancelAnimationFrame').mockImplementation((id: any) => clearTimeout(id));
+    window.requestAnimationFrame = jest.fn((cb: any) => setTimeout(cb, 16) as unknown as number);
+    window.cancelAnimationFrame = jest.fn((id: any) => clearTimeout(id));
   });
 
   afterAll(() => {
-    (window.requestAnimationFrame as jest.Mock).mockRestore();
-    (window.cancelAnimationFrame as jest.Mock).mockRestore();
+    window.requestAnimationFrame = originalRAF;
+    window.cancelAnimationFrame = originalCAF;
   });
 
   it("should initialize with 0 level when no stream", () => {
     const { result } = renderHook(() => useVoiceVisualizer(null));
     expect(result.current.audioLevel).toBe(0);
+  });
+
+  it("should cleanup resources when stream is removed", () => {
+    const stream = {} as MediaStream;
+    const { unmount } = renderHook(() => useVoiceVisualizer(stream));
+
+    unmount();
+
+    expect(mockClose).toHaveBeenCalled();
+    expect(window.cancelAnimationFrame).toHaveBeenCalled();
+  });
+
+  it("should handle error during context close", async () => {
+    const stream = {} as MediaStream;
+    mockClose.mockRejectedValue("Close Error");
+
+    const { unmount } = renderHook(() => useVoiceVisualizer(stream));
+
+    // Should not throw
+    unmount();
+
+    expect(mockClose).toHaveBeenCalled();
   });
 
   it("should connect stream and update levels", () => {
@@ -75,29 +100,5 @@ describe("useVoiceVisualizer", () => {
     expect(result.current.audioLevel).toBeDefined();
     // Ideally check if it changed from 0, but our mock might return constant.
     // The key is covering the rAF loop lines.
-  });
-
-  it("should cleanup resources when stream is removed", () => {
-    const stream = {} as MediaStream;
-    const { result, rerender } = renderHook(
-      (s) => useVoiceVisualizer(s),
-      {
-        initialProps: stream as MediaStream | null,
-      }
-    );
-
-    // Verify setup
-    expect(mockCreateAnalyser).toHaveBeenCalled();
-
-    // Rerender with null
-    rerender(null);
-
-    // Flush cleanup implementation (if any timeouts/promises involved)
-    act(() => {
-      jest.runAllTimers();
-    });
-
-    // Verify cleanup
-    expect(mockClose).toHaveBeenCalled();
   });
 });
