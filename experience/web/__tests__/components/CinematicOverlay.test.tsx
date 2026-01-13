@@ -1,9 +1,19 @@
 import { render, screen, act } from "@testing-library/react";
 import { CinematicOverlay } from "../../components/CinematicOverlay";
+import type { AtlasEmotion } from "@/types";
+
+const mockEmotion = (name: string): AtlasEmotion => ({
+  id: name.toLowerCase(),
+  name,
+  category: "Places We Go With Others",
+  definition: "Definition",
+  vac: [0.5, 0.5, 0.5],
+  quaternion: [0, 0, 0, 1],
+});
 
 describe("CinematicOverlay", () => {
   const defaultProps = {
-    activeEmotions: ["Joy"],
+    activeEmotions: [mockEmotion("Joy")],
     isWaiting: false,
     hasAudioEnabled: true,
     onEnableAudio: jest.fn(),
@@ -61,7 +71,9 @@ describe("CinematicOverlay", () => {
   });
 
   it("should animate text changes", () => {
-    const { rerender } = render(<CinematicOverlay {...defaultProps} activeEmotions={["Calm"]} />);
+    const { rerender } = render(
+      <CinematicOverlay {...defaultProps} activeEmotions={[mockEmotion("Calm")]} />
+    );
 
     act(() => {
       jest.runAllTimers();
@@ -70,7 +82,7 @@ describe("CinematicOverlay", () => {
     expect(screen.getByText("Calm")).toBeInTheDocument();
 
     // Change text
-    rerender(<CinematicOverlay {...defaultProps} activeEmotions={["Excited"]} />);
+    rerender(<CinematicOverlay {...defaultProps} activeEmotions={[mockEmotion("Excited")]} />);
 
     // Should fade out first (impl check: fadeState="out")
     // We can't easily check internal state, but we can check if text eventually updates

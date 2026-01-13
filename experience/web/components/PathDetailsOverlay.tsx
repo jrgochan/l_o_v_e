@@ -27,12 +27,12 @@ function getEmotionColor(valence: number): string {
 }
 
 // Helper to get color for V, A, C components matching AxisLabels
-function getVacComponentColor(value: number, component: 'V' | 'A' | 'C'): string {
+function getVacComponentColor(value: number, component: "V" | "A" | "C"): string {
   // Colors generated from Tailwind 400 series for visibility on dark bg
   const colors = {
     V: {
       positive: "#22d3ee", // cyan-400
-      neutral: "#94a3b8",  // slate-400 (near zero)
+      neutral: "#94a3b8", // slate-400 (near zero)
       negative: "#f87171", // red-400
     },
     A: {
@@ -120,15 +120,15 @@ export function PathDetailsOverlay() {
       const wp = waypoints[currentIndex - 1];
       return wp
         ? {
-          id: `wp-${currentIndex}`,
-          label: `Step ${currentIndex + 1}`,
-          emotion: wp.emotion,
-          description: wp.reasoning || "Transitioning through this emotional state.",
-          index: currentIndex,
-          // Check if wp has vac, otherwise default to neutral logic or look it up (assuming it has vac per interface)
-          color: wp.vac ? getEmotionColor(wp.vac[0]) : "#fbbf24",
-          vac: wp.vac,
-        }
+            id: `wp-${currentIndex}`,
+            label: `Step ${currentIndex + 1}`,
+            emotion: wp.emotion,
+            description: wp.reasoning || "Transitioning through this emotional state.",
+            index: currentIndex,
+            // Check if wp has vac, otherwise default to neutral logic or look it up (assuming it has vac per interface)
+            color: wp.vac ? getEmotionColor(wp.vac[0]) : "#fbbf24",
+            vac: wp.vac,
+          }
         : null;
     }
   }, [currentIndex, totalPoints, waypoints, transitionPath]);
@@ -157,10 +157,30 @@ export function PathDetailsOverlay() {
   const modalPath = useMemo(() => {
     if (!transitionPath) return null;
     return {
-      ...transitionPath,
-      from: transitionPath.current_state,
-      to: transitionPath.goal_state,
-    } as EmotionPath;
+      id: transitionPath.path_id,
+      // Map basic metrics
+      total_distance: transitionPath.path_metrics.total_distance,
+      estimated_time: transitionPath.path_metrics.total_estimated_time,
+      difficulty: transitionPath.path_metrics.overall_difficulty,
+      // Map states to AtlasEmotion shape (best effort)
+      from: {
+        id: "start-node", // verification-only fallback
+        name: transitionPath.current_state.emotion,
+        category: transitionPath.current_state.category,
+        vac: transitionPath.current_state.vac,
+        quaternion: transitionPath.current_state.quaternion,
+        definition: "Start of journey",
+      },
+      to: {
+        id: "end-node", // verification-only fallback
+        name: transitionPath.goal_state.emotion,
+        category: transitionPath.goal_state.category,
+        vac: transitionPath.goal_state.vac,
+        quaternion: transitionPath.goal_state.quaternion,
+        definition: "Goal of journey",
+      },
+      waypoints: transitionPath.waypoints,
+    } as unknown as EmotionPath;
   }, [transitionPath]);
 
   const handleOpenModal = () => {
@@ -333,9 +353,15 @@ export function PathDetailsOverlay() {
                           </span>
                           {item.vac && (
                             <span className="text-[9px] font-mono ml-0.5 tracking-tight flex gap-1">
-                              <span style={{ color: getVacComponentColor(item.vac[0], 'V') }}>V:{item.vac[0].toFixed(2)}</span>
-                              <span style={{ color: getVacComponentColor(item.vac[1], 'A') }}>A:{item.vac[1].toFixed(2)}</span>
-                              <span style={{ color: getVacComponentColor(item.vac[2], 'C') }}>C:{item.vac[2].toFixed(2)}</span>
+                              <span style={{ color: getVacComponentColor(item.vac[0], "V") }}>
+                                V:{item.vac[0].toFixed(2)}
+                              </span>
+                              <span style={{ color: getVacComponentColor(item.vac[1], "A") }}>
+                                A:{item.vac[1].toFixed(2)}
+                              </span>
+                              <span style={{ color: getVacComponentColor(item.vac[2], "C") }}>
+                                C:{item.vac[2].toFixed(2)}
+                              </span>
                             </span>
                           )}
 
@@ -352,7 +378,6 @@ export function PathDetailsOverlay() {
                           </button>
                         </div>
                       </animated.div>
-
                     )
                 )}
               </div>
@@ -367,10 +392,11 @@ export function PathDetailsOverlay() {
                 onClick={() => setFlyoverSpeed(s)}
                 className={`
                                 w-7 h-7 rounded-full flex items-center justify-center text-[10px] font-bold transition-all
-                                ${flyoverSpeed === s
-                    ? "bg-white text-black shadow-sm"
-                    : "text-white/30 hover:bg-white/10 hover:text-white"
-                  }
+                                ${
+                                  flyoverSpeed === s
+                                    ? "bg-white text-black shadow-sm"
+                                    : "text-white/30 hover:bg-white/10 hover:text-white"
+                                }
                             `}
               >
                 {s}x
@@ -429,22 +455,20 @@ export function PathDetailsOverlay() {
           <div className="absolute -bottom-6 left-1/2 -translate-x-1/2 text-[9px] text-white/30 uppercase tracking-[0.2em] font-medium selection:bg-transparent">
             BROWSING: <span className="text-white/60">{categoryInfo.name}</span>
           </div>
-        </animated.div >
-      </div >
+        </animated.div>
+      </div>
 
       {/* Integrated Waypoint Detail Modal */}
-      {
-        isModalOpen && modalPath && (
-          <WaypointDetailModal
-            waypointIndex={modalWaypointIndex}
-            path={modalPath}
-            onClose={() => setIsModalOpen(false)}
-            onNavigate={(index) => {
-              setModalWaypointIndex(index);
-            }}
-          />
-        )
-      }
+      {isModalOpen && modalPath && (
+        <WaypointDetailModal
+          waypointIndex={modalWaypointIndex}
+          path={modalPath}
+          onClose={() => setIsModalOpen(false)}
+          onNavigate={(index) => {
+            setModalWaypointIndex(index);
+          }}
+        />
+      )}
     </>
   );
 }

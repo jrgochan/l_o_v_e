@@ -163,7 +163,14 @@ export function PathFlyover() {
     // But currently `selectedPathId` is set by clicking the list.
     // We probably want to wait for "Play".
     // So valid.
-  }, [selectedPathId, computedPaths, allEmotions, setTransitionPath, setFlyoverProgress]);
+  }, [
+    selectedPathId,
+    computedPaths,
+    allEmotions,
+    setTransitionPath,
+    setFlyoverProgress,
+    setIsFlying,
+  ]);
 
   // SFX Trigger on Fly Start (only when toggling from false to true)
   useEffect(() => {

@@ -50,7 +50,7 @@ export function CinematicOverlay({
     // Actually, we can just let the grid render directly.
     // But for consistency, let's keep the cinematic text for small numbers.
     if (!isGridMode) {
-      const newText = activeEmotions.map(e => e.name).join(" + ");
+      const newText = activeEmotions.map((e) => e.name).join(" + ");
       if (newText !== displayText) {
         setTimeout(() => setFadeState("out"), 0);
         setTimeout(() => {
@@ -78,10 +78,11 @@ export function CinematicOverlay({
       {/* Mode 1: Large Cinematic Text (Few Emotions) or Waiting State */}
       {(isWaiting || !isGridMode) && (
         <div
-          className={`text-center transition-all duration-1000 transform ${fadeState === "in"
-            ? "opacity-100 translate-y-0 scale-100"
-            : "opacity-0 translate-y-4 scale-95"
-            }`}
+          className={`text-center transition-all duration-1000 transform ${
+            fadeState === "in"
+              ? "opacity-100 translate-y-0 scale-100"
+              : "opacity-0 translate-y-4 scale-95"
+          }`}
         >
           <h1 className="text-4xl md:text-6xl lg:text-7xl font-thin text-white tracking-[0.2em] uppercase drop-shadow-[0_0_15px_rgba(255,255,255,0.3)] max-w-4xl leading-tight">
             {displayText}
@@ -121,9 +122,15 @@ export function CinematicOverlay({
                     {/* Micro VAC Stats on Hover */}
                     <div className="w-0 overflow-hidden group-hover:w-auto group-hover:pl-2 transition-all duration-300 flex items-center opacity-0 group-hover:opacity-100">
                       <span className="text-[9px] font-mono text-white/50 space-x-1">
-                        <span className={emotion.vac[0] > 0 ? "text-green-400" : "text-red-400"}>V{emotion.vac[0].toFixed(1)}</span>
-                        <span className={emotion.vac[1] > 0 ? "text-yellow-400" : "text-blue-400"}>A{emotion.vac[1].toFixed(1)}</span>
-                        <span className={emotion.vac[2] > 0 ? "text-purple-400" : "text-gray-400"}>C{emotion.vac[2].toFixed(1)}</span>
+                        <span className={emotion.vac[0] > 0 ? "text-green-400" : "text-red-400"}>
+                          V{emotion.vac[0].toFixed(1)}
+                        </span>
+                        <span className={emotion.vac[1] > 0 ? "text-yellow-400" : "text-blue-400"}>
+                          A{emotion.vac[1].toFixed(1)}
+                        </span>
+                        <span className={emotion.vac[2] > 0 ? "text-purple-400" : "text-gray-400"}>
+                          C{emotion.vac[2].toFixed(1)}
+                        </span>
                       </span>
                     </div>
                   </div>

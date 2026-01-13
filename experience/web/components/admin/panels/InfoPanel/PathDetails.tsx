@@ -14,6 +14,7 @@
 
 import { useAtlasAdminStore } from "@/stores/useAtlasAdminStore";
 import { BRIDGE_EMOTIONS, DIFFICULTY_COLORS } from "@/types/atlas-admin";
+import type { EmotionPath, PathWaypoint } from "@/types/atlas-admin";
 import { Info } from "lucide-react";
 
 interface PathDetailsProps {

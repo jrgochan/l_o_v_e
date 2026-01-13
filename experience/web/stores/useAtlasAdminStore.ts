@@ -443,9 +443,7 @@ export const useAtlasAdminStore = create<AtlasAdminState>()(
 
         // 1. Filter paths to only those where BOTH ends are in selected set
         const filteredPaths = Array.from(computedPaths.values()).filter((path) => {
-          return (
-            selectedEmotionIds.has(path.from.id) && selectedEmotionIds.has(path.to.id)
-          );
+          return selectedEmotionIds.has(path.from.id) && selectedEmotionIds.has(path.to.id);
         });
 
         if (filteredPaths.length === 0) return;

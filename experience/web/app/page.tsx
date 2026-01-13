@@ -21,7 +21,7 @@ import { useExperienceStore } from "@/stores/useExperienceStore";
 const Scene = dynamic(() => import("@/components/Scene").then((mod) => mod.Scene), {
   ssr: false,
 });
-import { SimpleAxisLabels } from "@/components/SimpleAxisLabels";
+
 import { CinematicOverlay } from "@/components/CinematicOverlay";
 import { ViewerShortcuts } from "@/components/ViewerShortcuts";
 import { VACDisplay } from "@/components/VACDisplay";
