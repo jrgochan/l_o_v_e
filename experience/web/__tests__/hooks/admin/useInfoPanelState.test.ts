@@ -115,4 +115,58 @@ describe("useInfoPanelState", () => {
     expect(result.current.selectedPaths).toHaveLength(1);
     expect(result.current.selectedPaths[0].id).toBe("e1-e2");
   });
+
+  it("should return null for displayPath when path missing from map", () => {
+    (useAtlasAdminStore as unknown as jest.Mock).mockImplementation((selector) => {
+      const state = {
+        allEmotions: mockAllEmotions,
+        selectedEmotionIds: new Set(),
+        hoveredEmotionId: null,
+        hoveredPathId: "unknown-path",
+        selectedPathId: null,
+        computedPaths: mockComputedPaths,
+        settings: {},
+      };
+      return selector(state);
+    });
+
+    const { result } = renderHook(() => useInfoPanelState());
+    expect(result.current.displayPath).toBeNull();
+  });
+
+  it("should return null for displayPath when selected path missing from map", () => {
+    (useAtlasAdminStore as unknown as jest.Mock).mockImplementation((selector) => {
+      const state = {
+        allEmotions: mockAllEmotions,
+        selectedEmotionIds: new Set(),
+        hoveredEmotionId: null,
+        hoveredPathId: null,
+        selectedPathId: "unknown-selected-path",
+        computedPaths: mockComputedPaths,
+        settings: {},
+      };
+      return selector(state);
+    });
+
+    const { result } = renderHook(() => useInfoPanelState());
+    expect(result.current.displayPath).toBeNull();
+  });
+
+  it("should return null for displayEmotion when emotion missing from list", () => {
+    (useAtlasAdminStore as unknown as jest.Mock).mockImplementation((selector) => {
+      const state = {
+        allEmotions: mockAllEmotions,
+        selectedEmotionIds: new Set(),
+        hoveredEmotionId: "unknown-emotion",
+        hoveredPathId: null,
+        selectedPathId: null,
+        computedPaths: mockComputedPaths,
+        settings: {},
+      };
+      return selector(state);
+    });
+
+    const { result } = renderHook(() => useInfoPanelState());
+    expect(result.current.displayEmotion).toBeNull();
+  });
 });

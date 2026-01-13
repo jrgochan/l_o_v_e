@@ -91,4 +91,14 @@ describe("useCategoryState", () => {
 
     expect(result.current.getCategorySelectionState("Negative")).toBe("all");
   });
+
+  it("should return 'none' for unknown or empty category", () => {
+    const { result } = renderHook(() =>
+      useCategoryState({
+        allEmotions: mockEmotions,
+        selectedIds: new Set(),
+      })
+    );
+    expect(result.current.getCategorySelectionState("Unknown")).toBe("none");
+  });
 });

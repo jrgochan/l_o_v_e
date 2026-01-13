@@ -175,6 +175,7 @@ export default function AdminUserDetailsPage() {
               <button
                 onClick={() => setIsActive(!isActive)}
                 className={`relative w-12 h-6 rounded-full transition-colors ${isActive ? "bg-green-600" : "bg-gray-700"}`}
+                aria-label="Toggle account active"
               >
                 <div
                   className={`absolute top-1 left-1 w-4 h-4 bg-white rounded-full transition-transform ${isActive ? "transform translate-x-6" : ""}`}
@@ -216,10 +217,10 @@ export default function AdminUserDetailsPage() {
                   <td className="px-6 py-3">
                     {session.ended_at
                       ? Math.round(
-                          (new Date(session.ended_at).getTime() -
-                            new Date(session.started_at).getTime()) /
-                            60000
-                        ) + " min"
+                        (new Date(session.ended_at).getTime() -
+                          new Date(session.started_at).getTime()) /
+                        60000
+                      ) + " min"
                       : "Active"}
                   </td>
                   <td className="px-6 py-3">{session.message_count}</td>

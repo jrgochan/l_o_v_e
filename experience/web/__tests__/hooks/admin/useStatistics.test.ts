@@ -69,4 +69,73 @@ describe("useStatistics", () => {
       expect(result.current.error).toBe("API Fail");
     });
   });
+
+  it("should handle non-OK fetch response", async () => {
+    (global.fetch as jest.Mock).mockResolvedValue({
+      ok: false,
+    });
+
+    const { result } = renderHook(() => useStatistics());
+
+    await waitFor(() => {
+      expect(result.current.error).toBe("Failed to fetch statistics");
+    });
+  });
+
+  it("should handle unknown error type during fetch", async () => {
+    (global.fetch as jest.Mock).mockRejectedValue("String Error"); // Not an Error object
+
+    const { result } = renderHook(() => useStatistics());
+
+    await waitFor(() => {
+      expect(result.current.error).toBe("Unknown error");
+    });
+  });
+
+  it("should cancel clear cache if user declines", async () => {
+    (window.confirm as jest.Mock).mockReturnValue(false);
+    (global.fetch as jest.Mock).mockResolvedValue({ ok: true });
+
+    const { result } = renderHook(() => useStatistics());
+    await waitFor(() => expect(result.current.loading).toBe(false));
+
+    await act(async () => {
+      await result.current.clearCache();
+    });
+
+    expect(global.fetch).not.toHaveBeenCalledWith(
+      expect.stringContaining("/cache"),
+      expect.anything()
+    );
+  });
+
+  it("should handle clear cache failure (non-OK)", async () => {
+    (global.fetch as jest.Mock)
+      .mockResolvedValueOnce({ ok: true, json: async () => ({}) }) // Init
+      .mockResolvedValueOnce({ ok: false }); // Delete fails
+
+    const { result } = renderHook(() => useStatistics());
+    await waitFor(() => expect(result.current.loading).toBe(false));
+
+    await act(async () => {
+      await result.current.clearCache();
+    });
+
+    expect(window.alert).toHaveBeenCalledWith("Error clearing cache. Check console.");
+  });
+
+  it("should handle clear cache network error", async () => {
+    (global.fetch as jest.Mock)
+      .mockResolvedValueOnce({ ok: true, json: async () => ({}) }) // Init
+      .mockRejectedValueOnce(new Error("Net Error")); // Delete fails
+
+    const { result } = renderHook(() => useStatistics());
+    await waitFor(() => expect(result.current.loading).toBe(false));
+
+    await act(async () => {
+      await result.current.clearCache();
+    });
+
+    expect(window.alert).toHaveBeenCalledWith("Error clearing cache. Check console.");
+  });
 });
