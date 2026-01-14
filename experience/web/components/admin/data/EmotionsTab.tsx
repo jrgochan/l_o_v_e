@@ -40,7 +40,7 @@ export function EmotionsTab() {
     setEditForm({
       category: emotion.category,
       definition: emotion.definition,
-      vac_vector: [...emotion.vac_vector],
+      vac_vector: [...(emotion.vac_vector || [0, 0, 0])],
       haptic_pattern_id: emotion.haptic_pattern_id || "",
       color_hint: emotion.color_hint || "",
     });
@@ -128,7 +128,7 @@ export function EmotionsTab() {
     if (isNaN(val)) return;
 
     setEditForm((prev) => {
-      const newVac = [...(prev.vac_vector || [0, 0, 0])] as [number, number, number];
+      const newVac = [...(prev.vac_vector as number[])] as [number, number, number];
       newVac[index] = val;
       return { ...prev, vac_vector: newVac };
     });
@@ -275,7 +275,7 @@ export function EmotionsTab() {
                     <>
                       <td className="px-6 py-4 text-gray-300 text-sm">{emotion.category}</td>
                       <td className="px-6 py-4 font-mono text-xs text-cyan-300">
-                        [{emotion.vac_vector.join(", ")}]
+                        [{(emotion.vac_vector || [0, 0, 0]).join(", ")}]
                       </td>
                       <td className="px-6 py-4 text-gray-400 text-sm">{emotion.definition}</td>
                       <td className="px-6 py-4 text-right">

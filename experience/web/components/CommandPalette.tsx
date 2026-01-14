@@ -106,7 +106,7 @@ export function CommandPalette() {
     if (modifiers.command) return "add";
     if (modifiers.option && modifiers.shift) return "isolate";
     if (modifiers.option) return "focus";
-    if (modifiers.shift && modifiers.command) return "compute-paths";
+
     if (modifiers.shift) return "navigate";
     return "select";
   };

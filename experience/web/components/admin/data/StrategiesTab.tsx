@@ -59,7 +59,7 @@ export function StrategiesTab() {
     setEditingId(strategy.id);
     setEditForm({
       description: strategy.description,
-      detailed_steps: [...strategy.detailed_steps],
+      detailed_steps: [...(strategy.detailed_steps || [])],
       time_required: strategy.time_required,
       difficulty_level: strategy.difficulty_level,
       evidence_level: strategy.evidence_level,
@@ -265,13 +265,12 @@ export function StrategiesTab() {
                       <td className="px-6 py-4">
                         <span
                           className={`px-2 py-0.5 rounded text-[10px] uppercase font-bold tracking-wider
-                                                    ${
-                                                      strategy.evidence_level === "meta_analysis"
-                                                        ? "bg-purple-900/50 text-purple-200 border border-purple-800"
-                                                        : strategy.evidence_level === "rct"
-                                                          ? "bg-green-900/50 text-green-200 border border-green-800"
-                                                          : "bg-gray-800 text-gray-400 border border-gray-700"
-                                                    }`}
+                                                    ${strategy.evidence_level === "meta_analysis"
+                              ? "bg-purple-900/50 text-purple-200 border border-purple-800"
+                              : strategy.evidence_level === "rct"
+                                ? "bg-green-900/50 text-green-200 border border-green-800"
+                                : "bg-gray-800 text-gray-400 border border-gray-700"
+                            }`}
                         >
                           {strategy.evidence_level}
                         </span>
@@ -372,7 +371,7 @@ export function StrategiesTab() {
                                 </div>
                               ) : (
                                 <ol className="list-decimal list-outside text-sm text-gray-300 space-y-1 ml-4">
-                                  {strategy.detailed_steps.map((step, idx) => (
+                                  {(strategy.detailed_steps || []).map((step, idx) => (
                                     <li key={idx} className="pl-1">
                                       {step}
                                     </li>
@@ -423,11 +422,10 @@ export function StrategiesTab() {
                                       {[1, 2, 3, 4, 5].map((star) => (
                                         <div
                                           key={star}
-                                          className={`w-2 h-2 rounded-full ${
-                                            (strategy.difficulty_level || 0) >= star
-                                              ? "bg-cyan-500"
-                                              : "bg-gray-700"
-                                          }`}
+                                          className={`w-2 h-2 rounded-full ${(strategy.difficulty_level || 0) >= star
+                                            ? "bg-cyan-500"
+                                            : "bg-gray-700"
+                                            }`}
                                         />
                                       ))}
                                     </div>

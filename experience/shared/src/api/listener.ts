@@ -133,22 +133,21 @@ export class ListenerApiClient {
    */
   async healthCheck(): Promise<boolean> {
     const url = `${this.config.baseUrl}/health`;
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 5000);
 
     try {
-      const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 5000);
-
       const response = await fetch(url, {
         method: "GET",
         headers: { "Content-Type": "application/json" },
         signal: controller.signal,
       });
-
-      clearTimeout(timeoutId);
       return response.ok;
     } catch (error) {
       console.error("Listener API health check failed:", error);
       return false;
+    } finally {
+      clearTimeout(timeoutId);
     }
   }
 
@@ -184,16 +183,15 @@ export class ListenerApiClient {
     options: RequestInit,
     attempt: number = 1
   ): Promise<Response> {
-    try {
-      const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), this.config.timeout);
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), this.config.timeout);
 
+    try {
       const response = await fetch(url, {
         ...options,
         signal: controller.signal,
       });
 
-      clearTimeout(timeoutId);
       return response;
     } catch (error) {
       if (attempt < this.config.retryAttempts) {
@@ -201,6 +199,8 @@ export class ListenerApiClient {
         return this.fetchWithRetry(url, options, attempt + 1);
       }
       throw error;
+    } finally {
+      clearTimeout(timeoutId);
     }
   }
 

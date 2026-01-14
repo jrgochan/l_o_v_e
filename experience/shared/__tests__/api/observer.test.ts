@@ -14,7 +14,7 @@ describe("Observer API", () => {
   const mockFetch = jest.fn();
   global.fetch = mockFetch;
 
-  const mockConsoleError = jest.spyOn(console, "error").mockImplementation(() => {});
+  const mockConsoleError = jest.spyOn(console, "error").mockImplementation(() => { });
 
   beforeEach(() => {
     jest.useRealTimers();
@@ -254,7 +254,7 @@ describe("Observer API", () => {
       mockFetch.mockRejectedValue(new Error("Poll fail"));
 
       const onError = jest.fn();
-      manager.start("u1", () => {}, onError, 100);
+      manager.start("u1", () => { }, onError, 100);
 
       await jest.runOnlyPendingTimersAsync();
       await Promise.resolve();
@@ -263,10 +263,27 @@ describe("Observer API", () => {
       manager.stop();
     });
 
+    it("should use default silent error handler", async () => {
+      const manager = createPollingManager();
+      // Cause an error
+      mockFetch.mockRejectedValue(new Error("Poll fail"));
+
+      // Start without onError
+      manager.start("u1", () => { }); // No onError provided
+
+      // Advance timers to trigger poll and failure
+      await jest.runOnlyPendingTimersAsync();
+      await Promise.resolve(); // Flush promises
+
+      // Should not throw and just remain active/silent
+      expect(manager.isActive()).toBe(true);
+      manager.stop();
+    });
+
     it("should prevent double start (coverage)", () => {
       const manager = createPollingManager();
-      manager.start("u1", () => {});
-      manager.start("u1", () => {});
+      manager.start("u1", () => { });
+      manager.start("u1", () => { });
       expect(manager.isActive()).toBe(true);
       manager.stop();
     });
@@ -296,7 +313,7 @@ describe("Observer API", () => {
       jest.spyOn(client, "getCurrentState").mockImplementation(() => statePromise as any);
 
       // Mock cancel to do nothing (so promise doesn't reject)
-      jest.spyOn(client, "cancel").mockImplementation(() => {});
+      jest.spyOn(client, "cancel").mockImplementation(() => { });
 
       const onUpdate = jest.fn();
       manager.start("u1", onUpdate); // This triggers the immediate poll
@@ -336,6 +353,9 @@ describe("Observer API", () => {
     it("fetchCurrentState", async () => {
       mockFetch.mockResolvedValueOnce({ ok: true, json: async () => ({}) });
       await fetchCurrentState("u1");
+
+      mockFetch.mockResolvedValueOnce({ ok: true, json: async () => ({}) });
+      await fetchCurrentState("u1", "http://custom:8000");
     });
     it("generateMockResponse", () => {
       generateMockResponse("u1");

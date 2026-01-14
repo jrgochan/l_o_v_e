@@ -504,22 +504,21 @@ export class ObserverApiClient {
    */
   async healthCheck(): Promise<boolean> {
     const url = `${this.config.baseUrl}/health`;
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), this.config.timeout);
 
     try {
-      const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), this.config.timeout);
-
       const response = await fetch(url, {
         method: "GET",
         headers: { "Content-Type": "application/json" },
         signal: controller.signal,
       });
-
-      clearTimeout(timeoutId);
       return response.ok;
     } catch {
       // console.error("Observer API health check failed:", error);
       return false;
+    } finally {
+      clearTimeout(timeoutId);
     }
   }
 
@@ -527,10 +526,10 @@ export class ObserverApiClient {
    * Fetch with automatic retry logic
    */
   private async fetchWithRetry(url: string, attempt: number = 1): Promise<Response> {
-    try {
-      this.abortController = new AbortController();
-      const timeoutId = setTimeout(() => this.abortController?.abort(), this.config.timeout);
+    this.abortController = new AbortController();
+    const timeoutId = setTimeout(() => this.abortController?.abort(), this.config.timeout);
 
+    try {
       const response = await fetch(url, {
         method: "GET",
         headers: {
@@ -539,7 +538,6 @@ export class ObserverApiClient {
         signal: this.abortController.signal,
       });
 
-      clearTimeout(timeoutId);
       return response;
     } catch (error) {
       if (attempt < this.config.retryAttempts) {
@@ -548,6 +546,8 @@ export class ObserverApiClient {
         return this.fetchWithRetry(url, attempt + 1);
       }
       throw error;
+    } finally {
+      clearTimeout(timeoutId);
     }
   }
 

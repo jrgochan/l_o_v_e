@@ -262,12 +262,6 @@ describe("EmotionsTab", () => {
     (adminApi.getAtlasEmotions as jest.Mock).mockResolvedValue(mockEmotions);
     const error = new Error("Import crashed");
 
-    // We want importAtlasData to be called and fail? 
-    // OR file reading to fail?
-    // The previous test logic was:
-    // (adminApi.importAtlasData as jest.Mock).mockRejectedValue(error);
-    // So we need file reading to succeed.
-
     (adminApi.importAtlasData as jest.Mock).mockRejectedValue(error);
 
     const { container } = render(<EmotionsTab />);
@@ -284,6 +278,202 @@ describe("EmotionsTab", () => {
 
     await waitFor(() => {
       expect(screen.getByText("Import crashed")).toBeInTheDocument();
+    });
+  });
+
+  it("handles empty file selection", async () => {
+    (adminApi.getAtlasEmotions as jest.Mock).mockResolvedValue(mockEmotions);
+    const { container } = render(<EmotionsTab />);
+    await waitFor(() => expect(screen.getByText("Joy")).toBeInTheDocument());
+
+    const input = container.querySelector('input[type="file"]') as HTMLInputElement;
+
+    // Simulate cancelling file dialog / empty selection
+    fireEvent.change(input, { target: { files: [] } });
+
+    // Should not trigger import
+    expect(adminApi.importAtlasData).not.toHaveBeenCalled();
+  });
+
+  it("handles non-Error objects in fetch", async () => {
+    (adminApi.getAtlasEmotions as jest.Mock).mockRejectedValue("String Error");
+    render(<EmotionsTab />);
+    await waitFor(() => {
+      expect(screen.getByText("Failed to load atlas data")).toBeInTheDocument();
+    });
+  });
+
+  it("handles non-Error objects in save", async () => {
+    (adminApi.getAtlasEmotions as jest.Mock).mockResolvedValue(mockEmotions);
+    // Mock save to reject with non-Error
+    (adminApi.updateAtlasEmotion as jest.Mock).mockRejectedValue({ some: "obj" });
+
+    render(<EmotionsTab />);
+    await waitFor(() => expect(screen.getByText("Joy")).toBeInTheDocument());
+
+    const row = screen.getByText("Joy").closest("tr")!;
+    fireEvent.click(within(row).getByTitle("Edit"));
+    fireEvent.click(within(row).getByTitle("Save"));
+
+    await waitFor(() => {
+      expect(screen.getByText("Failed to update emotion")).toBeInTheDocument();
+    });
+  });
+
+  it("handles non-Error objects in export", async () => {
+    (adminApi.getAtlasEmotions as jest.Mock).mockResolvedValue(mockEmotions);
+    (adminApi.exportAtlasData as jest.Mock).mockRejectedValue(123);
+
+    render(<EmotionsTab />);
+    await waitFor(() => expect(screen.getByText("Joy")).toBeInTheDocument());
+
+    fireEvent.click(screen.getByText("Export JSON"));
+    await waitFor(() => {
+      expect(screen.getByText("Export failed")).toBeInTheDocument();
+    });
+  });
+
+  it("handles non-Error objects in import", async () => {
+    (adminApi.getAtlasEmotions as jest.Mock).mockResolvedValue(mockEmotions);
+    (adminApi.importAtlasData as jest.Mock).mockRejectedValue(null);
+
+    const { container } = render(<EmotionsTab />);
+    await waitFor(() => expect(screen.getByText("Joy")).toBeInTheDocument());
+
+    const file = new File(["{}"], "test.json", { type: "application/json" });
+    Object.defineProperty(file, 'text', {
+      value: jest.fn().mockResolvedValue("{}")
+    });
+
+    const input = container.querySelector('input[type="file"]') as HTMLInputElement;
+    await userEvent.upload(input, file);
+
+    await waitFor(() => {
+      expect(screen.getByText("Import failed")).toBeInTheDocument();
+    });
+  });
+
+  it("handles VAC changes with valid and invalid inputs", async () => {
+    (adminApi.getAtlasEmotions as jest.Mock).mockResolvedValue(mockEmotions);
+    render(<EmotionsTab />);
+    await waitFor(() => expect(screen.getByText("Joy")).toBeInTheDocument());
+
+    const row = screen.getByText("Joy").closest("tr")!;
+    fireEvent.click(within(row).getByTitle("Edit"));
+
+    const vacInputs = within(row).getAllByRole("spinbutton") as HTMLInputElement[];
+    expect(vacInputs).toHaveLength(3);
+
+    // Test valid change
+    fireEvent.change(vacInputs[0], { target: { value: "0" } });
+    expect(vacInputs[0].value).toBe("0");
+
+    // Test invalid change (NaN) - should not update state
+    // We need to verify state didn't change. 
+    // Since input value is controlled by state, if state doesn't update, value shouldn't change
+    // BUT simulate change event with "abc" on number input usually results in empty string value in standard DOM
+    // In React testing library, fireEvent.change essentially sets the value prop if controlled?
+    // Let's spy on setEditForm or just check if value reverts or stays
+
+    // Reset to known
+    fireEvent.change(vacInputs[0], { target: { value: "0.5" } });
+    expect(vacInputs[0].value).toBe("0.5");
+
+    // Try NaN
+    fireEvent.change(vacInputs[0], { target: { value: "nan" } });
+    // If logic works: const val = parseFloat("nan"); if(isNaN(val)) return;
+    // So setState is NOT called.
+    // The input value in DOM *might* drift if we don't force re-render, but usually React handles this.
+    // Let's just assume if we save, it uses 0.5
+
+    // Save and check call
+    (adminApi.updateAtlasEmotion as jest.Mock).mockResolvedValue(mockEmotions[0]);
+    fireEvent.click(within(row).getByTitle("Save"));
+
+    await waitFor(() => {
+      expect(adminApi.updateAtlasEmotion).toHaveBeenCalledWith("e1", expect.objectContaining({
+        vac_vector: [0.5, 0.5, 0.2] // First value should stay 0.5, not become NaN
+      }));
+    });
+  });
+
+  it("handles definition change", async () => {
+    (adminApi.getAtlasEmotions as jest.Mock).mockResolvedValue(mockEmotions);
+    render(<EmotionsTab />);
+    await waitFor(() => expect(screen.getByText("Joy")).toBeInTheDocument());
+
+    const row = screen.getByText("Joy").closest("tr")!;
+    fireEvent.click(within(row).getByTitle("Edit"));
+
+    const defInput = within(row).getByDisplayValue("A feeling of great pleasure.");
+    fireEvent.change(defInput, { target: { value: "New Def" } });
+
+    expect(defInput).toHaveValue("New Def");
+  });
+
+  it("handles missing vac vector fallback", async () => {
+    // Mock emotion with missing VAC (if possible by type, though type usually requires it)
+    const brokenEmotion = { ...mockEmotions[0], id: "e3", vac_vector: undefined as unknown as number[] };
+    (adminApi.getAtlasEmotions as jest.Mock).mockResolvedValue([brokenEmotion]);
+
+    render(<EmotionsTab />);
+    await waitFor(() => expect(screen.getByText("Joy")).toBeInTheDocument());
+
+    const row = screen.getByText("Joy").closest("tr")!;
+    fireEvent.click(within(row).getByTitle("Edit"));
+
+    // Should default to 0s and render inputs
+    const vacInputs = within(row).getAllByRole("spinbutton");
+    expect(vacInputs[0]).toHaveValue(0); // 0 fallback
+  });
+  it("handles empty fields in edit form (coverage)", async () => {
+    // Emotion with undefined optional fields to hit || "" branches
+    const emptyEmotion = {
+      ...mockEmotions[0],
+      id: "e_empty",
+      category: "",
+      definition: "",
+      color_hint: undefined,
+      haptic_pattern_id: undefined
+      // vac_vector checked separately
+    };
+    (adminApi.getAtlasEmotions as jest.Mock).mockResolvedValue([emptyEmotion]);
+
+    render(<EmotionsTab />);
+    await waitFor(() => expect(screen.getByText("Joy")).toBeInTheDocument());
+
+    const row = screen.getByText("Joy").closest("tr")!;
+    fireEvent.click(within(row).getByTitle("Edit"));
+
+    // Check inputs have empty values (defaults)
+    // Both category and definition are empty, so getByDisplayValue("") finds multiple
+    const inputs = within(row).getAllByDisplayValue("");
+    expect(inputs.length).toBeGreaterThanOrEqual(2);
+    // Optionally check if one is the category input (first one generally)
+    expect(inputs[0]).toBeInTheDocument();
+  });
+
+  it("handles null files in import", async () => {
+    (adminApi.getAtlasEmotions as jest.Mock).mockResolvedValue(mockEmotions);
+    const { container } = render(<EmotionsTab />);
+    await waitFor(() => expect(screen.getByText("Joy")).toBeInTheDocument());
+
+    const input = container.querySelector('input[type="file"]') as HTMLInputElement;
+
+    // Simulate event with null files
+    fireEvent.change(input, { target: { files: null } });
+
+    expect(adminApi.importAtlasData).not.toHaveBeenCalled();
+  });
+
+  it("handles fetch success with invalid data format (non-array)", async () => {
+    (adminApi.getAtlasEmotions as jest.Mock).mockResolvedValue({ not: "an array" });
+    const { container } = render(<EmotionsTab />);
+
+    await waitFor(() => {
+      // Should not crash, renders empty list or loading done
+      const rows = container.querySelectorAll("tbody tr");
+      expect(rows.length).toBe(0);
     });
   });
 });

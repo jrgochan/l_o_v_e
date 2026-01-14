@@ -8,7 +8,7 @@ import {
 describe("Listener API", () => {
   const mockFetch = jest.fn();
   global.fetch = mockFetch;
-  const mockConsoleError = jest.spyOn(console, "error").mockImplementation(() => {});
+  const mockConsoleError = jest.spyOn(console, "error").mockImplementation(() => { });
 
   beforeEach(() => {
     jest.useRealTimers();
@@ -140,6 +140,9 @@ describe("Listener API", () => {
     it("analyzeText", async () => {
       mockFetch.mockResolvedValueOnce({ ok: true, json: async () => ({}) });
       await analyzeText("t");
+
+      mockFetch.mockResolvedValueOnce({ ok: true, json: async () => ({}) });
+      await analyzeText("t", "u2", "http://custom:8000");
     });
   });
 });

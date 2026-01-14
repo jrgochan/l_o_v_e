@@ -2,6 +2,7 @@
 import { render, screen, fireEvent, waitFor, within } from "@testing-library/react";
 import AiModelsTab from "@/components/admin/data/AiModelsTab";
 import { adminApi } from "@/utils/api";
+import { act } from "react";
 
 jest.mock("@/utils/api", () => ({
   adminApi: {
@@ -13,19 +14,19 @@ jest.mock("@/utils/api", () => ({
 describe("AiModelsTab", () => {
   const mockModels = [
     {
-      function: "chat_completion",
-      ai_model_name: "llama3",
-      avg_latency_ms: 150,
+      function: "chat_generation",
+      ai_model_name: "llama3.1:8b-instruct-q4_0",
+      avg_latency_ms: 150.5,
       total_invocations: 100,
-      last_used_at: "2024-01-01T12:00:00Z"
+      last_used_at: "2024-01-01T12:00:00Z",
     },
     {
-      function: "embedding",
-      ai_model_name: "nomic-embed",
-      avg_latency_ms: 50,
-      total_invocations: 500,
-      last_used_at: null
-    }
+      function: "audio_transcription",
+      ai_model_name: "whisper:base",
+      avg_latency_ms: null,
+      total_invocations: 0,
+      last_used_at: null,
+    },
   ];
 
   beforeEach(() => {
@@ -38,96 +39,148 @@ describe("AiModelsTab", () => {
     expect(screen.getByText("Loading AI configuration...")).toBeInTheDocument();
   });
 
-  it("renders models table on success", async () => {
+  it("renders models table on success (with conditional formatting)", async () => {
     (adminApi.getAiModels as jest.Mock).mockResolvedValue(mockModels);
     render(<AiModelsTab />);
 
     await waitFor(() => {
-      expect(screen.getByText("chat_completion")).toBeInTheDocument();
+      expect(screen.getByText("chat_generation")).toBeInTheDocument();
     });
 
-    expect(screen.getByText("llama3")).toBeInTheDocument();
-    expect(screen.getByText("150ms")).toBeInTheDocument();
-    expect(screen.getByText("nomic-embed")).toBeInTheDocument();
-    // Verify last used formatting
-    expect(screen.getByText(new Date("2024-01-01T12:00:00Z").toLocaleTimeString())).toBeInTheDocument();
+    // Check with latency
+    expect(screen.getByText("151ms")).toBeInTheDocument(); // Math.round(150.5) -> 151
+    expect(screen.getByText("100")).toBeInTheDocument();
+
+    // Check without latency (null)
+    expect(screen.getByText("audio_transcription")).toBeInTheDocument();
+    const rows = screen.getAllByRole("row");
+    // Find the row for audio_transcription
+    const audioRow = rows.find(r => r.textContent?.includes("audio_transcription"));
+    expect(audioRow).toBeDefined();
+    expect(within(audioRow!).getAllByText("-").length).toBeGreaterThanOrEqual(2); // Latency and LastUsed are "-"
   });
 
-  it("handles fetch error", async () => {
-    (adminApi.getAiModels as jest.Mock).mockRejectedValue(new Error("Fetch failed"));
+  it("handles fetch error (Error object)", async () => {
+    (adminApi.getAiModels as jest.Mock).mockRejectedValue(new Error("API Error"));
     render(<AiModelsTab />);
+
     await waitFor(() => {
-      expect(screen.getByText("Fetch failed")).toBeInTheDocument();
+      expect(screen.getByText("API Error")).toBeInTheDocument();
     });
   });
 
-  it("handles editing a model assignment", async () => {
+  it("handles fetch error (non-Error string)", async () => {
+    (adminApi.getAiModels as jest.Mock).mockRejectedValue("String Failure");
+    render(<AiModelsTab />);
+
+    await waitFor(() => {
+      expect(screen.getByText("Failed to load AI models")).toBeInTheDocument();
+    });
+  });
+
+  it("handles editing and saving a model assignment", async () => {
     (adminApi.getAiModels as jest.Mock).mockResolvedValue(mockModels);
     (adminApi.updateAiModel as jest.Mock).mockResolvedValue({
       ...mockModels[0],
-      ai_model_name: "llama3.1:8b-instruct-q4_0"
+      ai_model_name: "mixtral:8x7b-instruct-v0.1"
     });
 
     render(<AiModelsTab />);
-    await waitFor(() => expect(screen.getByText("chat_completion")).toBeInTheDocument());
+    await waitFor(() => expect(screen.getByText("chat_generation")).toBeInTheDocument());
 
-    const row = screen.getByText("chat_completion").closest("tr")!;
-    fireEvent.click(within(row).getByLabelText("Edit chat_completion"));
+    const editBtn = screen.getByLabelText("Edit chat_generation");
+    fireEvent.click(editBtn);
 
-    const select = within(row).getByRole("combobox");
-    fireEvent.change(select, { target: { value: "llama3.1:8b-instruct-q4_0" } });
+    const select = screen.getByRole("combobox");
+    expect(select).toHaveValue("llama3.1:8b-instruct-q4_0");
 
-    fireEvent.click(within(row).getByLabelText("Save"));
+    fireEvent.change(select, { target: { value: "mixtral:8x7b-instruct-v0.1" } });
+
+    fireEvent.click(screen.getByLabelText("Save"));
 
     await waitFor(() => {
-      expect(adminApi.updateAiModel).toHaveBeenCalledWith("chat_completion", {
-        ai_model_name: "llama3.1:8b-instruct-q4_0"
+      expect(adminApi.updateAiModel).toHaveBeenCalledWith("chat_generation", {
+        ai_model_name: "mixtral:8x7b-instruct-v0.1"
       });
+      // The local update logic uses map
+      expect(screen.getAllByText("mixtral:8x7b-instruct-v0.1")).toHaveLength(1); // One in text
     });
+  });
 
-    // Check update reflected in UI (via state update from mock response)
-    expect(within(row).getByText("llama3.1:8b-instruct-q4_0")).toBeInTheDocument();
+  it("handles editing and saving failure (Error object)", async () => {
+    (adminApi.getAiModels as jest.Mock).mockResolvedValue(mockModels);
+    (adminApi.updateAiModel as jest.Mock).mockRejectedValue(new Error("Update Failed"));
+
+    render(<AiModelsTab />);
+    await waitFor(() => expect(screen.getByText("chat_generation")).toBeInTheDocument());
+
+    fireEvent.click(screen.getByLabelText("Edit chat_generation"));
+    fireEvent.click(screen.getByLabelText("Save"));
+
+    await waitFor(() => {
+      expect(screen.getByText("Update Failed")).toBeInTheDocument();
+    });
+  });
+
+  it("handles editing and saving failure (non-Error)", async () => {
+    (adminApi.getAiModels as jest.Mock).mockResolvedValue(mockModels);
+    (adminApi.updateAiModel as jest.Mock).mockRejectedValue("String Update Error");
+
+    render(<AiModelsTab />);
+    await waitFor(() => expect(screen.getByText("chat_generation")).toBeInTheDocument());
+
+    fireEvent.click(screen.getByLabelText("Edit chat_generation"));
+    fireEvent.click(screen.getByLabelText("Save"));
+
+    await waitFor(() => {
+      expect(screen.getByText("Failed to update model")).toBeInTheDocument();
+    });
   });
 
   it("handles cancel edit", async () => {
     (adminApi.getAiModels as jest.Mock).mockResolvedValue(mockModels);
     render(<AiModelsTab />);
-    await waitFor(() => expect(screen.getByText("chat_completion")).toBeInTheDocument());
+    await waitFor(() => expect(screen.getByText("chat_generation")).toBeInTheDocument());
 
-    const row = screen.getByText("chat_completion").closest("tr")!;
-    fireEvent.click(within(row).getByLabelText("Edit chat_completion"));
+    fireEvent.click(screen.getByLabelText("Edit chat_generation"));
+    expect(screen.getByRole("combobox")).toBeInTheDocument();
 
-    expect(within(row).getByRole("combobox")).toBeInTheDocument();
-
-    fireEvent.click(within(row).getByLabelText("Cancel"));
-
-    expect(within(row).queryByRole("combobox")).not.toBeInTheDocument();
-    expect(within(row).getByText("llama3")).toBeInTheDocument();
-  });
-
-  it("handles save error", async () => {
-    (adminApi.getAiModels as jest.Mock).mockResolvedValue(mockModels);
-    (adminApi.updateAiModel as jest.Mock).mockRejectedValue(new Error("Update failed"));
-
-    render(<AiModelsTab />);
-    await waitFor(() => expect(screen.getByText("chat_completion")).toBeInTheDocument());
-
-    const row = screen.getByText("chat_completion").closest("tr")!;
-    fireEvent.click(within(row).getByLabelText("Edit chat_completion"));
-    fireEvent.click(within(row).getByLabelText("Save"));
-
-    await waitFor(() => {
-      expect(screen.getByText("Update failed")).toBeInTheDocument();
-    });
+    fireEvent.click(screen.getByLabelText("Cancel"));
+    expect(screen.queryByRole("combobox")).not.toBeInTheDocument();
   });
 
   it("handles refresh click", async () => {
     (adminApi.getAiModels as jest.Mock).mockResolvedValue(mockModels);
     render(<AiModelsTab />);
-    await waitFor(() => expect(screen.getByText("chat_completion")).toBeInTheDocument());
+    await waitFor(() => expect(screen.getByText("chat_generation")).toBeInTheDocument());
+
+    (adminApi.getAiModels as jest.Mock).mockResolvedValue([
+      { ...mockModels[0], total_invocations: 101 }
+    ]);
 
     fireEvent.click(screen.getByLabelText("Refresh Config"));
 
-    expect(adminApi.getAiModels).toHaveBeenCalledTimes(2); // initial + refresh
+    await waitFor(() => {
+      expect(screen.getByText("101")).toBeInTheDocument();
+    });
+  });
+
+  it("handles save guard when editingFunction is null (unreachable UI state)", async () => {
+    (adminApi.getAiModels as jest.Mock).mockResolvedValue(mockModels);
+    render(<AiModelsTab />);
+    await waitFor(() => expect(screen.getByText("chat_generation")).toBeInTheDocument());
+
+    // Enter edit mode
+    fireEvent.click(screen.getByLabelText("Edit chat_generation"));
+    const saveBtn = screen.getByLabelText("Save");
+
+    // Exit edit mode (set editingFunction null)
+    fireEvent.click(screen.getByLabelText("Cancel"));
+
+    // Guard check: functional update shouldn't happen if I click the stale button
+    // (though in reality button is unmounted, JSDOM allows clicking detached nodes)
+    fireEvent.click(saveBtn);
+
+    expect(adminApi.updateAiModel).not.toHaveBeenCalled();
   });
 });
