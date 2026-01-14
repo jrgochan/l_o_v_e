@@ -133,7 +133,16 @@ describe("ClinicalAlertsTab", () => {
 
     const item = screen.getByLabelText("View alert details: High heart rate detected");
 
+    // Test Enter key
     fireEvent.keyDown(item, { key: "Enter" });
+    expect(screen.getByText("Alert Details")).toBeInTheDocument();
+
+    // Close to reset
+    fireEvent.click(screen.getByLabelText("Close Details"));
+    expect(screen.queryByText("Alert Details")).not.toBeInTheDocument();
+
+    // Test Space key
+    fireEvent.keyDown(item, { key: " " });
     expect(screen.getByText("Alert Details")).toBeInTheDocument();
   });
 

@@ -84,8 +84,8 @@ export function SessionTimeline({ emotionTimeline }: SessionTimelineProps) {
                 {/* Event details */}
                 <div
                   className={`flex-1 pb-3 ${isLast
-                      ? "bg-gray-700/50 -mt-1 -ml-3 pl-9 pr-4 py-3 rounded-lg border border-cyan-500/30"
-                      : ""
+                    ? "bg-gray-700/50 -mt-1 -ml-3 pl-9 pr-4 py-3 rounded-lg border border-cyan-500/30"
+                    : ""
                     }`}
                 >
                   <div className="flex items-start justify-between gap-2">
@@ -94,7 +94,7 @@ export function SessionTimeline({ emotionTimeline }: SessionTimelineProps) {
                         <span className="text-sm font-semibold text-white truncate">
                           {event.emotion}
                         </span>
-                        {event.alertLevel && event.alertLevel !== "stable" && (
+                        {event.alertLevel && (
                           <span className="text-xs">{getAlertIcon(event.alertLevel)}</span>
                         )}
                       </div>

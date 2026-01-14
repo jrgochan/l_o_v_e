@@ -235,6 +235,34 @@ describe("EmotionsTab", () => {
       expect(adminApi.importAtlasData).toHaveBeenCalled();
       expect(screen.getByText(/Import complete: 5 emotions updated/)).toBeInTheDocument();
     });
+
+    // Verify input value is cleared (finally block coverage)
+    expect(input.value).toBe("");
+  });
+
+  it("handles editing an emotion with incomplete string vector", async () => {
+    // Mock emotion with vac_vector having fewer than 3 elements to trigger ?? 0 fallback
+    const incompleteEmotion = {
+      ...mockEmotions[0],
+      id: "e_inc",
+      vac_vector: [0.5, 0.5] as any // Force 2 elements
+    };
+    (adminApi.getAtlasEmotions as jest.Mock).mockResolvedValue([incompleteEmotion]);
+
+    render(<EmotionsTab />);
+    await waitFor(() => expect(screen.getByText("Joy")).toBeInTheDocument());
+
+    const row = screen.getByText("Joy").closest("tr")!;
+    fireEvent.click(within(row).getByTitle("Edit"));
+
+    const vacInputs = within(row).getAllByRole("spinbutton") as HTMLInputElement[];
+    expect(vacInputs).toHaveLength(3);
+
+    // The 1st and 2nd should have values
+    expect(vacInputs[0]).toHaveValue(0.5);
+    expect(vacInputs[1]).toHaveValue(0.5);
+    // The 3rd input should fallback to 0 (because index 2 is undefined)
+    expect(vacInputs[2]).toHaveValue(0);
   });
 
   it("handles import partial errors", async () => {

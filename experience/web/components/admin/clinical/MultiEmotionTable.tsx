@@ -28,8 +28,6 @@ type SortKey =
   | "emotion"
   | "confidence"
   | "valence"
-  | "arousal"
-  | "connection"
   | "voice_alignment"
   | "prominence";
 type SortDirection = "asc" | "desc";
@@ -67,6 +65,10 @@ export function MultiEmotionTable({
         case "confidence":
           aValue = a.confidence;
           bValue = b.confidence;
+          break;
+        case "valence":
+          aValue = a.vac.valence;
+          bValue = b.vac.valence;
           break;
         case "voice_alignment":
           aValue = a.voice_alignment ?? -1;
@@ -279,10 +281,14 @@ export function MultiEmotionTable({
                   {renderSortIndicator("confidence")}
                 </div>
               </th>
-              <th className="px-4 py-3 text-center text-gray-300 font-semibold">
+              <th
+                className="px-4 py-3 text-center text-gray-300 font-semibold cursor-pointer hover:bg-gray-750 transition"
+                onClick={() => handleSort("valence")}
+              >
                 <div className="flex items-center justify-center gap-2">
                   <span>VAC Coordinates</span>
                   <span className="text-gray-600 text-xs">(V, A, C)</span>
+                  {renderSortIndicator("valence")}
                 </div>
               </th>
               <th

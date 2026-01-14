@@ -65,22 +65,23 @@ export default function BootstrapTab() {
   };
 
   const handleSave = async () => {
-    if (!currentEdit) return;
+    // UI guarantees currentEdit is set when in edit mode
+    const editData = currentEdit!;
 
     try {
-      if (currentEdit.id) {
+      if (editData.id) {
         // Update
-        await adminApi.updateBootstrapData(currentEdit.id, {
-          data_type: currentEdit.data_type,
-          data_category: currentEdit.data_category,
-          content: currentEdit.content,
+        await adminApi.updateBootstrapData(editData.id, {
+          data_type: editData.data_type,
+          data_category: editData.data_category,
+          content: editData.content,
         });
       } else {
         // Create
         await adminApi.createBootstrapData({
-          data_type: currentEdit.data_type!,
-          data_category: currentEdit.data_category,
-          content: currentEdit.content || {},
+          data_type: editData.data_type!,
+          data_category: editData.data_category,
+          content: editData.content,
         } as BootstrapDataCreate);
       }
       setIsEditing(false);

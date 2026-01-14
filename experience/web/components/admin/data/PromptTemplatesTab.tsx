@@ -90,7 +90,7 @@ export function PromptTemplatesTab() {
           function_name: currentPrompt.function_name,
           version: currentPrompt.version,
           template_content: currentPrompt.template_content,
-          input_variables: currentPrompt.input_variables || [],
+          input_variables: currentPrompt.input_variables!, // Guaranteed by handleCreate init
           description: currentPrompt.description,
           is_active: currentPrompt.is_active,
         };

@@ -114,7 +114,9 @@ export function EmotionsTab() {
       setError(err instanceof Error ? err.message : "Import failed");
     } finally {
       setLoading(false);
-      if (fileInputRef.current) fileInputRef.current.value = "";
+      if (fileInputRef.current) {
+        fileInputRef.current.value = "";
+      }
     }
   };
 

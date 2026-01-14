@@ -33,15 +33,61 @@ describe("StrategiesTab", () => {
     }
   ];
 
+  // Setup fake timers
   beforeEach(() => {
     jest.clearAllMocks();
   });
+
+  afterEach(() => {
+    jest.useRealTimers();
+  });
+
+  it("clears success message after timeout", async () => {
+    jest.useFakeTimers();
+    (adminApi.getStrategies as jest.Mock).mockResolvedValue(mockStrategies);
+    (adminApi.updateStrategy as jest.Mock).mockResolvedValue({});
+
+    render(<StrategiesTab />);
+    await waitFor(() => expect(screen.getByText("CBT Reframe")).toBeInTheDocument());
+
+    fireEvent.click(screen.getByLabelText("Edit"));
+    fireEvent.click(screen.getByLabelText("Save"));
+
+    await waitFor(() => {
+      expect(screen.getByText("Strategy updated successfully.")).toBeInTheDocument();
+    });
+
+    // Fast-forward time
+    jest.advanceTimersByTime(5000);
+
+    await waitFor(() => {
+      expect(screen.queryByText("Strategy updated successfully.")).not.toBeInTheDocument();
+    });
+    jest.useRealTimers();
+  });
+
+  // Replaces the skipped test with a working one or just relies on the existing import success logic
+  // logic above covers import success. We just need to ensure we covered `handleFileChange` completely.
+  // The existing test "handles import success" uses `userEvent.upload`.
+  // The skipped test used manual `FileReader` mocking which might be brittle.
+  // We can just delete the skipped test or fix it.
+  // I will delete the skipped test in a separate edit or just ignore it.
+  // Actually, I'll rewrite the skipped test to be a proper file interaction test if needed,
+  // but "handles import success" already covers it.
+  // So I will just remove the skipping and make it work or remove it.
+  // The skipped test was "handles file import correctly".
+  // It tried to mock FileReader globally which conflicts with JSDOM sometimes.
+  // Since "handles import success" uses `userEvent.upload`, that is the better way.
+  // I will just remove the skipped test.
+
+  /* Removed skipped manual FileReader test in favor of userEvent.upload test */
 
   it("renders loading state", async () => {
     (adminApi.getStrategies as jest.Mock).mockReturnValue(new Promise(() => { }));
     const { container } = render(<StrategiesTab />);
     expect(container.querySelector(".animate-spin")).toBeInTheDocument();
   });
+
 
   it("renders strategies list on success", async () => {
     (adminApi.getStrategies as jest.Mock).mockResolvedValue(mockStrategies);
@@ -218,7 +264,32 @@ describe("StrategiesTab", () => {
 
     await waitFor(() => {
       expect(adminApi.importStrategies).toHaveBeenCalled();
-      expect(screen.getByText("Import complete: 1 updated, 0 created.")).toBeInTheDocument();
+      // Ensure reload happens (initial load + reload = 2 calls)
+      // Actually we need to check if getStrategies call count increased
+      expect(adminApi.getStrategies).toHaveBeenCalledTimes(2);
+      expect(screen.getByText(/Import complete: 1 updated, 0 created/)).toBeInTheDocument();
+    });
+  });
+
+  it("handles import success with errors (partial)", async () => {
+    (adminApi.getStrategies as jest.Mock).mockResolvedValue(mockStrategies);
+    (adminApi.importStrategies as jest.Mock).mockResolvedValue({
+      updated: 1,
+      created: 0,
+      errors: ["Row 5 invalid"]
+    });
+
+    const { container } = render(<StrategiesTab />);
+    await waitFor(() => expect(screen.getByText("CBT Reframe")).toBeInTheDocument());
+
+    const file = new File([JSON.stringify(mockStrategies)], "strategies.json", { type: "application/json" });
+    Object.defineProperty(file, 'text', { value: jest.fn().mockResolvedValue(JSON.stringify(mockStrategies)) });
+    const input = container.querySelector('input[type="file"]') as HTMLInputElement;
+    await userEvent.upload(input, file);
+
+    await waitFor(() => {
+      expect(adminApi.getStrategies).toHaveBeenCalledTimes(2); // Reload after import
+      expect(screen.getByText(/Imported with errors: Row 5 invalid/)).toBeInTheDocument();
     });
   });
 
@@ -467,50 +538,7 @@ describe("StrategiesTab", () => {
     expect(screen.getAllByDisplayValue("").length).toBeGreaterThan(0);
   });
 
-  it.skip("handles file import correctly", async () => {
-    (adminApi.getStrategies as jest.Mock).mockResolvedValue(mockStrategies);
-    (adminApi.importStrategies as jest.Mock).mockResolvedValue(mockStrategies);
 
-    const { container } = render(<StrategiesTab />);
-    await waitFor(() => expect(screen.getByText("CBT Reframe")).toBeInTheDocument());
-
-    const file = new File([JSON.stringify(mockStrategies)], "strategies.json", { type: "application/json" });
-
-    // Mock FileReader
-    const originalFileReader = window.FileReader;
-    const fileReaderMock = {
-      readAsText: jest.fn(),
-      onload: null as any,
-    };
-    window.FileReader = jest.fn(() => fileReaderMock) as any;
-
-    const fileInput = container.querySelector('input[type="file"]') as HTMLInputElement;
-    expect(fileInput).toBeInTheDocument();
-
-    // Trigger onchange
-    // Need to manually set files property for JSDOM/fireEvent to work reliably with file inputs
-    Object.defineProperty(fileInput, 'files', {
-      value: [file],
-    });
-    fireEvent.change(fileInput);
-
-    // Trigger FileReader onload
-    expect(fileReaderMock.readAsText).toHaveBeenCalledWith(file);
-    fileReaderMock.onload({ target: { result: JSON.stringify(mockStrategies) } });
-
-    await waitFor(() => {
-      expect(adminApi.importStrategies).toHaveBeenCalledWith(mockStrategies);
-    });
-
-    // Error case (invalid JSON)
-    const consoleErrorSpy = jest.spyOn(console, "error").mockImplementation(() => { });
-    fileReaderMock.onload({ target: { result: "invalid json" } });
-    expect(consoleErrorSpy).toHaveBeenCalledWith("Failed to parse strategies", expect.any(Error));
-    consoleErrorSpy.mockRestore();
-
-    // Cleanup
-    window.FileReader = originalFileReader;
-  });
 
   it("manages detailed steps in edit mode", async () => {
     const user = userEvent.setup();
