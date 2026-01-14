@@ -90,4 +90,19 @@ describe("useMatrixProcessing", () => {
     );
     expect(result.current.getCategoryAverageDifficulty("Low", "NonExistent")).toBeNull();
   });
+
+  it("should get category cell color", () => {
+    const { result } = renderHook(() =>
+      useMatrixProcessing({ allEmotions: mockEmotions, computedPaths: mockPaths })
+    );
+
+    // Same category -> dark gray
+    expect(result.current.getCategoryCellColor("Calm", "Calm")).toBe("#1a1a1a");
+
+    // Existing path avg (Calm -> Low) = moderate
+    expect(result.current.getCategoryCellColor("Calm", "Low")).toBe(DIFFICULTY_COLORS["moderate"]);
+
+    // No paths (Low -> NonExistent or just empty intersection) -> fallback gray
+    expect(result.current.getCategoryCellColor("Low", "NonExistent")).toBe("#2a2a2a");
+  });
 });

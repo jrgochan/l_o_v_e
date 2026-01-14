@@ -302,7 +302,60 @@ describe("useZenKeyboardShortcuts", () => {
 
     it("should ignore shortcuts with modifiers", () => {
         renderHook(() => useZenKeyboardShortcuts(getProps()));
-        dispatchKey("m", { ctrlKey: true });
-        expect(mockToggleMute).not.toHaveBeenCalled();
+        const keys = ["m", "i", "v", "t", "a", "s", "e", "f", "l", "p", " ", "ArrowRight", "ArrowLeft", "ArrowUp", "ArrowDown", "d", "j"];
+
+        keys.forEach(key => {
+            jest.clearAllMocks();
+            dispatchKey(key, { ctrlKey: true });
+            expect(mockSettingsStore.updateLayer).not.toHaveBeenCalled();
+            expect(mockSettingsStore.updateVisualSetting).not.toHaveBeenCalled();
+            expect(mockExpStore.setTransitionPath).not.toHaveBeenCalled();
+        });
+    });
+
+    it("should handle empty categories gracefully", () => {
+        const props = getProps();
+        props.emotions = []; // No emotions -> No categories
+        mockExpStore.transitionPath = { current_state: { emotion: "Joy" } } as any;
+        mockSettingsStore.layers.transitionPaths = true;
+
+        renderHook(() => useZenKeyboardShortcuts(props));
+
+        dispatchKey("ArrowRight");
+        expect(mockExpStore.setTransitionPath).not.toHaveBeenCalled();
+
+        dispatchKey("ArrowLeft");
+        expect(mockExpStore.setTransitionPath).not.toHaveBeenCalled();
+    });
+
+    it("should handle insufficient emotions in category", () => {
+        // Only 1 emotion in Happiness
+        const props = getProps();
+        props.emotions = [{ id: "1", name: "Joy", category: "Happiness", vac: [1, 1, 1] } as any];
+
+        mockExpStore.transitionPath = { current_state: { emotion: "Joy" } } as any;
+        mockSettingsStore.layers.transitionPaths = true;
+
+        renderHook(() => useZenKeyboardShortcuts(props));
+
+        // Attempt to move/cycle
+        dispatchKey("ArrowRight"); // Next category? (Wrap around to Happiness) -> Insufficient emotions
+        expect(mockExpStore.setTransitionPath).not.toHaveBeenCalled();
+
+        dispatchKey("ArrowUp"); // Cycle in Happiness -> Insufficient emotions
+        expect(mockExpStore.setTransitionPath).not.toHaveBeenCalled();
+    });
+
+    it("should handle fallback when current category not found in path", () => {
+        // Path has emotion "Unknown", so category lookup fails, uses default/first
+        mockExpStore.transitionPath = { current_state: { emotion: "Unknown" } } as any;
+        mockSettingsStore.layers.transitionPaths = true;
+
+        renderHook(() => useZenKeyboardShortcuts(getProps()));
+
+        // Should fallback to first available category and proceed
+        dispatchKey("ArrowRight");
+        expect(mockExpStore.setTransitionPath).toHaveBeenCalled();
+        // First cat is Happiness (sorted?). Happiness has Joy, Contentment.
     });
 });

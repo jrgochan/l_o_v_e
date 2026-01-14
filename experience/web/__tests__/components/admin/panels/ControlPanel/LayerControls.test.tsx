@@ -10,8 +10,8 @@ jest.mock("@/components/admin/shared/ExportControls", () => ({
 
 describe("LayerControls", () => {
   const mockCategoryFilters = new Map([
-    ["joy", { name: "Joy", enabled: true, color: "#FFFF00" }],
-    ["sadness", { name: "Sadness", enabled: false, color: "#0000FF" }],
+    ["joy", { name: "Joy", enabled: true, color: "#FFFF00", emotionCount: 10 }],
+    ["sadness", { name: "Sadness", enabled: false, color: "#0000FF", emotionCount: 5 }],
   ]);
 
   const mockLayers = {
@@ -21,6 +21,10 @@ describe("LayerControls", () => {
     transitionPaths: false,
     waypoints: false,
     legend: true,
+    bridgeHighlight: false,
+    cinematicOverlay: false,
+    viewerShortcuts: true,
+    vacDisplay: false,
   };
 
   const mockSettings = {
@@ -101,15 +105,47 @@ describe("LayerControls", () => {
     expect(onUpdateSetting).toHaveBeenCalledWith("enableAnimations", false); // toggle from true
   });
 
+  it("handles auto-compute toggle off (negative branch)", () => {
+    const props = {
+      ...defaultProps,
+      settings: { ...mockSettings, computeMode: "cache-first" },
+    };
+    render(<LayerControls {...props} />);
+
+    // Toggle auto-compute (checked -> unchecked)
+    const autoCompute = screen.getByLabelText("Auto-compute paths");
+    expect(autoCompute).toBeChecked();
+
+    fireEvent.click(autoCompute);
+    expect(onUpdateSetting).toHaveBeenCalledWith("computeMode", "manual");
+  });
+
   it("renders layer toggles", () => {
     render(<LayerControls {...defaultProps} />);
     expect(screen.getByLabelText("Soul Sphere")).toBeChecked();
     expect(screen.getByLabelText("Paths")).not.toBeChecked();
   });
 
-  it("toggles layers", () => {
+  it("toggles all layer types", () => {
     render(<LayerControls {...defaultProps} />);
-    fireEvent.click(screen.getByLabelText("Soul Sphere"));
-    expect(onToggleLayer).toHaveBeenCalledWith("soulSphere");
+
+    const layers = [
+      { label: "Soul Sphere", key: "soulSphere" },
+      { label: "Emotion Points", key: "emotionPoints" },
+      { label: "Labels", key: "emotionLabels" },
+      { label: "Paths", key: "transitionPaths" },
+      { label: "Waypoints", key: "waypoints" },
+      { label: "Legend", key: "legend" },
+    ];
+
+    layers.forEach(({ label, key }) => {
+      fireEvent.click(screen.getByLabelText(label));
+      expect(onToggleLayer).toHaveBeenCalledWith(key);
+    });
+  });
+
+  it("renders Hide All button when all categories enabled", () => {
+    render(<LayerControls {...defaultProps} allCategoriesEnabled={true} />);
+    expect(screen.getByText("Hide All")).toBeInTheDocument();
   });
 });

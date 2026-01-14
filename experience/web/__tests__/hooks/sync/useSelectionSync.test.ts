@@ -104,4 +104,46 @@ describe("useSelectionSync", () => {
 
     expect(mockSetTarget).toHaveBeenCalledWith([1, 1, 1]);
   });
+
+  it("should match by case-insensitive ID", () => {
+    (useAtlasAdminStore as unknown as jest.Mock).mockImplementation((selector) => {
+      return selector({
+        selectedEmotionIds: new Set(["E1"]), // Uppercase ID
+        allEmotions: mockEmotions,
+      });
+    });
+
+    renderHook(() => useSelectionSync());
+
+    expect(mockSetTarget).toHaveBeenCalledWith([1, 1, 1]);
+  });
+
+  it("should match by case-insensitive Name", () => {
+    (useAtlasAdminStore as unknown as jest.Mock).mockImplementation((selector) => {
+      return selector({
+        selectedEmotionIds: new Set(["joy"]), // Lowercase Name
+        allEmotions: mockEmotions,
+      });
+    });
+
+    renderHook(() => useSelectionSync());
+
+    expect(mockSetTarget).toHaveBeenCalledWith([1, 1, 1]);
+  });
+
+  it("should handle totally invalid ID (no internal, no canonical)", () => {
+    (useAtlasAdminStore as unknown as jest.Mock).mockImplementation((selector) => {
+      return selector({
+        selectedEmotionIds: new Set(["InvalidID"]),
+        allEmotions: mockEmotions,
+      });
+    });
+
+    renderHook(() => useSelectionSync());
+
+    // Should effectively map to nothing, so reset to neutral
+    expect(mockSetTarget).toHaveBeenCalledWith([0, 0, 0]);
+    // Should NOT warn about canonical use (since none found)
+    expect(logger.warn).not.toHaveBeenCalled();
+  });
 });

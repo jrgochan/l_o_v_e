@@ -16,6 +16,7 @@ import { DIFFICULTY_COLORS, CATEGORY_COLORS } from "@/types/atlas-admin";
 import type { EmotionPath } from "@/types/atlas-admin";
 import { PathParticles } from "../visualizations/PathParticles";
 import { PathCurveAnimated } from "../paths/PathCurveAnimated";
+import { WaypointMarker } from "./WaypointMarker";
 
 export function PathNetwork() {
   const computedPaths = useAtlasAdminStore((state) => state.computedPaths);
@@ -162,6 +163,7 @@ function PathCurve({ path, opacity, showWaypoints, activePathDetails }: PathCurv
 
   return (
     <group
+      data-testid="path-group"
       onPointerEnter={handlePointerEnter}
       onPointerLeave={handlePointerLeave}
       onClick={handleClick}
@@ -204,99 +206,4 @@ function PathCurve({ path, opacity, showWaypoints, activePathDetails }: PathCurv
   );
 }
 
-interface WaypointMarkerProps {
-  position: [number, number, number];
-  emotionName: string;
-  categoryColor: string;
-  isHighlighted: boolean;
-  mode: "subtle" | "dynamic" | "mystical";
-  opacity: number;
-}
-
-function WaypointMarker({
-  position,
-  emotionName,
-  categoryColor,
-  isHighlighted,
-  mode,
-  opacity,
-}: WaypointMarkerProps) {
-  const meshRef = useRef<THREE.Mesh>(null);
-  const allEmotions = useAtlasAdminStore((state) => state.allEmotions);
-  const setHoveredEmotion = useAtlasAdminStore((state) => state.setHoveredEmotion);
-
-  const color = useMemo(() => {
-    return new THREE.Color(categoryColor);
-  }, [categoryColor]);
-
-  // Find the full emotion data for this waypoint
-  const emotion = useMemo(() => {
-    return allEmotions.find((e) => e.name === emotionName);
-  }, [allEmotions, emotionName]);
-
-  useFrame((state) => {
-    if (!meshRef.current) return;
-
-    const time = state.clock.elapsedTime;
-
-    // Mode-based pulsing animations
-    let pulse = 1.0;
-
-    switch (mode) {
-      case "subtle":
-        // Gentle pulsing (2.0 Hz, 10% amplitude)
-        pulse = 1.0 + Math.sin(time * 2.0) * 0.1;
-        break;
-
-      case "dynamic": {
-        // Bouncy pulsing (3.5 Hz, 20% amplitude with harmonic overshoot)
-        const base = Math.sin(time * 3.5) * 0.2;
-        const overshoot = Math.sin(time * 7.0) * 0.05; // Double frequency harmonic
-        pulse = 1.0 + base + overshoot;
-        break;
-      }
-
-      case "mystical": {
-        // Ethereal shimmer (variable frequency, quantum-like)
-        const wave1 = Math.sin(time * 1.7) * 0.12;
-        const wave2 = Math.sin(time * 2.3) * 0.08;
-        const wave3 = Math.sin(time * 3.1) * 0.05;
-        pulse = 1.0 + wave1 + wave2 + wave3;
-        break;
-      }
-    }
-
-    meshRef.current.scale.setScalar(pulse);
-  });
-
-  const handlePointerOver = (e: ThreeEvent<PointerEvent>) => {
-    e.stopPropagation();
-    if (emotion) {
-      setHoveredEmotion(emotion.id);
-    }
-    document.body.style.cursor = "pointer";
-  };
-
-  const handlePointerOut = () => {
-    setHoveredEmotion(null);
-    document.body.style.cursor = "auto";
-  };
-
-  return (
-    <mesh
-      ref={meshRef}
-      position={position}
-      onPointerOver={handlePointerOver}
-      onPointerOut={handlePointerOut}
-    >
-      <sphereGeometry args={[0.04, 12, 12]} />
-      <meshStandardMaterial
-        color={color}
-        emissive={color}
-        emissiveIntensity={isHighlighted ? 2.0 : 1.0}
-        transparent
-        opacity={opacity}
-      />
-    </mesh>
-  );
-}
+// Component cleanup

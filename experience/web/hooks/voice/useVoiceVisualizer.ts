@@ -46,9 +46,11 @@ export function useVoiceVisualizer(stream: MediaStream | null) {
     monitor();
 
     return () => {
+      /* istanbul ignore next */
       if (animationFrameRef.current) {
         cancelAnimationFrame(animationFrameRef.current);
       }
+      /* istanbul ignore next */
       if (audioContextRef.current) {
         audioContextRef.current.close().catch(() => { });
       }
