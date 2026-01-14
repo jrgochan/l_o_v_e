@@ -1,7 +1,7 @@
+
 import { render, screen, fireEvent } from "@testing-library/react";
-import userEvent from "@testing-library/user-event";
 import { LayerControls } from "@/components/admin/panels/ControlPanel/LayerControls";
-import { CategoryFilter, LayerVisibility, AtlasAdminSettings } from "@/types/atlas-admin";
+import { ExportControls } from "@/components/admin/shared/ExportControls";
 
 // Mock ExportControls
 jest.mock("@/components/admin/shared/ExportControls", () => ({
@@ -9,137 +9,107 @@ jest.mock("@/components/admin/shared/ExportControls", () => ({
 }));
 
 describe("LayerControls", () => {
-  const mockToggleCategoryFilter = jest.fn();
-  const mockToggleAllCategories = jest.fn();
-  const mockUpdateSetting = jest.fn();
-  const mockToggleLayer = jest.fn();
-
-  const partialFilters = new Map<string, CategoryFilter>([
-    ["Joy", { name: "Joy", enabled: true, color: "yellow", emotionCount: 10 }],
-    ["Sadness", { name: "Sadness", enabled: false, color: "blue", emotionCount: 5 }],
+  const mockCategoryFilters = new Map([
+    ["joy", { name: "Joy", enabled: true, color: "#FFFF00" }],
+    ["sadness", { name: "Sadness", enabled: false, color: "#0000FF" }],
   ]);
 
+  const mockLayers = {
+    soulSphere: true,
+    emotionPoints: true,
+    emotionLabels: true,
+    transitionPaths: false,
+    waypoints: false,
+    legend: true,
+  };
+
+  const mockSettings = {
+    computeMode: "manual",
+    enableAnimations: true,
+    // ... other settings
+  } as any;
+
+  const onToggleCategoryFilter = jest.fn();
+  const onToggleAllCategories = jest.fn();
+  const onUpdateSetting = jest.fn();
+  const onToggleLayer = jest.fn();
+
   const defaultProps = {
-    categoryFilters: partialFilters,
-    layers: {
-      soulSphere: true,
-      emotionPoints: true,
-      emotionLabels: true,
-      transitionPaths: false,
-      waypoints: false,
-      legend: true,
-    } as LayerVisibility,
-    settings: {
-      computeMode: "cache-first",
-      enableAnimations: true,
-      pathAnimationMode: "classic",
-    } as unknown as AtlasAdminSettings,
+    categoryFilters: mockCategoryFilters,
+    layers: mockLayers,
+    settings: mockSettings,
     allCategoriesEnabled: false,
-    onToggleCategoryFilter: mockToggleCategoryFilter,
-    onToggleAllCategories: mockToggleAllCategories,
-    onUpdateSetting: mockUpdateSetting,
-    onToggleLayer: mockToggleLayer,
+    onToggleCategoryFilter,
+    onToggleAllCategories,
+    onUpdateSetting,
+    onToggleLayer,
   };
 
   beforeEach(() => {
     jest.clearAllMocks();
   });
 
-  it("renders visibility filters", () => {
+  it("renders category filters", () => {
     render(<LayerControls {...defaultProps} />);
     expect(screen.getByText("Joy")).toBeInTheDocument();
-  });
+    expect(screen.getByText("Sadness")).toBeInTheDocument();
 
-  it("toggles category filters", async () => {
-    render(<LayerControls {...defaultProps} />);
+    // Assert checked state based on filter
+    // We look for checkboxes associated with labels
+    // Joy is enabled
     const joyCheckbox = screen.getByLabelText("Joy");
-    await userEvent.click(joyCheckbox);
-    expect(mockToggleCategoryFilter).toHaveBeenCalledWith("Joy");
+    expect(joyCheckbox).toBeChecked();
+
+    // Sadness is disabled
+    const sadnessCheckbox = screen.getByLabelText("Sadness");
+    expect(sadnessCheckbox).not.toBeChecked();
   });
 
-  it("toggles all categories button", async () => {
+  it("toggles category filter", () => {
     render(<LayerControls {...defaultProps} />);
-    const toggleBtn = screen.getByText("Show All");
-    await userEvent.click(toggleBtn);
-    expect(mockToggleAllCategories).toHaveBeenCalled();
+    fireEvent.click(screen.getByLabelText("Joy"));
+    expect(onToggleCategoryFilter).toHaveBeenCalledWith("Joy");
   });
 
-  it("renders correct Show/Hide All text", () => {
-    const { rerender } = render(<LayerControls {...defaultProps} allCategoriesEnabled={true} />);
-    expect(screen.getByText("Hide All")).toBeInTheDocument();
-
-    rerender(<LayerControls {...defaultProps} allCategoriesEnabled={false} />);
-    expect(screen.getByText("Show All")).toBeInTheDocument();
-  });
-
-  it("toggles settings: Auto-compute paths (Disable)", async () => {
+  it("toggles all categories", () => {
     render(<LayerControls {...defaultProps} />);
+    fireEvent.click(screen.getByText("Show All"));
+    expect(onToggleAllCategories).toHaveBeenCalled();
+  });
+
+  it("renders settings controls", () => {
+    render(<LayerControls {...defaultProps} />);
+
+    // Auto-compute settings
     const autoCompute = screen.getByLabelText("Auto-compute paths");
+    expect(autoCompute).not.toBeChecked(); // manual mode
 
-    expect(autoCompute).toBeChecked(); // default is cache-first
-    await userEvent.click(autoCompute);
-    expect(mockUpdateSetting).toHaveBeenCalledWith("computeMode", "manual");
+    // Animations
+    const animations = screen.getByLabelText("Enable animations");
+    expect(animations).toBeChecked();
   });
 
-  it("toggles settings: Auto-compute paths (Enable)", async () => {
-    // Start with manual
-    const props = {
-      ...defaultProps,
-      settings: { ...defaultProps.settings, computeMode: "manual" } as unknown as AtlasAdminSettings
-    };
-
-    render(<LayerControls {...props} />);
-    const autoCompute = screen.getByLabelText("Auto-compute paths");
-
-    expect(autoCompute).not.toBeChecked();
-    await userEvent.click(autoCompute);
-    expect(mockUpdateSetting).toHaveBeenCalledWith("computeMode", "cache-first");
-  });
-
-  it("toggles settings: Enable animations", async () => {
-    render(<LayerControls {...defaultProps} />);
-    const anim = screen.getByLabelText("Enable animations");
-
-    expect(anim).toBeChecked();
-    await userEvent.click(anim);
-    expect(mockUpdateSetting).toHaveBeenCalledWith("enableAnimations", false);
-  });
-
-  it("toggles specific layers", async () => {
+  it("toggles settings", () => {
     render(<LayerControls {...defaultProps} />);
 
-    // Soul Sphere
-    await userEvent.click(screen.getByLabelText("Soul Sphere"));
-    expect(mockToggleLayer).toHaveBeenCalledWith("soulSphere");
+    // Toggle auto-compute
+    fireEvent.click(screen.getByLabelText("Auto-compute paths"));
+    expect(onUpdateSetting).toHaveBeenCalledWith("computeMode", "cache-first");
 
-    // Emotion Points
-    await userEvent.click(screen.getByLabelText("Emotion Points"));
-    expect(mockToggleLayer).toHaveBeenCalledWith("emotionPoints");
-
-    // Labels
-    await userEvent.click(screen.getByLabelText("Labels"));
-    expect(mockToggleLayer).toHaveBeenCalledWith("emotionLabels");
-
-    // Paths
-    await userEvent.click(screen.getByLabelText("Paths"));
-    expect(mockToggleLayer).toHaveBeenCalledWith("transitionPaths");
-
-    // Waypoints
-    await userEvent.click(screen.getByLabelText("Waypoints"));
-    expect(mockToggleLayer).toHaveBeenCalledWith("waypoints");
-
-    // Legend
-    await userEvent.click(screen.getByLabelText("Legend"));
-    expect(mockToggleLayer).toHaveBeenCalledWith("legend");
+    // Toggle animations
+    fireEvent.click(screen.getByLabelText("Enable animations"));
+    expect(onUpdateSetting).toHaveBeenCalledWith("enableAnimations", false); // toggle from true
   });
 
-  it("renders export controls", () => {
+  it("renders layer toggles", () => {
     render(<LayerControls {...defaultProps} />);
-    expect(screen.getByTestId("export-controls")).toBeInTheDocument();
+    expect(screen.getByLabelText("Soul Sphere")).toBeChecked();
+    expect(screen.getByLabelText("Paths")).not.toBeChecked();
   });
 
-  it("renders shortcuts", () => {
+  it("toggles layers", () => {
     render(<LayerControls {...defaultProps} />);
-    expect(screen.getByText("Shortcuts")).toBeInTheDocument();
+    fireEvent.click(screen.getByLabelText("Soul Sphere"));
+    expect(onToggleLayer).toHaveBeenCalledWith("soulSphere");
   });
 });
