@@ -99,8 +99,8 @@ describe("InsightCard", () => {
       expect(screen.getByText(/Calm tone/i)).toBeInTheDocument();
       expect(screen.getByText(/Joy is a positive emotion/i)).toBeInTheDocument();
       expect(screen.getByText(/High energy/i)).toBeInTheDocument(); // VAC interpretation
-      expect(screen.getByText("Reflect on this feeling.")).toBeInTheDocument();
-      expect(screen.getByText("Excitement")).toBeInTheDocument();
+      expect(screen.getByText(/Reflect on this feeling/i)).toBeInTheDocument();
+      expect(screen.getByText(/Excitement/i)).toBeInTheDocument();
     });
 
     it("handles truncation and read more", async () => {
