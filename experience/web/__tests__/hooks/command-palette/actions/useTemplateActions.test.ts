@@ -57,4 +57,23 @@ describe("useTemplateActions", () => {
 
     expect(mockSelectMultiple).not.toHaveBeenCalled();
   });
+
+  it("should ignore command not matching template syntax", async () => {
+    const { result } = getHook();
+    await result.current.executeTemplateCommand("/other command");
+
+    expect(mockSelectMultiple).not.toHaveBeenCalled();
+    expect(mockClose).not.toHaveBeenCalled();
+  });
+
+  it("should not select if emotions missing", async () => {
+    (useAtlasAdminStore.getState as jest.Mock).mockReturnValue({
+      allEmotions: [] // Empty emotions
+    });
+    const { result } = getHook();
+    await result.current.executeTemplateCommand("/template t1");
+
+    expect(mockSelectMultiple).not.toHaveBeenCalled();
+    expect(mockClose).not.toHaveBeenCalled();
+  });
 });

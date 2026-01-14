@@ -279,7 +279,7 @@ export function useZenKeyboardShortcuts({
                         e.preventDefault();
 
                         // 1. Identify current category
-                        let currentCat = "Joy"; // Default
+                        let currentCat = "Happiness"; // Default
                         if (transitionPath?.current_state.emotion) {
                             const currentEmotion = emotions.find(
                                 (e) => e.name === transitionPath.current_state.emotion

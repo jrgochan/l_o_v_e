@@ -83,4 +83,92 @@ describe("useSessionActions", () => {
     expect(mockAddSessionNote).toHaveBeenCalledWith("My Note");
     expect(mockClose).toHaveBeenCalled();
   });
+  it("should not start session if already active", () => {
+    (useExperienceStore.getState as jest.Mock).mockReturnValue({
+      activeSession: { status: "active" },
+      startSession: mockStartSession,
+    });
+    const { result } = getHook();
+    result.current.executeSessionCommand("/session start");
+    expect(mockStartSession).not.toHaveBeenCalled();
+    expect(mockClose).not.toHaveBeenCalled();
+  });
+
+  it("should not end session if no active session", () => {
+    (useExperienceStore.getState as jest.Mock).mockReturnValue({
+      activeSession: null,
+      endSession: mockEndSession,
+    });
+    const { result } = getHook();
+    result.current.executeSessionCommand("/session end");
+    expect(mockEndSession).not.toHaveBeenCalled();
+    expect(mockClose).not.toHaveBeenCalled(); // Should it close? The code returns early: `if (!activeSession) return;` so NO close.
+  });
+
+  it("should not end session if user cancels confirm", () => {
+    window.confirm = jest.fn(() => false);
+    const { result } = getHook();
+    result.current.executeSessionCommand("/session end");
+    expect(mockEndSession).not.toHaveBeenCalled();
+    expect(mockClose).toHaveBeenCalled(); // Code: close() happen after confirm block, regardless of result?
+    // Code says:
+    // if (window.confirm("End this session?")) { experienceStore.endSession(); }
+    // close();
+    // So yes, it closes even if cancelled.
+  });
+
+  it("should not pause if not active", () => {
+    (useExperienceStore.getState as jest.Mock).mockReturnValue({
+      activeSession: { status: "paused" }, // Already paused or null
+      pauseSession: mockPauseSession,
+    });
+    const { result } = getHook();
+    result.current.executeSessionCommand("/session pause");
+    expect(mockPauseSession).not.toHaveBeenCalled();
+    expect(mockClose).not.toHaveBeenCalled();
+  });
+
+  it("should not resume if not paused", () => {
+    (useExperienceStore.getState as jest.Mock).mockReturnValue({
+      activeSession: { status: "active" }, // Not paused
+      resumeSession: mockResumeSession,
+    });
+    const { result } = getHook();
+    result.current.executeSessionCommand("/session resume");
+    expect(mockResumeSession).not.toHaveBeenCalled();
+    expect(mockClose).not.toHaveBeenCalled();
+  });
+
+  it("should not add note if no active session", () => {
+    (useExperienceStore.getState as jest.Mock).mockReturnValue({
+      activeSession: null,
+      addSessionNote: mockAddSessionNote,
+    });
+    const { result } = getHook();
+    result.current.executeSessionCommand("/session notes");
+    expect(mockAddSessionNote).not.toHaveBeenCalled();
+    expect(mockClose).not.toHaveBeenCalled(); // Returns early
+  });
+
+  it("should not add note if prompt cancelled or empty", () => {
+    window.prompt = jest.fn(() => null); // Cancelled
+    const { result } = getHook();
+    result.current.executeSessionCommand("/session notes");
+    expect(mockAddSessionNote).not.toHaveBeenCalled();
+    expect(mockClose).toHaveBeenCalled(); // Closes anyway
+
+    window.prompt = jest.fn(() => "   "); // Empty/Whitespace
+    result.current.executeSessionCommand("/session notes");
+    expect(mockAddSessionNote).not.toHaveBeenCalled();
+  });
+  it("should ignore unknown commands", () => {
+    const { result } = getHook();
+    result.current.executeSessionCommand("/session unknown");
+    expect(mockStartSession).not.toHaveBeenCalled();
+    expect(mockEndSession).not.toHaveBeenCalled();
+    expect(mockPauseSession).not.toHaveBeenCalled();
+    expect(mockResumeSession).not.toHaveBeenCalled();
+    expect(mockAddSessionNote).not.toHaveBeenCalled();
+    expect(mockClose).not.toHaveBeenCalled();
+  });
 });

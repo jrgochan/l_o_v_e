@@ -1,5 +1,5 @@
 import { renderHook, act } from "@testing-library/react";
-import { useSettingsStore } from "../../stores/useSettingsStore";
+import { useSettingsStore, mergeSettingsState } from "../../stores/useSettingsStore";
 
 // Mock fetch for network tests
 global.fetch = jest.fn();
@@ -330,12 +330,12 @@ describe("useSettingsStore (Deep Coverage)", () => {
   // (useSettingsStore as any).persist.getOptions().merge(persisted, current)
 
   it("should handle missing layers in rehydration merge", () => {
-    const merge = (useSettingsStore as any).persist.getOptions().merge;
-    const current = { layers: { soulSphere: true } };
-    const persisted = { someOtherSetting: true }; // No layers
+    const current = { layers: { soulSphere: true } } as any;
+    const persisted = { someOtherSetting: true } as any; // No layers
 
-    const merged = merge(persisted, current);
+    const merged = mergeSettingsState(persisted, current);
     expect(merged.layers).toEqual(current.layers);
+    // @ts-ignore
     expect(merged.someOtherSetting).toBe(true);
   });
 });

@@ -60,6 +60,27 @@ describe("useProgressSimulation", () => {
     expect(setProgress).not.toHaveBeenCalled();
   });
 
+  it("should clear existing interval if started while running", () => {
+    const setProgress = jest.fn();
+    const { result } = renderHook(() => useProgressSimulation(setProgress));
+
+    act(() => {
+      result.current.startProgressSimulation();
+    });
+
+    // Start again immediately
+    act(() => {
+      result.current.startProgressSimulation();
+    });
+
+    // Should still work
+    act(() => {
+      jest.advanceTimersByTime(500);
+    });
+
+    expect(setProgress).toHaveBeenCalled();
+  });
+
   it("should cap progress at 90%", () => {
     const setProgress = jest.fn();
     const { result } = renderHook(() => useProgressSimulation(setProgress));

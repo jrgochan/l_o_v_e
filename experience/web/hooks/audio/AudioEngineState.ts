@@ -52,6 +52,7 @@ export const toggleGlobalMute = () => {
 };
 
 export const resetAudioEngineState = () => {
+  /* istanbul ignore next */
   if (process.env.NODE_ENV === "test") {
     globalAudioEngine = null;
     globalIsMuted = true;

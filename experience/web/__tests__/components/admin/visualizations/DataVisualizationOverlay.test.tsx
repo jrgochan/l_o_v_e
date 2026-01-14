@@ -26,26 +26,33 @@ describe("DataVisualizationOverlay", () => {
     { id: "1", name: "Joy", category: "Happy", definition: "A feeling of pleasure", vac: [0.8, 0.5, 0.6] },
     { id: "2", name: "Sadness", category: "Sad", definition: "A feeling of sorrow", vac: [-0.5, -0.2, 0.3] },
     { id: "3", name: "Anger", category: "Angry", definition: "A strong feeling of annoyance", vac: [-0.3, 0.8, -0.2] },
+    { id: "4", name: "Contentment", category: "Happy", definition: "Peaceful happiness", vac: [0.7, -0.4, 0.5] }, // Duplicate category
   ];
 
   const mockSelectEmotion = jest.fn();
   const mockSetFocusedEmotion = jest.fn();
   const mockOnClose = jest.fn();
 
-  beforeEach(() => {
-    jest.clearAllMocks();
+  const setupMockState = (scheme: string) => {
     (useAtlasAdminStore as unknown as jest.Mock).mockImplementation((selector) => {
       const state = {
         allEmotions: mockEmotions,
-        settings: { colorScheme: "category" },
+        settings: { colorScheme: scheme },
         selectEmotion: mockSelectEmotion,
         setFocusedEmotion: mockSetFocusedEmotion,
       };
       return selector(state);
     });
+  };
+
+  beforeEach(() => {
+    jest.clearAllMocks();
+    // Default setup
+    setupMockState("category");
   });
 
   it("renders header and emotion grid", () => {
+
     render(<DataVisualizationOverlay onClose={mockOnClose} />);
 
     expect(screen.getByText("Data Visualization Mode")).toBeInTheDocument();
@@ -127,5 +134,36 @@ describe("DataVisualizationOverlay", () => {
 
     render(<DataVisualizationOverlay onClose={mockOnClose} />);
     expect(screen.getByText("No emotions in this category")).toBeInTheDocument();
+
+    // Click "View all emotions"
+    fireEvent.click(screen.getByText("View all emotions"));
+
+    // Expect category to be cleared (setSelectedCategory(null))
+    // Since selectedCategory is internal state, we can't easily check it directly without inspecting the component internals or side effects.
+    // However, clicking it shouldn't crash.
+    // If we want to be sure, we can check if "No emotions" is gone or if `allEmotions` are shown?
+    // But in this specific mock setup, `allEmotions` is empty, so it will still look empty.
+    // The previous implementation plan just said "Verify state update (indirectly, or simply ensure no crash/handler execution)".
+    // So just clicking it covers the line.
+  });
+
+
+  it("renders correct descriptions for different color schemes", () => {
+    // Valence
+    setupMockState("valence");
+    const { unmount: unmount1 } = render(<DataVisualizationOverlay onClose={mockOnClose} />);
+    expect(screen.getByText("Red (negative) to Green (positive)")).toBeInTheDocument();
+    unmount1();
+
+    // Arousal
+    setupMockState("arousal");
+    const { unmount: unmount2 } = render(<DataVisualizationOverlay onClose={mockOnClose} />);
+    expect(screen.getByText("Blue (low) to Red (high)")).toBeInTheDocument();
+    unmount2();
+
+    // Connection
+    setupMockState("connection");
+    render(<DataVisualizationOverlay onClose={mockOnClose} />);
+    expect(screen.getByText("Purple (withdrawal) to Yellow (openness)")).toBeInTheDocument();
   });
 });

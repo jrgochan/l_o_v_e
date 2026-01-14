@@ -358,4 +358,65 @@ describe("useZenKeyboardShortcuts", () => {
         expect(mockExpStore.setTransitionPath).toHaveBeenCalled();
         // First cat is Happiness (sorted?). Happiness has Joy, Contentment.
     });
+    it("should handle ArrowRight without active path (fallback to default category)", () => {
+        mockExpStore.transitionPath = null;
+        mockSettingsStore.layers.transitionPaths = true;
+
+        renderHook(() => useZenKeyboardShortcuts(getProps()));
+        dispatchKey("ArrowRight");
+
+        expect(mockExpStore.setTransitionPath).toHaveBeenCalled();
+        const newPath = (mockExpStore.setTransitionPath as jest.Mock).mock.calls[0][0];
+        expect(newPath.current_state.category).toBe("Sadness");
+    });
+
+    it("should handle ArrowLeft without active path (fallback to default category)", () => {
+        mockExpStore.transitionPath = null;
+        mockSettingsStore.layers.transitionPaths = true;
+
+        renderHook(() => useZenKeyboardShortcuts(getProps()));
+        dispatchKey("ArrowLeft");
+
+        expect(mockExpStore.setTransitionPath).toHaveBeenCalled();
+        const newPath = (mockExpStore.setTransitionPath as jest.Mock).mock.calls[0][0];
+        expect(newPath.current_state.category).toBe("Sadness");
+    });
+
+
+
+    it("should stop flying when generating path via ArrowUp (isFlying logic)", () => {
+        mockExpStore.transitionPath = {
+            current_state: { emotion: "Joy" }
+        } as any;
+        mockExpStore.isFlying = true;
+
+        renderHook(() => useZenKeyboardShortcuts(getProps()));
+        dispatchKey("ArrowUp");
+
+        expect(mockExpStore.setTransitionPath).toHaveBeenCalled();
+        expect(mockExpStore.setIsFlying).toHaveBeenCalledWith(false);
+    });
+
+    it("should stop flying when generating path via ArrowLeft", () => {
+        mockExpStore.transitionPath = { current_state: { emotion: "Joy" } } as any;
+        mockExpStore.isFlying = true;
+
+        renderHook(() => useZenKeyboardShortcuts(getProps()));
+        dispatchKey("ArrowLeft");
+
+        expect(mockExpStore.setTransitionPath).toHaveBeenCalled();
+        expect(mockExpStore.setIsFlying).toHaveBeenCalledWith(false);
+    });
+
+    it("should handle ArrowUp with unknown emotion (fallback to default Happiness)", () => {
+        mockExpStore.transitionPath = { current_state: { emotion: "Unknown" } } as any;
+        mockSettingsStore.layers.transitionPaths = true;
+
+        renderHook(() => useZenKeyboardShortcuts(getProps()));
+        dispatchKey("ArrowUp");
+
+        expect(mockExpStore.setTransitionPath).toHaveBeenCalled();
+        const newPath = (mockExpStore.setTransitionPath as jest.Mock).mock.calls[0][0];
+        expect(newPath.current_state.category).toBe("Happiness");
+    });
 });

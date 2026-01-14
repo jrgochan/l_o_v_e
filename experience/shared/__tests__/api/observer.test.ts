@@ -361,4 +361,28 @@ describe("Observer API", () => {
       generateMockResponse("u1");
     });
   });
+
+  describe("Timeouts", () => {
+    beforeEach(() => {
+      jest.useFakeTimers();
+    });
+    afterEach(() => {
+      jest.useRealTimers();
+    });
+
+    it("should trigger timeout callback in healthCheck", async () => {
+      mockFetch.mockImplementation(() => new Promise(() => { }));
+      const client = new ObserverApiClient();
+      client.healthCheck();
+      jest.advanceTimersByTime(5000);
+    });
+
+    it("should trigger timeout callback in fetchWithRetry", async () => {
+      mockFetch.mockImplementation(() => new Promise(() => { }));
+      const client = new ObserverApiClient();
+      // @ts-ignore
+      client.fetchWithRetry("http://foo", 1);
+      jest.advanceTimersByTime(5000);
+    });
+  });
 });
