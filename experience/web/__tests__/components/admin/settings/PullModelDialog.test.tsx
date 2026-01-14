@@ -104,6 +104,14 @@ describe("PullModelDialog", () => {
     expect(screen.getByText("Failed")).toBeInTheDocument();
   });
 
+  it("handles completely unknown status string", () => {
+    // "weird-status" not in map -> fallbacks to "unknown" -> "Connecting to Ollama..."
+    const progress = { "m": { status: "weird-status" } };
+    render(<PullModelDialog isOpen={true} onClose={mockOnClose} onPull={mockOnPull} pullProgress={progress as any} localModels={[]} />);
+    fireEvent.change(screen.getByPlaceholderText(/Type to search/i), { target: { value: "m" } });
+    expect(screen.getByText("Connecting to Ollama...")).toBeInTheDocument();
+  });
+
   it("shows unknown status correctly", async () => {
     const progress = { "unknown-model": { status: "unknown", total: 100, completed: 10, percent: 10 } };
     render(<PullModelDialog isOpen={true} onClose={mockOnClose} onPull={mockOnPull} pullProgress={progress as any} localModels={[]} />);
@@ -173,5 +181,79 @@ describe("PullModelDialog", () => {
 
     await waitFor(() => expect(screen.getByText(/Taking longer than expected/)).toBeInTheDocument(), { timeout: 3000 });
     jest.useRealTimers();
+  });
+
+  it("prevents submission with empty input", async () => {
+    render(<PullModelDialog isOpen={true} onClose={mockOnClose} onPull={mockOnPull} pullProgress={{}} localModels={[]} />);
+    const submitBtn = screen.getByRole("button", { name: "Start Download" });
+    expect(submitBtn).toBeDisabled();
+
+    // Even if forced click
+    fireEvent.click(submitBtn);
+    expect(mockOnPull).not.toHaveBeenCalled();
+  });
+
+  it("shows warning for 70b models", async () => {
+    render(<PullModelDialog isOpen={true} onClose={mockOnClose} onPull={mockOnPull} pullProgress={{}} localModels={[]} />);
+    fireEvent.change(screen.getByPlaceholderText(/Type to search/i), { target: { value: "llama-70b" } });
+    await waitFor(() => expect(screen.getByText(/70B models are very large/)).toBeInTheDocument());
+  });
+
+  it("auto-closes on server-side already_installed status", async () => {
+    jest.useFakeTimers();
+    const { rerender } = render(<PullModelDialog isOpen={true} onClose={mockOnClose} onPull={mockOnPull} pullProgress={{}} localModels={[]} />);
+
+    fireEvent.change(screen.getByPlaceholderText(/Type to search/i), { target: { value: "installed-model" } });
+    fireEvent.click(screen.getByRole("button", { name: "Start Download" }));
+
+    // Simulate server response updating status to already_installed
+    rerender(<PullModelDialog isOpen={true} onClose={mockOnClose} onPull={mockOnPull} pullProgress={{ "installed-model": { status: "already_installed" } } as any} localModels={[]} />);
+
+    await waitFor(() => expect(screen.getAllByText("Already Installed!").length).toBeGreaterThan(0));
+
+    act(() => { jest.advanceTimersByTime(2000); });
+    await waitFor(() => expect(mockOnClose).toHaveBeenCalled());
+    jest.useRealTimers();
+  });
+
+  it("does not auto-close quickly if download took a long time", async () => {
+    jest.useFakeTimers();
+    const { rerender } = render(<PullModelDialog isOpen={true} onClose={mockOnClose} onPull={mockOnPull} pullProgress={{}} localModels={[]} />);
+    fireEvent.change(screen.getByPlaceholderText(/Type to search/i), { target: { value: "slow-success" } });
+    fireEvent.click(screen.getByRole("button", { name: "Start Download" }));
+
+    // Advance time by 4s (simulating long download)
+    act(() => { jest.advanceTimersByTime(4000); });
+
+    // Update to success
+    rerender(<PullModelDialog isOpen={true} onClose={mockOnClose} onPull={mockOnPull} pullProgress={{ "slow-success": { status: "success" } } as any} localModels={[]} />);
+
+    // Should show success message
+    expect(screen.getByText("Model ready!")).toBeInTheDocument();
+
+    // Advance 2s (which would normally trigger close if it was quick success)
+    act(() => { jest.advanceTimersByTime(2000); });
+
+    // Should NOT have called close yet (logic only closes if elapsed < 3000)
+    expect(mockOnClose).not.toHaveBeenCalled();
+    jest.useRealTimers();
+  });
+
+  it("handles whitespace-only input", () => {
+    render(<PullModelDialog isOpen={true} onClose={mockOnClose} onPull={mockOnPull} pullProgress={{}} localModels={[]} />);
+    const input = screen.getByPlaceholderText(/Type to search/i);
+    fireEvent.change(input, { target: { value: "   " } });
+    const submitBtn = screen.getByRole("button", { name: "Start Download" });
+    fireEvent.click(submitBtn);
+    expect(mockOnPull).not.toHaveBeenCalled();
+  });
+
+  it("handles undefined status in progress", () => {
+    // missing status
+    const progress = { "mystery": { completed: 100 } };
+    render(<PullModelDialog isOpen={true} onClose={mockOnClose} onPull={mockOnPull} pullProgress={progress as any} localModels={[]} />);
+    fireEvent.change(screen.getByPlaceholderText(/Type to search/i), { target: { value: "mystery" } });
+    // Should fallback to unknown -> Connecting...
+    expect(screen.getByText("Connecting to Ollama...")).toBeInTheDocument();
   });
 });

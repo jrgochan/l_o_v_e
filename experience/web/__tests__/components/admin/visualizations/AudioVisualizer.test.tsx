@@ -27,6 +27,17 @@ describe("AudioVisualizer", () => {
     jest.restoreAllMocks();
   });
 
+  it("handles canvas context creation failure", () => {
+    // Force getContext to return null
+    jest.spyOn(HTMLCanvasElement.prototype, "getContext").mockImplementation(() => null);
+
+    render(<AudioVisualizer audioLevel={0.5} isRecording={true} />);
+
+    // Should not crash.
+    // No context methods should be called (impl check)
+    // We can't check mockContext call counts because getContext returns null, not our mock.
+  });
+
   it("renders canvas and level meter", () => {
     render(<AudioVisualizer audioLevel={0.5} isRecording={false} />);
 

@@ -144,4 +144,24 @@ describe("NetworkSettings", () => {
       expect(screen.getByText("Failed")).toBeInTheDocument();
     });
   });
+  it("allows editing endpoints in network mode with custom endpoints enabled", () => {
+    (useSettingsStore as unknown as jest.Mock).mockReturnValue({
+      ...defaultSettings,
+      network: {
+        mode: "network",
+        customEndpoints: true,
+        endpoints: defaultSettings.network.endpoints,
+      },
+    });
+    render(<NetworkSettings />);
+
+    const versorInput = screen.getByDisplayValue("http://localhost:8001");
+    // Should not be disabled
+    expect(versorInput).not.toBeDisabled();
+
+    fireEvent.change(versorInput, { target: { value: "http://network-custom:8001" } });
+    expect(mockUpdateNetworkSetting).toHaveBeenCalledWith({
+      endpoints: expect.objectContaining({ versor: "http://network-custom:8001" }),
+    });
+  });
 });

@@ -59,4 +59,10 @@ describe("ChatLayout", () => {
     rerender(<ChatLayout {...defaultProps} isExpanded={false} />);
     expect(container.querySelector(".cursor-row-resize")).not.toBeInTheDocument();
   });
+
+  it("should apply resizing styles when active", () => {
+    const { container } = render(<ChatLayout {...defaultProps} isResizing={true} />);
+    const handle = container.querySelector(".cursor-row-resize");
+    expect(handle).toHaveClass("bg-cyan-500/50");
+  });
 });

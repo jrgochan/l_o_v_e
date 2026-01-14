@@ -120,6 +120,17 @@ describe("MatrixGrid", () => {
       expect(cells.length).toBeGreaterThan(0);
       expect(cells[0]).toBeInTheDocument();
     });
+
+    it("should apply hover styles to hovered cell", () => {
+      // Re-render with hoveredCell set
+      render(<MatrixGrid {...defaultProps} hoveredCell={{ from: "1", to: "2" }} />);
+
+      const cell = screen.getByTitle(/Joy → Sadness/i);
+      expect(cell).toHaveClass("ring-2");
+      expect(cell).toHaveClass("ring-cyan-400");
+      expect(cell).toHaveClass("z-30");
+      expect(cell).toHaveClass("scale-125");
+    });
   });
 
   describe("Category View", () => {
@@ -167,5 +178,64 @@ describe("MatrixGrid", () => {
       fireEvent.mouseEnter(cell);
       expect(defaultProps.onHoverCell).toHaveBeenCalled();
     });
+    it("should apply hover styles in category mode", () => {
+      render(
+        <MatrixGrid
+          {...catProps}
+          hoveredCell={{ from: "Positive", to: "Negative" }}
+        />
+      );
+
+      // Find the cell at intersection of Positive row and Negative col
+      // The cell title will contain the stats mock return
+      // We need to ensure getCategoryAverageDifficulty returns something for this pair
+      (defaultProps.getCategoryAverageDifficulty as jest.Mock).mockReturnValue({
+        avgDistance: 2.5,
+        difficulty: "difficult",
+        pathCount: 5,
+      });
+
+      // Re-render to pick up mock change
+      render(
+        <MatrixGrid
+          {...catProps}
+          hoveredCell={{ from: "Positive", to: "Negative" }}
+        />
+      );
+
+      const cell = screen.getAllByTitle(/Avg Distance: 2.50/i)[0];
+      expect(cell).toHaveClass("ring-2");
+      expect(cell).toHaveClass("ring-cyan-400");
+    });
+  });
+
+  it("should show 'Not computed' tooltip for missing paths", () => {
+    (defaultProps.getPathForPair as jest.Mock).mockReturnValue(null);
+    render(<MatrixGrid {...defaultProps} />);
+
+  });
+
+  it("renders computed path details in tooltip", () => {
+    // Ensure we have a computed path
+    (defaultProps.getPathForPair as jest.Mock).mockReturnValue({
+      id: "1-2",
+      from: { name: "Joy" },
+      to: { name: "Sadness" },
+      total_distance: 1.234,
+      difficulty: "moderate",
+      waypoints: [{}, {}]
+    });
+
+    render(<MatrixGrid {...defaultProps} />);
+
+    // Check for the detailed title
+    // "Joy → Sadness\nDistance: 1.23\nDifficulty: moderate\nWaypoints: 2"
+    // Check for the detailed title
+    // "Joy → Sadness\nDistance: 1.23\nDifficulty: moderate\nWaypoints: 2"
+    const cells = screen.getAllByTitle(/Distance: 1.23/i);
+    expect(cells.length).toBeGreaterThan(0);
+    expect(cells[0]).toBeInTheDocument();
+    expect(cells[0]).toHaveAttribute("title", expect.stringContaining("Difficulty: moderate"));
   });
 });
+

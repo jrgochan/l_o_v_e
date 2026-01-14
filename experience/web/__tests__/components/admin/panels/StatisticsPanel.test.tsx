@@ -106,7 +106,6 @@ describe("StatisticsPanel", () => {
     await userEvent.click(clearBtn);
     expect(mockClearCache).toHaveBeenCalled();
   });
-
   it("shows clearing state", () => {
     setupHooks({ isClearing: true });
     render(<StatisticsPanel />);
@@ -114,4 +113,27 @@ describe("StatisticsPanel", () => {
     expect(screen.getByText("Clearing...")).toBeInTheDocument();
     expect(screen.getByRole("button")).toBeDisabled();
   });
+
+  it("handles sparse data safely", () => {
+    // Test with missing optional fields
+    setupHooks({
+      stats: {
+        total_cached: 10,
+        total_possible: 20,
+        completion_percentage: 50,
+        // Missing difficulty_distribution
+        // Missing distance_stats
+        // Missing last_computed
+      }
+    });
+    render(<StatisticsPanel />);
+
+    // Difficulty defaults (0)
+    // There are multiple 0s, but we just verify at least some are present as defaults
+    expect(screen.getAllByText("0").length).toBeGreaterThan(0);
+
+    // Cache Age N/A
+    expect(screen.getByText("N/A")).toBeInTheDocument();
+  });
 });
+

@@ -11,17 +11,17 @@ jest.mock("@/components/admin/panels/StatisticsPanel", () => ({
     StatisticsPanel: () => <div data-testid="stats-panel">Statistics Panel</div>,
 }));
 jest.mock("@/components/admin/panels/InfoPanel/EmotionDetails", () => ({
-    EmotionDetails: ({ emotion }) => <div data-testid="emotion-details">{emotion.name}</div>,
+    EmotionDetails: ({ emotion }: { emotion: any }) => <div data-testid="emotion-details">{emotion.name}</div>,
 }));
 jest.mock("@/components/admin/panels/InfoPanel/EmotionList", () => ({
-    EmotionList: ({ emotions }) => (
+    EmotionList: ({ emotions }: { emotions: any[] }) => (
         <div data-testid="emotion-list">
             {emotions.map((e: any) => <div key={e.id}>{e.name}</div>)}
         </div>
     ),
 }));
 jest.mock("@/components/admin/panels/InfoPanel/PathDetails", () => ({
-    PathDetails: ({ path, onWaypointClick, onShowDetails }) => (
+    PathDetails: ({ path, onWaypointClick, onShowDetails }: { path: any; onWaypointClick: any; onShowDetails: any }) => (
         <div data-testid="path-details">
             Path Details
             <button onClick={() => onWaypointClick({ id: 'wp1' }, 1)}>Click Waypoint</button>
@@ -33,7 +33,7 @@ jest.mock("@/components/admin/panels/InfoPanel/PathComparison", () => ({
     PathComparison: () => <div data-testid="path-comparison">Path Comparison</div>,
 }));
 jest.mock("@/components/admin/panels/InfoPanel/PathSummaryList", () => ({
-    PathSummaryList: ({ onWaypointClick }) => (
+    PathSummaryList: ({ onWaypointClick }: { onWaypointClick: any }) => (
         <div data-testid="path-summary-list">
             Path Summary List
             <button onClick={() => onWaypointClick({ id: 'p1' }, { id: 'wp1' }, 1)}>Click Summary Waypoint</button>
@@ -46,7 +46,7 @@ jest.mock("@/components/admin/panels/InfoPanel/ActionSuggestions", () => ({
 
 // Mock WaypointDetailModal
 jest.mock("@/components/admin/shared/WaypointDetailModal", () => ({
-    WaypointDetailModal: ({ onClose, onNavigate }) => (
+    WaypointDetailModal: ({ onClose, onNavigate }: { onClose: any; onNavigate: any }) => (
         <div data-testid="waypoint-modal">
             Waypoint Modal
             <button onClick={onClose}>Close</button>
@@ -157,5 +157,24 @@ describe("InfoPanel", () => {
         fireEvent.click(screen.getByText("Show Details"));
         expect(screen.getByTestId("waypoint-modal")).toBeInTheDocument();
         expect(mockSetSelectedWaypoint).toHaveBeenCalledWith(null); // Clear WP for start step
+    });
+    it("clears selection when navigating to Start/End steps", () => {
+        const mockPath = {
+            id: "p1",
+            waypoints: [{ id: 'wp1' }]
+        };
+        (useInfoPanelState as jest.Mock).mockReturnValue({
+            ...defaultState,
+            displayPath: mockPath,
+        });
+        render(<InfoPanel />);
+        fireEvent.click(screen.getByText("Show Details")); // Open Modal at start
+
+        // Simulate navigating to Start (Step 0) - handled by default opening logic? 
+        // Let's rely on the mock's onNavigate call which we can trigger manually in the mock if we expose it, 
+        // or add a button in the mock that calls onNavigate(0) specifically.
+        fireEvent.click(screen.getByText("Start Step"));
+        // 0 - 1 = -1 -> < 0 -> else branch
+        expect(mockSetSelectedWaypoint).toHaveBeenCalledWith(null);
     });
 });

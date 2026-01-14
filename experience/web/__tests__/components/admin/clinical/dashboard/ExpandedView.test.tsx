@@ -178,6 +178,15 @@ describe("ExpandedView", () => {
     render(<ExpandedView {...props} />);
     expect(screen.getByText("0.500")).toBeInTheDocument();
   });
+
+  it("should handle low energy color (blue)", () => {
+    const props = {
+      ...mockProps,
+      prosody: { ...mockProps.prosody, energy: 0.3 } // Blue (<0.4)
+    };
+    render(<ExpandedView {...props} />);
+    expect(screen.getByText("0.300")).toBeInTheDocument();
+  });
   it("should handle medium confidence (yellow)", () => {
     const props = { ...mockProps, confidence: 0.65 };
     render(<ExpandedView {...props} />);

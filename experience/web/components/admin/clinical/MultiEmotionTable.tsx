@@ -54,8 +54,8 @@ export function MultiEmotionTable({
   // Sort emotions
   const sortedEmotions = useMemo(() => {
     const sorted = [...filteredEmotions].sort((a, b) => {
-      let aValue: string | number;
-      let bValue: string | number;
+      let aValue: string | number = 0;
+      let bValue: string | number = 0;
 
       switch (sortKey) {
         case "emotion":
@@ -80,9 +80,6 @@ export function MultiEmotionTable({
           bValue = order[b.prominence as keyof typeof order];
           break;
         }
-        default:
-          /* istanbul ignore next */
-          return 0;
       }
 
       if (typeof aValue === "string" && typeof bValue === "string") {

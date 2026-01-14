@@ -38,6 +38,19 @@ describe("MatrixHeader", () => {
     expect(defaultProps.onViewModeChange).toHaveBeenCalledWith("emotions");
   });
 
+  it("highlights active view mode button", () => {
+    const { rerender } = render(<MatrixHeader {...defaultProps} viewMode="emotions" />);
+    const emotionsBtn = screen.getByText(/Emotions/).closest("button");
+    const categoriesBtn = screen.getByText(/Categories/).closest("button");
+
+    expect(emotionsBtn).toHaveClass("bg-cyan-600");
+    expect(categoriesBtn).not.toHaveClass("bg-cyan-600");
+
+    rerender(<MatrixHeader {...defaultProps} viewMode="categories" />);
+    expect(screen.getByText(/Emotions/).closest("button")).not.toHaveClass("bg-cyan-600");
+    expect(screen.getByText(/Categories/).closest("button")).toHaveClass("bg-cyan-600");
+  });
+
   it("renders computing state correctly", () => {
     render(
       <MatrixHeader

@@ -394,10 +394,30 @@ describe("AIModelsSettings", () => {
     const assignButtons = screen.getAllByText("Assign");
     fireEvent.click(assignButtons[0]);
 
-    // Click specific function (assuming dialog lists them as buttons/clickable)
-    // Based on previous tests, functions list items.
     fireEvent.click(screen.getByRole("button", { name: /chat/i }));
 
     await waitFor(() => expect(screen.getByText(/Failed to assign model/)).toBeInTheDocument());
+  });
+
+  it("handles preset application with partial failures", async () => {
+    const originalModel = MODEL_PRESETS.balanced.model;
+    MODEL_PRESETS.balanced.model = "llama3";
+
+    // Fail first 2 calls, succeed next 2. Preset has 4 assignments.
+    mockAssignments.assignModel
+      .mockResolvedValueOnce(false)
+      .mockResolvedValueOnce(false)
+      .mockResolvedValueOnce(true)
+      .mockResolvedValueOnce(true);
+
+    render(<AIModelsSettings />);
+    await screen.findByText(/Local Models/i);
+
+    fireEvent.click(screen.getByText("Balanced"));
+
+    // Expect error message with count
+    await waitFor(() => expect(screen.getByText(/Applied 2\/4 assignments/)).toBeInTheDocument());
+
+    MODEL_PRESETS.balanced.model = originalModel;
   });
 });

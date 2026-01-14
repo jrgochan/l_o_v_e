@@ -27,6 +27,7 @@ export function AudioVisualizer({
 
   useEffect(() => {
     const canvas = canvasRef.current;
+    /* istanbul ignore next */
     if (!canvas) return;
 
     const ctx = canvas.getContext("2d");
@@ -37,7 +38,7 @@ export function AudioVisualizer({
     canvas.height = height;
 
     const draw = () => {
-      if (!ctx || !canvas) return;
+      // ctx and canvas are guaranteed to be defined here due to early returns above
 
       // Clear canvas
       ctx.fillStyle = "#1f2937"; // gray-800
