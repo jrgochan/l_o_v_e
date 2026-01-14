@@ -181,6 +181,23 @@ describe("AdminUserDetailsPage", () => {
         expect(screen.getByText("No trajectory data available.")).toBeInTheDocument();
     });
 
+    it("renders trajectory chart when data is available", async () => {
+        (api.get as jest.Mock)
+            .mockResolvedValueOnce(mockUser)
+            .mockResolvedValueOnce(mockSessions)
+            .mockResolvedValueOnce(mockTrajectory);
+
+        render(<AdminUserDetailsPage />);
+        await waitFor(() => expect(screen.getByText("Test User")).toBeInTheDocument());
+
+        // Switch to Trajectory
+        fireEvent.click(screen.getByText(/Trajectory Points \(\d+\)/));
+
+        // Should show chart (mocked) and NOT "No data"
+        expect(screen.getByTestId("trajectory-chart")).toBeInTheDocument();
+        expect(screen.queryByText("No trajectory data available.")).not.toBeInTheDocument();
+    });
+
     it("handles active session display", async () => {
         (api.get as jest.Mock)
             .mockResolvedValueOnce(mockUser)
