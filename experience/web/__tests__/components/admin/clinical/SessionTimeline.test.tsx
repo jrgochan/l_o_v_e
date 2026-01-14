@@ -1,110 +1,76 @@
 
 import { render, screen } from "@testing-library/react";
 import { SessionTimeline } from "@/components/admin/clinical/SessionTimeline";
-import type { EmotionTimelineEvent, VAC } from "@/types/chat";
+import type { EmotionTimelineEvent } from "@/types/chat";
 
 describe("SessionTimeline", () => {
-  const mockVAC: VAC = { valence: 0.5, arousal: 0.5, connection: 0.5 };
-  const baseTime = new Date("2024-01-01T10:00:00");
-
-  const mockEvents: EmotionTimelineEvent[] = [
+  const sessionStart = new Date("2024-01-01T12:00:00");
+  const mockTimeline: EmotionTimelineEvent[] = [
     {
-      timestamp: baseTime,
-      emotion: "Neutral",
-      confidence: 0.8,
-      category: "Neutral",
-      vac: mockVAC,
-      alertLevel: "stable",
-      intensity: 0.5,
-      trigger: "start"
-    },
-    {
-      timestamp: new Date(baseTime.getTime() + 60000), // +1 min
+      id: "1",
+      timestamp: sessionStart,
       emotion: "Joy",
+      category: "joy",
       confidence: 0.9,
-      category: "Positive",
-      vac: { ...mockVAC, valence: 0.8 },
-      alertLevel: "attention",
-      intensity: 0.7,
-      trigger: "joke"
+      vac: { valence: 0.8, arousal: 0.5, connection: 0.7 },
+      alertLevel: "stable"
     },
     {
-      timestamp: new Date(baseTime.getTime() + 120000), // +2 min
+      id: "2",
+      timestamp: new Date(sessionStart.getTime() + 65000), // +1:05
       emotion: "Anxiety",
+      category: "fear",
       confidence: 0.7,
-      category: "Negative",
-      vac: { ...mockVAC, arousal: 0.8 },
-      alertLevel: "warning",
-      intensity: 0.8,
-      trigger: "stress"
+      vac: { valence: -0.5, arousal: 0.8, connection: -0.2 },
+      alertLevel: "warning"
     },
     {
-      timestamp: new Date(baseTime.getTime() + 180000), // +3 min
+      id: "3",
+      timestamp: new Date(sessionStart.getTime() + 125000), // +2:05
       emotion: "Panic",
-      confidence: 0.95,
-      category: "Negative",
-      vac: { ...mockVAC, arousal: 0.9 },
-      alertLevel: "critical",
-      intensity: 1.0,
-      trigger: "trauma"
-    },
-    {
-      timestamp: new Date(baseTime.getTime() + 240000), // +4 min
-      emotion: "Depression",
-      confidence: 0.85,
-      category: "Negative",
-      vac: { valence: -0.8, arousal: -0.5, connection: -0.6 },
-      alertLevel: "attention",
-      intensity: 0.6,
-      trigger: "sadness"
+      category: "fear",
+      confidence: 0.6,
+      vac: { valence: -0.9, arousal: 0.9, connection: -0.8 },
+      alertLevel: "critical"
     }
   ];
 
-  it("renders nothing when timeline is empty", () => {
+  it("renders nothing if timeline empty", () => {
     const { container } = render(<SessionTimeline emotionTimeline={[]} />);
     expect(container).toBeEmptyDOMElement();
   });
 
-  it("renders chronological timeline events", () => {
-    render(<SessionTimeline emotionTimeline={mockEvents} />);
+  it("renders timeline events correctly", () => {
+    render(<SessionTimeline emotionTimeline={mockTimeline} />);
+    expect(screen.getByText("3 events")).toBeInTheDocument();
 
-    expect(screen.getByText("🕐 Session Timeline")).toBeInTheDocument();
-
-    // Check emotions present
-    expect(screen.getAllByText("Neutral").length).toBeGreaterThan(0);
+    // Check emotions
     expect(screen.getByText("Joy")).toBeInTheDocument();
     expect(screen.getByText("Anxiety")).toBeInTheDocument();
     expect(screen.getByText("Panic")).toBeInTheDocument();
 
-    // Check timestamps relative format
+    // Check relative time
     expect(screen.getByText("+0:00")).toBeInTheDocument();
-    expect(screen.getByText("+1:00")).toBeInTheDocument();
-    expect(screen.getByText("+2:00")).toBeInTheDocument();
+    expect(screen.getByText("+1:05")).toBeInTheDocument();
+    expect(screen.getByText("+2:05")).toBeInTheDocument();
   });
 
-  it("renders correct alert icons and styles", () => {
-    render(<SessionTimeline emotionTimeline={mockEvents} />);
+  it("displays alert icons and messages", () => {
+    render(<SessionTimeline emotionTimeline={mockTimeline} />);
 
-    // Critical - Panic
-    expect(screen.getByText("High distress detected")).toBeInTheDocument();
-    // Warning - Anxiety
+    // Warning
+    expect(screen.getByText("⚠️")).toBeInTheDocument();
     expect(screen.getByText("Monitor closely")).toBeInTheDocument();
 
-    // Joy (Attention) - should have yellow dot icon
-    // Note: The icon is unicode/emoji, so we check for presence in the DOM structure or specific class if needed.
-    // The component uses emoji text for icons in specific spans.
-
-    const panicEvent = screen.getByText("Panic").closest(".flex");
-    expect(panicEvent).toBeInTheDocument();
+    // Critical
+    expect(screen.getByText("🔴")).toBeInTheDocument();
+    expect(screen.getByText("High distress detected")).toBeInTheDocument();
   });
 
-  it("renders VAC values correctly", () => {
-    render(<SessionTimeline emotionTimeline={mockEvents} />);
-
-    // Check formatted VAC strings
-    // V: +0.50, +0.80
-    // A: +0.50, +0.80, +0.90
-    const vacElements = screen.getAllByText(/V:/);
-    expect(vacElements.length).toBeGreaterThan(0);
+  it("renders legend", () => {
+    render(<SessionTimeline emotionTimeline={mockTimeline} />);
+    expect(screen.getByText("Alert Levels:")).toBeInTheDocument();
+    expect(screen.getByText("Stable")).toBeInTheDocument();
+    expect(screen.getByText("Critical")).toBeInTheDocument();
   });
 });

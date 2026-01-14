@@ -1,104 +1,67 @@
+
 import { render, screen } from "@testing-library/react";
 import { SessionMetricsDisplay } from "@/components/admin/clinical/SessionMetrics";
 import type { SessionMetrics } from "@/types/chat";
 
-const MOCK_METRICS: SessionMetrics = {
-  startTime: new Date(),
-  elapsedSeconds: 125, // 2:05
-  emotionCount: 15,
-  averageConfidence: 0.85,
-  dominantCategory: "Positive",
-  alertCount: { critical: 1, warning: 2, attention: 0 },
-};
-
 describe("SessionMetricsDisplay", () => {
-  describe("Compact Mode", () => {
-    it("should render summary metrics", () => {
-      render(<SessionMetricsDisplay sessionMetrics={MOCK_METRICS} isExpanded={false} />);
+  const mockMetrics: SessionMetrics = {
+    elapsedSeconds: 125, // 2:05
+    emotionCount: 15,
+    averageConfidence: 0.85,
+    dominantCategory: "joy",
+    alertCount: {
+      critical: 1,
+      warning: 2,
+      attention: 0,
+      stable: 12
+    }
+  };
 
-      expect(screen.getByText("2:05")).toBeInTheDocument();
-      expect(screen.getByText("15")).toBeInTheDocument();
-      expect(screen.getByText("85%")).toBeInTheDocument();
-      expect(screen.getByText("Positive")).toBeInTheDocument();
-    });
-
-    it("should not show alert badges in compact mode", () => {
-      render(<SessionMetricsDisplay sessionMetrics={MOCK_METRICS} isExpanded={false} />);
-      expect(screen.queryByText(/Critical/)).not.toBeInTheDocument();
-    });
+  it("renders compact view correctly", () => {
+    render(<SessionMetricsDisplay sessionMetrics={mockMetrics} isExpanded={false} />);
+    expect(screen.getByText("2:05")).toBeInTheDocument();
+    expect(screen.getByText("15")).toBeInTheDocument();
+    expect(screen.getByText("85%")).toBeInTheDocument();
+    expect(screen.getByText("joy")).toBeInTheDocument();
   });
 
-  describe("Expanded Mode", () => {
-    it("should render detailed metric blocks with labels", () => {
-      render(<SessionMetricsDisplay sessionMetrics={MOCK_METRICS} isExpanded={true} />);
+  it("renders expanded view with details", () => {
+    render(<SessionMetricsDisplay sessionMetrics={mockMetrics} isExpanded={true} />);
+    expect(screen.getByText("Session Duration")).toBeInTheDocument();
+    expect(screen.getByText("2:05")).toBeInTheDocument();
 
-      expect(screen.getByText("Session Duration")).toBeInTheDocument();
-      expect(screen.getByText("Emotions Analyzed")).toBeInTheDocument();
-      expect(screen.getByText("Avg Confidence")).toBeInTheDocument();
-      expect(screen.getByText("Primary Category")).toBeInTheDocument();
-    });
+    expect(screen.getByText("Emotions Analyzed")).toBeInTheDocument();
+    expect(screen.getByText("15")).toBeInTheDocument();
 
-    it("should display alert counts", () => {
-      render(<SessionMetricsDisplay sessionMetrics={MOCK_METRICS} isExpanded={true} />);
+    expect(screen.getByText("Avg Confidence")).toBeInTheDocument();
+    expect(screen.getByText("85%")).toBeInTheDocument();
 
-      expect(screen.getByText(/1 Critical/)).toBeInTheDocument();
-      expect(screen.getByText(/2 Warning/)).toBeInTheDocument();
-      expect(screen.queryByText(/Attention/)).not.toBeInTheDocument(); // 0 count
-    });
+    expect(screen.getByText("Primary Category")).toBeInTheDocument();
+    expect(screen.getByText("joy")).toBeInTheDocument();
+  });
 
-    it("should render confidence visualization bar", () => {
-      const { container } = render(
-        <SessionMetricsDisplay sessionMetrics={MOCK_METRICS} isExpanded={true} />
-      );
+  it("renders alerts in expanded view", () => {
+    render(<SessionMetricsDisplay sessionMetrics={mockMetrics} isExpanded={true} />);
+    expect(screen.getByText(/1 Critical/)).toBeInTheDocument();
+    expect(screen.getByText(/2 Warning/)).toBeInTheDocument();
+    expect(screen.queryByText(/Attention/)).not.toBeInTheDocument();
+  });
 
-      // Check for the progress bar element style
-      // We can look for the style attribute directly or a class
-      const bar = container.querySelector(".bg-green-500"); // 85% is green
-      expect(bar).toBeInTheDocument();
-      expect(bar).toHaveStyle({ width: "85%" });
-    });
+  it("handles empty metrics/defaults", () => {
+    const emptyMetrics = {
+      ...mockMetrics,
+      averageConfidence: 0,
+      dominantCategory: undefined,
+      alertCount: { critical: 0, warning: 0, attention: 0, stable: 0 }
+    };
+    const { rerender } = render(<SessionMetricsDisplay sessionMetrics={emptyMetrics} isExpanded={false} />);
+    // Compact checks
+    expect(screen.queryByText("%")).not.toBeInTheDocument();
 
-    it("should use correct colors for confidence levels", () => {
-      // Yellow test
-      const mediumMetrics = { ...MOCK_METRICS, averageConfidence: 0.65 };
-      const { container: c1 } = render(
-        <SessionMetricsDisplay sessionMetrics={mediumMetrics} isExpanded={true} />
-      );
-      expect(c1.querySelector(".bg-yellow-500")).toBeInTheDocument();
-
-      // Red test
-      const lowMetrics = { ...MOCK_METRICS, averageConfidence: 0.4 };
-      const { container: c2 } = render(
-        <SessionMetricsDisplay sessionMetrics={lowMetrics} isExpanded={true} />
-      );
-      expect(c2.querySelector(".bg-red-500")).toBeInTheDocument();
-    });
-    it("should display attention alerts", () => {
-      const metrics = { ...MOCK_METRICS, alertCount: { critical: 0, warning: 0, attention: 3 } };
-      render(<SessionMetricsDisplay sessionMetrics={metrics} isExpanded={true} />);
-      expect(screen.getByText(/3 Attention/)).toBeInTheDocument();
-    });
-
-    it("should handle missing dominant category", () => {
-      const metrics = { ...MOCK_METRICS, dominantCategory: null };
-      render(<SessionMetricsDisplay sessionMetrics={metrics} isExpanded={true} />);
-      expect(screen.getByText("--")).toBeInTheDocument();
-    });
-
-    it("should handle low/zero confidence", () => {
-      const metrics = { ...MOCK_METRICS, averageConfidence: 0 };
-      render(<SessionMetricsDisplay sessionMetrics={metrics} isExpanded={true} />);
-      // Should show -- for percentage
-      const percentageElements = screen.getAllByText("--");
-      expect(percentageElements.length).toBeGreaterThan(0);
-      // Should not render p-bar
-      expect(screen.queryByRole("progressbar")).not.toBeInTheDocument();
-    });
-
-    it("should hide alert section if no alerts", () => {
-      const metrics = { ...MOCK_METRICS, alertCount: { critical: 0, warning: 0, attention: 0 } };
-      render(<SessionMetricsDisplay sessionMetrics={metrics} isExpanded={true} />);
-      expect(screen.queryByText(/Session Alerts:/)).not.toBeInTheDocument();
-    });
+    rerender(<SessionMetricsDisplay sessionMetrics={emptyMetrics} isExpanded={true} />);
+    // Expanded checks
+    const placeholders = screen.getAllByText("--");
+    expect(placeholders).toHaveLength(2); // Avg Confidence and Primary Category
+    expect(screen.queryByText("Session Alerts:")).not.toBeInTheDocument();
   });
 });

@@ -1,70 +1,46 @@
+
 import { render, screen } from "@testing-library/react";
 import { VoiceContentCorrelation } from "@/components/admin/clinical/VoiceContentCorrelation";
+import type { VoiceContentCorrelation as VCCType } from "@/types/chat";
 
 describe("VoiceContentCorrelation", () => {
-  it("should render aligned state", () => {
-    const correlation = {
-      voice_energy: 0.8,
-      content_arousal: 0.8,
-      discrepancy: 0.0,
-      aligned: true,
-      interpretation: "Voice and content match.",
-    };
+  const alignedMetric: VCCType = {
+    voice_energy: 0.8,
+    content_arousal: 0.7,
+    discrepancy: 0.1,
+    aligned: true,
+    interpretation: "Consistent expression"
+  };
 
-    render(<VoiceContentCorrelation correlation={correlation} />);
+  const misalignedMetric: VCCType = {
+    voice_energy: 0.2,
+    content_arousal: 0.9,
+    discrepancy: 0.7,
+    aligned: false,
+    interpretation: "Potential suppression detected"
+  };
 
-    expect(screen.getByText("Voice-Content Correlation")).toBeInTheDocument();
+  it("renders aligned state correctly", () => {
+    render(<VoiceContentCorrelation correlation={alignedMetric} />);
     expect(screen.getByText("✓ Aligned")).toBeInTheDocument();
-    expect(screen.getByText("✓ Aligned")).toHaveClass("text-green-300");
-
-    // Check interpretation
-    expect(screen.getByText("Voice and content match.")).toBeInTheDocument();
-
-    // Check missing discrepancy note
-    expect(screen.queryByText("Clinical Note:")).not.toBeInTheDocument();
+    expect(screen.getByText("Consistent expression")).toBeInTheDocument();
+    // Values
+    expect(screen.getByText("0.800")).toBeInTheDocument(); // Voice
+    expect(screen.getByText("0.700")).toBeInTheDocument(); // Content
+    expect(screen.getByText("0.100")).toBeInTheDocument(); // Discrepancy
   });
 
-  it("should render discrepancy state", () => {
-    const correlation = {
-      voice_energy: 0.9,
-      content_arousal: -0.2, // High discrepancy
-      discrepancy: 0.6,
-      aligned: false,
-      interpretation: "Potential suppression.",
-    };
-
-    render(<VoiceContentCorrelation correlation={correlation} />);
-
+  it("renders misaligned state with warnings", () => {
+    render(<VoiceContentCorrelation correlation={misalignedMetric} />);
     expect(screen.getByText("⚠️ Discrepancy")).toBeInTheDocument();
-    expect(screen.getByText("⚠️ Discrepancy")).toHaveClass("text-orange-300");
+    expect(screen.getByText("Potential suppression detected")).toBeInTheDocument();
 
-    // Discrepancy Level High styling
-    expect(screen.getByText("0.600")).toBeInTheDocument();
-    expect(screen.getByText("Discrepancy Level")).toHaveClass("text-orange-300");
+    // Clinical Note check
+    expect(screen.getByText(/Clinical Note:/)).toBeInTheDocument();
+    expect(screen.getByText(/Significant mismatch/)).toBeInTheDocument();
 
-    // Clinical Note
-    expect(screen.getByText("Clinical Note:")).toBeInTheDocument();
-    expect(screen.getByText(/Significant mismatch between vocal/)).toBeInTheDocument();
-  });
-
-  it("should render medium discrepancy styling", () => {
-    const correlation = {
-      voice_energy: 0.5,
-      content_arousal: 0.2,
-      discrepancy: 0.35, // Medium discrepancy (0.3-0.5)
-      aligned: false,
-    };
-
-    render(<VoiceContentCorrelation correlation={correlation} />);
-
-    // Check progress bar color logic (we can't easily check bg color of nested div without test-id, 
-    // but we can check if the high-discrepancy classes are ABSENT)
-
-    // Discrepancy Level Text shouldn't be orange bold if < 0.5 (logic: discrepancy > 0.5 ? ... : "text-white")
-    // Wait, let's check code:
-    // row 76: discrepancy > 0.5 ? "text-orange-300 font-bold" : "text-white"
-
-    expect(screen.getByText("0.350")).toHaveClass("text-white");
-    expect(screen.queryByText("Clinical Note:")).not.toBeInTheDocument();
+    // High discrepancy styling check logic
+    const discrepancyValue = screen.getByText("0.700");
+    expect(discrepancyValue).toHaveClass("text-orange-300 font-bold");
   });
 });

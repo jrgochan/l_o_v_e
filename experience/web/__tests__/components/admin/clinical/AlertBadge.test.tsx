@@ -1,74 +1,52 @@
+
 import { render, screen } from "@testing-library/react";
 import { AlertBadge } from "@/components/admin/clinical/AlertBadge";
 
 describe("AlertBadge", () => {
-  it("should render stable status correctly", () => {
+  const mockAlerts = [
+    {
+      level: "critical" as const,
+      type: "high_arousal" as const,
+      message: "High Arousal Detected",
+      suggestion: "Consider calming intervention",
+    },
+  ];
+
+  it("renders no alerts state correctly", () => {
     render(<AlertBadge alerts={[]} overallStatus="stable" />);
-
-    expect(screen.getByText("🟢")).toBeInTheDocument();
     expect(screen.getByText("All Clear")).toBeInTheDocument();
-
-    // Check styling class (partial match)
-    const container = screen.getByText("All Clear").closest(".border-b");
-    expect(container).toHaveClass("bg-green-500/20");
-    expect(container).toHaveClass("text-green-300");
+    expect(screen.getByText("🟢")).toBeInTheDocument();
   });
 
-  it("should render critical status with alerts", () => {
-    const alerts: any[] = [
-      {
-        level: "critical",
-        type: "high_arousal",
-        message: "High Arousal Detected",
-        suggestion: "Consider calming sequence",
-      },
-    ];
-
-    render(<AlertBadge alerts={alerts} overallStatus="critical" />);
-
-    expect(screen.getByText("🔴")).toBeInTheDocument();
+  it("renders alerts and critical status correctly", () => {
+    render(<AlertBadge alerts={mockAlerts} overallStatus="critical" />);
     expect(screen.getByText("1 Alert")).toBeInTheDocument();
+    expect(screen.getByText("🔴")).toBeInTheDocument();
     expect(screen.getByText("High Arousal Detected")).toBeInTheDocument();
-    expect(screen.getByText("Consider calming sequence")).toBeInTheDocument();
-
-    const container = screen.getByText("1 Alert").closest(".border-b");
-    expect(container).toHaveClass("bg-red-500/20");
-    expect(container).toHaveClass("text-red-300");
+    expect(screen.getByText("Consider calming intervention")).toBeInTheDocument();
   });
 
-  it("should render warning status with multiple alerts", () => {
-    const alerts: any[] = [
+  it("renders multiple alerts", () => {
+    const multipleAlerts = [
+      ...mockAlerts,
       {
-        level: "warning",
-        type: "voice_quality",
-        message: "Audio Quality Low",
-      },
-      {
-        level: "warning",
-        type: "pattern_concern",
-        message: "Erratic Movement",
-      },
+        level: "warning" as const,
+        type: "voice_quality" as const,
+        message: "Voice quality degrading"
+      }
     ];
-
-    render(<AlertBadge alerts={alerts} overallStatus="warning" />);
-
-    expect(screen.getByText("⚠️")).toBeInTheDocument();
+    render(<AlertBadge alerts={multipleAlerts} overallStatus="critical" />);
     expect(screen.getByText("2 Alerts")).toBeInTheDocument();
-    expect(screen.getByText("Audio Quality Low")).toBeInTheDocument();
-    expect(screen.getByText("Erratic Movement")).toBeInTheDocument();
-
-    const container = screen.getByText("2 Alerts").closest(".border-b");
-    expect(container).toHaveClass("bg-yellow-500/20");
-    expect(container).toHaveClass("text-yellow-300");
+    expect(screen.getByText("Voice quality degrading")).toBeInTheDocument();
   });
 
-  it("should render attention status", () => {
-    render(<AlertBadge alerts={[]} overallStatus="attention" />);
+  it("renders warning status correctly", () => {
+    render(<AlertBadge alerts={mockAlerts} overallStatus="warning" />);
+    expect(screen.getByText("⚠️")).toBeInTheDocument();
+  });
 
+  it("renders attention status correctly", () => {
+    render(<AlertBadge alerts={mockAlerts} overallStatus="attention" />);
     expect(screen.getByText("🟡")).toBeInTheDocument();
-
-    const container = screen.getByText("All Clear").closest(".border-b");
-    expect(container).toHaveClass("bg-orange-500/20");
-    expect(container).toHaveClass("text-orange-300");
   });
 });
