@@ -87,60 +87,58 @@ export function NetworkSettings() {
           </p>
         </div>
 
-        {(settings.network.customEndpoints || settings.network.mode === "local") && (
-          <div className="space-y-4">
-            {/* Observer */}
-            <div>
-              <label className="block text-sm text-gray-300 mb-2">Observer URL</label>
-              <input
-                type="text"
-                value={settings.network.endpoints.observer}
-                onChange={(e) =>
-                  settings.updateNetworkSetting({
-                    endpoints: { ...settings.network.endpoints, observer: e.target.value },
-                  })
-                }
-                disabled={!settings.network.customEndpoints && settings.network.mode === "network"}
-                className="w-full px-4 py-2 bg-gray-800 border border-gray-700 rounded text-white text-sm focus:border-cyan-500 focus:outline-none disabled:opacity-50"
-                placeholder="http://localhost:8000"
-              />
-            </div>
-
-            {/* Listener */}
-            <div>
-              <label className="block text-sm text-gray-300 mb-2">Listener URL</label>
-              <input
-                type="text"
-                value={settings.network.endpoints.listener}
-                onChange={(e) =>
-                  settings.updateNetworkSetting({
-                    endpoints: { ...settings.network.endpoints, listener: e.target.value },
-                  })
-                }
-                disabled={!settings.network.customEndpoints && settings.network.mode === "network"}
-                className="w-full px-4 py-2 bg-gray-800 border border-gray-700 rounded text-white text-sm focus:border-cyan-500 focus:outline-none disabled:opacity-50"
-                placeholder="http://localhost:8002"
-              />
-            </div>
-
-            {/* Versor */}
-            <div>
-              <label className="block text-sm text-gray-300 mb-2">Versor URL</label>
-              <input
-                type="text"
-                value={settings.network.endpoints.versor}
-                onChange={(e) =>
-                  settings.updateNetworkSetting({
-                    endpoints: { ...settings.network.endpoints, versor: e.target.value },
-                  })
-                }
-                disabled={!settings.network.customEndpoints && settings.network.mode === "network"}
-                className="w-full px-4 py-2 bg-gray-800 border border-gray-700 rounded text-white text-sm focus:border-cyan-500 focus:outline-none disabled:opacity-50"
-                placeholder="http://localhost:8001"
-              />
-            </div>
+        <div className="space-y-4">
+          {/* Observer */}
+          <div>
+            <label className="block text-sm text-gray-300 mb-2">Observer URL</label>
+            <input
+              type="text"
+              value={settings.network.endpoints.observer}
+              onChange={(e) =>
+                settings.updateNetworkSetting({
+                  endpoints: { ...settings.network.endpoints, observer: e.target.value },
+                })
+              }
+              disabled={!settings.network.customEndpoints && settings.network.mode === "network"}
+              className="w-full px-4 py-2 bg-gray-800 border border-gray-700 rounded text-white text-sm focus:border-cyan-500 focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed"
+              placeholder="http://localhost:8000"
+            />
           </div>
-        )}
+
+          {/* Listener */}
+          <div>
+            <label className="block text-sm text-gray-300 mb-2">Listener URL</label>
+            <input
+              type="text"
+              value={settings.network.endpoints.listener}
+              onChange={(e) =>
+                settings.updateNetworkSetting({
+                  endpoints: { ...settings.network.endpoints, listener: e.target.value },
+                })
+              }
+              disabled={!settings.network.customEndpoints && settings.network.mode === "network"}
+              className="w-full px-4 py-2 bg-gray-800 border border-gray-700 rounded text-white text-sm focus:border-cyan-500 focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed"
+              placeholder="http://localhost:8002"
+            />
+          </div>
+
+          {/* Versor */}
+          <div>
+            <label className="block text-sm text-gray-300 mb-2">Versor URL</label>
+            <input
+              type="text"
+              value={settings.network.endpoints.versor}
+              onChange={(e) =>
+                settings.updateNetworkSetting({
+                  endpoints: { ...settings.network.endpoints, versor: e.target.value },
+                })
+              }
+              disabled={!settings.network.customEndpoints && settings.network.mode === "network"}
+              className="w-full px-4 py-2 bg-gray-800 border border-gray-700 rounded text-white text-sm focus:border-cyan-500 focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed"
+              placeholder="http://localhost:8001"
+            />
+          </div>
+        </div>
       </section>
 
       {/* Connection Testing */}
@@ -160,11 +158,10 @@ export function NetworkSettings() {
             {Object.entries(connectionStatus).map(([service, status]) => (
               <div
                 key={service}
-                className={`p-4 rounded-lg border ${
-                  status.connected
+                className={`p-4 rounded-lg border ${status.connected
                     ? "bg-green-900/20 border-green-500/30"
                     : "bg-red-900/20 border-red-500/30"
-                }`}
+                  }`}
               >
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
@@ -174,7 +171,7 @@ export function NetworkSettings() {
                       <div className="text-xs text-gray-400">
                         {
                           settings.network.endpoints[
-                            service as keyof typeof settings.network.endpoints
+                          service as keyof typeof settings.network.endpoints
                           ]
                         }
                       </div>

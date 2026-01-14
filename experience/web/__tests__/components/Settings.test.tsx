@@ -426,5 +426,68 @@ describe("Settings Component", () => {
     fireEvent.click(screen.getByText("ℹ️ About"));
     expect(screen.getByText("🔴 Offline")).toBeInTheDocument();
   });
+  it("should handle import cancellation (no file selected)", async () => {
+    openSettings();
+    fireEvent.click(screen.getByText(/Data/));
+
+    const inputMock = { type: "", accept: "", onchange: null as any, click: jest.fn() };
+    const originalCreateElement = document.createElement;
+    jest.spyOn(document, "createElement").mockImplementation((tagName) => {
+      if (tagName === "input") return inputMock as any;
+      return originalCreateElement(tagName);
+    });
+
+    fireEvent.click(screen.getByText("📤 Import Settings"));
+
+    // Trigger onchange with no files
+    const event = { target: { files: [] } };
+    await act(async () => {
+      inputMock.onchange(event);
+    });
+
+    expect(mockStore.importSettings).not.toHaveBeenCalled();
+
+    (document.createElement as jest.Mock).mockRestore();
+  });
+
+  it("should reflect accessibility toggle states", () => {
+    // 1. Initial State (off)
+    const { unmount } = render(<Settings />);
+    fireEvent.click(screen.getByText("⚙️"));
+    fireEvent.click(screen.getByText(/Access/));
+
+    const rmToggle = screen.getByText("Reduced Motion").parentElement?.nextElementSibling;
+    const hcToggle = screen.getByText("High Contrast").parentElement?.nextElementSibling;
+    const srToggle = screen.getByText("Screen Reader Mode").parentElement?.nextElementSibling;
+
+    expect(rmToggle).toHaveClass("bg-gray-700");
+    expect(hcToggle).toHaveClass("bg-gray-700");
+    expect(srToggle).toHaveClass("bg-gray-700");
+
+    unmount();
+
+    // 2. Enable State
+    const newStore = {
+      ...mockStore,
+      reducedMotion: true,
+      highContrast: true,
+      screenReaderMode: true
+    };
+    (useSettingsStore as unknown as jest.Mock).mockReturnValue(newStore);
+
+    const { unmount: unmount2 } = render(<Settings />);
+    fireEvent.click(screen.getByText("⚙️"));
+    fireEvent.click(screen.getByText(/Access/));
+
+    const rmToggleActive = screen.getByText("Reduced Motion").parentElement?.nextElementSibling;
+    const hcToggleActive = screen.getByText("High Contrast").parentElement?.nextElementSibling;
+    const srToggleActive = screen.getByText("Screen Reader Mode").parentElement?.nextElementSibling;
+
+    expect(rmToggleActive).toHaveClass("bg-cyan-600");
+    expect(hcToggleActive).toHaveClass("bg-cyan-600");
+    expect(srToggleActive).toHaveClass("bg-cyan-600");
+
+    unmount2();
+  });
 });
 

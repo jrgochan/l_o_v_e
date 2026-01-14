@@ -190,4 +190,52 @@ describe("AdminSessionDetailPage", () => {
             expect(screen.getByText("User is reflective")).toBeInTheDocument();
         });
     });
+    it("handles non-Error rejection", async () => {
+        (adminApi.getSessionDetails as jest.Mock).mockRejectedValue("String error");
+
+        render(<AdminSessionDetailPage params={mockParams} />);
+
+        await waitFor(() => {
+            expect(screen.getByText("Error: Failed to load session details")).toBeInTheDocument();
+        });
+    });
+
+    it("handles null session response (not found)", async () => {
+        (adminApi.getSessionDetails as jest.Mock).mockResolvedValue(null);
+
+        render(<AdminSessionDetailPage params={mockParams} />);
+
+        await waitFor(() => {
+            expect(screen.getByText("Error: Session not found")).toBeInTheDocument();
+        });
+    });
+
+    it("handles user without full name", async () => {
+        (adminApi.getSessionDetails as jest.Mock).mockResolvedValue({
+            ...mockSession,
+            user: { ...mockSession.user!, full_name: "" },
+        });
+
+        render(<AdminSessionDetailPage params={mockParams} />);
+
+        await waitFor(() => {
+            expect(screen.getByText("Unknown Name")).toBeInTheDocument();
+        });
+    });
+
+    it("handles non-warm tone preference", async () => {
+        (adminApi.getSessionDetails as jest.Mock).mockResolvedValue({
+            ...mockSession,
+            tone_preference: "investigative",
+        });
+
+        render(<AdminSessionDetailPage params={mockParams} />);
+
+        await waitFor(() => {
+            const toneBadge = screen.getByText("investigative Tone");
+            expect(toneBadge).toBeInTheDocument();
+            // Check for cyan class (else branch)
+            expect(toneBadge.className).toContain("bg-cyan-900/30");
+        });
+    });
 });

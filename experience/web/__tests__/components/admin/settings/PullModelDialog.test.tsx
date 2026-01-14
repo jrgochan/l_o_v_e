@@ -255,5 +255,19 @@ describe("PullModelDialog", () => {
     fireEvent.change(screen.getByPlaceholderText(/Type to search/i), { target: { value: "mystery" } });
     // Should fallback to unknown -> Connecting...
     expect(screen.getByText("Connecting to Ollama...")).toBeInTheDocument();
+    // Should fallback to unknown -> Connecting...
+    expect(screen.getByText("Connecting to Ollama...")).toBeInTheDocument();
+  });
+
+  it("guards against programmatic submission with empty input", () => {
+    const { container } = render(<PullModelDialog isOpen={true} onClose={mockOnClose} onPull={mockOnPull} pullProgress={{}} localModels={[]} />);
+    const form = container.querySelector('form');
+    expect(form).toBeInTheDocument();
+
+    // Force form submission event without clicking button
+    fireEvent.submit(form!);
+
+    // Should hit the guard clause because modelName state is ""
+    expect(mockOnPull).not.toHaveBeenCalled();
   });
 });

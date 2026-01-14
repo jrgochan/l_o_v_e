@@ -94,6 +94,24 @@ describe("usePathSorting", () => {
     expect(badge.fewestSteps).toBe(true);
   });
 
+  it("does not award noBridge badge if no bridges needed at all", () => {
+    // All paths don't need bridge
+    const paths = mockPaths.filter(p => !p.requires_bridge).map(p => ({ ...p }));
+    const { result } = renderHook(() => usePathSorting(paths));
+
+    // For p1 (easy, no bridge):
+    // anyBridge should be false.
+    // noBridge badge should be false.
+    expect(result.current[0].badges.noBridge).toBe(false);
+  });
+
+  it("does not award fewestSteps if 0 steps", () => {
+    const { result } = renderHook(() => usePathSorting(mockPaths));
+    // p3 is index 2. waypoints=[], minWaypoints=0.
+    // But >0 check fails.
+    expect(result.current[2].badges.fewestSteps).toBe(false);
+  });
+
   it("should handle empty list", () => {
     const { result } = renderHook(() => usePathSorting([]));
     expect(result.current).toEqual([]);

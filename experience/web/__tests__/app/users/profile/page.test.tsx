@@ -136,4 +136,34 @@ describe("UserProfilePage", () => {
         // Initials from email (T from test@example.com)
         expect(screen.getByText("T")).toBeInTheDocument();
     });
+
+    it("renders inactive status", async () => {
+        mockUseAuthStore.mockReturnValue({ user: { ...mockUser, is_active: false }, isLoading: false });
+        mockApiGet.mockResolvedValue([]);
+
+        render(<UserProfilePage />);
+
+        expect(screen.getByText("Inactive")).toBeInTheDocument();
+    });
+
+    it("handles sessions with missing message count", async () => {
+        mockUseAuthStore.mockReturnValue({ user: mockUser, isLoading: false });
+        mockApiGet.mockResolvedValue([{
+            id: "session-missing-count",
+            started_at: "2023-10-26T15:00:00Z",
+            ended_at: "2023-10-26T15:30:00Z",
+            tone_preference: "calm",
+            // message_count undefined
+        }]);
+
+        render(<UserProfilePage />);
+
+        await waitFor(() => {
+            expect(screen.getByText(/0 messages/)).toBeInTheDocument();
+            // Total messages should be 0
+            const stats = screen.getAllByText("0");
+            // One for Total Messages stat, one for messages count in list?
+            expect(stats.some(el => el.className.includes("text-3xl"))).toBe(true);
+        });
+    });
 });

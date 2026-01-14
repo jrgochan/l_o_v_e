@@ -420,4 +420,85 @@ describe("AIModelsSettings", () => {
 
     MODEL_PRESETS.balanced.model = originalModel;
   });
+
+  it("handles retry failure", async () => {
+    // Check returns false (fail)
+    const checkMock = jest.fn().mockResolvedValue(false);
+    (useOllamaModels as jest.Mock).mockReturnValue({
+      ...mockOllama,
+      checkOllamaHealth: checkMock,
+    });
+
+    render(<AIModelsSettings />);
+
+    // Initial fail
+    await waitFor(() => expect(screen.getByText(/Ollama Not Running/i)).toBeInTheDocument());
+
+    const retryBtn = screen.getByText("Retry Connection");
+    fireEvent.click(retryBtn);
+
+    // Wait for check
+    await waitFor(() => expect(checkMock).toHaveBeenCalled());
+
+    // Should still be in offline state, fetch mocks NOT called
+    expect(mockOllama.fetchLocalModels).not.toHaveBeenCalled();
+    expect(screen.getByText(/Ollama Not Running/i)).toBeInTheDocument();
+  });
+
+  it("handles undefined assignments gracefully", async () => {
+    (useModelAssignments as jest.Mock).mockReturnValue({
+      ...mockAssignments,
+      assignments: undefined, // Explicit undefined
+    });
+
+    render(<AIModelsSettings />);
+    await screen.findByText(/Local Models/i);
+
+    // Check any model card (triggers usage check)
+    expect(screen.getByTestId("model-card-llama3")).toBeInTheDocument();
+
+    // If logic survives, test passes. 
+    // Implicitly creating coverage for optional chaining or guards.
+  });
+
+  it("handles delete confirmation with undefined assignments", async () => {
+    (useModelAssignments as jest.Mock).mockReturnValue({
+      ...mockAssignments,
+      assignments: undefined,
+    });
+
+    render(<AIModelsSettings />);
+    await screen.findByText(/Local Models/i);
+
+    const card = screen.getByTestId("model-card-llama3");
+    // Click delete
+    fireEvent.click(card.querySelector("button:last-child")!);
+
+    // Should show confirm dialog (danger variant because usedBy calculation fallback to [])
+    await waitFor(() => expect(screen.getByText(/This action cannot be undone/)).toBeInTheDocument());
+
+  });
+
+  it("displays persistent error banner when hooks return errors", async () => {
+    (useOllamaModels as jest.Mock).mockReturnValue({
+      ...mockOllama,
+      error: "Critical Model Failure",
+    });
+
+    render(<AIModelsSettings />);
+    await waitFor(() => expect(screen.getByText(/Critical Model Failure/)).toBeInTheDocument());
+
+  });
+
+  it("displays persistent error banner when assignment hook returns error", async () => {
+    (useOllamaModels as jest.Mock).mockReturnValue({ ...mockOllama, error: null });
+    (useModelAssignments as jest.Mock).mockReturnValue({
+      ...mockAssignments,
+      error: "Assignment Sync Failed",
+    });
+
+    render(<AIModelsSettings />);
+    await waitFor(() => expect(screen.getByText(/Assignment Sync Failed/)).toBeInTheDocument());
+  });
 });
+

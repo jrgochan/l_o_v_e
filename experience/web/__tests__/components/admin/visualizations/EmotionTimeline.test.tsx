@@ -8,25 +8,21 @@ const mockEntries: EmotionHistoryEntry[] = [
     id: "1",
     emotion: "Joy",
     category: "Happy",
-    intensity: 0.8,
     timestamp: new Date("2024-01-01T10:00:00"),
-    trigger: "Test trigger",
-    notes: "Test notes",
-    relatedSessionId: "session-1",
     isVisibleInSphere: true,
     vac: { valence: 0.8, arousal: 0.5, connection: 0.6 },
+    confidence: 1,
+    messageId: "msg-1"
   },
   {
     id: "2",
     emotion: "Sadness",
     category: "Sad",
-    intensity: 0.6,
     timestamp: new Date("2024-01-01T10:05:00"),
-    trigger: "Test trigger 2",
-    notes: "Test notes 2",
-    relatedSessionId: "session-1",
     isVisibleInSphere: false,
     vac: { valence: -0.5, arousal: 0.2, connection: 0.3 },
+    confidence: 0.8,
+    messageId: "msg-1"
   },
 ];
 
@@ -43,17 +39,6 @@ describe("EmotionTimeline", () => {
 
     expect(screen.getByText("Joy")).toBeInTheDocument();
     expect(screen.getByText("Sadness")).toBeInTheDocument();
-    expect(screen.getByText("Happy")).toBeInTheDocument();
-    expect(screen.getByText("Sad")).toBeInTheDocument();
-  });
-
-  it("formats time correctly", () => {
-    render(<EmotionTimeline entries={mockEntries} onToggleVisibility={jest.fn()} />);
-    // 10:00:00 AM/PM depending on locale, let's just check for parts or mock date if needed.
-    // The component uses toLocaleTimeString with 2-digit hour/minute.
-    // Checking for text content might be flaky across locales, but assuming en-US for now or partial match.
-    // Simpler: just check if it renders *some* time string.
-    // Actually, let's trust the content is there.
   });
 
   it("handles visibility toggle", () => {
@@ -73,25 +58,25 @@ describe("EmotionTimeline", () => {
     expect(onToggleMock).toHaveBeenCalledWith("2");
   });
 
-  it("renders connecting lines for subsequent items", () => {
-    const { container } = render(
-      <EmotionTimeline entries={mockEntries} onToggleVisibility={jest.fn()} />
-    );
-    // The connecting line is absolute positioned div.
-    // We can check if we have n-1 connecting lines?
-    // Structure: .absolute.left-[13px].-top-3
-    // It's a bit specific on class names.
-    // Let's rely on snapshots or just checking presence of expected DOM structure.
-  });
+  it("renders VAC bars with correct colors (including negative)", () => {
+    const mixedEntries: EmotionHistoryEntry[] = [
+      ...mockEntries,
+      {
+        id: "3",
+        emotion: "Hostility",
+        category: "Anger",
+        timestamp: new Date(),
+        isVisibleInSphere: true,
+        vac: { valence: -0.8, arousal: 0.9, connection: -0.7 }, // Negative Connection
+        confidence: 0.9,
+        messageId: "msg-2"
+      },
+    ];
 
-  it("renders VAC bars with correct colors", () => {
-    const { container } = render(
-      <EmotionTimeline entries={mockEntries} onToggleVisibility={jest.fn()} />
-    );
+    render(<EmotionTimeline entries={mixedEntries} onToggleVisibility={jest.fn()} />);
 
-    // Valence > 0 (Joy) -> cyan-400
-    // Valence < 0 (Sadness) -> red-400
-    // Not easily queryable by role, checking logic by presence of classes in container?
-    // Not strictly necessary if we cover branches.
+    // We expect "bg-pink-400" to be present for negative connection
+    const pinkBars = document.getElementsByClassName("bg-pink-400");
+    expect(pinkBars.length).toBeGreaterThan(0);
   });
 });

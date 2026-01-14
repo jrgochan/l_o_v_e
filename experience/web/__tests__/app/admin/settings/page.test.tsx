@@ -160,6 +160,27 @@ describe("SettingsPage", () => {
         Blob.prototype.text = originalText;
     });
 
+    it("handles import cancellation (no file selected)", async () => {
+        render(<SettingsPage />);
+        const createElementSpy = jest.spyOn(document, "createElement");
+        const originalText = Blob.prototype.text;
+
+        fireEvent.click(screen.getByRole("button", { name: /Import/i }));
+
+        const results = createElementSpy.mock.results;
+        const inputFn = results.find(r => r.value instanceof HTMLInputElement && r.value.type === "file");
+        const input = inputFn?.value as HTMLInputElement;
+
+        // Trigger change with no files
+        Object.defineProperty(input, 'files', { value: [], writable: true });
+        fireEvent.change(input);
+
+        // Should not call import
+        expect(mockImportSettings).not.toHaveBeenCalled();
+
+        Blob.prototype.text = originalText;
+    });
+
     it("handles import failure with invalid JSON", async () => {
         render(<SettingsPage />);
         const createElementSpy = jest.spyOn(document, "createElement");
@@ -179,6 +200,29 @@ describe("SettingsPage", () => {
 
         await waitFor(() => {
             expect(screen.getByText("Invalid settings file")).toBeInTheDocument();
+        });
+        Blob.prototype.text = originalText;
+    });
+
+    it("handles import failure on file read error", async () => {
+        render(<SettingsPage />);
+        const createElementSpy = jest.spyOn(document, "createElement");
+        const originalText = Blob.prototype.text;
+
+        // Mock Blob.text to throw
+        Blob.prototype.text = jest.fn().mockRejectedValue(new Error("Read failed"));
+
+        fireEvent.click(screen.getByRole("button", { name: /Import/i }));
+
+        const results = createElementSpy.mock.results;
+        const inputFn = results.find(r => r.value instanceof HTMLInputElement && r.value.type === "file");
+        const input = inputFn?.value as HTMLInputElement;
+        const file = new File(['{}'], "settings.json", { type: "application/json" });
+        Object.defineProperty(input, 'files', { value: [file], writable: true });
+        fireEvent.change(input);
+
+        await waitFor(() => {
+            expect(screen.getByText("Failed to import settings")).toBeInTheDocument();
         });
         Blob.prototype.text = originalText;
     });

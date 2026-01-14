@@ -36,11 +36,6 @@ export function useObserverPolling({
 
   useEffect(() => {
     if (!enabled) {
-      // Clean up if polling is disabled
-      if (managerRef.current) {
-        managerRef.current.stop();
-        managerRef.current = null;
-      }
       return;
     }
 

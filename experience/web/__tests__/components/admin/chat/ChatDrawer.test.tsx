@@ -188,5 +188,48 @@ describe("ChatDrawer", () => {
 
     addSpy.mockRestore();
     removeSpy.mockRestore();
+    addSpy.mockRestore();
+    removeSpy.mockRestore();
+  });
+
+  it("ignores messages with unknown type", async () => {
+    render(<ChatDrawer isOpen={true} onToggle={mockOnToggle} sessionId="sess1" />);
+    const callbacks = getSocketCallbacks();
+
+    // Should not throw or process
+    await act(async () => {
+      callbacks.onMessage({ type: "unknown_type", content: "" });
+    });
+
+    expect(screen.queryByText("Analyzing...")).not.toBeInTheDocument();
+  });
+
+  it("does not send message if content empty", async () => {
+    (useWebSocketChat as jest.Mock).mockReturnValue({ ...defaultWebSocketState, isConnected: true });
+    render(<ChatDrawer isOpen={true} onToggle={mockOnToggle} sessionId="sess1" />);
+
+    const input = screen.getByPlaceholderText(/How are you feeling/i);
+    await userEvent.type(input, "   ");
+
+    // Enter key
+    fireEvent.keyPress(input, { key: "Enter", code: "Enter", charCode: 13 });
+    expect(mockSendMessage).not.toHaveBeenCalled();
+
+    // Click button
+    const sendBtn = screen.getByText("Send");
+    fireEvent.click(sendBtn);
+    expect(mockSendMessage).not.toHaveBeenCalled();
+  });
+
+  it("does not send message if disconnected", () => {
+    (useWebSocketChat as jest.Mock).mockReturnValue({ ...defaultWebSocketState, isConnected: false });
+    render(<ChatDrawer isOpen={true} onToggle={mockOnToggle} sessionId="sess1" />);
+
+    const input = screen.getByPlaceholderText(/How are you feeling/i) as HTMLInputElement;
+    expect(input).toBeDisabled();
+
+    // Force event to verify guard despite disabled UI
+    fireEvent.keyPress(input, { key: "Enter", code: "Enter", charCode: 13 });
+    expect(mockSendMessage).not.toHaveBeenCalled();
   });
 });

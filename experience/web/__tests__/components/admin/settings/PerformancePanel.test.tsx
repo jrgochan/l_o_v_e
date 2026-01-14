@@ -113,4 +113,32 @@ describe("PerformancePanel", () => {
     // Or just expect the text "Last used:" to be present
     expect(screen.getAllByText(/Last used:/).length).toBeGreaterThan(0);
   });
+
+  it("handles edge cases", () => {
+    const edgeCasePerf = {
+      "edge_func": {
+        avg_latency_ms: null,
+        total_invocations: 1,
+        last_used: null
+      }
+    };
+
+    render(
+      <PerformancePanel
+        performance={edgeCasePerf}
+        assignments={null} // null assignments
+      />
+    );
+
+    // Verify "Unknown" model name (assignments is null)
+    expect(screen.getByText("Unknown")).toBeInTheDocument();
+
+    // Verify null latency -> 0.0s
+    expect(screen.getByText("0.0s")).toBeInTheDocument();
+
+    // Verify singular invocation
+    expect(screen.getByText("1")).toBeInTheDocument();
+    expect(screen.getByText("invocation")).toBeInTheDocument();
+    expect(screen.queryByText("invocations")).not.toBeInTheDocument();
+  });
 });

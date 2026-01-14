@@ -36,6 +36,22 @@ describe("useChatAnalysisState", () => {
     expect(result.current.multiEmotionAnalysis).toBe(mockMulti);
   });
 
+  it("should update three-way analysis", () => {
+    const { result } = renderHook(() => useChatAnalysisState());
+    const mockThreeWay = {
+      overall_alignment: 0.8,
+      voice_content_gap: 0,
+      modality_weights: { text: 0.5, audio: 0.5 },
+    };
+
+    act(() => {
+      // @ts-ignore - mock minimal
+      result.current.setThreeWayAnalysis(mockThreeWay);
+    });
+
+    expect(result.current.threeWayAnalysis).toBe(mockThreeWay);
+  });
+
   it("should clear analysis with optional blob", () => {
     const { result } = renderHook(() => useChatAnalysisState());
 

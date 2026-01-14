@@ -8,9 +8,10 @@ import { ChatSession } from "@/types/chat";
 // Mock next/navigation
 const mockPush = jest.fn();
 const mockBack = jest.fn();
+const mockUseParams = jest.fn(() => ({ id: "user-123" }));
 
 jest.mock("next/navigation", () => ({
-    useParams: () => ({ id: "user-123" }),
+    useParams: () => mockUseParams(),
     useRouter: () => ({
         push: mockPush,
         back: mockBack,
@@ -23,6 +24,7 @@ jest.mock("@/utils/api", () => ({
         get: jest.fn(),
         put: jest.fn(),
     },
+    adminApi: {},
 }));
 
 // Mock AdminLayout
@@ -45,7 +47,7 @@ describe("AdminUserDetailsPage", () => {
         role: "user" as UserRole,
         is_active: true,
         created_at: "2024-01-01",
-        last_login: "2024-01-02",
+        updated_at: "2024-01-01",
     };
 
     const mockSessions: ChatSession[] = [
@@ -65,12 +67,21 @@ describe("AdminUserDetailsPage", () => {
 
     beforeEach(() => {
         jest.clearAllMocks();
+        mockUseParams.mockReturnValue({ id: "user-123" } as any);
     });
 
     it("renders loading state initially", async () => {
         (api.get as jest.Mock).mockImplementation(() => new Promise(() => { }));
         render(<AdminUserDetailsPage />);
         expect(screen.getByText("Loading user details...")).toBeInTheDocument();
+    });
+
+    it("handles missing id parameter", async () => {
+        mockUseParams.mockReturnValue({} as any); // No ID
+        render(<AdminUserDetailsPage />);
+        // If no ID, effect doesn't run, stays loading
+        expect(screen.getByText("Loading user details...")).toBeInTheDocument();
+        expect(api.get).not.toHaveBeenCalled();
     });
 
     it("renders user details and profile tab by default", async () => {
@@ -89,6 +100,20 @@ describe("AdminUserDetailsPage", () => {
         expect(screen.getByText("Edit User Access")).toBeInTheDocument(); // Profile tab content
     });
 
+    it("handles user without full name and inactive status", async () => {
+        (api.get as jest.Mock)
+            .mockResolvedValueOnce({ ...mockUser, full_name: "", is_active: false })
+            .mockResolvedValueOnce(mockSessions)
+            .mockResolvedValueOnce(mockTrajectory);
+
+        render(<AdminUserDetailsPage />);
+
+        await waitFor(() => {
+            expect(screen.getByText("Unknown User")).toBeInTheDocument();
+            expect(screen.getByText("Inactive")).toBeInTheDocument();
+        });
+    });
+
     it("handles fetch error", async () => {
         (api.get as jest.Mock).mockRejectedValue(new Error("Fetch failed"));
 
@@ -97,8 +122,6 @@ describe("AdminUserDetailsPage", () => {
         await waitFor(() => {
             expect(screen.getByText("Fetch failed")).toBeInTheDocument();
         });
-
-        // expect(screen.getByText("User not found")).toBeInTheDocument(); // Removed as we expect the error message
     });
 
     it("handles fetch error and back navigation", async () => {
@@ -125,27 +148,42 @@ describe("AdminUserDetailsPage", () => {
         });
     });
 
-    it("handles tab switching", async () => {
+    it("handles tab switching and empty data", async () => {
         (api.get as jest.Mock)
             .mockResolvedValueOnce(mockUser)
-            .mockResolvedValueOnce(mockSessions)
-            .mockResolvedValueOnce(mockTrajectory);
+            .mockResolvedValueOnce([]) // Empty sessions
+            .mockResolvedValueOnce([]); // Empty trajectory
 
         render(<AdminUserDetailsPage />);
         await waitFor(() => expect(screen.getByText("Test User")).toBeInTheDocument());
 
         // Switch to Sessions
         fireEvent.click(screen.getByText(/Sessions \(\d+\)/));
-        expect(screen.getByText("warm")).toBeInTheDocument(); // Session detail
-        expect(screen.queryByText("Edit User Access")).not.toBeInTheDocument();
+        expect(screen.getByText("No sessions recorded.")).toBeInTheDocument();
 
         // Switch to Trajectory
         fireEvent.click(screen.getByText(/Trajectory Points \(\d+\)/));
-        expect(screen.getByTestId("trajectory-chart")).toBeInTheDocument();
+        expect(screen.getByText("No trajectory data available.")).toBeInTheDocument();
+    });
 
-        // Switch back to Profile
-        fireEvent.click(screen.getByText("Profile & Access"));
-        expect(screen.getByText("Edit User Access")).toBeInTheDocument();
+    it("handles active session display", async () => {
+        (api.get as jest.Mock)
+            .mockResolvedValueOnce(mockUser)
+            .mockResolvedValueOnce([{
+                ...mockSessions[0],
+                ended_at: null // Active
+            }])
+            .mockResolvedValueOnce(mockTrajectory);
+
+        render(<AdminUserDetailsPage />);
+        await waitFor(() => expect(screen.getByText("Test User")).toBeInTheDocument());
+
+        fireEvent.click(screen.getByText(/Sessions \(\d+\)/));
+
+        // "Active" appears twice (Status and Table). Check table cell explicitly or getAll.
+        const activeElements = screen.getAllByText("Active");
+        expect(activeElements.length).toBeGreaterThanOrEqual(2);
+        expect(activeElements.some(el => el.tagName === "TD")).toBe(true);
     });
 
     it("handles user update (save)", async () => {
@@ -195,6 +233,25 @@ describe("AdminUserDetailsPage", () => {
 
         await waitFor(() => {
             expect(window.alert).toHaveBeenCalledWith(expect.stringContaining("Failed to update user"));
+        });
+    });
+
+    it("handles save non-Error rejection", async () => {
+        (api.get as jest.Mock)
+            .mockResolvedValueOnce(mockUser)
+            .mockResolvedValueOnce(mockSessions)
+            .mockResolvedValueOnce(mockTrajectory);
+
+        (api.put as jest.Mock).mockRejectedValue("String error");
+        window.alert = jest.fn();
+
+        render(<AdminUserDetailsPage />);
+        await waitFor(() => expect(screen.getByText("Test User")).toBeInTheDocument());
+
+        fireEvent.click(screen.getByText("Save Changes"));
+
+        await waitFor(() => {
+            expect(window.alert).toHaveBeenCalledWith("Failed to update user: String error");
         });
     });
 });

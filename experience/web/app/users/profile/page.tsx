@@ -165,13 +165,13 @@ export default function UserProfilePage() {
                           ⏱️{" "}
                           {session.ended_at
                             ? Math.ceil(
-                                (new Date(session.ended_at).getTime() -
-                                  new Date(session.started_at).getTime()) /
-                                  60000
-                              ) + " min"
+                              (new Date(session.ended_at).getTime() -
+                                new Date(session.started_at).getTime()) /
+                              60000
+                            ) + " min"
                             : "Ongoing"}
                         </span>
-                        <span>💬 {session.message_count} messages</span>
+                        <span>💬 {session.message_count || 0} messages</span>
                       </div>
                     </div>
 

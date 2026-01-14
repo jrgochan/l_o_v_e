@@ -163,5 +163,35 @@ describe("NetworkSettings", () => {
     expect(mockUpdateNetworkSetting).toHaveBeenCalledWith({
       endpoints: expect.objectContaining({ versor: "http://network-custom:8001" }),
     });
+    expect(mockUpdateNetworkSetting).toHaveBeenCalledWith({
+      endpoints: expect.objectContaining({ versor: "http://network-custom:8001" }),
+    });
+  });
+
+  it("disables inputs in network mode without custom endpoints", () => {
+    (useSettingsStore as unknown as jest.Mock).mockReturnValue({
+      ...defaultSettings,
+      network: {
+        mode: "network",
+        customEndpoints: false, // Default network mode
+        endpoints: defaultSettings.network.endpoints,
+      },
+    });
+
+    render(<NetworkSettings />);
+
+    const observerInput = screen.getByDisplayValue("http://localhost:8000");
+    const listenerInput = screen.getByDisplayValue("http://localhost:8002");
+    const versorInput = screen.getByDisplayValue("http://localhost:8001");
+
+    // Expect items to be visible but disabled
+    expect(observerInput).toBeVisible();
+    expect(observerInput).toBeDisabled();
+
+    expect(listenerInput).toBeVisible();
+    expect(listenerInput).toBeDisabled();
+
+    expect(versorInput).toBeVisible();
+    expect(versorInput).toBeDisabled();
   });
 });

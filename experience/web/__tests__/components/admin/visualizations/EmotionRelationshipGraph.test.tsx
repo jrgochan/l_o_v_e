@@ -1,6 +1,7 @@
 
 import { render, screen, act } from "@testing-library/react";
 import { EmotionRelationshipGraph } from "@/components/admin/visualizations/EmotionRelationshipGraph";
+import { useGraphData } from "@/hooks/visualizations/useGraphData";
 import * as d3 from "d3";
 
 // Data types
@@ -109,7 +110,7 @@ jest.mock("d3", () => {
     select: jest.fn().mockReturnThis(),
     data: jest.fn().mockReturnThis(),
     join: jest.fn().mockReturnThis(),
-    attr: jest.fn().mockImplementation(function (name, value) {
+    attr: jest.fn().mockImplementation(function (this: any, name, value) {
       // Execute function values to cover branches
       if (typeof value === "function") {
         // Execute with various data to hit branches
@@ -138,14 +139,14 @@ jest.mock("d3", () => {
       return this;
     }),
     style: jest.fn().mockReturnThis(), // .style also takes functions
-    on: jest.fn().mockImplementation(function (event, handler) {
+    on: jest.fn().mockImplementation(function (this: any, event, handler) {
       mockHandlers[event] = handler;
       return this;
     }),
     call: jest.fn().mockReturnThis(),
     append: jest.fn().mockReturnThis(),
     remove: jest.fn().mockReturnThis(),
-    text: jest.fn().mockImplementation(function (value) {
+    text: jest.fn().mockImplementation(function (this: any, value) {
       if (typeof value === "function") {
         try {
           value({ emotion: { emotion_name: "test" } });
@@ -206,6 +207,10 @@ describe("EmotionRelationshipGraph", () => {
     if (mockHandlers["mouseover"]) {
       mockHandlers["mouseover"].call({}, {}, { radius: 10, emotion: { prominence: "primary" } });
     }
+
+    if (mockHandlers["mouseout"]) {
+      mockHandlers["mouseout"].call({}, {}, { radius: 10, emotion: { prominence: "primary" } });
+    }
   });
 
   it("handles tick updates", () => {
@@ -215,5 +220,26 @@ describe("EmotionRelationshipGraph", () => {
     if ((global as any).mockOnTick) {
       (global as any).mockOnTick();
     }
+  });
+
+  it("handles empty data gracefully", () => {
+    (useGraphData as jest.Mock).mockReturnValue({ nodes: [], links: [] });
+    render(<EmotionRelationshipGraph {...defaultProps} emotions={[]} relationships={[]} />);
+    // Effect checks nodes.length === 0 and returns early, skipping d3.select
+    expect(d3.select).not.toHaveBeenCalled();
+  });
+
+  it("handles tick when unmounted (null ref)", () => {
+    const { unmount } = render(<EmotionRelationshipGraph {...defaultProps} />);
+
+    // Capture tick
+    const tick = (global as any).mockOnTick;
+    expect(tick).toBeDefined();
+
+    // Unmount -> svgRef.current becomes null
+    unmount();
+
+    // Invoke tick - should return early (covering line 39)
+    tick();
   });
 });

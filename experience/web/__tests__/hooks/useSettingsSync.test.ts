@@ -41,4 +41,53 @@ describe("useSettingsSync", () => {
 
     expect(mockSetState).toHaveBeenCalledTimes(2); // Mount + Change
   });
+
+  it("should map settings correctly", () => {
+    mockGetState.mockReturnValue({
+      pathAnimationMode: "test-mode",
+      showMotionIndicators: true,
+      colorScheme: "dark",
+      pathOpacity: 0.5,
+      emotionSize: 10,
+      enableAnimations: false,
+      dataVisualizationMode: "vis-mode",
+      computeMode: "compute-mode",
+      showAllPaths: true,
+      focusMode: "focus-mode",
+      layers: { layer1: true },
+    } as any);
+
+    renderHook(() => useSettingsSync());
+
+    const updater = mockSetState.mock.calls[0][0];
+    const prevState = { settings: { existing: "val" }, layers: {} };
+    const newState = updater(prevState);
+
+    expect(newState).toEqual({
+      settings: expect.objectContaining({
+        pathAnimationMode: "test-mode",
+        showMotionIndicators: true,
+        colorScheme: "dark",
+        pathOpacity: 0.5,
+        emotionSize: 10,
+        enableAnimations: false,
+        dataVisualizationMode: "vis-mode",
+        computeMode: "compute-mode",
+        showAllPaths: true,
+        focusMode: "focus-mode",
+        existing: "val", // Preserves existing state spread
+      }),
+      layers: { layer1: true },
+    });
+  });
+
+  it("should unsubscribe on unmount", () => {
+    const mockUnsubscribe = jest.fn();
+    mockSubscribe.mockReturnValue(mockUnsubscribe);
+
+    const { unmount } = renderHook(() => useSettingsSync());
+    unmount();
+
+    expect(mockUnsubscribe).toHaveBeenCalled();
+  });
 });

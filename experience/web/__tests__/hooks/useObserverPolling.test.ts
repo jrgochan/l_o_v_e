@@ -10,6 +10,13 @@ jest.mock("@love/experience-shared", () => ({
   convertQuaternion: jest.fn((q) => q),
 }));
 
+jest.mock("@/utils/logger", () => ({
+  logger: {
+    info: jest.fn(),
+    error: jest.fn(),
+  },
+}));
+
 describe("useObserverPolling", () => {
   const mockSetTarget = jest.fn();
   const mockStart = jest.fn();
@@ -58,5 +65,39 @@ describe("useObserverPolling", () => {
     successCallback(mockData);
 
     expect(mockSetTarget).toHaveBeenCalledWith([1, 1, 1], [0, 0, 0, 1]);
+  });
+
+  it("should log error on polling failure", () => {
+    // Import mocked logger to spy on it
+    const { logger } = require("@/utils/logger");
+
+    renderHook(() => useObserverPolling({ userId: "u1", enabled: true }));
+    const errorCallback = mockStart.mock.calls[0][2];
+    const testError = new Error("Poll fail");
+
+    errorCallback(testError);
+
+    expect(logger.error).toHaveBeenCalledWith("api", "Observer polling error", testError);
+  });
+
+  it("provides manual stop function", () => {
+    const { result } = renderHook(() => useObserverPolling({ userId: "u1", enabled: true }));
+
+    expect(mockStop).not.toHaveBeenCalled();
+    result.current.stop();
+    expect(mockStop).toHaveBeenCalled();
+  });
+
+  it("cleans up on unmount", () => {
+    const { unmount } = renderHook(() => useObserverPolling({ userId: "u1", enabled: true }));
+    expect(mockStop).not.toHaveBeenCalled();
+    unmount();
+    expect(mockStop).toHaveBeenCalled();
+  });
+  it("defaults to disabled", () => {
+    // @ts-ignore
+    const { result } = renderHook(() => useObserverPolling({ userId: "u1" }));
+    expect(result.current.isPolling).toBe(false);
+    expect(createPollingManager).not.toHaveBeenCalled();
   });
 });

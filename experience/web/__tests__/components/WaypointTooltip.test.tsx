@@ -51,4 +51,50 @@ describe("WaypointTooltip", () => {
     rerender(<WaypointTooltip {...defaultProps} waypointState="goal" />);
     expect(screen.getByText("Goal")).toBeInTheDocument();
   });
+  it("renders correct color for each difficulty", () => {
+    // Moderate
+    const { rerender } = render(
+      <WaypointTooltip
+        {...defaultProps}
+        waypoint={{ ...mockWaypoint, difficulty: "moderate" }}
+      />
+    );
+    expect(screen.getByText("moderate")).toHaveClass("text-yellow-400");
+
+    // Hard
+    rerender(
+      <WaypointTooltip
+        {...defaultProps}
+        waypoint={{ ...mockWaypoint, difficulty: "hard" }}
+      />
+    );
+    expect(screen.getByText("hard")).toHaveClass("text-red-400");
+  });
+
+  it("handles multiple strategies pluralization and truncation", () => {
+    const strategies = [
+      { name: "S1" },
+      { name: "S2" },
+      { name: "S3" },
+      { name: "S4" },
+    ];
+
+    render(
+      <WaypointTooltip
+        {...defaultProps}
+        waypoint={{ ...mockWaypoint, strategies }}
+      />
+    );
+
+    expect(screen.getByText((content) => content.includes("4 Strategies Available"))).toBeInTheDocument();
+
+    // Check for first 3
+    expect(screen.getByText("S1")).toBeInTheDocument();
+    expect(screen.getByText("S2")).toBeInTheDocument();
+    expect(screen.getByText("S3")).toBeInTheDocument();
+
+    // Check for +1 more
+    expect(screen.getByText("+1 more...")).toBeInTheDocument();
+    expect(screen.queryByText("S4")).not.toBeInTheDocument();
+  });
 });
