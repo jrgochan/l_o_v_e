@@ -63,4 +63,28 @@ describe("PathSummaryList", () => {
     const { container } = render(<PathSummaryList paths={[]} selectedPathId={null} isComputingPaths={false} onWaypointClick={jest.fn()} />);
     expect(container).toBeEmptyDOMElement();
   });
+
+  it("highlights selected path", () => {
+    render(<PathSummaryList paths={mockPaths as any} selectedPathId="p1" isComputingPaths={false} onWaypointClick={jest.fn()} />);
+    const card = screen.getByText("A → B").closest(".rounded-lg");
+    expect(card).toHaveClass("bg-cyan-900/40");
+    expect(card).toHaveClass("border-cyan-500");
+  });
+
+  it("shows bridge requirements", () => {
+    const bridgePath = [{
+      ...mockPaths[0],
+      id: "p2",
+      requires_bridge: true,
+      bridge_emotions: ["Awe"]
+    }];
+
+    // Sort hook mock needs to return this new path
+    const sortedBridgePath = [{ path: bridgePath[0], badges: { noBridge: false } }];
+    (usePathSorting as jest.Mock).mockReturnValue(sortedBridgePath);
+
+    render(<PathSummaryList paths={bridgePath as any} selectedPathId={null} isComputingPaths={false} onWaypointClick={jest.fn()} />);
+
+    expect(screen.getByText("★ Requires: Awe")).toBeInTheDocument();
+  });
 });

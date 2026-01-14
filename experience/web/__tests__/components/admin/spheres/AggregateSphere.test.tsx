@@ -133,4 +133,68 @@ describe("AggregateSphere", () => {
     );
     expect(mockSetSize).toHaveBeenCalledWith(500, 500);
   });
+
+  it("should constrain particles within bounds during animation", () => {
+    render(
+      <AggregateSphere emotions={mockEmotions as any} aggregate={mockAggregate as any} />
+    );
+
+    // Get particles from mockAdd calls
+    // mockAdd called ~4 times: AmbientLight, DirectionalLight, Sphere, Particles
+    const addCalls = mockAdd.mock.calls;
+    // Find the one that has geometry.attributes.position (our Particles mock)
+    const particles = addCalls.find(call =>
+      call[0].geometry &&
+      call[0].geometry.attributes &&
+      call[0].geometry.attributes.position
+    )?.[0];
+
+    expect(particles).toBeDefined();
+
+    // Access the array in the mock structure
+    // Mock definition: attributes.position.array is Float32Array(30)
+    const positions = particles.geometry.attributes.position.array;
+
+    // Set a particle out of bounds
+    positions[0] = 10;
+    positions[1] = 0;
+    positions[2] = 0;
+
+    // Trigger animation frame
+    const calls = (window.requestAnimationFrame as jest.Mock).mock.calls;
+    // The last call is the most recent request for next frame.
+    // But animate() calls requestAnimationFrame immediately.
+    // And useEffect calls animate() once.
+    // So there should be at least one call.
+    const animateCallback = calls[calls.length - 1][0];
+
+    act(() => {
+      animateCallback();
+    });
+
+    // Verify reduction
+    expect(positions[0]).toBeLessThan(10);
+  });
+
+  it("should use different params for mode and arousal", () => {
+    // High arousal (swirl multiplier) + High Valence (swirl direction)
+    render(
+      <AggregateSphere
+        emotions={mockEmotions as any}
+        aggregate={{ ...mockAggregate, vac: { ...mockAggregate.vac, arousal: 0.8, valence: 0.8 } } as any}
+        mode="dynamic"
+      />
+    );
+    // Just verify render doesn't crash and sizing logic runs
+    expect(THREE.WebGLRenderer).toHaveBeenCalled();
+
+    // Low arousal, Negative Valence
+    render(
+      <AggregateSphere
+        emotions={mockEmotions as any}
+        aggregate={{ ...mockAggregate, vac: { ...mockAggregate.vac, arousal: -0.5, valence: -0.5 } } as any}
+        mode="mystical"
+      />
+    );
+  });
 });

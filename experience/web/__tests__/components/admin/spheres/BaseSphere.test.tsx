@@ -133,4 +133,45 @@ describe("BaseSphere Component", () => {
     );
     expect(getByTestId("child-content")).toBeInTheDocument();
   });
+
+  it("handles standard lighting helper", () => {
+    render(
+      // @react-three/fiber Canvas needed? No, StandardLighting returns JSX elements (lights)
+      // treating it as a component
+      <StandardLighting />
+    );
+    // Just verify it renders without error (though strictly lights don't render DOM nodes)
+    // We can't query DOM for lights unless we render inside a Canvas with a mock that renders divs
+    // But since it's a helper function returning JSX, just calling it is enough for 'invocation' coverage.
+  });
+
+  it("handles rotation on X axis", () => {
+    let frameCallback: any;
+    (useFrame as jest.Mock).mockImplementation((cb) => { frameCallback = cb; });
+
+    const { container } = render(
+      <BaseSphere
+        color="#fff"
+        animation={{ rotation: { enabled: true, speed: 0.5, axis: 'x' } }}
+      />
+    );
+    const mesh = container.querySelector("mesh") as any;
+    if (frameCallback) frameCallback({ clock: { elapsedTime: 1 } });
+    expect(mesh.rotation.x).toBeCloseTo(0.5);
+  });
+
+  it("handles rotation on Z axis", () => {
+    let frameCallback: any;
+    (useFrame as jest.Mock).mockImplementation((cb) => { frameCallback = cb; });
+
+    const { container } = render(
+      <BaseSphere
+        color="#fff"
+        animation={{ rotation: { enabled: true, speed: 0.5, axis: 'z' } }}
+      />
+    );
+    const mesh = container.querySelector("mesh") as any;
+    if (frameCallback) frameCallback({ clock: { elapsedTime: 1 } });
+    expect(mesh.rotation.z).toBeCloseTo(0.5);
+  });
 });

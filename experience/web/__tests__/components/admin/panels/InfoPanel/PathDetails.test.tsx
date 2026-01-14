@@ -95,6 +95,15 @@ describe("PathDetails", () => {
     expect(vulnerabilityElements.length).toBeGreaterThan(0);
   });
 
+  it("renders specific warning for Awe bridge emotion", () => {
+    const awePath = {
+      ...mockPath,
+      bridge_emotions: ["Awe"]
+    };
+    render(<PathDetails path={awePath as any} onWaypointClick={jest.fn()} />);
+    expect(screen.getByText(/Awe provides perspective shift/)).toBeInTheDocument();
+  });
+
   it("handles Play button", () => {
     render(<PathDetails path={mockPath as any} onWaypointClick={jest.fn()} />);
     fireEvent.click(screen.getByText("▶ Play"));

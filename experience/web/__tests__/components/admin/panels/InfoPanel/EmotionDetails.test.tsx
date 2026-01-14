@@ -38,6 +38,7 @@ describe("EmotionDetails", () => {
     definition: "A feeling of great pleasure and happiness.",
     vac: [0.8, 0.6, 0.7],
     color: "#FFFF00",
+    quaternion: [0, 0, 0, 1],
   };
 
   beforeAll(() => {

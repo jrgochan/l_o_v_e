@@ -53,4 +53,13 @@ describe("MiniSoulSphere", () => {
     // Check transform for hover
     expect(style).toContain('scale(1.1)');
   });
+
+  it("uses fallback color for invalid mode", () => {
+    // Cast to any to bypass TS check for invalid mode
+    const { container } = render(<MiniSoulSphere emotion={mockEmotion as any} colorMode={"invalid" as any} />);
+    const innerSphere = container.querySelector('.absolute.inset-0') as HTMLElement;
+    const style = innerSphere.getAttribute('style');
+    // Fallback is #888888
+    expect(style).toContain('#888888');
+  });
 });

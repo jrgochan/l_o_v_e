@@ -97,4 +97,87 @@ describe("ActionSuggestions", () => {
     fireEvent.click(screen.getByText("Clear Selection"));
     expect(mockSetSelectedPath).toHaveBeenCalledWith(null);
   });
+
+  it("renders null (empty) when multiple emotions selected but no path active", () => {
+    (useAtlasAdminStore as unknown as jest.Mock).mockImplementation((selector) => selector({
+      selectedEmotionIds: new Set(["joy", "sadness"]),
+      selectedPathId: null, // explicit null
+      allEmotions: mockEmotions,
+    }));
+
+    const { container } = render(<ActionSuggestions />);
+    expect(container).toBeEmptyDOMElement();
+  });
+
+  it("omits 'Find Path' if no opposite emotion exists", () => {
+    (useAtlasAdminStore as unknown as jest.Mock).mockImplementation((selector) => selector({
+      selectedEmotionIds: new Set(["joy"]),
+      selectedPathId: null,
+      allEmotions: [mockEmotions[0]], // Only Joy exists, so no opposite
+      cycleViewMode: mockCycleViewMode,
+      selectEmotion: mockSelectEmotion,
+      setFocusedEmotion: mockSetFocusedEmotion,
+    }));
+
+    render(<ActionSuggestions />);
+    expect(screen.queryByText(/Find Path/)).not.toBeInTheDocument();
+    expect(screen.getByText("Focus Camera")).toBeInTheDocument();
+  });
+
+  it("does nothing when Surprise Me clicked with empty emotions list", () => {
+    (useAtlasAdminStore as unknown as jest.Mock).mockImplementation((selector) => selector({
+      selectedEmotionIds: new Set(),
+      selectedPathId: null,
+      allEmotions: [], // Empty list
+      cycleViewMode: mockCycleViewMode,
+      selectEmotion: mockSelectEmotion,
+      setFocusedEmotion: mockSetFocusedEmotion,
+    }));
+
+    render(<ActionSuggestions />);
+    const surpriseBtn = screen.getByText("Surprise Me");
+    fireEvent.click(surpriseBtn);
+    expect(mockSelectEmotion).not.toHaveBeenCalled();
+  });
+
+  it("handles invalid emotion selection gracefully (no crash)", () => {
+    // Case where selected ID is not in allEmotions
+    (useAtlasAdminStore as unknown as jest.Mock).mockImplementation((selector) => selector({
+      selectedEmotionIds: new Set(["invalid-id"]),
+      selectedPathId: null,
+      allEmotions: mockEmotions,
+    }));
+
+    // Should behave like single selection but findOpposite returns null early
+    render(<ActionSuggestions />);
+    // Since current is undefined, findOpposite returns null (line 25 covered)
+    // opposite is null, so "Find Path" not added.
+    expect(screen.queryByText(/Find Path/)).not.toBeInTheDocument();
+    // "Focus Camera" is still added because it uses activeIds[0] directly
+    expect(screen.getByText("Focus Camera")).toBeInTheDocument();
+  });
+
+  it("selects the furthest opposite among multiple candidates", () => {
+    const multiEmotions = [
+      { id: "joy", name: "Joy", vac: [0.8, 0.5, 0.5] as [number, number, number], category: "joy", definition: "def", color: "#FF0" },
+      { id: "sadness", name: "Sadness", vac: [-0.8, -0.5, -0.5] as [number, number, number], category: "sadness", definition: "def", color: "#00F" }, // Far (First to set maxDist)
+      { id: "meh", name: "Meh", vac: [0.7, 0.4, 0.4] as [number, number, number], category: "neutral", definition: "def", color: "#888" }, // Close (Should trigger else branch)
+    ];
+
+    (useAtlasAdminStore as unknown as jest.Mock).mockImplementation((selector) => selector({
+      selectedEmotionIds: new Set(["joy"]),
+      selectedPathId: null,
+      allEmotions: multiEmotions, // Order matters: Sadness (Far) -> Meh (Near)? No, map/forEach order.
+      // If we pass array: [Joy, Sadness, Meh]
+      // 1. Joy (skipped)
+      // 2. Sadness (Far). maxDist = High.
+      // 3. Meh (Near). Dist < maxDist. Else branch taken.
+      selectEmotion: mockSelectEmotion,
+      setFocusedEmotion: mockSetFocusedEmotion,
+    }));
+
+    render(<ActionSuggestions />);
+    // Verify it picked Sadness, not Meh
+    expect(screen.getByText("Find Path to Sadness")).toBeInTheDocument();
+  });
 });
