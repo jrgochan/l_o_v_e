@@ -596,5 +596,132 @@ describe("ChatPanel", () => {
     expect(mockSetMultiEmotionAnalysis).toHaveBeenCalled();
     expect(mockSetCurrentAnalysis).toHaveBeenCalled();
   });
-});
+  it("renders resizing state styling", () => {
+    (useChatPanelState as jest.Mock).mockReturnValue({ ...defaultChatPanelState, isExpanded: true, isResizing: true });
 
+    // We need to render it to find the element
+    const { container } = render(<ChatPanel sessionId="sess1" />);
+
+    // The resize handle is the div with cursor-row-resize
+    const resizeHandle = container.querySelector('.cursor-row-resize');
+    expect(resizeHandle).toHaveClass('bg-cyan-500/50');
+  });
+
+  it("handles WebSocket callbacks: onAnalysis (Stable)", async () => {
+    render(<ChatPanel sessionId="sess1" />);
+    const callbacks = getSocketCallbacks();
+    const vac = { valence: 0.5, arousal: 0.2, connection: 0.5 };
+
+    await act(async () => {
+      callbacks.onAnalysis("Joy", "positive", vac, 0.9); // High confidence, mundane VAC
+    });
+
+    expect(mockSetSessionMetricsSpy).toHaveBeenCalled();
+  });
+
+  it("handles WebSocket callbacks: onInsight (No Alert)", async () => {
+    render(<ChatPanel sessionId="sess1" />);
+    const callbacks = getSocketCallbacks();
+    const insight = {
+      summary: "Normal insight",
+      // No voice_content_correlation
+    };
+
+    await act(async () => {
+      callbacks.onInsight(insight);
+    });
+
+    expect(mockSetCurrentAnalysisSpy).toHaveBeenCalled();
+  });
+
+  it("handles WebSocket callbacks: onMessage (Other Type)", async () => {
+    jest.useFakeTimers();
+    render(<ChatPanel sessionId="sess1" />);
+    const callbacks = getSocketCallbacks();
+
+    await act(async () => {
+      callbacks.onMessage({ type: "pong" }); // Not message_received
+    });
+
+    act(() => {
+      jest.advanceTimersByTime(120000);
+    });
+    jest.useRealTimers();
+  });
+
+  it("handles WebSocket callbacks: onAggregateState (Empty Fields)", async () => {
+    render(<ChatPanel sessionId="sess1" />);
+    const callbacks = getSocketCallbacks();
+
+    await act(async () => {
+      callbacks.onAggregateState({
+        vac: { valence: 0, arousal: 0, connection: 0 },
+        // complexity_score and clarity missing
+      });
+    });
+
+    expect(mockSetMultiEmotionAnalysisSpy).toHaveBeenCalled();
+  });
+
+  it("renders resizing active state", () => {
+    (useChatPanelState as jest.Mock).mockReturnValue({
+      ...defaultChatPanelState,
+      isExpanded: true,
+      isResizing: true
+    });
+
+    const { container } = render(<ChatPanel sessionId="sess1" />);
+    // The resize handle div
+    const resizeHandle = container.querySelector('.cursor-row-resize');
+    expect(resizeHandle).toHaveClass('bg-cyan-500/50');
+  });
+
+  it("renders analysis panel expanded state", () => {
+    (useChatPanelState as jest.Mock).mockReturnValue({
+      ...defaultChatPanelState,
+      isExpanded: true,
+      analysisExpandState: "expanded"
+    });
+
+    const { container } = render(<ChatPanel sessionId="sess1" />);
+    // Find the div wrapping AnalysisPanel
+    // It has "w-[calc(100%-18rem)]"
+    const wrapper = screen.getByTestId("analysis-panel").parentElement;
+    expect(wrapper).toHaveClass("w-[calc(100%-18rem)]");
+  });
+
+  it("renders analysis panel fullscreen state", () => {
+    (useChatPanelState as jest.Mock).mockReturnValue({
+      ...defaultChatPanelState,
+      isExpanded: true,
+      analysisExpandState: "fullscreen"
+    });
+
+    // In fullscreen, EmotionHistoryPanel is hidden (checked by existing logic?)
+    // ChatMessages is hidden (if analysisExpandState !== "normal"?)
+    // Wait, ChatPanel logic:
+    // {analysisExpandState !== "fullscreen" && <EmotionHistoryPanel />}
+    // {analysisExpandState === "normal" && <ChatMessages ... />}
+
+    render(<ChatPanel sessionId="sess1" />);
+
+    expect(screen.queryByTestId("history-panel")).not.toBeInTheDocument();
+    expect(screen.queryByTestId("chat-messages")).not.toBeInTheDocument();
+
+    const wrapper = screen.getByTestId("analysis-panel").parentElement;
+    expect(wrapper).toHaveClass("w-full");
+  });
+
+  it("renders fullscreen chat mode", () => {
+    (useChatPanelState as jest.Mock).mockReturnValue({
+      ...defaultChatPanelState,
+      isFullscreen: true
+    });
+
+    const { container } = render(<ChatPanel sessionId="sess1" />);
+    // The main div should have style height: 100vh
+    const mainDiv = container.firstChild;
+    expect(mainDiv).toHaveStyle({ height: '100vh' });
+    expect(mainDiv).toHaveClass('inset-0');
+  });
+});

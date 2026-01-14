@@ -1,5 +1,6 @@
 import { useWaypointPulse } from "../../../../components/admin/atlas/useWaypointPulse";
 import { render } from "@testing-library/react";
+import React from "react";
 import * as THREE from "three";
 
 // Mock R3F

@@ -8,7 +8,7 @@ jest.mock("../../../../components/admin/visualizations/PathParticles", () => ({
 }));
 
 jest.mock("../../../../components/admin/paths/PathCurveAnimated", () => ({
-  PathCurveAnimated: () => <mesh data-testid="path-curve-animated" />,
+  PathCurveAnimated: (props: any) => <mesh data-testid="path-curve-animated" data-opacity={props.opacity} />,
 }));
 
 // Mock extracted WaypointMarker to allow DOM interactions
@@ -298,5 +298,45 @@ describe("PathNetwork", () => {
     const { getAllByTestId } = render(<PathNetwork />);
     // Just rendering is enough to trigger getWaypointCategoryColor and hit the default return
     expect(getAllByTestId("waypoint-marker")).toHaveLength(1);
+  });
+
+
+  it("should dim non-active paths when another path is hovered", () => {
+    const activePath = { ...mockPath, id: "p2", from: { ...mockPath.from, id: "e3" }, to: { ...mockPath.to, id: "e4" } };
+
+    mockUseAtlasAdminStore.mockImplementation((selector: any) => {
+      const state = {
+        computedPaths: new Map([["p1", mockPath], ["p2", activePath]]),
+        selectedEmotionIds: new Set(["e1", "e2", "e3", "e4"]),
+        layers: { transitionPaths: true },
+        settings: { pathOpacity: 1.0, pathAnimationMode: "flow" },
+        allEmotions: [],
+        selectedPathId: null,
+        hoveredPathId: "p2", // p2 is hovered, p1 should be dimmed
+        setHoveredPath: jest.fn(),
+        setSelectedPath: jest.fn(),
+      };
+      return selector(state);
+    });
+
+    const { getAllByTestId } = render(<PathNetwork />);
+    const paths = getAllByTestId("path-curve-animated");
+    expect(paths).toHaveLength(2);
+
+    // Check opacities
+    // Since map iteration order matches insertion, p1 matches index 0 or 1?
+    // It's a Map. Iteration order is insertion order. p1 first, p2 second.
+    // p1 (inactive) should be 0.05
+    // p2 (hovered) should be 1.0
+
+    // We need to check which one is which. 
+    // Use Array.from(paths).find... or accept order.
+    const p1 = paths[0];
+    const p2 = paths[1];
+
+    // One should be 0.05, one should be 1.0
+    const opacities = [p1.getAttribute("data-opacity"), p2.getAttribute("data-opacity")];
+    expect(opacities).toContain("0.05");
+    expect(opacities).toContain("1");
   });
 });
