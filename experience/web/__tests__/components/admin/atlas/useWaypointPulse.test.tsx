@@ -60,4 +60,16 @@ describe("useWaypointPulse", () => {
         frameCallback({ clock: { elapsedTime: 1 } });
         expect(meshRef.current.scale.setScalar).toHaveBeenCalled();
     });
+    it("should handle null ref safely", () => {
+        const meshRef = { current: null };
+        const TestComponent = () => {
+            useWaypointPulse(meshRef as any, "subtle");
+            return null;
+        };
+        render(<TestComponent />);
+
+        const frameCallback = mockUseFrame.mock.calls[0][0];
+        // Should execute without error and return early
+        expect(() => frameCallback({ clock: { elapsedTime: 1 } })).not.toThrow();
+    });
 });

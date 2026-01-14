@@ -32,6 +32,8 @@ afterAll(() => {
 });
 
 describe("DynamicPlayfulPath", () => {
+  let useFrameCallback: (state: any) => void;
+
   beforeAll(() => {
     // Patch Element for R3F props
     Object.defineProperties(window.Element.prototype, {
@@ -46,7 +48,51 @@ describe("DynamicPlayfulPath", () => {
       rotation: {
         get() { if (!this._rot) this._rot = new THREE.Euler(); return this._rot; },
         configurable: true
+      },
+      // Material props
+      color: {
+        get() { if (!this._color) this._color = new THREE.Color(); return this._color; },
+        configurable: true
+      },
+      emissive: {
+        get() { if (!this._emissive) this._emissive = new THREE.Color(); return this._emissive; },
+        configurable: true
+      },
+      opacity: {
+        get() { return this._opacity ?? 1; },
+        set(v) { this._opacity = v; },
+        configurable: true
+      },
+      emissiveIntensity: {
+        get() { return this._emissiveIntensity ?? 1; },
+        set(v) { this._emissiveIntensity = v; },
+        configurable: true
+      },
+      // Mesh prop to access material
+      material: {
+        get() {
+          if (!this._material) {
+            this._material = {
+              uniforms: {
+                time: { value: 0 },
+                pathColor: { value: new THREE.Color() },
+                isSelected: { value: 0 },
+                opacity: { value: 1 }
+              },
+              color: new THREE.Color(),
+              emissive: new THREE.Color(),
+              opacity: 1,
+              emissiveIntensity: 1
+            };
+          }
+          return this._material;
+        },
+        configurable: true
       }
+    });
+
+    (useFrame as jest.Mock).mockImplementation((cb) => {
+      useFrameCallback = cb;
     });
   });
 
@@ -60,6 +106,7 @@ describe("DynamicPlayfulPath", () => {
   beforeEach(() => {
     jest.clearAllMocks();
     cleanup();
+    useFrameCallback = () => { };
   });
 
   it("renders mesh", () => {
@@ -67,8 +114,47 @@ describe("DynamicPlayfulPath", () => {
     expect(container.querySelector("mesh")).toBeInTheDocument();
   });
 
-  it("registers animation loop", () => {
-    render(<DynamicPlayfulPath {...mockProps} />);
+  it("registers animation loop and updates visuals", () => {
+    const { container } = render(<DynamicPlayfulPath {...mockProps} />);
     expect(useFrame).toHaveBeenCalled();
+
+    // Trigger frame update
+    const mockState = { clock: { elapsedTime: 1.0 } };
+    useFrameCallback(mockState);
+
+    const mesh = container.querySelector("mesh") as unknown as THREE.Mesh;
+    const materialElem = container.querySelector("meshStandardMaterial") as any;
+
+    // 1. Check Breathe (scale)
+    expect(mesh.scale.x).not.toBe(1);
+    expect(mesh.scale.y).toBe(1); // Y is fixed
+
+    // 2. Check Wobble (position.y)
+    expect(mesh.position.y).not.toBe(0);
+
+    // 3. Check Opacity
+    expect(materialElem.opacity).toBeLessThan(0.8);
+    expect(materialElem.opacity).toBeCloseTo(0.56, 1);
+
+    // 4. Check Color Brightness
+    expect(materialElem.color.r).toBeGreaterThan(new THREE.Color("orange").r);
+
+    // 5. Check Glow (emissiveIntensity)
+    expect(materialElem.emissiveIntensity).toBeGreaterThan(1.2);
+  });
+
+  it("handles isSelected state in animation", () => {
+    const { container } = render(<DynamicPlayfulPath {...{ ...mockProps, isSelected: true }} />);
+
+    const mockState = { clock: { elapsedTime: 1.0 } };
+    useFrameCallback(mockState);
+
+    const materialElem = container.querySelector("meshStandardMaterial") as any;
+
+    expect(materialElem.emissiveIntensity).toBeGreaterThan(0);
+  });
+
+  it("safe checks for missing refs", () => {
+    useFrameCallback({ clock: { elapsedTime: 1 } });
   });
 });

@@ -72,15 +72,33 @@ describe("EmotionLabelTracker", () => {
       frameCallback = cb;
     });
 
+    // Add an ignored emotion (not selected, not hovered)
+    mockUseAtlasAdminStore.mockReturnValue({
+      allEmotions: [
+        mockEmotion,
+        { id: "e2", name: "Ignored", vac: [1, 1, 1] }
+      ],
+      selectedEmotionIds: new Set(["e1"]),
+      hoveredEmotionId: null,
+      layers: { emotionLabels: true },
+    });
+
     render(<EmotionLabelTracker onUpdate={mockOnUpdate} />);
 
     // Run frame
     if (frameCallback) frameCallback();
 
     expect(mockProject).toHaveBeenCalled();
+
+    // Expect e1 to be present
     expect(mockOnUpdate).toHaveBeenCalledWith(
       expect.arrayContaining([expect.objectContaining({ emotion: mockEmotion, visible: true })])
     );
+
+    // Expect e2 to NOT be present (list length 1)
+    const updateCall = mockOnUpdate.mock.calls[0][0];
+    expect(updateCall).toHaveLength(1);
+    expect(updateCall.find((l: any) => l.emotion.id === "e2")).toBeUndefined();
   });
 
   it("should return empty if disabled", () => {

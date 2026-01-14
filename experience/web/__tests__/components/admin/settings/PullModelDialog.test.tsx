@@ -1,181 +1,177 @@
 
-import { render, screen, fireEvent, waitFor, act } from "@testing-library/react";
+import { render, screen, fireEvent, act, waitFor } from "@testing-library/react";
 import { PullModelDialog } from "@/components/admin/settings/PullModelDialog";
-import * as ollamaUtils from "@/utils/ollamaModels";
+import { searchOllamaModels } from "@/utils/ollamaModels";
 
 // Mock the search util
 jest.mock("@/utils/ollamaModels", () => ({
   searchOllamaModels: jest.fn(),
 }));
 
-const mockPullProgress = {
-  "llama3": {
-    status: "downloading",
-    digest: "sha256:abc",
-    total: 1000,
-    completed: 500,
-    percent: 50,
-  }
-};
-
-const mockLocalModels = [
-  { name: "existing-model", size: 100, digest: "sha256:123", modified_at: "", details: {}, parameter_size: "7b", quantization: "Q4", family: "llama" }
-];
-
 describe("PullModelDialog", () => {
   const mockOnClose = jest.fn();
-  const mockOnPull = jest.fn();
+  const mockOnPull = jest.fn().mockResolvedValue(true);
 
   beforeEach(() => {
     jest.clearAllMocks();
-    (ollamaUtils.searchOllamaModels as jest.Mock).mockReturnValue([]);
+    (searchOllamaModels as jest.Mock).mockReturnValue([
+      { name: "llama3", description: "Meta's Llama 3" },
+    ]);
   });
 
-  it("does not render when isOpen is false", () => {
-    render(
-      <PullModelDialog
-        isOpen={false}
-        onClose={mockOnClose}
-        onPull={mockOnPull}
-        pullProgress={{}}
-        localModels={[]}
-      />
-    );
-    expect(screen.queryByText("Pull New Model")).not.toBeInTheDocument();
-  });
-
-  it("renders when isOpen is true", () => {
-    render(
-      <PullModelDialog
-        isOpen={true}
-        onClose={mockOnClose}
-        onPull={mockOnPull}
-        pullProgress={{}}
-        localModels={[]}
-      />
-    );
+  // Basic renders
+  it("renders when open", () => {
+    render(<PullModelDialog isOpen={true} onClose={mockOnClose} onPull={mockOnPull} pullProgress={{}} localModels={[]} />);
     expect(screen.getByText("Pull New Model")).toBeInTheDocument();
   });
 
-  it("updates input value and shows suggestions", async () => {
-    (ollamaUtils.searchOllamaModels as jest.Mock).mockReturnValue([
-      { name: "llama3", description: "Meta Llama 3", size: "4.7GB" }
-    ]);
-
-    render(
-      <PullModelDialog
-        isOpen={true}
-        onClose={mockOnClose}
-        onPull={mockOnPull}
-        pullProgress={{}}
-        localModels={[]}
-      />
-    );
-
-    const input = screen.getByPlaceholderText(/Type to search models/i);
-    fireEvent.change(input, { target: { value: "lla" } });
-
-    expect(input).toHaveValue("lla");
-    // Suggestions should appear
-    expect(screen.getByText("llama3")).toBeInTheDocument();
-    expect(screen.getByText("Meta Llama 3")).toBeInTheDocument();
+  it("does not render when closed", () => {
+    render(<PullModelDialog isOpen={false} onClose={mockOnClose} onPull={mockOnPull} pullProgress={{}} localModels={[]} />);
+    expect(screen.queryByText("Pull New Model")).not.toBeInTheDocument();
   });
 
-  it("selects suggestion when clicked", () => {
-    (ollamaUtils.searchOllamaModels as jest.Mock).mockReturnValue([
-      { name: "llama3", description: "Meta Llama 3", size: "4.7GB" }
-    ]);
-
-    render(
-      <PullModelDialog
-        isOpen={true}
-        onClose={mockOnClose}
-        onPull={mockOnPull}
-        pullProgress={{}}
-        localModels={[]}
-      />
-    );
-
-    const input = screen.getByPlaceholderText(/Type to search models/i);
-    fireEvent.focus(input); // Trigger suggestions show
-
-    const suggestion = screen.getByText("llama3");
-    // Use mouseDown to bypass blur behavior in component
-    fireEvent.mouseDown(suggestion);
-
-    expect(input).toHaveValue("llama3");
-  });
-
-  it("calls onPull when form submitted", async () => {
-    render(
-      <PullModelDialog
-        isOpen={true}
-        onClose={mockOnClose}
-        onPull={mockOnPull}
-        pullProgress={{}}
-        localModels={[]}
-      />
-    );
-
-    const input = screen.getByPlaceholderText(/Type to search models/i);
-    fireEvent.change(input, { target: { value: "new-model" } });
-
-    fireEvent.click(screen.getByRole("button", { name: "Start Download" }));
-
-    expect(mockOnPull).toHaveBeenCalledWith("new-model");
-  });
-
-  it("shows download progress", () => {
-    render(
-      <PullModelDialog
-        isOpen={true}
-        onClose={mockOnClose}
-        onPull={mockOnPull}
-        pullProgress={mockPullProgress}
-        localModels={[]}
-      />
-    );
-
-    // Simulate typing the name that matches the progress
-    const input = screen.getByPlaceholderText(/Type to search models/i);
-    fireEvent.change(input, { target: { value: "llama3" } });
-    fireEvent.click(screen.getByRole("button", { name: "Start Download" }));
-
-    expect(screen.getByText("50.0%")).toBeInTheDocument();
-    expect(screen.getByText("Downloading")).toBeInTheDocument();
-  });
-
-  it("handles already installed models", async () => {
+  it("handles input and suggestions", async () => {
     jest.useFakeTimers();
-    render(
-      <PullModelDialog
-        isOpen={true}
-        onClose={mockOnClose}
-        onPull={mockOnPull}
-        pullProgress={{}}
-        localModels={mockLocalModels}
-      />
-    );
+    render(<PullModelDialog isOpen={true} onClose={mockOnClose} onPull={mockOnPull} pullProgress={{}} localModels={[]} />);
 
-    const input = screen.getByPlaceholderText(/Type to search models/i);
-    fireEvent.change(input, { target: { value: "existing-model" } });
+    // Type
+    fireEvent.change(screen.getByPlaceholderText(/Type to search/i), { target: { value: "lla" } });
+    act(() => { jest.advanceTimersByTime(500); }); // Increased wait time
+    await waitFor(() => expect(searchOllamaModels).toHaveBeenCalled());
+    expect(screen.getByText("Meta's Llama 3")).toBeInTheDocument();
 
-    // Warning should appear
-    expect(screen.getByText("This model is already installed")).toBeInTheDocument();
+    // Select
+    fireEvent.mouseDown(screen.getByText("llama3"));
+    expect(screen.getByPlaceholderText(/Type to search/i)).toHaveValue("llama3");
+    jest.useRealTimers();
+  });
 
-    // Verify button text changes
-    const button = screen.getByRole("button", { name: "Verify & Install" });
-    fireEvent.click(button);
+  it("shows recommendations in suggestions", async () => {
+    jest.useFakeTimers();
+    (searchOllamaModels as jest.Mock).mockReturnValue([
+      { name: "code-model", recommended_for: ["coding"] },
+    ]);
+    render(<PullModelDialog isOpen={true} onClose={mockOnClose} onPull={mockOnPull} pullProgress={{}} localModels={[]} />);
+    fireEvent.focus(screen.getByPlaceholderText(/Type to search/i));
+    fireEvent.change(screen.getByPlaceholderText(/Type to search/i), { target: { value: "code" } });
+    act(() => { jest.advanceTimersByTime(500); });
+    await waitFor(() => expect(screen.getByText("coding")).toBeInTheDocument());
+    jest.useRealTimers();
+  });
 
-    // Should show already installed success state
-    expect(screen.getByText("Already Installed!")).toBeInTheDocument();
+  it("handles onBlur suggestion hiding", async () => {
+    jest.useFakeTimers();
+    render(<PullModelDialog isOpen={true} onClose={mockOnClose} onPull={mockOnPull} pullProgress={{}} localModels={[]} />);
+    const input = screen.getByPlaceholderText(/Type to search/i);
+    fireEvent.focus(input); // Ensure suggestions open
+    fireEvent.change(input, { target: { value: "lla" } });
+    act(() => { jest.advanceTimersByTime(500); });
+    await waitFor(() => expect(screen.getByText("llama3")).toBeInTheDocument());
 
-    // Should auto-close
-    act(() => {
-      jest.advanceTimersByTime(2000);
-    });
+    fireEvent.blur(input);
+    // Should persist briefly
+    expect(screen.getByText("llama3")).toBeInTheDocument();
 
-    expect(mockOnClose).toHaveBeenCalled();
+    act(() => { jest.advanceTimersByTime(250); });
+    await waitFor(() => expect(screen.queryByText("llama3")).not.toBeInTheDocument());
+    jest.useRealTimers();
+  });
+
+  it("submits pull request", async () => {
+    render(<PullModelDialog isOpen={true} onClose={mockOnClose} onPull={mockOnPull} pullProgress={{}} localModels={[]} />);
+    fireEvent.change(screen.getByPlaceholderText(/Type to search/i), { target: { value: "my-model" } });
+    fireEvent.click(screen.getByRole("button", { name: "Start Download" }));
+    await waitFor(() => expect(mockOnPull).toHaveBeenCalledWith("my-model"));
+  });
+
+  it("formats bytes correctly", () => {
+    const progress = {
+      "a": { status: "downloading", completed: 500, total: 1000, percent: 50 },
+      "b": { status: "downloading", completed: 1024 * 500, total: 1024 * 1000, percent: 50 },
+    };
+    const { rerender } = render(<PullModelDialog isOpen={true} onClose={mockOnClose} onPull={mockOnPull} pullProgress={progress as any} localModels={[]} />);
+    fireEvent.change(screen.getByPlaceholderText(/Type to search/i), { target: { value: "a" } });
+    expect(screen.getByText(/500 B/)).toBeInTheDocument();
+
+    fireEvent.change(screen.getByPlaceholderText(/Type to search/i), { target: { value: "b" } });
+    expect(screen.getByText(/500.0 KB/)).toBeInTheDocument();
+  });
+
+  it("handles status types", () => {
+    const progress = { "m": { status: "error" } };
+    render(<PullModelDialog isOpen={true} onClose={mockOnClose} onPull={mockOnPull} pullProgress={progress as any} localModels={[]} />);
+    fireEvent.change(screen.getByPlaceholderText(/Type to search/i), { target: { value: "m" } });
+    expect(screen.getByText("Failed")).toBeInTheDocument();
+  });
+
+  it("shows unknown status correctly", async () => {
+    const progress = { "unknown-model": { status: "unknown", total: 100, completed: 10, percent: 10 } };
+    render(<PullModelDialog isOpen={true} onClose={mockOnClose} onPull={mockOnPull} pullProgress={progress as any} localModels={[]} />);
+    fireEvent.change(screen.getByPlaceholderText(/Type to search/i), { target: { value: "unknown-model" } });
+    fireEvent.click(screen.getByRole("button", { name: "Start Download" }));
+
+    // "unknown" status with data maps to "downloading" (line 65 of component)
+    expect(screen.getByText(/Downloading/i)).toBeInTheDocument();
+  });
+
+  it("auto-closes on success", async () => {
+    jest.useFakeTimers();
+    const { rerender } = render(<PullModelDialog isOpen={true} onClose={mockOnClose} onPull={mockOnPull} pullProgress={{}} localModels={[]} />);
+    fireEvent.change(screen.getByPlaceholderText(/Type to search/i), { target: { value: "fast" } });
+    fireEvent.click(screen.getByRole("button", { name: "Start Download" }));
+
+    rerender(<PullModelDialog isOpen={true} onClose={mockOnClose} onPull={mockOnPull} pullProgress={{ "fast": { status: "success" } } as any} localModels={[]} />);
+
+    await waitFor(() => expect(screen.getByText("Model ready!")).toBeInTheDocument());
+
+    act(() => { jest.advanceTimersByTime(2000); });
+    await waitFor(() => expect(mockOnClose).toHaveBeenCalled());
+    jest.useRealTimers();
+  });
+
+  it("handles already installed model flow", async () => {
+    jest.useFakeTimers();
+    render(<PullModelDialog isOpen={true} onClose={mockOnClose} onPull={mockOnPull} pullProgress={{}} localModels={[{ name: "llama3", size: 0, family: "" } as any]} />);
+
+    const input = screen.getByPlaceholderText(/Type to search/i);
+    fireEvent.change(input, { target: { value: "llama3" } });
+    fireEvent.click(screen.getByRole("button", { name: "Verify & Install" }));
+
+    // Should call auto close after timeout
+    act(() => { jest.advanceTimersByTime(2000); });
+    await waitFor(() => expect(mockOnClose).toHaveBeenCalled());
+    expect(mockOnPull).not.toHaveBeenCalled(); // Should assume success locally
+    jest.useRealTimers();
+  });
+
+  it("formats large bytes correctly", () => {
+    const progress = {
+      "mb": { status: "downloading", completed: 1024 ** 2 * 5.5, total: 1024 ** 2 * 10, percent: 55 },
+      "gb": { status: "downloading", completed: 1024 ** 3 * 1.5, total: 1024 ** 3 * 2, percent: 75 },
+    };
+    const { rerender } = render(<PullModelDialog isOpen={true} onClose={mockOnClose} onPull={mockOnPull} pullProgress={progress as any} localModels={[]} />);
+
+    fireEvent.change(screen.getByPlaceholderText(/Type to search/i), { target: { value: "mb" } });
+    expect(screen.getByText(/5.5 MB/)).toBeInTheDocument();
+
+    fireEvent.change(screen.getByPlaceholderText(/Type to search/i), { target: { value: "gb" } });
+    expect(screen.getByText(/1.50 GB/)).toBeInTheDocument();
+  });
+  it("shows timeout warning", async () => {
+    jest.useFakeTimers();
+    const progress = { "slow-model": { status: "unknown" } };
+    render(<PullModelDialog isOpen={true} onClose={mockOnClose} onPull={mockOnPull} pullProgress={progress as any} localModels={[]} />);
+
+    fireEvent.change(screen.getByPlaceholderText(/Type to search/i), { target: { value: "slow-model" } });
+    fireEvent.click(screen.getByRole("button", { name: "Start Download" }));
+
+    // Verify mapped status
+    await waitFor(() => expect(screen.getByText(/Checking model/i)).toBeInTheDocument());
+
+    // Advance 6s
+    act(() => { jest.advanceTimersByTime(6000); });
+
+    await waitFor(() => expect(screen.getByText(/Taking longer than expected/)).toBeInTheDocument(), { timeout: 3000 });
     jest.useRealTimers();
   });
 });

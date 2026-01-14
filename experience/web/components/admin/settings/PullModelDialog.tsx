@@ -94,15 +94,21 @@ export function PullModelDialog({
 
   useEffect(() => {
     // Timeout detection - if stuck on unknown/connecting for >5s
+    let interval: NodeJS.Timeout;
+
     if (currentPull && (currentPull.status === "unknown" || !currentPull.status) && pullStartTime) {
-      const elapsed = Date.now() - pullStartTime;
-      if (elapsed > 5000) {
-        setShowTimeout(true);
-      }
+      interval = setInterval(() => {
+        const elapsed = Date.now() - pullStartTime;
+        if (elapsed > 5000) {
+          setShowTimeout(true);
+        }
+      }, 1000);
     } else {
       setShowTimeout(false);
     }
-  }, [currentPull, pullStartTime]);
+
+    return () => clearInterval(interval);
+  }, [currentPull?.status, pullStartTime]);
 
   if (!isOpen) return null;
 
@@ -429,11 +435,10 @@ export function PullModelDialog({
               <button
                 type="button"
                 onClick={handleClose}
-                className={`flex-1 px-4 py-2 text-white rounded transition font-medium ${
-                  currentPull.status === "success"
+                className={`flex-1 px-4 py-2 text-white rounded transition font-medium ${currentPull.status === "success"
                     ? "bg-green-600 hover:bg-green-500"
                     : "bg-red-600 hover:bg-red-500"
-                }`}
+                  }`}
               >
                 {currentPull.status === "success" ? "Done" : "Close"}
               </button>

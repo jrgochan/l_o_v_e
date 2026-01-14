@@ -8,34 +8,18 @@ import { useFrame } from "@react-three/fiber";
 // Mock R3F
 jest.mock("@react-three/fiber", () => ({
   useFrame: jest.fn(),
+  ThreeEvent: {}
 }));
 
 // Mock Utils
 jest.mock("@/utils/emotionAnimationMapper", () => ({
-  getEmotionAnimationParams: jest.fn(() => ({
-    breathingRate: 1,
-    breathingAmplitude: 0.1,
-    rotationSpeed: 0.1,
-    secondaryMotion: "orbital",
-    secondaryAmplitude: 0.2,
-    glowPulseSpeed: 1,
-    colorBoost: 1.0,
-  })),
+  getEmotionAnimationParams: jest.fn(),
 }));
 
 jest.mock("@/utils/modeVisualConfigs", () => ({
   getModeConfig: jest.fn((mode) => ({
-    colors: {
-      hueShift: 0,
-      saturation: 1,
-      lightness: 1,
-    },
-    materials: {
-      metalness: 0.5,
-      roughness: 0.5,
-      transparent: false,
-      opacityBase: 1,
-    },
+    colors: { hueShift: 0, saturation: 1, lightness: 1 },
+    materials: { metalness: 0.5, roughness: 0.5, transparent: false, opacityBase: 1 },
     animations: {
       floatEnabled: mode === "mystical" || mode === "dynamic",
       floatSpeed: 0.5,
@@ -46,10 +30,11 @@ jest.mock("@/utils/modeVisualConfigs", () => ({
   calculateEmissiveIntensity: jest.fn(() => 0.5),
 }));
 
+import { getEmotionAnimationParams } from "@/utils/emotionAnimationMapper";
+
 describe("AnimatedEmotionNode", () => {
   // Patch Element prototype for 3D properties
   beforeAll(() => {
-    // We patch Element to be safe for all node types
     Object.defineProperties(window.Element.prototype, {
       position: {
         get() {
@@ -99,23 +84,20 @@ describe("AnimatedEmotionNode", () => {
     });
   });
 
-  afterAll(() => {
-    // Cleanup would go here
-  });
-
   const mockEmotion = {
     id: "joy",
     name: "Joy",
-    vac: [0.8, 0.6, 0.7],
-    category: "joy",
-    description: "Happy"
+    vac: [0.8, 0.6, 0.7] as [number, number, number],
+    category: "Positive",
+    definition: "Happy",
+    quaternion: [0, 0, 0, 1] as [number, number, number, number]
   };
 
   const defaultProps = {
     emotion: mockEmotion,
     color: new THREE.Color("yellow"),
     size: 1,
-    mode: "scientific",
+    mode: "scientific" as const,
     isSelected: false,
     isHovered: false,
     onClick: jest.fn(),
@@ -123,9 +105,20 @@ describe("AnimatedEmotionNode", () => {
     onPointerOut: jest.fn(),
   };
 
+  const defaultAnimParams = {
+    breathingRate: 1,
+    breathingAmplitude: 0.1,
+    rotationSpeed: 0.1,
+    secondaryMotion: "stable",
+    secondaryAmplitude: 0.2,
+    glowPulseSpeed: 1,
+    colorBoost: 1.0,
+  };
+
   beforeEach(() => {
     jest.clearAllMocks();
     cleanup();
+    (getEmotionAnimationParams as jest.Mock).mockReturnValue(defaultAnimParams);
   });
 
   it("renders and registers frame loop", () => {
@@ -134,34 +127,130 @@ describe("AnimatedEmotionNode", () => {
     expect(useFrame).toHaveBeenCalled();
   });
 
-  it("animates on frame loop", () => {
-    const { container } = render(<AnimatedEmotionNode {...defaultProps} />);
-    const meshElement = container.querySelector("mesh") as any;
+  describe("Secondary Motion logic", () => {
+    it("handles ORBITAL motion", () => {
+      (getEmotionAnimationParams as jest.Mock).mockReturnValue({
+        ...defaultAnimParams,
+        secondaryMotion: "orbital"
+      });
+      const { container } = render(<AnimatedEmotionNode {...defaultProps} />);
+      const mesh = container.querySelector("mesh") as any;
+      const frameCallback = (useFrame as jest.Mock).mock.calls[0][0];
 
-    // Ensure values are fresh
-    meshElement.position.set(0, 0, 0);
-    meshElement.rotation.set(0, 0, 0);
-    meshElement.scale.set(1, 1, 1);
+      // x = sin(t*0.5)*amp, z = cos(t*0.5)*amp
+      // Need cos to match -1, so t*0.5 = PI => t = 2 * PI
+      frameCallback({ clock: { elapsedTime: Math.PI * 2 } });
 
-    // Capture frame callback
-    const frameCallback = (useFrame as jest.Mock).mock.calls[0][0];
+      // Expected: x=0, z = -0.2
+      expect(mesh.position.z).toBeCloseTo(-0.2);
+    });
 
-    // Run callback
-    frameCallback({ clock: { elapsedTime: 1.0 } });
+    it("handles RECOIL motion", () => {
+      (getEmotionAnimationParams as jest.Mock).mockReturnValue({
+        ...defaultAnimParams,
+        secondaryMotion: "recoil"
+      });
+      const { container } = render(<AnimatedEmotionNode {...defaultProps} />);
+      const mesh = container.querySelector("mesh") as any;
+      const frameCallback = (useFrame as jest.Mock).mock.calls[0][0];
 
-    // Verify updates
-    expect(meshElement.rotation.y).not.toBe(0);
-    expect(meshElement.scale.x).not.toBe(1);
+      // y = -abs(sin(t*1.5)*amp)*0.5
+      frameCallback({ clock: { elapsedTime: 1.0 } });
+      expect(mesh.position.y).toBeLessThan(0); // Should be downward
+    });
+
+    it("handles REACHING motion", () => {
+      (getEmotionAnimationParams as jest.Mock).mockReturnValue({
+        ...defaultAnimParams,
+        secondaryMotion: "reaching"
+      });
+      const { container } = render(<AnimatedEmotionNode {...defaultProps} />);
+      const mesh = container.querySelector("mesh") as any;
+      const frameCallback = (useFrame as jest.Mock).mock.calls[0][0];
+
+      frameCallback({ clock: { elapsedTime: 1.0 } });
+      // y = abs(reach)*0.3 -> Upward
+      expect(mesh.position.y).toBeGreaterThan(0);
+    });
   });
 
-  it("handles visibility logic for mystical/dynamic modes", () => {
-    // Just verify it doesn't crash when logic runs
-    const { container } = render(<AnimatedEmotionNode {...defaultProps} mode="mystical" />);
-    const frameCallback = (useFrame as jest.Mock).mock.calls[0][0];
-    frameCallback({ clock: { elapsedTime: 1.0 } });
+  describe("Mode specific logic", () => {
+    it("Dynamic mode: applies jitter when arousal > 0.5", () => {
+      const highArousalEmotion = { ...mockEmotion, vac: [0.8, 0.9, 0.7] as [number, number, number] };
 
-    const meshElement = container.querySelector("mesh") as any;
-    // Logic checks floatEnabled
-    expect(meshElement.rotation.x).not.toBe(0); // Mystical adds wobbling
+      const { container } = render(
+        <AnimatedEmotionNode {...defaultProps} emotion={highArousalEmotion} mode="dynamic" />
+      );
+      const mesh = container.querySelector("mesh") as any;
+      const frameCallback = (useFrame as jest.Mock).mock.calls[0][0];
+
+      mesh.position.set(0, 0, 0);
+      frameCallback({ clock: { elapsedTime: 1.0 } });
+
+      // Should have accumulated some jitter offsets
+      expect(mesh.position.y).not.toBe(0);
+      expect(mesh.position.x).not.toBe(0); // Jitter X
+      expect(mesh.position.z).not.toBe(0); // Jitter Z
+    });
+
+    it("Mystical mode: applies figure-8 drift", () => {
+      const { container } = render(<AnimatedEmotionNode {...defaultProps} mode="mystical" />);
+      const mesh = container.querySelector("mesh") as any;
+      const frameCallback = (useFrame as jest.Mock).mock.calls[0][0];
+
+      frameCallback({ clock: { elapsedTime: 1.0 } });
+
+      // Applies vertical float, horizontal, depth drift + rotation wobble
+      expect(mesh.position.x).not.toBe(0);
+      expect(mesh.position.y).not.toBe(0);
+      expect(mesh.rotation.x).not.toBe(0); // Precession wobble
+    });
+  });
+
+  describe("Interactive States", () => {
+    it("Scales up on hover", () => {
+      const { container } = render(<AnimatedEmotionNode {...defaultProps} isHovered={true} />);
+      const mesh = container.querySelector("mesh") as any;
+      const frameCallback = (useFrame as jest.Mock).mock.calls[0][0];
+
+      frameCallback({ clock: { elapsedTime: 0 } });
+      expect(mesh.scale.x).toBeGreaterThan(1.0);
+    });
+
+    it("Brightens glow on selection", () => {
+      const { container } = render(<AnimatedEmotionNode {...defaultProps} isSelected={true} />);
+      // Targeting material which receives the updates
+      const material = container.querySelector("meshStandardMaterial") as any;
+      const frameCallback = (useFrame as jest.Mock).mock.calls[0][0];
+
+      frameCallback({ clock: { elapsedTime: 0 } });
+      // Expected 1.0 (0.5 * 2.0)
+      expect(material.emissiveIntensity).toBe(1.0);
+    });
+
+    it("Transparency logic for transparent modes", () => {
+      // Override mock for this test
+      (require("@/utils/modeVisualConfigs").getModeConfig as jest.Mock).mockReturnValue({
+        colors: { hueShift: 0, saturation: 1, lightness: 1 },
+        materials: { metalness: 0.5, roughness: 0.5, transparent: true, opacityBase: 0.5 },
+        animations: {
+          floatEnabled: false,
+          floatSpeed: 0.5,
+          floatAmplitude: 0.5,
+        },
+      });
+
+      const { container } = render(<AnimatedEmotionNode {...defaultProps} mode="mystical" />);
+      const material = container.querySelector("meshStandardMaterial") as any;
+      const frameCallback = (useFrame as jest.Mock).mock.calls[0][0];
+
+      // Run frame
+      frameCallback({ clock: { elapsedTime: 0 } });
+
+      // Logic: opacity = lerp(opacityBase*0.7, opacityBase, connectionFactor)
+      // connectionFactor for 0.7 is (0.7+1)/2 = 0.85
+      // lerp(0.35, 0.5, 0.85) = 0.35 + (0.15 * 0.85) = 0.35 + 0.1275 = 0.4775
+      expect(material.opacity).toBeCloseTo(0.4775);
+    });
   });
 });
