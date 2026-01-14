@@ -413,10 +413,6 @@ export function ChatPanel({ sessionId }: ChatPanelProps) {
       }
 
       if (status === "complete" && percentage === 100) {
-        if (progressSimulationRef.current) {
-          clearInterval(progressSimulationRef.current);
-          progressSimulationRef.current = null;
-        }
         setTimeout(() => setShowProgress(false), 1500);
       }
     },
@@ -552,10 +548,10 @@ export function ChatPanel({ sessionId }: ChatPanelProps) {
             {/* Right: Analysis Panel */}
             <div
               className={`flex-shrink-0 transition-all duration-300 ease-in-out ${analysisExpandState === "normal"
-                  ? "w-96"
-                  : analysisExpandState === "expanded"
-                    ? "w-[calc(100%-18rem)]" // approximate width calc
-                    : "w-full"
+                ? "w-96"
+                : analysisExpandState === "expanded"
+                  ? "w-[calc(100%-18rem)]" // approximate width calc
+                  : "w-full"
                 }`}
             >
               <AnalysisPanel

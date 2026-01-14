@@ -421,4 +421,180 @@ describe("ChatPanel", () => {
 
     expect(mockViewInSphere).toHaveBeenCalledWith("Hope");
   });
+
+  it("handles WebSocket callbacks: onAnalysis (Critical Alert)", async () => {
+    render(<ChatPanel sessionId="sess1" />);
+    const callbacks = getSocketCallbacks();
+    const vac = { valence: -0.6, arousal: 0.8, connection: 0 }; // Critical condition
+
+    await act(async () => {
+      callbacks.onAnalysis("Fear", "negative", vac, 0.9);
+    });
+
+    expect(mockSetSessionMetricsSpy).toHaveBeenCalled();
+    // Verify specific alert update structure if possible, or at least that it fired
+  });
+
+  it("handles WebSocket callbacks: onAnalysis (Attention Alert)", async () => {
+    render(<ChatPanel sessionId="sess1" />);
+    const callbacks = getSocketCallbacks();
+    const vac = { valence: 0, arousal: 0, connection: 0 };
+
+    await act(async () => {
+      callbacks.onAnalysis("Unsure", "neutral", vac, 0.5); // Low confidence
+    });
+
+    expect(mockSetSessionMetricsSpy).toHaveBeenCalled();
+  });
+
+  it("handles WebSocket callbacks: onProgressUpdate (Cleanup Interval)", async () => {
+    jest.useFakeTimers();
+    const mockRef = { current: 123 as unknown as NodeJS.Timeout };
+    const mockClearInterval = jest.spyOn(global, 'clearInterval');
+
+    (useChatProgress as jest.Mock).mockReturnValue({
+      progressState: { stages: [{ id: "stage1", status: "pending", percentage: 0 }] },
+      setProgressState: createFunctionalSetter(jest.fn()),
+      showProgress: true,
+      setShowProgress: mockSetShowProgress,
+      startProgressSimulation: jest.fn(),
+      progressSimulationRef: mockRef,
+    });
+
+    render(<ChatPanel sessionId="sess1" />);
+    const callbacks = getSocketCallbacks();
+
+    // Ensure ref is set before callback
+    mockRef.current = 123 as unknown as NodeJS.Timeout;
+
+    // Trigger complete to hit cleanup logic
+    await act(async () => {
+      callbacks.onProgressUpdate("stage1", "complete", "Done", 100);
+    });
+
+    expect(mockClearInterval).toHaveBeenCalledWith(123);
+    expect(mockRef.current).toBeNull();
+
+    act(() => {
+      jest.runAllTimers();
+    });
+    expect(mockSetShowProgress).toHaveBeenCalledWith(false);
+    jest.useRealTimers();
+  });
+
+  it("handles WebSocket callbacks: onTranscription", async () => {
+    render(<ChatPanel sessionId="sess1" />);
+    const callbacks = getSocketCallbacks();
+
+    await act(async () => {
+      callbacks.onTranscription("Transcribed text");
+    });
+
+    expect(mockSetCurrentAnalysisSpy).toHaveBeenCalled();
+  });
+
+  it("handles WebSocket callbacks: onMultiEmotion (First Emotion)", async () => {
+    (useChatAnalysisState as jest.Mock).mockReturnValue({
+      ...useChatAnalysisState({} as any),
+      multiEmotionAnalysis: null,
+      setMultiEmotionAnalysis: mockSetMultiEmotionAnalysis,
+    });
+
+    render(<ChatPanel sessionId="sess1" />);
+    const callbacks = getSocketCallbacks();
+
+    await act(async () => {
+      callbacks.onMultiEmotion("Joy", "positive", { valence: 1, arousal: 0, connection: 0 }, 0.95, { intensity: 1 });
+    });
+
+    expect(mockSetMultiEmotionAnalysisSpy).toHaveBeenCalled();
+  });
+
+  it("handles navigation callback", async () => {
+    let navOptions: any;
+    (useEmotionNavigation as jest.Mock).mockImplementation((opts) => {
+      navOptions = opts;
+      return {
+        autoFocusEmotion: mockAutoFocusEmotion,
+        viewInSphere: mockViewInSphere
+      };
+    });
+
+    render(<ChatPanel sessionId="sess1" />);
+
+    act(() => {
+      if (navOptions && navOptions.onNavigate) {
+        navOptions.onNavigate();
+      }
+    });
+
+    expect(mockSetIsExpanded).toHaveBeenCalledWith(false);
+    expect(mockSetHeight).toHaveBeenCalledWith(60);
+  });
+
+  it("handles WebSocket callbacks: onProsody", async () => {
+    // Mock setter to execute callback for coverage
+    const mockSetCurrentAnalysis = jest.fn((cb) => cb({}));
+    (useChatAnalysisState as jest.Mock).mockReturnValue({
+      ...useChatAnalysisState({} as any),
+      setCurrentAnalysis: mockSetCurrentAnalysis,
+    });
+
+    render(<ChatPanel sessionId="sess1" />);
+    const callbacks = getSocketCallbacks();
+    const prosodyData = { pitch: 100, energy: 0.5 };
+
+    await act(async () => {
+      callbacks.onProsody(prosodyData);
+    });
+
+    expect(mockSetCurrentAnalysis).toHaveBeenCalled();
+  });
+
+  it("executes state updates for MultiEmotion and Transformation", async () => {
+    // This test ensures the functional updates (prev => ...) are actually executed
+    // covering lines inside the setter callbacks.
+
+    const mockSetMultiEmotionAnalysis = jest.fn((cb) => {
+      // Simulate prev = null (First emotion)
+      if (typeof cb === 'function') cb(null);
+      // Simulate prev = exists (Subsequent)
+      if (typeof cb === 'function') cb({ emotions: [], relationships: [], aggregate: { vac: {} } });
+    });
+
+    const mockSetCurrentAnalysis = jest.fn((cb) => {
+      if (typeof cb === 'function') cb({});
+    });
+
+    (useChatAnalysisState as jest.Mock).mockReturnValue({
+      ...useChatAnalysisState({} as any),
+      setMultiEmotionAnalysis: mockSetMultiEmotionAnalysis,
+      setCurrentAnalysis: mockSetCurrentAnalysis,
+      // Need to ensure transformation/prosody/etc use these
+    });
+
+    render(<ChatPanel sessionId="sess1" />);
+    const callbacks = getSocketCallbacks();
+
+    await act(async () => {
+      // Trigger multi-emotion (should hit null and non-null paths in mock)
+      callbacks.onMultiEmotion("Joy", "positive", { valence: 1, arousal: 0, connection: 0 }, 0.95, { intensity: 1 });
+
+      // Trigger transcription
+      callbacks.onTranscription("test");
+
+      // Trigger prosody
+      callbacks.onProsody({} as any);
+
+      // Trigger relationship (uses setMultiEmotionAnalysis)
+      callbacks.onRelationship("Joy", "Sadness", "conflict", 0.5, "desc");
+
+      // Trigger aggregate (uses setMultiEmotionAnalysis)
+      callbacks.onAggregateState({ complexity_score: 0.5 });
+    });
+
+    expect(mockSetMultiEmotionAnalysis).toHaveBeenCalled();
+    expect(mockSetCurrentAnalysis).toHaveBeenCalled();
+  });
 });
+

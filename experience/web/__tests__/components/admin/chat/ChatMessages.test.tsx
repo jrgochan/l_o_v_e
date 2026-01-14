@@ -1,4 +1,4 @@
-import { render, screen } from "@testing-library/react";
+import { render, screen, fireEvent } from "@testing-library/react";
 import { ChatMessages } from "@/components/admin/chat/ChatMessages";
 import type { DisplayMessage, ProgressStage } from "@/types/chat";
 
@@ -8,10 +8,12 @@ jest.mock("@/components/admin/shared/InsightCard", () => ({
 }));
 
 jest.mock("@/components/admin/emotion-display/EmotionChipCluster", () => ({
-  EmotionChipCluster: ({ emotions }: any) => (
+  EmotionChipCluster: ({ emotions, onEmotionClick }: any) => (
     <div data-testid="emotion-cluster">
       {emotions.map((e: any) => (
-        <span key={e.emotion_name}>{e.emotion_name}</span>
+        <span key={e.emotion_name} onClick={() => onEmotionClick && onEmotionClick(e.emotion_name)}>
+          {e.emotion_name}
+        </span>
       ))}
     </div>
   ),
@@ -109,6 +111,10 @@ describe("ChatMessages", () => {
     render(<ChatMessages {...defaultProps} messages={messages} />);
     expect(screen.getByText("Complex state detected")).toBeInTheDocument();
     expect(screen.getByTestId("emotion-cluster")).toBeInTheDocument();
+
+    // Test click interaction
+    fireEvent.click(screen.getByText("Joy"));
+    expect(defaultProps.onEmotionClick).toHaveBeenCalledWith("Joy");
   });
 
   it("renders insight message", () => {
