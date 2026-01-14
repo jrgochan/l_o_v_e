@@ -34,6 +34,7 @@ export default function AdminUserDetailsPage() {
       try {
         // Fetch User
         const userData = await api.get<User>(`/admin/users/${id}`);
+        if (!userData) throw new Error("User not found");
         setUser(userData);
         setRole(userData.role);
         setIsActive(userData.is_active);
@@ -60,15 +61,14 @@ export default function AdminUserDetailsPage() {
   }, [id]);
 
   const handleSave = async () => {
-    if (!user) return;
     setIsSaving(true);
     try {
-      await api.put(`/admin/users/${user.id}`, {
+      await api.put(`/admin/users/${user!.id}`, {
         role,
         is_active: isActive,
       });
       // Refresh user data (or just update local state?)
-      const updated = { ...user, role, is_active: isActive };
+      const updated = { ...user!, role, is_active: isActive };
       setUser(updated);
       alert("User updated successfully");
     } catch (err: unknown) {

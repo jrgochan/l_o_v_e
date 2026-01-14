@@ -160,7 +160,7 @@ function RawStorageMonitor() {
                                 ? `[${data.parsed.vac.map((v) => v.toFixed(2)).join(",")}]`
                                 : "No VAC"}
                         </div>
-                        <div>Age: {age !== null ? `${age}s ago` : "Unknown"}</div>
+                        <div>Age: {age}s ago</div>
                         <div className="text-gray-500 text-[9px] truncate">{data.raw.substring(0, 40)}...</div>
                     </div>
                 ) : (

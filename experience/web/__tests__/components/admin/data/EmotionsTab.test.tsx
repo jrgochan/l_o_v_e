@@ -508,4 +508,35 @@ describe("EmotionsTab", () => {
       expect(rows.length).toBe(0);
     });
   });
+  it("handles unmount during import to cover finally block ref check", async () => {
+    (adminApi.getAtlasEmotions as jest.Mock).mockResolvedValue(mockEmotions);
+    // Mock import to pending forever (or long enough) but we won't wait for it
+    let resolveImport: (val: any) => void = () => { };
+    (adminApi.importAtlasData as jest.Mock).mockImplementation(() => {
+      return new Promise((resolve) => {
+        resolveImport = resolve;
+      });
+    });
+
+    const { container, unmount } = render(<EmotionsTab />);
+    await waitFor(() => expect(screen.getByText("Joy")).toBeInTheDocument());
+
+    const file = new File(["{}"], "test.json", { type: "application/json" });
+    Object.defineProperty(file, 'text', { value: jest.fn().mockResolvedValue("{}") });
+    const input = container.querySelector('input[type="file"]') as HTMLInputElement;
+
+    // Trigger upload
+    await userEvent.upload(input, file);
+
+    // Unmount before import completes
+    unmount();
+
+    // Now resolve import
+    resolveImport({ updated: 0, errors: [] });
+
+    // We can't really assert on state change since unmounted (React warns usually)
+    // But we want to ensure no crash in finally block when accessing ref.current
+    // The finally block runs when promise settles.
+    expect(adminApi.importAtlasData).toHaveBeenCalled();
+  });
 });

@@ -6,6 +6,8 @@ const mockOpen = jest.fn();
 const mockClose = jest.fn();
 const mockToggle = jest.fn();
 const mockSetSearch = jest.fn();
+const mockSetPage = jest.fn();
+const mockSetCategory = jest.fn();
 const mockExecuteAction = jest.fn();
 
 // Mock sub-hooks
@@ -18,8 +20,8 @@ jest.mock("../../hooks/command-palette/useCommandPaletteState", () => ({
     open: mockOpen,
     close: mockClose,
     toggle: mockToggle,
-    setPage: jest.fn(),
-    setCategory: jest.fn(),
+    setPage: mockSetPage,
+    setCategory: mockSetCategory,
     setSearch: mockSetSearch,
   }),
 }));
@@ -102,5 +104,21 @@ describe("useCommandPalette", () => {
     window.dispatchEvent(event);
 
     expect(mockClose).toHaveBeenCalled();
+  });
+
+  it("should navigate home", () => {
+    const { result } = renderHook(() => useCommandPalette());
+    act(() => {
+      result.current.goHome();
+    });
+    expect(mockSetPage).toHaveBeenCalledWith("home");
+  });
+
+  it("should view category", () => {
+    const { result } = renderHook(() => useCommandPalette());
+    act(() => {
+      result.current.viewCategory("Positive");
+    });
+    expect(mockSetCategory).toHaveBeenCalledWith("Positive");
   });
 });

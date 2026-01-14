@@ -102,7 +102,17 @@ describe("SphereDebugOverlay", () => {
             expect(screen.getByText(/\[1.00,2.00,3.00\]/)).toBeInTheDocument();
         });
 
-        it("displays invalid JSON error", () => {
+        it("displays correct age", () => {
+            const data = { timestamp: Date.now() - 5000, vac: [1, 1, 1] }; // 5s ago
+            store["love-sphere-sync"] = JSON.stringify(data);
+            render(<SphereDebugOverlay {...mockProps} />);
+            act(() => {
+                jest.advanceTimersByTime(1000); // Trigger interval
+            });
+            expect(screen.getByText(/Age: 6s ago/)).toBeInTheDocument();
+        });
+
+        it("displays invalid JSON error", async () => {
             store["love-sphere-sync"] = "{ invalid json";
 
             render(<SphereDebugOverlay {...mockProps} />);
@@ -111,7 +121,8 @@ describe("SphereDebugOverlay", () => {
                 jest.advanceTimersByTime(1000);
             });
 
-            expect(screen.getByText("Invalid JSON")).toBeInTheDocument();
+            // State update is async
+            expect(await screen.findByText("Invalid JSON")).toBeInTheDocument();
         });
 
         it("displays NULL when empty", () => {

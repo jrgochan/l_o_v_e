@@ -66,7 +66,7 @@ describe("AdminUserDetailsPage", () => {
     ];
 
     beforeEach(() => {
-        jest.clearAllMocks();
+        jest.resetAllMocks();
         mockUseParams.mockReturnValue({ id: "user-123" } as any);
     });
 
@@ -145,6 +145,21 @@ describe("AdminUserDetailsPage", () => {
 
         await waitFor(() => {
             expect(screen.getByText("Failed to load user data")).toBeInTheDocument();
+        });
+    });
+
+    it("handles user not found (null user, no error)", async () => {
+        // Return null user
+        (api.get as jest.Mock)
+            .mockResolvedValueOnce(null) // User
+            .mockResolvedValueOnce([]) // Sessions
+            .mockResolvedValueOnce([]); // Trajectory
+
+        render(<AdminUserDetailsPage />);
+
+        await waitFor(() => {
+            // Should show "User not found" fallback
+            expect(screen.getByText("User not found")).toBeInTheDocument();
         });
     });
 
@@ -253,5 +268,23 @@ describe("AdminUserDetailsPage", () => {
         await waitFor(() => {
             expect(window.alert).toHaveBeenCalledWith("Failed to update user: String error");
         });
+    });
+
+    it("switches back to profile tab (covers lambda)", async () => {
+        (api.get as jest.Mock)
+            .mockResolvedValueOnce(mockUser)
+            .mockResolvedValueOnce(mockSessions)
+            .mockResolvedValueOnce(mockTrajectory);
+
+        render(<AdminUserDetailsPage />);
+        await waitFor(() => expect(screen.getByText("Test User")).toBeInTheDocument());
+
+        // Switch away
+        fireEvent.click(screen.getByText(/Sessions \(\d+\)/));
+        expect(screen.queryByText("Edit User Access")).not.toBeInTheDocument();
+
+        // Switch back (covers line 132)
+        fireEvent.click(screen.getByText("Profile & Access"));
+        expect(screen.getByText("Edit User Access")).toBeInTheDocument();
     });
 });

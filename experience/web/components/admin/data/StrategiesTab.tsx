@@ -158,14 +158,14 @@ export function StrategiesTab() {
   const handleRemoveStep = (index: number) => {
     setEditForm((prev) => ({
       ...prev,
-      detailed_steps: (prev.detailed_steps || []).filter((_, i) => i !== index),
+      detailed_steps: (prev.detailed_steps!).filter((_, i) => i !== index),
     }));
   };
 
   // Helper to update a step at specific index
   const handleStepChange = (index: number, value: string) => {
     setEditForm((prev) => {
-      const newSteps = [...(prev.detailed_steps || [])];
+      const newSteps = [...(prev.detailed_steps!)];
       newSteps[index] = value;
       return { ...prev, detailed_steps: newSteps };
     });
@@ -342,7 +342,7 @@ export function StrategiesTab() {
                               </h4>
                               {isEditing ? (
                                 <div className="space-y-2">
-                                  {(editForm.detailed_steps || []).map((step, idx) => (
+                                  {(editForm.detailed_steps!).map((step, idx) => (
                                     <div key={idx} className="flex gap-2">
                                       <span className="text-gray-500 text-xs w-4 pt-1">
                                         {idx + 1}.

@@ -119,4 +119,40 @@ describe("useEmotionAtlas", () => {
       // Assuming it works.
     });
   });
+
+  it("should handle non-ok API response", async () => {
+    fetchMock.mockResponseOnce("Internal Server Error", { status: 500, statusText: "Internal Server Error" });
+
+    renderHook(() => useEmotionAtlas());
+
+    await waitFor(() => {
+      expect(mockSetError).toHaveBeenCalledWith("Failed to fetch emotions: Internal Server Error");
+    });
+  });
+
+  it("should allow refetching", async () => {
+    // Initial load prevented by store having data
+    (useAtlasAdminStore as unknown as jest.Mock).mockReturnValue({
+      allEmotions: [{ id: "e1" }], // Store has data
+      isLoadingEmotions: false,
+      error: null,
+      setAllEmotions: mockSetAllEmotions,
+      setLoadingEmotions: mockSetLoading,
+      setError: mockSetError,
+    });
+
+    const { result } = renderHook(() => useEmotionAtlas());
+
+    expect(fetchMock).not.toHaveBeenCalled();
+
+    // Trigger refetch
+    fetchMock.mockResponseOnce(JSON.stringify({ emotions: [] }));
+
+    // We need to act?
+    // refetch is standard function
+    await result.current.refetch();
+
+    expect(mockSetLoading).toHaveBeenCalledWith(true);
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+  });
 });

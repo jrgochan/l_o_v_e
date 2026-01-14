@@ -58,6 +58,22 @@ describe("AuthModal", () => {
     expect(buttons.length).toBeGreaterThan(1);
   });
 
+  it("switches back to login mode", async () => {
+    const user = userEvent.setup();
+    render(<AuthModal isOpen={true} onClose={mockOnClose} />);
+
+    // Switch to register first
+    await user.click(screen.getByRole("button", { name: "Create Account" }));
+    expect(screen.getByRole("heading", { name: "Create Account" })).toBeInTheDocument();
+
+    // Switch back to login
+    // "Sign In" tab is present
+    await user.click(screen.getByRole("button", { name: "Sign In" }));
+
+    expect(screen.getByRole("heading", { name: "Welcome Back" })).toBeInTheDocument();
+    expect(screen.queryByPlaceholderText("Full Name")).not.toBeInTheDocument();
+  });
+
   it("calls login on submit", async () => {
     const user = userEvent.setup();
     render(<AuthModal isOpen={true} onClose={mockOnClose} />);

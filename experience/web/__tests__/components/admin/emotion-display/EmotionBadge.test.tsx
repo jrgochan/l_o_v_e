@@ -153,5 +153,21 @@ describe("EmotionBadgeList", () => {
     const badges = screen.getAllByText(/Primary|Undefined/).map(el => el.textContent);
     // Primary (0) comes before Secondary (1)
     expect(badges).toEqual(["Primary", "Undefined"]);
+
+    // Verify fallback styling
+    // Note: List treats it as 'secondary' for sorting/sizing, but Badge component defaults to 'primary' for styling if prop is undefined.
+    const secondaryBadge = screen.getByText("Undefined").closest("div");
+    expect(secondaryBadge).toHaveClass("font-bold");
+  });
+
+  it("handles explicit undefined prominence", () => {
+    const startEmotions = [
+      { emotion: "A", confidence: 0.5, prominence: undefined },
+      { emotion: "B", confidence: 0.5, prominence: "primary" as const },
+    ];
+    render(<EmotionBadgeList emotions={startEmotions} />);
+    const texts = screen.getAllByText(/A|B/).map(e => e.textContent);
+    // B (primary=0) -> A (undefined->secondary=1)
+    expect(texts).toEqual(["B", "A"]);
   });
 });

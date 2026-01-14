@@ -105,5 +105,64 @@ describe("useHistorySphereSync", () => {
     rerender();
 
     expect(mockSetVisibility).toHaveBeenCalledWith(joyHistoryId, false);
+    expect(mockSetVisibility).toHaveBeenCalledWith(joyHistoryId, false);
+  });
+
+  it("should sync hidden history entry to sphere deselection", () => {
+    // Start consistent (Selected/Visible)
+    currentAtlasState = {
+      ...currentAtlasState,
+      selectedEmotionIds: new Set([joyId]),
+    };
+    currentHistoryState = {
+      ...currentHistoryState,
+      entries: [{ id: joyHistoryId, emotion: joyName, isVisibleInSphere: true }],
+    };
+
+    const { rerender } = renderHook(() => useHistorySphereSync());
+
+    // Update: User toggles Joy HIDDEN in history
+    currentHistoryState = {
+      ...currentHistoryState,
+      entries: [{ id: joyHistoryId, emotion: joyName, isVisibleInSphere: false }],
+    };
+
+    rerender();
+
+    expect(mockDeselectEmotion).toHaveBeenCalledWith(joyId);
+  });
+
+  it("should NOT deselect sphere if another history entry keeps it visible", () => {
+    // Start with 2 entries for Joy (Both Visible, or one Visible)
+    // Actually, let's say one is visible, one is about to be hidden.
+    const joyHistoryId2 = "h2";
+
+    currentAtlasState = {
+      ...currentAtlasState,
+      selectedEmotionIds: new Set([joyId]),
+    };
+    currentHistoryState = {
+      ...currentHistoryState,
+      entries: [
+        { id: joyHistoryId, emotion: joyName, isVisibleInSphere: true },
+        { id: joyHistoryId2, emotion: joyName, isVisibleInSphere: true },
+      ],
+    };
+
+    const { rerender } = renderHook(() => useHistorySphereSync());
+
+    // Update: Hide the first one
+    currentHistoryState = {
+      ...currentHistoryState,
+      entries: [
+        { id: joyHistoryId, emotion: joyName, isVisibleInSphere: false },
+        { id: joyHistoryId2, emotion: joyName, isVisibleInSphere: true },
+      ],
+    };
+
+    rerender();
+
+    // Should NOT call deselect because the second entry keeps it alive
+    expect(mockDeselectEmotion).not.toHaveBeenCalled();
   });
 });

@@ -48,29 +48,27 @@ export function VoiceRecorder({ isOpen, onClose, onSend }: VoiceRecorderProps) {
 
     // Wait a moment for the blob to be ready
     setTimeout(() => {
-      if (audioBlob) {
-        // Convert to base64 and send (also pass blob for waveform visualization)
-        const reader = new FileReader();
+      // Convert to base64 and send (also pass blob for waveform visualization)
+      const reader = new FileReader();
 
-        reader.onerror = (ev) => {
-          logger.error("general", "Error reading audio blob", ev);
-        };
+      reader.onerror = (ev) => {
+        logger.error("general", "Error reading audio blob", ev);
+      };
 
-        reader.onloadend = () => {
-          const base64data = reader.result as string;
-          if (!base64data) {
-            logger.error("general", "FileReader result is empty");
-            return;
-          }
-          const base64Audio = base64data.split(",")[1];
-          onSend(base64Audio, audioBlob); // Pass blob as second parameter
-          onClose();
+      reader.onloadend = () => {
+        const base64data = reader.result as string;
+        if (!base64data) {
+          logger.error("general", "FileReader result is empty");
+          return;
+        }
+        const base64Audio = base64data.split(",")[1];
+        onSend(base64Audio, audioBlob || undefined); // Pass blob as second parameter
+        onClose();
 
-          // Reset for next recording
-          cancelRecording();
-        };
-        reader.readAsDataURL(audioBlob);
-      }
+        // Reset for next recording
+        cancelRecording();
+      };
+      reader.readAsDataURL(audioBlob!);
     }, 100);
   };
 

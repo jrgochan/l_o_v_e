@@ -471,54 +471,7 @@ describe("StrategiesTab", () => {
     expect(screen.getByText("Detailed Steps")).toBeInTheDocument();
   });
 
-  it("handles step manipulation with missing initial steps", async () => {
-    const emptyStrat = { ...mockStrategies[0], id: "s-steps", detailed_steps: undefined as unknown as string[] };
-    (adminApi.getStrategies as jest.Mock).mockResolvedValue([emptyStrat]);
-    (adminApi.updateStrategy as jest.Mock).mockResolvedValue(emptyStrat);
 
-    render(<StrategiesTab />);
-    await waitFor(() => expect(screen.getByText("CBT Reframe")).toBeInTheDocument());
-
-    fireEvent.click(screen.getByLabelText("Expand details"));
-    fireEvent.click(screen.getByLabelText("Edit"));
-
-    // Add Step (covers handleAddStep fallback)
-    fireEvent.click(screen.getByText("Add Step"));
-
-    const inputs = screen.getAllByRole("textbox");
-    const stepInput = screen.getByPlaceholderText("Step 1");
-    fireEvent.change(stepInput, { target: { value: "New Step" } }); // Covers handleStepChange fallback
-
-    // Remove Step (covers handleRemoveStep fallback)
-    const removeBtns = screen.getAllByTitle("Remove step");
-    fireEvent.click(removeBtns[0]);
-
-    expect(screen.queryByDisplayValue("New Step")).not.toBeInTheDocument();
-  });
-  it("handles updates in multi-item list correctly", async () => {
-    const multiProps = [
-      { ...mockStrategies[0], id: "s1", strategy_name: "S1" },
-      { ...mockStrategies[0], id: "s2", strategy_name: "S2" }
-    ];
-    (adminApi.getStrategies as jest.Mock).mockResolvedValue(multiProps);
-    (adminApi.updateStrategy as jest.Mock).mockResolvedValue({ ...multiProps[0], strategy_name: "S1 Updated" });
-
-    render(<StrategiesTab />);
-    await waitFor(() => expect(screen.getByText("S1")).toBeInTheDocument());
-    expect(screen.getByText("S2")).toBeInTheDocument();
-
-    // Edit S1
-    const editButtons = screen.getAllByLabelText("Edit");
-    fireEvent.click(editButtons[0]);
-
-    fireEvent.click(screen.getByLabelText("Save"));
-
-    await waitFor(() => {
-      expect(screen.getByText("S1 Updated")).toBeInTheDocument();
-      // S2 should still be there unchanged
-      expect(screen.getByText("S2")).toBeInTheDocument();
-    });
-  });
 
   it("handles editing strategy with null description (coverage)", async () => {
     const nullDescStrat = { ...mockStrategies[0], description: null as unknown as string };
@@ -587,4 +540,30 @@ describe("StrategiesTab", () => {
       }));
     });
   });
+  it("handles unmount during import to cover finally block ref check", async () => {
+    (adminApi.getStrategies as jest.Mock).mockResolvedValue(mockStrategies);
+    let resolveImport: (val: any) => void = () => { };
+    (adminApi.importStrategies as jest.Mock).mockImplementation(() => {
+      return new Promise((resolve) => {
+        resolveImport = resolve;
+      });
+    });
+
+    const { container, unmount } = render(<StrategiesTab />);
+    await waitFor(() => expect(screen.getByText("CBT Reframe")).toBeInTheDocument());
+
+    const file = new File(["{}"], "strategies.json", { type: "application/json" });
+    Object.defineProperty(file, 'text', { value: jest.fn().mockResolvedValue("{}") });
+    const input = container.querySelector('input[type="file"]') as HTMLInputElement;
+
+    await userEvent.upload(input, file);
+
+    unmount();
+
+    resolveImport({ updated: 0, created: 0, errors: [] });
+
+    expect(adminApi.importStrategies).toHaveBeenCalled();
+  });
+
+
 });

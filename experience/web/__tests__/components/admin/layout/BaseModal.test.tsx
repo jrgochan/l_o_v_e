@@ -82,6 +82,16 @@ describe("BaseModal", () => {
     expect(onClose).toHaveBeenCalled();
   });
 
+  it("ignores non-escape keys", () => {
+    render(
+      <BaseModal isOpen={true} onClose={onClose}>
+        <div>Content</div>
+      </BaseModal>
+    );
+    fireEvent.keyDown(window, { key: "Enter" });
+    expect(onClose).not.toHaveBeenCalled();
+  });
+
   it("closes on close button click", () => {
     render(
       <BaseModal isOpen={true} onClose={onClose} showCloseButton={true}>

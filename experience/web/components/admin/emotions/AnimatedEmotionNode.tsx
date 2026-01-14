@@ -59,7 +59,7 @@ export function AnimatedEmotionNode({
 
   // Store initial position
   useEffect(() => {
-    if (meshRef.current) {
+    if (meshRef.current?.position) {
       initialPosition.current.copy(meshRef.current.position);
     }
   }, []);

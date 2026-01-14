@@ -13,9 +13,6 @@ describe("AggregateStateCard", () => {
       arousal: 0.2,
       connection: 0.9,
     },
-    dominant_emotions: [
-      { id: "1", name: "Joy", confidence: 0.9, timestamp: new Date(), category: "joy", vac: { valence: 0.8, arousal: 0.5, connection: 0.7 } }
-    ]
   };
 
   it("renders Complexity and Clarity labels correctly", () => {
@@ -62,5 +59,18 @@ describe("AggregateStateCard", () => {
     expect(screen.getAllByText("Moderate")).toHaveLength(2);
     expect(screen.getByText("↗")).toBeInTheDocument();
     expect(screen.getByText("Building or developing")).toBeInTheDocument();
+  });
+
+  it("renders fallback for unknown temporal pattern", () => {
+    const unknownAggregate = {
+      ...mockAggregate,
+      temporal_pattern: "unknown-pattern" as any,
+    };
+    render(<AggregateStateCard aggregate={unknownAggregate} />);
+    // Fallback icon is "•"
+    expect(screen.getByText("•")).toBeInTheDocument();
+    // Fallback description is the pattern string itself
+    // Fallback description is the pattern string itself
+    expect(screen.getAllByText("unknown-pattern")).toHaveLength(2);
   });
 });

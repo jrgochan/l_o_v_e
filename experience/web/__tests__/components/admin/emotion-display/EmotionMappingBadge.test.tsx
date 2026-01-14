@@ -78,4 +78,11 @@ describe("EmotionMappingBadge", () => {
       'Fuzzy match: AI detected "happy", mapped to Atlas emotion "Joy" with 95% confidence'
     );
   });
+
+  it("renders with default props (coverage)", () => {
+    render(<EmotionMappingBadge originalName="DefOrig" atlasName="DefAtlas" />);
+    // Defaults: method=fuzzy (≈), confidence=1.0 (100%)
+    expect(screen.getByText("≈")).toBeInTheDocument();
+    expect(screen.getByText("(100%)")).toBeInTheDocument();
+  });
 });
