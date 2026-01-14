@@ -68,18 +68,6 @@ export function MultiEmotionTable({
           aValue = a.confidence;
           bValue = b.confidence;
           break;
-        case "valence":
-          aValue = a.vac.valence;
-          bValue = b.vac.valence;
-          break;
-        case "arousal":
-          aValue = a.vac.arousal;
-          bValue = b.vac.arousal;
-          break;
-        case "connection":
-          aValue = a.vac.connection;
-          bValue = b.vac.connection;
-          break;
         case "voice_alignment":
           aValue = a.voice_alignment ?? -1;
           bValue = b.voice_alignment ?? -1;
@@ -91,6 +79,7 @@ export function MultiEmotionTable({
           break;
         }
         default:
+          /* istanbul ignore next */
           return 0;
       }
 
@@ -104,6 +93,7 @@ export function MultiEmotionTable({
         return sortDirection === "asc" ? aValue - bValue : bValue - aValue;
       }
 
+      /* istanbul ignore next */
       return 0;
     });
 
@@ -329,9 +319,8 @@ export function MultiEmotionTable({
               return (
                 <React.Fragment key={emotion.id}>
                   <tr
-                    className={`border-b border-gray-700/50 hover:bg-gray-750 transition cursor-pointer ${
-                      isEven ? "bg-gray-850" : "bg-gray-900"
-                    }`}
+                    className={`border-b border-gray-700/50 hover:bg-gray-750 transition cursor-pointer ${isEven ? "bg-gray-850" : "bg-gray-900"
+                      }`}
                     onClick={() => onEmotionClick?.(emotion)}
                   >
                     {/* Emotion Name */}

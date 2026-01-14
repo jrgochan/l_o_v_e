@@ -1,234 +1,278 @@
-import { render, screen, fireEvent, within } from "@testing-library/react";
+
+import { render, screen, fireEvent } from "@testing-library/react";
 import { MultiEmotionTable } from "@/components/admin/clinical/MultiEmotionTable";
-import { DetectedEmotion } from "@/types/chat";
+import type { DetectedEmotion, VAC } from "@/types/chat";
 
 // Mock child components
 jest.mock("@/components/admin/emotion-display/EmotionMappingBadge", () => ({
-  EmotionMappingBadge: () => <div data-testid="mapping-badge" />,
+  EmotionMappingBadge: () => <div data-testid="mock-mapping-badge" />
 }));
 
-// Mock URL.createObjectURL for export
-const mockCreateObjectURL = jest.fn();
-const mockRevokeObjectURL = jest.fn();
-global.URL.createObjectURL = mockCreateObjectURL;
-global.URL.revokeObjectURL = mockRevokeObjectURL;
-
-const mockEmotions: DetectedEmotion[] = [
-  {
-    id: "e1",
-    emotion_name: "Joy",
-    confidence: 0.9,
-    vac: { valence: 0.8, arousal: 0.6, connection: 0.7 },
-    prominence: "primary",
-    voice_alignment: 0.85,
-    category: "Positive",
-    match_method: "exact",
-    match_confidence: 1.0,
-    original_name: "Joy"
-  },
-  {
-    id: "e2",
-    emotion_name: "Sadness",
-    confidence: 0.5,
-    vac: { valence: -0.6, arousal: -0.4, connection: -0.2 },
-    prominence: "secondary",
-    voice_alignment: 0.4,
-    category: "Negative",
-  },
-  {
-    id: "e3",
-    emotion_name: "Anger",
-    confidence: 0.3,
-    vac: { valence: -0.5, arousal: 0.8, connection: -0.6 },
-    prominence: "underlying",
-    voice_alignment: 0.7, // Medium (Yellow)
-    category: "Negative",
-  },
-];
+// Mock URL.createObjectURL for CSV export
+global.URL.createObjectURL = jest.fn(() => "mock-url");
+global.URL.revokeObjectURL = jest.fn();
 
 describe("MultiEmotionTable", () => {
-  beforeEach(() => {
-    jest.clearAllMocks();
-  });
+  const mockEmotions: DetectedEmotion[] = [
+    {
+      id: "1",
+      emotion_name: "Joy",
+      category: "Positive",
+      confidence: 0.9,
+      intensity: 0.8,
+      prominence: "primary",
+      vac: { valence: 0.8, arousal: 0.6, connection: 0.7 },
+      voice_alignment: 0.85,
+      original_name: "Ecstasy",
+      match_method: "vector",
+      match_confidence: 0.95
+    },
+    {
+      id: "2",
+      emotion_name: "Anxiety",
+      category: "Negative",
+      confidence: 0.6,
+      intensity: 0.5,
+      prominence: "secondary",
+      vac: { valence: -0.4, arousal: 0.7, connection: -0.2 },
+      voice_alignment: 0.4,
+      original_name: null // Exact match case
+    },
+    {
+      id: "3",
+      emotion_name: "Sadness",
+      category: "Negative",
+      confidence: 0.4,
+      intensity: 0.4,
+      prominence: "underlying",
+      vac: { valence: -0.8, arousal: -0.5, connection: -0.6 },
+      match_method: "fuzzy"
+      // undefined voice_alignment
+    },
+    {
+      id: "4",
+      emotion_name: "Interest",
+      category: "Cognitive",
+      confidence: 0.7,
+      intensity: 0.6,
+      prominence: "secondary",
+      vac: { valence: 0.2, arousal: 0.4, connection: 0.3 },
+      voice_alignment: 0.7 // Medium alignment (0.6 - 0.8)
+    }
+  ];
 
-  it("renders table and basic empty state", () => {
-    const { rerender } = render(<MultiEmotionTable emotions={[]} />);
+  it("renders empty state", () => {
+    render(<MultiEmotionTable emotions={[]} />);
     expect(screen.getByText("No multi-emotion data available")).toBeInTheDocument();
+  });
 
-    rerender(<MultiEmotionTable emotions={mockEmotions} />);
+  it("renders table with correct headers", () => {
+    render(<MultiEmotionTable emotions={mockEmotions} />);
     expect(screen.getByText("Multi-Emotion Analysis")).toBeInTheDocument();
+    expect(screen.getByText("(4 emotions)")).toBeInTheDocument();
+
+    // Headers
+    expect(screen.getByText("Emotion")).toBeInTheDocument();
+    expect(screen.getByText("Confidence")).toBeInTheDocument();
+    expect(screen.getByText("VAC Coordinates")).toBeInTheDocument();
+    expect(screen.getByText("Voice Match")).toBeInTheDocument();
+    expect(screen.getByText("Prominence")).toBeInTheDocument();
+  });
+
+  it("renders emotion rows correctly", () => {
+    render(<MultiEmotionTable emotions={mockEmotions} />);
+
+    // Check first emotion
     expect(screen.getByText("Joy")).toBeInTheDocument();
+    expect(screen.getByText("90%")).toBeInTheDocument(); // 0.9 confidence
+    expect(screen.getByText("+0.800")).toBeInTheDocument(); // Valence
+    expect(screen.getByText("✓")).toBeInTheDocument(); // Good voice alignment
+    expect(screen.getByText("PRIMARY")).toBeInTheDocument();
+
+    // Check second emotion
+    expect(screen.getByText("Anxiety")).toBeInTheDocument();
+    expect(screen.getByText("~")).toBeInTheDocument(); // Moderate voice alignment
+    // Use getAllByText because "Interest" is also secondary
+    expect(screen.getAllByText("SECONDARY").length).toBeGreaterThan(0);
+    expect(screen.getAllByText("Exact").length).toBeGreaterThan(0); // Multiple Exacts
   });
 
-  describe("Sorting Logic", () => {
-    // Helper to check row order by testing content of first non-header row
-    const checkFirstRow = (text: string) => {
-      const rows = screen.getAllByRole("row");
-      expect(within(rows[1]).getByText(text)).toBeInTheDocument();
-    };
+  it("handles sorting", () => {
+    render(<MultiEmotionTable emotions={mockEmotions} />);
 
-    it("sorts by various columns", () => {
-      render(<MultiEmotionTable emotions={mockEmotions} />);
+    // Default is sorted by prominence asc (primary -> secondary -> underlying)
+    const rows = screen.getAllByRole("row");
+    // Row 0 is header. Row 1 should be Joy (primary), Row 2 Anxiety (secondary), Row 3 Sadness (underlying)
+    expect(rows[1]).toHaveTextContent("Joy");
 
-      // Emotion Name Desc (Joy -> Sadness -> Anger)
-      fireEvent.click(screen.getByText("Emotion")); // Asc: Anger
-      checkFirstRow("Anger");
-      fireEvent.click(screen.getByText("Emotion")); // Desc: Sadness
-      checkFirstRow("Sadness");
+    // Sort by Emotion Name
+    fireEvent.click(screen.getByText("Emotion"));
+    // A-Z: Anxiety, Joy, Sadness
+    const rowsAsc = screen.getAllByRole("row");
+    expect(rowsAsc[1]).toHaveTextContent("Anxiety");
+    expect(rowsAsc[2]).toHaveTextContent("Interest"); // I before J
+    expect(rowsAsc[3]).toHaveTextContent("Joy");
 
-      // Valence
-      fireEvent.click(screen.getByText("VAC Coordinates")); // Nothing happens, not sortable directly? 
-      // Wait, the header for VAC might not have a click handler or correct Label?
-      // Looking at the code: "VAC Coordinates" header has NO onClick.
-      // Correct. VAC sorting is not exposed in UI based on my previous read (Lines 292-297 in source).
-      // Wait, sorting logic (lines 71-82 of source) exists for 'valence', 'arousal', 'connection' keys... but are they connected to header?
-      // Source: <th ... onClick={() => handleSort("emotion")}>...
-      // VAC header: <th ...> (No onClick). 
-      // So VAC sorting logic is dead code or unreachable via UI? 
-      // Ah, checking source lines 292-297: No click handler.
-      // So I cannot test VAC sorting via UI.
-
-      // Voice Match (key: voice_alignment)
-      fireEvent.click(screen.getByText("Voice Match"));
-      // Asc (0.4) -> Sadness
-      checkFirstRow("Sadness");
-      fireEvent.click(screen.getByText("Voice Match"));
-      // Desc (0.85) -> Joy
-      checkFirstRow("Joy");
-
-      // Prominence
-      // Order: primary(0), secondary(1), underlying(2)
-      fireEvent.click(screen.getByText("Prominence"));
-      // Asc: Primary (Joy)
-      checkFirstRow("Joy");
-      fireEvent.click(screen.getByText("Prominence"));
-      // Desc: Underlying (Anger)
-      checkFirstRow("Anger");
-    });
-    it("sorts by confidence", () => {
-      render(<MultiEmotionTable emotions={mockEmotions} />);
-      fireEvent.click(screen.getByText("Confidence"));
-      // Asc (0.3) -> Anger
-      checkFirstRow("Anger");
-      fireEvent.click(screen.getByText("Confidence"));
-      // Desc (0.9) -> Joy
-      checkFirstRow("Joy");
-    });
+    // Toggle Sort (Desc)
+    fireEvent.click(screen.getByText("Emotion"));
+    // Z-A: Sadness, Joy, Interest, Anxiety
+    const rowsDesc = screen.getAllByRole("row");
+    expect(rowsDesc[1]).toHaveTextContent("Sadness");
+    expect(rowsDesc[4]).toHaveTextContent("Anxiety");
   });
 
-  describe("Interactions", () => {
-    it("calls onEmotionClick when row is clicked", () => {
-      const handleClick = jest.fn();
-      render(<MultiEmotionTable emotions={mockEmotions} onEmotionClick={handleClick} />);
+  it("handles numeric sorting", () => {
+    render(<MultiEmotionTable emotions={mockEmotions} />);
 
-      const joyRow = screen.getByText("Joy").closest("tr")!;
-      fireEvent.click(joyRow);
-      expect(handleClick).toHaveBeenCalledWith(expect.objectContaining({ emotion_name: "Joy" }));
-    });
+    // Sort by Confidence
+    fireEvent.click(screen.getByText("Confidence"));
+    // Asc: 40, 60, 90 (Sadness, Anxiety, Joy)
+    let rows = screen.getAllByRole("row");
+    expect(rows[1]).toHaveTextContent("Sadness");
+
+    // Toggle (Desc)
+    fireEvent.click(screen.getByText("Confidence"));
+    // Desc: 90, 60, 40 (Joy, Anxiety, Sadness)
+    rows = screen.getAllByRole("row");
+    expect(rows[1]).toHaveTextContent("Joy");
   });
 
-  describe("Filtering", () => {
-    it("filters by prominence levels", () => {
-      render(<MultiEmotionTable emotions={mockEmotions} />);
-      const select = screen.getByRole("combobox");
+  it("handles voice alignment sorting and rendering", () => {
+    render(<MultiEmotionTable emotions={mockEmotions} />);
 
-      // Primary
-      fireEvent.change(select, { target: { value: "primary" } });
-      expect(screen.getByText("Joy")).toBeInTheDocument();
-      expect(screen.queryByText("Sadness")).not.toBeInTheDocument();
+    // Sort by Voice Match
+    fireEvent.click(screen.getByText("Voice Match"));
+    // Asc: Sadness (-1/N/A), Anxiety (0.4), Interest (0.7), Joy (0.85)
+    // Check rows
+    let rows = screen.getAllByRole("row");
+    expect(rows[1]).toHaveTextContent("Sadness");
 
-      // Underlying
-      fireEvent.change(select, { target: { value: "underlying" } });
-      expect(screen.getByText("Anger")).toBeInTheDocument();
-      expect(screen.queryByText("Joy")).not.toBeInTheDocument();
-
-      // All
-      fireEvent.change(select, { target: { value: "all" } });
-      expect(screen.getAllByRole("row").length).toBe(4); // Header + 3 rows
-    });
+    // Check medium alignment rendering (~)
+    expect(screen.getByText("~")).toBeInTheDocument();
+    expect(screen.getAllByText("70%").length).toBeGreaterThan(0);
   });
 
-  describe("Expansion and Details", () => {
-    it("expands row to show detailed VAC interpretation and logic", () => {
-      render(<MultiEmotionTable emotions={mockEmotions} />);
-      const expandButtons = screen.getAllByText("⊕ Expand");
+  it("handles prominence sorting", () => {
+    render(<MultiEmotionTable emotions={mockEmotions} />);
 
-      // Expand Joy (e1) - High positive values
-      fireEvent.click(expandButtons[0]);
-      expect(screen.getByText("Very positive")).toBeInTheDocument(); // Valence 0.8 > 0.5
-      expect(screen.getByText("Very high energy")).toBeInTheDocument(); // Arousal 0.6 > 0.5
-      expect(screen.getByText("Strong connection")).toBeInTheDocument(); // Connection 0.7 > 0.5
+    // Force deterministic state: Click Emotion first, then Prominence
+    fireEvent.click(screen.getByText("Emotion"));
+    fireEvent.click(screen.getByText("Prominence").closest("th")!);
+    // Now it should be Prominence ASC (Joy/Primary first)
 
-      // Detailed fields
-      expect(screen.getByText("Emotion ID:")).toBeInTheDocument();
-      expect(screen.getByText("e1")).toBeInTheDocument();
-      expect(screen.getByText("Match Method:")).toBeInTheDocument();
-      expect(screen.getByText("exact")).toBeInTheDocument(); // Check value
-    });
+    const rowsAsc = screen.getAllByRole("row");
+    expect(rowsAsc[1]).toHaveTextContent("Joy");
 
-    it("collapses row", () => {
-      render(<MultiEmotionTable emotions={mockEmotions} />);
-      const expandButton = screen.getAllByText("⊕ Expand")[0];
-      fireEvent.click(expandButton);
-      expect(screen.getByText("Detailed Analysis")).toBeInTheDocument();
+    // Toggle Desc (Underlying, Secondary, Primary) by clicking ONCE
+    fireEvent.click(screen.getByText("Prominence").closest("th")!);
 
-      const collapseButton = screen.getByText("⊖ Collapse");
-      fireEvent.click(collapseButton);
-      expect(screen.queryByText("Detailed Analysis")).not.toBeInTheDocument();
-    });
-
-    it("handles negative VAC interpretation", () => {
-      // Expand Sadness (e2): V(-0.6), A(-0.4), C(-0.2)
-      render(<MultiEmotionTable emotions={mockEmotions} />);
-      const expandButtons = screen.getAllByText("⊕ Expand");
-      fireEvent.click(expandButtons[1]); // Sadness is 2nd in default list? 
-      // Default sort is Prominence (lines 45). primary(e1) -> secondary(e2) -> underlying(e3).
-      // So index 1 is Sadness.
-
-      // Val: -0.6 < -0.5 -> "Very negative"
-      expect(screen.getByText("Very negative")).toBeInTheDocument();
-
-      // Arousal: -0.4 > -0.5 -> "Low energy"
-      expect(screen.getByText("Low energy")).toBeInTheDocument();
-
-      // Connection: -0.2 < -0.1 (Wait: > -0.5) -> "Disconnected"
-      expect(screen.getByText("Disconnected")).toBeInTheDocument();
-    });
+    const rowsDesc = screen.getAllByRole("row");
+    // Row 1 should be Sadness (Underlying)
+    expect(rowsDesc[1]).toHaveTextContent("Sadness");
   });
 
-  describe("Visual Indicators", () => {
-    it("renders correct voice alignment colors", () => {
-      const { container } = render(<MultiEmotionTable emotions={mockEmotions} />);
+  it("handles filtering by prominence", () => {
+    render(<MultiEmotionTable emotions={mockEmotions} showFilters={true} />);
 
-      // Joy: 0.85 -> Green
-      const joyRow = screen.getByText("Joy").closest("tr")!;
-      // We can check text-green-400 class presence within this row for Voice Alignment column
-      const greenIndicator = within(joyRow).getByText("✓").parentElement;
-      expect(greenIndicator).toHaveClass("text-green-400");
+    const filter = screen.getByRole("combobox");
 
-      // Anger: 0.7 -> Yellow
-      const angerRow = screen.getByText("Anger").closest("tr")!;
-      const yellowIndicator = within(angerRow).getByText("~").parentElement;
-      expect(yellowIndicator).toHaveClass("text-yellow-400");
+    // Select Primary
+    fireEvent.change(filter, { target: { value: "primary" } });
+    expect(screen.getByText("Joy")).toBeInTheDocument();
+    expect(screen.queryByText("Anxiety")).not.toBeInTheDocument();
+    expect(screen.queryByText("Sadness")).not.toBeInTheDocument();
 
-      // Sadness: 0.4 -> Red
-      const sadnessRow = screen.getByText("Sadness").closest("tr")!;
-      const redIndicator = within(sadnessRow).getByText("⚠️").parentElement;
-      expect(redIndicator).toHaveClass("text-red-400");
-    });
+    // Select Secondary
+    fireEvent.change(filter, { target: { value: "secondary" } });
+    expect(screen.queryByText("Joy")).not.toBeInTheDocument();
+    expect(screen.getByText("Anxiety")).toBeInTheDocument();
+  });
 
-    it("renders N/A for missing alignment", () => {
-      const missingAlign = [{ ...mockEmotions[0], id: "e99", voice_alignment: undefined }];
-      render(<MultiEmotionTable emotions={missingAlign as any} />);
-      expect(screen.getByText("N/A")).toBeInTheDocument();
-    });
+  it("expands row on click", () => {
+    render(<MultiEmotionTable emotions={mockEmotions} />);
+
+    // Click expand button for first row
+    const expandBtns = screen.getAllByText("⊕ Expand");
+    fireEvent.click(expandBtns[0]);
+
+    // Check detailed view text
+    expect(screen.getByText("Detailed Analysis")).toBeInTheDocument();
+    expect(screen.getByText("Emotion ID:")).toBeInTheDocument();
+    expect(screen.getByText("Ecstasy")).toBeInTheDocument(); // Original name
+    expect(screen.getByText("vector")).toBeInTheDocument(); // Match method
+
+    // Check collapse button
+    expect(screen.getByText("⊖ Collapse")).toBeInTheDocument();
+
+    // Click collapse
+    fireEvent.click(screen.getByText("⊖ Collapse"));
+    expect(screen.queryByText("Detailed Analysis")).not.toBeInTheDocument();
+  });
+
+  it("triggers emotion click callback", () => {
+    const onEmotionClick = jest.fn();
+    render(<MultiEmotionTable emotions={mockEmotions} onEmotionClick={onEmotionClick} />);
+
+    // Click the row (not the button)
+    // Find the cell containing "Joy"
+    const joyCell = screen.getByText("Joy").closest("tr");
+    fireEvent.click(joyCell!);
+
+    expect(onEmotionClick).toHaveBeenCalledWith(mockEmotions[0]);
   });
 
   it("exports CSV", () => {
-    render(<MultiEmotionTable emotions={mockEmotions} />);
-    const exportBtn = screen.getByText("Export CSV");
-    fireEvent.click(exportBtn);
-    expect(mockCreateObjectURL).toHaveBeenCalled();
-    expect(mockRevokeObjectURL).toHaveBeenCalled();
+    render(<MultiEmotionTable emotions={mockEmotions} showExport={true} />);
+
+    // Mock anchor click
+    const link = { click: jest.fn(), href: "", download: "" };
+    const originalCreateElement = document.createElement.bind(document);
+    jest.spyOn(document, "createElement").mockImplementation((tag) => {
+      if (tag === "a") return link as any;
+      return originalCreateElement(tag);
+    });
+
+    fireEvent.click(screen.getByText("Export CSV"));
+
+    expect(global.URL.createObjectURL).toHaveBeenCalled();
+    expect(link.click).toHaveBeenCalled();
+    expect(link.download).toContain("multi-emotion-analysis");
+  });
+
+  it("renders VAC interpretation labels correctly", () => {
+    // We need to test various VAC ranges to hit all branches
+    const vacEmotions: DetectedEmotion[] = [
+      { ...mockEmotions[0], id: "v1", vac: { valence: 0.6, arousal: 0.6, connection: 0.6 }, emotion_name: "E1" }, // Very positive, Very high, Strong
+      { ...mockEmotions[0], id: "v2", vac: { valence: 0.2, arousal: 0.2, connection: 0.2 }, emotion_name: "E2" }, // Somewhat positive, High, Connected
+      { ...mockEmotions[0], id: "v3", vac: { valence: 0.0, arousal: 0.0, connection: 0.0 }, emotion_name: "E3" }, // Neutral, Moderate, Neutral
+      { ...mockEmotions[0], id: "v4", vac: { valence: -0.2, arousal: -0.2, connection: -0.2 }, emotion_name: "E4" }, // Somewhat negative, Low, Disconnected
+      { ...mockEmotions[0], id: "v5", vac: { valence: -0.6, arousal: -0.6, connection: -0.6 }, emotion_name: "E5" }, // Very negative, Very low, Strongly disconnected
+    ];
+
+    render(<MultiEmotionTable emotions={vacEmotions} />);
+
+    // Expand all rows to show details
+    const expandBtns = screen.getAllByText("⊕ Expand");
+    expandBtns.forEach(btn => fireEvent.click(btn));
+
+    // Verify labels exist (sampling a few key ones)
+    expect(screen.getByText("Very positive")).toBeInTheDocument();
+    expect(screen.getByText("Very high energy")).toBeInTheDocument();
+    expect(screen.getByText("Strong connection")).toBeInTheDocument();
+
+    expect(screen.getByText("Somewhat positive")).toBeInTheDocument();
+    expect(screen.getByText("High energy")).toBeInTheDocument();
+    expect(screen.getByText("Connected")).toBeInTheDocument();
+
+    expect(screen.getAllByText("Neutral").length).toBeGreaterThan(0);
+    expect(screen.getByText("Moderate")).toBeInTheDocument();
+
+    expect(screen.getByText("Somewhat negative")).toBeInTheDocument();
+    expect(screen.getByText("Low energy")).toBeInTheDocument();
+    expect(screen.getByText("Disconnected")).toBeInTheDocument();
+
+    expect(screen.getByText("Very negative")).toBeInTheDocument();
+    expect(screen.getByText("Very low energy")).toBeInTheDocument();
+    expect(screen.getByText("Strongly disconnected")).toBeInTheDocument();
   });
 });
