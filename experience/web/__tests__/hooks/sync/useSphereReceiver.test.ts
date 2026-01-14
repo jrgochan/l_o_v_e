@@ -51,6 +51,26 @@ describe("useSphereReceiver", () => {
 
     expect(setTarget).toHaveBeenCalledWith([0.1, 0.2, 0.3]);
     expect(result.current.lastUpdate).toBe(1000);
+    expect(setTarget).toHaveBeenCalledWith([0.1, 0.2, 0.3]);
+    expect(result.current.lastUpdate).toBe(1000);
+  });
+
+  it("should update path on sphere_update with path", () => {
+    const { result } = renderHook(() => useSphereReceiver("listener", 0));
+
+    const message: SphereStateMessage = {
+      type: "sphere_update",
+      vac: [0.1, 0.2, 0.3],
+      path: { id: "p2" } as any,
+      timestamp: 1000,
+    };
+
+    act(() => {
+      result.current.handleMessage(message);
+    });
+
+    expect(setTarget).toHaveBeenCalledWith([0.1, 0.2, 0.3]);
+    expect(setTransitionPath).toHaveBeenCalledWith({ id: "p2" });
   });
 
   it("should update path on path_update", () => {
@@ -146,5 +166,17 @@ describe("useSphereReceiver", () => {
     });
 
     expect(onStale).not.toHaveBeenCalled();
+  });
+
+  it("should call onSync callback when provided", () => {
+    const onSync = jest.fn();
+    const { result } = renderHook(() => useSphereReceiver("listener", 0, onSync));
+    const message = { type: "sphere_update", vac: [0, 0, 0], timestamp: 123 } as SphereStateMessage;
+
+    act(() => {
+      result.current.handleMessage(message);
+    });
+
+    expect(onSync).toHaveBeenCalledWith(message);
   });
 });

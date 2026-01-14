@@ -62,4 +62,18 @@ describe("useCommandPaletteNavigation", () => {
 
     expect(result.current.selectedIndex).toBe(2); // Wrap to last
   });
+
+  it("should ignore keydown when not open", () => {
+    const { result } = renderHook(() =>
+      useCommandPaletteNavigation({ filteredEmotions: mockEmotions, isOpen: false, search: "" })
+    );
+
+    act(() => {
+      const event = new KeyboardEvent("keydown", { key: "ArrowDown" });
+      result.current.handleKeyDown(event);
+    });
+
+    // Should stay at 0
+    expect(result.current.selectedIndex).toBe(0);
+  });
 });

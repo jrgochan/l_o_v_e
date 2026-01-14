@@ -95,14 +95,16 @@ describe("AnimatedEmotionNode", () => {
 
   const defaultProps = {
     emotion: mockEmotion,
-    color: new THREE.Color("yellow"),
+    color: new THREE.Color("red"),
     size: 1,
-    mode: "scientific" as const,
     isSelected: false,
     isHovered: false,
-    onClick: jest.fn(),
+    isFocused: false,
+    isNeighbor: false,
+    mode: "dynamic" as const, // dynamic is valid
     onPointerOver: jest.fn(),
     onPointerOut: jest.fn(),
+    onClick: jest.fn(),
   };
 
   const defaultAnimParams = {
@@ -150,7 +152,7 @@ describe("AnimatedEmotionNode", () => {
         ...defaultAnimParams,
         secondaryMotion: "recoil"
       });
-      const { container } = render(<AnimatedEmotionNode {...defaultProps} />);
+      const { container } = render(<AnimatedEmotionNode {...defaultProps} mode="subtle" />);
       const mesh = container.querySelector("mesh") as any;
       const frameCallback = (useFrame as jest.Mock).mock.calls[0][0];
 

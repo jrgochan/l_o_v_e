@@ -5,9 +5,12 @@ import { MysticalEtherealPath } from "@/components/admin/paths/MysticalEtherealP
 import { useFrame } from "@react-three/fiber";
 import * as THREE from "three";
 
+let useFrameCallback: (state: any, delta?: number) => void;
+
 // Mock R3F
 jest.mock("@react-three/fiber", () => ({
   useFrame: jest.fn(),
+  useThree: jest.fn(() => ({ camera: { position: new THREE.Vector3() } })), // Add useThree availability if needed
 }));
 
 // Suppress R3F tag warnings
@@ -73,9 +76,11 @@ describe("MysticalEtherealPath", () => {
 
   const mockProps = {
     tubeGeometry: new THREE.TubeGeometry(),
-    color: new THREE.Color("purple"),
+    color: new THREE.Color("yellow"),
+    size: 1,
+    mode: "dynamic" as const,
+    isSelected: false,
     opacity: 0.7,
-    isSelected: true,
   };
 
   beforeEach(() => {
@@ -90,7 +95,7 @@ describe("MysticalEtherealPath", () => {
   });
 
   it("registers animation loop and updates shader uniforms", () => {
-    const { container } = render(<MysticalEtherealPath {...mockProps} />);
+    const { container } = render(<MysticalEtherealPath {...{ ...mockProps, isSelected: true }} />);
     expect(useFrame).toHaveBeenCalled();
 
     // Trigger frame update

@@ -26,9 +26,9 @@ describe("useVoiceVisualizer", () => {
   const originalCAF = window.cancelAnimationFrame;
 
   // Return non-zero ID
+  // Return actual timeout ID for correct cancellation
   const mockRAF = jest.fn((cb: any) => {
-    setTimeout(cb, 16);
-    return 123;
+    return setTimeout(cb, 16) as unknown as number;
   });
   const mockCAF = jest.fn((id: any) => clearTimeout(id));
 
@@ -108,6 +108,26 @@ describe("useVoiceVisualizer", () => {
     // Called twice: once by cleanup of previous effect, once by new effect body
     expect(mockClose).toHaveBeenCalledTimes(2);
     expect(mockCAF).toHaveBeenCalledTimes(2);
+
+    // Cover setTimeout(() => setAudioLevel(0), 0)
+    act(() => {
+      jest.runAllTimers();
+    });
+  });
+
+  it("should handle error during context close on stream update to null", () => {
+    const stream = {} as MediaStream;
+    mockClose.mockRejectedValue("Close Error");
+
+    const { rerender } = renderHook((s) => useVoiceVisualizer(s), {
+      initialProps: stream as MediaStream | null,
+    });
+
+    // Update to null should try to close and catch error
+    rerender(null);
+
+    expect(mockClose).toHaveBeenCalled();
+    // Should not throw
   });
 
   it("should handle error during context close", async () => {

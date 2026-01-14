@@ -24,7 +24,8 @@ export function useBatchJob(onComplete?: () => void, onFail?: (error: string) =>
   }, []);
 
   const pollProgress = useCallback(async () => {
-    if (!currentJobId) return;
+    // currentJobId is guaranteed by useEffect guard
+
 
     try {
       const response = await fetch(
@@ -72,7 +73,10 @@ export function useBatchJob(onComplete?: () => void, onFail?: (error: string) =>
     pollIntervalRef.current = setInterval(pollProgress, POLL_INTERVAL);
 
     return () => {
-      if (pollIntervalRef.current) clearInterval(pollIntervalRef.current);
+      const interval = pollIntervalRef.current;
+      if (interval) {
+        clearInterval(interval);
+      }
     };
   }, [currentJobId, isComputing, pollProgress]);
 

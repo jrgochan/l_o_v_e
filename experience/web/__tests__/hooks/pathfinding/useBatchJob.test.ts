@@ -160,4 +160,59 @@ describe("useBatchJob", () => {
     // but unmount triggering the effect cleanup is standard React behavior we rely on.
     // Coverage report will confirm line execution.
   });
+  it("should cleanup safely when unmounted without active job", () => {
+    const { unmount } = renderHook(() => useBatchJob(mockOnComplete, mockOnFail));
+    unmount();
+    // Implicitly asserts no error thrown and covers the 'else' path where interval is null
+  });
+
+  it("should handle cleanup when interval ref is null", () => {
+    const { unmount } = renderHook(() => useBatchJob());
+    // Immediately unmount without starting anything
+    unmount();
+    // Should not crash and implicitly hits the else branch of the cleanup check
+  });
+  it("should handle missing callbacks", async () => {
+    // Render without callbacks
+    const { result } = renderHook(() => useBatchJob());
+
+    (global.fetch as any).mockResolvedValue({
+      ok: true,
+      json: async () => ({
+        status: "completed",
+        completed_paths: 100,
+        total_paths: 100,
+        percentage: 100,
+      }),
+    });
+
+    act(() => {
+      result.current.startJob("job-no-cb", 100);
+    });
+
+    await act(async () => {
+      jest.advanceTimersByTime(2000);
+    });
+
+    expect(result.current.isComputing).toBe(false);
+
+    // Test failure without callback
+    act(() => {
+      result.current.startJob("job-fail-no-cb", 100);
+    });
+
+    (global.fetch as any).mockResolvedValue({
+      ok: true,
+      json: async () => ({
+        status: "failed",
+        error_message: "Error",
+      }),
+    });
+
+    await act(async () => {
+      jest.advanceTimersByTime(2000);
+    });
+
+    expect(result.current.isComputing).toBe(false);
+  });
 });

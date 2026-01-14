@@ -75,6 +75,36 @@ describe("useMatrixProcessing", () => {
     expect(stats).not.toBeNull();
     expect(stats?.avgDistance).toBe(1.5);
     expect(stats?.difficulty).toBe("moderate");
+
+    // Test Easy (< 1.0)
+    // Awe(Calm) -> Calmness(Calm) is same category, skipped by logic usually, 
+    // but logic says if fromCategory == toCategory return null.
+    // So we need DIFFERENT category with short path.
+    // Mock paths has 1-3 (Awe -> Calmness). But they are same category in mockEmotions.
+    // Let's create a new mock data specifically for this test scope or expand mockEmotions?
+    // We can just rely on the fact that existing logic uses the passed props.
+  });
+
+  it("should classify easy and difficult category averages", () => {
+    const emotions = [
+      { id: "e1", name: "E1", category: "C1" },
+      { id: "e2", name: "E2", category: "C2" },
+      { id: "e3", name: "E3", category: "C3" },
+    ] as any[];
+
+    const paths = new Map();
+    paths.set("e1-e2", { total_distance: 0.5 }); // Easy
+    paths.set("e1-e3", { total_distance: 2.5 }); // Difficult
+
+    const { result } = renderHook(() =>
+      useMatrixProcessing({ allEmotions: emotions, computedPaths: paths })
+    );
+
+    const easyStats = result.current.getCategoryAverageDifficulty("C1", "C2");
+    expect(easyStats?.difficulty).toBe("easy");
+
+    const diffStats = result.current.getCategoryAverageDifficulty("C1", "C3");
+    expect(diffStats?.difficulty).toBe("difficult");
   });
 
   it("should return null stats for same category", () => {

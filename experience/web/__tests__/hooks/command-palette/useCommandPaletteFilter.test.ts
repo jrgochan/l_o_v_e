@@ -260,7 +260,61 @@ describe("useCommandPaletteFilter", () => {
         selectedEmotionIds: new Set(),
       })
     );
-    // Sadness (-1), Anger (-1)
     expect(result.current.filteredEmotions).toHaveLength(2);
+  });
+
+  it("should filter recent emotions excluding invalid IDs", () => {
+    const { result } = renderHook(() =>
+      useCommandPaletteFilter({
+        search: "",
+        selectedCategory: null,
+        favoriteEmotions: [],
+        recentEmotions: ["1", "invalid-id"], // "1" is Joy, "invalid-id" doesn't exist
+        selectedEmotionIds: new Set(),
+      })
+    );
+
+    expect(result.current.recentEmotionsList).toHaveLength(1);
+    expect(result.current.recentEmotionsList[0].name).toBe("Joy");
+  });
+
+  it("should handle unknown emotion for similarity search (~Unknown)", () => {
+    const { result } = renderHook(() =>
+      useCommandPaletteFilter({
+        search: "~Unknown",
+        selectedCategory: null,
+        favoriteEmotions: [],
+        recentEmotions: [],
+        selectedEmotionIds: new Set(),
+      })
+    );
+    expect(result.current.filteredEmotions).toEqual([]);
+  });
+
+  it("should handle unknown emotion for opposite search (!Unknown)", () => {
+    const { result } = renderHook(() =>
+      useCommandPaletteFilter({
+        search: "!Unknown",
+        selectedCategory: null,
+        favoriteEmotions: [],
+        recentEmotions: [],
+        selectedEmotionIds: new Set(),
+      })
+    );
+    expect(result.current.filteredEmotions).toEqual([]);
+  });
+
+  it("should handle partial to query", () => {
+    const { result } = renderHook(() =>
+      useCommandPaletteFilter({
+        search: "Joy to ",
+        selectedCategory: null,
+        favoriteEmotions: [],
+        recentEmotions: [],
+        selectedEmotionIds: new Set(),
+      })
+    );
+    // Should filter paths but maybe return empty if not enough context
+    expect(result.current.filteredPaths).toEqual([]);
   });
 });

@@ -37,6 +37,52 @@ describe("useAnimationModeTransition", () => {
     expect(result.current.fromMode).toBe("flow");
     expect(result.current.toMode).toBe("network");
     expect(result.current.progress).toBe(0);
+    expect(result.current.progress).toBe(0);
+  });
+
+  it("should use default duration of 1500ms", () => {
+    const { result, rerender } = renderHook(({ mode }) => useAnimationModeTransition(mode as any), {
+      initialProps: { mode: "flow" },
+    });
+
+    rerender({ mode: "network" });
+
+    // Advance 750ms (half of 1500)
+    act(() => {
+      jest.advanceTimersByTime(750);
+    });
+
+    expect(result.current.isTransitioning).toBe(true);
+    expect(result.current.progress).toBeGreaterThan(0.1);
+    expect(result.current.progress).toBeLessThan(0.9);
+
+    // Advance remaining 750ms
+    act(() => {
+      jest.advanceTimersByTime(850); // +100 buffer
+    });
+
+    expect(result.current.isTransitioning).toBe(false);
+    expect(result.current.progress).toBe(1);
+  });
+
+  it("should accept explicit undefined duration and use default", () => {
+    const { result, rerender } = renderHook(
+      ({ mode, duration }) => useAnimationModeTransition(mode as any, duration),
+      {
+        initialProps: { mode: "flow", duration: undefined as number | undefined },
+      }
+    );
+
+    rerender({ mode: "network", duration: undefined });
+
+    // Should use default 1500ms. Halfway at 750ms.
+    act(() => {
+      jest.advanceTimersByTime(750);
+    });
+
+    expect(result.current.isTransitioning).toBe(true);
+    expect(result.current.progress).toBeGreaterThan(0.1);
+    expect(result.current.progress).toBeLessThan(0.9);
   });
 
   it("should progress through transition over time", () => {

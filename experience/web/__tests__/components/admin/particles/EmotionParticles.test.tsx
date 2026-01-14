@@ -64,6 +64,8 @@ describe("EmotionParticles", () => {
     maxDistance: 2,
     opacity: 1,
     enableAuras: true,
+    enableTrails: false,
+    enableBursts: false,
   };
 
   const defaultProps = {
