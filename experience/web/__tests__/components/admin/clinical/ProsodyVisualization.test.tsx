@@ -83,7 +83,27 @@ describe("ProsodyVisualization", () => {
     });
 
     expect(screen.getByText(/🎙️ Real Audio/)).toBeInTheDocument();
+    expect(screen.getByText(/🎙️ Real Audio/)).toBeInTheDocument();
     expect(mockDecodeAudioData).toHaveBeenCalled();
+  });
+
+  it("uses webkitAudioContext fallback", async () => {
+    // Remove standard AudioContext
+    const originalAudioContext = window.AudioContext;
+    (window as any).AudioContext = undefined;
+
+    const mockBlob = new Blob(["data"], { type: "audio/wav" });
+    mockBlob.arrayBuffer = jest.fn().mockResolvedValue(new ArrayBuffer(8));
+    mockDecodeAudioData.mockResolvedValue({ getChannelData: () => new Float32Array(100) });
+
+    render(<ProsodyVisualization prosody={mockProsody} audioBlob={mockBlob} />);
+
+    await waitFor(() => {
+      expect(screen.queryByText("Processing audio...")).not.toBeInTheDocument();
+    });
+
+    // Restore
+    window.AudioContext = originalAudioContext;
   });
 
   it("renders buckets correctly (Low/Med/High)", () => {

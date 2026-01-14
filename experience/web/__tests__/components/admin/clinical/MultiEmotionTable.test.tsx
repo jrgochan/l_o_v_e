@@ -104,6 +104,11 @@ describe("MultiEmotionTable", () => {
     await user.click(screen.getByText("Confidence"));
     const rowsDesc = screen.getAllByRole("row");
     expect(within(rowsDesc[1]).getAllByText("Joy")[0]).toBeInTheDocument();
+
+    // Toggle back to Ascending
+    await user.click(screen.getByText("Confidence"));
+    const rowsAscAgian = screen.getAllByRole("row");
+    expect(within(rowsAscAgian[1]).getAllByText("Sadness")[0]).toBeInTheDocument();
   });
 
   it("sorts by VAC columns", async () => {
@@ -114,13 +119,16 @@ describe("MultiEmotionTable", () => {
     // e3: -0.7 (Sadness)
     // e2: -0.4 (Anxiety)
     // e1: 0.8 (Joy)
-    await user.click(screen.getByText("VAC Coordinates")); // This header doesn't have onClick!
-    // Wait, let's check the code.
-    // Line 282: <th ...> VAC Coordinates </th> - NO onClick!
-    // So VAC columns are NOT sortable via the header click??
-    // Line 28. SortKey includes 'valence' | 'arousal' | 'connection'.
-    // But the UI (render) doesn't seem to expose sorting by them individually or as a group.
-    // The columns are merged into "VAC Coordinates".
+    await user.click(screen.getByText("VAC Coordinates"));
+
+    // Verify sort order
+    const rows = screen.getAllByRole("row");
+    // Row 1 should be Sadness (-0.7)
+    expect(within(rows[1]).getAllByText("Sadness")[0]).toBeInTheDocument();
+    // Row 2 should be Anxiety (-0.4)
+    expect(within(rows[2]).getAllByText("Anxiety")[0]).toBeInTheDocument();
+    // Row 3 should be Joy (0.8)
+    expect(within(rows[3]).getAllByText("Joy")[0]).toBeInTheDocument();
   });
 
   it("exports CSV", async () => {
@@ -182,6 +190,15 @@ describe("MultiEmotionTable", () => {
     const rows = screen.getAllByRole("row");
     expect(within(rows[1]).getAllByText("Anxiety")[0]).toBeInTheDocument();
     expect(within(rows[2]).getAllByText("Joy")[0]).toBeInTheDocument();
+
+    // Toggle Descending
+    await user.click(screen.getByText("Emotion"));
+    const rowsDesc = screen.getAllByRole("row");
+    expect(within(rowsDesc[1]).getAllByText("Sadness")[0]).toBeInTheDocument();
+    // Toggle Descending
+    await user.click(screen.getByText("Emotion"));
+    const rowsDescAgain = screen.getAllByRole("row");
+    expect(within(rowsDescAgain[1]).getAllByText("Anxiety")[0]).toBeInTheDocument();
   });
 
   it("handles prominence sort toggle", async () => {
@@ -314,5 +331,43 @@ describe("MultiEmotionTable", () => {
     expect(rows.length).toBe(2); // 1 header + 1 data
     expect(within(rows[1]).getByText("Joy")).toBeInTheDocument();
     expect(screen.queryByText("Anxiety")).not.toBeInTheDocument(); // Secondary
+  });
+
+  it("handles null voice_alignment", async () => {
+    // Need 2 items to trigger sort comparator
+    const nullVoiceEmotion = {
+      ...mockEmotions[0],
+      id: "e_null",
+      voice_alignment: null as any
+    };
+    const normalEmotion = { ...mockEmotions[1], id: "e_normal" };
+
+    const user = userEvent.setup();
+    render(<MultiEmotionTable emotions={[nullVoiceEmotion, normalEmotion]} />);
+
+    // Default sort is prominence. Switch to Voice Match.
+    await user.click(screen.getByText("Voice Match"));
+
+    // Sort logic: `a.voice_alignment ?? -1`.
+    // Comparator runs. Coverage for `??` should be hit.
+  });
+
+  it("handles mixed types in sort comparison", async () => {
+    // Line 94: if (typeof aValue === "number" && typeof bValue === "number")
+    // Use mixed types for 'confidence' (string vs number)
+    const mixedTypeEmotions = [
+      { ...mockEmotions[0], id: "m1", confidence: 0.5 },
+      { ...mockEmotions[1], id: "m2", confidence: "0.9" as any } // String confidence
+    ];
+
+    const user = userEvent.setup();
+    render(<MultiEmotionTable emotions={mixedTypeEmotions} />);
+
+    // Default sort is prominence (both numbers).
+    // MUST switch to Confidence to trigger mixed type comparison
+    await user.click(screen.getByText("Confidence"));
+
+    // Comparator runs with mixed types.
+    // Line 94 (number && number) should be false for the mixed pair.
   });
 });

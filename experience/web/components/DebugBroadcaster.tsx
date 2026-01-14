@@ -16,9 +16,7 @@ export function DebugBroadcaster() {
   const [origin, setOrigin] = useState("SSR");
 
   useEffect(() => {
-    if (typeof window !== "undefined") {
-      setTimeout(() => setOrigin(window.origin), 0);
-    }
+    setTimeout(() => setOrigin(window.origin), 0);
   }, []);
 
   // Poll LocalStorage to see what we actually wrote

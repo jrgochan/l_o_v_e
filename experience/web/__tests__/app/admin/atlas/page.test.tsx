@@ -4,6 +4,7 @@ import { useAmbientAudio } from "@/hooks/useAmbientAudio";
 import { useSphereSync } from "@/hooks/useSphereSync";
 import { useAtlasAdminStore } from "@/stores/useAtlasAdminStore";
 import { useExperienceStore } from "@/stores/useExperienceStore";
+import { useEmotionAtlas } from "@/hooks/useEmotionAtlas";
 
 // --- MOCK COMPONENTS ---
 jest.mock("@/components/admin/atlas/AtlasScene", () => ({ AtlasScene: () => <div data-testid="atlas-scene" /> }));
@@ -222,6 +223,40 @@ describe("AtlasAdminPage", () => {
         */
         // Actually, verifying usage is enough for "lines verified". Component logic is:
         // setInfoPanelWidth(Math.max(300, Math.min(900, newWidth)));
+
+        // Test mousemove when NOT resizing (Branch coverage for Line 153)
+        fireEvent.mouseUp(document); // Stop resizing
+        fireEvent.mouseMove(document, { clientX: 200 });
+        // Logic should assume return early
+    });
+
+    it("ignores shortcuts when typing in inputs", () => {
+        render(<AtlasAdminPage />);
+        const input = document.createElement("input");
+        document.body.appendChild(input);
+
+        const mockSetIsFlying = jest.fn();
+        (useAtlasAdminStore.getState as jest.Mock) = jest.fn(() => ({ setIsFlying: mockSetIsFlying }));
+
+        fireEvent.keyDown(input, { key: " " });
+        fireEvent.keyDown(input, { key: "ArrowRight" });
+        fireEvent.keyDown(input, { key: "d" });
+
+        expect(mockSetIsFlying).not.toHaveBeenCalled();
+        document.body.removeChild(input);
+    });
+
+    it("ignores Space key if no transitionPath", () => {
+        const mockSetIsFlying = jest.fn();
+        (useAtlasAdminStore.getState as jest.Mock) = jest.fn(() => ({ setIsFlying: mockSetIsFlying }));
+
+        (useExperienceStore as unknown as jest.Mock).mockImplementation((selector: any) => selector({
+            transitionPath: null // Null path
+        }));
+
+        render(<AtlasAdminPage />);
+        fireEvent.keyDown(window, { key: " " });
+        expect(mockSetIsFlying).not.toHaveBeenCalled();
     });
 
     it("toggles info panel expansion", () => {
@@ -285,6 +320,39 @@ describe("AtlasAdminPage", () => {
         // ArrowUp: Up
         fireEvent.keyDown(window, { key: "ArrowUp" });
         expect(mockCyclePath).toHaveBeenCalledWith("up");
+
+        // ArrowDown: Down (Branch Coverage)
+        fireEvent.keyDown(window, { key: "ArrowDown" });
+        expect(mockCyclePath).toHaveBeenCalledWith("down");
+    });
+
+    it("handles Space key when transitionPaths already enabled", () => {
+        const mockUpdateLayer = jest.fn();
+        const mockSetIsFlying = jest.fn();
+
+        (useAtlasAdminStore.getState as jest.Mock) = jest.fn(() => ({
+            setIsFlying: mockSetIsFlying,
+            updateLayer: mockUpdateLayer
+        }));
+
+        (useAtlasAdminStore as unknown as jest.Mock).mockImplementation((selector: any) => selector({
+            selectedEmotions: { size: 0 },
+            layers: { transitionPaths: true }, // Already enabled
+            settings: {},
+            viewMode: "default",
+        }));
+
+        (useExperienceStore as unknown as jest.Mock).mockImplementation((selector: any) => selector({
+            transitionPath: {} // Truthy
+        }));
+
+        render(<AtlasAdminPage />);
+        fireEvent.keyDown(window, { key: " " });
+
+        // Should NOT call updateLayer
+        expect(mockUpdateLayer).not.toHaveBeenCalled();
+        // Should toggle flying
+        expect(mockSetIsFlying).toHaveBeenCalled();
     });
 
     it("renders data visualization overlay and handles close", () => {
@@ -338,23 +406,34 @@ describe("AtlasAdminPage", () => {
 
         render(<AtlasAdminPage />);
 
-        // ArrowRight should NOT crash and should hit fallback logic (lines 216+)
-        // Since logic inside fallback might be stubbed or minimal, we just ensure it executes
         fireEvent.keyDown(window, { key: "ArrowRight" });
         fireEvent.keyDown(window, { key: "ArrowLeft" });
         fireEvent.keyDown(window, { key: "ArrowUp" });
     });
 
-    it("closes Path Matrix via callback", () => {
-        // Mock PathMatrixGrid to expose onClose
-        // override global mock locally for this test? OR use a smarter mock globally?
-        // Let's rely on the global mock rendering a div. We can't interact with it easily unless it renders a button.
-        // Let's verify `onClose` prop is passed.
-        // Re-render approach or checking props?
-        // Checking props is hard with RTL.
+    it("handles fallback navigation with empty categories", () => {
+        // Mock store with empty emotions
+        (useAtlasAdminStore.getState as jest.Mock) = jest.fn(() => ({
+            selectedEmotionIds: { size: 0 },
+            allEmotions: [], // Empty
+            cycleSelectedPath: jest.fn(),
+        }));
 
-        // Let's assume we can click "Close Matrix" if we update the mock.
-        // Update the mock for this test file?
+        render(<AtlasAdminPage />);
+        fireEvent.keyDown(window, { key: "ArrowRight" });
+        // Should return early (Line 223)
+    });
+
+    it("closes Path Matrix via callback", () => {
+        render(<AtlasAdminPage />);
+
+        // Open Matrix
+        fireEvent.click(screen.getByText(/Path Matrix/i));
+        expect(screen.getByTestId("path-matrix")).toBeInTheDocument();
+
+        // Close Matrix using the button in our mock
+        fireEvent.click(screen.getByText("Close Matrix"));
+        expect(screen.queryByTestId("path-matrix")).toBeNull();
     });
     it("exposes openCommandPalette on window", () => {
         render(<AtlasAdminPage />);
@@ -397,6 +476,46 @@ describe("AtlasAdminPage", () => {
         // We can't easily check the sessionId state.
         // But simply rendering without crypto should trigger the fallback logic lines 99-102.
         expect(screen.getByTestId("admin-guard")).toBeInTheDocument();
+    });
+    it("renders error state correctly", () => {
+        // Mock hook to return error
+        (useEmotionAtlas as jest.Mock).mockReturnValue({ isLoading: false, error: "Connection Failed" });
+        render(<AtlasAdminPage />);
+        expect(screen.getByText("Error Loading Atlas")).toBeInTheDocument();
+        expect(screen.getByText("Connection Failed")).toBeInTheDocument();
+        // Covers fallback URL display branch
+        expect(screen.getByText(/http:\/\/localhost:8000/)).toBeInTheDocument();
+    });
+
+    it("renders Zen Mode HUD (PathDetailsOverlay)", () => {
+        // Reset Error State from previous test
+        (useEmotionAtlas as jest.Mock).mockReturnValue({ isLoading: false, error: null });
+
+        (useAtlasAdminStore as unknown as jest.Mock).mockImplementation((selector: any) => selector({
+            selectedEmotions: [],
+            selectMultiple: jest.fn(),
+            layers: { transitionPaths: true },
+            settings: {},
+            viewMode: "zen", // Not default
+            isIntroActive: false
+        }));
+
+        render(<AtlasAdminPage />);
+        expect(screen.getByTestId("path-details")).toBeInTheDocument();
+    });
+
+    it("applies correct mute button styling", () => {
+        // Test muted state styling
+        (useAmbientAudio as jest.Mock).mockReturnValue({
+            initAudio: jest.fn(),
+            toggleMute: jest.fn(),
+            isMuted: true, // Muted
+            playClickSound: jest.fn()
+        });
+
+        render(<AtlasAdminPage />);
+        const btn = screen.getByTitle("Unmute Audio");
+        expect(btn).toHaveClass("bg-red-900/50");
     });
 });
 

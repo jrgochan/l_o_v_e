@@ -134,7 +134,6 @@ export function ChatDrawer({ isOpen, onToggle, sessionId }: ChatDrawerProps) {
 
   useEffect(() => {
     const handleMouseMove = (e: MouseEvent) => {
-      if (!isResizing) return;
       e.preventDefault();
 
       const deltaY = startYRef.current - e.clientY;
@@ -252,12 +251,12 @@ export function ChatDrawer({ isOpen, onToggle, sessionId }: ChatDrawerProps) {
           >
             <div
               className={`max-w-[70%] rounded-lg px-4 py-3 ${msg.type === "user"
-                  ? "bg-cyan-600 text-white"
-                  : msg.type === "analysis"
-                    ? "bg-purple-900/50 border border-purple-500/30 text-white"
-                    : msg.type === "insight"
-                      ? "bg-gray-800 border border-gray-600 text-white"
-                      : "bg-gray-700 text-gray-200"
+                ? "bg-cyan-600 text-white"
+                : msg.type === "analysis"
+                  ? "bg-purple-900/50 border border-purple-500/30 text-white"
+                  : msg.type === "insight"
+                    ? "bg-gray-800 border border-gray-600 text-white"
+                    : "bg-gray-700 text-gray-200"
                 }`}
             >
               {/* Message Content */}

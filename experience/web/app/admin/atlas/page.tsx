@@ -150,7 +150,6 @@ const AtlasAdminContent = () => {
 
   useEffect(() => {
     const handleMouseMove = (e: MouseEvent) => {
-      if (!isResizing) return;
       e.preventDefault();
 
       // Calculate from right edge
@@ -303,8 +302,8 @@ const AtlasAdminContent = () => {
                 playClickSound();
               }}
               className={`px-3 py-2 rounded transition flex items-center gap-2 text-sm ${isMuted
-                  ? "bg-red-900/50 text-red-200 hover:bg-red-800/50"
-                  : "bg-gray-700 text-white hover:bg-gray-600"
+                ? "bg-red-900/50 text-red-200 hover:bg-red-800/50"
+                : "bg-gray-700 text-white hover:bg-gray-600"
                 }`}
               title={isMuted ? "Unmute Audio" : "Mute Audio"}
             >

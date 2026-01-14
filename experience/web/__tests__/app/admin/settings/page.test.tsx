@@ -198,4 +198,76 @@ describe("SettingsPage", () => {
 
         expect(screen.getByText("Failed to export settings")).toBeInTheDocument();
     });
+
+    it("handles copy failure", async () => {
+        const originalClipboard = navigator.clipboard;
+        // Mock clipboard writeText to reject
+        Object.assign(navigator, {
+            clipboard: {
+                writeText: jest.fn().mockRejectedValue(new Error("Copy failed")),
+            },
+        });
+
+        render(<SettingsPage />);
+        fireEvent.click(screen.getByRole("button", { name: /Copy/i }));
+
+        await waitFor(() => {
+            expect(screen.getByText("Failed to copy to clipboard")).toBeInTheDocument();
+        });
+
+        // Restore clipboard
+        Object.assign(navigator, { clipboard: originalClipboard });
+    });
+
+    it("handles preset load failure", () => {
+        // Mock import to fail
+        mockImportSettings.mockReturnValue(false);
+
+        render(<SettingsPage />);
+        fireEvent.click(screen.getByRole("button", { name: /Presets/i }));
+
+        const presetBtn = screen.getByText("Performance Mode");
+        fireEvent.click(presetBtn);
+
+        expect(mockImportSettings).toHaveBeenCalled();
+        expect(screen.getByText("Failed to load preset")).toBeInTheDocument();
+    });
+
+    it("handles modal cancellations", () => {
+        render(<SettingsPage />);
+
+        // 1. Reset Modal Cancel
+        fireEvent.click(screen.getByText("🔄 Reset"));
+        expect(screen.getByText("Reset to Defaults?")).toBeInTheDocument();
+
+        // Click Cancel button in Reset Modal (usually "Cancel" or "No")
+        // Based on typical modal implementation, let's find by text "Cancel"
+        const cancelReset = screen.getByText("Cancel");
+        fireEvent.click(cancelReset);
+
+        expect(screen.queryByText("Reset to Defaults?")).not.toBeInTheDocument();
+
+        // 2. Presets Modal Close
+        fireEvent.click(screen.getByRole("button", { name: /Presets/i }));
+        expect(screen.getByText("Load Settings Preset")).toBeInTheDocument();
+
+        // Click Close/Cancel in Presets Modal
+        // Assuming there is a close button or "Cancel"
+        // Let's check for "Cancel" first, invalidating if not found
+        // If it's a dialog component, it might have a close icon btn or "Close" text
+        // Viewing `SettingsPage.tsx` lines would verify, but let's assume standard UI
+        // or look for aria-label "Close string" or similar if standard Modal component
+        // Typically custom Modals have a Close button.
+        // Let's try locating by "Close" or "Cancel"
+
+        // If lines 243 is `onClose={() => setPresetModalOpen(false)}`, it might be the Modal backdrop or a close button.
+        // Let's assume there is a Close button with text "Close" or Title "Close".
+        // Or "Cancel".
+
+        // The Presets modal uses a "✕" button in the header
+        const closePresets = screen.getByText("✕");
+        fireEvent.click(closePresets);
+
+        expect(screen.queryByText("Load Settings Preset")).not.toBeInTheDocument();
+    });
 });

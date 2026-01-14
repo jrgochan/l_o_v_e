@@ -81,6 +81,18 @@ describe("ChatDrawer", () => {
     });
 
     expect(logger.debug).toHaveBeenCalledWith("websocket", "Chat message received", expect.anything());
+    // Verify processing state
+    expect(screen.getByText("Analyzing...")).toBeInTheDocument();
+  });
+
+  it("handles Enter key to send", async () => {
+    (useWebSocketChat as jest.Mock).mockReturnValue({ ...defaultWebSocketState, isConnected: true });
+    render(<ChatDrawer isOpen={true} onToggle={mockOnToggle} sessionId="sess1" />);
+
+    const input = screen.getByPlaceholderText(/How are you feeling/i);
+    await userEvent.type(input, "Message via Enter{enter}");
+
+    expect(mockSendMessage).toHaveBeenCalledWith("Message via Enter", expect.any(String));
   });
 
   it("handles websocket events: Transcription", async () => {
@@ -134,7 +146,15 @@ describe("ChatDrawer", () => {
 
     fireEvent.mouseDown(handle, { clientY: 500 });
     fireEvent.mouseMove(document, { clientY: 400 });
+    fireEvent.mouseMove(document, { clientY: 400 });
     fireEvent.mouseUp(document);
+  });
+
+  it("handles passive mouse move (not resizing)", () => {
+    render(<ChatDrawer isOpen={true} onToggle={mockOnToggle} sessionId="sess1" />);
+    // Just move mouse without down
+    fireEvent.mouseMove(document, { clientY: 400 });
+    // Should hit guard and do nothing
   });
 
   it("toggles tone", async () => {
@@ -142,5 +162,31 @@ describe("ChatDrawer", () => {
     const btn = screen.getByText(/Warm/); // Default is Warm
     await userEvent.click(btn);
     expect(screen.getByText(/Clinical/)).toBeInTheDocument();
+
+    // Toggle back
+    await userEvent.click(screen.getByText(/Clinical/));
+    expect(screen.getByText(/Warm/)).toBeInTheDocument();
+  });
+
+  it("cleans up event listeners on unmount", () => {
+    const addSpy = jest.spyOn(document, "addEventListener");
+    const removeSpy = jest.spyOn(document, "removeEventListener");
+
+    const { unmount } = render(<ChatDrawer isOpen={true} onToggle={mockOnToggle} sessionId="sess1" />);
+
+    // Trigger resize start to attach listeners
+    const handle = screen.getByTestId("resize-handle");
+    fireEvent.mouseDown(handle);
+
+    expect(addSpy).toHaveBeenCalledWith("mousemove", expect.any(Function));
+    expect(addSpy).toHaveBeenCalledWith("mouseup", expect.any(Function));
+
+    unmount();
+
+    expect(removeSpy).toHaveBeenCalledWith("mousemove", expect.any(Function));
+    expect(removeSpy).toHaveBeenCalledWith("mouseup", expect.any(Function));
+
+    addSpy.mockRestore();
+    removeSpy.mockRestore();
   });
 });

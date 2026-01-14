@@ -144,6 +144,13 @@ describe("ClinicalAlertsTab", () => {
     // Test Space key
     fireEvent.keyDown(item, { key: " " });
     expect(screen.getByText("Alert Details")).toBeInTheDocument();
+
+    // Reset
+    fireEvent.click(screen.getByLabelText("Close Details"));
+
+    // Test other key (should not open)
+    fireEvent.keyDown(item, { key: "a" });
+    expect(screen.queryByText("Alert Details")).not.toBeInTheDocument();
   });
 
   it("handles refresh", async () => {

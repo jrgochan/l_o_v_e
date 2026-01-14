@@ -307,6 +307,10 @@ describe("EmotionsTab", () => {
     await waitFor(() => {
       expect(screen.getByText("Import crashed")).toBeInTheDocument();
     });
+
+    // Verify input cleared even on error
+    const inputClean = container.querySelector('input[type="file"]') as HTMLInputElement;
+    expect(inputClean.value).toBe("");
   });
 
   it("handles empty file selection", async () => {

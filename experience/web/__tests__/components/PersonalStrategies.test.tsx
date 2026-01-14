@@ -44,7 +44,7 @@ describe("PersonalStrategies", () => {
   };
 
   it("renders loading state", () => {
-    mockGetUserEffectiveStrategies.mockReturnValue(new Promise(() => {}));
+    mockGetUserEffectiveStrategies.mockReturnValue(new Promise(() => { }));
     render(<PersonalStrategies userId={mockUserId} />);
     expect(screen.getByText("Loading your effective strategies...")).toBeInTheDocument();
   });
@@ -93,6 +93,17 @@ describe("PersonalStrategies", () => {
 
     await waitFor(() => {
       expect(screen.getByText("Could not load your strategy history")).toBeInTheDocument();
+    });
+  });
+
+  it("handles missing strategies property (defaults to empty)", async () => {
+    // @ts-ignore
+    mockGetUserEffectiveStrategies.mockResolvedValue({});
+    render(<PersonalStrategies userId={mockUserId} />);
+
+    await waitFor(() => {
+      // Should show empty state
+      expect(screen.getByText("Your Effective Strategies")).toBeInTheDocument();
     });
   });
 });

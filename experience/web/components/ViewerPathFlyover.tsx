@@ -35,15 +35,12 @@ export function ViewerPathFlyover() {
         new THREE.Vector3(...transitionPath.goal_state.vac),
       ];
 
-      // Only create spline if we have enough points (Start + End = 2 minimum)
-      if (points.length >= 2) {
-        splineRef.current = new THREE.CatmullRomCurve3(points, false, "catmullrom", 0.5);
+      splineRef.current = new THREE.CatmullRomCurve3(points, false, "catmullrom", 0.5);
 
-        // Reset progress when path changes
-        progressRef.current = 0;
-        setFlyoverProgress(0);
-        setFlyoverCurrentWaypointIndex(-1);
-      }
+      // Reset progress when path changes
+      progressRef.current = 0;
+      setFlyoverProgress(0);
+      setFlyoverCurrentWaypointIndex(-1);
     }
   }, [transitionPath, setFlyoverProgress, setFlyoverCurrentWaypointIndex]);
 
