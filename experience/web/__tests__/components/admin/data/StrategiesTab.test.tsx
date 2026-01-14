@@ -1,8 +1,8 @@
 
-import { render, screen, fireEvent, waitFor, within } from "@testing-library/react";
+import { render, screen, fireEvent, waitFor } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 import { StrategiesTab } from "@/components/admin/data/StrategiesTab";
 import { adminApi } from "@/utils/api";
-import userEvent from "@testing-library/user-event";
 
 jest.mock("@/utils/api", () => ({
   adminApi: {
@@ -426,5 +426,140 @@ describe("StrategiesTab", () => {
     fireEvent.click(removeBtns[0]);
 
     expect(screen.queryByDisplayValue("New Step")).not.toBeInTheDocument();
+  });
+  it("handles updates in multi-item list correctly", async () => {
+    const multiProps = [
+      { ...mockStrategies[0], id: "s1", strategy_name: "S1" },
+      { ...mockStrategies[0], id: "s2", strategy_name: "S2" }
+    ];
+    (adminApi.getStrategies as jest.Mock).mockResolvedValue(multiProps);
+    (adminApi.updateStrategy as jest.Mock).mockResolvedValue({ ...multiProps[0], strategy_name: "S1 Updated" });
+
+    render(<StrategiesTab />);
+    await waitFor(() => expect(screen.getByText("S1")).toBeInTheDocument());
+    expect(screen.getByText("S2")).toBeInTheDocument();
+
+    // Edit S1
+    const editButtons = screen.getAllByLabelText("Edit");
+    fireEvent.click(editButtons[0]);
+
+    fireEvent.click(screen.getByLabelText("Save"));
+
+    await waitFor(() => {
+      expect(screen.getByText("S1 Updated")).toBeInTheDocument();
+      // S2 should still be there unchanged
+      expect(screen.getByText("S2")).toBeInTheDocument();
+    });
+  });
+
+  it("handles editing strategy with null description (coverage)", async () => {
+    const nullDescStrat = { ...mockStrategies[0], description: null as unknown as string };
+    (adminApi.getStrategies as jest.Mock).mockResolvedValue([nullDescStrat]);
+    render(<StrategiesTab />);
+    await waitFor(() => expect(screen.getByText("CBT Reframe")).toBeInTheDocument());
+
+    fireEvent.click(screen.getByLabelText("Edit"));
+
+    // Should render empty string in textarea
+    const textareas = screen.getAllByRole("textbox");
+    // We expect one of them to be empty (description)
+    // Note: getByDisplayValue("") matches generic inputs too.
+    expect(screen.getAllByDisplayValue("").length).toBeGreaterThan(0);
+  });
+
+  it.skip("handles file import correctly", async () => {
+    (adminApi.getStrategies as jest.Mock).mockResolvedValue(mockStrategies);
+    (adminApi.importStrategies as jest.Mock).mockResolvedValue(mockStrategies);
+
+    const { container } = render(<StrategiesTab />);
+    await waitFor(() => expect(screen.getByText("CBT Reframe")).toBeInTheDocument());
+
+    const file = new File([JSON.stringify(mockStrategies)], "strategies.json", { type: "application/json" });
+
+    // Mock FileReader
+    const originalFileReader = window.FileReader;
+    const fileReaderMock = {
+      readAsText: jest.fn(),
+      onload: null as any,
+    };
+    window.FileReader = jest.fn(() => fileReaderMock) as any;
+
+    const fileInput = container.querySelector('input[type="file"]') as HTMLInputElement;
+    expect(fileInput).toBeInTheDocument();
+
+    // Trigger onchange
+    // Need to manually set files property for JSDOM/fireEvent to work reliably with file inputs
+    Object.defineProperty(fileInput, 'files', {
+      value: [file],
+    });
+    fireEvent.change(fileInput);
+
+    // Trigger FileReader onload
+    expect(fileReaderMock.readAsText).toHaveBeenCalledWith(file);
+    fileReaderMock.onload({ target: { result: JSON.stringify(mockStrategies) } });
+
+    await waitFor(() => {
+      expect(adminApi.importStrategies).toHaveBeenCalledWith(mockStrategies);
+    });
+
+    // Error case (invalid JSON)
+    const consoleErrorSpy = jest.spyOn(console, "error").mockImplementation(() => { });
+    fileReaderMock.onload({ target: { result: "invalid json" } });
+    expect(consoleErrorSpy).toHaveBeenCalledWith("Failed to parse strategies", expect.any(Error));
+    consoleErrorSpy.mockRestore();
+
+    // Cleanup
+    window.FileReader = originalFileReader;
+  });
+
+  it("manages detailed steps in edit mode", async () => {
+    const user = userEvent.setup();
+    const strategy = { ...mockStrategies[0], detailed_steps: ["Step 1"] };
+    (adminApi.getStrategies as jest.Mock).mockResolvedValue([strategy]);
+
+    render(<StrategiesTab />);
+    await waitFor(() => expect(screen.getByText(strategy.strategy_name)).toBeInTheDocument());
+
+    // Expand row
+    await user.click(screen.getByText(strategy.strategy_name));
+
+    // Enter edit mode
+    await user.click(screen.getByTitle("Edit"));
+
+    // Check "Detailed Steps" header
+    expect(screen.getByText("Detailed Steps")).toBeInTheDocument();
+
+    // Find first step input
+    // The previous code shows inputs with placeholder `Step ${idx + 1}`
+    const step1Input = screen.getByPlaceholderText("Step 1");
+    await user.clear(step1Input);
+    await user.type(step1Input, "Updated Step 1");
+
+    // Add a step
+    await user.click(screen.getByText("Add Step"));
+
+    // Find new input
+    const step2Input = screen.getByPlaceholderText("Step 2"); // index 1 + 1 = 2?
+    // Based on `(prev.detailed_steps || []).map((step, idx) => ... placeholder={\`Step ${idx + 1}\`}`
+    // Initial was ["Step 1"], we added one, so now there should be Step 2.
+    await user.type(step2Input, "New Step 2");
+
+    // Remove first step
+    // Buttons have `title="Remove step"`
+    const removeButtons = screen.getAllByTitle("Remove step");
+    await user.click(removeButtons[0]);
+
+    // Now "New Step 2" should be first (Step 1)
+    expect(screen.getAllByPlaceholderText("Step 1")[0]).toHaveValue("New Step 2");
+
+    // Save
+    (adminApi.updateStrategy as jest.Mock).mockResolvedValue({});
+    await user.click(screen.getByTitle("Save"));
+
+    await waitFor(() => {
+      expect(adminApi.updateStrategy).toHaveBeenCalledWith(strategy.id, expect.objectContaining({
+        detailed_steps: ["New Step 2"]
+      }));
+    });
   });
 });

@@ -79,7 +79,7 @@ export function PromptTemplatesTab() {
         // Update
         const update: PromptTemplateUpdate = {
           template_content: currentPrompt.template_content,
-          input_variables: currentPrompt.input_variables,
+          input_variables: currentPrompt.input_variables || [],
           description: currentPrompt.description,
           is_active: currentPrompt.is_active,
         };
@@ -356,7 +356,7 @@ export function PromptTemplatesTab() {
                   {prompt.description || "No description"}
                 </p>
                 <div className="text-xs text-gray-600 font-mono">
-                  Variables: {prompt.input_variables.join(", ")}
+                  Variables: {(prompt.input_variables || []).join(", ")}
                 </div>
               </div>
               <div className="flex gap-2">

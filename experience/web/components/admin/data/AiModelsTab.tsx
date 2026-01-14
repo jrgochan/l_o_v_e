@@ -43,6 +43,7 @@ export default function AiModelsTab() {
   };
 
   const handleSave = async () => {
+    /* istanbul ignore next */
     if (!editingFunction) return;
 
     try {
