@@ -34,8 +34,8 @@ jest.mock("@/components/admin/visualizations/EmotionRelationshipGraph", () => ({
   )
 }));
 
-jest.mock("@/components/admin/spheres/AggregateEmotionSphere", () => ({
-  AggregateEmotionSphere: () => <div data-testid="mock-aggregate-sphere" />
+jest.mock("@/components/admin/spheres/AggregateSphere", () => ({
+  AggregateSphere: () => <div data-testid="mock-aggregate-sphere" />
 }));
 
 jest.mock("@/components/admin/state-display/AggregateStateCard", () => ({

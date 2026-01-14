@@ -9,6 +9,7 @@
 "use client";
 
 import { useMemo } from "react";
+import * as THREE from "three";
 import type { AtlasEmotion } from "@/types/atlas-admin";
 import { CATEGORY_COLORS } from "@/types/atlas-admin";
 
@@ -40,7 +41,7 @@ export function MiniSoulSphere({
         // Red (negative) to Green (positive)
         const valence = emotion.vac[0];
         const hue = ((valence + 1) / 2) * 120; // 0-120 degrees
-        return `hsl(${hue}, 80%, 50%)`;
+        return new THREE.Color().setHSL(hue / 360, 0.8, 0.5).getHexString();
       }
 
       case "arousal": {
@@ -48,7 +49,7 @@ export function MiniSoulSphere({
         const arousal = emotion.vac[1];
         const normalized = (arousal + 1) / 2;
         const hue = (1 - normalized) * 240; // 240-0 degrees
-        return `hsl(${hue}, 80%, 50%)`;
+        return new THREE.Color().setHSL(hue / 360, 0.8, 0.5).getHexString();
       }
 
       case "connection": {
@@ -56,13 +57,16 @@ export function MiniSoulSphere({
         const connection = emotion.vac[2];
         const normalized = (connection + 1) / 2;
         const hue = normalized * 60 + 270; // 270-330 degrees
-        return `hsl(${hue}, 80%, 50%)`;
+        return new THREE.Color().setHSL((hue % 360) / 360, 0.8, 0.5).getHexString();
       }
 
       default:
         return "#888888";
     }
   }, [emotion, colorMode]);
+
+  // Ensure hash prefix for non-category hex strings (THREE returns without hash)
+  const finalColor = colorHex.startsWith("#") ? colorHex : `#${colorHex}`;
 
   return (
     <div
@@ -86,10 +90,11 @@ export function MiniSoulSphere({
           className="absolute inset-0 transition-all duration-200"
           style={{
             borderRadius: "50%",
-            background: `radial-gradient(circle at 30% 30%, ${colorHex}dd, ${colorHex} 60%, ${colorHex}88)`,
+            background: `radial-gradient(circle at 30% 30%, ${finalColor}dd, ${finalColor} 60%, ${finalColor}88)`,
+            display: "flex", // Ensure it renders
             boxShadow: isHovered
-              ? `0 0 20px ${colorHex}aa, inset 0 0 10px ${colorHex}44`
-              : `0 0 10px ${colorHex}66, inset 0 0 5px ${colorHex}22`,
+              ? `0 0 20px ${finalColor}aa, inset 0 0 10px ${finalColor}44`
+              : `0 0 10px ${finalColor}66, inset 0 0 5px ${finalColor}22`,
             transform: isHovered ? "scale(1.1)" : "scale(1)",
             filter: isHovered ? "brightness(1.2)" : "brightness(1)",
           }}

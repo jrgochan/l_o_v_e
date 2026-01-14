@@ -16,7 +16,7 @@ import { useState } from "react";
 import { RelationshipList } from "../shared/RelationshipIndicator";
 import { AggregateStateCard } from "../state-display/AggregateStateCard";
 import { EmotionRelationshipGraph } from "../visualizations/EmotionRelationshipGraph";
-import { AggregateEmotionSphere } from "../spheres/AggregateEmotionSphere";
+import { AggregateSphere } from "../spheres/AggregateSphere";
 import { EmotionMappingBadge } from "./EmotionMappingBadge";
 import { useAtlasAdminStore } from "@/stores/useAtlasAdminStore";
 import type { DetectedEmotion, EmotionRelationship, AggregateState } from "@/types/chat";
@@ -219,7 +219,7 @@ export function MultiEmotionCard({
 
           {showSphere && (
             <div className="bg-gray-900 rounded-lg p-4 border border-purple-500/30 flex justify-center">
-              <AggregateEmotionSphere
+              <AggregateSphere
                 emotions={emotions}
                 aggregate={aggregate}
                 width={300}

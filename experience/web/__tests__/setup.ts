@@ -138,7 +138,11 @@ beforeAll(() => {
     // Allow through specific errors we want to see
     if (
       args[0]?.includes?.("Not implemented: HTMLFormElement.prototype.requestSubmit") ||
-      args[0]?.includes?.("Not implemented: HTMLCanvasElement.prototype.getContext")
+      args[0]?.includes?.("Not implemented: HTMLCanvasElement.prototype.getContext") ||
+      args[0]?.includes?.("The tag <") || // R3F/JSDOM unrecognized tag warning
+      args[0]?.includes?.("is using incorrect casing") || // R3F casing warning
+      args[0]?.includes?.("React does not recognize the") || // R3F prop warning generic
+      args[0]?.includes?.("for a non-boolean attribute") // R3F boolean prop warning generic
     ) {
       return;
     }

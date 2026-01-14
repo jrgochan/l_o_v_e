@@ -79,4 +79,19 @@ describe("EmotionDetails", () => {
     render(<EmotionDetails emotion={bridgeEmotion} animationMode="dynamic" />);
     expect(screen.getByText("★ Bridge")).toBeInTheDocument();
   });
+
+  it("renders hover state styles", () => {
+    render(<EmotionDetails emotion={mockEmotion} isHovered={true} animationMode="dynamic" />);
+    expect(screen.getByText("👁️ Hovering Over")).toBeInTheDocument();
+    // Check for the rendered pulse div
+    const pulseDiv = screen.getByText("👁️ Hovering Over").parentElement?.firstChild;
+    expect(pulseDiv).toHaveClass("animate-pulse");
+  });
+
+  it("uses fallback color for unknown category", () => {
+    const unknownCategoryEmotion = { ...mockEmotion, category: "unknown_category" };
+    render(<EmotionDetails emotion={unknownCategoryEmotion} animationMode="dynamic" />);
+    const categoryText = screen.getByText("unknown_category");
+    expect(categoryText).toHaveStyle({ color: "#888888" });
+  });
 });

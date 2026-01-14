@@ -1,5 +1,6 @@
 import { render, screen, fireEvent } from "@testing-library/react";
 import * as THREE from "three";
+import { useFrame } from "@react-three/fiber";
 import {
   BaseSphere,
   getColorFromValence,
@@ -72,21 +73,64 @@ describe("BaseSphere Helpers", () => {
   });
 });
 
-// Since we are testing a R3F component in a DOM environment without a real WebGL context,
-// we mostly check that it renders the mesh group without crashing and handles props.
+// Since we are testing a R3F component in a DOM environment
 describe("BaseSphere Component", () => {
-  // We mock the R3F elements as standard HTML elements for testing
-  global.React = require("react");
+  // Patch Element prototype for R3F props (needed here too)
+  beforeAll(() => {
+    Object.defineProperties(window.Element.prototype, {
+      position: {
+        get() { if (!this._pos) this._pos = new THREE.Vector3(); return this._pos; },
+        configurable: true
+      },
+      rotation: {
+        get() { if (!this._rot) this._rot = new THREE.Euler(); return this._rot; },
+        configurable: true
+      },
+      scale: {
+        get() { if (!this._scale) this._scale = new THREE.Vector3(1, 1, 1); return this._scale; },
+        configurable: true
+      }
+    });
+  });
 
-  // Simple mock for Mesh and Material refs integration
-  // Ideally we'd use @react-three/test-renderer but sticking to RTL with mocks is standard for this codebase
+  it("registers animation loop and updates mesh", () => {
+    let frameCallback: any;
+    (useFrame as jest.Mock).mockImplementation((cb) => {
+      frameCallback = cb;
+    });
 
-  it("should render without crashing", () => {
-    // We cannot easily render R3F components with standard render() unless we mock the canvas or primitives.
-    // Given the constraints and previous patterns, we assume standard unit tests for logic
-    // or use a very lightweight mock approach.
-    // Let's assume the previous tests used a pattern or we skip deep rendering.
-    // However, we can assert logic via the helpers.
-    expect(true).toBe(true);
+    const { container } = render(
+      <BaseSphere
+        color="#ff0000"
+        animation={{
+          rotation: { enabled: true, speed: 0.1, axis: 'y' },
+          breathing: { enabled: true, rate: 1, amplitude: 0.1 },
+          glow: { enabled: true, intensity: 1, pulseSpeed: 1 }
+        }}
+      />
+    );
+
+    const mesh = container.querySelector("mesh") as any;
+    expect(mesh).toBeInTheDocument();
+
+    // Run frame
+    if (frameCallback) frameCallback({ clock: { elapsedTime: 0.25 } });
+
+    // Verify rotation
+    expect(mesh.rotation.y).toBeCloseTo(0.1);
+
+    // Verify scale (breathing)
+    // At t=0.25, rate=1 => sin(2*PI*0.25) = sin(PI/2) = 1.
+    // scale = 1 + 1 * 0.1 = 1.1
+    expect(mesh.scale.x).toBeCloseTo(1.1);
+  });
+
+  it("renders children via render prop", () => {
+    const { getByTestId } = render(
+      <BaseSphere color="red">
+        {(meshRef, matRef) => <group data-testid="child-content" />}
+      </BaseSphere>
+    );
+    expect(getByTestId("child-content")).toBeInTheDocument();
   });
 });
