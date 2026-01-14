@@ -153,6 +153,38 @@ describe("useCommandPaletteFilter", () => {
     expect(result.current.filteredPaths[0].id).toBe("path1");
   });
 
+  it("should return empty if 'from' matches but 'to' does not", () => {
+    const { result } = renderHook(() =>
+      useCommandPaletteFilter({
+        search: "Joy to Anger", // Joy exists, Anger exists (as emotion), but path Joy->Anger might not
+        selectedCategory: null,
+        favoriteEmotions: [],
+        recentEmotions: [],
+        selectedEmotionIds: new Set(),
+      })
+    );
+    // MOCK_PATHS has path1: Joy -> Sadness.
+    // Joy to Anger: match 'Joy'(from) && 'Anger'(to).
+    // fromName(Joy) includes 'Joy'. toName(Sadness) NO include 'Anger'.
+    // 191: return true && false -> false.
+    expect(result.current.filteredPaths).toEqual([]);
+  });
+
+  it("should return empty if 'from' fails match", () => {
+    const { result } = renderHook(() =>
+      useCommandPaletteFilter({
+        search: "Anger to Sadness", // Anger does not start path
+        selectedCategory: null,
+        favoriteEmotions: [],
+        recentEmotions: [],
+        selectedEmotionIds: new Set(),
+      })
+    );
+    // fromName(Joy) includes 'Anger'? No.
+    // 191: return false && ... -> false (short circuit)
+    expect(result.current.filteredPaths).toEqual([]);
+  });
+
   it("should filter favorites via @favorite", () => {
     const { result } = renderHook(() =>
       useCommandPaletteFilter({
@@ -189,6 +221,70 @@ describe("useCommandPaletteFilter", () => {
       const names = result.current.filteredEmotions.map((e: any) => e.name);
       expect(names.sort()).toEqual(expected.sort());
     });
+  });
+
+  it("should handle all VAC coords correctly for ternary coverage", () => {
+    // Test "arousal" and "connection"
+    const cases = [
+      { query: "arousal > 0.9", expected: ["Joy", "Anger"] }, // Joy(1), Anger(1)
+      { query: "connection > 0.9", expected: ["Joy"] }, // Joy(1)
+      { query: "connection < -0.9", expected: ["Sadness"] } // Sadness(-1)
+    ];
+
+    cases.forEach(({ query, expected }) => {
+      const { result } = renderHook(() =>
+        useCommandPaletteFilter({
+          search: query,
+
+          selectedCategory: null,
+          favoriteEmotions: [],
+          recentEmotions: [],
+          selectedEmotionIds: new Set(),
+        })
+      );
+      const names = result.current.filteredEmotions.map((e: any) => e.name);
+      expect(names.sort()).toEqual(expected.sort());
+    });
+  });
+
+  it("should handle invalid X to Y search patterns", () => {
+    const { result } = renderHook(() =>
+      useCommandPaletteFilter({
+        search: "Joy to", // Missing end part
+        selectedCategory: null,
+        favoriteEmotions: [],
+        recentEmotions: [],
+        selectedEmotionIds: new Set(),
+      })
+    );
+    // Should return empty list (filteredPaths)
+    expect(result.current.filteredPaths).toEqual([]);
+  });
+
+  it("should handle ' to target' (missing start) search pattern", () => {
+    const { result } = renderHook(() =>
+      useCommandPaletteFilter({
+        search: " to Sadness",
+        selectedCategory: null,
+        favoriteEmotions: [],
+        recentEmotions: [],
+        selectedEmotionIds: new Set(),
+      })
+    );
+    expect(result.current.filteredPaths).toEqual([]);
+  });
+
+  it("should handle ' to ' (missing both) search pattern", () => {
+    const { result } = renderHook(() =>
+      useCommandPaletteFilter({
+        search: " to ",
+        selectedCategory: null,
+        favoriteEmotions: [],
+        recentEmotions: [],
+        selectedEmotionIds: new Set(),
+      })
+    );
+    expect(result.current.filteredPaths).toEqual([]);
   });
 
   it("should group emotions by category", () => {

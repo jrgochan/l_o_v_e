@@ -116,6 +116,13 @@ describe("useZenKeyboardShortcuts", () => {
         expect(mockSettingsStore.updateVisualSetting).toHaveBeenCalledWith("pathAnimationMode", "dynamic");
     });
 
+    it("should cycle 'v' from last mode to first", () => {
+        mockSettingsStore.pathAnimationMode = "mystical";
+        renderHook(() => useZenKeyboardShortcuts(getProps()));
+        dispatchKey("v"); // mystical -> subtle
+        expect(mockSettingsStore.updateVisualSetting).toHaveBeenCalledWith("pathAnimationMode", "subtle");
+    });
+
     it("should handle 't' for flyover toggle", () => {
         mockExpStore.transitionPath = { id: "path" } as any;
         renderHook(() => useZenKeyboardShortcuts(getProps()));
@@ -188,6 +195,26 @@ describe("useZenKeyboardShortcuts", () => {
 
         // Should enable paths
         expect(mockSettingsStore.updateLayer).toHaveBeenCalledWith("transitionPaths", true);
+        // Should toggle flying
+        expect(mockExpStore.setIsFlying).toHaveBeenCalledWith(true);
+    });
+
+    it("should ignore ' ' (Space) if no transition path", () => {
+        mockExpStore.transitionPath = null;
+        renderHook(() => useZenKeyboardShortcuts(getProps()));
+        dispatchKey(" ");
+        expect(mockExpStore.setIsFlying).not.toHaveBeenCalled();
+    });
+
+    it("should handle ' ' (Space) when paths already visible", () => {
+        mockExpStore.transitionPath = { id: "p1" } as any;
+        mockSettingsStore.layers.transitionPaths = true; // Already visible
+
+        renderHook(() => useZenKeyboardShortcuts(getProps()));
+        dispatchKey(" ");
+
+        // Should NOT call updateLayer (as it's already true)
+        expect(mockSettingsStore.updateLayer).not.toHaveBeenCalled();
         // Should toggle flying
         expect(mockExpStore.setIsFlying).toHaveBeenCalledWith(true);
     });
@@ -305,8 +332,16 @@ describe("useZenKeyboardShortcuts", () => {
         const keys = ["m", "i", "v", "t", "a", "s", "e", "f", "l", "p", " ", "ArrowRight", "ArrowLeft", "ArrowUp", "ArrowDown", "d", "j"];
 
         keys.forEach(key => {
+            // Test Ctrl
             jest.clearAllMocks();
             dispatchKey(key, { ctrlKey: true });
+            expect(mockSettingsStore.updateLayer).not.toHaveBeenCalled();
+            expect(mockSettingsStore.updateVisualSetting).not.toHaveBeenCalled();
+            expect(mockExpStore.setTransitionPath).not.toHaveBeenCalled();
+
+            // Test Meta (Command)
+            jest.clearAllMocks();
+            dispatchKey(key, { metaKey: true });
             expect(mockSettingsStore.updateLayer).not.toHaveBeenCalled();
             expect(mockSettingsStore.updateVisualSetting).not.toHaveBeenCalled();
             expect(mockExpStore.setTransitionPath).not.toHaveBeenCalled();
@@ -343,6 +378,12 @@ describe("useZenKeyboardShortcuts", () => {
         expect(mockExpStore.setTransitionPath).not.toHaveBeenCalled();
 
         dispatchKey("ArrowUp"); // Cycle in Happiness -> Insufficient emotions
+        expect(mockExpStore.setTransitionPath).not.toHaveBeenCalled();
+
+        dispatchKey("ArrowLeft"); // Prev category -> Insufficient emotions
+        expect(mockExpStore.setTransitionPath).not.toHaveBeenCalled();
+
+        dispatchKey("ArrowLeft"); // Prev category -> Insufficient emotions
         expect(mockExpStore.setTransitionPath).not.toHaveBeenCalled();
     });
 
@@ -414,6 +455,33 @@ describe("useZenKeyboardShortcuts", () => {
 
         renderHook(() => useZenKeyboardShortcuts(getProps()));
         dispatchKey("ArrowUp");
+
+        expect(mockExpStore.setTransitionPath).toHaveBeenCalled();
+        const newPath = (mockExpStore.setTransitionPath as jest.Mock).mock.calls[0][0];
+        expect(newPath.current_state.category).toBe("Happiness");
+    });
+
+    it("should handle ArrowUp with missing current emotion (fallback to default Happiness)", () => {
+        mockExpStore.transitionPath = { current_state: { emotion: null } } as any;
+        mockSettingsStore.layers.transitionPaths = true;
+
+        renderHook(() => useZenKeyboardShortcuts(getProps()));
+        dispatchKey("ArrowUp");
+
+        expect(mockExpStore.setTransitionPath).toHaveBeenCalled();
+        const newPath = (mockExpStore.setTransitionPath as jest.Mock).mock.calls[0][0];
+        expect(newPath.current_state.category).toBe("Happiness");
+    });
+
+    it("should handle ArrowLeft from last category to first (simple decrement)", () => {
+        // Categories: Happiness (0), Sadness (1)
+        // Current: Sadness. Prev: Happiness.
+        mockExpStore.transitionPath = {
+            current_state: { emotion: "Sadness" }
+        } as any;
+
+        renderHook(() => useZenKeyboardShortcuts(getProps()));
+        dispatchKey("ArrowLeft");
 
         expect(mockExpStore.setTransitionPath).toHaveBeenCalled();
         const newPath = (mockExpStore.setTransitionPath as jest.Mock).mock.calls[0][0];

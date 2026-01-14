@@ -13,7 +13,12 @@ export function useNavigationShortcuts() {
 
   const handleArrowNav = useCallback(
     (key: string, e: KeyboardEvent) => {
-      if (computedPaths.size > 0 && selectedEmotionIds.size >= 2) {
+      if (
+        !e.ctrlKey &&
+        !e.metaKey &&
+        computedPaths.size > 0 &&
+        selectedEmotionIds.size >= 2
+      ) {
         e.preventDefault();
 
         const pathArray = Array.from(computedPaths.values()).filter(

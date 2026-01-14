@@ -130,4 +130,38 @@ describe("ProsodyVisualization", () => {
     // Based on code: if (!energy) return { label: "Unknown", ... }
     expect(screen.getAllByText("Unknown").length).toBeGreaterThan(0);
   });
+  it("handles audio processing errors", async () => {
+    const mockBlob = new Blob(["corrupt data"], { type: "audio/wav" });
+    mockBlob.arrayBuffer = jest.fn().mockResolvedValue(new ArrayBuffer(8));
+    // Mock failure
+    mockDecodeAudioData.mockRejectedValue(new Error("Decoding failed"));
+
+    const { unmount } = render(<ProsodyVisualization prosody={mockProsody} audioBlob={mockBlob} />);
+
+    // Should show loading then fallback to synthetic
+    expect(screen.getByText("Processing audio...")).toBeInTheDocument();
+
+    await waitFor(() => {
+      expect(screen.queryByText("Processing audio...")).not.toBeInTheDocument();
+    });
+
+    // Should verify logger was called and synthetic displayed
+    expect(logger.error).toHaveBeenCalledWith("rendering", "Failed to extract waveform", expect.any(Error));
+    expect(screen.getByText(/📊 Synthetic/)).toBeInTheDocument();
+
+    unmount();
+  });
+  it("renders non-numeric features", () => {
+    const stringFeatureProsody: any = {
+      ...mockProsody,
+      features: { status: "Active" }
+    };
+    render(<ProsodyVisualization prosody={stringFeatureProsody} audioBlob={null} />);
+    expect(screen.getByText("Active")).toBeInTheDocument();
+  });
+
+  it("returns null when prosody is missing", () => {
+    const { container } = render(<ProsodyVisualization prosody={null as any} audioBlob={null} />);
+    expect(container).toBeEmptyDOMElement();
+  });
 });

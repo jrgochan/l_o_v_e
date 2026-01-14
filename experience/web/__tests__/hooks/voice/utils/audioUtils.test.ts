@@ -57,6 +57,38 @@ describe("audioUtils", () => {
       expect(result.base64).toBe("mockbase64data");
       expect(result.blob).toBeInstanceOf(Blob);
     });
+
+    it("should reject if blob creation or reading fails", async () => {
+      const originalCreateObjectUrl = global.URL.createObjectURL;
+      global.URL.createObjectURL = jest.fn(() => {
+        throw new Error("Blob error");
+      });
+
+      try {
+        await expect(processAudioBlob([])).rejects.toThrow("Blob error");
+      } finally {
+        global.URL.createObjectURL = originalCreateObjectUrl;
+      }
+    });
+
+    it("should reject if FileReader encounters error", async () => {
+      const originalFileReader = global.FileReader;
+      class ErrorFileReader {
+        readAsDataURL() {
+          setTimeout(() => {
+            if (this.onerror) this.onerror(new Error("Reader Error"));
+          }, 0);
+        }
+        onerror: ((error: any) => void) | null = null;
+      }
+      (global as any).FileReader = ErrorFileReader;
+
+      try {
+        await expect(processAudioBlob([new Blob([])])).rejects.toThrow("Reader Error");
+      } finally {
+        global.FileReader = originalFileReader;
+      }
+    });
   });
 
   describe("stopStreamTracks", () => {

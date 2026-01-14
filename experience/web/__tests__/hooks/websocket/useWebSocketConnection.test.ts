@@ -62,6 +62,29 @@ describe("useWebSocketConnection", () => {
     expect(mockWsRef.current.send).toHaveBeenCalledWith(JSON.stringify({ type: "ping" }));
   });
 
+  it("should skip heartbeat if socket is not OPEN", () => {
+    // Set socket to CONNECTING (0)
+    mockWsRef.current.readyState = 0;
+
+    const { result } = renderHook(() =>
+      useWebSocketConnection({
+        sessionId: "123",
+        onMessage: jest.fn(),
+        setError: jest.fn(),
+      })
+    );
+
+    act(() => {
+      result.current.connect();
+    });
+
+    act(() => {
+      jest.advanceTimersByTime(30000);
+    });
+
+    expect(mockWsRef.current.send).not.toHaveBeenCalled();
+  });
+
   it("should start disconnected", () => {
     const { result } = renderHook(() =>
       useWebSocketConnection({

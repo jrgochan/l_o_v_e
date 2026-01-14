@@ -96,4 +96,12 @@ describe("CompactView", () => {
     expect(screen.getByText("🔴")).toBeInTheDocument(); // Poor voice quality icon
     expect(screen.getByText("5.0dB")).toHaveClass("text-red-400");
   });
+  it("should render medium energy label", () => {
+    const props = {
+      ...mockProps,
+      prosody: { ...mockProps.prosody!, energy: 0.5 } // Med (0.3 - 0.7)
+    };
+    render(<CompactView {...props} />);
+    expect(screen.getByText("Med")).toBeInTheDocument();
+  });
 });

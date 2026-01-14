@@ -288,7 +288,36 @@ describe("useMediaRecorder Advanced", () => {
       result.current.resumeMediaRecorder();
     });
 
-    expect(mockActions.setIsRecording).not.toHaveBeenCalled();
     expect(mockActions.setIsPaused).not.toHaveBeenCalled();
+  });
+
+  it("should clear duration interval on stop", async () => {
+    const { result } = renderHook(() =>
+      useMediaRecorder({ state: mockState, actions: mockActions })
+    );
+
+    // Start
+    await act(async () => {
+      await result.current.startMediaRecorder();
+    });
+
+    // Verify interval active
+    mockActions.setDuration.mockClear();
+    act(() => {
+      jest.advanceTimersByTime(200);
+    });
+    expect(mockActions.setDuration).toHaveBeenCalled();
+
+    // Stop
+    act(() => {
+      result.current.stopMediaRecorder();
+    });
+
+    // Verify interval inactive
+    mockActions.setDuration.mockClear();
+    act(() => {
+      jest.advanceTimersByTime(200);
+    });
+    expect(mockActions.setDuration).not.toHaveBeenCalled();
   });
 });

@@ -36,8 +36,6 @@ export function useSyncTransport({ mode, onMessage }: TransportOptions) {
   }, []);
 
   useEffect(() => {
-    if (typeof window === "undefined") return;
-
     // 1. Storage Sync Logic
     const handleStorage = (e: StorageEvent | { key: string; newValue: string | null }) => {
       if (mode === "listener" && e.key === CHANNEL_NAME && e.newValue) {

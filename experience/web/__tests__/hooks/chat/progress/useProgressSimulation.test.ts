@@ -90,11 +90,34 @@ describe("useProgressSimulation", () => {
       jest.advanceTimersByTime(500);
     });
 
+    const clearIntervalSpy = jest.spyOn(global, 'clearInterval');
+
+    act(() => {
+      // Advance to trigger the update where it should stop
+      jest.advanceTimersByTime(500);
+    });
+
     const updater = setProgress.mock.calls[0][0];
     const prevState = { overallPercentage: 90 };
-    const newState = updater(prevState);
+    // Executing the updater manually inside the test won't trigger the side effect of clearing interval 
+    // because the hook logic (lines 105-108 in useChatProgress or lines 24-27 in useProgressSimulation) 
+    // is inside the setState *callback* which runs during the interval tick.
+    // Wait, the interval *body* calls setProgress(prev => ...).
+    // The *logic* to clear interval is INSIDE the updater function in the hook:
+    /*
+        setProgressState((prev) => {
+          if (prev.overallPercentage >= 90) {
+             if (progressSimulationRef.current) clearInterval(...)
+             return prev;
+          }
+          ...
+        })
+    */
+    // So if I execute the updater manually with state >= 90, it SHOULD call clearInterval.
 
-    // If >= 90, it should return same state (and maybe clear interval internally)
-    expect(newState).toBe(prevState);
+    updater(prevState);
+
+    expect(clearIntervalSpy).toHaveBeenCalled();
+    clearIntervalSpy.mockRestore();
   });
 });

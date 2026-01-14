@@ -234,4 +234,31 @@ describe("useConnectionLifecycle", () => {
     // But we can verify disconnect logic proceeded.
     expect(props.setIsConnected).toHaveBeenCalledWith(false);
   });
+  it("should execute connectRef wrapper via handleSocketClose callback", () => {
+    // We want to ensure the arrow function '() => connectRef.current()' is executed
+    // and that it actually calls the latest connect function.
+
+    let capturedConnectFn: (() => void) | undefined;
+    (
+      require("@/hooks/websocket/utils/socketHelpers").handleSocketClose as jest.Mock
+    ).mockImplementationOnce((e, options) => {
+      capturedConnectFn = options.connectFn;
+    });
+
+    renderHook(() => useConnectionLifecycle(props));
+
+    act(() => {
+      capturedCallbacks.onClose({ code: 1006 });
+    });
+
+    expect(capturedConnectFn).toBeDefined();
+
+    // Now execute it
+    (createWebSocketConnection as jest.Mock).mockClear();
+    act(() => {
+      capturedConnectFn?.();
+    });
+
+    expect(createWebSocketConnection).toHaveBeenCalled();
+  });
 });

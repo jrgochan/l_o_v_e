@@ -36,6 +36,14 @@ describe("useChatProgress", () => {
       expect(getAdaptiveMessage("emotions", "pending", "warm", false)).toContain("Identifying");
       expect(getAdaptiveMessage("emotions", "pending", "clinical", true)).toContain("multi-emotion");
       expect(getAdaptiveMessage("emotions", "pending", "clinical", false)).toContain("semantic");
+
+      // Verify other stages
+      expect(getAdaptiveMessage("transcription", "pending", "warm", false)).toContain("Listening");
+      expect(getAdaptiveMessage("prosody", "pending", "warm", false)).toContain("Understanding how you're expressing");
+      expect(getAdaptiveMessage("relationships", "pending", "warm", true)).toContain("emotions interact");
+      expect(getAdaptiveMessage("aggregate", "pending", "clinical", true)).toContain("Computing aggregate");
+      expect(getAdaptiveMessage("three_way", "pending", "warm", true)).toContain("Comparing what you said");
+      expect(getAdaptiveMessage("insights", "pending", "clinical", true)).toContain("Generating AI-powered");
     });
   });
 

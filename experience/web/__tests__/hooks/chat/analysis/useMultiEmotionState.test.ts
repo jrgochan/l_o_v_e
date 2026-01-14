@@ -165,4 +165,27 @@ describe("useMultiEmotionState", () => {
     expect(result.current.multiEmotionAnalysis?.aggregate.vac).toEqual(initialVAC);
     expect(result.current.multiEmotionAnalysis?.aggregate.complexity_score).toBe(0.9);
   });
+  it("should fallback to default values in aggregate update", () => {
+    const { result } = renderHook(() => useMultiEmotionState(sessionId));
+
+    act(() => {
+      result.current.addMultiEmotion("joy", "cat", { valence: 1, arousal: 1, connection: 1 }, 1, "primary");
+    });
+
+    // First update to set non-zero values
+    act(() => {
+      result.current.updateAggregateState({ complexity_score: 0.9, emotional_clarity: 0.9 });
+    });
+
+    // Second update with empty partial to check defaults (0)?
+    // Wait, the logic is `state.complexity_score || 0`. If I pass undefined, it becomes 0.
+    // If I don't pass it, it becomes 0.
+    act(() => {
+      result.current.updateAggregateState({});
+    });
+
+    expect(result.current.multiEmotionAnalysis?.aggregate.complexity_score).toBe(0);
+    expect(result.current.multiEmotionAnalysis?.aggregate.emotional_clarity).toBe(0);
+    expect(result.current.multiEmotionAnalysis?.aggregate.temporal_pattern).toBe("concurrent");
+  });
 });

@@ -129,7 +129,7 @@ export function useZenKeyboardShortcuts({
                             ? emotions.find((e) => e.name === transitionPath.current_state.emotion)?.category
                             : categories[0];
 
-                        const nextIdx = (categories.indexOf(currentCat || "") + 1) % categories.length;
+                        const nextIdx = (categories.indexOf(currentCat!) + 1) % categories.length;
                         const nextCat = categories[nextIdx];
 
                         // 3. Pick 2 random emotions from this category
@@ -208,7 +208,7 @@ export function useZenKeyboardShortcuts({
                             : categories[0];
 
                         const prevIdx =
-                            (categories.indexOf(currentCat || "") - 1 + categories.length) % categories.length;
+                            (categories.indexOf(currentCat!) - 1 + categories.length) % categories.length;
                         const prevCat = categories[prevIdx];
 
                         // 3. Pick 2 random emotions

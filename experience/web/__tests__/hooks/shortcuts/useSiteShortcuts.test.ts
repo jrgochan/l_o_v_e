@@ -1,4 +1,4 @@
-import { renderHook, act } from "@testing-library/react";
+import { renderHook, act, fireEvent } from "@testing-library/react";
 import { useSiteShortcuts } from "../../../hooks/shortcuts/useSiteShortcuts";
 
 // Mock dependencies
@@ -22,26 +22,42 @@ describe("useSiteShortcuts", () => {
     renderHook(() => useSiteShortcuts());
 
     act(() => {
-      const event = new KeyboardEvent("keydown", { key: "s" });
-      window.dispatchEvent(event);
+      fireEvent.keyDown(window, { key: "s" });
     });
 
     expect(mockGetActions).toHaveBeenCalled();
     expect(mockAction).toHaveBeenCalled();
   });
 
-  it("should open command palette on Cmd+K", () => {
+  it("should open command palette on Cmd+K (Meta)", () => {
     const mockOpenCommandPalette = jest.fn();
     Object.defineProperty(window, "openCommandPalette", {
       value: mockOpenCommandPalette,
       writable: true,
+      configurable: true, // Allow deletion
     });
 
     renderHook(() => useSiteShortcuts());
 
     act(() => {
-      const event = new KeyboardEvent("keydown", { key: "k", metaKey: true });
-      window.dispatchEvent(event);
+      fireEvent.keyDown(window, { key: "k", metaKey: true });
+    });
+
+    expect(mockOpenCommandPalette).toHaveBeenCalled();
+  });
+
+  it("should open command palette on Ctrl+K", () => {
+    const mockOpenCommandPalette = jest.fn();
+    Object.defineProperty(window, "openCommandPalette", {
+      value: mockOpenCommandPalette,
+      writable: true,
+      configurable: true,
+    });
+
+    renderHook(() => useSiteShortcuts());
+
+    act(() => {
+      fireEvent.keyDown(window, { key: "k", ctrlKey: true });
     });
 
     expect(mockOpenCommandPalette).toHaveBeenCalled();
@@ -55,13 +71,12 @@ describe("useSiteShortcuts", () => {
     renderHook(() => useSiteShortcuts());
 
     act(() => {
-      const event = new KeyboardEvent("keydown", { key: "k", metaKey: true });
+      const event = new KeyboardEvent("keydown", { key: "k", metaKey: true, bubbles: true, cancelable: true });
       jest.spyOn(event, "preventDefault");
       window.dispatchEvent(event);
+      // We check if preventDefault was called, implying it entered the block
       expect(event.preventDefault).toHaveBeenCalled();
     });
-
-    // Should not crash
   });
 
   it("should ignore keys with no actions", () => {
@@ -70,11 +85,11 @@ describe("useSiteShortcuts", () => {
     renderHook(() => useSiteShortcuts());
 
     act(() => {
-      const event = new KeyboardEvent("keydown", { key: "z" });
-      window.dispatchEvent(event);
+      fireEvent.keyDown(window, { key: "z" });
     });
 
-    // Should assume no action called (implicit check)
+    // Should assume no action called (implicit check via mockGetActions call but no execution)
+    expect(mockGetActions).toHaveBeenCalled();
   });
 
   it("should treat 'k' as normal key if no modifier", () => {
@@ -85,8 +100,7 @@ describe("useSiteShortcuts", () => {
     renderHook(() => useSiteShortcuts());
 
     act(() => {
-      const event = new KeyboardEvent("keydown", { key: "k", ctrlKey: false, metaKey: false });
-      window.dispatchEvent(event);
+      fireEvent.keyDown(window, { key: "k", ctrlKey: false, metaKey: false });
     });
 
     expect(mockKAction).toHaveBeenCalled();

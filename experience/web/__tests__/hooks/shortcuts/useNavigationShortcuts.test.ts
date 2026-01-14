@@ -1,4 +1,4 @@
-import { renderHook, act } from "@testing-library/react";
+import { renderHook, act, fireEvent } from "@testing-library/react";
 import { useNavigationShortcuts } from "../../../hooks/shortcuts/useNavigationShortcuts";
 import { useAtlasAdminStore } from "@/stores/useAtlasAdminStore";
 
@@ -289,4 +289,22 @@ describe("useNavigationShortcuts", () => {
     // Should not call setSelectedPath for invalid index
     expect(mockSetSelectedPath).not.toHaveBeenCalled();
   });
+
+  it("should ignore shortcuts with modifier keys (Ctrl/Meta)", () => {
+    renderHook(() => useNavigationShortcuts());
+
+    // Ctrl + 1
+    act(() => {
+      fireEvent.keyDown(window, { key: "1", ctrlKey: true });
+    });
+    expect(mockSetSelectedPath).not.toHaveBeenCalled();
+
+    // Meta + ArrowDown
+    act(() => {
+      fireEvent.keyDown(window, { key: "ArrowDown", metaKey: true });
+    });
+    expect(mockSetSelectedPath).not.toHaveBeenCalled();
+  });
+
+
 });

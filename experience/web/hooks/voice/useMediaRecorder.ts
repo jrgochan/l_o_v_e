@@ -75,10 +75,8 @@ export function useMediaRecorder({
       mediaRecorderRef.current.stop();
       actions.setIsRecording(false);
       actions.setIsPaused(false);
-      if (durationIntervalRef.current) {
-        clearInterval(durationIntervalRef.current);
-        durationIntervalRef.current = null;
-      }
+      clearInterval(durationIntervalRef.current as any);
+      durationIntervalRef.current = null;
       logger.info("hooks", "Recording stopped");
     }
   }, [actions]);

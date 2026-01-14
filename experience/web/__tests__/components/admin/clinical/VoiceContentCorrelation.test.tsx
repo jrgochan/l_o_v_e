@@ -43,4 +43,15 @@ describe("VoiceContentCorrelation", () => {
     const discrepancyValue = screen.getByText("0.700");
     expect(discrepancyValue).toHaveClass("text-orange-300 font-bold");
   });
+  it("renders medium discrepancy styling", () => {
+    const mediumMetric: VCCType = {
+      ...alignedMetric,
+      discrepancy: 0.4, // Between 0.3 and 0.5 -> Yellow
+      aligned: false
+    };
+    render(<VoiceContentCorrelation correlation={mediumMetric} />);
+
+    const bar = screen.getByText("0.400").parentElement?.nextElementSibling?.firstChild;
+    expect(bar).toHaveClass("bg-yellow-500");
+  });
 });
