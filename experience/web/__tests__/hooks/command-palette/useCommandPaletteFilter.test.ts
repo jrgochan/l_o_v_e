@@ -413,4 +413,16 @@ describe("useCommandPaletteFilter", () => {
     // Should filter paths but maybe return empty if not enough context
     expect(result.current.filteredPaths).toEqual([]);
   });
+  it("should return empty paths for short search queries", () => {
+    const { result } = renderHook(() =>
+      useCommandPaletteFilter({
+        search: "a", // length 1 < 2
+        selectedCategory: null,
+        favoriteEmotions: [],
+        recentEmotions: [],
+        selectedEmotionIds: new Set(),
+      })
+    );
+    expect(result.current.filteredPaths).toEqual([]);
+  });
 });

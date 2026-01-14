@@ -175,4 +175,23 @@ describe("useEmotionActions", () => {
     expect(response.success).toBe(false);
     expect(response.message).toBe("Store error");
   });
+
+
+  it("should handle non-Error objects thrown gracefully", () => {
+    (useAtlasAdminStore as unknown as jest.Mock).mockImplementation((selector) => {
+      const state = {
+        selectEmotion: jest.fn().mockImplementation(() => {
+          throw "String error";
+        }),
+        selectedEmotionIds: mockSelectedEmotionIds,
+      };
+      return selector(state);
+    });
+
+    const { result } = getHook();
+    const response = result.current.executeAction(mockEmotion, "select", {} as any);
+
+    expect(response.success).toBe(false);
+    expect(response.message).toBe("Unknown error");
+  });
 });

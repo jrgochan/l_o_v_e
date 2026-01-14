@@ -177,6 +177,12 @@ describe("useZenKeyboardShortcuts", () => {
         renderHook(() => useZenKeyboardShortcuts(getProps()));
         dispatchKey("d");
         expect(mockSetShowDebug).toHaveBeenCalled();
+        // Execute the updater function to ensure coverage
+        const updater = mockSetShowDebug.mock.calls[0][0];
+        if (typeof updater === 'function') {
+            expect(updater(false)).toBe(true);
+            expect(updater(true)).toBe(false);
+        }
     });
 
     it("should handle 'j' for mock journey", () => {
@@ -486,5 +492,35 @@ describe("useZenKeyboardShortcuts", () => {
         expect(mockExpStore.setTransitionPath).toHaveBeenCalled();
         const newPath = (mockExpStore.setTransitionPath as jest.Mock).mock.calls[0][0];
         expect(newPath.current_state.category).toBe("Happiness");
+    });
+
+    it("should remove event listener on unmount", () => {
+        const removeEventListenerSpy = jest.spyOn(window, "removeEventListener");
+        const { unmount } = renderHook(() => useZenKeyboardShortcuts(getProps()));
+        unmount();
+        expect(removeEventListenerSpy).toHaveBeenCalledWith("keydown", expect.any(Function));
+        removeEventListenerSpy.mockRestore();
+    });
+
+    it("should handle ArrowRight with path but missing emotion (fallback to default/first category)", () => {
+        mockExpStore.transitionPath = { current_state: { emotion: null } } as any;
+        mockSettingsStore.layers.transitionPaths = true;
+        renderHook(() => useZenKeyboardShortcuts(getProps()));
+        dispatchKey("ArrowRight");
+        expect(mockExpStore.setTransitionPath).toHaveBeenCalled();
+        const newPath = (mockExpStore.setTransitionPath as jest.Mock).mock.calls[0][0];
+        // Default category logic -> categories[0] -> Happiness? 
+        // Logic: categories.indexOf(currentCat) + 1.
+        expect(newPath.current_state.category).toBe("Sadness"); // Happiness -> Sadness
+    });
+
+    it("should handle ArrowLeft with path but missing emotion (fallback to default/first category)", () => {
+        mockExpStore.transitionPath = { current_state: { emotion: null } } as any;
+        mockSettingsStore.layers.transitionPaths = true;
+        renderHook(() => useZenKeyboardShortcuts(getProps()));
+        dispatchKey("ArrowLeft");
+        expect(mockExpStore.setTransitionPath).toHaveBeenCalled();
+        const newPath = (mockExpStore.setTransitionPath as jest.Mock).mock.calls[0][0];
+        expect(newPath.current_state.category).toBe("Sadness");
     });
 });

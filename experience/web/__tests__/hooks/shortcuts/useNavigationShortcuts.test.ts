@@ -307,4 +307,45 @@ describe("useNavigationShortcuts", () => {
   });
 
 
+  it("should not navigate if paths exist but filtering returns empty (empty computedPaths after filter)", () => {
+    (useAtlasAdminStore as unknown as jest.Mock).mockImplementation((selector) => {
+      return selector({
+        // Paths exist but emotions don't match ends
+        computedPaths: new Map([["p1", { id: "p1", from: { id: "e1" }, to: { id: "e2" } }]]),
+        selectedPathId: null,
+        selectedEmotionIds: new Set(["e3", "e4"]), // Size >= 2, but no match
+        setSelectedPath: mockSetSelectedPath,
+      });
+    });
+
+    renderHook(() => useNavigationShortcuts());
+
+    act(() => {
+      const event = new KeyboardEvent("keydown", { key: "ArrowDown" });
+      window.dispatchEvent(event);
+    });
+
+    expect(mockSetSelectedPath).not.toHaveBeenCalled();
+  });
+
+  it("should not jump if path index out of bounds (but positive)", () => {
+    (useAtlasAdminStore as unknown as jest.Mock).mockImplementation((selector) => {
+      return selector({
+        computedPaths: new Map([["p1", { id: "p1", from: { id: "e1" }, to: { id: "e2" } }]]),
+        selectedPathId: null,
+        selectedEmotionIds: new Set(["e1", "e2"]),
+        setSelectedPath: mockSetSelectedPath,
+      });
+    });
+
+    renderHook(() => useNavigationShortcuts());
+
+    act(() => {
+      // 1 path available. Press '2' (index 1). Length is 1. 1 < 1 is false.
+      const event = new KeyboardEvent("keydown", { key: "2" });
+      window.dispatchEvent(event);
+    });
+
+    expect(mockSetSelectedPath).not.toHaveBeenCalled();
+  });
 });

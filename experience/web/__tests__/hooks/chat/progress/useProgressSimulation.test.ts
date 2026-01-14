@@ -60,6 +60,19 @@ describe("useProgressSimulation", () => {
     expect(setProgress).not.toHaveBeenCalled();
   });
 
+  it("should handle stop when not running (branch coverage)", () => {
+    const setProgress = jest.fn();
+    const { result } = renderHook(() => useProgressSimulation(setProgress));
+
+    // Call stop without ever starting (ref.current is null)
+    act(() => {
+      result.current.stopProgressSimulation();
+    });
+
+    // Should not throw or error
+    expect(setProgress).not.toHaveBeenCalled();
+  });
+
   it("should clear existing interval if started while running", () => {
     const setProgress = jest.fn();
     const { result } = renderHook(() => useProgressSimulation(setProgress));
@@ -92,32 +105,75 @@ describe("useProgressSimulation", () => {
 
     const clearIntervalSpy = jest.spyOn(global, 'clearInterval');
 
-    act(() => {
-      // Advance to trigger the update where it should stop
-      jest.advanceTimersByTime(500);
-    });
-
+    // Simulate the updater function being called when progress reaches 90%
     const updater = setProgress.mock.calls[0][0];
     const prevState = { overallPercentage: 90 };
-    // Executing the updater manually inside the test won't trigger the side effect of clearing interval 
-    // because the hook logic (lines 105-108 in useChatProgress or lines 24-27 in useProgressSimulation) 
-    // is inside the setState *callback* which runs during the interval tick.
-    // Wait, the interval *body* calls setProgress(prev => ...).
-    // The *logic* to clear interval is INSIDE the updater function in the hook:
-    /*
-        setProgressState((prev) => {
-          if (prev.overallPercentage >= 90) {
-             if (progressSimulationRef.current) clearInterval(...)
-             return prev;
-          }
-          ...
-        })
-    */
-    // So if I execute the updater manually with state >= 90, it SHOULD call clearInterval.
 
+    // This manual call simulates what happens inside the interval callback
     updater(prevState);
 
     expect(clearIntervalSpy).toHaveBeenCalled();
+    clearIntervalSpy.mockRestore();
+  });
+
+  it("should cleanup interval on unmount", () => {
+    const setProgress = jest.fn();
+    const clearIntervalSpy = jest.spyOn(global, 'clearInterval');
+
+    const { result, unmount } = renderHook(() => useProgressSimulation(setProgress));
+
+    act(() => {
+      result.current.startProgressSimulation();
+    });
+
+    unmount();
+
+    expect(clearIntervalSpy).toHaveBeenCalled();
+    clearIntervalSpy.mockRestore();
+  });
+
+  it("should handle unmount when not running (branch coverage)", () => {
+    const setProgress = jest.fn();
+    const clearIntervalSpy = jest.spyOn(global, 'clearInterval');
+
+    const { unmount } = renderHook(() => useProgressSimulation(setProgress));
+
+    // Unmount without starting
+    unmount();
+
+    // Should not call clearInterval if not running
+    expect(clearIntervalSpy).not.toHaveBeenCalled();
+    clearIntervalSpy.mockRestore();
+  });
+
+  it("should not clear interval if ref is null when reaching 90% (defensive branch)", () => {
+    const setProgress = jest.fn();
+    const clearIntervalSpy = jest.spyOn(global, 'clearInterval');
+
+    const { result } = renderHook(() => useProgressSimulation(setProgress));
+
+    act(() => {
+      result.current.startProgressSimulation();
+      jest.advanceTimersByTime(500);
+    });
+
+    // Capture the updater
+    const updater = setProgress.mock.calls[0][0];
+
+    // Stop simulation to set ref.current = null
+    act(() => {
+      result.current.stopProgressSimulation();
+    });
+
+    // Clear the spy from the stop call
+    clearIntervalSpy.mockClear();
+
+    // Now execute updater with 90% state
+    // This hits the branch where percentage >= 90 BUT ref is null
+    updater({ overallPercentage: 90 });
+
+    // Should NOT call clearInterval again (since ref is null)
+    expect(clearIntervalSpy).not.toHaveBeenCalled();
     clearIntervalSpy.mockRestore();
   });
 });
