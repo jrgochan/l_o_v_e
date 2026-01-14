@@ -15,7 +15,12 @@ jest.mock("next/link", () => {
 
 // Mock AuthModal
 jest.mock("@/components/auth/AuthModal", () => ({
-  AuthModal: ({ isOpen }: any) => (isOpen ? <div data-testid="auth-modal">Auth Modal</div> : null),
+  AuthModal: ({ isOpen, onClose }: any) => (isOpen ? (
+    <div data-testid="auth-modal">
+      Auth Modal
+      <button data-testid="close-modal-btn" onClick={onClose}>Close</button>
+    </div>
+  ) : null),
 }));
 
 describe("AdminGuard", () => {
@@ -135,5 +140,27 @@ describe("AdminGuard", () => {
 
     fireEvent.click(screen.getByText("Sign In"));
     expect(screen.getByTestId("auth-modal")).toBeInTheDocument();
+  });
+  it("opens and closes auth modal", async () => {
+    (useAuthStore as unknown as jest.Mock).mockReturnValue({
+      user: null,
+      isLoading: false,
+    });
+
+    render(
+      <AdminGuard>
+        <div>Secret</div>
+      </AdminGuard>
+    );
+
+    await waitFor(() => {
+      expect(screen.getByText("Sign In")).toBeInTheDocument();
+    });
+
+    fireEvent.click(screen.getByText("Sign In"));
+    expect(screen.getByTestId("auth-modal")).toBeInTheDocument();
+
+    fireEvent.click(screen.getByTestId("close-modal-btn"));
+    expect(screen.queryByTestId("auth-modal")).not.toBeInTheDocument();
   });
 });

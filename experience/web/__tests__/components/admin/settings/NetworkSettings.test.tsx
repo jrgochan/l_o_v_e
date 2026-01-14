@@ -47,6 +47,18 @@ describe("NetworkSettings", () => {
     expect(mockSwitchNetworkMode).toHaveBeenCalledWith("network");
   });
 
+  it("handles mode toggle back to local", () => {
+    (useSettingsStore as unknown as jest.Mock).mockReturnValue({
+      ...defaultSettings,
+      network: { ...defaultSettings.network, mode: "network" },
+    });
+    render(<NetworkSettings />);
+    // Toggle is checked (Network). Click to switch to Local.
+    const toggle = screen.getByLabelText("Toggle between 🏠 Local and 🌐 Network");
+    fireEvent.click(toggle);
+    expect(mockSwitchNetworkMode).toHaveBeenCalledWith("local");
+  });
+
   it("handles custom endpoints toggle", () => {
     render(<NetworkSettings />);
     // Toggle: "Default Endpoints" / "Custom Endpoints" -> "Toggle between Default Endpoints and Custom Endpoints"
@@ -63,6 +75,18 @@ describe("NetworkSettings", () => {
 
     expect(mockUpdateNetworkSetting).toHaveBeenCalledWith({
       endpoints: expect.objectContaining({ observer: "http://custom:8000" }),
+    });
+
+    const listenerInput = screen.getByDisplayValue("http://localhost:8002");
+    fireEvent.change(listenerInput, { target: { value: "http://custom:8002" } });
+    expect(mockUpdateNetworkSetting).toHaveBeenCalledWith({
+      endpoints: expect.objectContaining({ listener: "http://custom:8002" }),
+    });
+
+    const versorInput = screen.getByDisplayValue("http://localhost:8001");
+    fireEvent.change(versorInput, { target: { value: "http://custom:8001" } });
+    expect(mockUpdateNetworkSetting).toHaveBeenCalledWith({
+      endpoints: expect.objectContaining({ versor: "http://custom:8001" }),
     });
   });
 
@@ -93,6 +117,31 @@ describe("NetworkSettings", () => {
 
     await waitFor(() => {
       expect(logger.error).toHaveBeenCalledWith("api", "Connection test failed", expect.any(Error));
+    });
+  });
+
+  it("displays explicit connection error message", async () => {
+    mockTestConnection.mockResolvedValue({
+      observer: { connected: false, error: "Custom Timeout" },
+    });
+    render(<NetworkSettings />);
+    fireEvent.click(screen.getByText("🔍 Test Connection"));
+
+    await waitFor(() => {
+      expect(screen.getByText("Custom Timeout")).toBeInTheDocument();
+    });
+  });
+
+  it("displays default 'Failed' message when no error string provided", async () => {
+    mockTestConnection.mockResolvedValue({
+      observer: { connected: false }, // no error string
+    });
+    render(<NetworkSettings />);
+    fireEvent.click(screen.getByText("🔍 Test Connection"));
+
+    await waitFor(() => {
+      // Should fallback to "Failed"
+      expect(screen.getByText("Failed")).toBeInTheDocument();
     });
   });
 });

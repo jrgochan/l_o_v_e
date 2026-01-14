@@ -29,11 +29,33 @@ jest.mock("@/components/command-palette/ActiveJourneyStatus", () => ({
   ActiveJourneyStatus: () => <div data-testid="active-journey-status" />,
 }));
 jest.mock("@/components/command-palette/PaletteResults", () => ({
-  PaletteResults: ({ quickActions }: any) => (
+  PaletteResults: ({ quickActions, filteredEmotions, filteredPaths, onSelectEmotion, onSelectPath, onQuickAction }: any) => (
     <div data-testid="palette-results">
-      {quickActions.map((qa: any) => (
-        <div key={qa.command} data-testid={`qa-${qa.command}`}>
+      {quickActions?.map((qa: any) => (
+        <div
+          key={qa.command}
+          data-testid={`qa-${qa.command}`}
+          onClick={() => onQuickAction(qa.command)}
+        >
           {qa.command}
+        </div>
+      ))}
+      {filteredEmotions?.map((emotion: any) => (
+        <div
+          key={emotion.id}
+          data-testid={`emotion-${emotion.id}`}
+          onClick={() => onSelectEmotion(emotion)}
+        >
+          {emotion.name}
+        </div>
+      ))}
+      {filteredPaths?.map((path: any) => (
+        <div
+          key={path.id}
+          data-testid={`path-${path.id}`}
+          onClick={() => onSelectPath(path.id)}
+        >
+          {path.id}
         </div>
       ))}
     </div>
@@ -109,6 +131,20 @@ describe("CommandPalette", () => {
     });
     expect(mockPalette.open).toHaveBeenCalled();
     expect(window.__commandPaletteOpen).toBe(true);
+  });
+
+  it("should auto-focus input on open", () => {
+    jest.useFakeTimers();
+    render(<CommandPalette />);
+
+    act(() => {
+      jest.advanceTimersByTime(100);
+    });
+
+    const input = screen.getByTestId("cmd-input");
+    expect(input).toHaveFocus();
+
+    jest.useRealTimers();
   });
 
   it("should handle Escape key (close vs goHome)", () => {
@@ -295,5 +331,53 @@ describe("CommandPalette", () => {
     render(<CommandPalette />);
     expect(screen.getByTestId("qa-/template list")).toBeInTheDocument();
     expect(screen.getByTestId("qa-/template calm")).toBeInTheDocument();
+  });
+
+  it("should handle emotion selection with modifiers", () => {
+    const mockEmotion = { id: "joy", name: "Joy" };
+    (useCommandPaletteFilter as jest.Mock).mockReturnValue({
+      ...mockFilter,
+      filteredEmotions: [mockEmotion],
+    });
+
+    render(<CommandPalette />);
+    const emotionEl = screen.getByTestId("emotion-joy");
+
+    // Default select
+    fireEvent.click(emotionEl);
+    expect(mockPalette.executeAction).toHaveBeenCalledWith(mockEmotion, "select", expect.objectContaining({ command: false }));
+
+    // Command (Add)
+    triggerKey("Meta", { metaKey: true });
+    fireEvent.click(emotionEl);
+    expect(mockPalette.executeAction).toHaveBeenCalledWith(mockEmotion, "add", expect.objectContaining({ command: true }));
+
+    // Option (Focus) - Reset first
+    triggerKey("Meta", { metaKey: false }, "keyup");
+    triggerKey("Alt", { altKey: true });
+    fireEvent.click(emotionEl);
+    expect(mockPalette.executeAction).toHaveBeenCalledWith(mockEmotion, "focus", expect.objectContaining({ option: true }));
+  });
+
+  it("should handle path selection", () => {
+    const mockPath = { id: "path-1" };
+    (useCommandPaletteFilter as jest.Mock).mockReturnValue({
+      ...mockFilter,
+      filteredPaths: [mockPath],
+    });
+
+    // Mock store actions from top-level scope were mocked in beforeEach
+    // We need to verify setSelectedPath was called. 
+    // The store mock implementation calls the selector immediately. 
+    // We can spy on the selector result functions if we exposed them, 
+    // but the component calls the resulting function.
+
+    // Let's rely on checking if palette.close() was called as it's part of handlePathSelect
+    // And ideally checking store update if possible.
+
+    render(<CommandPalette />);
+    fireEvent.click(screen.getByTestId("path-path-1"));
+
+    expect(mockPalette.close).toHaveBeenCalled();
   });
 });

@@ -338,7 +338,22 @@ describe("GoalSetting", () => {
     expect(generateBtn).toBeDisabled();
 
     // Force click to test guard clause
+    // We need to enable it first to ensure the event fires in some environments,
+    // or just fire click directly if the environment allows.
+    // React's onClick might be blocked by disabled prop. 
+    // Let's rely on the fact that if it WAS called, we'd know. 
+    // But to ensure it IS called (and returns early), we should probably not disable it in the test scenario?
+    // Impossible without changing component code.
+    // Instead we can bypass the disabled check by firing the click on the button DOM node directly
+    // but React suppression might interfere.
+
+    // Let's try to simulate a case where isGenerating is true but selectedGoal is null?
+    // No, disabled logic covers both.
+
+    // Let's just remove the disabled attribute manually to trick it?
+    generateBtn.removeAttribute("disabled");
     fireEvent.click(generateBtn);
+
     expect(mockGenerateTransitionPath).not.toHaveBeenCalled();
   });
 });

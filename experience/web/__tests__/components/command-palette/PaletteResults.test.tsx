@@ -234,6 +234,39 @@ describe("PaletteResults", () => {
         expect(screen.getByText("📊 VAC Filtered")).toBeInTheDocument();
     });
 
+    it("renders dynamic path heading for single emotion selection", () => {
+        const filteredPaths = [mockPath];
+        const selectedEmotionIds = new Set(["joy-1"]);
+        const filteredEmotions = [mockEmotion];
+
+        render(
+            <Wrapper>
+                <PaletteResults
+                    {...defaultProps}
+                    search=""
+                    filteredPaths={filteredPaths as any}
+                    selectedEmotionIds={selectedEmotionIds}
+                    filteredEmotions={filteredEmotions as any}
+                />
+            </Wrapper>
+        );
+
+        expect(screen.getByText("✨ Paths from Joy")).toBeInTheDocument();
+    });
+
+    it("renders nothing for unknown page", () => {
+        const { container } = render(
+            <Wrapper>
+                <PaletteResults {...defaultProps} currentPage="unknown" />
+            </Wrapper>
+        );
+        // cmdk Command wrappers might render, but our component items should be null.
+        // The container might contain the Command shell (input etc are outside in CommandPalette usually, but here PaletteResults is inside Command).
+        // PaletteResults returns null, so it shouldn't render groups/items.
+        // We can check that no groups exist.
+        expect(container.querySelectorAll('[cmdk-group]')).toHaveLength(0);
+    });
+
     it("displays selection and favorite indicators", () => {
         const filteredEmotions = [mockEmotion];
         const selectedEmotionIds = new Set(["joy-1"]);
@@ -253,5 +286,89 @@ describe("PaletteResults", () => {
 
         expect(screen.getByText("✓")).toBeInTheDocument();
         expect(screen.getByText("⭐")).toBeInTheDocument();
+    });
+
+    it("handles category list interaction on home view", () => {
+        const onSelectCategory = jest.fn();
+        const emotionsByCategory = new Map([
+            ["Positive", [mockEmotion]]
+        ]);
+
+        render(
+            <Wrapper>
+                <PaletteResults
+                    {...defaultProps}
+                    currentPage="home"
+                    search=""
+                    emotionsByCategory={emotionsByCategory as any}
+                    onSelectCategory={onSelectCategory}
+                />
+            </Wrapper>
+        );
+
+        fireEvent.click(screen.getByText("Positive"));
+        expect(onSelectCategory).toHaveBeenCalledWith("Positive");
+    });
+
+    it("handles favorites interaction on home view", () => {
+        const onSelectEmotion = jest.fn();
+        const favoriteEmotionsList = [mockEmotion];
+
+        render(
+            <Wrapper>
+                <PaletteResults
+                    {...defaultProps}
+                    currentPage="home"
+                    search=""
+                    favoriteEmotionsList={favoriteEmotionsList as any}
+                    onSelectEmotion={onSelectEmotion}
+                />
+            </Wrapper>
+        );
+
+        fireEvent.click(screen.getByText("Joy"));
+        expect(onSelectEmotion).toHaveBeenCalledWith(mockEmotion);
+    });
+
+    it("handles recent interaction on home view", () => {
+        const onSelectEmotion = jest.fn();
+        const recentEmotionsList = [mockEmotion];
+
+        render(
+            <Wrapper>
+                <PaletteResults
+                    {...defaultProps}
+                    currentPage="home"
+                    search=""
+                    recentEmotionsList={recentEmotionsList as any}
+                    onSelectEmotion={onSelectEmotion}
+                />
+            </Wrapper>
+        );
+
+        fireEvent.click(screen.getByText("Joy"));
+        expect(onSelectEmotion).toHaveBeenCalledWith(mockEmotion);
+    });
+
+    it("handles category drill-down item selection", () => {
+        const onSelectEmotion = jest.fn();
+        const emotionsByCategory = new Map([
+            ["Positive", [mockEmotion]]
+        ]);
+
+        render(
+            <Wrapper>
+                <PaletteResults
+                    {...defaultProps}
+                    currentPage="category"
+                    selectedCategory="Positive"
+                    emotionsByCategory={emotionsByCategory as any}
+                    onSelectEmotion={onSelectEmotion}
+                />
+            </Wrapper>
+        );
+
+        fireEvent.click(screen.getByText("Joy"));
+        expect(onSelectEmotion).toHaveBeenCalledWith(mockEmotion);
     });
 });

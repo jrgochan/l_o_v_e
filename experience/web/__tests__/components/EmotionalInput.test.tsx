@@ -4,7 +4,7 @@
  * Tests the text input form that submits to Listener API for emotional analysis.
  */
 
-import { render, screen, waitFor } from "@testing-library/react";
+import { render, screen, waitFor, fireEvent } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { EmotionalInput } from "@/components/EmotionalInput";
 import { useExperienceStore } from "@/stores/useExperienceStore";
@@ -435,6 +435,36 @@ describe("EmotionalInput", () => {
         expect(screen.queryByText("First error")).not.toBeInTheDocument();
         expect(screen.getByText("Joy")).toBeInTheDocument();
       });
+      await waitFor(() => {
+        expect(screen.queryByText("First error")).not.toBeInTheDocument();
+        expect(screen.getByText("Joy")).toBeInTheDocument();
+      });
+    });
+
+    it("handles non-Error objects thrown by API", async () => {
+      const user = userEvent.setup();
+      mockAnalyzeText.mockRejectedValue("String Error"); // Not an Error object
+
+      render(<EmotionalInput />);
+
+      const textarea = screen.getByPlaceholderText(/Type how you're feeling/i);
+      await user.type(textarea, "test");
+      const button = screen.getByRole("button", { name: /Analyze Emotion/i });
+      await user.click(button);
+
+      await waitFor(() => {
+        expect(screen.getByText("Analysis failed")).toBeInTheDocument();
+      });
+    });
+
+    it("does not submit if text is empty (bypass button check)", async () => {
+      render(<EmotionalInput />);
+      const form = screen.getByRole("button", { name: /Analyze Emotion/i }).closest("form");
+
+      // Force submit despite disabled button
+      fireEvent.submit(form!);
+
+      expect(mockAnalyzeText).not.toHaveBeenCalled();
     });
   });
 });

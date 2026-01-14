@@ -12,101 +12,30 @@ import { useExperienceStore } from "@/stores/useExperienceStore";
 import { getObserverClient, AtlasEmotion, TransitionPathResponse } from "@love/experience-shared";
 import { PersonalStrategies } from "./PersonalStrategies";
 import { logger } from "@/utils/logger";
+import { useGoalSettingLogic } from "./GoalSettingLogic";
 
 export function GoalSetting() {
-  const [isOpen, setIsOpen] = useState(false);
-  const [searchQuery, setSearchQuery] = useState("");
-  const [emotions, setEmotions] = useState<AtlasEmotion[]>([]);
-  const [filteredEmotions, setFilteredEmotions] = useState<AtlasEmotion[]>([]);
-  const [selectedGoal, setSelectedGoal] = useState<AtlasEmotion | null>(null);
-  const [generatedPath, setGeneratedPath] = useState<TransitionPathResponse | null>(null);
-  const [isGenerating, setIsGenerating] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [expandedStrategy, setExpandedStrategy] = useState<string | null>(null);
-
-  const currentVAC = useExperienceStore((state) => state.currentVAC);
-  const setTransitionPath = useExperienceStore((state) => state.setTransitionPath);
-  const startJourney = useExperienceStore((state) => state.startJourney);
-  const activeJourney = useExperienceStore((state) => state.activeJourney);
-
-  // Load emotion atlas when opened
-  useEffect(() => {
-    if (isOpen && emotions.length === 0) {
-      loadEmotionAtlas();
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isOpen]);
-
-  // Filter emotions based on search
-  useEffect(() => {
-    if (searchQuery) {
-      const filtered = emotions.filter(
-        (e) =>
-          e.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          e.category.toLowerCase().includes(searchQuery.toLowerCase())
-      );
-      setFilteredEmotions(filtered);
-    } else {
-      setFilteredEmotions(emotions);
-    }
-  }, [searchQuery, emotions]);
-
-  const loadEmotionAtlas = async () => {
-    setIsLoading(true);
-    setError(null);
-
-    try {
-      const client = getObserverClient();
-      const response = await client.loadEmotionAtlas();
-
-      setEmotions(response.emotions);
-      setFilteredEmotions(response.emotions);
-      logger.info("api", `Loaded ${response.total_count} emotions from atlas`);
-    } catch (err) {
-      const errorMsg = err instanceof Error ? err.message : "Failed to load emotions";
-      setError(errorMsg);
-      logger.error("api", "Failed to load emotion atlas", err);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const handleGeneratePath = async () => {
-    if (!selectedGoal) return;
-
-    setIsGenerating(true);
-    setError(null);
-
-    try {
-      const client = getObserverClient();
-      const path = await client.generateTransitionPath(
-        "00000000-0000-0000-0000-000000000001", // Mock user ID
-        currentVAC,
-        selectedGoal.vac,
-        3 // max waypoints
-      );
-
-      setGeneratedPath(path);
-      setTransitionPath(path); // Store in global state for 3D visualization
-      logger.info("api", "Generated transition path", { path });
-    } catch (err) {
-      const errorMsg = err instanceof Error ? err.message : "Failed to generate path";
-      setError(errorMsg);
-      logger.error("api", "Path generation error", err);
-    } finally {
-      setIsGenerating(false);
-    }
-  };
-
-  const handleSelectGoal = (emotion: AtlasEmotion) => {
-    setSelectedGoal(emotion);
-    setGeneratedPath(null); // Clear previous path
-  };
-
-  const toggleStrategy = (strategyId: string) => {
-    setExpandedStrategy(expandedStrategy === strategyId ? null : strategyId);
-  };
+  const {
+    isOpen,
+    setIsOpen,
+    searchQuery,
+    setSearchQuery,
+    emotions,
+    filteredEmotions,
+    selectedGoal,
+    generatedPath,
+    setGeneratedPath,
+    isGenerating,
+    isLoading,
+    error,
+    expandedStrategy,
+    handleGeneratePath,
+    handleSelectGoal,
+    toggleStrategy,
+    handleStartJourney,
+    currentVAC,
+    activeJourney
+  } = useGoalSettingLogic();
 
   if (!isOpen) {
     return (
@@ -166,11 +95,10 @@ export function GoalSetting() {
                 <button
                   key={emotion.id}
                   onClick={() => handleSelectGoal(emotion)}
-                  className={`w-full text-left p-3 rounded-lg transition-all ${
-                    selectedGoal?.id === emotion.id
-                      ? "bg-purple-600 text-white"
-                      : "bg-gray-800 text-gray-200 hover:bg-gray-700"
-                  }`}
+                  className={`w-full text-left p-3 rounded-lg transition-all ${selectedGoal?.id === emotion.id
+                    ? "bg-purple-600 text-white"
+                    : "bg-gray-800 text-gray-200 hover:bg-gray-700"
+                    }`}
                 >
                   <div className="font-semibold">{emotion.name}</div>
                   <div className="text-xs opacity-70 line-clamp-1">{emotion.category}</div>
@@ -358,27 +286,7 @@ export function GoalSetting() {
           {/* Actions */}
           <div className="flex gap-2 pt-2">
             <button
-              onClick={async () => {
-                try {
-                  const client = getObserverClient();
-                  const response = await client.startJourney(
-                    "00000000-0000-0000-0000-000000000001",
-                    generatedPath.path_id
-                  );
-
-                  // Store journey in state
-                  startJourney(
-                    response.journey_id,
-                    generatedPath.path_id,
-                    generatedPath.waypoints.length
-                  );
-
-                  logger.info("general", "Journey started", { response });
-                } catch (err) {
-                  logger.error("general", "Failed to start journey", err);
-                  setError("Failed to start journey. Please try again.");
-                }
-              }}
+              onClick={handleStartJourney}
               disabled={activeJourney !== null}
               className="flex-1 px-4 py-2 bg-green-600 hover:bg-green-500 disabled:bg-gray-600 disabled:cursor-not-allowed text-white font-semibold rounded-lg transition-colors"
             >

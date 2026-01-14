@@ -37,6 +37,17 @@ describe("ChatSettings", () => {
     expect(mockUpdateChatSetting).toHaveBeenCalledWith("defaultToneMode", "clinical");
   });
 
+  it("handles tone selection back to warm", () => {
+    (useSettingsStore as unknown as jest.Mock).mockReturnValue({
+      ...defaultSettings,
+      defaultToneMode: "clinical",
+    });
+    render(<ChatSettings />);
+    const toggle = screen.getByLabelText("Toggle between 💗 Warm and 🔬 Clinical");
+    fireEvent.click(toggle); // Should toggle from clinical (true) to warm (false)
+    expect(mockUpdateChatSetting).toHaveBeenCalledWith("defaultToneMode", "warm");
+  });
+
   it("handles deep feeling toggle", () => {
     render(<ChatSettings />);
     // Left: "Single Emotion", Right: "Deep Feeling (Multi)"
@@ -51,5 +62,39 @@ describe("ChatSettings", () => {
     const toggle = screen.getByLabelText("Toggle between Manual Add and Auto-Focus Emotions");
     fireEvent.click(toggle);
     expect(mockUpdateChatSetting).toHaveBeenCalledWith("autoFocusEmotions", false);
+  });
+  it("handles keyboard shortcuts toggle", () => {
+    (useSettingsStore as unknown as jest.Mock).mockReturnValue({
+      ...defaultSettings,
+      enableKeyboardShortcuts: false,
+    });
+    render(<ChatSettings />);
+
+    // Left: "Disabled", Right: "Enabled"
+    const toggle = screen.getByLabelText("Toggle between Disabled and Enabled");
+    fireEvent.click(toggle);
+
+    expect(mockUpdateChatSetting).toHaveBeenCalledWith("enableKeyboardShortcuts", true);
+  });
+
+  it("shows shortcuts list when enabled", () => {
+    (useSettingsStore as unknown as jest.Mock).mockReturnValue({
+      ...defaultSettings,
+      enableKeyboardShortcuts: true,
+    });
+    render(<ChatSettings />);
+
+    expect(screen.getByText("Key Shortcuts")).toBeInTheDocument();
+    expect(screen.getByText("D: Data Viz Mode")).toBeInTheDocument();
+  });
+
+  it("hides shortcuts list when disabled", () => {
+    (useSettingsStore as unknown as jest.Mock).mockReturnValue({
+      ...defaultSettings,
+      enableKeyboardShortcuts: false,
+    });
+    render(<ChatSettings />);
+
+    expect(screen.queryByText("Key Shortcuts")).not.toBeInTheDocument();
   });
 });
