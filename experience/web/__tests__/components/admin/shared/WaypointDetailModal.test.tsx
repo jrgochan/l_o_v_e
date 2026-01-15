@@ -282,4 +282,146 @@ describe("WaypointDetailModal", () => {
     );
     expect(screen.getByText("You have reached your destination. Reflect on the journey.")).toBeInTheDocument();
   });
+
+  it("renders positive VAC shifts correctly", () => {
+    const positivePath = {
+      ...mockPath,
+      waypoints: [{
+        ...mockPath.waypoints[0],
+        vac: [1.0, 1.0, 1.0], // Way higher than prev (0.8, 0.8, 0.8) -> +0.2
+        explanation: {
+          ...mockPath.waypoints[0].explanation,
+          vac_analysis: {
+            valence_shift: { psychological_meaning: "Improving", delta: 0.2, direction: "up" },
+            arousal_shift: { psychological_meaning: "Rising", delta: 0.2, direction: "up" },
+            connection_shift: { psychological_meaning: "Connecting", delta: 0.2, direction: "up" },
+          }
+        }
+      }]
+    } as EmotionPath;
+
+    render(
+      <WaypointDetailModal
+        waypointIndex={1}
+        path={positivePath}
+        onClose={onCloseMock}
+        onNavigate={onNavigateMock}
+      />
+    );
+
+    // Check for positive colors (cyan, yellow, purple)
+    const values = screen.getAllByText("0.200");
+    const cyan = values.find(el => el.classList.contains("text-cyan-400"));
+    const yellow = values.find(el => el.classList.contains("text-yellow-400"));
+    const purple = values.find(el => el.classList.contains("text-purple-400"));
+
+    expect(cyan).toBeInTheDocument();
+    expect(yellow).toBeInTheDocument();
+    expect(purple).toBeInTheDocument();
+  });
+
+  it("ignores navigation keys at boundaries", () => {
+    const { rerender } = render(
+      <WaypointDetailModal
+        waypointIndex={0}
+        path={mockPath}
+        onClose={onCloseMock}
+        onNavigate={onNavigateMock}
+      />
+    );
+
+    fireEvent.keyDown(window, { key: "ArrowLeft" });
+    expect(onNavigateMock).not.toHaveBeenCalled();
+
+    rerender(
+      <WaypointDetailModal
+        waypointIndex={2}
+        path={mockPath}
+        onClose={onCloseMock}
+        onNavigate={onNavigateMock}
+      />
+    );
+
+    fireEvent.keyDown(window, { key: "ArrowRight" });
+    expect(onNavigateMock).not.toHaveBeenCalled();
+  });
+
+  it("renders fallback text when step explanation and reasoning are missing", () => {
+    const minimalPath = {
+      ...mockPath,
+      waypoints: [
+        {
+          ...mockPath.waypoints[0],
+          explanation: null as any,
+          reasoning: undefined as unknown as string,
+        },
+      ],
+    };
+
+    render(
+      <WaypointDetailModal
+        waypointIndex={1}
+        path={minimalPath}
+        onClose={onCloseMock}
+      />
+    );
+
+    expect(
+      screen.getByText(`${mockPath.waypoints[0].emotion} is a key state in this journey.`)
+    ).toBeInTheDocument();
+  });
+
+  it("renders correct text for VAC decreases, increases, and no change", () => {
+    // Test 1: Decreases
+    const varyingPath = {
+      ...mockPath,
+      from: { ...mockPath.from, vac: [0.8, 0.5, 0.5] as [number, number, number] },
+      waypoints: [
+        {
+          ...mockPath.waypoints[0],
+          vac: [0.5, 0.5, 0.3] as [number, number, number],
+          explanation: null as any,
+        },
+      ],
+    };
+
+    const { unmount } = render(
+      <WaypointDetailModal
+        waypointIndex={1}
+        path={varyingPath}
+        onClose={onCloseMock}
+      />
+    );
+
+    expect(screen.getByText("↓ More Negative")).toBeInTheDocument();
+    expect(screen.getByText("→ No Change")).toBeInTheDocument();
+    expect(screen.getByText("↓ Less Connected")).toBeInTheDocument();
+
+    unmount();
+
+    // Test 2: Increases
+    const increasingPath = {
+      ...mockPath,
+      from: { ...mockPath.from, vac: [0.5, 0.5, 0.5] as [number, number, number] },
+      waypoints: [
+        {
+          ...mockPath.waypoints[0],
+          vac: [0.8, 0.8, 0.8] as [number, number, number],
+          explanation: null as any,
+        },
+      ],
+    };
+
+    render(
+      <WaypointDetailModal
+        waypointIndex={1}
+        path={increasingPath}
+        onClose={onCloseMock}
+      />
+    );
+
+    expect(screen.getByText("↑ More Positive")).toBeInTheDocument();
+    expect(screen.getByText("↑ Higher Arousal")).toBeInTheDocument();
+    expect(screen.getByText("↑ More Connected")).toBeInTheDocument();
+  });
 });

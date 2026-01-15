@@ -1,5 +1,5 @@
 
-import { render, screen, fireEvent } from "@testing-library/react";
+import { render, screen, fireEvent, cleanup } from "@testing-library/react";
 import { PaletteResults } from "@/components/command-palette/PaletteResults";
 import { Command } from "cmdk";
 
@@ -110,6 +110,44 @@ describe("PaletteResults", () => {
         expect(screen.getByText("Sadness")).toBeInTheDocument();
         expect(screen.getByText("Joy")).toBeInTheDocument();
         expect(screen.getByText("moderate")).toBeInTheDocument();
+    });
+
+    it("renders correct path badges for difficulty", () => {
+        const easyPath = { ...mockPath, id: "p-easy", difficulty: "easy" };
+        const hardPath = { ...mockPath, id: "p-hard", difficulty: "hard" };
+
+        const { rerender } = render(
+            <Wrapper>
+                <PaletteResults {...defaultProps} search="path" filteredPaths={[easyPath] as any} />
+            </Wrapper>
+        );
+        expect(screen.getByText("easy")).toHaveClass("text-green-300");
+
+        rerender(
+            <Wrapper>
+                <PaletteResults {...defaultProps} search="path" filteredPaths={[hardPath] as any} />
+            </Wrapper>
+        );
+        expect(screen.getByText("hard")).toHaveClass("text-red-300");
+    });
+
+    it("renders correct path badges for difficulty", () => {
+        const easyPath = { ...mockPath, id: "p-easy", difficulty: "easy" };
+        const hardPath = { ...mockPath, id: "p-hard", difficulty: "hard" };
+
+        const { rerender } = render(
+            <Wrapper>
+                <PaletteResults {...defaultProps} search="path" filteredPaths={[easyPath] as any} />
+            </Wrapper>
+        );
+        expect(screen.getByText("easy")).toHaveClass("text-green-300");
+
+        rerender(
+            <Wrapper>
+                <PaletteResults {...defaultProps} search="path" filteredPaths={[hardPath] as any} />
+            </Wrapper>
+        );
+        expect(screen.getByText("hard")).toHaveClass("text-red-300");
     });
 
     it("handles path selection", () => {
@@ -254,6 +292,74 @@ describe("PaletteResults", () => {
         expect(screen.getByText("✨ Paths from Joy")).toBeInTheDocument();
     });
 
+    it("renders generic path heading when search is active or multiple emotions selected", () => {
+        const filteredPaths = [mockPath];
+        const selectedEmotionIds = new Set(["joy-1"]);
+        const filteredEmotions = [mockEmotion];
+
+        // Case 1: Search active
+        const { rerender } = render(
+            <Wrapper>
+                <PaletteResults
+                    {...defaultProps}
+                    search="some search"
+                    filteredPaths={filteredPaths as any}
+                    selectedEmotionIds={selectedEmotionIds}
+                    filteredEmotions={filteredEmotions as any}
+                />
+            </Wrapper>
+        );
+        expect(screen.getByText("🛤️ Relevant Paths")).toBeInTheDocument();
+
+        // Case 2: No search, but 0 selected emotions
+        rerender(
+            <Wrapper>
+                <PaletteResults
+                    {...defaultProps}
+                    search=""
+                    filteredPaths={filteredPaths as any}
+                    selectedEmotionIds={new Set()}
+                    filteredEmotions={filteredEmotions as any}
+                />
+            </Wrapper>
+        );
+        expect(screen.getByText("🛤️ Relevant Paths")).toBeInTheDocument();
+    });
+
+    it("renders generic path heading when search is active or multiple emotions selected", () => {
+        const filteredPaths = [mockPath];
+        const selectedEmotionIds = new Set(["joy-1"]);
+        const filteredEmotions = [mockEmotion];
+
+        // Case 1: Search active
+        const { rerender } = render(
+            <Wrapper>
+                <PaletteResults
+                    {...defaultProps}
+                    search="some search"
+                    filteredPaths={filteredPaths as any}
+                    selectedEmotionIds={selectedEmotionIds}
+                    filteredEmotions={filteredEmotions as any}
+                />
+            </Wrapper>
+        );
+        expect(screen.getByText("🛤️ Relevant Paths")).toBeInTheDocument();
+
+        // Case 2: No search, but 0 selected emotions
+        rerender(
+            <Wrapper>
+                <PaletteResults
+                    {...defaultProps}
+                    search=""
+                    filteredPaths={filteredPaths as any}
+                    selectedEmotionIds={new Set()}
+                    filteredEmotions={filteredEmotions as any}
+                />
+            </Wrapper>
+        );
+        expect(screen.getByText("🛤️ Relevant Paths")).toBeInTheDocument();
+    });
+
     it("renders nothing for unknown page", () => {
         const { container } = render(
             <Wrapper>
@@ -370,5 +476,81 @@ describe("PaletteResults", () => {
 
         fireEvent.click(screen.getByText("Joy"));
         expect(onSelectEmotion).toHaveBeenCalledWith(mockEmotion);
+    });
+
+    it("renders color hints for emotions", () => {
+        const emotions = [{ ...mockEmotion, color_hint: "🔴" }];
+        render(
+            <Wrapper>
+                <PaletteResults {...defaultProps} search="joy" filteredEmotions={emotions as any} />
+            </Wrapper>
+        );
+        expect(screen.getByText("🔴")).toBeInTheDocument();
+    });
+
+    it("renders selected emotion indicator", () => {
+        const emotions = [mockEmotion];
+        const selectedIds = new Set([mockEmotion.id]);
+
+        render(
+            <Wrapper>
+                <PaletteResults
+                    {...defaultProps}
+                    search="joy"
+                    filteredEmotions={emotions as any}
+                    selectedEmotionIds={selectedIds}
+                />
+            </Wrapper>
+        );
+        expect(screen.getByText("✓")).toBeInTheDocument();
+    });
+
+    it("renders selection states correctly in Favorites, Recent, and Category lists", () => {
+        const selectedId = "e1"; // Joy
+        const unselectedId = "e2"; // Boredom
+        const selectedIds = new Set([selectedId]);
+
+        const favEmotionSelected = { ...mockEmotion, id: selectedId, name: "Joy" };
+        const recentEmotionUnselected = { ...mockEmotion, id: unselectedId, name: "Boredom" };
+
+        // Setup Category Map
+        const categoryMap = new Map();
+        categoryMap.set("Positive", [favEmotionSelected]);
+
+        render(
+            <Wrapper>
+                <PaletteResults
+                    {...defaultProps}
+                    search=""
+                    currentPage="home" // Shows Favorites/Recent
+                    selectedEmotionIds={selectedIds}
+                    favoriteEmotionsList={[favEmotionSelected as any]}
+                    recentEmotionsList={[recentEmotionUnselected as any]}
+                    emotionsByCategory={categoryMap as any}
+                />
+            </Wrapper>
+        );
+
+        // Verify Favorites: Joy should have checkmark/selected style
+        const checks = screen.getAllByText("✓");
+        expect(checks.length).toBeGreaterThan(0);
+
+        // Switch to Category View to test Category list selection logic
+        cleanup();
+        render(
+            <Wrapper>
+                <PaletteResults
+                    {...defaultProps}
+                    search=""
+                    currentPage="category"
+                    selectedCategory="Positive"
+                    selectedEmotionIds={selectedIds}
+                    emotionsByCategory={categoryMap as any}
+                />
+            </Wrapper>
+        );
+
+        // Verify Category List: Joy should be selected
+        expect(screen.getAllByText("✓").length).toBeGreaterThan(0);
     });
 });

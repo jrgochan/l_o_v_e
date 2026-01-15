@@ -84,6 +84,25 @@ describe("useEmotionAtlas", () => {
     expect(mockSetLoading).toHaveBeenCalledWith(false);
   });
 
+  it("handles unknown error objects", async () => {
+    (useAtlasAdminStore as unknown as jest.Mock).mockReturnValue({
+      allEmotions: [],
+      isLoadingEmotions: false,
+      error: null,
+      setAllEmotions: mockSetAllEmotions,
+      setLoadingEmotions: mockSetLoading,
+      setError: mockSetError,
+    });
+
+    fetchMock.mockReject("Just a string error");
+
+    renderHook(() => useEmotionAtlas());
+
+    await waitFor(() => {
+      expect(mockSetError).toHaveBeenCalledWith("Unknown error");
+    });
+  });
+
   it("should patch suspicious zero VAC with canonical if available", async () => {
     const mockResponse = {
       emotions: [

@@ -124,6 +124,17 @@ describe("AggregateSphere", () => {
     expect(mockDispose).toHaveBeenCalled();
     expect(mockGeometryDispose).toHaveBeenCalled();
     expect(mockMeshMaterialDispose).toHaveBeenCalled();
+    expect(mockDispose).toHaveBeenCalled();
+    expect(mockGeometryDispose).toHaveBeenCalled();
+    expect(mockMeshMaterialDispose).toHaveBeenCalled();
+    // Verify it was called with a number (the frame ID)
+    expect(mockCancelAnimationFrame).toHaveBeenCalledWith(expect.any(Number));
+  });
+
+  it("should dispose resources on unmount", () => {
+    const { unmount } = render(<AggregateSphere emotions={mockEmotions as any} aggregate={mockAggregate as any} />); // Fixed: use explicit props instead of undefined defaultProps
+    unmount();
+    // Verify cleanup
     expect(mockCancelAnimationFrame).toHaveBeenCalled();
   });
 

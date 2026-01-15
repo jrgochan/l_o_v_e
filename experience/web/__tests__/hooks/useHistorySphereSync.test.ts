@@ -38,6 +38,7 @@ describe("useHistorySphereSync", () => {
     };
 
     (useAtlasAdminStore as unknown as jest.Mock).mockImplementation((selector) => {
+      // Basic state shape for selector usage
       return selector(currentAtlasState);
     });
 
@@ -45,6 +46,8 @@ describe("useHistorySphereSync", () => {
       return selector(currentHistoryState);
     });
   });
+
+
 
   afterEach(() => {
     jest.useRealTimers();
@@ -165,4 +168,76 @@ describe("useHistorySphereSync", () => {
     // Should NOT call deselect because the second entry keeps it alive
     expect(mockDeselectEmotion).not.toHaveBeenCalled();
   });
+
+  it("should handle unknown emotions in history gracefully", () => {
+    // 1. Start with clean state
+    const { rerender } = renderHook(() => useHistorySphereSync());
+
+    // 2. Update History with "UnknownEmotion" (triggers entriesChanged)
+    currentHistoryState = {
+      ...currentHistoryState,
+      entries: [{ id: "h99", emotion: "UnknownEmotion", isVisibleInSphere: true }],
+    };
+
+    // 3. Rerender to trigger effect
+    rerender();
+
+    // Should safely ignore and not throw/call select
+    expect(mockSelectEmotion).not.toHaveBeenCalled();
+  });
+
+  it("should prevent circular updates (History change -> Sphere sync -> skip History update)", () => {
+    // 1. Initial Render
+    const { rerender } = renderHook(() => useHistorySphereSync());
+
+    // 2. History change triggers Sphere selection (History -> Sphere)
+    currentHistoryState = {
+      ...currentHistoryState,
+      entries: [{ id: joyHistoryId, emotion: joyName, isVisibleInSphere: true }],
+    };
+
+    // Rerender 1: Effect 1 runs, adds to ref, calls selectEmotion
+    rerender();
+
+    // 3. Selection updates in Atlas Store (simulated response to history sync)
+    // AND we trigger the Sphere -> History sync check
+    currentAtlasState = {
+      ...currentAtlasState,
+      selectedEmotionIds: new Set([joyId]),
+    };
+
+    // Rerender 2: Effect 2 runs, sees Ref has ID, skips setVisibility
+    rerender();
+
+    // Verify setVisibility was NOT called (circular loop prevented)
+    expect(mockSetVisibility).not.toHaveBeenCalled();
+  });
+
+  it("should ignore unknown emotions during Sphere -> History sync", () => {
+    // 1. Start with history containing unknown emotion
+    // Note: We need this to be PRESENT when the Sphere->History effect runs.
+    const ghostId = "h_ghost";
+    const ghostName = "Ghost";
+
+    // To minimize complexity, we start with it, but we need to trigger SELECTION change to run effect 2.
+    currentHistoryState = {
+      ...currentHistoryState,
+      entries: [{ id: ghostId, emotion: ghostName, isVisibleInSphere: true }],
+    };
+
+    const { rerender } = renderHook(() => useHistorySphereSync());
+
+    // 2. Trigger Sphere Selection Change (to force the second effect)
+    currentAtlasState = {
+      ...currentAtlasState,
+      selectedEmotionIds: new Set([joyId]), // Select Joy locally
+    };
+
+    rerender();
+
+    // 3. The effect should iterate, find "Ghost" in history, try to find in Atlas -> fail -> return
+    // It should NOT crash, and mockSetVisibility should NOT be called for Ghost
+    expect(mockSetVisibility).not.toHaveBeenCalledWith(ghostId, expect.any(Boolean));
+  });
 });
+

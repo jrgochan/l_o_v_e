@@ -1,4 +1,4 @@
-import { renderHook } from "@testing-library/react";
+import { renderHook, act } from "@testing-library/react";
 import { usePathCalculator } from "@/hooks/usePathCalculator";
 import { useAtlasAdminStore } from "@/stores/useAtlasAdminStore";
 import { useSinglePath } from "@/hooks/pathfinding/useSinglePath";
@@ -96,5 +96,15 @@ describe("usePathCalculator", () => {
     await expect(result.current.computeSpecificPath("e1", "invalid")).rejects.toThrow(
       "Emotion not found"
     );
+  });
+
+  it("should trigger computation manually", () => {
+    const { result } = renderHook(() => usePathCalculator());
+
+    act(() => {
+      result.current.triggerComputation();
+    });
+
+    expect(mockComputeAllPaths).toHaveBeenCalled();
   });
 });

@@ -23,7 +23,13 @@ describe("useEmotionNavigation", () => {
       viewMultipleInSphere: jest.fn(),
       autoFocusEmotion: jest.fn(),
     });
-    (useAtlasAdminStore as unknown as jest.Mock).mockReturnValue(() => []);
+    (useAtlasAdminStore as unknown as jest.Mock).mockImplementation((selector) => {
+      // Support function selectors
+      const state = {
+        getSelectedEmotions: jest.fn(() => []),
+      };
+      return selector(state);
+    });
   });
 
   it("should compose resolution and actions", () => {
@@ -35,5 +41,25 @@ describe("useEmotionNavigation", () => {
     );
 
     expect(result.current.focusEmotion).toBe(mockFocus);
+
+    // Cover all exposed methods
+    result.current.selectEmotionByName("Joy");
+    expect(useNavigationActions().selectEmotionByName).toHaveBeenCalledWith("Joy");
+
+    result.current.viewInSphere("id-1");
+    expect(useNavigationActions().viewInSphere).toHaveBeenCalledWith("id-1");
+
+    result.current.addToSelection("id-2");
+    expect(useNavigationActions().addToSelection).toHaveBeenCalledWith("id-2");
+
+    result.current.viewMultipleInSphere(["id-3"]);
+    expect(useNavigationActions().viewMultipleInSphere).toHaveBeenCalledWith(["id-3"]);
+
+    result.current.autoFocusEmotion("Sadness");
+    expect(useNavigationActions().autoFocusEmotion).toHaveBeenCalledWith("Sadness");
+
+    // Check findEmotionByName
+    result.current.findEmotionByName("Joy");
+    expect(mockFind).toHaveBeenCalledWith("Joy");
   });
 });

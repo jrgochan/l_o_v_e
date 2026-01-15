@@ -213,6 +213,10 @@ describe("MatrixGrid", () => {
     (defaultProps.getPathForPair as jest.Mock).mockReturnValue(null);
     render(<MatrixGrid {...defaultProps} />);
 
+    // Check for "Not computed" in titles
+    // Since we have multiple cells, find all titles containing "Not computed"
+    const cells = screen.getAllByTitle(/Not computed/i);
+    expect(cells.length).toBeGreaterThan(0);
   });
 
   it("renders computed path details in tooltip", () => {

@@ -62,4 +62,13 @@ describe("MiniSoulSphere", () => {
     // Fallback is #888888
     expect(style).toContain('#888888');
   });
+  it("defaults to grey for unknown modes", () => {
+    // Targets default case in switch (line 63)
+    // @ts-ignore
+    const { container } = render(<MiniSoulSphere emotion={mockEmotion} colorMode="unknown_mode" />);
+    const innerSphere = container.querySelector('.absolute.inset-0') as HTMLElement;
+    const style = innerSphere.getAttribute('style');
+    // Default color #888888
+    expect(style).toContain("#888888");
+  });
 });

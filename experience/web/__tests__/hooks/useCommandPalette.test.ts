@@ -1,5 +1,6 @@
 import { renderHook, act } from "@testing-library/react";
 import { useCommandPalette } from "../../hooks/useCommandPalette";
+import { useCommandPaletteState } from "../../hooks/command-palette/useCommandPaletteState";
 
 // Mock dependencies
 const mockOpen = jest.fn();
@@ -12,7 +13,7 @@ const mockExecuteAction = jest.fn();
 
 // Mock sub-hooks
 jest.mock("../../hooks/command-palette/useCommandPaletteState", () => ({
-  useCommandPaletteState: () => ({
+  useCommandPaletteState: jest.fn(() => ({
     isOpen: true,
     currentPage: "home",
     selectedCategory: "all",
@@ -23,7 +24,7 @@ jest.mock("../../hooks/command-palette/useCommandPaletteState", () => ({
     setPage: mockSetPage,
     setCategory: mockSetCategory,
     setSearch: mockSetSearch,
-  }),
+  })),
 }));
 
 jest.mock("../../hooks/command-palette/useCommandPaletteData", () => ({
@@ -65,6 +66,8 @@ jest.mock("@/stores/useAtlasAdminStore", () => ({
 describe("useCommandPalette", () => {
   beforeEach(() => {
     jest.clearAllMocks();
+    jest.spyOn(window, "addEventListener");
+    jest.spyOn(window, "removeEventListener");
   });
 
   it("should initialize and return state/actions", () => {
@@ -120,5 +123,33 @@ describe("useCommandPalette", () => {
       result.current.viewCategory("Positive");
     });
     expect(mockSetCategory).toHaveBeenCalledWith("Positive");
+  });
+
+  it("should not attach key listener when closed", () => {
+    // Mock isOpen false
+    (useCommandPaletteState as unknown as jest.Mock).mockReturnValue({
+      isOpen: false,
+      currentPage: "home",
+      selectedCategory: "all",
+      search: "",
+      open: mockOpen,
+      close: mockClose,
+      toggle: mockToggle,
+      setPage: mockSetPage,
+      setCategory: mockSetCategory,
+      setSearch: mockSetSearch,
+    });
+
+    const { rerender } = renderHook(() => useCommandPalette());
+
+    // Initially closed
+    // Global listener is attached in first useEffect (no deps on isOpen)
+    expect(window.addEventListener).toHaveBeenCalledWith("keydown", expect.any(Function));
+    (window.addEventListener as jest.Mock).mockClear();
+
+    // Rerender
+    rerender();
+    // Specific navigation listener (second useEffect) should NOT be attached because !isOpen
+    expect(window.addEventListener).not.toHaveBeenCalled();
   });
 });

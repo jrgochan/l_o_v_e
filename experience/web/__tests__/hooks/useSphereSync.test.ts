@@ -44,4 +44,15 @@ describe("useSphereSync", () => {
     expect(result.current.isConnected).toBe(true);
     expect(result.current.broadcast).toBe(mockBroadcast);
   });
+
+  it("should return lastMessageTime if lastUpdate is missing", () => {
+    (useSphereReceiver as jest.Mock).mockReturnValue({
+      handleMessage: jest.fn(),
+      lastUpdate: null,
+    });
+
+    const { result } = renderHook(() => useSphereSync({ mode: "broadcaster" }));
+
+    expect(result.current.lastMessage).toBe(123);
+  });
 });

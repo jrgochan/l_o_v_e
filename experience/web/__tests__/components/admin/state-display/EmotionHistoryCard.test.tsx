@@ -75,4 +75,12 @@ describe("EmotionHistoryCard", () => {
     rerender(<EmotionHistoryCard entry={{ ...mockEntry, confidence: 0.4 }} onToggleVisibility={onToggleVisibility} onRemove={onRemove} />);
     expect(screen.getByText("40%")).toHaveClass("text-orange-400");
   });
+
+  it("handles unknown category", () => {
+    const unknownEntry = { ...mockEntry, id: "u1", category: "UnknownXYZ" };
+    render(<EmotionHistoryCard entry={unknownEntry} onToggleVisibility={onToggleVisibility} onRemove={onRemove} />);
+    // Should render without error and fall back to default color
+    // We can verify category text
+    expect(screen.getByText("UnknownXYZ")).toBeInTheDocument();
+  });
 });

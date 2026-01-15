@@ -242,4 +242,60 @@ describe("EmotionRelationshipGraph", () => {
     // Invoke tick - should return early (covering line 39)
     tick();
   });
+  it("handles various link strengths for stroke dasharray", () => {
+    // Mock data with diverse strengths
+    (useGraphData as jest.Mock).mockReturnValue({
+      nodes: [
+        { id: "1", color: "red", emotion: { prominence: "primary" } },
+        { id: "2", color: "blue", emotion: { prominence: "secondary" } }
+      ],
+      links: [
+        { source: "1", target: "2", relationship: { strength: 0.9 } }, // High
+        { source: "1", target: "2", relationship: { strength: 0.5 } }, // Med
+        { source: "1", target: "2", relationship: { strength: 0.1 } }  // Low
+      ]
+    });
+
+    render(<EmotionRelationshipGraph {...defaultProps} />);
+    expect(d3.select).toHaveBeenCalled();
+  });
+
+  it("handles mouse over/out node transitions", () => {
+    render(<EmotionRelationshipGraph {...defaultProps} />);
+
+    if (mockHandlers["mouseover"]) {
+      const nodeData = {
+        radius: 20,
+        emotion: { prominence: "primary" },
+        id: "e1"
+      };
+      act(() => {
+        mockHandlers["mouseover"].call({}, { stopPropagation: () => { } }, nodeData);
+      });
+    }
+
+    if (mockHandlers["mouseout"]) {
+      const nodeData = { radius: 20, emotion: { prominence: "primary" } };
+      act(() => {
+        mockHandlers["mouseout"].call({}, { stopPropagation: () => { } }, nodeData);
+      });
+    }
+
+    // Add secondary prominence mouseover test
+    if (mockHandlers["mouseover"]) {
+      const nodeDataSec = {
+        radius: 15,
+        emotion: { prominence: "secondary" },
+        id: "e2"
+      };
+      act(() => {
+        mockHandlers["mouseover"].call({}, { stopPropagation: () => { } }, nodeDataSec);
+      });
+      // And mouseout
+      act(() => {
+        if (mockHandlers["mouseout"])
+          mockHandlers["mouseout"].call({}, { stopPropagation: () => { } }, nodeDataSec);
+      });
+    }
+  });
 });

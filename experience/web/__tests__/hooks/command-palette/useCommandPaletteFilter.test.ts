@@ -425,4 +425,31 @@ describe("useCommandPaletteFilter", () => {
     );
     expect(result.current.filteredPaths).toEqual([]);
   });
+
+  it("should ignore completely unknown operators", () => {
+    const { result } = renderHook(() =>
+      useCommandPaletteFilter({
+        search: "valence >>> 0.5", // >>> matches regex [<>=]+ but hits default switch
+        selectedCategory: null,
+        favoriteEmotions: [],
+        recentEmotions: [],
+        selectedEmotionIds: new Set(),
+      })
+    );
+    // Default returns true (all emotions)
+    expect(result.current.filteredEmotions.length).toBeGreaterThan(0);
+  });
+
+  it("should handle incomplete 'to' queries", () => {
+    const { result } = renderHook(() =>
+      useCommandPaletteFilter({
+        search: "Joy to ",
+        selectedCategory: null,
+        favoriteEmotions: [],
+        recentEmotions: [],
+        selectedEmotionIds: new Set(),
+      })
+    );
+    expect(result.current.filteredPaths).toEqual([]);
+  });
 });

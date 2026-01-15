@@ -275,8 +275,13 @@ export function PaletteResults({
                     <div className="text-xs text-gray-400">{emotion.category}</div>
                   </div>
                 </div>
-                <div className="text-xs text-gray-500 font-mono">
-                  [{emotion.vac.map((v) => v.toFixed(1)).join(", ")}]
+                <div className="flex items-center gap-2">
+                  {selectedEmotionIds.has(emotion.id) && (
+                    <span className="text-cyan-400 text-xs">✓</span>
+                  )}
+                  <div className="text-xs text-gray-500 font-mono">
+                    [{emotion.vac.map((v) => v.toFixed(1)).join(", ")}]
+                  </div>
                 </div>
               </Command.Item>
             ))}
@@ -300,8 +305,14 @@ export function PaletteResults({
                     <div className="text-xs text-gray-400">{emotion.category}</div>
                   </div>
                 </div>
-                <div className="text-xs text-gray-500 font-mono">
-                  [{emotion.vac.map((v) => v.toFixed(1)).join(", ")}]
+                <div className="flex items-center gap-2">
+                  {selectedEmotionIds.has(emotion.id) && (
+                    <span className="text-cyan-400 text-xs">✓</span>
+                  )}
+                  {isFavorite(emotion.id) && <span className="text-yellow-400 text-xs">⭐</span>}
+                  <div className="text-xs text-gray-500 font-mono">
+                    [{emotion.vac.map((v) => v.toFixed(1)).join(", ")}]
+                  </div>
                 </div>
               </Command.Item>
             ))}

@@ -57,11 +57,11 @@ export interface BaseSphereProps {
   onPointerOver?: (event: ThreePointerEvent) => void;
   onPointerOut?: (event: ThreePointerEvent) => void;
   children?:
-    | React.ReactNode
-    | ((
-        meshRef: React.RefObject<THREE.Mesh | null>,
-        materialRef: React.RefObject<THREE.MeshStandardMaterial | null>
-      ) => React.ReactNode);
+  | React.ReactNode
+  | ((
+    meshRef: React.RefObject<THREE.Mesh | null>,
+    materialRef: React.RefObject<THREE.MeshStandardMaterial | null>
+  ) => React.ReactNode);
 }
 
 /**
@@ -163,11 +163,11 @@ export function BaseSphere({
       </mesh>
 
       {/* Render children (for custom additions like rings, particles, etc.) */}
-      {}
-      {}
-      {}
-      {}
-      {}
+      { }
+      { }
+      { }
+      { }
+      { }
       {/* eslint-disable-next-line react-hooks/refs */}
       {typeof children === "function" ? children(meshRef, materialRef) : children}
     </group>
@@ -220,7 +220,7 @@ export function blendColors(colors: THREE.Color[], weights: number[]): THREE.Col
   let weightedB = 0;
 
   colors.forEach((color, i) => {
-    const weight = weights[i] || 1.0;
+    const weight = weights[i] !== undefined ? weights[i] : 1.0;
     weightedR += color.r * weight;
     weightedG += color.g * weight;
     weightedB += color.b * weight;

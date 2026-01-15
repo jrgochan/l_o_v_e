@@ -104,4 +104,27 @@ describe("useModelAssignments", () => {
     // Should not throw, data remains empty/default
     expect(result.current.recommendations).toEqual({});
   });
+
+  it("should return false explicitly on failure", async () => {
+    (aiService.assignModel as jest.Mock).mockRejectedValue(new Error("Fail"));
+    const { result } = renderHook(() => useModelAssignments());
+
+    let success;
+    await act(async () => {
+      success = await result.current.assignModel("f", "m");
+    });
+    expect(success).toBe(false);
+  });
+
+  it("should handle non-Error objects in assignModel failure", async () => {
+    (aiService.assignModel as jest.Mock).mockRejectedValue("String error");
+    const { result } = renderHook(() => useModelAssignments());
+
+    let success;
+    await act(async () => {
+      success = await result.current.assignModel("f", "m");
+    });
+    expect(result.current.error).toBe("Failed to assign model");
+    expect(success).toBe(false);
+  });
 });

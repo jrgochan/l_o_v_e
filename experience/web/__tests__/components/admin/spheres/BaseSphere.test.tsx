@@ -35,43 +35,54 @@ describe("BaseSphere Helpers", () => {
       expect(color.getHexString()).toBe(new THREE.Color(0x22c55e).getHexString());
     });
 
-    it("should return red for low valence", () => {
-      const color = getColorFromValence(-0.8);
-      expect(color.getHexString()).toBe(new THREE.Color(0xef4444).getHexString());
-    });
+    const color = getColorFromValence(-0.8);
+    expect(color.getHexString()).toBe(new THREE.Color(0xef4444).getHexString());
   });
 
-  describe("getColorFromCategory", () => {
-    const categoryColors = { joy: "#ffff00", sadness: "#0000ff" };
-
-    it("should return mapped color", () => {
-      const color = getColorFromCategory("joy", categoryColors);
-      expect(color.getHexString()).toBe(new THREE.Color("#ffff00").getHexString());
-    });
-
-    it("should return fallback for unknown category", () => {
-      const color = getColorFromCategory("unknown", categoryColors);
-      expect(color.getHexString()).toBe(new THREE.Color("#888888").getHexString());
-    });
+  it("should return lime for moderately positive valence", () => {
+    expect(getColorFromValence(0.4).getHexString()).toBe(new THREE.Color(0xa3e635).getHexString());
   });
 
-  describe("blendColors", () => {
-    it("should blend colors based on weights", () => {
-      const c1 = new THREE.Color(1, 0, 0); // Red
-      const c2 = new THREE.Color(0, 0, 1); // Blue
-      const blended = blendColors([c1, c2], [0.5, 0.5]);
+  it("should return amber for neutral valence", () => {
+    expect(getColorFromValence(0).getHexString()).toBe(new THREE.Color(0xfbbf24).getHexString());
+  });
 
-      expect(blended.r).toBeCloseTo(0.5);
-      expect(blended.b).toBeCloseTo(0.5);
-      expect(blended.g).toBe(0);
-    });
-
-    it("should handle empty inputs", () => {
-      const result = blendColors([], []);
-      expect(result).toBeDefined();
-    });
+  it("should return orange for moderately negative valence", () => {
+    expect(getColorFromValence(-0.4).getHexString()).toBe(new THREE.Color(0xf97316).getHexString());
   });
 });
+
+describe("getColorFromCategory", () => {
+  const categoryColors = { joy: "#ffff00", sadness: "#0000ff" };
+
+  it("should return mapped color", () => {
+    const color = getColorFromCategory("joy", categoryColors);
+    expect(color.getHexString()).toBe(new THREE.Color("#ffff00").getHexString());
+  });
+
+  it("should return fallback for unknown category", () => {
+    const color = getColorFromCategory("unknown", categoryColors);
+    expect(color.getHexString()).toBe(new THREE.Color("#888888").getHexString());
+  });
+});
+
+describe("blendColors", () => {
+  it("should blend colors based on weights", () => {
+    const c1 = new THREE.Color(1, 0, 0); // Red
+    const c2 = new THREE.Color(0, 0, 1); // Blue
+    const blended = blendColors([c1, c2], [0.5, 0.5]);
+
+    expect(blended.r).toBeCloseTo(0.5);
+    expect(blended.b).toBeCloseTo(0.5);
+    expect(blended.g).toBe(0);
+  });
+
+  it("should handle empty inputs", () => {
+    const result = blendColors([], []);
+    expect(result).toBeDefined();
+  });
+});
+
 
 // Since we are testing a R3F component in a DOM environment
 describe("BaseSphere Component", () => {
@@ -173,5 +184,12 @@ describe("BaseSphere Component", () => {
     const mesh = container.querySelector("mesh") as any;
     if (frameCallback) frameCallback({ clock: { elapsedTime: 1 } });
     expect(mesh.rotation.z).toBeCloseTo(0.5);
+  });
+
+  it("accepts THREE.Color object as color prop", () => {
+    const colorObj = new THREE.Color("blue");
+    const { container } = render(<BaseSphere color={colorObj} />);
+    // Just verify render success
+    expect(container.querySelector("mesh")).toBeInTheDocument();
   });
 });

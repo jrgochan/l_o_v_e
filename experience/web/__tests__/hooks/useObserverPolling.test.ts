@@ -1,4 +1,4 @@
-import { renderHook } from "@testing-library/react";
+import { renderHook, act } from "@testing-library/react";
 import { useObserverPolling } from "@/hooks/useObserverPolling";
 import { useExperienceStore } from "@/stores/useExperienceStore";
 import { createPollingManager } from "@love/experience-shared";
@@ -99,5 +99,15 @@ describe("useObserverPolling", () => {
     const { result } = renderHook(() => useObserverPolling({ userId: "u1" }));
     expect(result.current.isPolling).toBe(false);
     expect(createPollingManager).not.toHaveBeenCalled();
+  });
+
+  it("ensures cleanup even if stopped manually", () => {
+    const { result, unmount } = renderHook(() => useObserverPolling({ userId: "u1", enabled: true }));
+
+    act(() => {
+      result.current.stop();
+    });
+
+    unmount();
   });
 });
