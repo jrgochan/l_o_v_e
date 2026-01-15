@@ -59,7 +59,7 @@ jest.mock("@/components/admin/clinical/VoiceContentThreeWay", () => ({
 
 describe("ClinicalDashboard", () => {
   const mockVAC: VAC = { valence: 0.5, arousal: 0.3, connection: 0.8 };
-  const mockMetrics: SessionMetrics = {
+  const mockMetrics: any = {
     duration: 300,
     turnCount: 15,
     userTalkTime: 60,
@@ -67,7 +67,7 @@ describe("ClinicalDashboard", () => {
     emotionsDetected: 10,
     dominanceScore: 0.4,
   };
-  const mockTimeline: EmotionTimelineEvent[] = [
+  const mockTimeline: any[] = [
     {
       timestamp: new Date(),
       emotion: "Joy",
@@ -78,8 +78,8 @@ describe("ClinicalDashboard", () => {
       trigger: "context",
     },
   ];
-  const mockHistory: VACHistoryPoint[] = [{ timestamp: new Date(), vac: mockVAC, emotion: "Joy" }];
-  const mockInsights: InsightData = {
+  const mockHistory: any[] = [{ timestamp: new Date(), vac: mockVAC, emotion: "Joy" }];
+  const mockInsights: any = {
     clinical_alerts: [],
     overall_status: "stable",
   };
@@ -155,8 +155,25 @@ describe("ClinicalDashboard", () => {
     });
 
     it("renders voice quality indicators correctly", () => {
+      const baseProsody: any = {
+        pitch_mean: 200,
+        pitch_range: 50,
+        pitch_std: 10,
+        pitch_min: 100,
+        pitch_max: 300,
+        energy: 0.8,
+        energy_std: 0.1,
+        energy_max: 0.9,
+        rate: 4.5,
+        duration: 5,
+        voice_quality: "good",
+        hnr: 20,
+        jitter: 0.5,
+        shimmer: 1.5,
+      };
+
       const prosodyModerate: ProsodyData = {
-        ...defaultProps.prosody!,
+        ...baseProsody,
         voice_quality: "moderate",
         hnr: 12,
       };
@@ -165,14 +182,14 @@ describe("ClinicalDashboard", () => {
       );
       expect(screen.getByText("🟡")).toBeInTheDocument();
 
-      const prosodyPoor: ProsodyData = { ...defaultProps.prosody!, voice_quality: "poor", hnr: 5 };
+      const prosodyPoor: ProsodyData = { ...baseProsody, voice_quality: "poor", hnr: 5 };
       rerender(<ClinicalDashboard {...defaultProps} prosody={prosodyPoor} />);
       expect(screen.getByText("🔴")).toBeInTheDocument();
     });
 
     it("renders status card correctly for different statuses", () => {
       // Critical
-      const criticalInsights: InsightData = {
+      const criticalInsights: any = {
         clinical_alerts: ["Alert"],
         overall_status: "critical",
       };
@@ -183,7 +200,7 @@ describe("ClinicalDashboard", () => {
       expect(screen.getByText("1 alert")).toBeInTheDocument(); // Singular
 
       // Warning
-      const warningInsights: InsightData = {
+      const warningInsights: any = {
         clinical_alerts: ["A1", "A2"],
         overall_status: "warning",
       };
@@ -192,19 +209,19 @@ describe("ClinicalDashboard", () => {
       expect(screen.getByText("2 alerts")).toBeInTheDocument(); // Plural
 
       // Attention
-      const attentionInsights: InsightData = { clinical_alerts: [], overall_status: "attention" };
+      const attentionInsights: any = { clinical_alerts: [], overall_status: "attention" };
       rerender(<ClinicalDashboard {...defaultProps} insights={attentionInsights} />);
       expect(screen.getByText("🟡 Attention")).toBeInTheDocument();
 
       // Stable
-      const stableInsights: InsightData = { clinical_alerts: [], overall_status: "stable" };
+      const stableInsights: any = { clinical_alerts: [], overall_status: "stable" };
       rerender(<ClinicalDashboard {...defaultProps} insights={stableInsights} />);
       expect(screen.getByText("🟢 Stable")).toBeInTheDocument();
     });
   });
 
   describe("Expanded View", () => {
-    const expandedProps = { ...defaultProps, expandState: "full" as const };
+    const expandedProps = { ...defaultProps, expandState: "fullscreen" as const };
 
     it("renders expanded core metrics", () => {
       render(<ClinicalDashboard {...expandedProps} />);
@@ -301,7 +318,7 @@ describe("ClinicalDashboard", () => {
         emotions: [{ emotion_name: "Joy", confidence: 0.9 } as DetectedEmotion],
         relationships: [],
         aggregate: { valence: 0.5, arousal: 0.5, connection: 0.5, overall_mood: "Pos" },
-      };
+      } as any;
 
       render(<ClinicalDashboard {...expandedProps} multiEmotionData={multiEmotionData} />);
       expect(screen.getByText("Deep Feeling Mode: Multi-Emotion Analysis")).toBeInTheDocument();
@@ -328,7 +345,7 @@ describe("ClinicalDashboard", () => {
           aligned: true,
           score: 0.9,
           description: "Good match",
-        },
+        } as any,
       };
       render(<ClinicalDashboard {...expandedProps} insights={insightWithCorr} />);
       expect(screen.getByTestId("mock-voice-correlation")).toBeInTheDocument();

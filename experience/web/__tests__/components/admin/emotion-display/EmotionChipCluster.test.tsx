@@ -23,27 +23,30 @@ jest.mock("@/components/admin/emotion-display/EmotionBadge", () => ({
 describe("EmotionChipCluster", () => {
   const mockEmotions: DetectedEmotion[] = [
     {
+      id: "1",
       emotion_name: "Joy",
       confidence: 0.9,
       prominence: "primary",
       vac: { valence: 0.8, arousal: 0.6, connection: 0.7 },
-      intensity: 0.8,
+
       category: "Positive",
     },
     {
+      id: "2",
       emotion_name: "Excitement",
       confidence: 0.7,
       prominence: "secondary",
       vac: { valence: 0.7, arousal: 0.8, connection: 0.6 },
-      intensity: 0.7,
+
       category: "Positive",
     },
     {
+      id: "3",
       emotion_name: "Hope",
       confidence: 0.5,
       prominence: "underlying",
       vac: { valence: 0.5, arousal: 0.4, connection: 0.5 },
-      intensity: 0.5,
+
       category: "Positive",
     },
   ];

@@ -5,6 +5,23 @@ import { useSettingsStore } from "@/stores/useSettingsStore";
 // Mock store
 jest.mock("@/stores/useSettingsStore");
 
+// Mock Three.js/R3F to prevent SIGSEGV
+jest.mock("@react-three/fiber", () => ({
+  useFrame: jest.fn(),
+  useThree: jest.fn(() => ({ camera: { position: { set: jest.fn() } } })),
+  Canvas: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
+}));
+jest.mock("@react-three/drei", () => ({
+  OrbitControls: () => null,
+  Text: () => null,
+}));
+jest.mock("three", () => ({
+  ...jest.requireActual("three"),
+  WebGLRenderer: jest.fn(),
+  Mesh: jest.fn(),
+  Group: jest.fn(),
+}));
+
 // Mock URL
 global.URL.createObjectURL = jest.fn(() => "blob:test");
 global.URL.revokeObjectURL = jest.fn();

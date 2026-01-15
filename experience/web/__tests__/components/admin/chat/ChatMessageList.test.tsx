@@ -71,7 +71,7 @@ describe("ChatMessageList", () => {
         type: "insight",
         content: "",
         timestamp: new Date(),
-        insights: [{ type: "pattern", title: "Pattern Found", description: "test" }],
+        insights: { clinical_alerts: [], overall_status: "stable" } as any,
       },
     ];
     render(<ChatMessageList {...defaultProps} messages={messages} />);
@@ -89,14 +89,11 @@ describe("ChatMessageList", () => {
           emotions: [
             {
               emotion_name: "Joy",
-              score: 0.9,
               confidence: 0.9,
               category: "Positive",
-              coordinates: [1, 1, 1],
-            },
+            } as any,
           ],
-          source_text: "happy",
-        },
+        } as any,
       },
     ];
     render(<ChatMessageList {...defaultProps} messages={messages} />);
@@ -138,14 +135,11 @@ describe("ChatMessageList", () => {
           emotions: [
             {
               emotion_name: "Joy",
-              score: 0.9,
               confidence: 0.9,
               category: "Positive",
-              coordinates: [1, 1, 1],
-            },
+            } as any,
           ],
-          source_text: "happy",
-        },
+        } as any,
       },
     ];
     const onEmotionClick = jest.fn();
@@ -165,7 +159,7 @@ describe("ChatMessageList", () => {
         type: "insight",
         content: "",
         timestamp: new Date(),
-        insights: [{ type: "pattern", title: "Pattern Found", description: "test" }],
+        insights: { clinical_alerts: [], overall_status: "stable" } as any,
       },
     ];
     const onEmotionClick = jest.fn();
@@ -206,8 +200,7 @@ describe("ChatMessageList", () => {
         timestamp: new Date(),
         multiEmotionData: {
           emotions: [],
-          source_text: "happy",
-        },
+        } as any,
       },
     ];
     const onEmotionClick = jest.fn();
@@ -229,8 +222,7 @@ describe("ChatMessageList", () => {
         timestamp: new Date(),
         multiEmotionData: {
           emotions: [],
-          source_text: "happy",
-        },
+        } as any,
       },
     ];
     const onEmotionClick = jest.fn();
@@ -251,8 +243,7 @@ describe("ChatMessageList", () => {
         timestamp: new Date(),
         multiEmotionData: {
           emotions: [],
-          source_text: "happy",
-        },
+        } as any,
       },
     ];
     // Render without onEmotionClick being defined

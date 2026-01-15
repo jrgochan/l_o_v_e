@@ -35,7 +35,7 @@ export function useConnectionLifecycle({
   const maxReconnectAttempts = 5;
 
   // Stabilization refs
-  const connectRef = useRef<() => void>(null as any);
+  const connectRef = useRef<(() => void) | null>(null);
   const onMessageRef = useRef(onMessage);
   const onErrorRef = useRef(onError);
   const setErrorRef = useRef(setError);
@@ -88,7 +88,7 @@ export function useConnectionLifecycle({
               maxAttempts: maxReconnectAttempts,
               reconnectAttempts,
               timeoutRef: reconnectTimeoutRef,
-              connectFn: () => connectRef.current(),
+              connectFn: () => connectRef.current?.(),
               setError: setErrorRef.current,
               onError: onErrorRef.current,
             },

@@ -72,7 +72,9 @@ export function useBatchJob(onComplete?: () => void, onFail?: (error: string) =>
     pollIntervalRef.current = setInterval(pollProgress, POLL_INTERVAL);
 
     return () => {
-      clearInterval(pollIntervalRef.current as any);
+      if (pollIntervalRef.current) {
+        clearInterval(pollIntervalRef.current);
+      }
     };
   }, [currentJobId, isComputing, pollProgress]);
 

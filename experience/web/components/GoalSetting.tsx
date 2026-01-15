@@ -7,11 +7,11 @@
 
 "use client";
 
-import { useState, useEffect } from "react";
-import { useExperienceStore } from "@/stores/useExperienceStore";
-import { getObserverClient, AtlasEmotion, TransitionPathResponse } from "@love/experience-shared";
+// import { useState, useEffect } from "react";
+// import { useExperienceStore } from "@/stores/useExperienceStore";
+// import { getObserverClient, AtlasEmotion, TransitionPathResponse } from "@love/experience-shared";
+// import { logger } from "@/utils/logger";
 import { PersonalStrategies } from "./PersonalStrategies";
-import { logger } from "@/utils/logger";
 import { useGoalSettingLogic } from "./GoalSettingLogic";
 
 export function GoalSetting() {

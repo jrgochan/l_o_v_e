@@ -7,8 +7,8 @@
 
 "use client";
 
-import { useMemo, useRef } from "react";
-import { useFrame, ThreeEvent } from "@react-three/fiber";
+import { useMemo } from "react";
+import { ThreeEvent } from "@react-three/fiber";
 import * as THREE from "three";
 import { useAtlasAdminStore } from "@/stores/useAtlasAdminStore";
 import { useExperienceStore } from "@/stores/useExperienceStore";

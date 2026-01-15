@@ -52,7 +52,6 @@ describe("EmotionDetails", () => {
     category: "Test Category",
     definition: "A test emotion definition",
     vac: [0.5, 0.5, 0.5], // Fixed to 3 elements
-    color: "#ff0000",
     quaternion: [0, 0, 0, 1],
   };
 

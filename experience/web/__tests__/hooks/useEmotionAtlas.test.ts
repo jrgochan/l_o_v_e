@@ -94,7 +94,7 @@ describe("useEmotionAtlas", () => {
       setError: mockSetError,
     });
 
-    fetchMock.mockReject("Just a string error");
+    fetchMock.mockImplementationOnce(() => Promise.reject("Not an Error object"));
 
     renderHook(() => useEmotionAtlas());
 

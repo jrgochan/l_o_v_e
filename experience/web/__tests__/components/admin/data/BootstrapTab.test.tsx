@@ -233,7 +233,7 @@ describe("BootstrapTab", () => {
     // If I fire "{" (invalid), state not updated. value remains `{}` (default).
     // So let's test that protection.
 
-    const initialValue = jsonInput.textContent || jsonInput.value; // likely "{}"
+    const initialValue = jsonInput.textContent || (jsonInput as HTMLTextAreaElement).value; // likely "{}"
     fireEvent.change(jsonInput, { target: { value: "{" } });
 
     // Since state didn't update, the rerender should show initialValue

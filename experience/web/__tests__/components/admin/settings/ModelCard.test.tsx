@@ -2,7 +2,7 @@ import { render, screen, fireEvent } from "@testing-library/react";
 import { ModelCard } from "@/components/admin/settings/ModelCard";
 import type { ModelInfo } from "@/hooks/useOllamaModels";
 
-const mockModel: ModelInfo = {
+const mockModel: any = {
   name: "llama3:8b",
   size: 5000000000,
   digest: "sha256:1234567890",

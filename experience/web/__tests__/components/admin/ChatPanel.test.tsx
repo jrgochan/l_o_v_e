@@ -564,7 +564,7 @@ describe("ChatPanel", () => {
 
   it("handles WebSocket callbacks: onMultiEmotion (First Emotion)", async () => {
     (useChatAnalysisState as jest.Mock).mockReturnValue({
-      ...useChatAnalysisState({} as any),
+      ...useChatAnalysisState(),
       multiEmotionAnalysis: null,
       setMultiEmotionAnalysis: mockSetMultiEmotionAnalysis,
     });
@@ -607,7 +607,7 @@ describe("ChatPanel", () => {
     // Mock setter to execute callback for coverage
     const mockSetCurrentAnalysis = jest.fn((cb) => cb({}));
     (useChatAnalysisState as jest.Mock).mockReturnValue({
-      ...useChatAnalysisState({} as any),
+      ...useChatAnalysisState(),
       setCurrentAnalysis: mockSetCurrentAnalysis,
     });
 
@@ -638,7 +638,7 @@ describe("ChatPanel", () => {
     });
 
     (useChatAnalysisState as jest.Mock).mockReturnValue({
-      ...useChatAnalysisState({} as any),
+      ...useChatAnalysisState(),
       setMultiEmotionAnalysis: mockSetMultiEmotionAnalysis,
       setCurrentAnalysis: mockSetCurrentAnalysis,
       // Need to ensure transformation/prosody/etc use these

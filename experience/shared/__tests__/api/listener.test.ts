@@ -157,7 +157,7 @@ describe("Listener API", () => {
     it("should trigger timeout callback in healthCheck", async () => {
       mockFetch.mockImplementation(() => new Promise(() => {})); // Never resolves
       const client = new ListenerApiClient();
-      const promise = client.healthCheck();
+      client.healthCheck();
 
       jest.advanceTimersByTime(5000);
       // We just want to ensure the callback runs. abort() will be called.

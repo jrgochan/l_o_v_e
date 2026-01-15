@@ -108,7 +108,7 @@ export function PullModelDialog({
     }
 
     return () => clearInterval(interval);
-  }, [currentPull?.status, pullStartTime]);
+  }, [currentPull, currentPull?.status, pullStartTime]);
 
   if (!isOpen) return null;
 

@@ -4,8 +4,22 @@ import type { DetectedEmotion } from "@/types/chat";
 
 describe("EmotionCluster", () => {
   const mockEmotions: DetectedEmotion[] = [
-    { id: "1", emotion_name: "Joy", category: "Joy", confidence: 0.9, intensity: 5 },
-    { id: "2", emotion_name: "Trust", category: "Trust", confidence: 0.8, intensity: 3 },
+    {
+      id: "1",
+      emotion_name: "Joy",
+      category: "Joy",
+      confidence: 0.9,
+      vac: { valence: 0.8, arousal: 0.6, connection: 0.7 },
+      prominence: "primary",
+    },
+    {
+      id: "2",
+      emotion_name: "Trust",
+      category: "Trust",
+      confidence: 0.8,
+      vac: { valence: 0.5, arousal: 0.3, connection: 0.9 },
+      prominence: "secondary",
+    },
   ];
 
   it("renders list of emotions in flow layout", () => {
@@ -53,7 +67,14 @@ describe("EmotionCluster", () => {
 
 describe("EmotionList", () => {
   const mockEmotions: DetectedEmotion[] = [
-    { id: "1", emotion_name: "Joy", category: "Joy", confidence: 0.9, intensity: 5 },
+    {
+      id: "1",
+      emotion_name: "Joy",
+      category: "Joy",
+      confidence: 0.9,
+      vac: { valence: 0.8, arousal: 0.6, connection: 0.7 },
+      prominence: "primary",
+    },
   ];
 
   it("handles emotions without IDs (fallback key)", () => {

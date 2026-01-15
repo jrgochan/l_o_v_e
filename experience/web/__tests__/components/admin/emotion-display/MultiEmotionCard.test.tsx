@@ -51,7 +51,6 @@ describe("MultiEmotionCard", () => {
       emotion_name: "Joy",
       category: "When Life Is Good",
       confidence: 0.9,
-      intensity: 5,
       prominence: "primary",
       vac: { valence: 0.8, arousal: 0.6, connection: 0.7 },
       original_name: "Happy",
@@ -61,7 +60,6 @@ describe("MultiEmotionCard", () => {
       emotion_name: "Trust",
       category: "When Life Is Good",
       confidence: 0.8,
-      intensity: 3,
       prominence: "secondary",
       vac: { valence: 0.5, arousal: 0.3, connection: 0.9 },
     },
@@ -70,7 +68,6 @@ describe("MultiEmotionCard", () => {
       emotion_name: "Curiosity",
       category: "When Life Is Good",
       confidence: 0.4,
-      intensity: 2,
       prominence: "underlying",
       vac: { valence: 0.2, arousal: 0.5, connection: 0.5 },
     },
@@ -88,10 +85,10 @@ describe("MultiEmotionCard", () => {
   ];
 
   const mockAggregate: AggregateState = {
-    valence: 0.5,
-    arousal: 0.5,
-    connection: 0.5,
-    overall_mood: "Positive",
+    vac: { valence: 0.5, arousal: 0.5, connection: 0.5 },
+    complexity_score: 0.5,
+    emotional_clarity: 0.8,
+    temporal_pattern: "integrated",
   };
 
   it("renders primary emotion details", () => {

@@ -16,16 +16,13 @@ describe("InsightCard", () => {
     },
     gentle_invitations: [
       { type: "reflection", text: "Reflect on this feeling." },
-      { type: "somatic", text: "Feel warmth." },
+      { type: "action", text: "Feel warmth." },
     ],
     recommendations: [
       {
         type: "similar_emotions",
         title: "Related Emotions",
-        items: [
-          { _id: "1", name: "Excitement" },
-          { _id: "2", name: "Hope" },
-        ],
+        items: [{ name: "Excitement" }, { name: "Hope" }],
       },
     ],
     // Clinical fields
@@ -42,7 +39,7 @@ describe("InsightCard", () => {
     },
     voice_metrics: [
       { label: "Pitch", value: "High", status: "attention", interpretation: "Elevated" },
-      { label: "Jitter", value: "Low", status: "normal", interpretation: "Stable" },
+      { label: "Jitter", value: "Low", status: "stable", interpretation: "Stable" },
       { label: "Shimmer", value: "Med", status: "critical", interpretation: "Unstable" },
     ],
     clinical_recommendations: [
@@ -51,9 +48,19 @@ describe("InsightCard", () => {
     ],
     analysis_reasoning: "High valence indicates joy.",
     summary: "Validation summary.", // Required by base InsightData
+    category: "Positive",
+    vac: { valence: 0.8, arousal: 0.6, connection: 0.7 },
+    confidence: 0.9,
+    vac_analysis: {
+      valence: { value: 0.8, interpretation: "High", percentile: 80 },
+      arousal: { value: 0.6, interpretation: "Medium", percentile: 60 },
+      connection: { value: 0.7, interpretation: "High", percentile: 70 },
+      quadrant: "Quadrant 1",
+    },
+    guidance: "Guidance text",
   };
 
-  const mockLegacyInsights: InsightData = {
+  const mockLegacyInsights: any = {
     summary: "Legacy summary text.",
     guidance: "Legacy guidance.",
     emotion: "Joy",
@@ -200,7 +207,7 @@ describe("InsightCard", () => {
           { label: "A", value: "1", status: "critical", interpretation: "" },
           { label: "B", value: "2", status: "warning", interpretation: "" },
           { label: "C", value: "3", status: "attention", interpretation: "" },
-          { label: "D", value: "4", status: "normal", interpretation: "" },
+          { label: "D", value: "4", status: "stable", interpretation: "" },
         ],
       };
 

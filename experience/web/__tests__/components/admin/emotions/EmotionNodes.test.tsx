@@ -235,7 +235,7 @@ describe("Emotion Nodes Coverage", () => {
           emotion={mockEmotion}
           color={mockColor}
           size={1}
-          mode="stable"
+          mode="subtle"
           isSelected={false}
           isHovered={false}
         />

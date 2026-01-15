@@ -29,7 +29,7 @@ const mockUseAtlasAdminStore = jest.fn((selector) => selector(mockState));
 const mockGetState = jest.fn(() => mockState);
 
 jest.mock("@/stores/useAtlasAdminStore", () => ({
-  useAtlasAdminStore: Object.assign((query) => mockUseAtlasAdminStore(query), {
+  useAtlasAdminStore: Object.assign((query: any) => mockUseAtlasAdminStore(query), {
     getState: () => mockGetState(), // Deferred execution to pick up current mockState values? No, closures.
     // Better: getState returns the object that mockSetHoveredEmotion belongs to.
   }),
@@ -42,7 +42,7 @@ jest.mock("@/stores/useAtlasAdminStore", () => ({
 
 // Mock R3F
 const mockUseFrame = jest.fn();
-const mockDistanceTo = jest.fn(() => 10);
+const mockDistanceTo = jest.fn((_v?: any) => 10);
 const mockCamera = {
   position: { copy: jest.fn(), distanceTo: mockDistanceTo },
   lookAt: jest.fn(),
