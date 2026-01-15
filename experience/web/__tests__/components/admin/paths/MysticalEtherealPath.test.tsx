@@ -1,16 +1,23 @@
 
 import React from "react";
-import { render, cleanup } from "@testing-library/react";
+import { render, cleanup, act } from "@testing-library/react";
 import { MysticalEtherealPath } from "@/components/admin/paths/MysticalEtherealPath";
-import { useFrame } from "@react-three/fiber";
 import * as THREE from "three";
 
-let useFrameCallback: (state: any, delta?: number) => void;
+// --- Robust R3F Mock ---
+const frameCallbacks: Set<(state: any, delta: number) => void> = new Set();
+const mockAdvanceFrame = (time: number, delta: number) => {
+  act(() => {
+    frameCallbacks.forEach((cb) => cb({ clock: { elapsedTime: time } }, delta));
+  });
+};
 
-// Mock R3F
 jest.mock("@react-three/fiber", () => ({
-  useFrame: jest.fn(),
-  useThree: jest.fn(() => ({ camera: { position: new THREE.Vector3() } })), // Add useThree availability if needed
+  useFrame: (callback: any) => {
+    frameCallbacks.add(callback);
+    return () => frameCallbacks.delete(callback);
+  },
+  useThree: jest.fn(() => ({ camera: { position: new THREE.Vector3() } })),
 }));
 
 // Suppress R3F tag warnings
@@ -35,58 +42,49 @@ afterAll(() => {
 });
 
 describe("MysticalEtherealPath", () => {
-  beforeAll(() => {
-    // Patch Element for R3F props
-    Object.defineProperties(window.Element.prototype, {
-      position: {
-        get() { if (!this._pos) this._pos = new THREE.Vector3(); return this._pos; },
-        configurable: true
+  const definePolyfill = (proto: any, prop: string, factory: () => any) => {
+    Object.defineProperty(proto, prop, {
+      configurable: true,
+      get() {
+        if (!(this as any)[`_${prop}`]) {
+          (this as any)[`_${prop}`] = factory();
+        }
+        return (this as any)[`_${prop}`];
       },
-      scale: {
-        get() { if (!this._scale) this._scale = new THREE.Vector3(1, 1, 1); return this._scale; },
-        configurable: true
-      },
-      rotation: {
-        get() { if (!this._rot) this._rot = new THREE.Euler(); return this._rot; },
-        configurable: true
-      },
-      // Mesh prop to access material
-      material: {
-        get() {
-          if (!this._material) {
-            this._material = {
-              uniforms: {
-                time: { value: 0 },
-                pathColor: { value: new THREE.Color() },
-                isSelected: { value: 0 },
-                opacity: { value: 1 }
-              }
-            };
-          }
-          return this._material;
-        },
-        configurable: true
+      set(value) {
+        (this as any)[`_${prop}`] = value;
       }
     });
+  };
 
-    (useFrame as jest.Mock).mockImplementation((cb) => {
-      useFrameCallback = cb;
-    });
+  beforeAll(() => {
+    const proto = HTMLElement.prototype;
+    definePolyfill(proto, 'position', () => new THREE.Vector3());
+    definePolyfill(proto, 'rotation', () => new THREE.Euler());
+    definePolyfill(proto, 'scale', () => new THREE.Vector3(1, 1, 1));
+
+    // Mesh prop to access material
+    definePolyfill(proto, 'material', () => ({
+      uniforms: {
+        time: { value: 0 },
+        pathColor: { value: new THREE.Color() },
+        isSelected: { value: 0 },
+        opacity: { value: 1 }
+      },
+    }));
   });
 
   const mockProps = {
     tubeGeometry: new THREE.TubeGeometry(),
     color: new THREE.Color("yellow"),
-    size: 1,
-    mode: "dynamic" as const,
-    isSelected: false,
     opacity: 0.7,
+    isSelected: false,
   };
 
   beforeEach(() => {
+    frameCallbacks.clear();
     jest.clearAllMocks();
     cleanup();
-    useFrameCallback = () => { };
   });
 
   it("renders mesh", () => {
@@ -96,11 +94,9 @@ describe("MysticalEtherealPath", () => {
 
   it("registers animation loop and updates shader uniforms", () => {
     const { container } = render(<MysticalEtherealPath {...{ ...mockProps, isSelected: true }} />);
-    expect(useFrame).toHaveBeenCalled();
 
     // Trigger frame update
-    const mockState = { clock: { elapsedTime: 2.0 } };
-    useFrameCallback(mockState);
+    mockAdvanceFrame(2.0, 0.016);
 
     const mesh = container.querySelector("mesh") as unknown as THREE.Mesh;
     const material = mesh.material as THREE.ShaderMaterial;
@@ -115,8 +111,7 @@ describe("MysticalEtherealPath", () => {
   it("handles unselected state in animation loop", () => {
     const { container } = render(<MysticalEtherealPath {...{ ...mockProps, isSelected: false }} />);
 
-    const mockState = { clock: { elapsedTime: 1.0 } };
-    useFrameCallback(mockState);
+    mockAdvanceFrame(1.0, 0.016);
 
     const mesh = container.querySelector("mesh") as unknown as THREE.Mesh;
     const material = mesh.material as THREE.ShaderMaterial;
@@ -125,6 +120,10 @@ describe("MysticalEtherealPath", () => {
   });
 
   it("safe checks for missing refs", () => {
-    useFrameCallback({ clock: { elapsedTime: 1 } });
+    const { unmount } = render(<MysticalEtherealPath {...mockProps} />);
+    const callback = Array.from(frameCallbacks)[0];
+    unmount();
+    frameCallbacks.add(callback);
+    expect(() => mockAdvanceFrame(1.0, 0.016)).not.toThrow();
   });
 });

@@ -170,4 +170,26 @@ describe("EmotionBadgeList", () => {
     // B (primary=0) -> A (undefined->secondary=1)
     expect(texts).toEqual(["B", "A"]);
   });
+
+  it("handles null prominence gracefully", () => {
+    const startEmotions = [
+      { emotion: "A", confidence: 0.5, prominence: null as any },
+      { emotion: "B", confidence: 0.5, prominence: "primary" as const },
+    ];
+    render(<EmotionBadgeList emotions={startEmotions} />);
+    const texts = screen.getAllByText(/A|B/).map(e => e.textContent);
+    // B (primary) -> A (null->secondary)
+    expect(texts).toEqual(["B", "A"]);
+  });
+
+  it("handles null prominence gracefully", () => {
+    const startEmotions = [
+      { emotion: "A", confidence: 0.5, prominence: null as any },
+      { emotion: "B", confidence: 0.5, prominence: "primary" as const },
+    ];
+    render(<EmotionBadgeList emotions={startEmotions} />);
+    const texts = screen.getAllByText(/A|B/).map(e => e.textContent);
+    // B (primary) -> A (null->secondary)
+    expect(texts).toEqual(["B", "A"]);
+  });
 });

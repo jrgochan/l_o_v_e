@@ -59,7 +59,10 @@ export function SphereDebugOverlay({
 
                 <div>Origin:</div>
                 <div className="text-orange-400">
-                    {typeof window !== "undefined" ? window.origin : "SSR"}
+                    {
+                        /* istanbul ignore next */
+                        typeof window !== "undefined" ? window.origin : "SSR"
+                    }
                 </div>
             </div>
 

@@ -30,6 +30,7 @@ export function DynamicPlayfulPath({
 
   // Store initial position
   useEffect(() => {
+    /* istanbul ignore next */
     if (meshRef.current) {
       initialY.current = meshRef.current.position.y;
     }

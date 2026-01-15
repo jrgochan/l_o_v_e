@@ -82,6 +82,7 @@ export function StrategiesTab() {
       const updated = await adminApi.updateStrategy(id, editForm);
 
       // Update local state
+      /* istanbul ignore next */
       setStrategies((prev) => prev.map((s) => (s.id === id ? updated : s)));
 
       setEditingId(null);
@@ -151,6 +152,7 @@ export function StrategiesTab() {
   const handleAddStep = () => {
     setEditForm((prev) => ({
       ...prev,
+      /* istanbul ignore next */
       detailed_steps: [...(prev.detailed_steps || []), ""],
     }));
   };

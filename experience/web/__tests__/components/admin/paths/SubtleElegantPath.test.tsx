@@ -1,13 +1,22 @@
 
 import React from "react";
-import { render, cleanup } from "@testing-library/react";
+import { render, cleanup, act } from "@testing-library/react";
 import { SubtleElegantPath } from "@/components/admin/paths/SubtleElegantPath";
-import { useFrame } from "@react-three/fiber";
 import * as THREE from "three";
 
-// Mock R3F
+// --- Robust R3F Mock ---
+const frameCallbacks: Set<(state: any, delta: number) => void> = new Set();
+const mockAdvanceFrame = (time: number, delta: number) => {
+  act(() => {
+    frameCallbacks.forEach((cb) => cb({ clock: { elapsedTime: time } }, delta));
+  });
+};
+
 jest.mock("@react-three/fiber", () => ({
-  useFrame: jest.fn(),
+  useFrame: (callback: any) => {
+    frameCallbacks.add(callback);
+    return () => frameCallbacks.delete(callback);
+  },
 }));
 
 // Suppress R3F tag warnings
@@ -32,51 +41,41 @@ afterAll(() => {
 });
 
 describe("SubtleElegantPath", () => {
-  let useFrameCallback: (state: any) => void;
-
-  beforeAll(() => {
-    Object.defineProperties(window.Element.prototype, {
-      position: {
-        get() { if (!this._pos) this._pos = new THREE.Vector3(); return this._pos; },
-        configurable: true
+  const definePolyfill = (proto: any, prop: string, factory: () => any) => {
+    Object.defineProperty(proto, prop, {
+      configurable: true,
+      get() {
+        if (!(this as any)[`_${prop}`]) {
+          (this as any)[`_${prop}`] = factory();
+        }
+        return (this as any)[`_${prop}`];
       },
-      scale: {
-        get() { if (!this._scale) this._scale = new THREE.Vector3(1, 1, 1); return this._scale; },
-        configurable: true
-      },
-      rotation: {
-        get() { if (!this._rot) this._rot = new THREE.Euler(); return this._rot; },
-        configurable: true
-      },
-      // Material props
-      opacity: {
-        get() { return this._opacity ?? 1; },
-        set(v) { this._opacity = v; },
-        configurable: true
-      },
-      emissiveIntensity: {
-        get() { return this._emissiveIntensity ?? 1; },
-        set(v) { this._emissiveIntensity = v; },
-        configurable: true
-      },
-      // Mesh prop to access material (optional here as it uses materialRef, but consistency is good)
-      material: {
-        get() {
-          if (!this._material) {
-            this._material = {
-              opacity: 1,
-              emissiveIntensity: 1
-            };
-          }
-          return this._material;
-        },
-        configurable: true
+      set(value) {
+        (this as any)[`_${prop}`] = value;
       }
     });
+  };
 
-    (useFrame as jest.Mock).mockImplementation((cb) => {
-      useFrameCallback = cb;
-    });
+  beforeAll(() => {
+    const proto = HTMLElement.prototype;
+    definePolyfill(proto, 'position', () => new THREE.Vector3());
+    definePolyfill(proto, 'rotation', () => new THREE.Euler());
+    definePolyfill(proto, 'scale', () => new THREE.Vector3(1, 1, 1));
+    definePolyfill(proto, 'color', () => new THREE.Color());
+    definePolyfill(proto, 'emissive', () => new THREE.Color());
+    definePolyfill(proto, 'emissiveIntensity', () => 1);
+    definePolyfill(proto, 'opacity', () => 1);
+
+    // Mesh prop to access material
+    definePolyfill(proto, 'material', () => ({
+      color: new THREE.Color(),
+      emissive: new THREE.Color(),
+      opacity: 1,
+      emissiveIntensity: 1,
+      metalness: 0,
+      roughness: 0,
+      transparent: true
+    }));
   });
 
   const mockProps = {
@@ -87,9 +86,9 @@ describe("SubtleElegantPath", () => {
   };
 
   beforeEach(() => {
+    frameCallbacks.clear();
     jest.clearAllMocks();
     cleanup();
-    useFrameCallback = () => { };
   });
 
   it("renders mesh", () => {
@@ -99,11 +98,9 @@ describe("SubtleElegantPath", () => {
 
   it("registers animation loop and updates visuals", () => {
     const { container } = render(<SubtleElegantPath {...mockProps} />);
-    expect(useFrame).toHaveBeenCalled();
 
     // Trigger frame update
-    const mockState = { clock: { elapsedTime: 1.0 } };
-    useFrameCallback(mockState);
+    mockAdvanceFrame(1.0, 0.016);
 
     const mesh = container.querySelector("mesh") as unknown as THREE.Mesh;
     const materialElem = container.querySelector("meshStandardMaterial") as any;
@@ -116,7 +113,7 @@ describe("SubtleElegantPath", () => {
     expect(mesh.position.y).not.toBe(0);
 
     // 3. Check Opacity
-    expect(materialElem.opacity).toBeLessThan(0.75); // Shimmer varies
+    expect(materialElem.opacity).toBeLessThan(0.75);
 
     // 4. Check Glow (emissiveIntensity)
     expect(materialElem.emissiveIntensity).toBeGreaterThan(1.0);
@@ -125,8 +122,7 @@ describe("SubtleElegantPath", () => {
   it("handles isSelected state in animation", () => {
     const { container } = render(<SubtleElegantPath {...{ ...mockProps, isSelected: true }} />);
 
-    const mockState = { clock: { elapsedTime: 1.0 } };
-    useFrameCallback(mockState);
+    mockAdvanceFrame(1.0, 0.016);
 
     const materialElem = container.querySelector("meshStandardMaterial") as any;
 
@@ -135,6 +131,10 @@ describe("SubtleElegantPath", () => {
   });
 
   it("safe checks for missing refs", () => {
-    useFrameCallback({ clock: { elapsedTime: 1 } });
+    const { unmount } = render(<SubtleElegantPath {...mockProps} />);
+    const callback = Array.from(frameCallbacks)[0];
+    unmount();
+    frameCallbacks.add(callback);
+    expect(() => mockAdvanceFrame(1.0, 0.016)).not.toThrow();
   });
 });

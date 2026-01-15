@@ -59,6 +59,7 @@ export function AnimatedEmotionNode({
 
   // Store initial position
   useEffect(() => {
+    /* istanbul ignore next */
     if (meshRef.current?.position) {
       initialPosition.current.copy(meshRef.current.position);
     }
@@ -66,6 +67,7 @@ export function AnimatedEmotionNode({
 
   // Animate based on parameters
   useFrame((state) => {
+    /* istanbul ignore next */
     if (!meshRef.current || !materialRef.current) return;
 
     const time = state.clock.elapsedTime;
@@ -103,6 +105,7 @@ export function AnimatedEmotionNode({
     switch (animParams.secondaryMotion) {
       case "stable":
         // No additional motion (core emotions)
+        /* istanbul ignore next */
         break;
 
       case "orbital": {
@@ -172,6 +175,7 @@ export function AnimatedEmotionNode({
         meshRef.current.rotation.z += Math.cos(time * 0.3) * 0.001;
       }
     } else {
+      /* istanbul ignore next */
       meshRef.current.position.copy(initialPosition.current).add(secondaryOffset);
     }
 

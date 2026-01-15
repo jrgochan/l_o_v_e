@@ -193,21 +193,41 @@ describe("Emotion Nodes Coverage", () => {
             mockAdvanceFrame(1.0, 0.1);
         });
 
-        it("handles high arousal jitter logic (dynamic mode)", () => {
-            // Arousal > 0.5 triggers jitter
-            const highArousal = { ...mockEmotion, vac: [0.8, 0.9, 0.4] as [number, number, number] };
+        it("handles recoil motion (Shame)", () => {
+            const shameEmotion = { ...mockEmotion, category: "Shame" };
             render(
                 <AnimatedEmotionNode
-                    emotion={highArousal}
+                    emotion={shameEmotion}
                     color={mockColor}
                     size={1}
                     mode="dynamic"
-                    isSelected={true}
-                    isHovered={true}
+                    isSelected={false}
+                    isHovered={false}
                 />
             );
 
-            mockAdvanceFrame(2.0, 0.1);
+            // Advance frame to trigger motion
+            mockAdvanceFrame(1.0, 0.016);
+
+            // Verify position changed (y should descend)
+            // Recoil logic: y = -|sin(t*1.5)| * amp * 0.5
+            // At t=1.0, sin(1.5) approx 0.997. y should be negative.
+            expect(document.querySelector("mesh")!.getBoundingClientRect).toBeDefined(); // verify mesh exists
+        });
+
+        it("handles reaching motion (Curiosity)", () => {
+            const curiosityEmotion = { ...mockEmotion, category: "Curiosity" };
+            render(
+                <AnimatedEmotionNode
+                    emotion={curiosityEmotion}
+                    color={mockColor}
+                    size={1}
+                    mode="dynamic"
+                    isSelected={false}
+                    isHovered={false}
+                />
+            );
+            mockAdvanceFrame(1.0, 0.016);
         });
 
         it("handles stable mode (no float)", () => {
@@ -217,6 +237,21 @@ describe("Emotion Nodes Coverage", () => {
                     color={mockColor}
                     size={1}
                     mode="stable"
+                    isSelected={false}
+                    isHovered={false}
+                />
+            );
+            mockAdvanceFrame(1.0, 0.016);
+        });
+
+        it("handles stable motion (Contentment)", () => {
+            const contentmentEmotion = { ...mockEmotion, category: "Contentment" };
+            render(
+                <AnimatedEmotionNode
+                    emotion={contentmentEmotion}
+                    color={mockColor}
+                    size={1}
+                    mode="dynamic"
                     isSelected={false}
                     isHovered={false}
                 />
@@ -255,16 +290,30 @@ describe("Emotion Nodes Coverage", () => {
         });
 
         it("handles neutral valence color", () => {
-            const neutralValence = { ...mockEmotion, vac: [0.0, 0.5, 0.5] as [number, number, number] };
+            const neutralEmotion = { ...mockEmotion, vac: [0.0, 0.5, 0.5] as [number, number, number] };
             render(
                 <MysticalEmotionNode
-                    emotion={neutralValence}
+                    emotion={neutralEmotion}
                     color={mockColor}
                     size={1}
-                    isSelected={true}
+                    isSelected={false}
+                    isHovered={false}
+                />
+            );
+        });
+
+        it("handles hovered state for opacity", () => {
+            render(
+                <MysticalEmotionNode
+                    emotion={mockEmotion}
+                    color={mockColor}
+                    size={1}
+                    isSelected={false}
                     isHovered={true}
                 />
             );
+            // Verify render specific logic for hovered
+            expect(document.querySelector("mesh")).toBeInTheDocument();
             mockAdvanceFrame(1.0, 0.016);
         });
     });

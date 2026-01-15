@@ -488,6 +488,25 @@ describe("StrategiesTab", () => {
     expect(screen.getAllByDisplayValue("").length).toBeGreaterThan(0);
   });
 
+  it("handles adding step when detailed_steps is undefined", async () => {
+    const noStepsStrat = { ...mockStrategies[0], detailed_steps: undefined as unknown as string[] };
+    (adminApi.getStrategies as jest.Mock).mockResolvedValue([noStepsStrat]);
+    render(<StrategiesTab />);
+    await waitFor(() => expect(screen.getByText("CBT Reframe")).toBeInTheDocument());
+
+    fireEvent.click(screen.getByLabelText("Edit"));
+
+    // "Add Step" button
+    fireEvent.click(screen.getByText("Add Step"));
+
+    // Should now have a step input
+    const inputs = screen.getAllByRole("textbox");
+    // Description + 1 generic input for step?
+    // Steps inputs are INPUT not TEXTAREA.
+    // getByPlaceholderText("Step 1")
+    expect(screen.getByPlaceholderText("Step 1")).toBeInTheDocument();
+  });
+
 
 
   it("manages detailed steps in edit mode", async () => {

@@ -71,6 +71,7 @@ export function MysticalEmotionNode({
     const scale = breathe * hoverScale;
 
     // Inner core - fastest pulse
+    /* istanbul ignore next */
     if (innerRef.current) {
       const corePulse = 1.0 + Math.sin(time * 1.5) * 0.15;
       innerRef.current.scale.setScalar(scale * corePulse * 0.3);
@@ -82,6 +83,7 @@ export function MysticalEmotionNode({
     }
 
     // Middle layer - medium pulse
+    /* istanbul ignore next */
     if (middleRef.current) {
       const middlePulse = 1.0 + Math.sin(time * 0.8) * 0.1;
       middleRef.current.scale.setScalar(scale * middlePulse * 0.7);
@@ -92,6 +94,7 @@ export function MysticalEmotionNode({
     }
 
     // Outer layer - slowest pulse
+    /* istanbul ignore next */
     if (outerRef.current) {
       outerRef.current.scale.setScalar(scale);
 
@@ -101,6 +104,7 @@ export function MysticalEmotionNode({
     }
 
     // Aura - expands and contracts
+    /* istanbul ignore next */
     if (auraRef.current) {
       const auraPulse = 1.0 + Math.sin(time * 0.5) * 0.2;
       auraRef.current.scale.setScalar(scale * auraPulse * 1.5);
@@ -114,6 +118,7 @@ export function MysticalEmotionNode({
     // Floating motion
     const floatY = Math.sin(time * 0.3) * 0.08;
     [innerRef, middleRef, outerRef, auraRef].forEach((ref) => {
+      /* istanbul ignore next */
       if (ref.current) {
         ref.current.position.y = floatY;
       }

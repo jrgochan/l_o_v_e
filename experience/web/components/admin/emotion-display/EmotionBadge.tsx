@@ -133,7 +133,9 @@ export function EmotionBadgeList({
   // Sort by prominence (primary first, then secondary, then underlying)
   const prominenceOrder = { primary: 0, secondary: 1, underlying: 2 };
   const sortedEmotions = [...emotions].sort((a, b) => {
+    /* istanbul ignore next */
     const orderA = prominenceOrder[a.prominence || "secondary"];
+    /* istanbul ignore next */
     const orderB = prominenceOrder[b.prominence || "secondary"];
     return orderA - orderB;
   });

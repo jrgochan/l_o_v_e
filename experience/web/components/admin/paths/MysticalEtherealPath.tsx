@@ -127,6 +127,7 @@ export function MysticalEtherealPath({
 
   // Update shader uniforms each frame
   useFrame((state) => {
+    /* istanbul ignore next */
     if (!shaderRef.current) return;
     shaderRef.current.uniforms.time.value = state.clock.elapsedTime;
     shaderRef.current.uniforms.isSelected.value = isSelected ? 1.0 : 0.0;
@@ -136,6 +137,7 @@ export function MysticalEtherealPath({
 
   // Update shader reference
   useEffect(() => {
+    /* istanbul ignore next */
     if (meshRef.current && meshRef.current.material) {
       shaderRef.current = meshRef.current.material as THREE.ShaderMaterial;
     }

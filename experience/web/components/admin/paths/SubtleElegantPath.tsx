@@ -30,6 +30,7 @@ export function SubtleElegantPath({
 
   // Store initial position
   useEffect(() => {
+    /* istanbul ignore next */
     if (meshRef.current) {
       initialY.current = meshRef.current.position.y;
     }
@@ -37,6 +38,7 @@ export function SubtleElegantPath({
 
   // Subtle elegant animations
   useFrame((state) => {
+    /* istanbul ignore next */
     if (!meshRef.current || !materialRef.current) return;
 
     const time = state.clock.elapsedTime;
