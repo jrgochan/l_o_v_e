@@ -166,6 +166,25 @@ describe("EmotionParticles", () => {
     const { container } = render(<EmotionParticles {...defaultProps} config={{ ...defaultConfig, enabled: false }} />);
     expect(container.firstChild).toBeNull();
   });
+
+  it("skips aura logic when disabled", async () => {
+    const { container } = render(<EmotionParticles {...defaultProps} config={{ ...defaultConfig, enableAuras: false }} />);
+    await act(async () => jest.runAllTimers());
+
+    // Check that rotation did NOT happen
+    const points = container.querySelector("points") as any;
+    const frameCallback = (useFrame as jest.Mock).mock.lastCall[0];
+
+    // Initial rotation should be 0 (from mock)
+    expect(points.rotation.y).toBe(0);
+
+    act(() => {
+      frameCallback({ clock: { elapsedTime: 1.0 } }, 0.1);
+    });
+
+    // Should still be 0 because lines 135-137 are skipped
+    expect(points.rotation.y).toBe(0);
+  });
 });
 
 describe("BurstParticles", () => {

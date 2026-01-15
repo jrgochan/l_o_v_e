@@ -186,13 +186,35 @@ describe("AnimatedEmotionNode", () => {
       const mesh = container.querySelector("mesh") as any;
       const frameCallback = (useFrame as jest.Mock).mock.calls[0][0];
 
+      // Explicitly init position to verify jitter delta
       mesh.position.set(0, 0, 0);
+
+      // Advance frame
       frameCallback({ clock: { elapsedTime: 1.0 } });
 
       // Should have accumulated some jitter offsets
+      // floatOffset (y) + jitter (x/z)
       expect(mesh.position.y).not.toBe(0);
       expect(mesh.position.x).not.toBe(0); // Jitter X
       expect(mesh.position.z).not.toBe(0); // Jitter Z
+    });
+
+    it("Dynamic mode: does NOT apply jitter when arousal <= 0.5", () => {
+      const lowArousalEmotion = { ...mockEmotion, vac: [0.8, 0.4, 0.7] as [number, number, number] }; // Arousal 0.4
+
+      const { container } = render(
+        <AnimatedEmotionNode {...defaultProps} emotion={lowArousalEmotion} mode="dynamic" />
+      );
+      const mesh = container.querySelector("mesh") as any;
+      const frameCallback = (useFrame as jest.Mock).mock.calls[0][0];
+
+      mesh.position.set(0, 0, 0);
+      frameCallback({ clock: { elapsedTime: 1.0 } });
+
+      // Should have float (y) but NO jitter (x/z)
+      expect(mesh.position.y).not.toBe(0); // Float
+      expect(mesh.position.x).toBe(0);     // No Jitter
+      expect(mesh.position.z).toBe(0);     // No Jitter
     });
 
     it("Mystical mode: applies figure-8 drift", () => {

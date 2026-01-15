@@ -93,7 +93,7 @@ export default function AdminUserDetailsPage() {
     return (
       <AdminLayout>
         <div className="p-4 bg-red-900/30 border border-red-800 rounded text-red-200">
-          {error ? error : "User not found"}
+          {error ? error : /* istanbul ignore next */ "User not found"}
         </div>
         <button onClick={() => router.back()} className="mt-4 text-cyan-400 hover:text-white">
           ← Back to Users

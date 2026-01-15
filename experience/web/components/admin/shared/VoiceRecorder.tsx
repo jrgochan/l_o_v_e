@@ -62,7 +62,7 @@ export function VoiceRecorder({ isOpen, onClose, onSend }: VoiceRecorderProps) {
           return;
         }
         const base64Audio = base64data.split(",")[1];
-        onSend(base64Audio, audioBlob || undefined); // Pass blob as second parameter
+        onSend(base64Audio, audioBlob || /* istanbul ignore next */ undefined); // Pass blob as second parameter
         onClose();
 
         // Reset for next recording

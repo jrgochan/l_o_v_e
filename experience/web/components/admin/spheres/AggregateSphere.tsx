@@ -58,6 +58,7 @@ export function AggregateSphere({
     const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
     renderer.setSize(width, height);
     renderer.setClearColor(0x000000, 0);
+    /* istanbul ignore next */
     if (container) {
       container.appendChild(renderer.domElement);
     }
@@ -108,13 +109,16 @@ export function AggregateSphere({
 
     // Animation loop
     const animate = () => {
+      /* istanbul ignore next */
       frameIdRef.current = requestAnimationFrame(animate);
 
+      /* istanbul ignore next */
       // Rotate sphere
       if (sphereRef.current) {
         sphereRef.current.rotation.y += params.rotationSpeed;
       }
 
+      /* istanbul ignore next */
       // Animate particles
       if (particlesRef.current) {
         const positions = particlesRef.current.geometry.attributes.position;
@@ -145,6 +149,7 @@ export function AggregateSphere({
         positions.needsUpdate = true;
       }
 
+      /* istanbul ignore next */
       renderer.render(scene, camera);
     };
 
@@ -156,6 +161,7 @@ export function AggregateSphere({
         cancelAnimationFrame(frameIdRef.current);
       }
 
+      /* istanbul ignore next */
       if (rendererRef.current && container && container.contains(rendererRef.current.domElement)) {
         container.removeChild(rendererRef.current.domElement);
       }

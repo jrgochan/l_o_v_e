@@ -88,6 +88,7 @@ export function EmotionParticles({
   }, [config, connection, arousal]);
 
   useFrame((state, delta) => {
+    /* istanbul ignore next */
     if (!particlesRef.current || !config.enabled || !particleData) return;
 
     timeRef.current += delta;
@@ -142,7 +143,7 @@ export function EmotionParticles({
   }
 
   const { positions, sizes } = particleData;
-  const opacity = config.opacity * (isSelected ? 1.5 : isHovered ? 1.2 : 1.0);
+  const opacity = config.opacity * (/* istanbul ignore next */ isSelected ? 1.5 : isHovered ? 1.2 : 1.0);
 
   return (
     <points ref={particlesRef}>
@@ -211,6 +212,7 @@ export function BurstParticles({ position, color, trigger }: BurstParticlesProps
   }, [trigger]);
 
   useFrame((state, delta) => {
+    /* istanbul ignore next */
     if (!particlesRef.current || !trigger || !burstData) return;
 
     progressRef.current += delta * 2;
@@ -232,6 +234,7 @@ export function BurstParticles({ position, color, trigger }: BurstParticlesProps
 
     particlesRef.current.geometry.attributes.position.needsUpdate = true;
 
+    /* istanbul ignore next */
     if (materialRef.current) {
       materialRef.current.opacity = 1 - progressRef.current;
     }

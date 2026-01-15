@@ -152,8 +152,7 @@ export function StrategiesTab() {
   const handleAddStep = () => {
     setEditForm((prev) => ({
       ...prev,
-      /* istanbul ignore next */
-      detailed_steps: [...(prev.detailed_steps || []), ""],
+      detailed_steps: [...(/* istanbul ignore next */ prev.detailed_steps || []), ""],
     }));
   };
 

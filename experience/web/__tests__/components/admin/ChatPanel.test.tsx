@@ -227,7 +227,26 @@ describe("ChatPanel", () => {
 
     expect(mockSetCurrentAnalysisSpy).toHaveBeenCalled();
     expect(mockSetSessionMetricsSpy).toHaveBeenCalled();
+    expect(mockSetSessionMetricsSpy).toHaveBeenCalled();
     expect(mockAutoFocusEmotion).toHaveBeenCalledWith("Fear");
+  });
+
+  it("syncs preferences on mount/change", () => {
+    (useChatPanelState as jest.Mock).mockReturnValue({
+      ...defaultChatPanelState,
+      isExpanded: true,
+      deepFeelingMode: true,
+      toneMode: "analytical"
+    });
+    (useWebSocketChat as jest.Mock).mockReturnValue({
+      ...defaultWebSocketState,
+      isConnected: true
+    });
+
+    render(<ChatPanel sessionId="sess1" />);
+
+    expect(mockUpdateDeepFeeling).toHaveBeenCalledWith(true);
+    expect(mockUpdateTone).toHaveBeenCalledWith("analytical");
   });
 
   it("handles WebSocket callbacks: onMultiEmotion", async () => {
@@ -605,6 +624,12 @@ describe("ChatPanel", () => {
     // The resize handle is the div with cursor-row-resize
     const resizeHandle = container.querySelector('.cursor-row-resize');
     expect(resizeHandle).toHaveClass('bg-cyan-500/50');
+
+    // Test resize interaction
+    if (resizeHandle) {
+      fireEvent.mouseDown(resizeHandle);
+      expect(defaultChatPanelState.handleMouseDown).toHaveBeenCalled();
+    }
   });
 
   it("handles WebSocket callbacks: onAnalysis (Stable)", async () => {

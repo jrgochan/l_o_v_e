@@ -1,4 +1,4 @@
-import { render } from "@testing-library/react";
+import { render, act } from "@testing-library/react";
 import { InnerCharacterSphere, MotionIndicator } from "@/components/admin/spheres/InnerCharacterSphere";
 import React from "react";
 import * as THREE from "three";
@@ -28,7 +28,7 @@ jest.mock("@react-three/fiber", () => ({
 describe("InnerCharacterSphere", () => {
     // Patch Element prototype for R3F props
     beforeAll(() => {
-        Object.defineProperties(window.Element.prototype, {
+        Object.defineProperties(window.HTMLElement.prototype, {
             position: {
                 get() { if (!this._pos) this._pos = new THREE.Vector3(); return this._pos; },
                 configurable: true
@@ -67,17 +67,20 @@ describe("InnerCharacterSphere", () => {
     };
 
     it("registers animation loop and updates mesh", () => {
-        let frameCallbacks: any[] = [];
+        const frameCallbacks: Set<any> = new Set();
         (useFrame as jest.Mock).mockImplementation((cb) => {
-            frameCallbacks.push(cb);
+            frameCallbacks.add(cb);
+            return () => frameCallbacks.delete(cb);
         });
 
         const { container } = render(<InnerCharacterSphere emotion={mockEmotion as any} mode="dynamic" />);
 
-        expect(frameCallbacks.length).toBeGreaterThan(0);
+        expect(frameCallbacks.size).toBeGreaterThan(0);
 
-        // Trigger all frames
-        frameCallbacks.forEach(cb => cb({ clock: { elapsedTime: 0.25 } }));
+        // Advance frame manually
+        act(() => {
+            frameCallbacks.forEach(cb => cb({ clock: { elapsedTime: 0.25 } }));
+        });
 
         const mesh = container.querySelector("mesh") as any;
 
@@ -91,8 +94,11 @@ describe("InnerCharacterSphere", () => {
     });
 
     it("handles orbital motion", () => {
-        let frameCallbacks: any[] = [];
-        (useFrame as jest.Mock).mockImplementation((cb) => { frameCallbacks.push(cb); });
+        const frameCallbacks: Set<any> = new Set();
+        (useFrame as jest.Mock).mockImplementation((cb) => {
+            frameCallbacks.add(cb);
+            return () => frameCallbacks.delete(cb);
+        });
 
         // Force orbital motion via category
         const orbitalEmotion = { ...mockEmotion, category: "places we go with others" }; // Known social category
@@ -100,9 +106,11 @@ describe("InnerCharacterSphere", () => {
         const { container } = render(<InnerCharacterSphere emotion={orbitalEmotion as any} mode="dynamic" />);
         const mesh = container.querySelector("mesh") as any;
 
-        expect(frameCallbacks.length).toBeGreaterThan(0);
+        expect(frameCallbacks.size).toBeGreaterThan(0);
         // Trigger all
-        frameCallbacks.forEach(cb => cb({ clock: { elapsedTime: 1 } }));
+        act(() => {
+            frameCallbacks.forEach(cb => cb({ clock: { elapsedTime: 1 } }));
+        });
 
         // Orbital updates x and z
         expect(mesh.position.x).not.toBe(0);
@@ -110,8 +118,11 @@ describe("InnerCharacterSphere", () => {
     });
 
     it("handles stable motion", () => {
-        let frameCallbacks: any[] = [];
-        (useFrame as jest.Mock).mockImplementation((cb) => { frameCallbacks.push(cb); });
+        const frameCallbacks: Set<any> = new Set();
+        (useFrame as jest.Mock).mockImplementation((cb) => {
+            frameCallbacks.add(cb);
+            return () => frameCallbacks.delete(cb);
+        });
 
         // Override mock for stable
         const { getEmotionAnimationParams } = require("@/utils/emotionAnimationMapper");
@@ -129,9 +140,11 @@ describe("InnerCharacterSphere", () => {
         const { container } = render(<InnerCharacterSphere emotion={mockEmotion as any} mode="dynamic" />);
         const mesh = container.querySelector("mesh") as any;
 
-        expect(frameCallbacks.length).toBeGreaterThan(0);
+        expect(frameCallbacks.size).toBeGreaterThan(0);
         // Trigger all
-        frameCallbacks.forEach(cb => cb({ clock: { elapsedTime: 1 } }));
+        act(() => {
+            frameCallbacks.forEach(cb => cb({ clock: { elapsedTime: 1 } }));
+        });
 
         // Stable updates nothing
         // (Assuming initial pos is 0,0,0)
@@ -140,8 +153,11 @@ describe("InnerCharacterSphere", () => {
     });
 
     it("handles recoil motion", () => {
-        let frameCallbacks: any[] = [];
-        (useFrame as jest.Mock).mockImplementation((cb) => { frameCallbacks.push(cb); });
+        const frameCallbacks: Set<any> = new Set();
+        (useFrame as jest.Mock).mockImplementation((cb) => {
+            frameCallbacks.add(cb);
+            return () => frameCallbacks.delete(cb);
+        });
 
         const { getEmotionAnimationParams } = require("@/utils/emotionAnimationMapper");
         getEmotionAnimationParams.mockReturnValue({
@@ -158,15 +174,20 @@ describe("InnerCharacterSphere", () => {
         const { container } = render(<InnerCharacterSphere emotion={mockEmotion as any} mode="dynamic" />);
         const mesh = container.querySelector("mesh") as any;
 
-        frameCallbacks.forEach(cb => cb({ clock: { elapsedTime: 1 } }));
+        act(() => {
+            frameCallbacks.forEach(cb => cb({ clock: { elapsedTime: 1 } }));
+        });
 
         // Recoil updates y
         expect(mesh.position.y).not.toBe(0);
     });
 
     it("handles reaching motion", () => {
-        let frameCallbacks: any[] = [];
-        (useFrame as jest.Mock).mockImplementation((cb) => { frameCallbacks.push(cb); });
+        const frameCallbacks: Set<any> = new Set();
+        (useFrame as jest.Mock).mockImplementation((cb) => {
+            frameCallbacks.add(cb);
+            return () => frameCallbacks.delete(cb);
+        });
 
         const { getEmotionAnimationParams } = require("@/utils/emotionAnimationMapper");
         getEmotionAnimationParams.mockReturnValue({
@@ -183,7 +204,9 @@ describe("InnerCharacterSphere", () => {
         const { container } = render(<InnerCharacterSphere emotion={mockEmotion as any} mode="dynamic" />);
         const mesh = container.querySelector("mesh") as any;
 
-        frameCallbacks.forEach(cb => cb({ clock: { elapsedTime: 1 } }));
+        act(() => {
+            frameCallbacks.forEach(cb => cb({ clock: { elapsedTime: 1 } }));
+        });
 
         // Reaching updates x and y
         expect(mesh.position.x).not.toBe(0);

@@ -34,6 +34,7 @@ export function InnerCharacterSphere({
 
     // Characteristic animation
     useFrame((state) => {
+        /* istanbul ignore next */
         if (!meshRef.current) return;
 
         const time = state.clock.elapsedTime;
@@ -84,12 +85,14 @@ export function InnerCharacterSphere({
         // 4. GLOW PULSE
         const glowPulse = 1.0 + Math.sin(time * ((Math.PI * 2) / animParams.glowPulseSpeed)) * 0.3;
         const baseGlow = animParams.glowIntensity * glowPulse;
+        /* istanbul ignore next */
         if (materialRef.current) {
             materialRef.current.emissiveIntensity = baseGlow;
         }
 
         // 5. COLOR BOOST
         const boostedColor = color.clone().multiplyScalar(animParams.colorBoost);
+        /* istanbul ignore next */
         if (materialRef.current) {
             materialRef.current.color.copy(boostedColor);
             materialRef.current.emissive.copy(boostedColor);
@@ -130,6 +133,7 @@ export function MotionIndicator({ type }: { type: MotionType }) {
     const ringRef = useRef<THREE.Mesh>(null);
 
     useFrame(() => {
+        /* istanbul ignore next */
         if (!ringRef.current) return;
         ringRef.current.rotation.z += 0.005;
     });

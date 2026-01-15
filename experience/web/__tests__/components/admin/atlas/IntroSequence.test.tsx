@@ -1,84 +1,81 @@
-import { render, screen, act } from "@testing-library/react";
-import { IntroSequence } from "../../../../components/admin/atlas/IntroSequence";
+import { render, act, screen } from "@testing-library/react";
+import { IntroSequence } from "@/components/admin/atlas/IntroSequence";
+// Interact with R3F state
+import { useThree, useFrame } from "@react-three/fiber";
 import * as THREE from "three";
+import { useAtlasAdminStore } from "@/stores/useAtlasAdminStore";
+
+// Mock Hooks
+jest.mock("@react-three/fiber", () => ({
+  useThree: jest.fn(),
+  useFrame: jest.fn(),
+}));
+
+jest.mock("@/stores/useAtlasAdminStore", () => ({
+  useAtlasAdminStore: jest.fn(),
+}));
+
+jest.mock("@/hooks/useAmbientAudio", () => ({
+  useAmbientAudio: jest.fn(() => ({
+    playWhoosh: jest.fn(),
+  })),
+}));
 
 // Mock Drei Html
 jest.mock("@react-three/drei", () => ({
-  Html: ({ children }: any) => <div data-testid="html-overlay">{children}</div>,
-}));
-
-// Mock Store
-const mockSetIntroActive = jest.fn();
-jest.mock("@/stores/useAtlasAdminStore", () => ({
-  useAtlasAdminStore: (selector: any) =>
-    selector({
-      setIntroActive: mockSetIntroActive,
-    }),
-}));
-
-// Mock R3F
-const mockUseFrame = jest.fn();
-jest.mock("@react-three/fiber", () => ({
-  useFrame: (cb: any) => mockUseFrame(cb),
-  useThree: () => ({
-    camera: {
-      position: { copy: jest.fn() },
-      lookAt: jest.fn(),
-    },
-    clock: { elapsedTime: 0 },
-  }),
-}));
-
-// Mock Audio
-jest.mock("@/hooks/useAmbientAudio", () => ({
-  useAmbientAudio: () => ({ playWhoosh: jest.fn() }),
+  Html: ({ children }: any) => <div data-testid="drei-html">{children}</div>,
 }));
 
 describe("IntroSequence", () => {
+  const setIntroActive = jest.fn();
+  const mockCamera = {
+    position: { copy: jest.fn() },
+    lookAt: jest.fn(),
+  };
+
   beforeEach(() => {
     jest.useFakeTimers();
     jest.clearAllMocks();
+    (useAtlasAdminStore as unknown as jest.Mock).mockImplementation((selector) => selector({ setIntroActive }));
+    (useThree as jest.Mock).mockReturnValue({ camera: mockCamera });
   });
 
   afterEach(() => {
     jest.useRealTimers();
   });
 
-  it("should render overlay title", () => {
+  it("initializes camera and plays sound", () => {
     render(<IntroSequence />);
-    expect(screen.getByText("ATLAS")).toBeInTheDocument();
+    expect(mockCamera.position.copy).toHaveBeenCalled();
+    expect(mockCamera.lookAt).toHaveBeenCalledWith(0, 0, 0);
   });
 
-  it("should animate camera and complete sequence", () => {
-    let frameCallback: any;
-    mockUseFrame.mockImplementation((cb) => {
-      frameCallback = cb;
-    });
-
+  it("animates camera and completes", () => {
     render(<IntroSequence />);
+
+    // Grab the frame callback
+    const frameCallback = (useFrame as jest.Mock).mock.calls[0][0];
 
     // Simulate frames
-    if (frameCallback) {
-      // Start
-      frameCallback({ clock: { elapsedTime: 10 } }); // Sets startTimeRef=10
+    // 1. Initial
+    frameCallback({ clock: { elapsedTime: 0 } });
 
-      // Progress 100% (6s duration)
-      frameCallback({ clock: { elapsedTime: 17 } });
-
-      expect(mockSetIntroActive).toHaveBeenCalledWith(false);
-    }
-  });
-
-  it("should fade title via timers", () => {
-    render(<IntroSequence />);
-    // Title hidden initally?
-    // Code: const [showTitle, setShowTitle] = useState(false);
-    // setTimeout(() => setShowTitle(true), 1000);
-
-    // We can't check opacity class easily without parsing classList, but we can verify timers ran
+    // 2. Middle (showTitle true)
+    // Advance timers to trigger setTimeout (1000ms delay)
     act(() => {
-      jest.advanceTimersByTime(1000);
+      jest.advanceTimersByTime(1500);
     });
-    // State update happens
+
+    // Determine frame update to trigger re-renders if needed?
+    // Actually, state update via setTimeout triggers re-render regardless of useFrame.
+
+    // Check if title has opacity-100 class
+    expect(screen.getByText("ATLAS").closest('div')).toHaveClass("opacity-100");
+
+    // 3. End
+    act(() => {
+      frameCallback({ clock: { elapsedTime: 7.0 } });
+    });
+    expect(setIntroActive).toHaveBeenCalledWith(false);
   });
 });

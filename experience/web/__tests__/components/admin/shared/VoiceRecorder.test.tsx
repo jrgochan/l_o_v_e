@@ -1,5 +1,5 @@
 
-import { render, screen, fireEvent, act } from "@testing-library/react";
+import { render, screen, fireEvent, act, waitFor } from "@testing-library/react";
 import { VoiceRecorder } from "@/components/admin/shared/VoiceRecorder";
 import { useVoiceRecording } from "@/hooks/useVoiceRecording";
 import { logger } from "@/utils/logger";
@@ -24,6 +24,12 @@ jest.mock("@/components/admin/visualizations/AudioVisualizer", () => ({
 describe("VoiceRecorder", () => {
   const mockOnClose = jest.fn();
   const mockOnSend = jest.fn();
+
+  const defaultProps = {
+    isOpen: true,
+    onClose: mockOnClose,
+    onSend: mockOnSend,
+  };
 
   const defaultHookReturn = {
     isRecording: false,
@@ -148,6 +154,38 @@ describe("VoiceRecorder", () => {
 
     expect(cancelRecording).toHaveBeenCalled();
     expect(mockOnClose).toHaveBeenCalled();
+  });
+
+  it("handles empty file reader result defensively", async () => {
+    // Override Mock FileReader for this test to return empty
+    // @ts-ignore
+    const originalFileReader = window.FileReader;
+    // @ts-ignore
+    window.FileReader = jest.fn(() => ({
+      readAsDataURL: jest.fn(), // @ts-ignore
+      onloadend: null, // @ts-ignore
+      result: ""
+    }));
+
+    (useVoiceRecording as jest.Mock).mockReturnValue({
+      ...defaultHookReturn,
+      isRecording: false,
+      audioBlob: new Blob([""], { type: "audio/webm" }),
+      audioUrl: "blob:url",
+    });
+
+    render(<VoiceRecorder {...defaultProps} isOpen={true} />);
+    const sendBtn = screen.getByText("Send Recording");
+    fireEvent.click(sendBtn);
+
+    await waitFor(() => {
+      // Since result is empty, onSend should NOT be called
+      expect(mockOnSend).not.toHaveBeenCalled();
+    }, { timeout: 200 });
+
+    // Cleanup
+    // @ts-ignore
+    window.FileReader = originalFileReader;
   });
 
   it("handles send recording flow", () => {

@@ -100,6 +100,27 @@ describe("DevelopmentSettings", () => {
     expect(mockUpdateDevelopmentSetting).toHaveBeenCalledWith({ backendLogLevel: "ERROR" });
   });
 
+  it("displays correct description for each log level", () => {
+    const { rerender } = render(<DevelopmentSettings />);
+    // Default is info
+    expect(screen.getByText("Informational messages, warnings, and errors")).toBeInTheDocument();
+
+    const levels = {
+      debug: "All logs including detailed debug information",
+      warn: "Warnings and errors only",
+      error: "Errors only"
+    };
+
+    Object.entries(levels).forEach(([level, text]) => {
+      (useSettingsStore as unknown as jest.Mock).mockReturnValue({
+        ...defaultSettings,
+        development: { ...defaultSettings.development, frontendLogLevel: level },
+      });
+      rerender(<DevelopmentSettings />);
+      expect(screen.getByText(text)).toBeInTheDocument();
+    });
+  });
+
   it("handles category toggles", () => {
     render(<DevelopmentSettings />);
 
