@@ -106,8 +106,8 @@ describe("usePathSync", () => {
       ...mockPath,
       waypoints: [
         { emotion: "Neutral", vac: [0, 0, 0], reasoning: "First" },
-        { emotion: "Joy", vac: [0.5, 0, 0], reasoning: "Second" }
-      ]
+        { emotion: "Joy", vac: [0.5, 0, 0], reasoning: "Second" },
+      ],
     };
 
     (useAtlasAdminStore as unknown as jest.Mock).mockImplementation((selector) => {
@@ -124,8 +124,8 @@ describe("usePathSync", () => {
       expect.objectContaining({
         waypoints: expect.arrayContaining([
           expect.objectContaining({ order: 1 }),
-          expect.objectContaining({ order: 2, emotion: "Joy" })
-        ])
+          expect.objectContaining({ order: 2, emotion: "Joy" }),
+        ]),
       })
     );
   });
@@ -133,9 +133,7 @@ describe("usePathSync", () => {
   it("should handle unknown emotions in waypoints", () => {
     const unknownPath = {
       ...mockPath,
-      waypoints: [
-        { emotion: "Mystery", vac: [0, 0, 0], reasoning: "Unknown" }
-      ]
+      waypoints: [{ emotion: "Mystery", vac: [0, 0, 0], reasoning: "Unknown" }],
     };
 
     (useAtlasAdminStore as unknown as jest.Mock).mockImplementation((selector) => {
@@ -154,9 +152,9 @@ describe("usePathSync", () => {
           expect.objectContaining({
             emotion: "Mystery",
             category: "Unknown",
-            quaternion: [0, 0, 0, 1]
-          })
-        ])
+            quaternion: [0, 0, 0, 1],
+          }),
+        ]),
       })
     );
   });

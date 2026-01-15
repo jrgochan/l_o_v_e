@@ -48,19 +48,21 @@ export function InfoPanel() {
         <div className="flex gap-1 bg-gray-900 p-1 rounded-lg border border-gray-800">
           <button
             onClick={() => setActiveTab("info")}
-            className={`flex-1 px-4 py-2 text-sm font-medium rounded-md transition-all ${activeTab === "info"
+            className={`flex-1 px-4 py-2 text-sm font-medium rounded-md transition-all ${
+              activeTab === "info"
                 ? "bg-cyan-900/40 text-cyan-100 shadow-sm border border-cyan-700/50"
                 : "text-gray-400 hover:text-gray-200 hover:bg-gray-800/50"
-              }`}
+            }`}
           >
             📋 Info & Paths
           </button>
           <button
             onClick={() => setActiveTab("stats")}
-            className={`flex-1 px-4 py-2 text-sm font-medium rounded-md transition-all ${activeTab === "stats"
+            className={`flex-1 px-4 py-2 text-sm font-medium rounded-md transition-all ${
+              activeTab === "stats"
                 ? "bg-cyan-900/40 text-cyan-100 shadow-sm border border-cyan-700/50"
                 : "text-gray-400 hover:text-gray-200 hover:bg-gray-800/50"
-              }`}
+            }`}
           >
             📊 Statistics
           </button>

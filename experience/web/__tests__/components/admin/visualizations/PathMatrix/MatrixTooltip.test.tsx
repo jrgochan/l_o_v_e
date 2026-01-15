@@ -9,7 +9,7 @@ describe("MatrixTooltip", () => {
     category: "Happy",
     definition: "Happy def",
     vac: [0.8, 0.5, 0.6] as [number, number, number],
-    quaternion: [0, 0, 0, 1] as [number, number, number, number]
+    quaternion: [0, 0, 0, 1] as [number, number, number, number],
   };
 
   const mockToEmotion = {
@@ -18,7 +18,7 @@ describe("MatrixTooltip", () => {
     category: "Sad",
     definition: "Sad def",
     vac: [-0.5, -0.2, 0.3] as [number, number, number],
-    quaternion: [0, 0, 0, 1] as [number, number, number, number]
+    quaternion: [0, 0, 0, 1] as [number, number, number, number],
   };
 
   const mockPath: EmotionPath = {
@@ -30,7 +30,7 @@ describe("MatrixTooltip", () => {
     difficulty: "difficult",
     waypoints: [
       { emotion: "Joy", vac: [1, 1, 1], reasoning: "Start" },
-      { emotion: "Sadness", vac: [-1, -1, -1], reasoning: "End" }
+      { emotion: "Sadness", vac: [-1, -1, -1], reasoning: "End" },
     ],
     requires_bridge: false,
     bridge_emotions: [],
@@ -38,11 +38,7 @@ describe("MatrixTooltip", () => {
 
   it("renders basic path details when path is provided", () => {
     render(
-      <MatrixTooltip
-        fromEmotion={mockFromEmotion}
-        toEmotion={mockToEmotion}
-        path={mockPath}
-      />
+      <MatrixTooltip fromEmotion={mockFromEmotion} toEmotion={mockToEmotion} path={mockPath} />
     );
 
     expect(screen.getByText("Joy → Sadness")).toBeInTheDocument();
@@ -57,15 +53,11 @@ describe("MatrixTooltip", () => {
     const bridgePath = {
       ...mockPath,
       requires_bridge: true,
-      bridge_emotions: ["Neutral"]
+      bridge_emotions: ["Neutral"],
     };
 
     render(
-      <MatrixTooltip
-        fromEmotion={mockFromEmotion}
-        toEmotion={mockToEmotion}
-        path={bridgePath}
-      />
+      <MatrixTooltip fromEmotion={mockFromEmotion} toEmotion={mockToEmotion} path={bridgePath} />
     );
 
     expect(screen.getByText("Requires Bridge Emotions:")).toBeInTheDocument();
@@ -74,30 +66,22 @@ describe("MatrixTooltip", () => {
 
   it("renders difficulty colors correctly", () => {
     // Check if the color style is applied (indirectly by style attribute)
-    // We can just verify it renders without crashing for now, 
+    // We can just verify it renders without crashing for now,
     // or inspect style prop if necessary.
     const { container } = render(
-      <MatrixTooltip
-        fromEmotion={mockFromEmotion}
-        toEmotion={mockToEmotion}
-        path={mockPath}
-      />
+      <MatrixTooltip fromEmotion={mockFromEmotion} toEmotion={mockToEmotion} path={mockPath} />
     );
 
     // Difficulty 'difficult' -> red/pink
     const expectedColor = DIFFICULTY_COLORS["difficult"];
     // The bar
-    const bar = container.querySelector('.rounded-full.shadow-lg');
+    const bar = container.querySelector(".rounded-full.shadow-lg");
     expect(bar).toHaveStyle({ backgroundColor: expectedColor });
   });
 
   it("renders empty state when path is undefined", () => {
     render(
-      <MatrixTooltip
-        fromEmotion={mockFromEmotion}
-        toEmotion={mockToEmotion}
-        path={undefined}
-      />
+      <MatrixTooltip fromEmotion={mockFromEmotion} toEmotion={mockToEmotion} path={undefined} />
     );
 
     expect(screen.getByText("Path not computed yet")).toBeInTheDocument();

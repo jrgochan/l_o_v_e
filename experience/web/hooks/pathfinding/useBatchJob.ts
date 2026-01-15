@@ -26,7 +26,6 @@ export function useBatchJob(onComplete?: () => void, onFail?: (error: string) =>
   const pollProgress = useCallback(async () => {
     // currentJobId is guaranteed by useEffect guard
 
-
     try {
       const response = await fetch(
         `${OBSERVER_API_URL}/observer/atlas/computation-status/${currentJobId}`

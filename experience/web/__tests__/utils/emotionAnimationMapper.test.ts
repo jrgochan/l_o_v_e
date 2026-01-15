@@ -1,6 +1,6 @@
 import {
   getEmotionAnimationParams,
-  getEmotionAnimationCharacter
+  getEmotionAnimationCharacter,
 } from "@/utils/emotionAnimationMapper";
 import { AtlasEmotion } from "@/types/atlas-admin";
 
@@ -11,7 +11,7 @@ describe("Emotion Animation Mapper", () => {
     category: "Places We Go With Others",
     definition: "A test definition",
     vac: [0.5, 0.5, 0.5], // V, A, C
-    quaternion: [0, 0, 0, 1]
+    quaternion: [0, 0, 0, 1],
   };
 
   describe("getEmotionAnimationParams", () => {

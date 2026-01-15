@@ -41,7 +41,14 @@ describe("AnalysisPanel", () => {
     deepFeelingMode: false,
     expandState: "normal" as const,
     onToggleExpansion: mockToggleExpansion,
-    sessionMetrics: { emotionCount: 0, averageConfidence: 0, alertCount: { warning: 0, critical: 0, attention: 0 } },
+    sessionMetrics: {
+      emotionCount: 0,
+      averageConfidence: 0,
+      alertCount: { warning: 0, critical: 0, attention: 0 },
+      startTime: new Date(),
+      elapsedSeconds: 0,
+      dominantCategory: null,
+    },
     vacHistory: [],
     emotionTimeline: [],
     audioBlob: null,
@@ -58,11 +65,19 @@ describe("AnalysisPanel", () => {
 
   it("renders empty state correctly", () => {
     render(<AnalysisPanel {...defaultProps} />);
-    expect(screen.getByText("Send a message or voice recording to see analysis data here")).toBeInTheDocument();
+    expect(
+      screen.getByText("Send a message or voice recording to see analysis data here")
+    ).toBeInTheDocument();
   });
 
   it("renders clinical dashboard and handles click", async () => {
-    render(<AnalysisPanel {...defaultProps} emotion="Joy" vac={{ valence: 1, arousal: 0, connection: 0 }} />);
+    render(
+      <AnalysisPanel
+        {...defaultProps}
+        emotion="Joy"
+        vac={{ valence: 1, arousal: 0, connection: 0 }}
+      />
+    );
 
     expect(screen.getByTestId("clinical-dashboard")).toBeInTheDocument();
 
@@ -81,7 +96,7 @@ describe("AnalysisPanel", () => {
       pitch_mean: 150,
       energy: 0.8,
       rate: 4.5,
-      interpretation: { pitch: "High" }
+      interpretation: { pitch: "High" },
     };
     render(<AnalysisPanel {...defaultProps} prosody={prosody} />);
 
@@ -90,7 +105,15 @@ describe("AnalysisPanel", () => {
   });
 
   it("renders single emotion analysis", async () => {
-    render(<AnalysisPanel {...defaultProps} emotion="Joy" category="Positive" vac={{ valence: 1, arousal: 0.5, connection: 0.2 }} confidence={0.9} />);
+    render(
+      <AnalysisPanel
+        {...defaultProps}
+        emotion="Joy"
+        category="Positive"
+        vac={{ valence: 1, arousal: 0.5, connection: 0.2 }}
+        confidence={0.9}
+      />
+    );
 
     expect(screen.getByText("Joy")).toBeInTheDocument();
     expect(screen.getByText("1.00")).toBeInTheDocument(); // Valence
@@ -110,9 +133,11 @@ describe("AnalysisPanel", () => {
     const multiData = {
       emotions: [],
       relationships: [],
-      aggregate: { vac: { valence: 0, arousal: 0, connection: 0 } }
-    };
-    render(<AnalysisPanel {...defaultProps} deepFeelingMode={true} multiEmotionAnalysis={multiData} />);
+      aggregate: { vac: { valence: 0, arousal: 0, connection: 0 } },
+    } as any;
+    render(
+      <AnalysisPanel {...defaultProps} deepFeelingMode={true} multiEmotionAnalysis={multiData} />
+    );
 
     expect(screen.getByTestId("multi-emotion-card")).toBeInTheDocument();
     // Test interaction prop drill
@@ -122,7 +147,12 @@ describe("AnalysisPanel", () => {
   });
 
   it("renders insights", () => {
-    render(<AnalysisPanel {...defaultProps} insights={{ summary: "Interesting thought", guidance: "Tips" }} />);
+    render(
+      <AnalysisPanel
+        {...defaultProps}
+        insights={{ summary: "Interesting thought", guidance: "Tips" } as any}
+      />
+    );
     expect(screen.getByText("Interesting thought")).toBeInTheDocument();
     expect(screen.getByText("Tips")).toBeInTheDocument();
   });

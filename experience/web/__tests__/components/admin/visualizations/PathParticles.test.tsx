@@ -1,4 +1,3 @@
-
 import { render } from "@testing-library/react";
 import { PathParticles } from "@/components/admin/visualizations/PathParticles";
 import * as THREE from "three";
@@ -43,8 +42,12 @@ describe("PathParticles", () => {
   it("should render and animate particles", () => {
     // Use immutable ref to prevents R3F from overwriting current with DOM node
     const createImmutableRef = (val: any) => ({
-      get current() { return val; },
-      set current(_v: any) { /* ignore assignment */ }
+      get current() {
+        return val;
+      },
+      set current(_v: any) {
+        /* ignore assignment */
+      },
     });
 
     // Sequence of refs in component:
@@ -59,7 +62,14 @@ describe("PathParticles", () => {
     mockUseRef
       .mockReturnValueOnce(createImmutableRef(mockMesh))
       .mockReturnValueOnce({ current: [] })
-      .mockReturnValueOnce({ current: { position: new THREE.Vector3(), scale: new THREE.Vector3(1, 1, 1), updateMatrix: mockUpdateMatrix, matrix: {} } });
+      .mockReturnValueOnce({
+        current: {
+          position: new THREE.Vector3(),
+          scale: new THREE.Vector3(1, 1, 1),
+          updateMatrix: mockUpdateMatrix,
+          matrix: {},
+        },
+      });
 
     let frameCallback: any;
     mockUseFrame.mockImplementation((cb) => {
@@ -83,8 +93,12 @@ describe("PathParticles", () => {
 
   it("should replenish progress array if short", () => {
     const createImmutableRef = (val: any) => ({
-      get current() { return val; },
-      set current(_v: any) { /* ignore assignment */ }
+      get current() {
+        return val;
+      },
+      set current(_v: any) {
+        /* ignore assignment */
+      },
     });
 
     // Use mutable ref object for progress so effect can write to it, and we can truncate it
@@ -93,10 +107,17 @@ describe("PathParticles", () => {
     mockUseRef
       .mockReturnValueOnce(createImmutableRef(mockMesh))
       .mockReturnValueOnce(progressRefObj)
-      .mockReturnValueOnce({ current: { position: new THREE.Vector3(), scale: new THREE.Vector3(1, 1, 1), updateMatrix: mockUpdateMatrix, matrix: {} } });
+      .mockReturnValueOnce({
+        current: {
+          position: new THREE.Vector3(),
+          scale: new THREE.Vector3(1, 1, 1),
+          updateMatrix: mockUpdateMatrix,
+          matrix: {},
+        },
+      });
 
     let frameCallback: any;
-    mockUseFrame.mockImplementation((cb: any) => frameCallback = cb);
+    mockUseFrame.mockImplementation((cb: any) => (frameCallback = cb));
 
     render(<PathParticles curve={mockCurve} color={new THREE.Color("red")} />);
 
@@ -112,8 +133,12 @@ describe("PathParticles", () => {
 
   it("should repair sparse progress array (safety check)", () => {
     const createImmutableRef = (val: any) => ({
-      get current() { return val; },
-      set current(_v: any) { /* ignore assignment */ }
+      get current() {
+        return val;
+      },
+      set current(_v: any) {
+        /* ignore assignment */
+      },
     });
 
     const progressRefObj = { current: [] as any[] };
@@ -121,10 +146,17 @@ describe("PathParticles", () => {
     mockUseRef
       .mockReturnValueOnce(createImmutableRef(mockMesh))
       .mockReturnValueOnce(progressRefObj)
-      .mockReturnValueOnce({ current: { position: new THREE.Vector3(), scale: new THREE.Vector3(1, 1, 1), updateMatrix: mockUpdateMatrix, matrix: {} } });
+      .mockReturnValueOnce({
+        current: {
+          position: new THREE.Vector3(),
+          scale: new THREE.Vector3(1, 1, 1),
+          updateMatrix: mockUpdateMatrix,
+          matrix: {},
+        },
+      });
 
     let frameCallback: any;
-    mockUseFrame.mockImplementation((cb: any) => frameCallback = cb);
+    mockUseFrame.mockImplementation((cb: any) => (frameCallback = cb));
 
     render(<PathParticles curve={mockCurve} color={new THREE.Color("red")} />);
 
@@ -140,32 +172,54 @@ describe("PathParticles", () => {
 
   it("should handle highlighted state", () => {
     const createImmutableRef = (val: any) => ({
-      get current() { return val; },
-      set current(_v: any) { /* ignore assignment */ }
+      get current() {
+        return val;
+      },
+      set current(_v: any) {
+        /* ignore assignment */
+      },
     });
 
     mockUseRef
       .mockReturnValueOnce(createImmutableRef(mockMesh))
       .mockReturnValueOnce({ current: [] })
-      .mockReturnValueOnce({ current: { position: new THREE.Vector3(), scale: new THREE.Vector3(1, 1, 1), updateMatrix: mockUpdateMatrix, matrix: {} } });
+      .mockReturnValueOnce({
+        current: {
+          position: new THREE.Vector3(),
+          scale: new THREE.Vector3(1, 1, 1),
+          updateMatrix: mockUpdateMatrix,
+          matrix: {},
+        },
+      });
 
     let frameCallback: any;
-    mockUseFrame.mockImplementation((cb: any) => frameCallback = cb);
+    mockUseFrame.mockImplementation((cb: any) => (frameCallback = cb));
 
-    render(<PathParticles curve={mockCurve} color={new THREE.Color("blue")} isHighlighted={true} mode="mystical" />);
+    render(
+      <PathParticles
+        curve={mockCurve}
+        color={new THREE.Color("blue")}
+        isHighlighted={true}
+        mode="mystical"
+      />
+    );
 
     if (frameCallback) frameCallback({ clock: { elapsedTime: 1.0 } }, 0.016);
 
     // Assert logic influenced by highlight?
-    // Hard to assert values on dummy without spying on them within the component, 
+    // Hard to assert values on dummy without spying on them within the component,
     // but coverage will be satisfied.
   });
 
   it("should return early if mesh ref is missing", () => {
     // Mock ref to be null
     const createImmutableRef = (val: any) => ({
-      get current() { return val; },
-      set current(_v: any) { /* ignore assignment */ }
+      get current() {
+        return val;
+      },
+      set current(_v: any) {
+        /* ignore assignment */
+      },
     });
 
     mockUseRef
@@ -174,7 +228,7 @@ describe("PathParticles", () => {
       .mockReturnValueOnce({ current: {} });
 
     let frameCallback: any;
-    mockUseFrame.mockImplementation((cb: any) => frameCallback = cb);
+    mockUseFrame.mockImplementation((cb: any) => (frameCallback = cb));
 
     render(<PathParticles curve={mockCurve} color={new THREE.Color("blue")} />);
 

@@ -4,7 +4,7 @@ import { CATEGORY_COLORS } from "@/types/atlas-admin";
 
 // Mock CharacterSphere since it uses Three.js
 jest.mock("@/components/admin/spheres/CharacterSphere", () => ({
-  CharacterSphere: () => <div data-testid="character-sphere" />
+  CharacterSphere: () => <div data-testid="character-sphere" />,
 }));
 
 describe("EmotionList", () => {
@@ -14,20 +14,22 @@ describe("EmotionList", () => {
       name: "Joy",
       category: "basic",
       vac: [0.8, 0.6, 0.4] as [number, number, number],
-      description: "A feeling of great pleasure and happiness."
+      description: "A feeling of great pleasure and happiness.",
     },
     {
       id: "sadness",
       name: "Sadness",
       category: "complex",
       vac: [-0.6, -0.4, -0.2] as [number, number, number],
-      description: "A feeling of deep sorrow."
-    }
+      description: "A feeling of deep sorrow.",
+    },
   ];
 
   it("renders empty state instruction when no emotions", () => {
     render(<EmotionList emotions={[]} animationMode="subtle" />);
-    expect(screen.getByText("Click emotions in the 3D view or select from the left panel")).toBeInTheDocument();
+    expect(
+      screen.getByText("Click emotions in the 3D view or select from the left panel")
+    ).toBeInTheDocument();
   });
 
   it("renders list of emotions with details", () => {

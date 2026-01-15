@@ -1,4 +1,3 @@
-
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { StrategiesTab } from "@/components/admin/data/StrategiesTab";
@@ -29,8 +28,8 @@ describe("StrategiesTab", () => {
       difficulty_level: 3,
       evidence_level: "rct",
       contraindications: "Acute distress",
-      created_at: "2024-01-01"
-    }
+      created_at: "2024-01-01",
+    },
   ];
 
   // Setup fake timers
@@ -83,11 +82,10 @@ describe("StrategiesTab", () => {
   /* Removed skipped manual FileReader test in favor of userEvent.upload test */
 
   it("renders loading state", async () => {
-    (adminApi.getStrategies as jest.Mock).mockReturnValue(new Promise(() => { }));
+    (adminApi.getStrategies as jest.Mock).mockReturnValue(new Promise(() => {}));
     const { container } = render(<StrategiesTab />);
     expect(container.querySelector(".animate-spin")).toBeInTheDocument();
   });
-
 
   it("renders strategies list on success", async () => {
     (adminApi.getStrategies as jest.Mock).mockResolvedValue(mockStrategies);
@@ -160,11 +158,14 @@ describe("StrategiesTab", () => {
     fireEvent.click(screen.getByLabelText("Save"));
 
     await waitFor(() => {
-      expect(adminApi.updateStrategy).toHaveBeenCalledWith("s1", expect.objectContaining({
-        description: "Updated desc",
-        detailed_steps: ["Step 1 Modified", "Step 3"],
-        difficulty_level: 4
-      }));
+      expect(adminApi.updateStrategy).toHaveBeenCalledWith(
+        "s1",
+        expect.objectContaining({
+          description: "Updated desc",
+          detailed_steps: ["Step 1 Modified", "Step 3"],
+          difficulty_level: 4,
+        })
+      );
       expect(screen.getByText("Strategy updated successfully.")).toBeInTheDocument();
     });
   });
@@ -249,14 +250,20 @@ describe("StrategiesTab", () => {
 
   it("handles import success", async () => {
     (adminApi.getStrategies as jest.Mock).mockResolvedValue(mockStrategies);
-    (adminApi.importStrategies as jest.Mock).mockResolvedValue({ updated: 1, created: 0, errors: [] });
+    (adminApi.importStrategies as jest.Mock).mockResolvedValue({
+      updated: 1,
+      created: 0,
+      errors: [],
+    });
 
     const { container } = render(<StrategiesTab />);
     await waitFor(() => expect(screen.getByText("CBT Reframe")).toBeInTheDocument());
 
-    const file = new File([JSON.stringify(mockStrategies)], "strategies.json", { type: "application/json" });
-    Object.defineProperty(file, 'text', {
-      value: jest.fn().mockResolvedValue(JSON.stringify(mockStrategies))
+    const file = new File([JSON.stringify(mockStrategies)], "strategies.json", {
+      type: "application/json",
+    });
+    Object.defineProperty(file, "text", {
+      value: jest.fn().mockResolvedValue(JSON.stringify(mockStrategies)),
     });
 
     const input = container.querySelector('input[type="file"]') as HTMLInputElement;
@@ -273,14 +280,18 @@ describe("StrategiesTab", () => {
     (adminApi.importStrategies as jest.Mock).mockResolvedValue({
       updated: 1,
       created: 0,
-      errors: ["Row 5 invalid"]
+      errors: ["Row 5 invalid"],
     });
 
     const { container } = render(<StrategiesTab />);
     await waitFor(() => expect(screen.getByText("CBT Reframe")).toBeInTheDocument());
 
-    const file = new File([JSON.stringify(mockStrategies)], "strategies.json", { type: "application/json" });
-    Object.defineProperty(file, 'text', { value: jest.fn().mockResolvedValue(JSON.stringify(mockStrategies)) });
+    const file = new File([JSON.stringify(mockStrategies)], "strategies.json", {
+      type: "application/json",
+    });
+    Object.defineProperty(file, "text", {
+      value: jest.fn().mockResolvedValue(JSON.stringify(mockStrategies)),
+    });
     const input = container.querySelector('input[type="file"]') as HTMLInputElement;
     await userEvent.upload(input, file);
 
@@ -298,7 +309,7 @@ describe("StrategiesTab", () => {
     await waitFor(() => expect(screen.getByText("CBT Reframe")).toBeInTheDocument());
 
     const file = new File(["{}"], "strategies.json", { type: "application/json" });
-    Object.defineProperty(file, 'text', { value: jest.fn().mockResolvedValue("{}") });
+    Object.defineProperty(file, "text", { value: jest.fn().mockResolvedValue("{}") });
 
     const input = container.querySelector('input[type="file"]') as HTMLInputElement;
     await userEvent.upload(input, file);
@@ -317,7 +328,7 @@ describe("StrategiesTab", () => {
 
     const input = container.querySelector('input[type="file"]') as HTMLInputElement;
     const file = new File(["{}"], "strategies.json", { type: "application/json" });
-    Object.defineProperty(file, 'text', { value: jest.fn().mockResolvedValue("{}") });
+    Object.defineProperty(file, "text", { value: jest.fn().mockResolvedValue("{}") });
 
     fireEvent.change(input, { target: { files: [file] } });
 
@@ -332,7 +343,7 @@ describe("StrategiesTab", () => {
     await waitFor(() => expect(screen.getByText("CBT Reframe")).toBeInTheDocument());
 
     const input = container.querySelector('input[type="file"]');
-    const clickSpy = jest.spyOn(input as HTMLElement, 'click');
+    const clickSpy = jest.spyOn(input as HTMLElement, "click");
 
     fireEvent.click(screen.getByText("Import"));
     expect(clickSpy).toHaveBeenCalled();
@@ -357,10 +368,13 @@ describe("StrategiesTab", () => {
 
     fireEvent.click(screen.getByLabelText("Save"));
     await waitFor(() => {
-      expect(adminApi.updateStrategy).toHaveBeenCalledWith("s1", expect.objectContaining({
-        time_required: "20 mins",
-        contraindications: "None"
-      }));
+      expect(adminApi.updateStrategy).toHaveBeenCalledWith(
+        "s1",
+        expect.objectContaining({
+          time_required: "20 mins",
+          contraindications: "None",
+        })
+      );
     });
   });
 
@@ -377,16 +391,18 @@ describe("StrategiesTab", () => {
     (adminApi.importStrategies as jest.Mock).mockResolvedValue({
       updated: 0,
       created: 1,
-      errors: ["Invalid ID s99", "Bad Format"]
+      errors: ["Invalid ID s99", "Bad Format"],
     });
 
     const file = new File(["{}"], "strategies.json", { type: "application/json" });
-    Object.defineProperty(file, 'text', { value: jest.fn().mockResolvedValue("{}") });
+    Object.defineProperty(file, "text", { value: jest.fn().mockResolvedValue("{}") });
 
     await userEvent.upload(input, file);
 
     await waitFor(() => {
-      expect(screen.getByText(/Imported with errors: Invalid ID s99, Bad Format/)).toBeInTheDocument();
+      expect(
+        screen.getByText(/Imported with errors: Invalid ID s99, Bad Format/)
+      ).toBeInTheDocument();
     });
   });
 
@@ -397,7 +413,7 @@ describe("StrategiesTab", () => {
       difficulty_level: undefined as unknown as number,
       contraindications: undefined as unknown as string,
       time_required: undefined as unknown as string,
-      detailed_steps: undefined as unknown as string[]
+      detailed_steps: undefined as unknown as string[],
     };
     (adminApi.getStrategies as jest.Mock).mockResolvedValue([emptyStrat]);
 
@@ -418,10 +434,10 @@ describe("StrategiesTab", () => {
     expect(diffInput).toBeInTheDocument();
 
     const inputs = screen.getAllByDisplayValue("");
-    const contraInput = inputs.find(el => el.tagName === "TEXTAREA");
+    const contraInput = inputs.find((el) => el.tagName === "TEXTAREA");
     expect(contraInput).toBeInTheDocument();
 
-    const textInputs = inputs.filter(el => el.tagName === "INPUT");
+    const textInputs = inputs.filter((el) => el.tagName === "INPUT");
     expect(textInputs.length).toBeGreaterThanOrEqual(1);
 
     expect(screen.queryByPlaceholderText("Step 1")).not.toBeInTheDocument();
@@ -471,8 +487,6 @@ describe("StrategiesTab", () => {
     expect(screen.getByText("Detailed Steps")).toBeInTheDocument();
   });
 
-
-
   it("handles editing strategy with null description (coverage)", async () => {
     const nullDescStrat = { ...mockStrategies[0], description: null as unknown as string };
     (adminApi.getStrategies as jest.Mock).mockResolvedValue([nullDescStrat]);
@@ -506,8 +520,6 @@ describe("StrategiesTab", () => {
     // getByPlaceholderText("Step 1")
     expect(screen.getByPlaceholderText("Step 1")).toBeInTheDocument();
   });
-
-
 
   it("manages detailed steps in edit mode", async () => {
     const user = userEvent.setup();
@@ -554,14 +566,17 @@ describe("StrategiesTab", () => {
     await user.click(screen.getByTitle("Save"));
 
     await waitFor(() => {
-      expect(adminApi.updateStrategy).toHaveBeenCalledWith(strategy.id, expect.objectContaining({
-        detailed_steps: ["New Step 2"]
-      }));
+      expect(adminApi.updateStrategy).toHaveBeenCalledWith(
+        strategy.id,
+        expect.objectContaining({
+          detailed_steps: ["New Step 2"],
+        })
+      );
     });
   });
   it("handles unmount during import to cover finally block ref check", async () => {
     (adminApi.getStrategies as jest.Mock).mockResolvedValue(mockStrategies);
-    let resolveImport: (val: any) => void = () => { };
+    let resolveImport: (val: any) => void = () => {};
     (adminApi.importStrategies as jest.Mock).mockImplementation(() => {
       return new Promise((resolve) => {
         resolveImport = resolve;
@@ -572,7 +587,7 @@ describe("StrategiesTab", () => {
     await waitFor(() => expect(screen.getByText("CBT Reframe")).toBeInTheDocument());
 
     const file = new File(["{}"], "strategies.json", { type: "application/json" });
-    Object.defineProperty(file, 'text', { value: jest.fn().mockResolvedValue("{}") });
+    Object.defineProperty(file, "text", { value: jest.fn().mockResolvedValue("{}") });
     const input = container.querySelector('input[type="file"]') as HTMLInputElement;
 
     await userEvent.upload(input, file);
@@ -583,6 +598,4 @@ describe("StrategiesTab", () => {
 
     expect(adminApi.importStrategies).toHaveBeenCalled();
   });
-
-
 });

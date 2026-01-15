@@ -90,11 +90,11 @@ describe("Settings Component", () => {
 
     // Toggle Polling
     const toggles = screen.getAllByRole("button");
-    // Identify toggle by sibling/parent context if possible, or order. 
-    // In polling tab: 
+    // Identify toggle by sibling/parent context if possible, or order.
+    // In polling tab:
     // 1. Tab buttons (6)
     // 2. Polling Enable Toggle (index 6, if 0-indexed across modal)
-    // Safer to look for specific visual cue or structure? 
+    // Safer to look for specific visual cue or structure?
     // Test DOM structure:
     // <div class="flex items-center justify-between"><label>Enable Polling</label><button>...
 
@@ -295,7 +295,7 @@ describe("Settings Component", () => {
     openSettings();
     fireEvent.click(screen.getByText(/Data/));
 
-    const file = new File(['invalid'], "settings.json", { type: "application/json" });
+    const file = new File(["invalid"], "settings.json", { type: "application/json" });
     const inputMock = { type: "", accept: "", onchange: null as any, click: jest.fn() };
 
     // @ts-ignore
@@ -314,7 +314,9 @@ describe("Settings Component", () => {
 
     await waitFor(() => {
       expect(mockStore.importSettings).toHaveBeenCalled();
-      expect(global.alert).toHaveBeenCalledWith("Failed to import settings. Please check the file format.");
+      expect(global.alert).toHaveBeenCalledWith(
+        "Failed to import settings. Please check the file format."
+      );
     });
 
     (document.createElement as jest.Mock).mockRestore();
@@ -346,7 +348,8 @@ describe("Settings Component", () => {
         expect(mockStore.updateLayer).toHaveBeenCalledWith(key, true);
       } else {
         // Map key to setter if needed, or assume specific mocks called
-        if (key === "showTransitionPath") expect(mockStore.setShowTransitionPath).toHaveBeenCalledWith(true);
+        if (key === "showTransitionPath")
+          expect(mockStore.setShowTransitionPath).toHaveBeenCalledWith(true);
         if (key === "autoRotate") expect(mockStore.toggleAutoRotate).toHaveBeenCalled();
         if (key === "showDebugInfo") expect(mockStore.toggleDebugInfo).toHaveBeenCalled();
       }
@@ -471,7 +474,7 @@ describe("Settings Component", () => {
       ...mockStore,
       reducedMotion: true,
       highContrast: true,
-      screenReaderMode: true
+      screenReaderMode: true,
     };
     (useSettingsStore as unknown as jest.Mock).mockReturnValue(newStore);
 
@@ -490,4 +493,3 @@ describe("Settings Component", () => {
     unmount2();
   });
 });
-

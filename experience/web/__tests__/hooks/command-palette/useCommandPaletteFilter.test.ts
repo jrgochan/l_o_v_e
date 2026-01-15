@@ -1,4 +1,3 @@
-
 import { renderHook } from "@testing-library/react";
 import { useCommandPaletteFilter } from "@/hooks/command-palette/useCommandPaletteFilter";
 import { useAtlasAdminStore } from "@/stores/useAtlasAdminStore";
@@ -13,7 +12,16 @@ const MOCK_EMOTIONS = [
 ];
 
 const MOCK_PATHS_STRUCT = new Map([
-  ["path1", { id: "path1", from: MOCK_EMOTIONS[0], to: MOCK_EMOTIONS[1], fromName: "Joy", toName: "Sadness" }],
+  [
+    "path1",
+    {
+      id: "path1",
+      from: MOCK_EMOTIONS[0],
+      to: MOCK_EMOTIONS[1],
+      fromName: "Joy",
+      toName: "Sadness",
+    },
+  ],
 ]);
 
 describe("useCommandPaletteFilter coverage sweep", () => {
@@ -34,7 +42,7 @@ describe("useCommandPaletteFilter coverage sweep", () => {
         selectedCategory: "positive",
         favoriteEmotions: [],
         recentEmotions: [],
-        selectedEmotionIds: new Set()
+        selectedEmotionIds: new Set(),
       })
     );
     expect(result.current.filteredEmotions.length).toBe(1);
@@ -47,7 +55,7 @@ describe("useCommandPaletteFilter coverage sweep", () => {
         selectedCategory: "negative",
         favoriteEmotions: [],
         recentEmotions: [],
-        selectedEmotionIds: new Set()
+        selectedEmotionIds: new Set(),
       })
     );
     expect(result2.current.filteredEmotions.length).toBe(0);
@@ -61,14 +69,13 @@ describe("useCommandPaletteFilter coverage sweep", () => {
         selectedCategory: null,
         favoriteEmotions: [],
         recentEmotions: ["1", "999"], // "1" exists (Joy), "999" does not
-        selectedEmotionIds: new Set()
+        selectedEmotionIds: new Set(),
       })
     );
     // Should return Joy, and verify length is 1 (999 filtered out)
     expect(result.current.recentEmotionsList).toHaveLength(1);
     expect(result.current.recentEmotionsList[0].name).toBe("Joy");
   });
-
 
   // 1b. Browsing Category (Empty Search)
   it("filters by category only (Empty Search)", () => {
@@ -78,7 +85,7 @@ describe("useCommandPaletteFilter coverage sweep", () => {
         selectedCategory: "positive",
         favoriteEmotions: [],
         recentEmotions: [],
-        selectedEmotionIds: new Set()
+        selectedEmotionIds: new Set(),
       })
     );
     expect(result.current.filteredEmotions.length).toBe(1);
@@ -93,13 +100,19 @@ describe("useCommandPaletteFilter coverage sweep", () => {
         selectedCategory: null,
         favoriteEmotions: [],
         recentEmotions: [],
-        selectedEmotionIds: new Set()
+        selectedEmotionIds: new Set(),
       })
     );
     expect(result.current.filteredEmotions).toBeDefined();
 
     // Mock close emotion
-    const MOCK_CLOSE = { id: "4", name: "Elation", category: "positive", vac: [0.9, 0.9, 0.9], definition: "Very happy" };
+    const MOCK_CLOSE = {
+      id: "4",
+      name: "Elation",
+      category: "positive",
+      vac: [0.9, 0.9, 0.9],
+      definition: "Very happy",
+    };
     (useAtlasAdminStore as unknown as jest.Mock).mockImplementation((selector) => {
       return selector({
         allEmotions: [...MOCK_EMOTIONS, MOCK_CLOSE],
@@ -113,7 +126,7 @@ describe("useCommandPaletteFilter coverage sweep", () => {
         selectedCategory: null,
         favoriteEmotions: [],
         recentEmotions: [],
-        selectedEmotionIds: new Set()
+        selectedEmotionIds: new Set(),
       })
     );
     expect(result3.current.filteredEmotions[0].name).toBe("Elation");
@@ -126,7 +139,7 @@ describe("useCommandPaletteFilter coverage sweep", () => {
         selectedCategory: null,
         favoriteEmotions: [],
         recentEmotions: [],
-        selectedEmotionIds: new Set()
+        selectedEmotionIds: new Set(),
       })
     );
     // Should fall through to fuzzy search (returning nothing for "Unknown")
@@ -141,7 +154,7 @@ describe("useCommandPaletteFilter coverage sweep", () => {
         selectedCategory: null,
         favoriteEmotions: [],
         recentEmotions: [],
-        selectedEmotionIds: new Set()
+        selectedEmotionIds: new Set(),
       })
     );
     expect(result.current.filteredEmotions.length).toBeGreaterThan(0);
@@ -155,7 +168,7 @@ describe("useCommandPaletteFilter coverage sweep", () => {
         selectedCategory: null,
         favoriteEmotions: [],
         recentEmotions: [],
-        selectedEmotionIds: new Set()
+        selectedEmotionIds: new Set(),
       })
     );
     // Should fall through to fuzzy search
@@ -170,7 +183,7 @@ describe("useCommandPaletteFilter coverage sweep", () => {
         selectedCategory: null,
         favoriteEmotions: ["1"], // Joy
         recentEmotions: [],
-        selectedEmotionIds: new Set()
+        selectedEmotionIds: new Set(),
       })
     );
     expect(result.current.filteredEmotions).toHaveLength(1);
@@ -184,7 +197,7 @@ describe("useCommandPaletteFilter coverage sweep", () => {
         selectedCategory: null,
         favoriteEmotions: ["1"],
         recentEmotions: [],
-        selectedEmotionIds: new Set()
+        selectedEmotionIds: new Set(),
       })
     );
     expect(result.current.filteredEmotions[0].name).toBe("Joy");
@@ -193,95 +206,239 @@ describe("useCommandPaletteFilter coverage sweep", () => {
   // 5. VAC Logic coverage (Default switch / Operators)
   it("handles VAC equality operators", () => {
     // =
-    const { result: eq } = renderHook(() => useCommandPaletteFilter({ search: "valence = 1", selectedCategory: null, favoriteEmotions: [], recentEmotions: [], selectedEmotionIds: new Set() }));
-    expect(eq.current.filteredEmotions.find(e => e.name === "Joy")).toBeTruthy();
+    const { result: eq } = renderHook(() =>
+      useCommandPaletteFilter({
+        search: "valence = 1",
+        selectedCategory: null,
+        favoriteEmotions: [],
+        recentEmotions: [],
+        selectedEmotionIds: new Set(),
+      })
+    );
+    expect(eq.current.filteredEmotions.find((e) => e.name === "Joy")).toBeTruthy();
 
     // ==
-    const { result: eq2 } = renderHook(() => useCommandPaletteFilter({ search: "valence == 1", selectedCategory: null, favoriteEmotions: [], recentEmotions: [], selectedEmotionIds: new Set() }));
-    expect(eq2.current.filteredEmotions.find(e => e.name === "Joy")).toBeTruthy();
+    const { result: eq2 } = renderHook(() =>
+      useCommandPaletteFilter({
+        search: "valence == 1",
+        selectedCategory: null,
+        favoriteEmotions: [],
+        recentEmotions: [],
+        selectedEmotionIds: new Set(),
+      })
+    );
+    expect(eq2.current.filteredEmotions.find((e) => e.name === "Joy")).toBeTruthy();
 
     // >=
-    const { result: gte } = renderHook(() => useCommandPaletteFilter({ search: "valence >= 0.8", selectedCategory: null, favoriteEmotions: [], recentEmotions: [], selectedEmotionIds: new Set() }));
-    expect(gte.current.filteredEmotions.find(e => e.name === "Joy")).toBeTruthy();
+    const { result: gte } = renderHook(() =>
+      useCommandPaletteFilter({
+        search: "valence >= 0.8",
+        selectedCategory: null,
+        favoriteEmotions: [],
+        recentEmotions: [],
+        selectedEmotionIds: new Set(),
+      })
+    );
+    expect(gte.current.filteredEmotions.find((e) => e.name === "Joy")).toBeTruthy();
 
     // <=
-    const { result: lte } = renderHook(() => useCommandPaletteFilter({ search: "valence <= -0.5", selectedCategory: null, favoriteEmotions: [], recentEmotions: [], selectedEmotionIds: new Set() }));
-    expect(lte.current.filteredEmotions.find(e => e.name === "Sadness")).toBeTruthy();
+    const { result: lte } = renderHook(() =>
+      useCommandPaletteFilter({
+        search: "valence <= -0.5",
+        selectedCategory: null,
+        favoriteEmotions: [],
+        recentEmotions: [],
+        selectedEmotionIds: new Set(),
+      })
+    );
+    expect(lte.current.filteredEmotions.find((e) => e.name === "Sadness")).toBeTruthy();
 
     // < (Missing from previous report)
-    const { result: lt } = renderHook(() => useCommandPaletteFilter({ search: "valence < 0", selectedCategory: null, favoriteEmotions: [], recentEmotions: [], selectedEmotionIds: new Set() }));
-    expect(lt.current.filteredEmotions.find(e => e.name === "Sadness")).toBeTruthy();
+    const { result: lt } = renderHook(() =>
+      useCommandPaletteFilter({
+        search: "valence < 0",
+        selectedCategory: null,
+        favoriteEmotions: [],
+        recentEmotions: [],
+        selectedEmotionIds: new Set(),
+      })
+    );
+    expect(lt.current.filteredEmotions.find((e) => e.name === "Sadness")).toBeTruthy();
 
     // > (Missing from previous report)
-    const { result: gt } = renderHook(() => useCommandPaletteFilter({ search: "valence > 0.5", selectedCategory: null, favoriteEmotions: [], recentEmotions: [], selectedEmotionIds: new Set() }));
-    expect(gt.current.filteredEmotions.find(e => e.name === "Joy")).toBeTruthy();
+    const { result: gt } = renderHook(() =>
+      useCommandPaletteFilter({
+        search: "valence > 0.5",
+        selectedCategory: null,
+        favoriteEmotions: [],
+        recentEmotions: [],
+        selectedEmotionIds: new Set(),
+      })
+    );
+    expect(gt.current.filteredEmotions.find((e) => e.name === "Joy")).toBeTruthy();
 
     // Arousal coverage
-    const { result: arousal } = renderHook(() => useCommandPaletteFilter({ search: "arousal > 0.5", selectedCategory: null, favoriteEmotions: [], recentEmotions: [], selectedEmotionIds: new Set() }));
-    expect(arousal.current.filteredEmotions.some(e => e.name === "Anger")).toBe(true);
+    const { result: arousal } = renderHook(() =>
+      useCommandPaletteFilter({
+        search: "arousal > 0.5",
+        selectedCategory: null,
+        favoriteEmotions: [],
+        recentEmotions: [],
+        selectedEmotionIds: new Set(),
+      })
+    );
+    expect(arousal.current.filteredEmotions.some((e) => e.name === "Anger")).toBe(true);
 
     // Connection coverage
-    const { result: connection } = renderHook(() => useCommandPaletteFilter({ search: "connection < 0", selectedCategory: null, favoriteEmotions: [], recentEmotions: [], selectedEmotionIds: new Set() }));
-    expect(connection.current.filteredEmotions.some(e => e.name === "Anger")).toBe(true);
+    const { result: connection } = renderHook(() =>
+      useCommandPaletteFilter({
+        search: "connection < 0",
+        selectedCategory: null,
+        favoriteEmotions: [],
+        recentEmotions: [],
+        selectedEmotionIds: new Set(),
+      })
+    );
+    expect(connection.current.filteredEmotions.some((e) => e.name === "Anger")).toBe(true);
 
     // Default switch case (pass '>>' which matches regex [<>]+ but isn't a case)
-    const { result: def } = renderHook(() => useCommandPaletteFilter({ search: "valence >> 0", selectedCategory: null, favoriteEmotions: [], recentEmotions: [], selectedEmotionIds: new Set() }));
+    const { result: def } = renderHook(() =>
+      useCommandPaletteFilter({
+        search: "valence >> 0",
+        selectedCategory: null,
+        favoriteEmotions: [],
+        recentEmotions: [],
+        selectedEmotionIds: new Set(),
+      })
+    );
     // With default returning true, should include all
     expect(def.current.filteredEmotions.length).toBeGreaterThan(0);
   });
 
   // 6. Category > prefix Logic
   it("filters by > Category (Lines 101-105)", () => {
-    const { result } = renderHook(() => useCommandPaletteFilter({ search: ">pos", selectedCategory: null, favoriteEmotions: [], recentEmotions: [], selectedEmotionIds: new Set() }));
+    const { result } = renderHook(() =>
+      useCommandPaletteFilter({
+        search: ">pos",
+        selectedCategory: null,
+        favoriteEmotions: [],
+        recentEmotions: [],
+        selectedEmotionIds: new Set(),
+      })
+    );
     expect(result.current.filteredEmotions[0].name).toBe("Joy"); // positive
   });
 
   // 7. Path Logic Edge Cases
   it("handles path suggestions context (1 selected)", () => {
-    const { result } = renderHook(() => useCommandPaletteFilter({ search: "", selectedCategory: null, favoriteEmotions: [], recentEmotions: [], selectedEmotionIds: new Set(["1"]) }));
+    const { result } = renderHook(() =>
+      useCommandPaletteFilter({
+        search: "",
+        selectedCategory: null,
+        favoriteEmotions: [],
+        recentEmotions: [],
+        selectedEmotionIds: new Set(["1"]),
+      })
+    );
     expect(result.current.filteredPaths.length).toBe(1);
   });
 
   it("handles empty path search scenarios", () => {
     // "Joy to"
-    const { result } = renderHook(() => useCommandPaletteFilter({ search: "Joy to", selectedCategory: null, favoriteEmotions: [], recentEmotions: [], selectedEmotionIds: new Set() }));
+    const { result } = renderHook(() =>
+      useCommandPaletteFilter({
+        search: "Joy to",
+        selectedCategory: null,
+        favoriteEmotions: [],
+        recentEmotions: [],
+        selectedEmotionIds: new Set(),
+      })
+    );
     expect(result.current.filteredPaths).toEqual([]);
 
     // " to Sadness"
-    const { result: res2 } = renderHook(() => useCommandPaletteFilter({ search: " to Sadness", selectedCategory: null, favoriteEmotions: [], recentEmotions: [], selectedEmotionIds: new Set() }));
+    const { result: res2 } = renderHook(() =>
+      useCommandPaletteFilter({
+        search: " to Sadness",
+        selectedCategory: null,
+        favoriteEmotions: [],
+        recentEmotions: [],
+        selectedEmotionIds: new Set(),
+      })
+    );
     expect(res2.current.filteredPaths).toEqual([]);
 
     // "/"
-    const { result: res3 } = renderHook(() => useCommandPaletteFilter({ search: "/", selectedCategory: null, favoriteEmotions: [], recentEmotions: [], selectedEmotionIds: new Set() }));
+    const { result: res3 } = renderHook(() =>
+      useCommandPaletteFilter({
+        search: "/",
+        selectedCategory: null,
+        favoriteEmotions: [],
+        recentEmotions: [],
+        selectedEmotionIds: new Set(),
+      })
+    );
     expect(res3.current.filteredPaths).toEqual([]);
 
     // " to "
-    const { result: res4 } = renderHook(() => useCommandPaletteFilter({ search: " to ", selectedCategory: null, favoriteEmotions: [], recentEmotions: [], selectedEmotionIds: new Set() }));
+    const { result: res4 } = renderHook(() =>
+      useCommandPaletteFilter({
+        search: " to ",
+        selectedCategory: null,
+        favoriteEmotions: [],
+        recentEmotions: [],
+        selectedEmotionIds: new Set(),
+      })
+    );
     expect(res4.current.filteredPaths).toEqual([]);
   });
 
   it("filters paths by X to Y check", () => {
     // Ensure lines 189-191 are hit
     const { result } = renderHook(() =>
-      useCommandPaletteFilter({ search: "Joy to Sadness", selectedCategory: null, favoriteEmotions: [], recentEmotions: [], selectedEmotionIds: new Set() })
+      useCommandPaletteFilter({
+        search: "Joy to Sadness",
+        selectedCategory: null,
+        favoriteEmotions: [],
+        recentEmotions: [],
+        selectedEmotionIds: new Set(),
+      })
     );
     expect(result.current.filteredPaths).toHaveLength(1);
 
     // Mismatching end (enters if block, returns false)
     const { result: res2 } = renderHook(() =>
-      useCommandPaletteFilter({ search: "Joy to Anger", selectedCategory: null, favoriteEmotions: [], recentEmotions: [], selectedEmotionIds: new Set() })
+      useCommandPaletteFilter({
+        search: "Joy to Anger",
+        selectedCategory: null,
+        favoriteEmotions: [],
+        recentEmotions: [],
+        selectedEmotionIds: new Set(),
+      })
     );
     expect(res2.current.filteredPaths).toHaveLength(0);
 
     // Mismatching start (enters if block, returns false immediately at line 193)
     const { result: res5 } = renderHook(() =>
-      useCommandPaletteFilter({ search: "Anger to Sadness", selectedCategory: null, favoriteEmotions: [], recentEmotions: [], selectedEmotionIds: new Set() })
+      useCommandPaletteFilter({
+        search: "Anger to Sadness",
+        selectedCategory: null,
+        favoriteEmotions: [],
+        recentEmotions: [],
+        selectedEmotionIds: new Set(),
+      })
     );
     expect(res5.current.filteredPaths).toHaveLength(0);
   });
 
   it("handles paths with ' to ' in the name (fallthrough logic)", () => {
-    const MOCK_SPECIAL_PATH = { id: "p2", from: { ...MOCK_EMOTIONS[0], name: "Joy to World" }, to: MOCK_EMOTIONS[1], fromName: "Joy to World", toName: "Sadness" };
+    const MOCK_SPECIAL_PATH = {
+      id: "p2",
+      from: { ...MOCK_EMOTIONS[0], name: "Joy to World" },
+      to: MOCK_EMOTIONS[1],
+      fromName: "Joy to World",
+      toName: "Sadness",
+    };
     const SPECIAL_PATHS = new Map([["p2", MOCK_SPECIAL_PATH]]);
 
     (useAtlasAdminStore as unknown as jest.Mock).mockImplementation((selector) => {
@@ -292,7 +449,13 @@ describe("useCommandPaletteFilter coverage sweep", () => {
     });
 
     const { result } = renderHook(() =>
-      useCommandPaletteFilter({ search: "Joy to", selectedCategory: null, favoriteEmotions: [], recentEmotions: [], selectedEmotionIds: new Set() })
+      useCommandPaletteFilter({
+        search: "Joy to",
+        selectedCategory: null,
+        favoriteEmotions: [],
+        recentEmotions: [],
+        selectedEmotionIds: new Set(),
+      })
     );
     expect(result.current.filteredPaths).toHaveLength(1);
     expect(result.current.filteredPaths[0].from.name).toBe("Joy to World");

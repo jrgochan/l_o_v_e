@@ -83,10 +83,11 @@ export function SessionTimeline({ emotionTimeline }: SessionTimelineProps) {
 
                 {/* Event details */}
                 <div
-                  className={`flex-1 pb-3 ${isLast
-                    ? "bg-gray-700/50 -mt-1 -ml-3 pl-9 pr-4 py-3 rounded-lg border border-cyan-500/30"
-                    : ""
-                    }`}
+                  className={`flex-1 pb-3 ${
+                    isLast
+                      ? "bg-gray-700/50 -mt-1 -ml-3 pl-9 pr-4 py-3 rounded-lg border border-cyan-500/30"
+                      : ""
+                  }`}
                 >
                   <div className="flex items-start justify-between gap-2">
                     <div className="flex-1 min-w-0">

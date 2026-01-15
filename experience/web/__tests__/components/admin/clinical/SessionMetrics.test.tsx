@@ -1,4 +1,3 @@
-
 import { render, screen } from "@testing-library/react";
 import { SessionMetricsDisplay } from "@/components/admin/clinical/SessionMetrics";
 import { SessionMetrics } from "@/types/chat";
@@ -12,7 +11,7 @@ describe("SessionMetricsDisplay", () => {
     alertCount: {
       critical: 0,
       warning: 0,
-      attention: 0
+      attention: 0,
     },
     // Adding minimal fields to satisfy type if needed, or assuming SessionMetrics matches this.
     // Based on usage in component, this seems sufficient.
@@ -64,13 +63,13 @@ describe("SessionMetricsDisplay", () => {
       />
     );
     // 0.9 >= 0.8 -> bg-green-500
-    // We can't easily check class names on the dynamic div without a testId, 
+    // We can't easily check class names on the dynamic div without a testId,
     // but we can query by style width or look for the class in the container
     // Let's rely on standard rendering. We can check if the class exists in the DOM snippet.
     // But testing-library prefers visible things.
     // We'll trust the logic if we can't select it easily, or use container selector.
 
-    const barContainer = screen.getByText("90%").parentElement?.querySelector('.bg-green-500');
+    const barContainer = screen.getByText("90%").parentElement?.querySelector(".bg-green-500");
     expect(barContainer).toBeInTheDocument();
 
     rerender(
@@ -80,7 +79,9 @@ describe("SessionMetricsDisplay", () => {
       />
     );
     // 0.7 >= 0.6 -> bg-yellow-500
-    expect(screen.getByText("70%").parentElement?.querySelector('.bg-yellow-500')).toBeInTheDocument();
+    expect(
+      screen.getByText("70%").parentElement?.querySelector(".bg-yellow-500")
+    ).toBeInTheDocument();
 
     rerender(
       <SessionMetricsDisplay
@@ -89,7 +90,7 @@ describe("SessionMetricsDisplay", () => {
       />
     );
     // < 0.6 -> bg-red-500
-    expect(screen.getByText("40%").parentElement?.querySelector('.bg-red-500')).toBeInTheDocument();
+    expect(screen.getByText("40%").parentElement?.querySelector(".bg-red-500")).toBeInTheDocument();
   });
 
   it("renders alert summary correctly", () => {
@@ -98,8 +99,8 @@ describe("SessionMetricsDisplay", () => {
       alertCount: {
         critical: 1,
         warning: 2,
-        attention: 3
-      }
+        attention: 3,
+      },
     };
     render(<SessionMetricsDisplay sessionMetrics={alertMetrics} isExpanded={true} />);
 
@@ -115,8 +116,8 @@ describe("SessionMetricsDisplay", () => {
       alertCount: {
         critical: 1,
         warning: 0,
-        attention: 0
-      }
+        attention: 0,
+      },
     };
     render(<SessionMetricsDisplay sessionMetrics={alertMetrics} isExpanded={true} />);
 

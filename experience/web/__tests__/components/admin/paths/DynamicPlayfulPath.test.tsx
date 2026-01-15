@@ -1,4 +1,3 @@
-
 import React from "react";
 import { render, cleanup, act } from "@testing-library/react";
 import { DynamicPlayfulPath } from "@/components/admin/paths/DynamicPlayfulPath";
@@ -52,27 +51,27 @@ describe("DynamicPlayfulPath", () => {
       },
       set(value) {
         (this as any)[`_${prop}`] = value;
-      }
+      },
     });
   };
 
   beforeAll(() => {
     const proto = HTMLElement.prototype;
-    definePolyfill(proto, 'position', () => new THREE.Vector3());
-    definePolyfill(proto, 'rotation', () => new THREE.Euler());
-    definePolyfill(proto, 'scale', () => new THREE.Vector3(1, 1, 1));
-    definePolyfill(proto, 'color', () => new THREE.Color());
-    definePolyfill(proto, 'emissive', () => new THREE.Color());
-    definePolyfill(proto, 'emissiveIntensity', () => 1);
-    definePolyfill(proto, 'opacity', () => 1);
+    definePolyfill(proto, "position", () => new THREE.Vector3());
+    definePolyfill(proto, "rotation", () => new THREE.Euler());
+    definePolyfill(proto, "scale", () => new THREE.Vector3(1, 1, 1));
+    definePolyfill(proto, "color", () => new THREE.Color());
+    definePolyfill(proto, "emissive", () => new THREE.Color());
+    definePolyfill(proto, "emissiveIntensity", () => 1);
+    definePolyfill(proto, "opacity", () => 1);
 
     // Mesh prop to access material
-    definePolyfill(proto, 'material', () => ({
+    definePolyfill(proto, "material", () => ({
       uniforms: {
         time: { value: 0 },
         pathColor: { value: new THREE.Color() },
         isSelected: { value: 0 },
-        opacity: { value: 1 }
+        opacity: { value: 1 },
       },
       color: new THREE.Color(),
       emissive: new THREE.Color(),
@@ -80,7 +79,7 @@ describe("DynamicPlayfulPath", () => {
       emissiveIntensity: 1,
       transparent: true,
       metalness: 0,
-      roughness: 0
+      roughness: 0,
     }));
   });
 

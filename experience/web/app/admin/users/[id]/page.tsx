@@ -217,10 +217,10 @@ export default function AdminUserDetailsPage() {
                   <td className="px-6 py-3">
                     {session.ended_at
                       ? Math.round(
-                        (new Date(session.ended_at).getTime() -
-                          new Date(session.started_at).getTime()) /
-                        60000
-                      ) + " min"
+                          (new Date(session.ended_at).getTime() -
+                            new Date(session.started_at).getTime()) /
+                            60000
+                        ) + " min"
                       : "Active"}
                   </td>
                   <td className="px-6 py-3">{session.message_count}</td>

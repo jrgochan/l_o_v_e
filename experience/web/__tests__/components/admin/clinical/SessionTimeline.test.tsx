@@ -1,4 +1,3 @@
-
 import { render, screen } from "@testing-library/react";
 import { SessionTimeline } from "@/components/admin/clinical/SessionTimeline";
 import { EmotionTimelineEvent } from "@/types/chat";
@@ -13,7 +12,7 @@ describe("SessionTimeline", () => {
       confidence: 0.9,
       category: "Positive",
       vac: { valence: 0.8, arousal: 0.5, connection: 0.6 },
-      alertLevel: "stable"
+      alertLevel: "stable",
     },
     {
       timestamp: new Date(baseTime.getTime() + 65000), // +1:05
@@ -21,7 +20,7 @@ describe("SessionTimeline", () => {
       confidence: 0.7,
       category: "Negative",
       vac: { valence: -0.5, arousal: 0.8, connection: -0.2 },
-      alertLevel: "warning"
+      alertLevel: "warning",
     },
     {
       timestamp: new Date(baseTime.getTime() + 125000), // +2:05
@@ -29,8 +28,8 @@ describe("SessionTimeline", () => {
       confidence: 0.95,
       category: "Negative",
       vac: { valence: -0.9, arousal: 0.9, connection: -0.8 },
-      alertLevel: "critical"
-    }
+      alertLevel: "critical",
+    },
   ];
 
   it("renders nothing when timeline is empty", () => {
@@ -63,11 +62,13 @@ describe("SessionTimeline", () => {
   });
 
   it("renders attention level correctly", () => {
-    const attentionEvent: EmotionTimelineEvent[] = [{
-      ...mockEvents[0],
-      alertLevel: "attention",
-      emotion: "Concern"
-    }];
+    const attentionEvent: EmotionTimelineEvent[] = [
+      {
+        ...mockEvents[0],
+        alertLevel: "attention",
+        emotion: "Concern",
+      },
+    ];
 
     render(<SessionTimeline emotionTimeline={attentionEvent} />);
 
@@ -77,10 +78,12 @@ describe("SessionTimeline", () => {
   });
 
   it("renders stable level correctly (default)", () => {
-    const stableEvent: EmotionTimelineEvent[] = [{
-      ...mockEvents[0],
-      alertLevel: undefined // Default fallback
-    }];
+    const stableEvent: EmotionTimelineEvent[] = [
+      {
+        ...mockEvents[0],
+        alertLevel: undefined, // Default fallback
+      },
+    ];
     render(<SessionTimeline emotionTimeline={stableEvent} />);
     // Should not have alert icons
     expect(screen.queryByText("🔴")).not.toBeInTheDocument();
@@ -89,10 +92,12 @@ describe("SessionTimeline", () => {
   });
 
   it("renders explicit stable level correctly", () => {
-    const stableEvent: EmotionTimelineEvent[] = [{
-      ...mockEvents[0],
-      alertLevel: "stable"
-    }];
+    const stableEvent: EmotionTimelineEvent[] = [
+      {
+        ...mockEvents[0],
+        alertLevel: "stable",
+      },
+    ];
     render(<SessionTimeline emotionTimeline={stableEvent} />);
     expect(screen.queryByText("🔴")).not.toBeInTheDocument();
   });
@@ -108,10 +113,12 @@ describe("SessionTimeline", () => {
   });
 
   it("renders negative VAC values correctly", () => {
-    const negativeEvent: EmotionTimelineEvent[] = [{
-      ...mockEvents[0],
-      vac: { valence: -0.5, arousal: -0.2, connection: -0.1 }
-    }];
+    const negativeEvent: EmotionTimelineEvent[] = [
+      {
+        ...mockEvents[0],
+        vac: { valence: -0.5, arousal: -0.2, connection: -0.1 },
+      },
+    ];
     render(<SessionTimeline emotionTimeline={negativeEvent} />);
     // Should NOT have "+" sign
     expect(screen.getByText((content) => content.includes("V: -0.50"))).toBeInTheDocument();

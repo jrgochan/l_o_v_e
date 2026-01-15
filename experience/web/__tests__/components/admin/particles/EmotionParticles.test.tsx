@@ -1,4 +1,3 @@
-
 import { render, cleanup, act } from "@testing-library/react";
 import React from "react";
 import * as THREE from "three";
@@ -53,7 +52,7 @@ describe("EmotionParticles", () => {
     vac: [0.8, 0.6, 0.7] as [number, number, number],
     category: "joy",
     definition: "Happy",
-    quaternion: [0, 0, 0, 1] as [number, number, number, number]
+    quaternion: [0, 0, 0, 1] as [number, number, number, number],
   };
 
   const defaultConfig = {
@@ -84,7 +83,7 @@ describe("EmotionParticles", () => {
 
   afterEach(() => {
     jest.useRealTimers();
-    jest.spyOn(Math, 'random').mockRestore();
+    jest.spyOn(Math, "random").mockRestore();
   });
 
   it("renders particles when enabled", async () => {
@@ -105,7 +104,9 @@ describe("EmotionParticles", () => {
     // Low arousal
     const lowEmotion = { ...mockEmotion, vac: [0, 0.1, 0] as [number, number, number] };
 
-    const { container, unmount } = render(<EmotionParticles {...defaultProps} emotion={lowEmotion} />);
+    const { container, unmount } = render(
+      <EmotionParticles {...defaultProps} emotion={lowEmotion} />
+    );
     await act(async () => jest.runAllTimers());
 
     unmount();
@@ -113,7 +114,7 @@ describe("EmotionParticles", () => {
     // Render high arousal
     const { container: c2 } = render(<EmotionParticles {...defaultProps} emotion={mockEmotion} />);
     await act(async () => jest.runAllTimers());
-    // Logic inside effect sets velocities. 
+    // Logic inside effect sets velocities.
     // We can't easily inspect internal state without a specialized hook or spy.
     // But we can verify it doesn't crash and lines are covered.
     // Ideally we'd spy on the Float32Array but it's local.
@@ -124,7 +125,7 @@ describe("EmotionParticles", () => {
     // 1. Initial position randoms
     // 2. Velocity randoms
     // 3. Reset randoms
-    jest.spyOn(Math, 'random').mockReturnValue(0.9); // Push things far away or fast
+    jest.spyOn(Math, "random").mockReturnValue(0.9); // Push things far away or fast
 
     const { container } = render(<EmotionParticles {...defaultProps} />);
     await act(async () => jest.runAllTimers());
@@ -163,12 +164,16 @@ describe("EmotionParticles", () => {
   });
 
   it("returns null when disabled", () => {
-    const { container } = render(<EmotionParticles {...defaultProps} config={{ ...defaultConfig, enabled: false }} />);
+    const { container } = render(
+      <EmotionParticles {...defaultProps} config={{ ...defaultConfig, enabled: false }} />
+    );
     expect(container.firstChild).toBeNull();
   });
 
   it("skips aura logic when disabled", async () => {
-    const { container } = render(<EmotionParticles {...defaultProps} config={{ ...defaultConfig, enableAuras: false }} />);
+    const { container } = render(
+      <EmotionParticles {...defaultProps} config={{ ...defaultConfig, enableAuras: false }} />
+    );
     await act(async () => jest.runAllTimers());
 
     // Check that rotation did NOT happen
@@ -199,7 +204,7 @@ describe("BurstParticles", () => {
     );
     await act(async () => jest.runAllTimers());
     return result;
-  }
+  };
 
   beforeEach(() => {
     jest.clearAllMocks();

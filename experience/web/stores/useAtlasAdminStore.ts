@@ -494,7 +494,6 @@ export const adminPartialize = (state: AtlasAdminState) => {
 
   console.log("DEBUG: partialize", { pathname: window.location.pathname, isClientViewer });
 
-
   if (isClientViewer) {
     // Client Viewer should ONLY persist selection state
     // This prevents overwriting Admin-computed paths with empty maps

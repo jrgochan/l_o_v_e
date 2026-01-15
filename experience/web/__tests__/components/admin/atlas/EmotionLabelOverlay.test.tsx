@@ -1,6 +1,8 @@
-
 import { render, screen } from "@testing-library/react";
-import { EmotionLabelOverlay, getLabelStyle } from "../../../../components/admin/atlas/EmotionLabelOverlay";
+import {
+  EmotionLabelOverlay,
+  getLabelStyle,
+} from "../../../../components/admin/atlas/EmotionLabelOverlay";
 import { useAtlasAdminStore } from "@/stores/useAtlasAdminStore";
 
 // Mock Store
@@ -19,9 +21,7 @@ describe("EmotionLabelOverlay", () => {
     quaternion: [0, 0, 0, 1] as [number, number, number, number],
   };
 
-  const mockLabels = [
-    { emotion: mockEmotion, x: 100, y: 100, visible: true },
-  ];
+  const mockLabels = [{ emotion: mockEmotion, x: 100, y: 100, visible: true }];
 
   beforeEach(() => {
     jest.clearAllMocks();
@@ -218,7 +218,7 @@ describe("EmotionLabelOverlay", () => {
     // "Awe" is in BRIDGE_EMOTIONS constant
     const bridgeLabel = {
       ...mockLabels[0],
-      emotion: { ...mockEmotion, id: "b1", name: "Awe" }
+      emotion: { ...mockEmotion, id: "b1", name: "Awe" },
     };
 
     // Test in default mode (Subtle)

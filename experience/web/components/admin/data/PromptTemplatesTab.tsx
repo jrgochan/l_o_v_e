@@ -336,8 +336,9 @@ export function PromptTemplatesTab() {
         {prompts.map((prompt) => (
           <div
             key={prompt.id}
-            className={`bg-gray-900/50 border rounded-lg p-4 transition-colors ${prompt.is_active ? "border-purple-500/50" : "border-gray-800 hover:border-gray-700"
-              }`}
+            className={`bg-gray-900/50 border rounded-lg p-4 transition-colors ${
+              prompt.is_active ? "border-purple-500/50" : "border-gray-800 hover:border-gray-700"
+            }`}
           >
             <div className="flex justify-between items-start">
               <div>

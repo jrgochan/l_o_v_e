@@ -1,4 +1,3 @@
-
 import { render, screen } from "@testing-library/react";
 import { CharacterSphere } from "@/components/admin/spheres/CharacterSphere";
 import React from "react";
@@ -42,26 +41,36 @@ describe("CharacterSphere", () => {
   beforeAll(() => {
     Object.defineProperties(window.Element.prototype, {
       position: {
-        get() { if (!this._pos) this._pos = new THREE.Vector3(); return this._pos; },
-        configurable: true
+        get() {
+          if (!this._pos) this._pos = new THREE.Vector3();
+          return this._pos;
+        },
+        configurable: true,
       },
       rotation: {
-        get() { if (!this._rot) this._rot = new THREE.Euler(); return this._rot; },
-        configurable: true
+        get() {
+          if (!this._rot) this._rot = new THREE.Euler();
+          return this._rot;
+        },
+        configurable: true,
       },
       scale: {
-        get() { if (!this._scale) this._scale = new THREE.Vector3(1, 1, 1); return this._scale; },
-        configurable: true
-      }
+        get() {
+          if (!this._scale) this._scale = new THREE.Vector3(1, 1, 1);
+          return this._scale;
+        },
+        configurable: true,
+      },
     });
   });
 
-  const mockEmotion = {
+  const mockEmotion: import("@/types/atlas-admin").AtlasEmotion = {
     id: "1",
     name: "Joy",
     category: "joy",
     vac: [0.8, 0.5, 0.7],
-    definition: "Happy"
+    definition: "Happy",
+    quaternion: [0, 0, 0, 1],
   };
 
   beforeEach(() => {

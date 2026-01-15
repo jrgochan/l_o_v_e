@@ -51,14 +51,14 @@ describe("useLayerActionMap", () => {
     let actions = result.current.getActions();
 
     // Group 1: True -> False (Log "OFF")
-    [...layerKeys, ...visualKeys].forEach(key => {
+    [...layerKeys, ...visualKeys].forEach((key) => {
       findAction(actions, key)();
       expect(logger.info).toHaveBeenCalledWith("user-interaction", expect.stringContaining("OFF"));
       (logger.info as jest.Mock).mockClear();
     });
 
     // Group 2: False -> True (Log "ON")
-    invertedKeys.forEach(key => {
+    invertedKeys.forEach((key) => {
       findAction(actions, key)();
       expect(logger.info).toHaveBeenCalledWith("user-interaction", expect.stringContaining("ON"));
       (logger.info as jest.Mock).mockClear();
@@ -83,14 +83,14 @@ describe("useLayerActionMap", () => {
     actions = result.current.getActions();
 
     // Group 1: False -> True (Log "ON")
-    [...layerKeys, ...visualKeys].forEach(key => {
+    [...layerKeys, ...visualKeys].forEach((key) => {
       findAction(actions, key)();
       expect(logger.info).toHaveBeenCalledWith("user-interaction", expect.stringContaining("ON"));
       (logger.info as jest.Mock).mockClear();
     });
 
     // Group 2: True -> False (Log "OFF")
-    invertedKeys.forEach(key => {
+    invertedKeys.forEach((key) => {
       findAction(actions, key)();
       expect(logger.info).toHaveBeenCalledWith("user-interaction", expect.stringContaining("OFF"));
       (logger.info as jest.Mock).mockClear();
@@ -99,7 +99,7 @@ describe("useLayerActionMap", () => {
 
   it("should cycle animation modes through full loop", () => {
     // 1. Subtle -> Dynamic
-    let { result, rerender } = renderHook(() => useLayerActionMap());
+    const { result, rerender } = renderHook(() => useLayerActionMap());
     findAction(result.current.getActions(), "v")();
     expect(mockUpdateVisualSetting).toHaveBeenCalledWith("pathAnimationMode", "dynamic");
 

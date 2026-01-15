@@ -44,19 +44,19 @@ describe("useEmotionNavigation", () => {
 
     // Cover all exposed methods
     result.current.selectEmotionByName("Joy");
-    expect(useNavigationActions().selectEmotionByName).toHaveBeenCalledWith("Joy");
+    expect(useNavigationActions({} as any).selectEmotionByName).toHaveBeenCalledWith("Joy");
 
     result.current.viewInSphere("id-1");
-    expect(useNavigationActions().viewInSphere).toHaveBeenCalledWith("id-1");
+    expect(useNavigationActions({} as any).viewInSphere).toHaveBeenCalledWith("id-1");
 
     result.current.addToSelection("id-2");
-    expect(useNavigationActions().addToSelection).toHaveBeenCalledWith("id-2");
+    expect(useNavigationActions({} as any).addToSelection).toHaveBeenCalledWith("id-2");
 
     result.current.viewMultipleInSphere(["id-3"]);
-    expect(useNavigationActions().viewMultipleInSphere).toHaveBeenCalledWith(["id-3"]);
+    expect(useNavigationActions({} as any).viewMultipleInSphere).toHaveBeenCalledWith(["id-3"]);
 
     result.current.autoFocusEmotion("Sadness");
-    expect(useNavigationActions().autoFocusEmotion).toHaveBeenCalledWith("Sadness");
+    expect(useNavigationActions({} as any).autoFocusEmotion).toHaveBeenCalledWith("Sadness");
 
     // Check findEmotionByName
     result.current.findEmotionByName("Joy");

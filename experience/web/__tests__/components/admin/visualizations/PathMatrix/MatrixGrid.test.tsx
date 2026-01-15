@@ -179,12 +179,7 @@ describe("MatrixGrid", () => {
       expect(defaultProps.onHoverCell).toHaveBeenCalled();
     });
     it("should apply hover styles in category mode", () => {
-      render(
-        <MatrixGrid
-          {...catProps}
-          hoveredCell={{ from: "Positive", to: "Negative" }}
-        />
-      );
+      render(<MatrixGrid {...catProps} hoveredCell={{ from: "Positive", to: "Negative" }} />);
 
       // Find the cell at intersection of Positive row and Negative col
       // The cell title will contain the stats mock return
@@ -196,12 +191,7 @@ describe("MatrixGrid", () => {
       });
 
       // Re-render to pick up mock change
-      render(
-        <MatrixGrid
-          {...catProps}
-          hoveredCell={{ from: "Positive", to: "Negative" }}
-        />
-      );
+      render(<MatrixGrid {...catProps} hoveredCell={{ from: "Positive", to: "Negative" }} />);
 
       const cell = screen.getAllByTitle(/Avg Distance: 2.50/i)[0];
       expect(cell).toHaveClass("ring-2");
@@ -227,7 +217,7 @@ describe("MatrixGrid", () => {
       to: { name: "Sadness" },
       total_distance: 1.234,
       difficulty: "moderate",
-      waypoints: [{}, {}]
+      waypoints: [{}, {}],
     });
 
     render(<MatrixGrid {...defaultProps} />);

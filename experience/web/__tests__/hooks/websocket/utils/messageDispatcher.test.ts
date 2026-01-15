@@ -175,7 +175,7 @@ describe("messageDispatcher", () => {
       "Awe",
       "", // default category
       payload.vac,
-      0,  // default confidence
+      0, // default confidence
       "primary"
     );
   });
@@ -193,8 +193,8 @@ describe("messageDispatcher", () => {
       "A",
       "B",
       "sequential",
-      0,  // default strength
-      ""  // default description
+      0, // default strength
+      "" // default description
     );
   });
 

@@ -178,7 +178,7 @@ describe("InfoPanel", () => {
 
   it("handles Modal navigation: Next Step (Valid WP)", async () => {
     setup({
-      displayPath: { id: "path1", waypoints: [{ id: "wp0" }, { id: "wp1" }, { id: "wp2" }] }
+      displayPath: { id: "path1", waypoints: [{ id: "wp0" }, { id: "wp1" }, { id: "wp2" }] },
     });
     render(<InfoPanel />);
 
@@ -208,11 +208,11 @@ describe("InfoPanel", () => {
 
   it("handles Modal navigation: Valid Intermediate WP", async () => {
     setup({
-      displayPath: { id: "path1", waypoints: [{ id: "wp0" }, { id: "wp1" }, { id: "wp2" }] }
+      displayPath: { id: "path1", waypoints: [{ id: "wp0" }, { id: "wp1" }, { id: "wp2" }] },
     });
     render(<InfoPanel />);
 
-    // Force modal open at Start (step 0). 
+    // Force modal open at Start (step 0).
     // We can use the Show Details button which sets step 0.
     await userEvent.click(screen.getByText("Show Details"));
 

@@ -8,7 +8,7 @@ const mockState = {
   transitionPath: {
     current_state: { emotion: "Joy", vac: [0, 0, 0] },
     goal_state: { emotion: "Peace", vac: [1, 1, 1] },
-    waypoints: [], // Should result in 2 points (start, end)
+    waypoints: [] as any[], // Should result in 2 points (start, end)
   },
   isFlying: true,
   setIsFlying: jest.fn(),
@@ -35,7 +35,9 @@ const mockCamera = {
 };
 
 jest.mock("@react-three/fiber", () => ({
-  useFrame: jest.fn((cb) => { frameCallback = cb; }),
+  useFrame: jest.fn((cb) => {
+    frameCallback = cb;
+  }),
   useThree: () => ({ camera: mockCamera }),
 }));
 
@@ -55,7 +57,9 @@ jest.mock("@react-spring/web", () => ({
 jest.mock("three", () => {
   return {
     Vector3: jest.fn((x, y, z) => ({
-      x, y, z,
+      x,
+      y,
+      z,
       copy: jest.fn(),
       lerp: jest.fn(),
     })),
@@ -86,7 +90,7 @@ describe("ViewerPathFlyover", () => {
       if (!selector) return mockState; // useExperienceStore.getState()
       return selector(mockState);
     });
-    (useExperienceStore as unknown as jest.Mock).getState = () => mockState;
+    (useExperienceStore as any).getState = () => mockState;
   });
 
   it("should initialize spline with valid path", () => {
@@ -96,7 +100,7 @@ describe("ViewerPathFlyover", () => {
         current_state: { emotion: "Joy", vac: [0, 0, 0] },
         goal_state: { emotion: "Peace", vac: [1, 1, 1] },
         waypoints: [{ id: "wp1", vac: [0.5, 0.5, 0.5] } as any],
-      }
+      },
     });
     render(<ViewerPathFlyover />);
     expect(THREE.CatmullRomCurve3).toHaveBeenCalled();
@@ -223,8 +227,8 @@ describe("ViewerPathFlyover", () => {
         // If we rely on valid types, points always >= 2.
         // But let's check if we can pass partial object
         goal_state: undefined as any,
-        waypoints: []
-      } as any
+        waypoints: [],
+      } as any,
     });
 
     // useEffect error boundary?
@@ -244,7 +248,9 @@ describe("ViewerPathFlyover", () => {
     // 1. isFlying = false
     setMockState({ isFlying: false });
     render(<ViewerPathFlyover />);
-    act(() => { if (frameCallback) frameCallback({ clock: { elapsedTime: 0 } } as any); });
+    act(() => {
+      if (frameCallback) frameCallback({ clock: { elapsedTime: 0 } } as any);
+    });
     // Should return early
     expect(mockCamera.position.copy).not.toHaveBeenCalled();
 
@@ -253,7 +259,9 @@ describe("ViewerPathFlyover", () => {
     jest.clearAllMocks();
     render(<ViewerPathFlyover />);
     // Spline ref is null because path null. UseFrame should return early.
-    act(() => { if (frameCallback) frameCallback({ clock: { elapsedTime: 0 } } as any); });
+    act(() => {
+      if (frameCallback) frameCallback({ clock: { elapsedTime: 0 } } as any);
+    });
     expect(mockCamera.position.copy).not.toHaveBeenCalled();
   });
 });

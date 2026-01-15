@@ -10,7 +10,7 @@ export function useVoiceVisualizer(stream: MediaStream | null) {
     if (!stream) {
       // Cleanup if stream disappears
       if (audioContextRef.current) {
-        audioContextRef.current.close().catch(() => { });
+        audioContextRef.current.close().catch(() => {});
         audioContextRef.current = null;
       }
       if (animationFrameRef.current) {
@@ -52,7 +52,7 @@ export function useVoiceVisualizer(stream: MediaStream | null) {
       }
       /* istanbul ignore next */
       if (audioContextRef.current) {
-        audioContextRef.current.close().catch(() => { });
+        audioContextRef.current.close().catch(() => {});
       }
     };
   }, [stream]);

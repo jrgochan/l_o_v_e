@@ -1,4 +1,3 @@
-
 import { render, screen, fireEvent, waitFor, act } from "@testing-library/react";
 import { AIModelsSettings } from "@/components/admin/settings/AIModelsSettings";
 import { MODEL_PRESETS } from "@/utils/modelPresets";
@@ -9,11 +8,14 @@ import { useModelAssignments } from "@/hooks/useModelAssignments";
 jest.mock("@/hooks/useOllamaModels");
 jest.mock("@/hooks/useModelAssignments");
 jest.mock("@/components/admin/settings/PullModelDialog", () => ({
-  PullModelDialog: ({ isOpen, onClose }: any) => isOpen ? (
-    <div data-testid="pull-dialog">
-      <button onClick={onClose} data-testid="close-pull-dialog">Close</button>
-    </div>
-  ) : null
+  PullModelDialog: ({ isOpen, onClose }: any) =>
+    isOpen ? (
+      <div data-testid="pull-dialog">
+        <button onClick={onClose} data-testid="close-pull-dialog">
+          Close
+        </button>
+      </div>
+    ) : null,
 }));
 jest.mock("@/components/admin/settings/ModelCard", () => ({
   ModelCard: ({ model, onAssign, onDelete }: any) => (
@@ -22,23 +24,24 @@ jest.mock("@/components/admin/settings/ModelCard", () => ({
       <button onClick={() => onAssign(model.name)}>Assign</button>
       <button onClick={() => onDelete(model.name)}>Delete</button>
     </div>
-  )
+  ),
 }));
 jest.mock("@/components/admin/settings/PerformancePanel", () => ({
-  PerformancePanel: () => <div data-testid="performance-panel">Performance</div>
+  PerformancePanel: () => <div data-testid="performance-panel">Performance</div>,
 }));
 jest.mock("@/components/admin/settings/RecommendationsPanel", () => ({
-  RecommendationsPanel: () => <div data-testid="recommendations-panel">Recommendations</div>
+  RecommendationsPanel: () => <div data-testid="recommendations-panel">Recommendations</div>,
 }));
 jest.mock("@/components/admin/settings/ConfirmDialog", () => ({
-  ConfirmDialog: ({ isOpen, title, message, onConfirm, onCancel }: any) => isOpen ? (
-    <div data-testid="confirm-dialog">
-      <h1>{title}</h1>
-      <p>{message}</p>
-      <button onClick={onConfirm}>Confirm</button>
-      <button onClick={onCancel}>Cancel</button>
-    </div>
-  ) : null
+  ConfirmDialog: ({ isOpen, title, message, onConfirm, onCancel }: any) =>
+    isOpen ? (
+      <div data-testid="confirm-dialog">
+        <h1>{title}</h1>
+        <p>{message}</p>
+        <button onClick={onConfirm}>Confirm</button>
+        <button onClick={onCancel}>Cancel</button>
+      </div>
+    ) : null,
 }));
 
 describe("AIModelsSettings", () => {
@@ -86,7 +89,7 @@ describe("AIModelsSettings", () => {
       ...mockOllama,
       loading: true,
       // We ensure health check resolves true so it enters loading block
-      checkOllamaHealth: jest.fn().mockResolvedValue(true)
+      checkOllamaHealth: jest.fn().mockResolvedValue(true),
     });
     render(<AIModelsSettings />);
     // Initial render might show "Not Running" (false state) -> then updates to true -> then shows "Loading"
@@ -190,7 +193,7 @@ describe("AIModelsSettings", () => {
   it("filters models by family", async () => {
     render(<AIModelsSettings />);
     await screen.findByText(/Local Models/i);
-    const mistralBtn = screen.getByText("mistral", { selector: 'button' });
+    const mistralBtn = screen.getByText("mistral", { selector: "button" });
     fireEvent.click(mistralBtn);
     expect(screen.getByTestId("model-card-mistral")).toBeInTheDocument();
     expect(screen.queryByTestId("model-card-llama3")).not.toBeInTheDocument();
@@ -210,9 +213,7 @@ describe("AIModelsSettings", () => {
 
   it("retries health check when clicking retry button", async () => {
     // Explicit sequence: False (initially), True (after retry)
-    const checkMock = jest.fn()
-      .mockResolvedValueOnce(false)
-      .mockResolvedValueOnce(true);
+    const checkMock = jest.fn().mockResolvedValueOnce(false).mockResolvedValueOnce(true);
 
     (useOllamaModels as jest.Mock).mockReturnValue({
       ...mockOllama,
@@ -246,9 +247,7 @@ describe("AIModelsSettings", () => {
   });
 
   it("handles preset partial failure", async () => {
-    mockAssignments.assignModel
-      .mockResolvedValueOnce(true)
-      .mockResolvedValueOnce(false);
+    mockAssignments.assignModel.mockResolvedValueOnce(true).mockResolvedValueOnce(false);
     render(<AIModelsSettings />);
     await screen.findByText(/Local Models/i);
     const assignButtons = screen.getAllByText("Assign");
@@ -261,13 +260,15 @@ describe("AIModelsSettings", () => {
   it("shows warning variant for delete confirmation when model is in use", async () => {
     (useModelAssignments as jest.Mock).mockReturnValue({
       ...mockAssignments,
-      assignments: { "chat": "llama3" }
+      assignments: { chat: "llama3" },
     });
     render(<AIModelsSettings />);
     await screen.findByText(/Local Models/i);
     const card = screen.getByTestId("model-card-llama3");
     fireEvent.click(card.querySelector("button:last-child")!);
-    await waitFor(() => expect(screen.getByText(/currently assigned to 1 function/)).toBeInTheDocument());
+    await waitFor(() =>
+      expect(screen.getByText(/currently assigned to 1 function/)).toBeInTheDocument()
+    );
   });
 
   it("shows danger variant for delete confirmation when unused", async () => {
@@ -275,13 +276,15 @@ describe("AIModelsSettings", () => {
     await screen.findByText(/Local Models/i);
     const card = screen.getByTestId("model-card-llama3");
     fireEvent.click(card.querySelector("button:last-child")!);
-    await waitFor(() => expect(screen.getByText(/This action cannot be undone/)).toBeInTheDocument());
+    await waitFor(() =>
+      expect(screen.getByText(/This action cannot be undone/)).toBeInTheDocument()
+    );
   });
 
   it("shows empty state when no models installed", async () => {
     (useOllamaModels as jest.Mock).mockReturnValue({
       ...mockOllama,
-      localModels: [] // Override for this test
+      localModels: [], // Override for this test
     });
     render(<AIModelsSettings />);
     await waitFor(() => expect(screen.getByText(/No models installed yet/i)).toBeInTheDocument());
@@ -457,7 +460,7 @@ describe("AIModelsSettings", () => {
     // Check any model card (triggers usage check)
     expect(screen.getByTestId("model-card-llama3")).toBeInTheDocument();
 
-    // If logic survives, test passes. 
+    // If logic survives, test passes.
     // Implicitly creating coverage for optional chaining or guards.
   });
 
@@ -475,8 +478,9 @@ describe("AIModelsSettings", () => {
     fireEvent.click(card.querySelector("button:last-child")!);
 
     // Should show confirm dialog (danger variant because usedBy calculation fallback to [])
-    await waitFor(() => expect(screen.getByText(/This action cannot be undone/)).toBeInTheDocument());
-
+    await waitFor(() =>
+      expect(screen.getByText(/This action cannot be undone/)).toBeInTheDocument()
+    );
   });
 
   it("displays persistent error banner when hooks return errors", async () => {
@@ -487,7 +491,6 @@ describe("AIModelsSettings", () => {
 
     render(<AIModelsSettings />);
     await waitFor(() => expect(screen.getByText(/Critical Model Failure/)).toBeInTheDocument());
-
   });
 
   it("displays persistent error banner when assignment hook returns error", async () => {
@@ -501,4 +504,3 @@ describe("AIModelsSettings", () => {
     await waitFor(() => expect(screen.getByText(/Assignment Sync Failed/)).toBeInTheDocument());
   });
 });
-

@@ -35,7 +35,7 @@ describe("EmotionHistoryPanel", () => {
   const defaultState = {
     entries: [
       { id: "1", emotion: "Joy", isVisibleInSphere: true, timestamp: new Date() },
-      { id: "2", emotion: "Hope", isVisibleInSphere: false, timestamp: new Date() }
+      { id: "2", emotion: "Hope", isVisibleInSphere: false, timestamp: new Date() },
     ],
     viewMode: "list",
     isCollapsed: false,

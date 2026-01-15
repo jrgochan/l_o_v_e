@@ -29,10 +29,10 @@ const mockUseAtlasAdminStore = jest.fn((selector) => selector(mockState));
 const mockGetState = jest.fn(() => mockState);
 
 jest.mock("@/stores/useAtlasAdminStore", () => ({
-  useAtlasAdminStore: Object.assign(query => mockUseAtlasAdminStore(query), {
+  useAtlasAdminStore: Object.assign((query) => mockUseAtlasAdminStore(query), {
     getState: () => mockGetState(), // Deferred execution to pick up current mockState values? No, closures.
     // Better: getState returns the object that mockSetHoveredEmotion belongs to.
-  })
+  }),
 }));
 
 // We need to update mockState in tests.
@@ -127,9 +127,7 @@ describe("PathFlyover", () => {
 
     const waypointPath = {
       ...mockPath,
-      waypoints: [
-        { emotion: "Joy", vac: [1, 1, 1], reasoning: "" }
-      ]
+      waypoints: [{ emotion: "Joy", vac: [1, 1, 1], reasoning: "" }],
     };
 
     Object.assign(mockState, {
@@ -161,15 +159,13 @@ describe("PathFlyover", () => {
 
     const waypointPath = {
       ...mockPath,
-      waypoints: [
-        { emotion: "Joy", vac: [1, 1, 1], reasoning: "" }
-      ]
+      waypoints: [{ emotion: "Joy", vac: [1, 1, 1], reasoning: "" }],
     };
 
     Object.assign(mockState, {
       computedPaths: new Map([["p1", waypointPath]]),
       allEmotions: [{ name: "Joy", id: "joy-id", category: "Happy", vac: [1, 1, 1] }],
-      hoveredEmotionId: "joy-id" // Already hovered
+      hoveredEmotionId: "joy-id", // Already hovered
     });
 
     mockDistanceTo.mockImplementation((vec: any) => {
@@ -229,9 +225,7 @@ describe("PathFlyover", () => {
   it("should handle waypoint with unknown emotion", () => {
     const waypointPath = {
       ...mockPath,
-      waypoints: [
-        { emotion: "Unknown", vac: [2, 2, 2], reasoning: "" }
-      ]
+      waypoints: [{ emotion: "Unknown", vac: [2, 2, 2], reasoning: "" }],
     };
     Object.assign(mockState, {
       computedPaths: new Map([["p1", waypointPath]]),
@@ -244,7 +238,7 @@ describe("PathFlyover", () => {
   it("should reset state when path is deselected", () => {
     Object.assign(mockState, {
       isFlying: false, // already not flying to avoid effect noise
-      selectedPathId: null
+      selectedPathId: null,
     });
     render(<PathFlyover />);
   });
@@ -252,7 +246,7 @@ describe("PathFlyover", () => {
   it("should clear hover state when flight stops", () => {
     Object.assign(mockState, {
       isFlying: false,
-      hoveredEmotionId: "some-id"
+      hoveredEmotionId: "some-id",
     });
     render(<PathFlyover />);
     expect(mockState.setHoveredEmotion).toHaveBeenCalledWith(null);

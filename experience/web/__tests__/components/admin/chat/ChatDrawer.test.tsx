@@ -14,7 +14,7 @@ jest.mock("@/utils/logger", () => ({
     info: jest.fn(),
     debug: jest.fn(),
     error: jest.fn(),
-  }
+  },
 }));
 
 // Mock scrollIntoView
@@ -51,7 +51,10 @@ describe("ChatDrawer", () => {
   });
 
   it("renders open state", () => {
-    (useWebSocketChat as jest.Mock).mockReturnValue({ ...defaultWebSocketState, isConnected: true });
+    (useWebSocketChat as jest.Mock).mockReturnValue({
+      ...defaultWebSocketState,
+      isConnected: true,
+    });
     render(<ChatDrawer isOpen={true} onToggle={mockOnToggle} sessionId="sess1" />);
 
     expect(screen.getByPlaceholderText(/How are you feeling/i)).toBeInTheDocument();
@@ -59,7 +62,10 @@ describe("ChatDrawer", () => {
   });
 
   it("handles sending messages", async () => {
-    (useWebSocketChat as jest.Mock).mockReturnValue({ ...defaultWebSocketState, isConnected: true });
+    (useWebSocketChat as jest.Mock).mockReturnValue({
+      ...defaultWebSocketState,
+      isConnected: true,
+    });
     render(<ChatDrawer isOpen={true} onToggle={mockOnToggle} sessionId="sess1" />);
 
     const input = screen.getByPlaceholderText(/How are you feeling/i);
@@ -80,13 +86,20 @@ describe("ChatDrawer", () => {
       callbacks.onMessage({ type: "message_received", content: "" });
     });
 
-    expect(logger.debug).toHaveBeenCalledWith("websocket", "Chat message received", expect.anything());
+    expect(logger.debug).toHaveBeenCalledWith(
+      "websocket",
+      "Chat message received",
+      expect.anything()
+    );
     // Verify processing state
     expect(screen.getByText("Analyzing...")).toBeInTheDocument();
   });
 
   it("handles Enter key to send", async () => {
-    (useWebSocketChat as jest.Mock).mockReturnValue({ ...defaultWebSocketState, isConnected: true });
+    (useWebSocketChat as jest.Mock).mockReturnValue({
+      ...defaultWebSocketState,
+      isConnected: true,
+    });
     render(<ChatDrawer isOpen={true} onToggle={mockOnToggle} sessionId="sess1" />);
 
     const input = screen.getByPlaceholderText(/How are you feeling/i);
@@ -172,7 +185,9 @@ describe("ChatDrawer", () => {
     const addSpy = jest.spyOn(document, "addEventListener");
     const removeSpy = jest.spyOn(document, "removeEventListener");
 
-    const { unmount } = render(<ChatDrawer isOpen={true} onToggle={mockOnToggle} sessionId="sess1" />);
+    const { unmount } = render(
+      <ChatDrawer isOpen={true} onToggle={mockOnToggle} sessionId="sess1" />
+    );
 
     // Trigger resize start to attach listeners
     const handle = screen.getByTestId("resize-handle");
@@ -205,7 +220,10 @@ describe("ChatDrawer", () => {
   });
 
   it("does not send message if content empty", async () => {
-    (useWebSocketChat as jest.Mock).mockReturnValue({ ...defaultWebSocketState, isConnected: true });
+    (useWebSocketChat as jest.Mock).mockReturnValue({
+      ...defaultWebSocketState,
+      isConnected: true,
+    });
     render(<ChatDrawer isOpen={true} onToggle={mockOnToggle} sessionId="sess1" />);
 
     const input = screen.getByPlaceholderText(/How are you feeling/i);
@@ -222,7 +240,10 @@ describe("ChatDrawer", () => {
   });
 
   it("does not send message if disconnected", () => {
-    (useWebSocketChat as jest.Mock).mockReturnValue({ ...defaultWebSocketState, isConnected: false });
+    (useWebSocketChat as jest.Mock).mockReturnValue({
+      ...defaultWebSocketState,
+      isConnected: false,
+    });
     render(<ChatDrawer isOpen={true} onToggle={mockOnToggle} sessionId="sess1" />);
 
     const input = screen.getByPlaceholderText(/How are you feeling/i) as HTMLInputElement;

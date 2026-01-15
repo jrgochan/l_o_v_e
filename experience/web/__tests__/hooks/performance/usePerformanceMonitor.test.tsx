@@ -127,7 +127,7 @@ describe("usePerformanceMonitor", () => {
       usePerformanceMonitor({
         sampleSize: 5,
         onQualityChange,
-        autoAdjustQuality: false
+        autoAdjustQuality: false,
       })
     );
     const frameCallback = (global as any).mockFrameCallback;

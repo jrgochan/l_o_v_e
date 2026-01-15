@@ -22,7 +22,10 @@ describe("InsightCard", () => {
       {
         type: "similar_emotions",
         title: "Related Emotions",
-        items: [{ _id: "1", name: "Excitement" }, { _id: "2", name: "Hope" }],
+        items: [
+          { _id: "1", name: "Excitement" },
+          { _id: "2", name: "Hope" },
+        ],
       },
     ],
     // Clinical fields
@@ -84,7 +87,9 @@ describe("InsightCard", () => {
     });
 
     it("applies clinical styling in clinical mode", () => {
-      const { container } = render(<InsightCard insights={mockLegacyInsights} toneMode="clinical" />);
+      const { container } = render(
+        <InsightCard insights={mockLegacyInsights} toneMode="clinical" />
+      );
       const wrapper = container.firstChild;
       expect(wrapper).toHaveClass("bg-gray-800");
     });
@@ -196,7 +201,7 @@ describe("InsightCard", () => {
           { label: "B", value: "2", status: "warning", interpretation: "" },
           { label: "C", value: "3", status: "attention", interpretation: "" },
           { label: "D", value: "4", status: "normal", interpretation: "" },
-        ]
+        ],
       };
 
       render(<InsightCard insights={statusInsights} toneMode="clinical" />);

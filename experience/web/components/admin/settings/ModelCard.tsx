@@ -92,12 +92,13 @@ export function ModelCard({ model, usedByFunctions, onDelete, onAssign }: ModelC
             )}
             {badge && (
               <span
-                className={`px-2 py-0.5 text-xs rounded-full ${badge.color === "purple"
+                className={`px-2 py-0.5 text-xs rounded-full ${
+                  badge.color === "purple"
                     ? "bg-purple-600/20 border border-purple-500/50 text-purple-400"
                     : badge.color === "green"
                       ? "bg-green-600/20 border border-green-500/50 text-green-400"
                       : "bg-blue-600/20 border border-blue-500/50 text-blue-400"
-                  }`}
+                }`}
               >
                 {badge.text}
               </span>

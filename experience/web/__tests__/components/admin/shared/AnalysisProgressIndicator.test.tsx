@@ -1,9 +1,18 @@
-
 import { render, screen, act } from "@testing-library/react";
-import { AnalysisProgressIndicator, ProgressStage } from "@/components/admin/shared/AnalysisProgressIndicator";
+import {
+  AnalysisProgressIndicator,
+  ProgressStage,
+} from "@/components/admin/shared/AnalysisProgressIndicator";
 
 const mockStages: ProgressStage[] = [
-  { id: "stage1", label: "Stage 1", icon: "🔴", status: "complete", percentage: 33, elapsed_ms: 1000 },
+  {
+    id: "stage1",
+    label: "Stage 1",
+    icon: "🔴",
+    status: "complete",
+    percentage: 33,
+    elapsed_ms: 1000,
+  },
   { id: "stage2", label: "Stage 2", icon: "🔵", status: "in_progress", percentage: 33 },
   { id: "stage3", label: "Stage 3", icon: "🟢", status: "pending", percentage: 34 },
 ];
@@ -35,7 +44,9 @@ describe("AnalysisProgressIndicator", () => {
     expect(screen.getByText("Overall Progress")).toBeInTheDocument();
     expect(screen.getAllByText("45%").length).toBeGreaterThanOrEqual(2);
     // Check progress bar text (should have font-mono)
-    const percentageText = screen.getAllByText("45%").find(el => el.classList.contains("font-mono"));
+    const percentageText = screen
+      .getAllByText("45%")
+      .find((el) => el.classList.contains("font-mono"));
     expect(percentageText).toBeInTheDocument();
     expect(percentageText).toHaveClass("text-cyan-400");
   });

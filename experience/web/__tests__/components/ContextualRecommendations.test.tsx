@@ -137,7 +137,7 @@ describe("ContextualRecommendations", () => {
   it("should handle empty recommendations", async () => {
     mockGetContextRecommendations.mockResolvedValue({
       recommended_strategies: [], // Empty
-      avoid_strategies: []
+      avoid_strategies: [],
     });
 
     render(<ContextualRecommendations />);

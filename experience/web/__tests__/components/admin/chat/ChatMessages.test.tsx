@@ -55,8 +55,8 @@ describe("ChatMessages", () => {
 
   it("triggers scrollIntoView when messages change", () => {
     const { rerender } = render(<ChatMessages {...defaultProps} />);
-    // Initial render might trigger it depending on ref attachment timing, 
-    // but usually ref is null on first pass execution of effect if rendered strictly? 
+    // Initial render might trigger it depending on ref attachment timing,
+    // but usually ref is null on first pass execution of effect if rendered strictly?
     // Actually in React Testing Library, refs update synchronously after render.
     // The effect runs after render. So ref.current should be populated.
     // However, if messages are empty, effect runs.

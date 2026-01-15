@@ -123,7 +123,7 @@ describe("useSphereReceiver", () => {
         type: "path_update",
         path: { id: "p1" },
         showPath: true,
-        timestamp: 123
+        timestamp: 123,
       } as any);
     });
 
@@ -136,7 +136,7 @@ describe("useSphereReceiver", () => {
     act(() => {
       result.current.handleMessage({
         type: "heartbeat",
-        timestamp: 123
+        timestamp: 123,
       });
     });
     // Just verify no crash, logger is mocked but not exported for verification easily unless we spy on import.
@@ -149,7 +149,7 @@ describe("useSphereReceiver", () => {
       result.current.handleMessage({
         type: "path_update",
         path: undefined, // path cleared
-        timestamp: 456
+        timestamp: 456,
       } as any);
     });
 

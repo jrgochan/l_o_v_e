@@ -1,4 +1,3 @@
-
 import { render, screen, fireEvent } from "@testing-library/react";
 import { BaseModal, ConfirmModal } from "@/components/admin/layout/BaseModal";
 
@@ -47,7 +46,7 @@ describe("BaseModal", () => {
     );
 
     // The backdrop is the first .absolute.inset-0 div (rendering order) or we can look for specific classes.
-    // The inner modal has e.stopPropagation. 
+    // The inner modal has e.stopPropagation.
     // We can simulate click on the backdrop div.
     // It has `bg-black/70` in classes.
     // Or we can rely on testing-library queries if we can find it.
@@ -126,12 +125,7 @@ describe("ConfirmModal", () => {
 
   it("renders title, message and buttons", () => {
     render(
-      <ConfirmModal
-        isOpen={true}
-        onClose={onClose}
-        onConfirm={onConfirm}
-        message="Are you sure?"
-      />
+      <ConfirmModal isOpen={true} onClose={onClose} onConfirm={onConfirm} message="Are you sure?" />
     );
 
     expect(screen.getByText("Confirm Action")).toBeInTheDocument(); // Default title
@@ -141,28 +135,14 @@ describe("ConfirmModal", () => {
   });
 
   it("calls onConfirm and onClose on confirm click", () => {
-    render(
-      <ConfirmModal
-        isOpen={true}
-        onClose={onClose}
-        onConfirm={onConfirm}
-        message="Msg"
-      />
-    );
+    render(<ConfirmModal isOpen={true} onClose={onClose} onConfirm={onConfirm} message="Msg" />);
     fireEvent.click(screen.getByText("Confirm"));
     expect(onConfirm).toHaveBeenCalled();
     expect(onClose).toHaveBeenCalled();
   });
 
   it("calls onClose on cancel click", () => {
-    render(
-      <ConfirmModal
-        isOpen={true}
-        onClose={onClose}
-        onConfirm={onConfirm}
-        message="Msg"
-      />
-    );
+    render(<ConfirmModal isOpen={true} onClose={onClose} onConfirm={onConfirm} message="Msg" />);
     fireEvent.click(screen.getByText("Cancel"));
     expect(onClose).toHaveBeenCalled();
     expect(onConfirm).not.toHaveBeenCalled();

@@ -143,7 +143,8 @@ export function EmotionParticles({
   }
 
   const { positions, sizes } = particleData;
-  const opacity = config.opacity * (/* istanbul ignore next */ isSelected ? 1.5 : isHovered ? 1.2 : 1.0);
+  const opacity =
+    config.opacity * /* istanbul ignore next */ (isSelected ? 1.5 : isHovered ? 1.2 : 1.0);
 
   return (
     <points ref={particlesRef}>

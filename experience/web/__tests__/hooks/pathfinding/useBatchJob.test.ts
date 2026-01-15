@@ -128,7 +128,7 @@ describe("useBatchJob", () => {
     const { result } = renderHook(() => useBatchJob(mockOnComplete, mockOnFail));
     (global.fetch as any).mockResolvedValue({
       ok: false,
-      status: 500
+      status: 500,
     });
 
     act(() => {
@@ -155,7 +155,7 @@ describe("useBatchJob", () => {
 
     unmount();
 
-    // Timer should be cleared. 
+    // Timer should be cleared.
     // Jest fake timers doesn't expose 'getTimerCount' easily in all envs without specific setup,
     // but unmount triggering the effect cleanup is standard React behavior we rely on.
     // Coverage report will confirm line execution.

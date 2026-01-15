@@ -1,4 +1,3 @@
-
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import { Header } from "@/components/layout/Header";
 import { useAuthStore } from "@/stores/authStore";
@@ -19,9 +18,12 @@ jest.mock("next/link", () => {
 
 // Mock child components
 jest.mock("@/components/auth/AuthModal", () => ({
-  AuthModal: ({ isOpen, onClose }: any) => (
-    isOpen ? <div data-testid="auth-modal"><button onClick={onClose}>Close</button></div> : null
-  ),
+  AuthModal: ({ isOpen, onClose }: any) =>
+    isOpen ? (
+      <div data-testid="auth-modal">
+        <button onClick={onClose}>Close</button>
+      </div>
+    ) : null,
 }));
 
 jest.mock("@/components/Settings", () => ({
@@ -102,7 +104,7 @@ describe("Header", () => {
     // Admin link should NOT be there for regular user
     expect(screen.queryByText("⚡ Admin Dashboard")).not.toBeInTheDocument();
 
-    // Close logic (click outside) - hard to mock exact document click in JSDOM sometimes without setup, 
+    // Close logic (click outside) - hard to mock exact document click in JSDOM sometimes without setup,
     // but we can test the toggle logic by clicking the button again
     fireEvent.click(profileBtn!);
     expect(screen.queryByText("Signed in as")).not.toBeInTheDocument();
@@ -166,11 +168,11 @@ describe("Header", () => {
     // Open dropdown
     fireEvent.click(screen.getByText("test").closest("button")!);
 
-    // Click profile link 
+    // Click profile link
     const profileLink = screen.getByText("👤 Profile");
     fireEvent.click(profileLink);
 
-    // Re-render check is implicit, but in a real browser nav would happen. 
+    // Re-render check is implicit, but in a real browser nav would happen.
     // Here we mainly ensure no error.
   });
 

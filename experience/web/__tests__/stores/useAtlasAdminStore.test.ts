@@ -1,5 +1,11 @@
 import { act } from "@testing-library/react";
-import { useAtlasAdminStore, adminPartialize, replacer, reviver, getInitialAdminState } from "../../stores/useAtlasAdminStore";
+import {
+  useAtlasAdminStore,
+  adminPartialize,
+  replacer,
+  reviver,
+  getInitialAdminState,
+} from "../../stores/useAtlasAdminStore";
 import { AtlasEmotion, EmotionPath } from "../../types";
 
 jest.mock("zustand/middleware", () => ({
@@ -7,7 +13,9 @@ jest.mock("zustand/middleware", () => ({
   persist: (config: any, options: any) => (set: any, get: any, api: any) => {
     // Execute partialize to ensure coverage
     if (options && options.partialize) {
-      try { options.partialize(get()); } catch (e) { }
+      try {
+        options.partialize(get());
+      } catch (e) {}
     }
     return config(set, get, api);
   },
@@ -102,15 +110,15 @@ describe("useAtlasAdminStore", () => {
           selectedEmotionIds: { __type: "Set", value: ["1", "2"] },
           computedPaths: {
             __type: "Map",
-            value: [["1-2", mockPath]]
-          }
+            value: [["1-2", mockPath]],
+          },
         },
-        version: 0
+        version: 0,
       };
       localStorage.setItem("love-atlas-admin", JSON.stringify(stateToPersist));
 
       // Trigger rehydration (this usually happens on mount, but we can force state update or just verify reviver logic directly if exported)
-      // Since we can't easily trigger rehydration in unit test without re-creating store, 
+      // Since we can't easily trigger rehydration in unit test without re-creating store,
       // we will assume the internal reviver is working if we can manually test the logic or use a specific hydration test.
 
       // Alternatively, we can use the `persist` API methods if available, but they are bounded.
@@ -347,12 +355,12 @@ describe("useAtlasAdminStore", () => {
       const weirdEmotion = { ...mockEmotions[0], id: "99", category: "Unlisted" };
       act(() => setAllEmotions([weirdEmotion]));
 
-      // Store cleans categories? No, it sets filters based on emotions. 
+      // Store cleans categories? No, it sets filters based on emotions.
       // Manually mess up filters to simulate mismatch?
       // Actually setAllEmotions initializes filters.
       // If we modify categoryFilters to delete "Unlisted"
       act(() => {
-        useAtlasAdminStore.setState(prev => {
+        useAtlasAdminStore.setState((prev) => {
           const newFilters = new Map(prev.categoryFilters);
           newFilters.delete("Unlisted");
           return { categoryFilters: newFilters };
@@ -481,7 +489,8 @@ describe("Additional Actions & Helpers", () => {
 
   describe("Path Cycling", () => {
     it("should cycle through filtered paths", () => {
-      const { setAllEmotions, addComputedPath, selectMultiple, cycleSelectedPath } = useAtlasAdminStore.getState();
+      const { setAllEmotions, addComputedPath, selectMultiple, cycleSelectedPath } =
+        useAtlasAdminStore.getState();
 
       // Setup: 2 paths between 3 emotions. All emotions selected.
       // Path 1: 1-2
@@ -513,7 +522,14 @@ describe("Additional Actions & Helpers", () => {
     });
 
     it("should not cycle if no valid paths for selection", () => {
-      const { setAllEmotions, addComputedPath, selectMultiple, cycleSelectedPath, clearComputedPaths, setSelectedPath } = useAtlasAdminStore.getState();
+      const {
+        setAllEmotions,
+        addComputedPath,
+        selectMultiple,
+        cycleSelectedPath,
+        clearComputedPaths,
+        setSelectedPath,
+      } = useAtlasAdminStore.getState();
       act(() => {
         clearComputedPaths(); // Force clear paths
         setSelectedPath(null); // Force clear selection residue
@@ -527,7 +543,13 @@ describe("Additional Actions & Helpers", () => {
     });
 
     it("should handle cycling when selected path is not in filtered list", () => {
-      const { setAllEmotions, addComputedPath, selectMultiple, cycleSelectedPath, setSelectedPath } = useAtlasAdminStore.getState();
+      const {
+        setAllEmotions,
+        addComputedPath,
+        selectMultiple,
+        cycleSelectedPath,
+        setSelectedPath,
+      } = useAtlasAdminStore.getState();
       // Setup
       act(() => {
         setAllEmotions(mockEmotions);
@@ -542,7 +564,13 @@ describe("Additional Actions & Helpers", () => {
     });
 
     it("should cycle correctly from null selection when paths exist", () => {
-      const { setAllEmotions, addComputedPath, selectMultiple, cycleSelectedPath, setSelectedPath } = useAtlasAdminStore.getState();
+      const {
+        setAllEmotions,
+        addComputedPath,
+        selectMultiple,
+        cycleSelectedPath,
+        setSelectedPath,
+      } = useAtlasAdminStore.getState();
       act(() => {
         setAllEmotions(mockEmotions);
         addComputedPath(mockPath);

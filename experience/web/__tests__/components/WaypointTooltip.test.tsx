@@ -54,39 +54,25 @@ describe("WaypointTooltip", () => {
   it("renders correct color for each difficulty", () => {
     // Moderate
     const { rerender } = render(
-      <WaypointTooltip
-        {...defaultProps}
-        waypoint={{ ...mockWaypoint, difficulty: "moderate" }}
-      />
+      <WaypointTooltip {...defaultProps} waypoint={{ ...mockWaypoint, difficulty: "moderate" }} />
     );
     expect(screen.getByText("moderate")).toHaveClass("text-yellow-400");
 
     // Hard
     rerender(
-      <WaypointTooltip
-        {...defaultProps}
-        waypoint={{ ...mockWaypoint, difficulty: "hard" }}
-      />
+      <WaypointTooltip {...defaultProps} waypoint={{ ...mockWaypoint, difficulty: "hard" }} />
     );
     expect(screen.getByText("hard")).toHaveClass("text-red-400");
   });
 
   it("handles multiple strategies pluralization and truncation", () => {
-    const strategies = [
-      { name: "S1" },
-      { name: "S2" },
-      { name: "S3" },
-      { name: "S4" },
-    ];
+    const strategies = [{ name: "S1" }, { name: "S2" }, { name: "S3" }, { name: "S4" }];
 
-    render(
-      <WaypointTooltip
-        {...defaultProps}
-        waypoint={{ ...mockWaypoint, strategies }}
-      />
-    );
+    render(<WaypointTooltip {...defaultProps} waypoint={{ ...mockWaypoint, strategies }} />);
 
-    expect(screen.getByText((content) => content.includes("4 Strategies Available"))).toBeInTheDocument();
+    expect(
+      screen.getByText((content) => content.includes("4 Strategies Available"))
+    ).toBeInTheDocument();
 
     // Check for first 3
     expect(screen.getByText("S1")).toBeInTheDocument();

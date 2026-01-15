@@ -77,7 +77,7 @@ describe("useMatrixProcessing", () => {
     expect(stats?.difficulty).toBe("moderate");
 
     // Test Easy (< 1.0)
-    // Awe(Calm) -> Calmness(Calm) is same category, skipped by logic usually, 
+    // Awe(Calm) -> Calmness(Calm) is same category, skipped by logic usually,
     // but logic says if fromCategory == toCategory return null.
     // So we need DIFFERENT category with short path.
     // Mock paths has 1-3 (Awe -> Calmness). But they are same category in mockEmotions.

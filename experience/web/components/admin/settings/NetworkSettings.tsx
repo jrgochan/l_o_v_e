@@ -158,10 +158,11 @@ export function NetworkSettings() {
             {Object.entries(connectionStatus).map(([service, status]) => (
               <div
                 key={service}
-                className={`p-4 rounded-lg border ${status.connected
+                className={`p-4 rounded-lg border ${
+                  status.connected
                     ? "bg-green-900/20 border-green-500/30"
                     : "bg-red-900/20 border-red-500/30"
-                  }`}
+                }`}
               >
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
@@ -171,7 +172,7 @@ export function NetworkSettings() {
                       <div className="text-xs text-gray-400">
                         {
                           settings.network.endpoints[
-                          service as keyof typeof settings.network.endpoints
+                            service as keyof typeof settings.network.endpoints
                           ]
                         }
                       </div>

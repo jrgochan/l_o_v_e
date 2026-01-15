@@ -1,4 +1,3 @@
-
 import { render, screen, fireEvent, act, waitFor } from "@testing-library/react";
 import { VoiceRecorder } from "@/components/admin/shared/VoiceRecorder";
 import { useVoiceRecording } from "@/hooks/useVoiceRecording";
@@ -13,12 +12,12 @@ jest.mock("@/utils/logger", () => ({
   logger: {
     info: jest.fn(),
     error: jest.fn(),
-  }
+  },
 }));
 
 // Mock AudioVisualizer to avoid canvas issues
 jest.mock("@/components/admin/visualizations/AudioVisualizer", () => ({
-  AudioVisualizer: () => <div data-testid="audio-visualizer" />
+  AudioVisualizer: () => <div data-testid="audio-visualizer" />,
 }));
 
 describe("VoiceRecorder", () => {
@@ -52,7 +51,9 @@ describe("VoiceRecorder", () => {
   });
 
   it("does not render when closed", () => {
-    const { container } = render(<VoiceRecorder isOpen={false} onClose={mockOnClose} onSend={mockOnSend} />);
+    const { container } = render(
+      <VoiceRecorder isOpen={false} onClose={mockOnClose} onSend={mockOnSend} />
+    );
     expect(container).toBeEmptyDOMElement();
   });
 
@@ -65,7 +66,7 @@ describe("VoiceRecorder", () => {
     const startRecording = jest.fn().mockResolvedValue(undefined);
     mockUseVoiceRecording.mockReturnValue({
       ...defaultHookReturn,
-      startRecording
+      startRecording,
     });
 
     render(<VoiceRecorder isOpen={true} onClose={mockOnClose} onSend={mockOnSend} />);
@@ -102,7 +103,9 @@ describe("VoiceRecorder", () => {
       resumeRecording,
     });
 
-    const { rerender } = render(<VoiceRecorder isOpen={true} onClose={mockOnClose} onSend={mockOnSend} />);
+    const { rerender } = render(
+      <VoiceRecorder isOpen={true} onClose={mockOnClose} onSend={mockOnSend} />
+    );
 
     fireEvent.click(screen.getByText("⏸ Pause"));
     expect(pauseRecording).toHaveBeenCalled();
@@ -146,7 +149,7 @@ describe("VoiceRecorder", () => {
     const cancelRecording = jest.fn();
     mockUseVoiceRecording.mockReturnValue({
       ...defaultHookReturn,
-      cancelRecording
+      cancelRecording,
     });
 
     render(<VoiceRecorder isOpen={true} onClose={mockOnClose} onSend={mockOnSend} />);
@@ -164,7 +167,7 @@ describe("VoiceRecorder", () => {
     window.FileReader = jest.fn(() => ({
       readAsDataURL: jest.fn(), // @ts-ignore
       onloadend: null, // @ts-ignore
-      result: ""
+      result: "",
     }));
 
     (useVoiceRecording as jest.Mock).mockReturnValue({
@@ -178,10 +181,13 @@ describe("VoiceRecorder", () => {
     const sendBtn = screen.getByText("Send Recording");
     fireEvent.click(sendBtn);
 
-    await waitFor(() => {
-      // Since result is empty, onSend should NOT be called
-      expect(mockOnSend).not.toHaveBeenCalled();
-    }, { timeout: 200 });
+    await waitFor(
+      () => {
+        // Since result is empty, onSend should NOT be called
+        expect(mockOnSend).not.toHaveBeenCalled();
+      },
+      { timeout: 200 }
+    );
 
     // Cleanup
     // @ts-ignore
@@ -261,7 +267,8 @@ describe("VoiceRecorder", () => {
   it("executes usage callbacks", () => {
     render(<VoiceRecorder isOpen={true} onClose={mockOnClose} onSend={mockOnSend} />);
     expect(mockUseVoiceRecording).toHaveBeenCalled();
-    const options = mockUseVoiceRecording.mock.calls[mockUseVoiceRecording.mock.calls.length - 1][0];
+    const options =
+      mockUseVoiceRecording.mock.calls[mockUseVoiceRecording.mock.calls.length - 1][0];
 
     options.onRecordingComplete();
     expect(logger.info).toHaveBeenCalledWith("hooks", expect.stringContaining("complete"));
@@ -276,7 +283,9 @@ describe("VoiceRecorder", () => {
     const stopRecording = jest.fn();
 
     // 1. Render where we are ready to send
-    const { rerender } = render(<VoiceRecorder isOpen={true} onClose={mockOnClose} onSend={mockOnSend} />);
+    const { rerender } = render(
+      <VoiceRecorder isOpen={true} onClose={mockOnClose} onSend={mockOnSend} />
+    );
 
     mockUseVoiceRecording.mockReturnValue({
       ...defaultHookReturn,
@@ -312,7 +321,7 @@ describe("VoiceRecorder", () => {
       readAsDataURL: jest.fn(),
       onloadend: null as any,
       onerror: null as any,
-      error: new Error("Read failed")
+      error: new Error("Read failed"),
     };
     (global as any).FileReader = jest.fn(() => mockFileReader);
     jest.useFakeTimers();
@@ -337,7 +346,11 @@ describe("VoiceRecorder", () => {
       mockFileReader.onerror(new Event("error"));
     });
 
-    expect(logger.error).toHaveBeenCalledWith("general", "Error reading audio blob", expect.any(Object));
+    expect(logger.error).toHaveBeenCalledWith(
+      "general",
+      "Error reading audio blob",
+      expect.any(Object)
+    );
     jest.useRealTimers();
   });
 

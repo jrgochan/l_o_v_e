@@ -1,4 +1,3 @@
-
 import { render, screen, fireEvent } from "@testing-library/react";
 import { VisualSettings } from "@/components/admin/settings/VisualSettings";
 import { useSettingsStore } from "@/stores/useSettingsStore";
@@ -52,7 +51,9 @@ describe("VisualSettings", () => {
     render(<VisualSettings />);
 
     // Motion Indicators: "Motion Indicators Off" / "Motion Indicators On"
-    const motionToggle = screen.getByLabelText("Toggle between Motion Indicators Off and Motion Indicators On");
+    const motionToggle = screen.getByLabelText(
+      "Toggle between Motion Indicators Off and Motion Indicators On"
+    );
     fireEvent.click(motionToggle);
     expect(mockUpdateVisualSetting).toHaveBeenCalledWith("showMotionIndicators", false);
 
@@ -77,9 +78,9 @@ describe("VisualSettings", () => {
 
     // Path Opacity range input
     // The label is "Path Opacity" but it wraps a span with percentage.
-    // The input is a sibling or inside. 
+    // The input is a sibling or inside.
     // Usually getByLabelText works if there's a label for id or wrapping.
-    // In VisualSettings.tsx: 
+    // In VisualSettings.tsx:
     // <label ...><span>Path Opacity</span>... </label> <input ... />
     // It is NOT wrapping the input. The input is a sibling to the label? No, code says:
     // <div> <label ...>...</label> <input ... /> </div>

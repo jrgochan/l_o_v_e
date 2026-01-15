@@ -68,7 +68,7 @@ describe("useTemplateActions", () => {
 
   it("should not select if emotions missing", async () => {
     (useAtlasAdminStore.getState as jest.Mock).mockReturnValue({
-      allEmotions: [] // Empty emotions
+      allEmotions: [], // Empty emotions
     });
     const { result } = getHook();
     await result.current.executeTemplateCommand("/template t1");

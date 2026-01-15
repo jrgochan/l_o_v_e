@@ -115,7 +115,7 @@ describe("EmotionBadgeList", () => {
   it("renders sorted list by prominence (primary -> secondary -> underlying)", () => {
     render(<EmotionBadgeList emotions={mockEmotions} />);
 
-    const badges = screen.getAllByText(/Joy|Sadness|Anger/).map(el => el.textContent);
+    const badges = screen.getAllByText(/Joy|Sadness|Anger/).map((el) => el.textContent);
     // Note: The Badge component renders text in a span, so getAllByText gets those spans
     // Order should be Joy (primary), Sadness (secondary), Anger (underlying)
     expect(badges).toEqual(["Joy", "Sadness", "Anger"]);
@@ -150,7 +150,7 @@ describe("EmotionBadgeList", () => {
 
     render(<EmotionBadgeList emotions={mixedEmotions} />);
 
-    const badges = screen.getAllByText(/Primary|Undefined/).map(el => el.textContent);
+    const badges = screen.getAllByText(/Primary|Undefined/).map((el) => el.textContent);
     // Primary (0) comes before Secondary (1)
     expect(badges).toEqual(["Primary", "Undefined"]);
 
@@ -166,7 +166,7 @@ describe("EmotionBadgeList", () => {
       { emotion: "B", confidence: 0.5, prominence: "primary" as const },
     ];
     render(<EmotionBadgeList emotions={startEmotions} />);
-    const texts = screen.getAllByText(/A|B/).map(e => e.textContent);
+    const texts = screen.getAllByText(/A|B/).map((e) => e.textContent);
     // B (primary=0) -> A (undefined->secondary=1)
     expect(texts).toEqual(["B", "A"]);
   });
@@ -177,7 +177,7 @@ describe("EmotionBadgeList", () => {
       { emotion: "B", confidence: 0.5, prominence: "primary" as const },
     ];
     render(<EmotionBadgeList emotions={startEmotions} />);
-    const texts = screen.getAllByText(/A|B/).map(e => e.textContent);
+    const texts = screen.getAllByText(/A|B/).map((e) => e.textContent);
     // B (primary) -> A (null->secondary)
     expect(texts).toEqual(["B", "A"]);
   });
@@ -188,7 +188,7 @@ describe("EmotionBadgeList", () => {
       { emotion: "B", confidence: 0.5, prominence: "primary" as const },
     ];
     render(<EmotionBadgeList emotions={startEmotions} />);
-    const texts = screen.getAllByText(/A|B/).map(e => e.textContent);
+    const texts = screen.getAllByText(/A|B/).map((e) => e.textContent);
     // B (primary) -> A (null->secondary)
     expect(texts).toEqual(["B", "A"]);
   });

@@ -1,4 +1,3 @@
-
 import { render, screen, fireEvent, waitFor, within } from "@testing-library/react";
 import AiModelsTab from "@/components/admin/data/AiModelsTab";
 import { adminApi } from "@/utils/api";
@@ -34,7 +33,7 @@ describe("AiModelsTab", () => {
   });
 
   it("renders loading state", async () => {
-    (adminApi.getAiModels as jest.Mock).mockReturnValue(new Promise(() => { }));
+    (adminApi.getAiModels as jest.Mock).mockReturnValue(new Promise(() => {}));
     render(<AiModelsTab />);
     expect(screen.getByText("Loading AI configuration...")).toBeInTheDocument();
   });
@@ -55,7 +54,7 @@ describe("AiModelsTab", () => {
     expect(screen.getByText("audio_transcription")).toBeInTheDocument();
     const rows = screen.getAllByRole("row");
     // Find the row for audio_transcription
-    const audioRow = rows.find(r => r.textContent?.includes("audio_transcription"));
+    const audioRow = rows.find((r) => r.textContent?.includes("audio_transcription"));
     expect(audioRow).toBeDefined();
     expect(within(audioRow!).getAllByText("-").length).toBeGreaterThanOrEqual(2); // Latency and LastUsed are "-"
   });
@@ -82,7 +81,7 @@ describe("AiModelsTab", () => {
     (adminApi.getAiModels as jest.Mock).mockResolvedValue(mockModels);
     (adminApi.updateAiModel as jest.Mock).mockResolvedValue({
       ...mockModels[0],
-      ai_model_name: "mixtral:8x7b-instruct-v0.1"
+      ai_model_name: "mixtral:8x7b-instruct-v0.1",
     });
 
     render(<AiModelsTab />);
@@ -100,7 +99,7 @@ describe("AiModelsTab", () => {
 
     await waitFor(() => {
       expect(adminApi.updateAiModel).toHaveBeenCalledWith("chat_generation", {
-        ai_model_name: "mixtral:8x7b-instruct-v0.1"
+        ai_model_name: "mixtral:8x7b-instruct-v0.1",
       });
       // The local update logic uses map
       expect(screen.getAllByText("mixtral:8x7b-instruct-v0.1")).toHaveLength(1); // One in text
@@ -155,7 +154,7 @@ describe("AiModelsTab", () => {
     await waitFor(() => expect(screen.getByText("chat_generation")).toBeInTheDocument());
 
     (adminApi.getAiModels as jest.Mock).mockResolvedValue([
-      { ...mockModels[0], total_invocations: 101 }
+      { ...mockModels[0], total_invocations: 101 },
     ]);
 
     fireEvent.click(screen.getByLabelText("Refresh Config"));

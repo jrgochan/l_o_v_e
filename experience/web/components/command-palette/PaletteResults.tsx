@@ -136,11 +136,12 @@ export function PaletteResults({
                   <span
                     className={`
                       text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wide
-                      ${path.difficulty === "easy"
-                        ? "bg-green-500/20 text-green-300"
-                        : path.difficulty === "moderate"
-                          ? "bg-yellow-500/20 text-yellow-300"
-                          : "bg-red-500/20 text-red-300"
+                      ${
+                        path.difficulty === "easy"
+                          ? "bg-green-500/20 text-green-300"
+                          : path.difficulty === "moderate"
+                            ? "bg-yellow-500/20 text-yellow-300"
+                            : "bg-red-500/20 text-red-300"
                       }
                     `}
                   >
@@ -180,9 +181,10 @@ export function PaletteResults({
                 onSelect={() => onSelectEmotion(emotion)}
                 className={`
                   px-3 py-2 rounded-lg cursor-pointer transition-colors duration-150 flex items-center justify-between
-                  ${selectedEmotionIds.has(emotion.id)
-                    ? "bg-cyan-500/30 text-cyan-200"
-                    : "hover:bg-cyan-500/20 hover:text-cyan-300"
+                  ${
+                    selectedEmotionIds.has(emotion.id)
+                      ? "bg-cyan-500/30 text-cyan-200"
+                      : "hover:bg-cyan-500/20 hover:text-cyan-300"
                   }
                 `}
               >
@@ -221,9 +223,10 @@ export function PaletteResults({
             onSelect={() => onSelectEmotion(emotion)}
             className={`
               px-3 py-2 rounded-lg cursor-pointer transition-colors duration-150 flex items-center justify-between
-              ${selectedEmotionIds.has(emotion.id)
-                ? "bg-cyan-500/30 text-cyan-200"
-                : "hover:bg-cyan-500/20 hover:text-cyan-300"
+              ${
+                selectedEmotionIds.has(emotion.id)
+                  ? "bg-cyan-500/30 text-cyan-200"
+                  : "hover:bg-cyan-500/20 hover:text-cyan-300"
               }
             `}
           >

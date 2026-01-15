@@ -1,4 +1,3 @@
-
 import { render, screen, fireEvent, waitFor, act } from "@testing-library/react";
 import { PathMatrixGrid } from "@/components/admin/visualizations/PathMatrix";
 import { useAtlasAdminStore } from "@/stores/useAtlasAdminStore";
@@ -8,7 +7,10 @@ const mockOnClose = jest.fn();
 
 // Mock store
 const mockState = {
-  allEmotions: [{ id: "e1", name: "Joy" }, { id: "e2", name: "Trust" }],
+  allEmotions: [
+    { id: "e1", name: "Joy" },
+    { id: "e2", name: "Trust" },
+  ],
   computedPaths: new Map(),
   addComputedPath: jest.fn(),
   selectMultiple: jest.fn(),
@@ -22,8 +24,7 @@ jest.mock("@/stores/useAtlasAdminStore", () => ({
   useAtlasAdminStore: jest.fn((selector) => selector(mockState)),
 }));
 // We also need getState for line 169
-useAtlasAdminStore.getState = jest.fn(() => mockState);
-
+useAtlasAdminStore.getState = jest.fn(() => mockState as any);
 
 // Mock Hooks
 jest.mock("@/hooks/useComputeAllPaths", () => ({
@@ -37,7 +38,10 @@ jest.mock("@/hooks/useComputeAllPaths", () => ({
 
 jest.mock("@/hooks/visualization/useMatrixData", () => ({
   useMatrixData: jest.fn().mockReturnValue({
-    sortedEmotions: [{ id: "e1", name: "Joy" }, { id: "e2", name: "Trust" }],
+    sortedEmotions: [
+      { id: "e1", name: "Joy" },
+      { id: "e2", name: "Trust" },
+    ],
     categories: [],
     getPathForPair: jest.fn(),
     getCellColor: jest.fn(),
@@ -58,26 +62,29 @@ jest.mock("@/components/admin/visualizations/PathMatrix/MatrixHeader", () => ({
       <button onClick={onExport}>Export</button>
       <button onClick={onClose}>Close</button>
     </div>
-  )
+  ),
 }));
 
 jest.mock("@/components/admin/visualizations/PathMatrix/MatrixGrid", () => ({
   MatrixGrid: ({ onCellClick, onHoverCell, onLeaveCell }: any) => (
     <div data-testid="grid">
-      <button onClick={() => onCellClick({ id: "e1", name: "Joy" }, { id: "e2", name: "Trust" })}>Click Cell</button>
-      <button onMouseOver={() => onHoverCell("e1", "e2")} onMouseOut={onLeaveCell}>Hover Cell</button>
+      <button onClick={() => onCellClick({ id: "e1", name: "Joy" }, { id: "e2", name: "Trust" })}>
+        Click Cell
+      </button>
+      <button onMouseOver={() => onHoverCell("e1", "e2")} onMouseOut={onLeaveCell}>
+        Hover Cell
+      </button>
     </div>
-  )
+  ),
 }));
 
 jest.mock("@/components/admin/visualizations/PathMatrix/MatrixLegend", () => ({
-  MatrixLegend: () => <div data-testid="legend" />
+  MatrixLegend: () => <div data-testid="legend" />,
 }));
 
 jest.mock("@/components/admin/visualizations/PathMatrix/MatrixTooltip", () => ({
-  MatrixTooltip: () => <div data-testid="tooltip">Tooltip</div>
+  MatrixTooltip: () => <div data-testid="tooltip">Tooltip</div>,
 }));
-
 
 // Mock Global fetch and URL
 global.fetch = jest.fn();
@@ -90,7 +97,7 @@ describe("PathMatrixGrid", () => {
     // Reset fetch mock
     (global.fetch as jest.Mock).mockResolvedValue({
       ok: true,
-      json: async () => ({ paths: [] })
+      json: async () => ({ paths: [] }),
     });
   });
 
@@ -110,13 +117,13 @@ describe("PathMatrixGrid", () => {
         distance: 10,
         difficulty: "easy",
         estimated_time: "5m",
-        requires_bridge: false
-      }
+        requires_bridge: false,
+      },
     ];
 
     (global.fetch as jest.Mock).mockResolvedValueOnce({
       ok: true,
-      json: async () => ({ paths: pathsData })
+      json: async () => ({ paths: pathsData }),
     });
 
     render(<PathMatrixGrid onClose={mockOnClose} />);
@@ -138,19 +145,21 @@ describe("PathMatrixGrid", () => {
 
   it("handles load cached paths non-200", async () => {
     (global.fetch as jest.Mock).mockResolvedValueOnce({
-      ok: false
+      ok: false,
     });
     render(<PathMatrixGrid onClose={mockOnClose} />);
     fireEvent.click(screen.getByText("Load Cache"));
     await waitFor(() => {
-      expect(global.alert).toHaveBeenCalledWith(expect.stringContaining("No cached paths available"));
+      expect(global.alert).toHaveBeenCalledWith(
+        expect.stringContaining("No cached paths available")
+      );
     });
   });
 
   it("handles load cached paths empty data", async () => {
     (global.fetch as jest.Mock).mockResolvedValueOnce({
       ok: true,
-      json: async () => ({ paths: [] })
+      json: async () => ({ paths: [] }),
     });
     render(<PathMatrixGrid onClose={mockOnClose} />);
     fireEvent.click(screen.getByText("Load Cache"));
@@ -160,17 +169,21 @@ describe("PathMatrixGrid", () => {
   });
 
   it("handles export CSV", () => {
-    mockMatrixData.sortedEmotions = [{ id: "e1", name: "Joy" }, { id: "e2", name: "Trust" }] as any;
+    mockMatrixData.sortedEmotions = [
+      { id: "e1", name: "Joy" },
+      { id: "e2", name: "Trust" },
+    ] as any;
 
     // Return null for one pair to test skipping logic
-    mockMatrixData.getPathForPair.mockImplementation((from, to) => {
-      if (from.id === "e1" && to.id === "e2") return {
-        total_distance: 10,
-        difficulty: "easy",
-        waypoints: [],
-        requires_bridge: false,
-        estimated_time: "5m"
-      };
+    mockMatrixData.getPathForPair.mockImplementation((from: any, to: any) => {
+      if (from.id === "e1" && to.id === "e2")
+        return {
+          total_distance: 10,
+          difficulty: "easy",
+          waypoints: [],
+          requires_bridge: false,
+          estimated_time: "5m",
+        };
       return null;
     });
 

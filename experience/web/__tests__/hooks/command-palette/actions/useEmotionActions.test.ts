@@ -176,7 +176,6 @@ describe("useEmotionActions", () => {
     expect(response.message).toBe("Store error");
   });
 
-
   it("should handle non-Error objects thrown gracefully", () => {
     (useAtlasAdminStore as unknown as jest.Mock).mockImplementation((selector) => {
       const state = {

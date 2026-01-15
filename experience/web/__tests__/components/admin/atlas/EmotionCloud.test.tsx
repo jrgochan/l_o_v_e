@@ -30,7 +30,6 @@ jest.mock("../../../../components/admin/particles/EmotionParticles", () => ({
 }));
 // ... rest of mocks
 
-
 // Mock Stores
 const mockUseAtlasAdminStore = jest.fn();
 jest.mock("@/stores/useAtlasAdminStore", () => ({
@@ -234,13 +233,12 @@ describe("EmotionCloud", () => {
 
     // Html from drei renders into the DOM
     // We expect "Joy" text
-    // Note: in valid JSDOM setup with R3F, Html might not render fully without a canvas, 
+    // Note: in valid JSDOM setup with R3F, Html might not render fully without a canvas,
     // but typically testing-library render works if we are just checking side effects or mocked HTML.
     // However, Html component from drei usually portals to a div.
     // Let's check if the text is present.
     // If this fails due to R3F context, we can mock Html to just render children in a div.
   });
-
 
   it("should handle interactions (click, hover)", () => {
     const toggleEmotionMock = jest.fn();
@@ -280,7 +278,7 @@ describe("EmotionCloud", () => {
   });
 
   it("should calculate light colors based on valence", () => {
-    // This test implicitly covers the logic by ensuring no crash, 
+    // This test implicitly covers the logic by ensuring no crash,
     // but ideally we'd check the pointLight props.
     // Since we can't easily query pointLight in unit tests without more mocking complexity,
     // we create a scenario that forces both branches (positive and negative valence).
@@ -351,7 +349,6 @@ describe("EmotionCloud", () => {
     // Since we mocked Html to render children in a div, we can query it.
   });
 
-
   it("should render motion indicators for all types", () => {
     // Override settings to show motion indicators
     const mockSettings = {
@@ -391,8 +388,8 @@ describe("EmotionCloud", () => {
 
     const { container } = render(<EmotionCloud />);
     expect(container).toBeDefined();
-    // Since we are using real utility, we assume it renders the correct geometries. 
-    // We can't easily query generic meshes without testIds in the loop, 
+    // Since we are using real utility, we assume it renders the correct geometries.
+    // We can't easily query generic meshes without testIds in the loop,
     // but code coverage will verify the branches were hit.
   });
 
@@ -422,7 +419,6 @@ describe("EmotionCloud", () => {
     expect(container).toBeDefined();
     // Again, coverage will assume lines 355-357 are hit
   });
-
 
   it("should default to enabled if category filter is missing", () => {
     mockUseAtlasAdminStore.mockImplementation((selector: any) => {
@@ -511,7 +507,6 @@ describe("EmotionCloud", () => {
     expect(toggleEmotionMock).toHaveBeenCalledWith("sel");
     // Covers the `if (isSelected)` branch logging
   });
-
 
   it("should render fallback mesh when animations are disabled", () => {
     mockUseSettingsStore.mockReturnValue({

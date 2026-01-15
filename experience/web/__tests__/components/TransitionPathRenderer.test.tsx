@@ -83,7 +83,7 @@ const mockPath = {
       order: 2,
       distance_from_previous: 0.5,
       strategies: [],
-    }
+    },
   ],
   total_steps: 4,
   estimated_duration: "5m",
@@ -102,12 +102,15 @@ const mockPath = {
 };
 
 describe("TransitionPathRenderer", () => {
-
   beforeEach(() => {
     jest.clearAllMocks();
     cleanup();
-    mockUseExperienceStoreImpl.mockImplementation((selector: any) => selector({ currentVAC: [0, 0, 0] }));
-    mockUseSettingsStore.mockImplementation((selector: any) => selector({ pathAnimationMode: "flow" }));
+    mockUseExperienceStoreImpl.mockImplementation((selector: any) =>
+      selector({ currentVAC: [0, 0, 0] })
+    );
+    mockUseSettingsStore.mockImplementation((selector: any) =>
+      selector({ pathAnimationMode: "flow" })
+    );
   });
 
   afterEach(() => {
@@ -168,7 +171,7 @@ describe("TransitionPathRenderer", () => {
     const activeJourney = {
       current_waypoint: 1, // Waypoint[1] is 'Curious', so Waypoint[0] is 'reached' or 'passed'?
       waypoints_reached: [0], // Waypoint[0] is reached
-      status: "active"
+      status: "active",
     };
 
     const onWaypointHover = jest.fn();
@@ -205,7 +208,7 @@ describe("TransitionPathRenderer", () => {
     const activeJourney = {
       current_waypoint: 0, // Waypoint 0 is current
       waypoints_reached: [],
-      status: "active"
+      status: "active",
     };
 
     const onWaypointHover = jest.fn();
@@ -243,7 +246,7 @@ describe("TransitionPathRenderer", () => {
 
     // Execute ALL callbacks to cover different marker states (Start, Waypoint, Goal)
     // This should cover the "waypoint" state branch (pulse only)
-    useFrameCalls.forEach(call => {
+    useFrameCalls.forEach((call) => {
       const callback = call[0];
       callback({ clock: { elapsedTime: 1 } });
     });
@@ -255,14 +258,11 @@ describe("TransitionPathRenderer", () => {
     const activeJourney = {
       current_waypoint: 0,
       waypoints_reached: [],
-      status: "active"
+      status: "active",
     };
 
     const { container } = render(
-      <TransitionPathRenderer
-        path={mockPath}
-        activeJourney={activeJourney}
-      />
+      <TransitionPathRenderer path={mockPath} activeJourney={activeJourney} />
     );
 
     // 1. Test "Current" state animation logic
@@ -290,7 +290,7 @@ describe("TransitionPathRenderer", () => {
 
     (meshes[2] as any).scale = { setScalar: mockScaleSetScalar };
 
-    newCalls.forEach(call => {
+    newCalls.forEach((call) => {
       const cb = call[0];
       try {
         cb({ clock: { elapsedTime: 2 } });
@@ -305,8 +305,10 @@ describe("TransitionPathRenderer", () => {
   it("renders with different animation modes and verifies logic", () => {
     const modes = ["subtle", "dynamic", "mystical", "default"];
 
-    modes.forEach(mode => {
-      mockUseSettingsStore.mockImplementation((selector: any) => selector({ pathAnimationMode: mode }));
+    modes.forEach((mode) => {
+      mockUseSettingsStore.mockImplementation((selector: any) =>
+        selector({ pathAnimationMode: mode })
+      );
       const { unmount, container } = render(<TransitionPathRenderer path={mockPath} />);
 
       const calls = (useFrame as jest.Mock).mock.calls;
@@ -332,7 +334,7 @@ describe("TransitionPathRenderer", () => {
     const activeJourney = {
       current_waypoint: 5, // Way advanced
       waypoints_reached: [], // None reached?
-      status: "active"
+      status: "active",
     };
 
     const onWaypointHover = jest.fn();
@@ -356,7 +358,9 @@ describe("TransitionPathRenderer", () => {
     );
   });
   it("uses correct base color when valence is negative", () => {
-    mockUseExperienceStoreImpl.mockImplementation((selector: any) => selector({ currentVAC: [-0.5, 0, 0] }));
+    mockUseExperienceStoreImpl.mockImplementation((selector: any) =>
+      selector({ currentVAC: [-0.5, 0, 0] })
+    );
 
     // We need to spy on PathCurveAnimated to check the props passed to it
     // The component is mocked as returning <div ... />
@@ -364,7 +368,7 @@ describe("TransitionPathRenderer", () => {
     // Or we can mock the component with a jest.fn and check calls?
     // But child mocks are defined at top level.
     // We can't change child mock implementation easily unless properly setup.
-    // However, we can simply rely on the fact that the component renders without error, 
+    // However, we can simply rely on the fact that the component renders without error,
     // OR we can spy on the mock if we refactor it.
 
     // Refactoring child mock:
@@ -372,7 +376,7 @@ describe("TransitionPathRenderer", () => {
     //   PathCurveAnimated: jest.fn(() => <div />),
     // }));
 
-    // For now, let's just trigger the render. 
+    // For now, let's just trigger the render.
     // Coverage should be hit (Line 101) regardless of assertion on exact color props.
     // Checking coverage is the goal.
     render(<TransitionPathRenderer path={mockPath} />);

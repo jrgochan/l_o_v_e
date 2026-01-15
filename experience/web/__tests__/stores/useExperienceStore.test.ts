@@ -179,4 +179,3 @@ describe("useExperienceStore", () => {
     expect(CANONICAL_EMOTIONS).toBeDefined();
   });
 });
-

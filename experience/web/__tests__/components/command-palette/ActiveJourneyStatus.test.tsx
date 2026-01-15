@@ -1,4 +1,3 @@
-
 import { render, screen, fireEvent } from "@testing-library/react";
 import { ActiveJourneyStatus } from "@/components/command-palette/ActiveJourneyStatus";
 import { useExperienceStore } from "@/stores/useExperienceStore";
@@ -8,169 +7,185 @@ jest.mock("@/stores/useExperienceStore");
 const mockUseExperienceStore = useExperienceStore as unknown as jest.Mock;
 
 describe("ActiveJourneyStatus", () => {
-    const mockOnAction = jest.fn();
+  const mockOnAction = jest.fn();
 
-    beforeEach(() => {
-        jest.clearAllMocks();
-    });
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
 
-    const mockTransitionPath = {
-        current_state: { emotion: "Joy" },
-        goal_state: { emotion: "Awe" },
-        waypoints: [{}, {}, {}], // 3 waypoints
+  const mockTransitionPath = {
+    current_state: { emotion: "Joy" },
+    goal_state: { emotion: "Awe" },
+    waypoints: [{}, {}, {}], // 3 waypoints
+  };
+
+  it("renders nothing if no active journey or transition path", () => {
+    mockUseExperienceStore.mockImplementation((selector: any) =>
+      selector({
+        activeJourney: null,
+        transitionPath: null,
+      })
+    );
+    const { container } = render(<ActiveJourneyStatus onAction={mockOnAction} />);
+    expect(container).toBeEmptyDOMElement();
+  });
+
+  it("renders in_progress status correctly", () => {
+    const mockJourney = {
+      status: "in_progress",
+      current_waypoint: 1,
+      total_waypoints: 3,
+      waypoints_reached: ["reached_1", "reached_2"],
     };
 
-    it("renders nothing if no active journey or transition path", () => {
-        mockUseExperienceStore.mockImplementation((selector: any) => selector({
-            activeJourney: null,
-            transitionPath: null,
-        }));
-        const { container } = render(<ActiveJourneyStatus onAction={mockOnAction} />);
-        expect(container).toBeEmptyDOMElement();
-    });
+    mockUseExperienceStore.mockImplementation((selector: any) =>
+      selector({
+        activeJourney: mockJourney,
+        transitionPath: mockTransitionPath,
+      })
+    );
 
-    it("renders in_progress status correctly", () => {
-        const mockJourney = {
-            status: "in_progress",
-            current_waypoint: 1,
-            total_waypoints: 3,
-            waypoints_reached: ["reached_1", "reached_2"],
-        };
+    render(<ActiveJourneyStatus onAction={mockOnAction} />);
 
-        mockUseExperienceStore.mockImplementation((selector: any) => selector({
-            activeJourney: mockJourney,
-            transitionPath: mockTransitionPath,
-        }));
+    expect(screen.getByText("🛤️")).toBeInTheDocument();
+    expect(screen.getByText("Active Journey")).toBeInTheDocument();
+    expect(screen.getByText("Joy → Awe")).toBeInTheDocument();
+    expect(screen.getByText("Waypoint 2 of 3")).toBeInTheDocument();
+    expect(screen.getByTitle("Next waypoint")).toBeInTheDocument();
+  });
 
-        render(<ActiveJourneyStatus onAction={mockOnAction} />);
+  it("renders paused status correctly", () => {
+    const mockJourney = {
+      status: "paused",
+      current_waypoint: 1,
+      total_waypoints: 3,
+      waypoints_reached: ["reached_1"],
+    };
 
-        expect(screen.getByText("🛤️")).toBeInTheDocument();
-        expect(screen.getByText("Active Journey")).toBeInTheDocument();
-        expect(screen.getByText("Joy → Awe")).toBeInTheDocument();
-        expect(screen.getByText("Waypoint 2 of 3")).toBeInTheDocument();
-        expect(screen.getByTitle("Next waypoint")).toBeInTheDocument();
-    });
+    mockUseExperienceStore.mockImplementation((selector: any) =>
+      selector({
+        activeJourney: mockJourney,
+        transitionPath: mockTransitionPath,
+      })
+    );
 
-    it("renders paused status correctly", () => {
-        const mockJourney = {
-            status: "paused",
-            current_waypoint: 1,
-            total_waypoints: 3,
-            waypoints_reached: ["reached_1"],
-        };
+    render(<ActiveJourneyStatus onAction={mockOnAction} />);
 
-        mockUseExperienceStore.mockImplementation((selector: any) => selector({
-            activeJourney: mockJourney,
-            transitionPath: mockTransitionPath,
-        }));
+    expect(screen.getByText("⏸️")).toBeInTheDocument();
+    expect(screen.getByText("Journey Paused")).toBeInTheDocument();
+    expect(screen.getByTitle("Resume journey")).toBeInTheDocument();
+  });
 
-        render(<ActiveJourneyStatus onAction={mockOnAction} />);
+  it("renders completed status correctly", () => {
+    const mockJourney = {
+      status: "completed",
+      current_waypoint: 3,
+      total_waypoints: 3,
+      waypoints_reached: ["reached_1", "reached_2", "reached_3"],
+    };
 
-        expect(screen.getByText("⏸️")).toBeInTheDocument();
-        expect(screen.getByText("Journey Paused")).toBeInTheDocument();
-        expect(screen.getByTitle("Resume journey")).toBeInTheDocument();
-    });
+    mockUseExperienceStore.mockImplementation((selector: any) =>
+      selector({
+        activeJourney: mockJourney,
+        transitionPath: mockTransitionPath,
+      })
+    );
 
-    it("renders completed status correctly", () => {
-        const mockJourney = {
-            status: "completed",
-            current_waypoint: 3,
-            total_waypoints: 3,
-            waypoints_reached: ["reached_1", "reached_2", "reached_3"],
-        };
+    render(<ActiveJourneyStatus onAction={mockOnAction} />);
 
-        mockUseExperienceStore.mockImplementation((selector: any) => selector({
-            activeJourney: mockJourney,
-            transitionPath: mockTransitionPath,
-        }));
+    expect(screen.getByText("✅")).toBeInTheDocument();
+    expect(screen.getByText("Journey Complete")).toBeInTheDocument();
+    expect(screen.queryByRole("button")).not.toBeInTheDocument();
+  });
 
-        render(<ActiveJourneyStatus onAction={mockOnAction} />);
+  it("renders default status fallback", () => {
+    const mockJourney = {
+      status: "unknown",
+      current_waypoint: 0,
+      total_waypoints: 3,
+      waypoints_reached: [],
+    };
 
-        expect(screen.getByText("✅")).toBeInTheDocument();
-        expect(screen.getByText("Journey Complete")).toBeInTheDocument();
-        expect(screen.queryByRole("button")).not.toBeInTheDocument();
-    });
+    mockUseExperienceStore.mockImplementation((selector: any) =>
+      selector({
+        activeJourney: mockJourney,
+        transitionPath: mockTransitionPath,
+      })
+    );
 
-    it("renders default status fallback", () => {
-        const mockJourney = {
-            status: "unknown",
-            current_waypoint: 0,
-            total_waypoints: 3,
-            waypoints_reached: [],
-        };
+    render(<ActiveJourneyStatus onAction={mockOnAction} />);
 
-        mockUseExperienceStore.mockImplementation((selector: any) => selector({
-            activeJourney: mockJourney,
-            transitionPath: mockTransitionPath,
-        }));
+    expect(screen.getByText("🚶")).toBeInTheDocument();
+    expect(screen.getByText("Journey")).toBeInTheDocument();
+  });
 
-        render(<ActiveJourneyStatus onAction={mockOnAction} />);
+  it("handles next action click", () => {
+    const mockJourney = {
+      status: "in_progress",
+      current_waypoint: 1,
+      total_waypoints: 3,
+      waypoints_reached: ["reached_1", "reached_2"],
+    };
 
-        expect(screen.getByText("🚶")).toBeInTheDocument();
-        expect(screen.getByText("Journey")).toBeInTheDocument();
-    });
+    mockUseExperienceStore.mockImplementation((selector: any) =>
+      selector({
+        activeJourney: mockJourney,
+        transitionPath: mockTransitionPath,
+      })
+    );
 
-    it("handles next action click", () => {
-        const mockJourney = {
-            status: "in_progress",
-            current_waypoint: 1,
-            total_waypoints: 3,
-            waypoints_reached: ["reached_1", "reached_2"],
-        };
+    render(<ActiveJourneyStatus onAction={mockOnAction} />);
 
-        mockUseExperienceStore.mockImplementation((selector: any) => selector({
-            activeJourney: mockJourney,
-            transitionPath: mockTransitionPath,
-        }));
+    fireEvent.click(screen.getByTitle("Next waypoint"));
+    expect(mockOnAction).toHaveBeenCalledWith("/next");
+  });
 
-        render(<ActiveJourneyStatus onAction={mockOnAction} />);
+  it("handles resume action click", () => {
+    const mockJourney = {
+      status: "paused",
+      current_waypoint: 1,
+      total_waypoints: 3,
+      waypoints_reached: ["reached_1"],
+    };
 
-        fireEvent.click(screen.getByTitle("Next waypoint"));
-        expect(mockOnAction).toHaveBeenCalledWith("/next");
-    });
+    mockUseExperienceStore.mockImplementation((selector: any) =>
+      selector({
+        activeJourney: mockJourney,
+        transitionPath: mockTransitionPath,
+      })
+    );
 
-    it("handles resume action click", () => {
-        const mockJourney = {
-            status: "paused",
-            current_waypoint: 1,
-            total_waypoints: 3,
-            waypoints_reached: ["reached_1"],
-        };
+    render(<ActiveJourneyStatus onAction={mockOnAction} />);
 
-        mockUseExperienceStore.mockImplementation((selector: any) => selector({
-            activeJourney: mockJourney,
-            transitionPath: mockTransitionPath,
-        }));
+    fireEvent.click(screen.getByTitle("Resume journey"));
+    expect(mockOnAction).toHaveBeenCalledWith("/journey resume");
+  });
 
-        render(<ActiveJourneyStatus onAction={mockOnAction} />);
+  it("does not show Next button if on last waypoint of transition path logic check", () => {
+    // Logic in component: activeJourney.current_waypoint < transitionPath.waypoints.length
+    // If activeJourney.current_waypoint is 3 and waypoints length is 3, it should hide?
+    // Wait, current_waypoint is 0-indexed usually? "Waypoint {activeJourney.current_waypoint + 1}" implies 0-indexed.
+    // If we are at the last one, current_waypoint = 2 (for length 3). 2 < 3 is true.
+    // If we are finished? usually status changes.
 
-        fireEvent.click(screen.getByTitle("Resume journey"));
-        expect(mockOnAction).toHaveBeenCalledWith("/journey resume");
-    });
+    const mockJourney = {
+      status: "in_progress",
+      current_waypoint: 3, // Beyond or at end
+      total_waypoints: 3,
+      waypoints_reached: ["1", "2", "3"],
+    };
 
-    it("does not show Next button if on last waypoint of transition path logic check", () => {
-        // Logic in component: activeJourney.current_waypoint < transitionPath.waypoints.length
-        // If activeJourney.current_waypoint is 3 and waypoints length is 3, it should hide?
-        // Wait, current_waypoint is 0-indexed usually? "Waypoint {activeJourney.current_waypoint + 1}" implies 0-indexed.
-        // If we are at the last one, current_waypoint = 2 (for length 3). 2 < 3 is true.
-        // If we are finished? usually status changes.
+    mockUseExperienceStore.mockImplementation((selector: any) =>
+      selector({
+        activeJourney: mockJourney,
+        transitionPath: mockTransitionPath, // length 3
+      })
+    );
 
-        const mockJourney = {
-            status: "in_progress",
-            current_waypoint: 3, // Beyond or at end
-            total_waypoints: 3,
-            waypoints_reached: ["1", "2", "3"],
-        };
+    render(<ActiveJourneyStatus onAction={mockOnAction} />);
 
-        mockUseExperienceStore.mockImplementation((selector: any) => selector({
-            activeJourney: mockJourney,
-            transitionPath: mockTransitionPath, // length 3
-        }));
-
-        render(<ActiveJourneyStatus onAction={mockOnAction} />);
-
-        // Condition: activeJourney.current_waypoint < transitionPath.waypoints.length
-        // 3 < 3 is false -> button hidden
-        expect(screen.queryByTitle("Next waypoint")).not.toBeInTheDocument();
-    });
+    // Condition: activeJourney.current_waypoint < transitionPath.waypoints.length
+    // 3 < 3 is false -> button hidden
+    expect(screen.queryByTitle("Next waypoint")).not.toBeInTheDocument();
+  });
 });

@@ -41,7 +41,7 @@ class MockMediaRecorder {
   ondataavailable: Function | null = null;
   onstop: Function | null = null;
 
-  constructor(stream: any) { }
+  constructor(stream: any) {}
 }
 
 global.MediaRecorder = MockMediaRecorder as any;

@@ -110,8 +110,8 @@ describe("Unified Logging System", () => {
         hooks: false,
         rendering: false,
         state: false,
-        "user-interaction": false
-      }
+        "user-interaction": false,
+      },
     });
 
     const config = logger.getConfig();

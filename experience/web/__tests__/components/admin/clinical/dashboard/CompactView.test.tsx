@@ -13,7 +13,7 @@ const mockProps = {
     pitch_mean: 220,
     pitch_std: 10,
     rate: 4.5,
-    hnr: 20
+    hnr: 20,
   },
   overallStatus: "stable",
   alertCount: 0,
@@ -23,7 +23,7 @@ describe("CompactView", () => {
   it("should handle low energy and medium HNR", () => {
     const props = {
       ...mockProps,
-      prosody: { ...mockProps.prosody!, energy: 0.1, hnr: 12 }
+      prosody: { ...mockProps.prosody!, energy: 0.1, hnr: 12 },
     };
     render(<CompactView {...props} />);
     expect(screen.getByText("Low")).toBeInTheDocument();
@@ -74,7 +74,11 @@ describe("CompactView", () => {
   });
 
   it("should render warning status", () => {
-    const props = { ...mockProps, overallStatus: "warning", prosody: { ...mockProps.prosody!, voice_quality: "moderate" as const } };
+    const props = {
+      ...mockProps,
+      overallStatus: "warning",
+      prosody: { ...mockProps.prosody!, voice_quality: "moderate" as const },
+    };
     render(<CompactView {...props} />);
 
     expect(screen.getByText("⚠️ Warning")).toBeInTheDocument();
@@ -90,7 +94,7 @@ describe("CompactView", () => {
   it("should render voice quality error (red)", () => {
     const props = {
       ...mockProps,
-      prosody: { ...mockProps.prosody!, voice_quality: "poor" as const, hnr: 5 }
+      prosody: { ...mockProps.prosody!, voice_quality: "poor" as const, hnr: 5 },
     };
     render(<CompactView {...props} />);
     expect(screen.getByText("🔴")).toBeInTheDocument(); // Poor voice quality icon
@@ -99,7 +103,7 @@ describe("CompactView", () => {
   it("should render medium energy label", () => {
     const props = {
       ...mockProps,
-      prosody: { ...mockProps.prosody!, energy: 0.5 } // Med (0.3 - 0.7)
+      prosody: { ...mockProps.prosody!, energy: 0.5 }, // Med (0.3 - 0.7)
     };
     render(<CompactView {...props} />);
     expect(screen.getByText("Med")).toBeInTheDocument();

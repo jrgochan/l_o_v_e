@@ -1,4 +1,3 @@
-
 import React from "react";
 import { render, cleanup, act } from "@testing-library/react";
 import { MysticalEtherealPath } from "@/components/admin/paths/MysticalEtherealPath";
@@ -53,23 +52,23 @@ describe("MysticalEtherealPath", () => {
       },
       set(value) {
         (this as any)[`_${prop}`] = value;
-      }
+      },
     });
   };
 
   beforeAll(() => {
     const proto = HTMLElement.prototype;
-    definePolyfill(proto, 'position', () => new THREE.Vector3());
-    definePolyfill(proto, 'rotation', () => new THREE.Euler());
-    definePolyfill(proto, 'scale', () => new THREE.Vector3(1, 1, 1));
+    definePolyfill(proto, "position", () => new THREE.Vector3());
+    definePolyfill(proto, "rotation", () => new THREE.Euler());
+    definePolyfill(proto, "scale", () => new THREE.Vector3(1, 1, 1));
 
     // Mesh prop to access material
-    definePolyfill(proto, 'material', () => ({
+    definePolyfill(proto, "material", () => ({
       uniforms: {
         time: { value: 0 },
         pathColor: { value: new THREE.Color() },
         isSelected: { value: 0 },
-        opacity: { value: 1 }
+        opacity: { value: 1 },
       },
     }));
   });

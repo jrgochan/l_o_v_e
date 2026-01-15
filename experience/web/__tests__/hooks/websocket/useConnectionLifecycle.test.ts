@@ -126,7 +126,7 @@ describe("useConnectionLifecycle", () => {
     const firstConnect = result.current.connect;
 
     // Rerender with new props
-    rerender({ ...props, onMessage: () => { } });
+    rerender({ ...props, onMessage: () => {} });
 
     expect(result.current.connect).toBe(firstConnect);
   });
@@ -211,7 +211,7 @@ describe("useConnectionLifecycle", () => {
     (
       require("@/hooks/websocket/utils/socketHelpers").handleSocketClose as jest.Mock
     ).mockImplementationOnce((e, options) => {
-      options.timeoutRef.current = setTimeout(() => { }, 1000);
+      options.timeoutRef.current = setTimeout(() => {}, 1000);
       // Simulate reconnection attempt
       options.connectFn();
     });
@@ -262,45 +262,36 @@ describe("useConnectionLifecycle", () => {
     expect(createWebSocketConnection).toHaveBeenCalled();
   });
   it("should ignore initial no-op in connectRef if mistakenly called", () => {
-    // We want to access the internal ref's initial value. 
+    // We want to access the internal ref's initial value.
     // This is tricky with functional components unless we intercept the hook result before useEffect runs.
-
     // However, we can simply verify that safely calling it does nothing.
     // If we can't access it, this "function coverage" miss might be the lambda inside the useRef(() => {})
     // To cover it, that lambda needs to be executed.
-
     // Hack: We can mock useRef to capture the initial value?
     // Or simpler: The coverage report says the *function* is uncovered. That function created in `useRef(() => {})`.
     // Just creating it during render covers the creation. But executing it?
-    // The initial value is `() => {}`. 
+    // The initial value is `() => {}`.
     // If coverage complains it's not run, we verify it runs.
-
     // We can't access it easily without using an interceptor on useRef or exposure.
-    // Let's rely on the fact that if we render, that line is executed (creation). 
+    // Let's rely on the fact that if we render, that line is executed (creation).
     // If execution of body is needed, we must invoke it.
-
     // Let's try to capture it by spying on useRef IF needed, but that's invasive.
     // Actually, `useConnectionLifecycle` defines `const connectRef = useRef<() => void>(() => {});`
     // The `() => {}` is the initial value.
-
     // Let's modify the hook source code to make it cleaner instead?
     // `const connectRef = useRef<() => void>(null as any);` and then assign in effect?
     // But Typescript... `useRef<() => void>(() => {})` is valid.
-
     // Let's just execute it via a test helper if really needed, OR ignore it if Lines are green.
     // The user requirement is 100% *function* coverage.
     // That arrow function is a function.
-
     // Let's create a test that specifically grabs the ref from the hook result if exposed (it's not).
     // Wait, the hook returns `connect`, `disconnect`, `reconnect`, `wsRef`.
     // `connectRef` is internal.
-
     // Coverage hack:
     // If we can't run it, maybe we don't need it to be a function initially.
     // But let's leave it for now and assume the "creation" counts or it was covered by previous runs.
     // Wait, report said "92.85% Funcs". That's 13/14 or similar.
     // Likely that no-op.
-
     // Let's try to exercise it by mocking useRef?
     // No, let's just assert "renderHook" covers the *declaration*.
     // The body `{}` is empty.

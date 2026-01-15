@@ -12,39 +12,48 @@ describe("ExportControls", () => {
   ];
   const mockSelectedIds = new Set(["1"]);
   const mockComputedPaths = new Map([
-    ["1-2", {
-      id: "1-2",
-      from: { id: "1", name: "Joy" },
-      to: { id: "2", name: "Sadness" },
-      total_distance: 1.5,
-      difficulty: "moderate",
-      estimated_time: "5m",
-      waypoints: [{ emotion: "Neutral" }],
-      requires_bridge: false,
-      bridge_emotions: []
-    }],
-    ["1-3", {
-      id: "1-3",
-      from: { id: "1", name: "Joy" },
-      to: { id: "3", name: "Anger" },
-      total_distance: 2.0,
-      difficulty: "hard",
-      estimated_time: "10m",
-      waypoints: [],
-      requires_bridge: false,
-      bridge_emotions: undefined
-    }],
-    ["1-4", {
-      id: "1-4",
-      from: { id: "1", name: "Joy" },
-      to: { id: "4", name: "Fear" },
-      total_distance: 3.0,
-      difficulty: "expert",
-      estimated_time: "15m",
-      waypoints: [],
-      requires_bridge: true,
-      bridge_emotions: ["Surprise", "Acceptance"]
-    }]
+    [
+      "1-2",
+      {
+        id: "1-2",
+        from: { id: "1", name: "Joy" },
+        to: { id: "2", name: "Sadness" },
+        total_distance: 1.5,
+        difficulty: "moderate",
+        estimated_time: "5m",
+        waypoints: [{ emotion: "Neutral" }],
+        requires_bridge: false,
+        bridge_emotions: [],
+      },
+    ],
+    [
+      "1-3",
+      {
+        id: "1-3",
+        from: { id: "1", name: "Joy" },
+        to: { id: "3", name: "Anger" },
+        total_distance: 2.0,
+        difficulty: "hard",
+        estimated_time: "10m",
+        waypoints: [],
+        requires_bridge: false,
+        bridge_emotions: undefined,
+      },
+    ],
+    [
+      "1-4",
+      {
+        id: "1-4",
+        from: { id: "1", name: "Joy" },
+        to: { id: "4", name: "Fear" },
+        total_distance: 3.0,
+        difficulty: "expert",
+        estimated_time: "15m",
+        waypoints: [],
+        requires_bridge: true,
+        bridge_emotions: ["Surprise", "Acceptance"],
+      },
+    ],
   ]);
 
   beforeEach(() => {
@@ -184,7 +193,9 @@ describe("ExportControls", () => {
 
     fireEvent.click(screen.getByText(/Copy Share Link/i));
 
-    expect(navigator.clipboard.writeText).toHaveBeenCalledWith(expect.stringContaining("emotions=1"));
+    expect(navigator.clipboard.writeText).toHaveBeenCalledWith(
+      expect.stringContaining("emotions=1")
+    );
     expect(window.alert).toHaveBeenCalledWith("Shareable URL copied to clipboard!");
   });
 

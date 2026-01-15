@@ -67,7 +67,6 @@ describe("useJourneyCommands", () => {
     );
   });
 
-
   it("should NOT start journey if no path", () => {
     (useExperienceStore.getState as jest.Mock).mockReturnValue({
       startJourney: mockStartJourney,

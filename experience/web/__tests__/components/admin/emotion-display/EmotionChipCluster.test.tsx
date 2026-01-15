@@ -1,5 +1,8 @@
 import { render, screen, fireEvent } from "@testing-library/react";
-import { EmotionChipCluster, SimpleEmotionChipCluster } from "@/components/admin/emotion-display/EmotionChipCluster";
+import {
+  EmotionChipCluster,
+  SimpleEmotionChipCluster,
+} from "@/components/admin/emotion-display/EmotionChipCluster";
 import { EmotionBadge } from "@/components/admin/emotion-display/EmotionBadge";
 import type { DetectedEmotion } from "@/types/chat";
 

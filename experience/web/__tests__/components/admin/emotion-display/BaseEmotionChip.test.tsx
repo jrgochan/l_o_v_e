@@ -1,4 +1,3 @@
-
 import { render, screen, fireEvent } from "@testing-library/react";
 import { BaseEmotionChip } from "@/components/admin/emotion-display/BaseEmotionChip";
 import { CATEGORY_COLORS } from "@/types/atlas-admin";
@@ -71,7 +70,7 @@ describe("BaseEmotionChip", () => {
   });
 
   it("handles interaction styles when onClick is present", () => {
-    const { container } = render(<BaseEmotionChip {...defaultProps} onClick={() => { }} />);
+    const { container } = render(<BaseEmotionChip {...defaultProps} onClick={() => {}} />);
     expect(container.firstChild).toHaveClass("cursor-pointer hover:brightness-110 active:scale-95");
   });
 

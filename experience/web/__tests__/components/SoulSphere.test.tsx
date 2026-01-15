@@ -13,7 +13,7 @@ const mockShaderMaterialUniforms = {
   uConnection: { value: 0 },
   uCameraPosition: { value: { copy: jest.fn() } },
   uColorNeg: { value: {} },
-  uColorPos: { value: {} }
+  uColorPos: { value: {} },
 };
 
 jest.mock("three", () => {
@@ -25,12 +25,12 @@ jest.mock("three", () => {
       position: { x: 0, y: 0, z: 0 },
     })),
     ShaderMaterial: jest.fn(() => ({
-      uniforms: mockShaderMaterialUniforms
+      uniforms: mockShaderMaterialUniforms,
     })),
     IcosahedronGeometry: jest.fn(),
     Color: jest.fn(),
     Vector3: jest.fn((x, y, z) => ({ x, y, z, copy: jest.fn() })),
-    DoubleSide: 2
+    DoubleSide: 2,
   };
 });
 
@@ -47,12 +47,11 @@ jest.mock("@/stores/useExperienceStore", () => {
     useExperienceStore: Object.assign(
       (selector: any) => selector({}), // hook implementation
       { getState: () => mockGetState() } // static method
-    )
+    ),
   };
 });
 
 describe("SoulSphere", () => {
-
   beforeEach(() => {
     jest.clearAllMocks();
     cleanup();
@@ -88,14 +87,14 @@ describe("SoulSphere", () => {
       uValence: { value: 0 },
       uArousal: { value: 0 },
       uConnection: { value: 0 },
-      uCameraPosition: { value: { copy: jest.fn() } }
+      uCameraPosition: { value: { copy: jest.fn() } },
     };
 
     (shaderMaterial as any).uniforms = domUniforms;
 
     // Setup Store State
     mockGetState.mockReturnValue({
-      currentVAC: [0.8, 0.5, 0.2] // V, A, C
+      currentVAC: [0.8, 0.5, 0.2], // V, A, C
     });
 
     // Get callback
@@ -123,7 +122,7 @@ describe("SoulSphere", () => {
     unmount();
 
     // Execute callback. It should return early because ref is null.
-    // If it proceeded, it would throw because we haven't patched the DOM node 
+    // If it proceeded, it would throw because we haven't patched the DOM node
     // (and the DOM node is gone anyway).
 
     // We spy on getState to ensure it's NOT reached

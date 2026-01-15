@@ -112,7 +112,7 @@ describe("VACAnimator", () => {
       })
     );
 
-    // Current: [0.995, 1, 1] -> diff 0.005. sq = 0.000025. 
+    // Current: [0.995, 1, 1] -> diff 0.005. sq = 0.000025.
     mockStore.getState.mockReturnValue({ currentVAC: [0.995, 1, 1] });
     render(<VACAnimator />);
 

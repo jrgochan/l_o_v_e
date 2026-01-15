@@ -22,7 +22,7 @@ jest.mock("@love/experience-shared", () => ({
   NEUTRAL_VAC: [0, 0, 0],
   IDENTITY_QUATERNION: [0, 0, 0, 1],
   vacToQuaternion: jest.fn().mockReturnValue([0, 0, 0, 1]),
-  CANONICAL_EMOTIONS: []
+  CANONICAL_EMOTIONS: [],
 }));
 
 jest.mock("@/components/PersonalStrategies", () => ({
@@ -32,7 +32,13 @@ jest.mock("@/components/PersonalStrategies", () => ({
 // Mock Data
 const mockEmotions = [
   { id: "joy", name: "Joy", category: "Positive", vac: [0.8, 0.6, 0.7], definition: "Happiness" },
-  { id: "sadness", name: "Sadness", category: "Negative", vac: [-0.6, -0.4, -0.2], definition: "Feeling down" }
+  {
+    id: "sadness",
+    name: "Sadness",
+    category: "Negative",
+    vac: [-0.6, -0.4, -0.2],
+    definition: "Feeling down",
+  },
 ];
 
 const mockPath = {
@@ -40,14 +46,20 @@ const mockPath = {
   current_state: { emotion: "Neutral" },
   goal_state: { emotion: "Joy" },
   waypoints: [
-    { order: 1, emotion: "Contentment", reasoning: "Step 1", estimated_time: "5m", difficulty: "easy" },
-    { order: 2, emotion: "Joy", reasoning: "Step 2", estimated_time: "5m", difficulty: "medium" }
+    {
+      order: 1,
+      emotion: "Contentment",
+      reasoning: "Step 1",
+      estimated_time: "5m",
+      difficulty: "easy",
+    },
+    { order: 2, emotion: "Joy", reasoning: "Step 2", estimated_time: "5m", difficulty: "medium" },
   ],
   path_metrics: {
     overall_difficulty: "easy",
     total_estimated_time: "10m",
-    success_probability: 0.9
-  }
+    success_probability: 0.9,
+  },
 };
 
 describe("GoalSetting", () => {
@@ -67,12 +79,12 @@ describe("GoalSetting", () => {
     (getObserverClient as jest.Mock).mockReturnValue({
       loadEmotionAtlas: mockLoadEmotionAtlas,
       generateTransitionPath: mockGenerateTransitionPath,
-      startJourney: mockStartJourney
+      startJourney: mockStartJourney,
     });
 
     mockLoadEmotionAtlas.mockResolvedValue({
       emotions: mockEmotions,
-      total_count: 2
+      total_count: 2,
     });
   });
 
@@ -187,19 +199,23 @@ describe("GoalSetting", () => {
     const user = userEvent.setup();
     const pathWithStrategies = {
       ...mockPath,
-      waypoints: [{
-        ...mockPath.waypoints[0],
-        strategies: [{
-          strategy_id: "strat-1",
-          name: "Deep Breathing",
-          description: "Breathe deeply",
-          difficulty_level: 1,
-          time_required: "2m",
-          steps: ["Inhale", "Exhale"],
-          evidence_level: "High",
-          type: "Somatic"
-        }]
-      }]
+      waypoints: [
+        {
+          ...mockPath.waypoints[0],
+          strategies: [
+            {
+              strategy_id: "strat-1",
+              name: "Deep Breathing",
+              description: "Breathe deeply",
+              difficulty_level: 1,
+              time_required: "2m",
+              steps: ["Inhale", "Exhale"],
+              evidence_level: "High",
+              type: "Somatic",
+            },
+          ],
+        },
+      ],
     };
     mockGenerateTransitionPath.mockResolvedValue(pathWithStrategies);
 
@@ -254,7 +270,11 @@ describe("GoalSetting", () => {
     await user.click(screen.getByText(/Start Journey/i));
 
     await waitFor(() => {
-      expect(logger.error).toHaveBeenCalledWith("general", "Failed to start journey", expect.any(Error));
+      expect(logger.error).toHaveBeenCalledWith(
+        "general",
+        "Failed to start journey",
+        expect.any(Error)
+      );
       expect(screen.getByText(/Failed to start journey/i)).toBeInTheDocument();
     });
   });
@@ -340,8 +360,8 @@ describe("GoalSetting", () => {
     // Force click to test guard clause
     // We need to enable it first to ensure the event fires in some environments,
     // or just fire click directly if the environment allows.
-    // React's onClick might be blocked by disabled prop. 
-    // Let's rely on the fact that if it WAS called, we'd know. 
+    // React's onClick might be blocked by disabled prop.
+    // Let's rely on the fact that if it WAS called, we'd know.
     // But to ensure it IS called (and returns early), we should probably not disable it in the test scenario?
     // Impossible without changing component code.
     // Instead we can bypass the disabled check by firing the click on the button DOM node directly

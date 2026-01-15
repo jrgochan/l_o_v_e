@@ -19,7 +19,7 @@ const mockAnalysis: ThreeWayAnalysis = {
     complexity_score: 0.5,
     emotional_clarity: 0.8,
     reasoning: "Reasoning content",
-    temporal_pattern: "concurrent"
+    temporal_pattern: "concurrent",
   },
   voice_only: {
     emotions: [{ ...mockEmotion, emotion_name: "Excited" }],
@@ -27,7 +27,7 @@ const mockAnalysis: ThreeWayAnalysis = {
     complexity_score: 0.6,
     emotional_clarity: 0.7,
     reasoning: "Reasoning voice",
-    temporal_pattern: "concurrent"
+    temporal_pattern: "concurrent",
   },
   blended: {
     emotions: [mockEmotion],
@@ -35,7 +35,7 @@ const mockAnalysis: ThreeWayAnalysis = {
     complexity_score: 0.55,
     emotional_clarity: 0.75,
     reasoning: "Reasoning blended",
-    temporal_pattern: "concurrent"
+    temporal_pattern: "concurrent",
   },
   discrepancy: {
     content_voice_distance: 0.1,
@@ -78,7 +78,7 @@ describe("VoiceContentThreeWay", () => {
         content_voice_distance: 0.8, // > 0.5
         interpretation: "Major mismatch",
         flags: ["significant_incongruence", "emotional_suppression"],
-      }
+      },
     };
     render(<VoiceContentThreeWay analysis={discrepantAnalysis} />);
 
@@ -89,7 +89,9 @@ describe("VoiceContentThreeWay", () => {
 
     // Clinical Note
     expect(screen.getByText("Clinical Note")).toBeInTheDocument();
-    expect(screen.getByText(/Significant discrepancies between voice and content/)).toBeInTheDocument();
+    expect(
+      screen.getByText(/Significant discrepancies between voice and content/)
+    ).toBeInTheDocument();
 
     // Check flags
     expect(screen.getByText("significant incongruence")).toBeInTheDocument();
@@ -101,8 +103,8 @@ describe("VoiceContentThreeWay", () => {
       ...mockAnalysis,
       content_only: {
         ...mockAnalysis.content_only,
-        emotions: [{ ...mockEmotion, prominence: "secondary" as const }]
-      }
+        emotions: [{ ...mockEmotion, prominence: "secondary" as const }],
+      },
     };
     render(<VoiceContentThreeWay analysis={noPrimaryAnalysis as any} />);
 
@@ -115,12 +117,8 @@ describe("VoiceContentThreeWay", () => {
       ...mockAnalysis,
       discrepancy: {
         ...mockAnalysis.discrepancy,
-        flags: [
-          "minimization",
-          "arousal_mismatch",
-          "unknown_flag"
-        ]
-      }
+        flags: ["minimization", "arousal_mismatch", "unknown_flag"],
+      },
     };
     render(<VoiceContentThreeWay analysis={multiFlagAnalysis} />);
 
@@ -149,8 +147,8 @@ describe("VoiceContentThreeWay", () => {
       ...mockAnalysis,
       blended: {
         ...mockAnalysis.blended!,
-        aggregate_vac: { valence: -0.5, arousal: -0.5, connection: -0.5 }
-      }
+        aggregate_vac: { valence: -0.5, arousal: -0.5, connection: -0.5 },
+      },
     };
     render(<VoiceContentThreeWay analysis={negAnalysis} />);
 

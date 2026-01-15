@@ -1,4 +1,3 @@
-
 import { renderHook, act, waitFor } from "@testing-library/react";
 import { useGoalSettingLogic } from "@/components/GoalSettingLogic";
 import { useExperienceStore } from "@/stores/useExperienceStore";
@@ -6,254 +5,285 @@ import { getObserverClient } from "@love/experience-shared";
 
 // Mock dependencies
 jest.mock("@/utils/logger", () => ({
-    logger: {
-        info: jest.fn(),
-        error: jest.fn(),
-    },
+  logger: {
+    info: jest.fn(),
+    error: jest.fn(),
+  },
 }));
 
 jest.mock("@love/experience-shared", () => ({
-    getObserverClient: jest.fn(),
-    NEUTRAL_VAC: [0, 0, 0],
+  getObserverClient: jest.fn(),
+  NEUTRAL_VAC: [0, 0, 0],
 }));
 
 describe("useGoalSettingLogic", () => {
-    const mockLoadEmotionAtlas = jest.fn();
-    const mockGenerateTransitionPath = jest.fn();
-    const mockStartJourney = jest.fn();
+  const mockLoadEmotionAtlas = jest.fn();
+  const mockGenerateTransitionPath = jest.fn();
+  const mockStartJourney = jest.fn();
 
-    beforeEach(() => {
-        jest.clearAllMocks();
-        act(() => {
-            useExperienceStore.getState().reset();
-        });
-
-        (getObserverClient as jest.Mock).mockReturnValue({
-            loadEmotionAtlas: mockLoadEmotionAtlas,
-            generateTransitionPath: mockGenerateTransitionPath,
-            startJourney: mockStartJourney
-        });
-
-        mockLoadEmotionAtlas.mockResolvedValue({
-            emotions: [{ id: "joy", name: "Joy", vac: [1, 1, 1], category: "cat" }],
-            total_count: 1
-        });
+  beforeEach(() => {
+    jest.clearAllMocks();
+    act(() => {
+      useExperienceStore.getState().reset();
     });
 
-    it("guards generate path when no goal selected", async () => {
-        const { result } = renderHook(() => useGoalSettingLogic());
-
-        await act(async () => {
-            await result.current.handleGeneratePath();
-        });
-
-        expect(mockGenerateTransitionPath).not.toHaveBeenCalled();
+    (getObserverClient as jest.Mock).mockReturnValue({
+      loadEmotionAtlas: mockLoadEmotionAtlas,
+      generateTransitionPath: mockGenerateTransitionPath,
+      startJourney: mockStartJourney,
     });
 
-    it("guards start journey when no generated path", async () => {
-        const { result } = renderHook(() => useGoalSettingLogic());
+    mockLoadEmotionAtlas.mockResolvedValue({
+      emotions: [{ id: "joy", name: "Joy", vac: [1, 1, 1], category: "cat" }],
+      total_count: 1,
+    });
+  });
 
-        await act(async () => {
-            await result.current.handleStartJourney();
-        });
+  it("guards generate path when no goal selected", async () => {
+    const { result } = renderHook(() => useGoalSettingLogic());
 
-        expect(mockStartJourney).not.toHaveBeenCalled();
+    await act(async () => {
+      await result.current.handleGeneratePath();
     });
 
-    it("handles non-error objects in loadEmotionAtlas", async () => {
-        mockLoadEmotionAtlas.mockRejectedValue("String Error");
-        const { result } = renderHook(() => useGoalSettingLogic());
+    expect(mockGenerateTransitionPath).not.toHaveBeenCalled();
+  });
 
-        await act(async () => {
-            result.current.setIsOpen(true);
-        });
+  it("guards start journey when no generated path", async () => {
+    const { result } = renderHook(() => useGoalSettingLogic());
 
-        await waitFor(() => {
-            expect(result.current.error).toBe("Failed to load emotions");
-        });
+    await act(async () => {
+      await result.current.handleStartJourney();
     });
 
-    it("handles non-error objects in generatePath", async () => {
-        mockGenerateTransitionPath.mockRejectedValue("String Error");
-        const { result } = renderHook(() => useGoalSettingLogic());
+    expect(mockStartJourney).not.toHaveBeenCalled();
+  });
 
-        act(() => {
-            result.current.handleSelectGoal({ id: "joy", name: "Joy", vac: [1, 1, 1], category: "cat" } as any);
-        });
+  it("handles non-error objects in loadEmotionAtlas", async () => {
+    mockLoadEmotionAtlas.mockRejectedValue("String Error");
+    const { result } = renderHook(() => useGoalSettingLogic());
 
-        await act(async () => {
-            await result.current.handleGeneratePath();
-        });
-
-        expect(result.current.error).toBe("Failed to generate path");
+    await act(async () => {
+      result.current.setIsOpen(true);
     });
 
-    it("handles error objects in loadEmotionAtlas", async () => {
-        mockLoadEmotionAtlas.mockRejectedValue(new Error("API Fail"));
-        const { result } = renderHook(() => useGoalSettingLogic());
+    await waitFor(() => {
+      expect(result.current.error).toBe("Failed to load emotions");
+    });
+  });
 
-        await act(async () => {
-            result.current.setIsOpen(true);
-        });
+  it("handles non-error objects in generatePath", async () => {
+    mockGenerateTransitionPath.mockRejectedValue("String Error");
+    const { result } = renderHook(() => useGoalSettingLogic());
 
-        await waitFor(() => {
-            expect(result.current.error).toBe("API Fail");
-        });
+    act(() => {
+      result.current.handleSelectGoal({
+        id: "joy",
+        name: "Joy",
+        vac: [1, 1, 1],
+        category: "cat",
+      } as any);
     });
 
-    it("handles error objects in generatePath", async () => {
-        mockGenerateTransitionPath.mockRejectedValue(new Error("Gen Fail"));
-        const { result } = renderHook(() => useGoalSettingLogic());
-
-        act(() => {
-            result.current.handleSelectGoal({ id: "joy", name: "Joy", vac: [1, 1, 1], category: "cat" } as any);
-        });
-
-        await act(async () => {
-            await result.current.handleGeneratePath();
-        });
-
-        expect(result.current.error).toBe("Gen Fail");
+    await act(async () => {
+      await result.current.handleGeneratePath();
     });
 
-    it("loads atlas when opened", async () => {
-        const { result } = renderHook(() => useGoalSettingLogic());
+    expect(result.current.error).toBe("Failed to generate path");
+  });
 
-        await act(async () => {
-            result.current.setIsOpen(true);
-        });
+  it("handles error objects in loadEmotionAtlas", async () => {
+    mockLoadEmotionAtlas.mockRejectedValue(new Error("API Fail"));
+    const { result } = renderHook(() => useGoalSettingLogic());
 
-        expect(mockLoadEmotionAtlas).toHaveBeenCalled();
-        expect(result.current.emotions).toHaveLength(1);
+    await act(async () => {
+      result.current.setIsOpen(true);
     });
 
-    it("does not load atlas if already loaded", async () => {
-        const { result } = renderHook(() => useGoalSettingLogic());
+    await waitFor(() => {
+      expect(result.current.error).toBe("API Fail");
+    });
+  });
 
-        // Load first time
-        await act(async () => {
-            result.current.setIsOpen(true);
-        });
-        expect(mockLoadEmotionAtlas).toHaveBeenCalledTimes(1);
+  it("handles error objects in generatePath", async () => {
+    mockGenerateTransitionPath.mockRejectedValue(new Error("Gen Fail"));
+    const { result } = renderHook(() => useGoalSettingLogic());
 
-        // Close and open again
-        act(() => {
-            result.current.setIsOpen(false);
-        });
-        await act(async () => {
-            result.current.setIsOpen(true);
-        });
-
-        // Should not call again because emotions are populated
-        expect(mockLoadEmotionAtlas).toHaveBeenCalledTimes(1);
+    act(() => {
+      result.current.handleSelectGoal({
+        id: "joy",
+        name: "Joy",
+        vac: [1, 1, 1],
+        category: "cat",
+      } as any);
     });
 
-    it("does not load atlas if closed", async () => {
-        const { result } = renderHook(() => useGoalSettingLogic());
-
-        // Initial state is closed
-        expect(result.current.isOpen).toBe(false);
-        expect(mockLoadEmotionAtlas).not.toHaveBeenCalled();
+    await act(async () => {
+      await result.current.handleGeneratePath();
     });
 
-    it("filters emotions", async () => {
-        mockLoadEmotionAtlas.mockResolvedValue({
-            emotions: [
-                { id: "joy", name: "Joy", vac: [1, 1, 1], category: "Positive" },
-                { id: "sad", name: "Sadness", vac: [-1, -1, -1], category: "Negative" }
-            ],
-            total_count: 2
-        });
-        const { result } = renderHook(() => useGoalSettingLogic());
+    expect(result.current.error).toBe("Gen Fail");
+  });
 
-        await act(async () => {
-            result.current.setIsOpen(true);
-        });
+  it("loads atlas when opened", async () => {
+    const { result } = renderHook(() => useGoalSettingLogic());
 
-        act(() => {
-            result.current.setSearchQuery("sad");
-        });
-
-        expect(result.current.filteredEmotions).toHaveLength(1);
-        expect(result.current.filteredEmotions[0].name).toBe("Sadness");
-
-        act(() => {
-            result.current.setSearchQuery("");
-        });
-        expect(result.current.filteredEmotions).toHaveLength(2);
+    await act(async () => {
+      result.current.setIsOpen(true);
     });
 
-    it("generates path successfully", async () => {
-        const mockPath = { path_id: "test", waypoints: [] };
-        mockGenerateTransitionPath.mockResolvedValue(mockPath);
-        const { result } = renderHook(() => useGoalSettingLogic());
+    expect(mockLoadEmotionAtlas).toHaveBeenCalled();
+    expect(result.current.emotions).toHaveLength(1);
+  });
 
-        act(() => {
-            result.current.handleSelectGoal({ id: "joy", name: "Joy", vac: [1, 1, 1], category: "cat" } as any);
-        });
+  it("does not load atlas if already loaded", async () => {
+    const { result } = renderHook(() => useGoalSettingLogic());
 
-        // Verify state clear
-        expect(result.current.generatedPath).toBeNull();
-        expect(result.current.selectedGoal).not.toBeNull();
+    // Load first time
+    await act(async () => {
+      result.current.setIsOpen(true);
+    });
+    expect(mockLoadEmotionAtlas).toHaveBeenCalledTimes(1);
 
-        await act(async () => {
-            await result.current.handleGeneratePath();
-        });
-
-        expect(result.current.generatedPath).toEqual(mockPath);
+    // Close and open again
+    act(() => {
+      result.current.setIsOpen(false);
+    });
+    await act(async () => {
+      result.current.setIsOpen(true);
     });
 
-    it("starts journey successfully", async () => {
-        const mockPath = { path_id: "test", waypoints: [], path_metrics: {}, current_state: {}, goal_state: {} };
-        mockGenerateTransitionPath.mockResolvedValue(mockPath);
-        mockStartJourney.mockResolvedValue({ journey_id: "j1" });
-        const { result } = renderHook(() => useGoalSettingLogic());
+    // Should not call again because emotions are populated
+    expect(mockLoadEmotionAtlas).toHaveBeenCalledTimes(1);
+  });
 
-        // Setup state
-        act(() => {
-            result.current.handleSelectGoal({ id: "joy", name: "Joy", vac: [1, 1, 1], category: "cat" } as any);
-        });
-        await act(async () => {
-            await result.current.handleGeneratePath();
-        });
+  it("does not load atlas if closed", async () => {
+    const { result } = renderHook(() => useGoalSettingLogic());
 
-        await act(async () => {
-            await result.current.handleStartJourney();
-        });
+    // Initial state is closed
+    expect(result.current.isOpen).toBe(false);
+    expect(mockLoadEmotionAtlas).not.toHaveBeenCalled();
+  });
 
-        expect(mockStartJourney).toHaveBeenCalledWith(expect.anything(), "test");
+  it("filters emotions", async () => {
+    mockLoadEmotionAtlas.mockResolvedValue({
+      emotions: [
+        { id: "joy", name: "Joy", vac: [1, 1, 1], category: "Positive" },
+        { id: "sad", name: "Sadness", vac: [-1, -1, -1], category: "Negative" },
+      ],
+      total_count: 2,
+    });
+    const { result } = renderHook(() => useGoalSettingLogic());
+
+    await act(async () => {
+      result.current.setIsOpen(true);
     });
 
-    it("handles start journey error", async () => {
-        const mockPath = { path_id: "test", waypoints: [] };
-        mockGenerateTransitionPath.mockResolvedValue(mockPath);
-        mockStartJourney.mockRejectedValue(new Error("Start failed"));
-        const { result } = renderHook(() => useGoalSettingLogic());
-
-        act(() => {
-            result.current.handleSelectGoal({ id: "joy", name: "Joy", vac: [1, 1, 1], category: "cat" } as any);
-            result.current.setGeneratedPath(mockPath as any); // cheat to set state
-        });
-        // Or generate it correctly
-
-        await act(async () => {
-            await result.current.handleStartJourney();
-        });
-
-        expect(result.current.error).toBe("Failed to start journey. Please try again.");
+    act(() => {
+      result.current.setSearchQuery("sad");
     });
 
-    it("toggles strategy", () => {
-        const { result } = renderHook(() => useGoalSettingLogic());
+    expect(result.current.filteredEmotions).toHaveLength(1);
+    expect(result.current.filteredEmotions[0].name).toBe("Sadness");
 
-        act(() => {
-            result.current.toggleStrategy("s1");
-        });
-        expect(result.current.expandedStrategy).toBe("s1");
-
-        act(() => {
-            result.current.toggleStrategy("s1");
-        });
-        expect(result.current.expandedStrategy).toBeNull();
+    act(() => {
+      result.current.setSearchQuery("");
     });
+    expect(result.current.filteredEmotions).toHaveLength(2);
+  });
+
+  it("generates path successfully", async () => {
+    const mockPath = { path_id: "test", waypoints: [] };
+    mockGenerateTransitionPath.mockResolvedValue(mockPath);
+    const { result } = renderHook(() => useGoalSettingLogic());
+
+    act(() => {
+      result.current.handleSelectGoal({
+        id: "joy",
+        name: "Joy",
+        vac: [1, 1, 1],
+        category: "cat",
+      } as any);
+    });
+
+    // Verify state clear
+    expect(result.current.generatedPath).toBeNull();
+    expect(result.current.selectedGoal).not.toBeNull();
+
+    await act(async () => {
+      await result.current.handleGeneratePath();
+    });
+
+    expect(result.current.generatedPath).toEqual(mockPath);
+  });
+
+  it("starts journey successfully", async () => {
+    const mockPath = {
+      path_id: "test",
+      waypoints: [],
+      path_metrics: {},
+      current_state: {},
+      goal_state: {},
+    };
+    mockGenerateTransitionPath.mockResolvedValue(mockPath);
+    mockStartJourney.mockResolvedValue({ journey_id: "j1" });
+    const { result } = renderHook(() => useGoalSettingLogic());
+
+    // Setup state
+    act(() => {
+      result.current.handleSelectGoal({
+        id: "joy",
+        name: "Joy",
+        vac: [1, 1, 1],
+        category: "cat",
+      } as any);
+    });
+    await act(async () => {
+      await result.current.handleGeneratePath();
+    });
+
+    await act(async () => {
+      await result.current.handleStartJourney();
+    });
+
+    expect(mockStartJourney).toHaveBeenCalledWith(expect.anything(), "test");
+  });
+
+  it("handles start journey error", async () => {
+    const mockPath = { path_id: "test", waypoints: [] };
+    mockGenerateTransitionPath.mockResolvedValue(mockPath);
+    mockStartJourney.mockRejectedValue(new Error("Start failed"));
+    const { result } = renderHook(() => useGoalSettingLogic());
+
+    act(() => {
+      result.current.handleSelectGoal({
+        id: "joy",
+        name: "Joy",
+        vac: [1, 1, 1],
+        category: "cat",
+      } as any);
+      result.current.setGeneratedPath(mockPath as any); // cheat to set state
+    });
+    // Or generate it correctly
+
+    await act(async () => {
+      await result.current.handleStartJourney();
+    });
+
+    expect(result.current.error).toBe("Failed to start journey. Please try again.");
+  });
+
+  it("toggles strategy", () => {
+    const { result } = renderHook(() => useGoalSettingLogic());
+
+    act(() => {
+      result.current.toggleStrategy("s1");
+    });
+    expect(result.current.expandedStrategy).toBe("s1");
+
+    act(() => {
+      result.current.toggleStrategy("s1");
+    });
+    expect(result.current.expandedStrategy).toBeNull();
+  });
 });

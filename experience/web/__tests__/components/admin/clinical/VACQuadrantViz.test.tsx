@@ -1,4 +1,3 @@
-
 import { render, screen } from "@testing-library/react";
 import { VACQuadrantViz } from "@/components/admin/clinical/VACQuadrantViz";
 
@@ -44,7 +43,9 @@ describe("VACQuadrantViz", () => {
 
   it("renders Connection info and color coding", () => {
     // High connection (Green)
-    const { rerender } = render(<VACQuadrantViz vac={{ valence: 0, arousal: 0, connection: 0.8 }} />);
+    const { rerender } = render(
+      <VACQuadrantViz vac={{ valence: 0, arousal: 0, connection: 0.8 }} />
+    );
     expect(screen.getByText("0.80")).toHaveClass("text-green-400");
 
     // Low connection (Red)

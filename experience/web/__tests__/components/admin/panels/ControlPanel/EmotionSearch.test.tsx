@@ -4,8 +4,22 @@ import { AtlasEmotion } from "@/types/atlas-admin";
 
 describe("EmotionSearch", () => {
   const mockEmotions: AtlasEmotion[] = [
-    { id: "e1", name: "Joy", category: "Cat1", definition: "D1", vac: [0, 0, 0], quaternion: [0, 0, 0, 1] },
-    { id: "e2", name: "Awe", category: "Cat1", definition: "D2", vac: [0, 0, 0], quaternion: [0, 0, 0, 1] } // Bridge emotion
+    {
+      id: "e1",
+      name: "Joy",
+      category: "Cat1",
+      definition: "D1",
+      vac: [0, 0, 0],
+      quaternion: [0, 0, 0, 1],
+    },
+    {
+      id: "e2",
+      name: "Awe",
+      category: "Cat1",
+      definition: "D2",
+      vac: [0, 0, 0],
+      quaternion: [0, 0, 0, 1],
+    }, // Bridge emotion
   ];
 
   const defaultProps = {
@@ -66,9 +80,7 @@ describe("EmotionSearch", () => {
 
   it("should handle selection toggle", () => {
     const onToggle = jest.fn();
-    const { getByText } = render(
-      <EmotionSearch {...defaultProps} onToggleEmotion={onToggle} />
-    );
+    const { getByText } = render(<EmotionSearch {...defaultProps} onToggleEmotion={onToggle} />);
     fireEvent.click(getByText("Joy"));
     expect(onToggle).toHaveBeenCalledWith("e1");
   });
@@ -77,11 +89,7 @@ describe("EmotionSearch", () => {
     const onToggle = jest.fn();
     const selected = new Set(["e1"]);
     const { getByText } = render(
-      <EmotionSearch
-        {...defaultProps}
-        selectedIds={selected}
-        onToggleEmotion={onToggle}
-      />
+      <EmotionSearch {...defaultProps} selectedIds={selected} onToggleEmotion={onToggle} />
     );
     expect(getByText("SELECTED")).toBeInTheDocument();
     // Joy should have specific class
@@ -95,9 +103,7 @@ describe("EmotionSearch", () => {
 
   it("should show selection state", () => {
     const selected = new Set(["e1"]);
-    const { getByText } = render(
-      <EmotionSearch {...defaultProps} selectedIds={selected} />
-    );
+    const { getByText } = render(<EmotionSearch {...defaultProps} selectedIds={selected} />);
     expect(getByText("SELECTED")).toBeInTheDocument();
     // Joy should have specific class
     const joyBtn = getByText("Joy").closest("button");
@@ -125,9 +131,7 @@ describe("EmotionSearch", () => {
   });
 
   it("should hide results if showResults is false", () => {
-    const { queryByText } = render(
-      <EmotionSearch {...defaultProps} showResults={false} />
-    );
+    const { queryByText } = render(<EmotionSearch {...defaultProps} showResults={false} />);
     expect(queryByText("Results")).not.toBeInTheDocument();
     expect(queryByText("Joy")).not.toBeInTheDocument();
   });

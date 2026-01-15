@@ -1,4 +1,3 @@
-
 import { render, screen } from "@testing-library/react";
 import { AudioVisualizer } from "@/components/admin/visualizations/AudioVisualizer";
 
@@ -89,7 +88,8 @@ describe("AudioVisualizer", () => {
   it("shifts levels when buffer full", () => {
     let frames = 0;
     jest.spyOn(window, "requestAnimationFrame").mockImplementation((cb: any) => {
-      if (frames < 10) { // Run enough frames to definitely exceed buffer
+      if (frames < 10) {
+        // Run enough frames to definitely exceed buffer
         frames++;
         cb(0);
       }

@@ -1,4 +1,3 @@
-
 import { render, screen, fireEvent } from "@testing-library/react";
 import { GraphNodeDetails } from "@/components/admin/visualizations/graph/GraphNodeDetails";
 
@@ -11,10 +10,10 @@ describe("GraphNodeDetails", () => {
       category: "joy",
       confidence: 0.95,
       prominence: "primary",
-      vac: { valence: 0.8, arousal: 0.5, connection: 0.7 }
+      vac: { valence: 0.8, arousal: 0.5, connection: 0.7 },
     },
     x: 0,
-    y: 0
+    y: 0,
   };
 
   const onClose = jest.fn();

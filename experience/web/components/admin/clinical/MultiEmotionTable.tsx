@@ -24,12 +24,7 @@ interface MultiEmotionTableProps {
   className?: string;
 }
 
-type SortKey =
-  | "emotion"
-  | "confidence"
-  | "valence"
-  | "voice_alignment"
-  | "prominence";
+type SortKey = "emotion" | "confidence" | "valence" | "voice_alignment" | "prominence";
 type SortDirection = "asc" | "desc";
 type ProminenceFilter = "all" | "primary" | "secondary" | "underlying";
 
@@ -322,8 +317,9 @@ export function MultiEmotionTable({
               return (
                 <React.Fragment key={emotion.id}>
                   <tr
-                    className={`border-b border-gray-700/50 hover:bg-gray-750 transition cursor-pointer ${isEven ? "bg-gray-850" : "bg-gray-900"
-                      }`}
+                    className={`border-b border-gray-700/50 hover:bg-gray-750 transition cursor-pointer ${
+                      isEven ? "bg-gray-850" : "bg-gray-900"
+                    }`}
                     onClick={() => onEmotionClick?.(emotion)}
                   >
                     {/* Emotion Name */}

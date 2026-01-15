@@ -163,8 +163,6 @@ export function PathMatrixGrid({ onClose }: PathMatrixGridProps) {
 
   // Handle cell click - select ONLY those two emotions
   const handleCellClick = (fromEmotion: AtlasEmotion, toEmotion: AtlasEmotion) => {
-
-
     // Temporarily set to manual to prevent auto-computation
     const currentSetting = useAtlasAdminStore.getState().settings.computeMode;
     useAtlasAdminStore.getState().updateSetting("computeMode", "manual");
@@ -191,9 +189,9 @@ export function PathMatrixGrid({ onClose }: PathMatrixGridProps) {
   const hoveredEmotions =
     hoveredCell && viewMode === "emotions"
       ? {
-        from: allEmotions.find((e) => e.id === hoveredCell.from),
-        to: allEmotions.find((e) => e.id === hoveredCell.to),
-      }
+          from: allEmotions.find((e) => e.id === hoveredCell.from),
+          to: allEmotions.find((e) => e.id === hoveredCell.to),
+        }
       : null;
 
   return (

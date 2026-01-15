@@ -134,10 +134,12 @@ describe("ClinicalDashboard", () => {
     const { rerender, getByText } = render(
       <ClinicalDashboard
         {...defaultProps}
-        prosody={{
-          ...baseProsody,
-          energy: 0.2, // Low
-        } as any}
+        prosody={
+          {
+            ...baseProsody,
+            energy: 0.2, // Low
+          } as any
+        }
       />
     );
     expect(getByText("Low")).toBeInTheDocument();
@@ -146,10 +148,12 @@ describe("ClinicalDashboard", () => {
     rerender(
       <ClinicalDashboard
         {...defaultProps}
-        prosody={{
-          ...baseProsody,
-          energy: 0.5, // Med
-        } as any}
+        prosody={
+          {
+            ...baseProsody,
+            energy: 0.5, // Med
+          } as any
+        }
       />
     );
     expect(getByText("Med")).toBeInTheDocument();
@@ -158,10 +162,12 @@ describe("ClinicalDashboard", () => {
     rerender(
       <ClinicalDashboard
         {...defaultProps}
-        prosody={{
-          ...baseProsody,
-          energy: 0.8, // High
-        } as any}
+        prosody={
+          {
+            ...baseProsody,
+            energy: 0.8, // High
+          } as any
+        }
       />
     );
     expect(getByText("High")).toBeInTheDocument();
@@ -173,10 +179,12 @@ describe("ClinicalDashboard", () => {
       <ClinicalDashboard
         {...defaultProps}
         expandState="expanded"
-        prosody={{
-          ...baseProsody,
-          rate: 2, // Slow
-        } as any}
+        prosody={
+          {
+            ...baseProsody,
+            rate: 2, // Slow
+          } as any
+        }
       />
     );
     expect(getByText(/2.0 syll\/sec/)).toBeInTheDocument();
@@ -187,13 +195,15 @@ describe("ClinicalDashboard", () => {
       <ClinicalDashboard
         {...defaultProps}
         expandState="expanded"
-        prosody={{
-          ...baseProsody,
-          voice_quality: "moderate", // Yellow
-          hnr: 12, // Yellow (>10)
-          jitter: 2, // Yellow (<3)
-          shimmer: 4, // Yellow (<6)
-        } as any}
+        prosody={
+          {
+            ...baseProsody,
+            voice_quality: "moderate", // Yellow
+            hnr: 12, // Yellow (>10)
+            jitter: 2, // Yellow (<3)
+            shimmer: 4, // Yellow (<6)
+          } as any
+        }
       />
     );
     expect(getByText("🟡 Moderate")).toBeInTheDocument();
@@ -205,10 +215,12 @@ describe("ClinicalDashboard", () => {
       <ClinicalDashboard
         {...defaultProps}
         expandState="expanded"
-        prosody={{
-          ...baseProsody,
-          energy: 0.8,
-        } as any}
+        prosody={
+          {
+            ...baseProsody,
+            energy: 0.8,
+          } as any
+        }
       />
     );
     // Gradient checks are hard on JSDOM, but execution covers the line.
@@ -218,10 +230,12 @@ describe("ClinicalDashboard", () => {
       <ClinicalDashboard
         {...defaultProps}
         expandState="expanded"
-        prosody={{
-          ...baseProsody,
-          energy: 0.5,
-        } as any}
+        prosody={
+          {
+            ...baseProsody,
+            energy: 0.5,
+          } as any
+        }
       />
     );
 
@@ -230,10 +244,12 @@ describe("ClinicalDashboard", () => {
       <ClinicalDashboard
         {...defaultProps}
         expandState="expanded"
-        prosody={{
-          ...baseProsody,
-          energy: 0.2, // Low
-        } as any}
+        prosody={
+          {
+            ...baseProsody,
+            energy: 0.2, // Low
+          } as any
+        }
       />
     );
   });
@@ -254,7 +270,7 @@ describe("ClinicalDashboard", () => {
         multiEmotionData={{
           emotions: [
             { name: "Joy", score: 0.9 },
-            { name: "Excitement", score: 0.8 }
+            { name: "Excitement", score: 0.8 },
           ] as any,
         }}
       />
@@ -269,9 +285,7 @@ describe("ClinicalDashboard", () => {
         {...defaultProps}
         expandState="expanded"
         multiEmotionData={{
-          emotions: [
-            { name: "Joy", score: 0.9 }
-          ] as any,
+          emotions: [{ name: "Joy", score: 0.9 }] as any,
         }}
       />
     );

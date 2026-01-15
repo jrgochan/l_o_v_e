@@ -71,7 +71,6 @@ export function useChatPanelState() {
     const handleMouseMove = (e: MouseEvent) => {
       e.preventDefault();
 
-
       // Calculate new height (drag up = increase height)
       const deltaY = startYRef.current - e.clientY;
       const newHeight = Math.max(200, Math.min(700, startHeightRef.current + deltaY));

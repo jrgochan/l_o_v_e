@@ -1,4 +1,3 @@
-
 import { render, screen } from "@testing-library/react";
 import { AggregateVACHeaderDisplay } from "../../../../components/admin/state-display/AggregateVACHeaderDisplay";
 import { useAtlasAdminStore } from "@/stores/useAtlasAdminStore";
@@ -97,7 +96,7 @@ describe("AggregateVACHeaderDisplay", () => {
       // Negative (< -0.3) - cleanup previous render
       jest.clearAllMocks(); // Actually render creates new DOM, testing library handles cleanup usually but mocks persistence might issue.
 
-      // Re-render approach or checking separate elements if test fails due to accumulation? 
+      // Re-render approach or checking separate elements if test fails due to accumulation?
       // Testing Library cleans up DOM. Mocks need resetting if changed per test.
     });
 

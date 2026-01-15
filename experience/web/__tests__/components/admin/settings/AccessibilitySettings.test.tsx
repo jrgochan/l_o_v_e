@@ -1,4 +1,3 @@
-
 import { render, screen, fireEvent } from "@testing-library/react";
 import { AccessibilitySettings } from "@/components/admin/settings/AccessibilitySettings";
 import { useSettingsStore } from "@/stores/useSettingsStore";

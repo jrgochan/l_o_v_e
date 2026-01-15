@@ -54,8 +54,6 @@ describe("useSettingsStore (Deep Coverage)", () => {
     expect(success).toBe(false);
   });
 
-
-
   it("should catch JSON parse errors", () => {
     const { result } = renderHook(() => useSettingsStore());
     let success = true;
@@ -65,8 +63,6 @@ describe("useSettingsStore (Deep Coverage)", () => {
     });
     expect(success).toBe(false);
   });
-
-
 
   it("should warn on version mismatch but proceed", () => {
     const { result } = renderHook(() => useSettingsStore());
@@ -296,7 +292,7 @@ describe("useSettingsStore (Deep Coverage)", () => {
 
     // JSDOM throws "Not implemented: navigation" on reload(), which creates a console.error
     // We suppress it for this test.
-    const consoleErrorSpy = jest.spyOn(console, "error").mockImplementation(() => { });
+    const consoleErrorSpy = jest.spyOn(console, "error").mockImplementation(() => {});
 
     act(() => {
       result.current.setUserId("data-to-clear");

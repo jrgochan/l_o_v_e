@@ -132,9 +132,7 @@ describe("useLoadCachedPaths", () => {
         {
           from_emotion: { id: "e1" },
           to_emotion: { id: "e2" },
-          waypoints: [
-            { emotion: { id: "w1", name: "W1" }, vac: { v: 1, a: 1, c: 1 } }
-          ],
+          waypoints: [{ emotion: { id: "w1", name: "W1" }, vac: { v: 1, a: 1, c: 1 } }],
           distance: 1,
           estimated_time: 1,
           difficulty: "easy",
@@ -157,8 +155,8 @@ describe("useLoadCachedPaths", () => {
             expect.objectContaining({
               emotion: expect.objectContaining({ id: "w1", name: "W1" }),
               reasoning: "",
-            })
-          ])
+            }),
+          ]),
         })
       );
     });

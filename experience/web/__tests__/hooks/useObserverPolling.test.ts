@@ -1,10 +1,9 @@
-
 import { renderHook, act } from "@testing-library/react";
 import { useObserverPolling } from "@/hooks/useObserverPolling";
 import { useExperienceStore } from "@/stores/useExperienceStore";
 import { createPollingManager } from "@love/experience-shared";
 import { logger } from "@/utils/logger";
-import React from 'react';
+import React from "react";
 
 jest.mock("@/stores/useExperienceStore");
 jest.mock("@love/experience-shared", () => ({
@@ -70,7 +69,7 @@ describe("useObserverPolling Coverage", () => {
     // Assuming start(userId, onData, onError, interval) based on usage
     // Args: 0=userId, 1=onData, 2=onError
     const errorCallback = mockStart.mock.calls[0][2];
-    if (typeof errorCallback === 'function') {
+    if (typeof errorCallback === "function") {
       errorCallback(new Error("Poll fail"));
       expect(logger.error).toHaveBeenCalled();
     }

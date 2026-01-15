@@ -1,4 +1,3 @@
-
 import { render, screen, fireEvent } from "@testing-library/react";
 import { DataVisualizationOverlay } from "@/components/admin/visualizations/DataVisualizationOverlay";
 import { useAtlasAdminStore } from "@/stores/useAtlasAdminStore";
@@ -14,7 +13,7 @@ jest.mock("@/components/admin/spheres/MiniSoulSphere", () => ({
     <div
       data-testid={`sphere-${emotion.id}`}
       onClick={onClick}
-      onMouseEnter={() => { }} // Not strictly using this handler in test, parent handles it
+      onMouseEnter={() => {}} // Not strictly using this handler in test, parent handles it
     >
       {emotion.name} {isHovered ? "(Hovered)" : ""}
     </div>
@@ -23,10 +22,34 @@ jest.mock("@/components/admin/spheres/MiniSoulSphere", () => ({
 
 describe("DataVisualizationOverlay", () => {
   const mockEmotions = [
-    { id: "1", name: "Joy", category: "Happy", definition: "A feeling of pleasure", vac: [0.8, 0.5, 0.6] },
-    { id: "2", name: "Sadness", category: "Sad", definition: "A feeling of sorrow", vac: [-0.5, -0.2, 0.3] },
-    { id: "3", name: "Anger", category: "Angry", definition: "A strong feeling of annoyance", vac: [-0.3, 0.8, -0.2] },
-    { id: "4", name: "Contentment", category: "Happy", definition: "Peaceful happiness", vac: [0.7, -0.4, 0.5] }, // Duplicate category
+    {
+      id: "1",
+      name: "Joy",
+      category: "Happy",
+      definition: "A feeling of pleasure",
+      vac: [0.8, 0.5, 0.6],
+    },
+    {
+      id: "2",
+      name: "Sadness",
+      category: "Sad",
+      definition: "A feeling of sorrow",
+      vac: [-0.5, -0.2, 0.3],
+    },
+    {
+      id: "3",
+      name: "Anger",
+      category: "Angry",
+      definition: "A strong feeling of annoyance",
+      vac: [-0.3, 0.8, -0.2],
+    },
+    {
+      id: "4",
+      name: "Contentment",
+      category: "Happy",
+      definition: "Peaceful happiness",
+      vac: [0.7, -0.4, 0.5],
+    }, // Duplicate category
   ];
 
   const mockSelectEmotion = jest.fn();
@@ -52,7 +75,6 @@ describe("DataVisualizationOverlay", () => {
   });
 
   it("renders header and emotion grid", () => {
-
     render(<DataVisualizationOverlay onClose={mockOnClose} />);
 
     expect(screen.getByText("Data Visualization Mode")).toBeInTheDocument();
@@ -78,7 +100,7 @@ describe("DataVisualizationOverlay", () => {
 
   it("handles sorting (alphabetical check)", () => {
     render(<DataVisualizationOverlay onClose={mockOnClose} />);
-    // Since we mock rendering as text, we can check order if needed, 
+    // Since we mock rendering as text, we can check order if needed,
     // but React Testing Library doesn't easily guarantee DOM order assertion without manual traversal.
     // However, our mock data is simple.
   });
@@ -146,7 +168,6 @@ describe("DataVisualizationOverlay", () => {
     // The previous implementation plan just said "Verify state update (indirectly, or simply ensure no crash/handler execution)".
     // So just clicking it covers the line.
   });
-
 
   it("renders correct descriptions for different color schemes", () => {
     // Valence

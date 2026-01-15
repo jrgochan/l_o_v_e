@@ -1,4 +1,3 @@
-
 import { render, screen } from "@testing-library/react";
 import { EmotionDetails } from "@/components/admin/panels/InfoPanel/EmotionDetails";
 import { AtlasEmotion } from "@/types/atlas-admin";
@@ -16,8 +15,23 @@ jest.mock("three", () => {
   const originalThree = jest.requireActual("three");
   return {
     ...originalThree,
-    Color: class { set() { } copy() { } offsetHSL() { } getHexString() { return "ffffff"; } },
-    Vector3: class { set() { } lerp() { } sub() { } length() { return 1; } normalize() { } },
+    Color: class {
+      set() {}
+      copy() {}
+      offsetHSL() {}
+      getHexString() {
+        return "ffffff";
+      }
+    },
+    Vector3: class {
+      set() {}
+      lerp() {}
+      sub() {}
+      length() {
+        return 1;
+      }
+      normalize() {}
+    },
   };
 });
 
@@ -39,7 +53,7 @@ describe("EmotionDetails", () => {
     definition: "A test emotion definition",
     vac: [0.5, 0.5, 0.5], // Fixed to 3 elements
     color: "#ff0000",
-    quaternion: [0, 0, 0, 1]
+    quaternion: [0, 0, 0, 1],
   };
 
   beforeAll(() => {

@@ -1,6 +1,8 @@
-
 import { render, screen, fireEvent } from "@testing-library/react";
-import { PathAnimator, PathAnimationControls } from "@/components/admin/visualizations/PathAnimator";
+import {
+  PathAnimator,
+  PathAnimationControls,
+} from "@/components/admin/visualizations/PathAnimator";
 import * as THREE from "three";
 import React from "react";
 
@@ -9,14 +11,26 @@ import type { EmotionPath } from "@/types/atlas-admin";
 
 const mockEmotionPath: EmotionPath = {
   id: "p1",
-  from: { id: "e1", name: "Joy", category: "Happy", vac: [1, 1, 1], definition: "", quaternion: [0, 0, 0, 1] },
-  to: { id: "e2", name: "Trust", category: "Happy", vac: [2, 2, 2], definition: "", quaternion: [0, 0, 0, 1] },
-  waypoints: [
-    { emotion: "Peace", vac: [1.5, 1.5, 1.5], reasoning: "" }
-  ],
+  from: {
+    id: "e1",
+    name: "Joy",
+    category: "Happy",
+    vac: [1, 1, 1],
+    definition: "",
+    quaternion: [0, 0, 0, 1],
+  },
+  to: {
+    id: "e2",
+    name: "Trust",
+    category: "Happy",
+    vac: [2, 2, 2],
+    definition: "",
+    quaternion: [0, 0, 0, 1],
+  },
+  waypoints: [{ emotion: "Peace", vac: [1.5, 1.5, 1.5], reasoning: "" }],
   total_distance: 5,
   estimated_time: "5m",
-  difficulty: "moderate"
+  difficulty: "moderate",
 };
 
 // Mock THREE
@@ -49,8 +63,12 @@ jest.mock("react", () => {
 
 // Helper for immutable ref (prevent R3F overwrite)
 const createImmutableRef = (val: any) => ({
-  get current() { return val; },
-  set current(_v: any) { /* ignore assignment */ }
+  get current() {
+    return val;
+  },
+  set current(_v: any) {
+    /* ignore assignment */
+  },
 });
 
 describe("PathAnimationControls", () => {
@@ -104,7 +122,7 @@ describe("PathAnimationControls", () => {
 
 describe("PathAnimator (R3F Component)", () => {
   const mockTraveler = {
-    position: { copy: jest.fn() }
+    position: { copy: jest.fn() },
   };
 
   beforeEach(() => {
@@ -133,7 +151,9 @@ describe("PathAnimator (R3F Component)", () => {
       frameCallback = cb;
     });
 
-    render(<PathAnimator path={mockEmotionPath} isPlaying={true} speed={1} onProgress={jest.fn()} />);
+    render(
+      <PathAnimator path={mockEmotionPath} isPlaying={true} speed={1} onProgress={jest.fn()} />
+    );
 
     // Assert initialization (useEffect should run)
     expect(THREE.CatmullRomCurve3).toHaveBeenCalled();
@@ -168,7 +188,7 @@ describe("PathAnimator (R3F Component)", () => {
       .mockReturnValueOnce(emotionsRefObj);
 
     let frameCallback: any;
-    mockUseFrame.mockImplementation((cb) => frameCallback = cb);
+    mockUseFrame.mockImplementation((cb) => (frameCallback = cb));
 
     render(<PathAnimator path={mockEmotionPath} isPlaying={true} speed={2} />); // Speed 2
 
@@ -192,7 +212,7 @@ describe("PathAnimator (R3F Component)", () => {
       .mockReturnValueOnce({ current: [] });
 
     let frameCallback: any;
-    mockUseFrame.mockImplementation((cb) => frameCallback = cb);
+    mockUseFrame.mockImplementation((cb) => (frameCallback = cb));
 
     render(<PathAnimator path={mockEmotionPath} isPlaying={false} speed={1} />);
 
@@ -222,9 +242,11 @@ describe("PathAnimator (R3F Component)", () => {
       .mockReturnValueOnce(emotionsRefObj);
 
     let frameCallback: any;
-    mockUseFrame.mockImplementation((cb) => frameCallback = cb);
+    mockUseFrame.mockImplementation((cb) => (frameCallback = cb));
 
-    render(<PathAnimator path={mockEmotionPath} isPlaying={true} speed={1} onProgress={onProgress} />);
+    render(
+      <PathAnimator path={mockEmotionPath} isPlaying={true} speed={1} onProgress={onProgress} />
+    );
 
     // Force progress to 1.0 (normally loops, but logic runs before check? No check is before update)
     // Wait:

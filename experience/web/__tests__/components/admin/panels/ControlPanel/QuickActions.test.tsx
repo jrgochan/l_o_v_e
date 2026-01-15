@@ -3,7 +3,7 @@ import { QuickActions } from "../../../../../components/admin/panels/ControlPane
 
 // Mock SmartRecommendations to avoid dependency issues
 jest.mock("@/components/admin/shared/SmartRecommendations", () => ({
-  SmartRecommendations: () => <div data-testid="smart-recommendations">Mock Recommendations</div>
+  SmartRecommendations: () => <div data-testid="smart-recommendations">Mock Recommendations</div>,
 }));
 
 describe("QuickActions", () => {
@@ -37,27 +37,35 @@ describe("QuickActions", () => {
 
   it("should handle clear selection click", () => {
     const onClear = jest.fn();
-    const { getByText } = render(<QuickActions {...defaultProps} selectedCount={1} onClearSelection={onClear} />);
+    const { getByText } = render(
+      <QuickActions {...defaultProps} selectedCount={1} onClearSelection={onClear} />
+    );
     fireEvent.click(getByText("Clear All"));
     expect(onClear).toHaveBeenCalled();
   });
 
   it("should handle bridge emotion selection", () => {
     const onSelectBridge = jest.fn();
-    const { getByText } = render(<QuickActions {...defaultProps} onSelectBridgeEmotions={onSelectBridge} />);
+    const { getByText } = render(
+      <QuickActions {...defaultProps} onSelectBridgeEmotions={onSelectBridge} />
+    );
     fireEvent.click(getByText(/Select Bridge Emotions/));
     expect(onSelectBridge).toHaveBeenCalled();
   });
 
   it("should handle recommendations toggle", () => {
     const onToggle = jest.fn();
-    const { getByText } = render(<QuickActions {...defaultProps} onToggleRecommendations={onToggle} />);
+    const { getByText } = render(
+      <QuickActions {...defaultProps} onToggleRecommendations={onToggle} />
+    );
     fireEvent.click(getByText(/Smart Recommendations/));
     expect(onToggle).toHaveBeenCalled();
   });
 
   it("should show encoded recommendations when visible", () => {
-    const { getByTestId, getByText } = render(<QuickActions {...defaultProps} showRecommendations={true} />);
+    const { getByTestId, getByText } = render(
+      <QuickActions {...defaultProps} showRecommendations={true} />
+    );
     expect(getByTestId("smart-recommendations")).toBeInTheDocument();
     expect(getByText("▼")).toBeInTheDocument(); // Expanded arrow
   });

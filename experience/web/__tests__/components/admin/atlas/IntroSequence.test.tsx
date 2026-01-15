@@ -36,7 +36,9 @@ describe("IntroSequence", () => {
   beforeEach(() => {
     jest.useFakeTimers();
     jest.clearAllMocks();
-    (useAtlasAdminStore as unknown as jest.Mock).mockImplementation((selector) => selector({ setIntroActive }));
+    (useAtlasAdminStore as unknown as jest.Mock).mockImplementation((selector) =>
+      selector({ setIntroActive })
+    );
     (useThree as jest.Mock).mockReturnValue({ camera: mockCamera });
   });
 
@@ -70,7 +72,7 @@ describe("IntroSequence", () => {
     // Actually, state update via setTimeout triggers re-render regardless of useFrame.
 
     // Check if title has opacity-100 class
-    expect(screen.getByText("ATLAS").closest('div')).toHaveClass("opacity-100");
+    expect(screen.getByText("ATLAS").closest("div")).toHaveClass("opacity-100");
 
     // 3. End
     act(() => {

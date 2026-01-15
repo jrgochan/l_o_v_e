@@ -140,7 +140,10 @@ describe("useEmotionAtlas", () => {
   });
 
   it("should handle non-ok API response", async () => {
-    fetchMock.mockResponseOnce("Internal Server Error", { status: 500, statusText: "Internal Server Error" });
+    fetchMock.mockResponseOnce("Internal Server Error", {
+      status: 500,
+      statusText: "Internal Server Error",
+    });
 
     renderHook(() => useEmotionAtlas());
 

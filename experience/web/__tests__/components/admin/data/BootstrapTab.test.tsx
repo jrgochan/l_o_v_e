@@ -1,4 +1,3 @@
-
 import { render, screen, fireEvent, waitFor, within } from "@testing-library/react";
 import BootstrapTab from "@/components/admin/data/BootstrapTab";
 import { adminApi } from "@/utils/api";
@@ -19,15 +18,15 @@ describe("BootstrapTab", () => {
       data_type: "strategy_effectiveness",
       data_category: "cat1",
       content: { foo: "bar" },
-      created_at: "2024-01-01T00:00:00Z"
+      created_at: "2024-01-01T00:00:00Z",
     },
     {
       id: "b2",
       data_type: "path_template",
       data_category: null,
       content: { baz: "qux" },
-      created_at: "2024-02-01T00:00:00Z"
-    }
+      created_at: "2024-02-01T00:00:00Z",
+    },
   ];
 
   beforeEach(() => {
@@ -35,7 +34,7 @@ describe("BootstrapTab", () => {
   });
 
   it("renders loading state", async () => {
-    (adminApi.getBootstrapData as jest.Mock).mockReturnValue(new Promise(() => { }));
+    (adminApi.getBootstrapData as jest.Mock).mockReturnValue(new Promise(() => {}));
     const { container } = render(<BootstrapTab />);
     expect(container.querySelector(".animate-spin")).toBeInTheDocument();
   });
@@ -115,15 +114,19 @@ describe("BootstrapTab", () => {
 
     // Fill form
     fireEvent.change(screen.getByLabelText(/Category/), { target: { value: "New Cat" } });
-    fireEvent.change(screen.getByLabelText(/JSON Content/), { target: { value: '{"new": "val"}' } });
+    fireEvent.change(screen.getByLabelText(/JSON Content/), {
+      target: { value: '{"new": "val"}' },
+    });
 
     fireEvent.click(screen.getByLabelText("Save Item"));
 
     await waitFor(() => {
-      expect(adminApi.createBootstrapData).toHaveBeenCalledWith(expect.objectContaining({
-        data_category: "New Cat",
-        content: { new: "val" }
-      }));
+      expect(adminApi.createBootstrapData).toHaveBeenCalledWith(
+        expect.objectContaining({
+          data_category: "New Cat",
+          content: { new: "val" },
+        })
+      );
       expect(adminApi.getBootstrapData).toHaveBeenCalledTimes(2); // Reload
     });
 
@@ -149,9 +152,12 @@ describe("BootstrapTab", () => {
     fireEvent.click(screen.getByLabelText("Save Item"));
 
     await waitFor(() => {
-      expect(adminApi.updateBootstrapData).toHaveBeenCalledWith("b1", expect.objectContaining({
-        data_category: "Updated Cat"
-      }));
+      expect(adminApi.updateBootstrapData).toHaveBeenCalledWith(
+        "b1",
+        expect.objectContaining({
+          data_category: "Updated Cat",
+        })
+      );
     });
   });
 
@@ -160,7 +166,7 @@ describe("BootstrapTab", () => {
     render(<BootstrapTab />);
 
     await waitFor(() => {
-      // It logs error but might not show UI error? 
+      // It logs error but might not show UI error?
       // The component code: console.error(...); setError("Failed to load data");
       expect(screen.getByText("Failed to load data")).toBeInTheDocument();
     });
@@ -202,9 +208,9 @@ describe("BootstrapTab", () => {
 
     // Invalid JSON input (component swallows error but doesn't update state)
     // Or if component allows typing but doesn't update internal 'content' object?
-    // Let's see: `onChange` tries `JSON.parse`. If fails, catches. 
-    // It does NOT update `currentEdit.content`. 
-    // BUT since it's controlled `value={...JSON.stringify...}`, 
+    // Let's see: `onChange` tries `JSON.parse`. If fails, catches.
+    // It does NOT update `currentEdit.content`.
+    // BUT since it's controlled `value={...JSON.stringify...}`,
     // if `currentEdit.content` doesn't update, the textarea value will revert to old valid json!
     // This is a UI quirk in the component "Allow simple editing...".
     // "For now, we rely on the user pasting valid JSON or careful editing"
@@ -220,7 +226,7 @@ describe("BootstrapTab", () => {
      }}
     */
     // YES, this component implementation prevents typing partial JSON. You can only type/paste VALID full JSON at once.
-    // This is a known issue/feature. 
+    // This is a known issue/feature.
     // Testing this: if I fireChange with invalid JSON, the state won't update.
 
     // However, Jest fireEvent/Simulate doesn't exactly simulate the "revert" visually unless we check what happens.

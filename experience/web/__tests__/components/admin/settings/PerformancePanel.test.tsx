@@ -1,55 +1,46 @@
-
 import { render, screen } from "@testing-library/react";
 import { PerformancePanel } from "@/components/admin/settings/PerformancePanel";
 
 const mockPerformance = {
-  "chat_response": {
+  chat_response: {
     avg_latency_ms: 1500,
     total_invocations: 10,
     last_used: "2024-01-01T10:00:00.000Z",
   },
-  "sentiment_analysis": {
+  sentiment_analysis: {
     avg_latency_ms: 4500,
     total_invocations: 50,
     last_used: "2024-01-01T11:00:00.000Z",
   },
-  "slow_function": {
+  slow_function: {
     avg_latency_ms: 8000,
     total_invocations: 2,
     last_used: null,
   },
-  "unused_function": {
+  unused_function: {
     avg_latency_ms: 0,
     total_invocations: 0,
     last_used: null,
-  }
+  },
 };
 
 const mockAssignments = {
-  "chat_response": "llama3",
-  "sentiment_analysis": "bert-base",
-  "slow_function": "gpt4all",
-  "unused_function": "none"
+  chat_response: "llama3",
+  sentiment_analysis: "bert-base",
+  slow_function: "gpt4all",
+  unused_function: "none",
 };
 
 describe("PerformancePanel", () => {
   it("renders empty state when no active functions", () => {
-    render(
-      <PerformancePanel
-        performance={{}}
-        assignments={null}
-      />
-    );
-    expect(screen.getByText("No performance data yet. Run some analyses to see metrics here.")).toBeInTheDocument();
+    render(<PerformancePanel performance={{}} assignments={null} />);
+    expect(
+      screen.getByText("No performance data yet. Run some analyses to see metrics here.")
+    ).toBeInTheDocument();
   });
 
   it("renders performance cards for active functions", () => {
-    render(
-      <PerformancePanel
-        performance={mockPerformance}
-        assignments={mockAssignments}
-      />
-    );
+    render(<PerformancePanel performance={mockPerformance} assignments={mockAssignments} />);
 
     // Should show chat_response (10 invocations)
     expect(screen.getByText("Chat Response")).toBeInTheDocument();
@@ -62,12 +53,7 @@ describe("PerformancePanel", () => {
   });
 
   it("renders correct latency metrics and colors", () => {
-    render(
-      <PerformancePanel
-        performance={mockPerformance}
-        assignments={mockAssignments}
-      />
-    );
+    render(<PerformancePanel performance={mockPerformance} assignments={mockAssignments} />);
 
     // Fast (Green) - < 2000ms
     const fastLatency = screen.getByText("1.5s");
@@ -89,24 +75,14 @@ describe("PerformancePanel", () => {
   });
 
   it("displays assignment info", () => {
-    render(
-      <PerformancePanel
-        performance={mockPerformance}
-        assignments={mockAssignments}
-      />
-    );
+    render(<PerformancePanel performance={mockPerformance} assignments={mockAssignments} />);
 
     expect(screen.getByText("llama3")).toBeInTheDocument();
     expect(screen.getByText("bert-base")).toBeInTheDocument();
   });
 
   it("displays last used timestamp if available", () => {
-    render(
-      <PerformancePanel
-        performance={mockPerformance}
-        assignments={mockAssignments}
-      />
-    );
+    render(<PerformancePanel performance={mockPerformance} assignments={mockAssignments} />);
 
     // We can rely on locale string rendering, but let's just check rendering
     // Since locale date string varies, we just check regex or partial
@@ -116,11 +92,11 @@ describe("PerformancePanel", () => {
 
   it("handles edge cases", () => {
     const edgeCasePerf = {
-      "edge_func": {
+      edge_func: {
         avg_latency_ms: null,
         total_invocations: 1,
-        last_used: null
-      }
+        last_used: null,
+      },
     };
 
     render(

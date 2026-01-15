@@ -1,6 +1,8 @@
-
 import { render, screen, fireEvent } from "@testing-library/react";
-import { RelationshipIndicator, RelationshipList } from "@/components/admin/shared/RelationshipIndicator";
+import {
+  RelationshipIndicator,
+  RelationshipList,
+} from "@/components/admin/shared/RelationshipIndicator";
 import { EmotionRelationship } from "@/types/chat";
 
 const mockRelationship: EmotionRelationship = {
@@ -27,6 +29,7 @@ const mockRelationships: EmotionRelationship[] = [
     emotion_a: "Fear",
     emotion_b: "Anxiety",
     type: "sequential",
+    strength: 0.7,
     description: "Leads to",
   },
   {
@@ -34,6 +37,7 @@ const mockRelationships: EmotionRelationship[] = [
     emotion_a: "A",
     emotion_b: "B",
     type: "complementary",
+    strength: 0.6,
     description: "Pairs well",
   },
   {
@@ -41,6 +45,7 @@ const mockRelationships: EmotionRelationship[] = [
     emotion_a: "C",
     emotion_b: "D",
     type: "masking",
+    strength: 0.5,
     description: "Hides it",
   },
   // Add another contradictory relationship to test grouping reduction (append to existing array)
@@ -49,8 +54,9 @@ const mockRelationships: EmotionRelationship[] = [
     emotion_a: "Anger",
     emotion_b: "Calm",
     type: "contradictory",
+    strength: 0.85,
     description: "Opposites attract",
-  }
+  },
 ];
 
 describe("RelationshipIndicator", () => {
@@ -78,7 +84,9 @@ describe("RelationshipIndicator", () => {
   });
 
   it("renders different sizes", () => {
-    const { rerender, container } = render(<RelationshipIndicator relationship={mockRelationship} size="small" />);
+    const { rerender, container } = render(
+      <RelationshipIndicator relationship={mockRelationship} size="small" />
+    );
     // Check for size classes
     expect(container.firstChild).toHaveClass("p-2", "text-xs");
 
@@ -89,10 +97,10 @@ describe("RelationshipIndicator", () => {
   it("renders varied relationship types correctly", () => {
     const types = ["complementary", "masking", "amplifying", "sequential", "unknown"] as const;
 
-    types.forEach(type => {
+    types.forEach((type) => {
       const rel = { ...mockRelationship, type: type as any };
       const { unmount } = render(<RelationshipIndicator relationship={rel} />);
-      // Just verifying it renders without error 
+      // Just verifying it renders without error
       expect(screen.getByText(rel.emotion_a)).toBeInTheDocument();
       unmount();
     });
@@ -123,7 +131,9 @@ describe("RelationshipList", () => {
 
   it("handles interaction in list", () => {
     const handleClick = jest.fn();
-    render(<RelationshipList relationships={[mockRelationship]} onRelationshipClick={handleClick} />);
+    render(
+      <RelationshipList relationships={[mockRelationship]} onRelationshipClick={handleClick} />
+    );
 
     fireEvent.click(screen.getByText("Joy"));
     expect(handleClick).toHaveBeenCalledWith(mockRelationship);
@@ -131,7 +141,13 @@ describe("RelationshipList", () => {
 
   it("handles interaction in grouped list", () => {
     const handleClick = jest.fn();
-    render(<RelationshipList relationships={[mockRelationship]} groupByType={true} onRelationshipClick={handleClick} />);
+    render(
+      <RelationshipList
+        relationships={[mockRelationship]}
+        groupByType={true}
+        onRelationshipClick={handleClick}
+      />
+    );
 
     const joyText = screen.getAllByText("Joy")[0];
     fireEvent.click(joyText);

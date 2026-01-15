@@ -1,4 +1,3 @@
-
 import { render, screen } from "@testing-library/react";
 import { PathCurveAnimated } from "@/components/admin/paths/PathCurveAnimated";
 import * as THREE from "three";

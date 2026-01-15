@@ -43,11 +43,13 @@ describe("DebugBroadcaster", () => {
     // Override the instance method directly to ensure it works regardless of prototype chain
     const originalSetItem = window.localStorage.setItem;
     Object.defineProperty(window.localStorage, "setItem", {
-      value: () => { throw new Error("Storage Full"); },
-      writable: true
+      value: () => {
+        throw new Error("Storage Full");
+      },
+      writable: true,
     });
 
-    const consoleSpy = jest.spyOn(console, "error").mockImplementation(() => { });
+    const consoleSpy = jest.spyOn(console, "error").mockImplementation(() => {});
 
     try {
       render(<DebugBroadcaster />);
@@ -62,7 +64,7 @@ describe("DebugBroadcaster", () => {
       // Restore original
       Object.defineProperty(window.localStorage, "setItem", {
         value: originalSetItem,
-        writable: true
+        writable: true,
       });
       consoleSpy.mockRestore();
     }
@@ -86,8 +88,10 @@ describe("DebugBroadcaster", () => {
   it("should handle localStorage polling errors", async () => {
     const originalGetItem = window.localStorage.getItem;
     Object.defineProperty(window.localStorage, "getItem", {
-      value: () => { throw new Error("Read Error"); },
-      writable: true
+      value: () => {
+        throw new Error("Read Error");
+      },
+      writable: true,
     });
 
     try {
@@ -101,7 +105,7 @@ describe("DebugBroadcaster", () => {
     } finally {
       Object.defineProperty(window.localStorage, "getItem", {
         value: originalGetItem,
-        writable: true
+        writable: true,
       });
     }
   });
@@ -128,7 +132,7 @@ describe("DebugBroadcaster", () => {
   });
 
   it("cleans up interval on unmount", () => {
-    const clearIntervalSpy = jest.spyOn(window, 'clearInterval');
+    const clearIntervalSpy = jest.spyOn(window, "clearInterval");
     const { unmount } = render(<DebugBroadcaster />);
     unmount();
     expect(clearIntervalSpy).toHaveBeenCalled();
@@ -161,11 +165,13 @@ describe("DebugBroadcaster", () => {
     // Override setItem to throw a string
     const originalSetItem = window.localStorage.setItem;
     Object.defineProperty(window.localStorage, "setItem", {
-      value: () => { throw "String Error"; }, // eslint-disable-line no-throw-literal
-      writable: true
+      value: () => {
+        throw "String Error";
+      },
+      writable: true,
     });
 
-    const consoleSpy = jest.spyOn(console, "error").mockImplementation(() => { });
+    const consoleSpy = jest.spyOn(console, "error").mockImplementation(() => {});
 
     try {
       render(<DebugBroadcaster />);
@@ -178,7 +184,7 @@ describe("DebugBroadcaster", () => {
     } finally {
       Object.defineProperty(window.localStorage, "setItem", {
         value: originalSetItem,
-        writable: true
+        writable: true,
       });
       consoleSpy.mockRestore();
     }

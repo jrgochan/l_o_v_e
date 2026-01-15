@@ -96,7 +96,7 @@ describe("usePathSorting", () => {
 
   it("does not award noBridge badge if no bridges needed at all", () => {
     // All paths don't need bridge
-    const paths = mockPaths.filter(p => !p.requires_bridge).map(p => ({ ...p }));
+    const paths = mockPaths.filter((p) => !p.requires_bridge).map((p) => ({ ...p }));
     const { result } = renderHook(() => usePathSorting(paths));
 
     // For p1 (easy, no bridge):

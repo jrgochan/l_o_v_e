@@ -34,7 +34,7 @@ export function GoalSetting() {
     toggleStrategy,
     handleStartJourney,
     currentVAC,
-    activeJourney
+    activeJourney,
   } = useGoalSettingLogic();
 
   if (!isOpen) {
@@ -95,10 +95,11 @@ export function GoalSetting() {
                 <button
                   key={emotion.id}
                   onClick={() => handleSelectGoal(emotion)}
-                  className={`w-full text-left p-3 rounded-lg transition-all ${selectedGoal?.id === emotion.id
-                    ? "bg-purple-600 text-white"
-                    : "bg-gray-800 text-gray-200 hover:bg-gray-700"
-                    }`}
+                  className={`w-full text-left p-3 rounded-lg transition-all ${
+                    selectedGoal?.id === emotion.id
+                      ? "bg-purple-600 text-white"
+                      : "bg-gray-800 text-gray-200 hover:bg-gray-700"
+                  }`}
                 >
                   <div className="font-semibold">{emotion.name}</div>
                   <div className="text-xs opacity-70 line-clamp-1">{emotion.category}</div>

@@ -110,16 +110,16 @@ describe("ProsodyVisualization", () => {
     // Create a test case covering different buckets than default
     const mixedProsody: ProsodyData = {
       pitch_mean: 100, // Low (<150)
-      pitch_std: 40,   // High var (>30)
-      energy: 0.2,     // Low (<0.3/0.4)
-      rate: 6,         // Fast (>5)
-      features: {}
+      pitch_std: 40, // High var (>30)
+      energy: 0.2, // Low (<0.3/0.4)
+      rate: 6, // Fast (>5)
+      features: {},
     };
 
     const { unmount } = render(<ProsodyVisualization prosody={mixedProsody} audioBlob={null} />);
 
     expect(screen.getByText("Low Pitch")).toBeInTheDocument();
-    expect(screen.getByText("Low Energy").className).toContain("text-blue-400"); // Energy 0.2 -> Low Energy -> Blue coverage 
+    expect(screen.getByText("Low Energy").className).toContain("text-blue-400"); // Energy 0.2 -> Low Energy -> Blue coverage
     // Energy 0.2 -> Low Energy
     expect(screen.getByText("Low Energy")).toBeInTheDocument();
     expect(screen.getByText("Fast Speech")).toBeInTheDocument();
@@ -130,10 +130,10 @@ describe("ProsodyVisualization", () => {
     // Moderate buckets
     const medProsody: ProsodyData = {
       pitch_mean: 260, // High (>250)
-      pitch_std: 10,   // Low (<15)
-      energy: 0.5,     // Moderate (>0.4)
-      rate: 2,         // Slow (<3)
-      features: {}
+      pitch_std: 10, // Low (<15)
+      energy: 0.5, // Moderate (>0.4)
+      rate: 2, // Slow (<3)
+      features: {},
     };
     render(<ProsodyVisualization prosody={medProsody} audioBlob={null} />);
     expect(screen.getByText("High Pitch")).toBeInTheDocument(); // Purple
@@ -166,7 +166,11 @@ describe("ProsodyVisualization", () => {
     });
 
     // Should verify logger was called and synthetic displayed
-    expect(logger.error).toHaveBeenCalledWith("rendering", "Failed to extract waveform", expect.any(Error));
+    expect(logger.error).toHaveBeenCalledWith(
+      "rendering",
+      "Failed to extract waveform",
+      expect.any(Error)
+    );
     expect(screen.getByText(/📊 Synthetic/)).toBeInTheDocument();
 
     unmount();
@@ -174,7 +178,7 @@ describe("ProsodyVisualization", () => {
   it("renders non-numeric features", () => {
     const stringFeatureProsody: any = {
       ...mockProsody,
-      features: { status: "Active" }
+      features: { status: "Active" },
     };
     render(<ProsodyVisualization prosody={stringFeatureProsody} audioBlob={null} />);
     expect(screen.getByText("Active")).toBeInTheDocument();

@@ -14,7 +14,7 @@ class MockWebSocket {
     MockWebSocket.instances.push(this);
   }
 
-  send(data: string) { }
+  send(data: string) {}
   close() {
     if (this.onclose) this.onclose();
   }
@@ -26,7 +26,7 @@ class MockWebSocket {
     }
   }
 
-  onopen() { }
+  onopen() {}
 
   static instances: MockWebSocket[] = [];
   static clear() {

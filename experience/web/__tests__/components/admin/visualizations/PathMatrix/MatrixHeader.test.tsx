@@ -1,4 +1,3 @@
-
 import { render, screen, fireEvent } from "@testing-library/react";
 import { MatrixHeader } from "@/components/admin/visualizations/PathMatrix/MatrixHeader";
 
@@ -20,7 +19,9 @@ describe("MatrixHeader", () => {
   it("renders correctly in default state", () => {
     render(<MatrixHeader {...defaultProps} />);
     expect(screen.getByText("Emotion Transition Matrix")).toBeInTheDocument();
-    expect(screen.getByText("87×87 grid showing all possible emotional transitions")).toBeInTheDocument();
+    expect(
+      screen.getByText("87×87 grid showing all possible emotional transitions")
+    ).toBeInTheDocument();
     expect(screen.getByText(/Computed:/)).toBeInTheDocument();
     expect(screen.getByText("50")).toBeInTheDocument();
     expect(screen.getByText(/\(50\.0%\)/)).toBeInTheDocument();

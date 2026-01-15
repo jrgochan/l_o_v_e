@@ -1,4 +1,3 @@
-
 import { render, screen, fireEvent } from "@testing-library/react";
 import { EmotionTimeline } from "@/components/admin/visualizations/EmotionTimeline";
 import { EmotionHistoryEntry } from "@/stores/useEmotionHistoryStore";
@@ -12,7 +11,7 @@ const mockEntries: EmotionHistoryEntry[] = [
     isVisibleInSphere: true,
     vac: { valence: 0.8, arousal: 0.5, connection: 0.6 },
     confidence: 1,
-    messageId: "msg-1"
+    messageId: "msg-1",
   },
   {
     id: "2",
@@ -22,15 +21,13 @@ const mockEntries: EmotionHistoryEntry[] = [
     isVisibleInSphere: false,
     vac: { valence: -0.5, arousal: 0.2, connection: 0.3 },
     confidence: 0.8,
-    messageId: "msg-1"
+    messageId: "msg-1",
   },
 ];
 
 describe("EmotionTimeline", () => {
   it("renders nothing when entries are empty", () => {
-    const { container } = render(
-      <EmotionTimeline entries={[]} onToggleVisibility={jest.fn()} />
-    );
+    const { container } = render(<EmotionTimeline entries={[]} onToggleVisibility={jest.fn()} />);
     expect(container).toBeEmptyDOMElement();
   });
 
@@ -69,7 +66,7 @@ describe("EmotionTimeline", () => {
         isVisibleInSphere: true,
         vac: { valence: -0.8, arousal: 0.9, connection: -0.7 }, // Negative Connection
         confidence: 0.9,
-        messageId: "msg-2"
+        messageId: "msg-2",
       },
     ];
 

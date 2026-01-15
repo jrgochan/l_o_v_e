@@ -9,9 +9,7 @@ describe("EmotionMappingBadge", () => {
   };
 
   it("returns null for exact match", () => {
-    const { container } = render(
-      <EmotionMappingBadge {...defaultProps} matchMethod="exact" />
-    );
+    const { container } = render(<EmotionMappingBadge {...defaultProps} matchMethod="exact" />);
     expect(container).toBeEmptyDOMElement();
   });
 

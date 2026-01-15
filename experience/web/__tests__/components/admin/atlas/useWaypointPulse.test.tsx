@@ -6,70 +6,70 @@ import * as THREE from "three";
 // Mock R3F
 const mockUseFrame = jest.fn();
 jest.mock("@react-three/fiber", () => ({
-    useFrame: (cb: any) => mockUseFrame(cb),
+  useFrame: (cb: any) => mockUseFrame(cb),
 }));
 
 describe("useWaypointPulse", () => {
-    beforeEach(() => {
-        jest.clearAllMocks();
-    });
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
 
-    it("should register frame loop and animate", () => {
-        const meshRef = { current: { scale: { setScalar: jest.fn() } } };
+  it("should register frame loop and animate", () => {
+    const meshRef = { current: { scale: { setScalar: jest.fn() } } };
 
-        // Render a dummy component to use the hook
-        const TestComponent = ({ mode }: { mode: any }) => {
-            useWaypointPulse(meshRef as any, mode);
-            return null;
-        };
+    // Render a dummy component to use the hook
+    const TestComponent = ({ mode }: { mode: any }) => {
+      useWaypointPulse(meshRef as any, mode);
+      return null;
+    };
 
-        render(<TestComponent mode="dynamic" />);
+    render(<TestComponent mode="dynamic" />);
 
-        expect(mockUseFrame).toHaveBeenCalled();
-        const frameCallback = mockUseFrame.mock.calls[0][0];
+    expect(mockUseFrame).toHaveBeenCalled();
+    const frameCallback = mockUseFrame.mock.calls[0][0];
 
-        // Execute callback
-        const state = { clock: { elapsedTime: 1 } };
-        frameCallback(state);
+    // Execute callback
+    const state = { clock: { elapsedTime: 1 } };
+    frameCallback(state);
 
-        expect(meshRef.current.scale.setScalar).toHaveBeenCalled();
-    });
+    expect(meshRef.current.scale.setScalar).toHaveBeenCalled();
+  });
 
-    it("should handle subtle mode", () => {
-        const meshRef = { current: { scale: { setScalar: jest.fn() } } };
-        const TestComponent = () => {
-            useWaypointPulse(meshRef as any, "subtle");
-            return null;
-        };
-        render(<TestComponent />);
+  it("should handle subtle mode", () => {
+    const meshRef = { current: { scale: { setScalar: jest.fn() } } };
+    const TestComponent = () => {
+      useWaypointPulse(meshRef as any, "subtle");
+      return null;
+    };
+    render(<TestComponent />);
 
-        const frameCallback = mockUseFrame.mock.calls[0][0];
-        frameCallback({ clock: { elapsedTime: 1 } });
-        expect(meshRef.current.scale.setScalar).toHaveBeenCalled();
-    });
+    const frameCallback = mockUseFrame.mock.calls[0][0];
+    frameCallback({ clock: { elapsedTime: 1 } });
+    expect(meshRef.current.scale.setScalar).toHaveBeenCalled();
+  });
 
-    it("should handle mystical mode", () => {
-        const meshRef = { current: { scale: { setScalar: jest.fn() } } };
-        const TestComponent = () => {
-            useWaypointPulse(meshRef as any, "mystical");
-            return null;
-        };
-        render(<TestComponent />);
+  it("should handle mystical mode", () => {
+    const meshRef = { current: { scale: { setScalar: jest.fn() } } };
+    const TestComponent = () => {
+      useWaypointPulse(meshRef as any, "mystical");
+      return null;
+    };
+    render(<TestComponent />);
 
-        const frameCallback = mockUseFrame.mock.calls[0][0];
-        frameCallback({ clock: { elapsedTime: 1 } });
-        expect(meshRef.current.scale.setScalar).toHaveBeenCalled();
-    });
-    it("should handle null ref safely", () => {
-        const meshRef = { current: null };
-        const TestComponent = () => {
-            useWaypointPulse(meshRef as any, "subtle");
-            return null;
-        };
-        render(<TestComponent />);
+    const frameCallback = mockUseFrame.mock.calls[0][0];
+    frameCallback({ clock: { elapsedTime: 1 } });
+    expect(meshRef.current.scale.setScalar).toHaveBeenCalled();
+  });
+  it("should handle null ref safely", () => {
+    const meshRef = { current: null };
+    const TestComponent = () => {
+      useWaypointPulse(meshRef as any, "subtle");
+      return null;
+    };
+    render(<TestComponent />);
 
-        const frameCallback = mockUseFrame.mock.calls[0][0];
-        // Should execute without error and return early
-        expect(() => frameCallback({ clock: { elapsedTime: 1 } })).not.toThrow();
-    });
+    const frameCallback = mockUseFrame.mock.calls[0][0];
+    // Should execute without error and return early
+    expect(() => frameCallback({ clock: { elapsedTime: 1 } })).not.toThrow();
+  });
 });

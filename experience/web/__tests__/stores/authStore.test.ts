@@ -146,7 +146,7 @@ describe("useAuthStore", () => {
       });
 
       // Mock console.error
-      const mockError = jest.spyOn(console, "error").mockImplementation(() => { });
+      const mockError = jest.spyOn(console, "error").mockImplementation(() => {});
       (api.get as jest.Mock).mockRejectedValueOnce(new Error("Network"));
 
       await act(async () => {

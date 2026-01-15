@@ -4,14 +4,31 @@ import { AtlasEmotion, CategoryFilter } from "@/types/atlas-admin";
 
 describe("CategoryBrowser", () => {
   const mockFilters = new Map<string, CategoryFilter>([
-    ["Cat1", { name: "Cat1", enabled: true, color: "#FF0000", emotionCount: 2 }]
+    ["Cat1", { name: "Cat1", enabled: true, color: "#FF0000", emotionCount: 2 }],
   ]);
 
   const mockEmotions = new Map<string, AtlasEmotion[]>([
-    ["Cat1", [
-      { id: "e1", name: "Joy", category: "Cat1", definition: "D1", vac: [0, 0, 0], quaternion: [0, 0, 0, 1] },
-      { id: "e2", name: "Awe", category: "Cat1", definition: "D2", vac: [0, 0, 0], quaternion: [0, 0, 0, 1] } // Awe is a bridge emotion
-    ]]
+    [
+      "Cat1",
+      [
+        {
+          id: "e1",
+          name: "Joy",
+          category: "Cat1",
+          definition: "D1",
+          vac: [0, 0, 0],
+          quaternion: [0, 0, 0, 1],
+        },
+        {
+          id: "e2",
+          name: "Awe",
+          category: "Cat1",
+          definition: "D2",
+          vac: [0, 0, 0],
+          quaternion: [0, 0, 0, 1],
+        }, // Awe is a bridge emotion
+      ],
+    ],
   ]);
 
   const defaultProps = {
@@ -78,7 +95,6 @@ describe("CategoryBrowser", () => {
     // Let's use getByText for button content
     // "+ Add" or "✓ All" or "◐ Some"
     // Since getCategorySelectionState mock returns "none", it should be "+ Add"
-
   });
 
   it("should display correct selection state on category button", () => {
@@ -121,11 +137,7 @@ describe("CategoryBrowser", () => {
     const expanded = new Set(["Cat1"]);
     const selected = new Set(["e1"]);
     const { getByText } = render(
-      <CategoryBrowser
-        {...defaultProps}
-        expandedCategories={expanded}
-        selectedIds={selected}
-      />
+      <CategoryBrowser {...defaultProps} expandedCategories={expanded} selectedIds={selected} />
     );
     // Selected emotion Joy should have checkmark
     // The checkmark is "✓" in a span.
@@ -140,12 +152,7 @@ describe("CategoryBrowser", () => {
     const filters = new Map(mockFilters);
     filters.set("Cat2", { name: "Cat2", enabled: true, color: "#00FF00", emotionCount: 0 });
 
-    const { getByText } = render(
-      <CategoryBrowser
-        {...defaultProps}
-        categoryFilters={filters}
-      />
-    );
+    const { getByText } = render(<CategoryBrowser {...defaultProps} categoryFilters={filters} />);
     expect(getByText("Cat2")).toBeInTheDocument();
   });
 });

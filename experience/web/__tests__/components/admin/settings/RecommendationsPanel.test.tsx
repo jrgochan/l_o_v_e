@@ -1,23 +1,22 @@
-
 import { render, screen, fireEvent } from "@testing-library/react";
 import { RecommendationsPanel } from "@/components/admin/settings/RecommendationsPanel";
 
 const mockRecommendations = {
-  "chat_response": {
+  chat_response: {
     recommended: ["llama3", "mistral"],
     not_recommended: ["gpt2"],
-    reasoning: "Llama3 performs best for chat."
+    reasoning: "Llama3 performs best for chat.",
   },
-  "sentiment_analysis": {
+  sentiment_analysis: {
     recommended: ["bert"],
     not_recommended: [],
-    reasoning: "BERT is specialized."
-  }
+    reasoning: "BERT is specialized.",
+  },
 };
 
 const mockAssignments = {
-  "chat_response": "gpt2", // Should be actionable (using not recommended)
-  "sentiment_analysis": "bert" // Should be okay (using recommended)
+  chat_response: "gpt2", // Should be actionable (using not recommended)
+  sentiment_analysis: "bert", // Should be okay (using recommended)
 };
 
 describe("RecommendationsPanel", () => {
@@ -35,7 +34,9 @@ describe("RecommendationsPanel", () => {
         onApplyRecommendation={mockOnApply}
       />
     );
-    expect(screen.getByText("No recommendations available. Add more models to see suggestions.")).toBeInTheDocument();
+    expect(
+      screen.getByText("No recommendations available. Add more models to see suggestions.")
+    ).toBeInTheDocument();
   });
 
   it("renders recommendations correctly", () => {
@@ -66,7 +67,7 @@ describe("RecommendationsPanel", () => {
     // Chat Response is using "gpt2" which is in not_recommended
     // So it should show Action Recommended badge
     // We need to find the card container or context, but simple text check works for uniqueness here
-    const chatHeader = screen.getAllByText("Chat Response")[0].closest('div')?.parentElement;
+    const chatHeader = screen.getAllByText("Chat Response")[0].closest("div")?.parentElement;
     expect(screen.getByText("Action Recommended")).toBeInTheDocument();
 
     // It should offer to switch to top recommendation (llama3)
@@ -140,7 +141,7 @@ describe("RecommendationsPanel", () => {
 
   it("handles missing assignment for a function", () => {
     const partialAssignments = {
-      "chat_response": "llama3"
+      chat_response: "llama3",
       // sentiment_analysis missing
     };
 
@@ -163,10 +164,10 @@ describe("RecommendationsPanel", () => {
     // Let's add another not_recommended model that is NOT selected to verify its rendering style.
     const multiBadRecs = {
       ...mockRecommendations,
-      "chat_response": {
+      chat_response: {
         ...mockRecommendations["chat_response"],
-        not_recommended: ["gpt2", "bad_model_2"]
-      }
+        not_recommended: ["gpt2", "bad_model_2"],
+      },
     };
 
     render(

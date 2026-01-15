@@ -25,7 +25,6 @@ export function EmotionMappingBadge({
   // Get icon and color based on match method
   const getMethodIcon = () => {
     switch (matchMethod) {
-
       case "fuzzy":
         return "≈";
       case "vac":

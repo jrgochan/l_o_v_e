@@ -1,4 +1,3 @@
-
 import { render, screen, act } from "@testing-library/react";
 import { EmotionRelationshipGraph } from "@/components/admin/visualizations/EmotionRelationshipGraph";
 import { useGraphData } from "@/hooks/visualizations/useGraphData";
@@ -74,7 +73,7 @@ jest.mock("@/hooks/visualizations/useGraphSimulation", () => ({
       (global as any).mockOnTick = onTick;
     }
     return {
-      createDragBehavior: jest.fn(() => () => { }),
+      createDragBehavior: jest.fn(() => () => {}),
       simulationRef: { current: { on: jest.fn(), stop: jest.fn(), restart: jest.fn() } },
     };
   }),
@@ -110,21 +109,21 @@ jest.mock("d3", () => {
           value({ relationship: { strength: 0.8 } });
           value({ relationship: { strength: 0.5 } });
           value({ relationship: { strength: 0.2 } });
-        } catch (e) { }
+        } catch (e) {}
 
         try {
           // Node Prominence
           value({ emotion: { prominence: "primary" }, radius: 10 });
           value({ emotion: { prominence: "secondary" }, radius: 10 });
           value({ emotion: { prominence: "underlying" }, radius: 10 });
-        } catch (e) { }
+        } catch (e) {}
 
         try {
           // Coords (onTick) - Valid
           value({ x: 10, y: 10, source: { x: 0, y: 0 }, target: { x: 1, y: 1 } });
           // Coords (onTick) - MISSING Target Coords (hits || 0 branch)
           value({ x: 10, y: 10, source: { x: 0, y: 0 }, target: {} });
-        } catch (e) { }
+        } catch (e) {}
       }
       return this;
     }),
@@ -140,7 +139,7 @@ jest.mock("d3", () => {
       if (typeof value === "function") {
         try {
           value({ emotion: { emotion_name: "test" } });
-        } catch (e) { }
+        } catch (e) {}
       }
       return this;
     }),
@@ -163,7 +162,7 @@ describe("EmotionRelationshipGraph", () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
-    Object.keys(mockHandlers).forEach(k => delete mockHandlers[k]);
+    Object.keys(mockHandlers).forEach((k) => delete mockHandlers[k]);
   });
 
   it("initializes D3 graph and executes attribute logic", () => {
@@ -225,13 +224,13 @@ describe("EmotionRelationshipGraph", () => {
     (useGraphData as jest.Mock).mockReturnValue({
       nodes: [
         { id: "1", color: "red", emotion: { prominence: "primary" } },
-        { id: "2", color: "blue", emotion: { prominence: "secondary" } }
+        { id: "2", color: "blue", emotion: { prominence: "secondary" } },
       ],
       links: [
         { source: "1", target: "2", relationship: { strength: 0.9 } }, // High
         { source: "1", target: "2", relationship: { strength: 0.5 } }, // Med
-        { source: "1", target: "2", relationship: { strength: 0.1 } }  // Low
-      ]
+        { source: "1", target: "2", relationship: { strength: 0.1 } }, // Low
+      ],
     });
     render(<EmotionRelationshipGraph {...defaultProps} />);
     expect(d3.select).toHaveBeenCalled();
@@ -244,17 +243,17 @@ describe("EmotionRelationshipGraph", () => {
       const nodeData = {
         radius: 20,
         emotion: { prominence: "primary" },
-        id: "e1"
+        id: "e1",
       };
       act(() => {
-        mockHandlers["mouseover"].call({}, { stopPropagation: () => { } }, nodeData);
+        mockHandlers["mouseover"].call({}, { stopPropagation: () => {} }, nodeData);
       });
     }
 
     if (mockHandlers["mouseout"]) {
       const nodeData = { radius: 20, emotion: { prominence: "primary" } };
       act(() => {
-        mockHandlers["mouseout"].call({}, { stopPropagation: () => { } }, nodeData);
+        mockHandlers["mouseout"].call({}, { stopPropagation: () => {} }, nodeData);
       });
     }
 
@@ -263,14 +262,14 @@ describe("EmotionRelationshipGraph", () => {
       const nodeDataSec = {
         radius: 15,
         emotion: { prominence: "secondary" },
-        id: "e2"
+        id: "e2",
       };
       act(() => {
-        mockHandlers["mouseover"].call({}, { stopPropagation: () => { } }, nodeDataSec);
+        mockHandlers["mouseover"].call({}, { stopPropagation: () => {} }, nodeDataSec);
       });
       act(() => {
         if (mockHandlers["mouseout"])
-          mockHandlers["mouseout"].call({}, { stopPropagation: () => { } }, nodeDataSec);
+          mockHandlers["mouseout"].call({}, { stopPropagation: () => {} }, nodeDataSec);
       });
     }
 
@@ -279,11 +278,11 @@ describe("EmotionRelationshipGraph", () => {
       const nodeDataUnder = {
         radius: 10,
         emotion: { prominence: "underlying" },
-        id: "e3"
+        id: "e3",
       };
       // We only need to check mouseout for the ternary
       act(() => {
-        mockHandlers["mouseout"].call({}, { stopPropagation: () => { } }, nodeDataUnder);
+        mockHandlers["mouseout"].call({}, { stopPropagation: () => {} }, nodeDataUnder);
       });
     }
   });
@@ -297,9 +296,9 @@ describe("EmotionRelationshipGraph", () => {
           target: {},
           color: "red",
           width: 1,
-          relationship: { strength: 0.8 }
-        }
-      ]
+          relationship: { strength: 0.8 },
+        },
+      ],
     });
     render(<EmotionRelationshipGraph {...defaultProps} />);
     expect(d3.select).toHaveBeenCalled();

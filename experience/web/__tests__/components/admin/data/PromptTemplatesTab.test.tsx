@@ -1,4 +1,3 @@
-
 import { render, screen, fireEvent, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { PromptTemplatesTab } from "@/components/admin/data/PromptTemplatesTab";
@@ -64,7 +63,7 @@ describe("PromptTemplatesTab", () => {
 
   it("handles loading state", () => {
     // Mock a promise that doesn't resolve immediately
-    (adminApi.getPromptTemplates as jest.Mock).mockReturnValue(new Promise(() => { }));
+    (adminApi.getPromptTemplates as jest.Mock).mockReturnValue(new Promise(() => {}));
     render(<PromptTemplatesTab />);
     // Initial render doesn't show loading spinner but might show empty state or just the header
     expect(screen.getByText("Prompt Library")).toBeInTheDocument();
@@ -72,7 +71,7 @@ describe("PromptTemplatesTab", () => {
 
   it("handles error loading prompts", async () => {
     (adminApi.getPromptTemplates as jest.Mock).mockRejectedValue(new Error("Failed load"));
-    const consoleSpy = jest.spyOn(console, "error").mockImplementation(() => { });
+    const consoleSpy = jest.spyOn(console, "error").mockImplementation(() => {});
 
     render(<PromptTemplatesTab />);
 
@@ -85,7 +84,9 @@ describe("PromptTemplatesTab", () => {
 
   it("filters prompts by function", async () => {
     render(<PromptTemplatesTab />);
-    await waitFor(() => expect(screen.getAllByRole("heading", { level: 3 })[0]).toHaveTextContent("semantic_vac"));
+    await waitFor(() =>
+      expect(screen.getAllByRole("heading", { level: 3 })[0]).toHaveTextContent("semantic_vac")
+    );
 
     const filterSelect = screen.getByLabelText("Filter by Function");
     fireEvent.change(filterSelect, { target: { value: "semantic_vac" } });
@@ -107,7 +108,9 @@ describe("PromptTemplatesTab", () => {
   it("enters edit mode correctly", async () => {
     const user = userEvent.setup();
     render(<PromptTemplatesTab />);
-    await waitFor(() => expect(screen.getAllByRole("heading", { level: 3 })[0]).toHaveTextContent("semantic_vac"));
+    await waitFor(() =>
+      expect(screen.getAllByRole("heading", { level: 3 })[0]).toHaveTextContent("semantic_vac")
+    );
 
     const editBtn = screen.getByTestId("edit-btn-uuid-1");
     await user.click(editBtn);
@@ -178,14 +181,16 @@ describe("PromptTemplatesTab", () => {
     await user.click(screen.getByText("Save Template"));
 
     await waitFor(() => {
-      expect(adminApi.createPromptTemplate).toHaveBeenCalledWith(expect.objectContaining({
-        function_name: "semantic_vac",
-        version: "2.0.0",
-        template_content: "Hello {input}",
-        input_variables: ["input"],
-        description: "New Desc",
-        is_active: true, // Now true
-      }));
+      expect(adminApi.createPromptTemplate).toHaveBeenCalledWith(
+        expect.objectContaining({
+          function_name: "semantic_vac",
+          version: "2.0.0",
+          template_content: "Hello {input}",
+          input_variables: ["input"],
+          description: "New Desc",
+          is_active: true, // Now true
+        })
+      );
     });
   });
 
@@ -229,15 +234,19 @@ describe("PromptTemplatesTab", () => {
     await user.click(screen.getByText("Save Template"));
 
     await waitFor(() => {
-      expect(adminApi.createPromptTemplate).toHaveBeenCalledWith(expect.objectContaining({
-        input_variables: [],
-      }));
+      expect(adminApi.createPromptTemplate).toHaveBeenCalledWith(
+        expect.objectContaining({
+          input_variables: [],
+        })
+      );
     });
   });
 
   it("tests prompt template execution", async () => {
     const user = userEvent.setup();
-    (adminApi.testPromptTemplate as jest.Mock).mockResolvedValue({ rendered_content: "Rendered Hello World" });
+    (adminApi.testPromptTemplate as jest.Mock).mockResolvedValue({
+      rendered_content: "Rendered Hello World",
+    });
 
     render(<PromptTemplatesTab />);
     await waitFor(() => expect(screen.getByText("New Template")).toBeInTheDocument());
@@ -258,8 +267,8 @@ describe("PromptTemplatesTab", () => {
       expect(adminApi.testPromptTemplate).toHaveBeenCalledWith({
         template_content: "Hello input",
         input_variables: {
-          "input_text": "I feel really happy today but a bit tired."
-        }
+          input_text: "I feel really happy today but a bit tired.",
+        },
       });
       expect(screen.getByText("Rendered Hello World")).toBeInTheDocument();
     });
@@ -338,15 +347,20 @@ describe("PromptTemplatesTab", () => {
     await user.click(screen.getByText("Save Template"));
 
     await waitFor(() => {
-      expect(adminApi.updatePromptTemplate).toHaveBeenCalledWith("uuid-1", expect.objectContaining({
-        template_content: "Updated Content",
-      }));
+      expect(adminApi.updatePromptTemplate).toHaveBeenCalledWith(
+        "uuid-1",
+        expect.objectContaining({
+          template_content: "Updated Content",
+        })
+      );
     });
   });
 
   it("handles test render", async () => {
     const user = userEvent.setup();
-    (adminApi.testPromptTemplate as jest.Mock).mockResolvedValue({ rendered_content: "Rendered: Hello World" });
+    (adminApi.testPromptTemplate as jest.Mock).mockResolvedValue({
+      rendered_content: "Rendered: Hello World",
+    });
 
     render(<PromptTemplatesTab />);
     await waitFor(() => expect(screen.getByTestId("edit-btn-uuid-1")).toBeInTheDocument());
@@ -416,7 +430,7 @@ describe("PromptTemplatesTab", () => {
     await waitFor(() => {
       expect(adminApi.testPromptTemplate).toHaveBeenCalledWith({
         template_content: "Just text",
-        input_variables: {}
+        input_variables: {},
       });
       expect(screen.getByText("No Vars")).toBeInTheDocument();
     });
@@ -455,21 +469,31 @@ describe("PromptTemplatesTab", () => {
     await user.click(screen.getByText("Save Template"));
 
     await waitFor(() => {
-      expect(adminApi.updatePromptTemplate).toHaveBeenCalledWith("legacy", expect.objectContaining({
-        input_variables: []
-      }));
+      expect(adminApi.updatePromptTemplate).toHaveBeenCalledWith(
+        "legacy",
+        expect.objectContaining({
+          input_variables: [],
+        })
+      );
     });
   });
 
   it("handles test render with undefined input_variables (legacy data)", async () => {
     const user = userEvent.setup();
-    const legacyTemplate = { ...mockTemplates[0], id: "legacy-test", input_variables: undefined, template_content: "No vars" };
+    const legacyTemplate = {
+      ...mockTemplates[0],
+      id: "legacy-test",
+      input_variables: undefined,
+      template_content: "No vars",
+    };
     (adminApi.getPromptTemplates as jest.Mock).mockResolvedValue([legacyTemplate]);
     (adminApi.testPromptTemplate as jest.Mock).mockResolvedValue({ rendered_content: "OK" });
 
     render(<PromptTemplatesTab />);
     // The component renders "Variables: " with a space if empty
-    await waitFor(() => expect(screen.getByText("Variables:", { exact: false })).toBeInTheDocument());
+    await waitFor(() =>
+      expect(screen.getByText("Variables:", { exact: false })).toBeInTheDocument()
+    );
 
     // Check that we can see the "Variables:" label but no variables
     const varsContainer = screen.getByText("Variables:", { exact: false });
@@ -482,7 +506,7 @@ describe("PromptTemplatesTab", () => {
     await waitFor(() => {
       expect(adminApi.testPromptTemplate).toHaveBeenCalledWith({
         template_content: "No vars",
-        input_variables: {}
+        input_variables: {},
       });
     });
   });
@@ -533,9 +557,11 @@ describe("PromptTemplatesTab", () => {
     await user.click(screen.getByText("Save Template"));
 
     await waitFor(() => {
-      expect(adminApi.createPromptTemplate).toHaveBeenCalledWith(expect.objectContaining({
-        input_variables: [] // This comes from .split()... which creates [].
-      }));
+      expect(adminApi.createPromptTemplate).toHaveBeenCalledWith(
+        expect.objectContaining({
+          input_variables: [], // This comes from .split()... which creates [].
+        })
+      );
     });
 
     // To truly hit the `|| []` in `handleSave` (create block), we'd need `currentPrompt.input_variables` to be undefined.
@@ -562,7 +588,7 @@ describe("PromptTemplatesTab", () => {
     // We can't do that easily via standard UI interactions.
     // However, if the field is empty, it is `[]`. `[]` is truthy.
     // So the `|| []` is effectively dead code in the Create path unless we change `handleCreate` or finding a way to make it undefined.
-    // Valid fix: Refactor code to remove unnecessary fallback if guaranteed. 
+    // Valid fix: Refactor code to remove unnecessary fallback if guaranteed.
     // BUT we are "Hardening", so maybe we just want to prove it's safe.
     // Or we can use `fireEvent.change` to set state to something invalid? No, it's strongly typed state.
     // Actually, `input_variables` in `PromptTemplate` is optional?

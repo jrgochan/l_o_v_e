@@ -59,12 +59,26 @@ describe("VACTrajectoryPlot", () => {
   });
 
   describe("Pattern Detection", () => {
-
     it("detects rapid shifts", () => {
       const jerkyHistory: VACHistoryPoint[] = [
-        { timestamp: new Date(), vac: { valence: 0, arousal: 0, connection: 0 }, emotion: "A", confidence: 1 },
-        { timestamp: new Date(), vac: { valence: 0.9, arousal: 0.9, connection: 0 }, emotion: "B", confidence: 1 }, // >0.5 diff
-        { timestamp: new Date(), vac: { valence: -0.9, arousal: -0.9, connection: 0 }, emotion: "C", confidence: 1 }, // >0.5 diff
+        {
+          timestamp: new Date(),
+          vac: { valence: 0, arousal: 0, connection: 0 },
+          emotion: "A",
+          confidence: 1,
+        },
+        {
+          timestamp: new Date(),
+          vac: { valence: 0.9, arousal: 0.9, connection: 0 },
+          emotion: "B",
+          confidence: 1,
+        }, // >0.5 diff
+        {
+          timestamp: new Date(),
+          vac: { valence: -0.9, arousal: -0.9, connection: 0 },
+          emotion: "C",
+          confidence: 1,
+        }, // >0.5 diff
       ];
       render(<VACTrajectoryPlot vacHistory={jerkyHistory} />);
       expect(screen.getByText("Rapid emotional shifts detected")).toBeInTheDocument();
@@ -72,9 +86,9 @@ describe("VACTrajectoryPlot", () => {
 
     it("detects negative bias", () => {
       // 3 points, 3 negative (< -0.2) -> 100% > 70%
-      const negativeHistory = mockHistory.map(p => ({
+      const negativeHistory = mockHistory.map((p) => ({
         ...p,
-        vac: { ...p.vac, valence: -0.5 }
+        vac: { ...p.vac, valence: -0.5 },
       }));
       render(<VACTrajectoryPlot vacHistory={negativeHistory} />);
       expect(screen.getByText("Persistent negative emotional state")).toBeInTheDocument();
@@ -100,14 +114,16 @@ describe("VACTrajectoryPlot", () => {
 
     const divPoints = container.querySelectorAll("div.cursor-pointer");
     const circles = container.querySelectorAll("circle");
-    const pointerCircles = Array.from(circles).filter(c => c.getAttribute("style")?.includes("cursor: pointer"));
+    const pointerCircles = Array.from(circles).filter((c) =>
+      c.getAttribute("style")?.includes("cursor: pointer")
+    );
 
     const allPoints = [...Array.from(divPoints), ...pointerCircles];
     expect(allPoints.length).toBeGreaterThanOrEqual(3);
 
     allPoints.forEach((point) => {
       fireEvent.mouseEnter(point);
-      // Use refined regex to query ONLY the V: ... A: ... format 
+      // Use refined regex to query ONLY the V: ... A: ... format
       // Default Quadrant label is "IV: Joyful" which matches /V:/.
       const tooltips = screen.getAllByText(/V:.*A:/); // "V: 0.80, A: 0.70"
       expect(tooltips.length).toBeGreaterThan(0);

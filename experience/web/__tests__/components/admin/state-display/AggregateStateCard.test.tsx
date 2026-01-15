@@ -1,4 +1,3 @@
-
 import { render, screen } from "@testing-library/react";
 import { AggregateStateCard } from "@/components/admin/state-display/AggregateStateCard";
 import type { AggregateState } from "@/types/chat";

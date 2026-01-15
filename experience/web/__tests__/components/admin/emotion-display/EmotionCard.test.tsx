@@ -5,7 +5,9 @@ import { CATEGORY_COLORS } from "@/types/atlas-admin";
 // Mock child components
 jest.mock("@/components/admin/emotion-display/BaseEmotionChip", () => ({
   BaseEmotionChip: jest.fn(({ emotion, category }) => (
-    <div data-testid="base-emotion-chip">{emotion} ({category})</div>
+    <div data-testid="base-emotion-chip">
+      {emotion} ({category})
+    </div>
   )),
 }));
 
@@ -21,7 +23,7 @@ describe("EmotionCard", () => {
     definition: "A feeling of great pleasure and happiness.",
     vac: [0.8, 0.6, 0.7] as [number, number, number],
     quaternion: [0, 0, 0, 1] as [number, number, number, number],
-    color_hint: "#ffffff"
+    color_hint: "#ffffff",
   };
 
   const defaultProps = {
@@ -101,12 +103,7 @@ describe("EmotionBadge (Local Variant)", () => {
   it("renders BaseEmotionChip with correct props", () => {
     const handleClick = jest.fn();
     render(
-      <EmotionBadge
-        emotion="Sadness"
-        category="Negative"
-        confidence={0.5}
-        onClick={handleClick}
-      />
+      <EmotionBadge emotion="Sadness" category="Negative" confidence={0.5} onClick={handleClick} />
     );
 
     const chip = screen.getByTestId("base-emotion-chip");

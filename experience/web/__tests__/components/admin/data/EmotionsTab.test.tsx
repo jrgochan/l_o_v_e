@@ -1,4 +1,3 @@
-
 import { render, screen, fireEvent, waitFor, within } from "@testing-library/react";
 import { EmotionsTab } from "@/components/admin/data/EmotionsTab";
 import { adminApi } from "@/utils/api";
@@ -35,7 +34,7 @@ describe("EmotionsTab", () => {
       definition: "Feeling sorrow.",
       vac_vector: [-0.5, -0.2, -0.1],
       // missing optional fields
-    }
+    },
   ];
 
   beforeEach(() => {
@@ -43,7 +42,7 @@ describe("EmotionsTab", () => {
   });
 
   it("renders loading state", async () => {
-    (adminApi.getAtlasEmotions as jest.Mock).mockReturnValue(new Promise(() => { }));
+    (adminApi.getAtlasEmotions as jest.Mock).mockReturnValue(new Promise(() => {}));
     const { container } = render(<EmotionsTab />);
     // Check for loader by class or role
     expect(container.querySelector(".animate-spin")).toBeInTheDocument();
@@ -105,10 +104,10 @@ describe("EmotionsTab", () => {
 
     // Invalid number check (should not change state)
     fireEvent.change(vInput, { target: { value: "abc" } });
-    // Should still be last valid input or unchanged in DOM? 
-    // Logic: if (isNaN) return. So value in input might change if uncontrolled, 
-    // but here value={editForm.vac_vector?.[i] ?? 0}. 
-    // If state doesn't update, input should revert or stay. 
+    // Should still be last valid input or unchanged in DOM?
+    // Logic: if (isNaN) return. So value in input might change if uncontrolled,
+    // but here value={editForm.vac_vector?.[i] ?? 0}.
+    // If state doesn't update, input should revert or stay.
     // React controlled inputs w/ uncontrolled change event logic is tricky.
     // Let's explicitly check the mocked update call arguments later.
 
@@ -117,15 +116,18 @@ describe("EmotionsTab", () => {
     fireEvent.click(saveBtn);
 
     // Verify loading state during save?
-    // expect(within(row).getByRole("img", { hidden: true })).toHaveClass("animate-spin"); 
+    // expect(within(row).getByRole("img", { hidden: true })).toHaveClass("animate-spin");
     // (using lucide loader which is usually svg with animate-spin class)
 
     await waitFor(() => {
-      expect(adminApi.updateAtlasEmotion).toHaveBeenCalledWith("e1", expect.objectContaining({
-        category: "Very Positive",
-        definition: "Updated definition",
-        vac_vector: [0.9, 0.5, 0.2],
-      }));
+      expect(adminApi.updateAtlasEmotion).toHaveBeenCalledWith(
+        "e1",
+        expect.objectContaining({
+          category: "Very Positive",
+          definition: "Updated definition",
+          vac_vector: [0.9, 0.5, 0.2],
+        })
+      );
     });
 
     // Verify UI updated (local state update)
@@ -208,7 +210,7 @@ describe("EmotionsTab", () => {
     const input = container.querySelector('input[type="file"]') as HTMLInputElement;
     expect(input).toBeInTheDocument();
 
-    const clickSpy = jest.spyOn(input, 'click');
+    const clickSpy = jest.spyOn(input, "click");
     fireEvent.click(screen.getByText("Import"));
 
     expect(clickSpy).toHaveBeenCalled();
@@ -221,10 +223,12 @@ describe("EmotionsTab", () => {
     const { container } = render(<EmotionsTab />);
     await waitFor(() => expect(screen.getByText("Joy")).toBeInTheDocument());
 
-    const file = new File([JSON.stringify({ some: "data" })], "test.json", { type: "application/json" });
+    const file = new File([JSON.stringify({ some: "data" })], "test.json", {
+      type: "application/json",
+    });
     // Mock .text() method
-    Object.defineProperty(file, 'text', {
-      value: jest.fn().mockResolvedValue(JSON.stringify({ some: "data" }))
+    Object.defineProperty(file, "text", {
+      value: jest.fn().mockResolvedValue(JSON.stringify({ some: "data" })),
     });
 
     const input = container.querySelector('input[type="file"]') as HTMLInputElement;
@@ -245,7 +249,7 @@ describe("EmotionsTab", () => {
     const incompleteEmotion = {
       ...mockEmotions[0],
       id: "e_inc",
-      vac_vector: [0.5, 0.5] as any // Force 2 elements
+      vac_vector: [0.5, 0.5] as any, // Force 2 elements
     };
     (adminApi.getAtlasEmotions as jest.Mock).mockResolvedValue([incompleteEmotion]);
 
@@ -267,14 +271,17 @@ describe("EmotionsTab", () => {
 
   it("handles import partial errors", async () => {
     (adminApi.getAtlasEmotions as jest.Mock).mockResolvedValue(mockEmotions);
-    (adminApi.importAtlasData as jest.Mock).mockResolvedValue({ updated: 2, errors: ["Err1", "Err2"] });
+    (adminApi.importAtlasData as jest.Mock).mockResolvedValue({
+      updated: 2,
+      errors: ["Err1", "Err2"],
+    });
 
     const { container } = render(<EmotionsTab />);
     await waitFor(() => expect(screen.getByText("Joy")).toBeInTheDocument());
 
     const file = new File(["{}"], "test.json", { type: "application/json" });
-    Object.defineProperty(file, 'text', {
-      value: jest.fn().mockResolvedValue("{}")
+    Object.defineProperty(file, "text", {
+      value: jest.fn().mockResolvedValue("{}"),
     });
 
     const input = container.querySelector('input[type="file"]') as HTMLInputElement;
@@ -296,8 +303,8 @@ describe("EmotionsTab", () => {
     await waitFor(() => expect(screen.getByText("Joy")).toBeInTheDocument());
 
     const file = new File(["{}"], "test.json", { type: "application/json" });
-    Object.defineProperty(file, 'text', {
-      value: jest.fn().mockResolvedValue("{}")
+    Object.defineProperty(file, "text", {
+      value: jest.fn().mockResolvedValue("{}"),
     });
 
     const input = container.querySelector('input[type="file"]') as HTMLInputElement;
@@ -373,8 +380,8 @@ describe("EmotionsTab", () => {
     await waitFor(() => expect(screen.getByText("Joy")).toBeInTheDocument());
 
     const file = new File(["{}"], "test.json", { type: "application/json" });
-    Object.defineProperty(file, 'text', {
-      value: jest.fn().mockResolvedValue("{}")
+    Object.defineProperty(file, "text", {
+      value: jest.fn().mockResolvedValue("{}"),
     });
 
     const input = container.querySelector('input[type="file"]') as HTMLInputElement;
@@ -401,7 +408,7 @@ describe("EmotionsTab", () => {
     expect(vacInputs[0].value).toBe("0");
 
     // Test invalid change (NaN) - should not update state
-    // We need to verify state didn't change. 
+    // We need to verify state didn't change.
     // Since input value is controlled by state, if state doesn't update, value shouldn't change
     // BUT simulate change event with "abc" on number input usually results in empty string value in standard DOM
     // In React testing library, fireEvent.change essentially sets the value prop if controlled?
@@ -423,9 +430,12 @@ describe("EmotionsTab", () => {
     fireEvent.click(within(row).getByTitle("Save"));
 
     await waitFor(() => {
-      expect(adminApi.updateAtlasEmotion).toHaveBeenCalledWith("e1", expect.objectContaining({
-        vac_vector: [0.5, 0.5, 0.2] // First value should stay 0.5, not become NaN
-      }));
+      expect(adminApi.updateAtlasEmotion).toHaveBeenCalledWith(
+        "e1",
+        expect.objectContaining({
+          vac_vector: [0.5, 0.5, 0.2], // First value should stay 0.5, not become NaN
+        })
+      );
     });
   });
 
@@ -445,7 +455,11 @@ describe("EmotionsTab", () => {
 
   it("handles missing vac vector fallback", async () => {
     // Mock emotion with missing VAC (if possible by type, though type usually requires it)
-    const brokenEmotion = { ...mockEmotions[0], id: "e3", vac_vector: undefined as unknown as number[] };
+    const brokenEmotion = {
+      ...mockEmotions[0],
+      id: "e3",
+      vac_vector: undefined as unknown as number[],
+    };
     (adminApi.getAtlasEmotions as jest.Mock).mockResolvedValue([brokenEmotion]);
 
     render(<EmotionsTab />);
@@ -466,7 +480,7 @@ describe("EmotionsTab", () => {
       category: "",
       definition: "",
       color_hint: undefined,
-      haptic_pattern_id: undefined
+      haptic_pattern_id: undefined,
       // vac_vector checked separately
     };
     (adminApi.getAtlasEmotions as jest.Mock).mockResolvedValue([emptyEmotion]);
@@ -511,7 +525,7 @@ describe("EmotionsTab", () => {
   it("handles unmount during import to cover finally block ref check", async () => {
     (adminApi.getAtlasEmotions as jest.Mock).mockResolvedValue(mockEmotions);
     // Mock import to pending forever (or long enough) but we won't wait for it
-    let resolveImport: (val: any) => void = () => { };
+    let resolveImport: (val: any) => void = () => {};
     (adminApi.importAtlasData as jest.Mock).mockImplementation(() => {
       return new Promise((resolve) => {
         resolveImport = resolve;
@@ -522,7 +536,7 @@ describe("EmotionsTab", () => {
     await waitFor(() => expect(screen.getByText("Joy")).toBeInTheDocument());
 
     const file = new File(["{}"], "test.json", { type: "application/json" });
-    Object.defineProperty(file, 'text', { value: jest.fn().mockResolvedValue("{}") });
+    Object.defineProperty(file, "text", { value: jest.fn().mockResolvedValue("{}") });
     const input = container.querySelector('input[type="file"]') as HTMLInputElement;
 
     // Trigger upload

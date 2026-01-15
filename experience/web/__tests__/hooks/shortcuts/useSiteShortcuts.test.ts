@@ -71,7 +71,12 @@ describe("useSiteShortcuts", () => {
     renderHook(() => useSiteShortcuts());
 
     act(() => {
-      const event = new KeyboardEvent("keydown", { key: "k", metaKey: true, bubbles: true, cancelable: true });
+      const event = new KeyboardEvent("keydown", {
+        key: "k",
+        metaKey: true,
+        bubbles: true,
+        cancelable: true,
+      });
       jest.spyOn(event, "preventDefault");
       window.dispatchEvent(event);
       // We check if preventDefault was called, implying it entered the block

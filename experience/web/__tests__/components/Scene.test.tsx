@@ -37,12 +37,8 @@ jest.mock("@/components/TransitionPathRenderer", () => ({
       <button onClick={() => onWaypointHover(0, { index: 0, emotion: "Joy", state: "reached" })}>
         Hover On
       </button>
-      <button onClick={() => onWaypointHover(null, null)}>
-        Hover Off
-      </button>
-      <button onClick={() => onWaypointClick(0)}>
-        Click Waypoint
-      </button>
+      <button onClick={() => onWaypointHover(null, null)}>Hover Off</button>
+      <button onClick={() => onWaypointClick(0)}>Click Waypoint</button>
     </div>
   ),
 }));
@@ -51,13 +47,13 @@ jest.mock("@/components/TransitionPathRenderer", () => ({
 jest.mock("@/utils/logger", () => ({
   logger: {
     debug: jest.fn(),
-  }
+  },
 }));
 
 jest.mock("@/components/WaypointTooltip", () => ({
   WaypointTooltip: ({ waypoint }: any) => (
     <div data-testid="waypoint-tooltip">{waypoint.emotion}</div>
-  )
+  ),
 }));
 
 jest.mock("@react-three/drei", () => ({
@@ -78,15 +74,17 @@ jest.mock("@/components/admin/atlas/EmotionCloud", () => ({
 }));
 
 jest.mock("@/components/VACAxisLabels3D", () => ({
-  VACAxisLabels3D: () => <div data-testid="vac-axis-labels" />
+  VACAxisLabels3D: () => <div data-testid="vac-axis-labels" />,
 }));
 
 // Mock Settings Store
 jest.mock("@/stores/useSettingsStore", () => {
   // create a simple mock store
   let state = { layers: { soulSphere: true, transitionPaths: true } };
-  const useSettingsStore = (selector?: any) => selector ? selector(state) : state;
-  useSettingsStore.setState = (newState: any) => { state = { ...state, ...newState }; };
+  const useSettingsStore = (selector?: any) => (selector ? selector(state) : state);
+  useSettingsStore.setState = (newState: any) => {
+    state = { ...state, ...newState };
+  };
   return { useSettingsStore };
 });
 
@@ -187,7 +185,9 @@ describe("Scene", () => {
 
       fireEvent.click(getByText("Click Waypoint"));
 
-      expect(logger.debug).toHaveBeenCalledWith("user-interaction", "Clicked waypoint", { index: 0 });
+      expect(logger.debug).toHaveBeenCalledWith("user-interaction", "Clicked waypoint", {
+        index: 0,
+      });
     });
   });
 

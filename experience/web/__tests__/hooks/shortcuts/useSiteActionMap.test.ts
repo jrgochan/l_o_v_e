@@ -46,7 +46,7 @@ describe("useSiteActionMap", () => {
       selector(mockExpStore)
     );
     (useShortcutGuards as jest.Mock).mockReturnValue({
-      shouldExecuteShortcut: () => true
+      shouldExecuteShortcut: () => true,
     });
   });
 
@@ -199,7 +199,7 @@ describe("useSiteActionMap", () => {
 
   it("should ignore shortcuts if guard returns false", () => {
     (useShortcutGuards as jest.Mock).mockReturnValue({
-      shouldExecuteShortcut: () => false
+      shouldExecuteShortcut: () => false,
     });
 
     const { result } = renderHook(() => useSiteActionMap());
@@ -216,7 +216,7 @@ describe("useSiteActionMap", () => {
 
     // Reset guard
     (useShortcutGuards as jest.Mock).mockReturnValue({
-      shouldExecuteShortcut: () => true
+      shouldExecuteShortcut: () => true,
     });
   });
 
@@ -241,7 +241,7 @@ describe("useSiteActionMap", () => {
     const ctrlEvent = { ctrlKey: true } as KeyboardEvent;
     const actionsCtrl = result.current.getActions(ctrlEvent);
 
-    nonModActions.forEach(key => {
+    nonModActions.forEach((key) => {
       // Mock window functions to avoid errors if they are called (they shouldn't be)
       (window as any).toggleAudio = jest.fn();
       (window as any).toggleZenIndicator = jest.fn();
@@ -260,7 +260,7 @@ describe("useSiteActionMap", () => {
     const metaEvent = { metaKey: true } as KeyboardEvent;
     const actionsMeta = result.current.getActions(metaEvent);
 
-    nonModActions.forEach(key => {
+    nonModActions.forEach((key) => {
       actionsMeta[key]();
     });
 
@@ -295,6 +295,9 @@ describe("useSiteActionMap", () => {
     expect(logger.info).not.toHaveBeenCalledWith("user-interaction", "Toggled Audio");
 
     actions.i();
-    expect(logger.info).not.toHaveBeenCalledWith("user-interaction", "Toggled Zen session indicator");
+    expect(logger.info).not.toHaveBeenCalledWith(
+      "user-interaction",
+      "Toggled Zen session indicator"
+    );
   });
 });

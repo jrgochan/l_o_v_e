@@ -1,6 +1,5 @@
-
 import { render, screen, fireEvent, cleanup, within } from "@testing-library/react";
-import React from 'react';
+import React from "react";
 import { WaypointDetailModal } from "@/components/admin/shared/WaypointDetailModal";
 import { useExperienceStore } from "@/stores/useExperienceStore";
 import { useAtlasAdminStore } from "@/stores/useAtlasAdminStore";
@@ -11,15 +10,15 @@ jest.mock("@/stores/useExperienceStore");
 jest.mock("@/stores/useAtlasAdminStore");
 jest.mock("@react-three/fiber", () => ({
   useFrame: jest.fn(),
-  Canvas: ({ children }: any) => <div>{children}</div>
+  Canvas: ({ children }: any) => <div>{children}</div>,
 }));
 
 // Mock ResizeObserver
 beforeAll(() => {
   global.ResizeObserver = class ResizeObserver {
-    observe() { }
-    unobserve() { }
-    disconnect() { }
+    observe() {}
+    unobserve() {}
+    disconnect() {}
   };
 });
 
@@ -47,32 +46,44 @@ describe("WaypointDetailModal", () => {
           psychological_purpose: "Purpose Text",
           readiness_signs: ["Ready Sign 1"],
           research_citations: [
-            { author: "Author", year: "2023", work: "Work", key_finding: "Finding", quote: "Quote" }
+            {
+              author: "Author",
+              year: "2023",
+              work: "Work",
+              key_finding: "Finding",
+              quote: "Quote",
+            },
           ],
           vac_analysis: {
             valence_shift: { psychological_meaning: "V Meaning" },
             arousal_shift: { psychological_meaning: "A Meaning" },
-            connection_shift: { psychological_meaning: "C Meaning" }
-          }
+            connection_shift: { psychological_meaning: "C Meaning" },
+          },
         },
         strategies: [
-          { name: "Strat 1", evidence_level: "High", description: "Desc", time_commitment: "5m", category: "Mind" }
-        ]
+          {
+            name: "Strat 1",
+            evidence_level: "High",
+            description: "Desc",
+            time_commitment: "5m",
+            category: "Mind",
+          },
+        ],
       },
       {
         id: "sorrow",
         name: "Sorrow",
         vac: [-0.8, -0.8, -0.5],
         category: "negative",
-        position: new THREE.Vector3(-10, -5, 0)
-      }
-    ]
+        position: new THREE.Vector3(-10, -5, 0),
+      },
+    ],
   } as any;
 
   beforeEach(() => {
     jest.clearAllMocks();
     (useExperienceStore as unknown as jest.Mock).mockReturnValue({
-      setCameraTarget: mockSetCameraTarget
+      setCameraTarget: mockSetCameraTarget,
     });
 
     // Strict selector implementation
@@ -84,8 +95,8 @@ describe("WaypointDetailModal", () => {
           { id: "joy", name: "Joy", category: "positive", vac: [0.8, 0.8, 0.5] },
           { id: "sorrow", name: "Sorrow", category: "negative", vac: [-0.8, -0.8, -0.5] },
           { id: "ecstasy", name: "ecstasy", category: "positive", vac: [1, 1, 0.8] },
-          { id: "start", name: "Start", category: "neutral", vac: [0, 0, 0] }
-        ]
+          { id: "start", name: "Start", category: "neutral", vac: [0, 0, 0] },
+        ],
       });
     });
   });
@@ -96,7 +107,7 @@ describe("WaypointDetailModal", () => {
       render(
         <WaypointDetailModal
           path={richPath}
-          onClose={() => { }}
+          onClose={() => {}}
           waypointIndex={0}
           onNavigate={onNavigate}
         />
@@ -116,7 +127,7 @@ describe("WaypointDetailModal", () => {
       render(
         <WaypointDetailModal
           path={richPath}
-          onClose={() => { }}
+          onClose={() => {}}
           waypointIndex={3} // End
           onNavigate={onNavigate}
         />
@@ -138,7 +149,7 @@ describe("WaypointDetailModal", () => {
           path={richPath}
           onClose={onClose}
           waypointIndex={1}
-          onNavigate={() => { }}
+          onNavigate={() => {}}
         />
       );
       fireEvent.keyDown(window, { key: "Escape" });
@@ -150,7 +161,7 @@ describe("WaypointDetailModal", () => {
       render(
         <WaypointDetailModal
           path={richPath}
-          onClose={() => { }}
+          onClose={() => {}}
           waypointIndex={0}
           onNavigate={onNavigate}
         />
@@ -164,7 +175,7 @@ describe("WaypointDetailModal", () => {
       render(
         <WaypointDetailModal
           path={richPath}
-          onClose={() => { }}
+          onClose={() => {}}
           waypointIndex={1}
           onNavigate={onNavigate}
         />
@@ -179,9 +190,9 @@ describe("WaypointDetailModal", () => {
       render(
         <WaypointDetailModal
           path={richPath}
-          onClose={() => { }}
+          onClose={() => {}}
           waypointIndex={1} // Joy (Rich content)
-          onNavigate={() => { }}
+          onNavigate={() => {}}
         />
       );
 
@@ -216,9 +227,9 @@ describe("WaypointDetailModal", () => {
       render(
         <WaypointDetailModal
           path={richPath}
-          onClose={() => { }}
+          onClose={() => {}}
           waypointIndex={1}
-          onNavigate={() => { }}
+          onNavigate={() => {}}
         />
       );
 
@@ -238,7 +249,7 @@ describe("WaypointDetailModal", () => {
       render(
         <WaypointDetailModal
           path={richPath}
-          onClose={() => { }}
+          onClose={() => {}}
           waypointIndex={1}
           onNavigate={onNavigate}
         />
@@ -261,9 +272,9 @@ describe("WaypointDetailModal", () => {
       const { container } = render(
         <WaypointDetailModal
           path={undefined as any}
-          onClose={() => { }}
+          onClose={() => {}}
           waypointIndex={0}
-          onNavigate={() => { }}
+          onNavigate={() => {}}
         />
       );
       // It might crash or return empty depending on guards.
@@ -282,7 +293,7 @@ describe("WaypointDetailModal", () => {
       render(
         <WaypointDetailModal
           path={richPath}
-          onClose={() => { }}
+          onClose={() => {}}
           waypointIndex={1}
           onNavigate={onNavigate}
         />
@@ -306,7 +317,7 @@ describe("WaypointDetailModal", () => {
       render(
         <WaypointDetailModal
           path={richPath}
-          onClose={() => { }}
+          onClose={() => {}}
           waypointIndex={1}
           onNavigate={onNavigate}
         />
@@ -326,9 +337,9 @@ describe("WaypointDetailModal", () => {
       render(
         <WaypointDetailModal
           path={richPath}
-          onClose={() => { }}
+          onClose={() => {}}
           waypointIndex={1}
-          onNavigate={() => { }}
+          onNavigate={() => {}}
         />
       );
 
@@ -349,17 +360,17 @@ describe("WaypointDetailModal", () => {
         waypoints: [
           {
             ...richPath.waypoints[0],
-            vac: [0.51, 0.5, 0.5]
-          }
-        ]
+            vac: [0.51, 0.5, 0.5],
+          },
+        ],
       } as any;
 
       render(
         <WaypointDetailModal
           path={neutralPath}
-          onClose={() => { }}
+          onClose={() => {}}
           waypointIndex={1}
-          onNavigate={() => { }}
+          onNavigate={() => {}}
         />
       );
 
@@ -374,9 +385,9 @@ describe("WaypointDetailModal", () => {
       render(
         <WaypointDetailModal
           path={richPath}
-          onClose={() => { }}
+          onClose={() => {}}
           waypointIndex={1}
-          onNavigate={() => { }}
+          onNavigate={() => {}}
         />
       );
       // Pressing a random key should not crash or trigger nav
@@ -388,19 +399,21 @@ describe("WaypointDetailModal", () => {
       // WP1: 0.2, 0.5, 0.8  (V decreases, A same, C increases)
       const diversePath = {
         ...richPath,
-        waypoints: [{
-          ...richPath.waypoints[0],
-          vac: [0.2, 0.5, 0.8],
-          explanation: null
-        }]
+        waypoints: [
+          {
+            ...richPath.waypoints[0],
+            vac: [0.2, 0.5, 0.8],
+            explanation: null,
+          },
+        ],
       } as any;
 
       render(
         <WaypointDetailModal
           path={diversePath}
-          onClose={() => { }}
+          onClose={() => {}}
           waypointIndex={1}
-          onNavigate={() => { }}
+          onNavigate={() => {}}
         />
       );
 
@@ -415,19 +428,21 @@ describe("WaypointDetailModal", () => {
       // WP1: 0.5, 0.8, 0.5 (V Same, A Increases, C Same)
       const equalPath = {
         ...richPath,
-        waypoints: [{
-          ...richPath.waypoints[0],
-          vac: [0.5, 0.8, 0.5],
-          explanation: null
-        }]
+        waypoints: [
+          {
+            ...richPath.waypoints[0],
+            vac: [0.5, 0.8, 0.5],
+            explanation: null,
+          },
+        ],
       } as any;
 
       render(
         <WaypointDetailModal
           path={equalPath}
-          onClose={() => { }}
+          onClose={() => {}}
           waypointIndex={1}
-          onNavigate={() => { }}
+          onNavigate={() => {}}
         />
       );
 
@@ -440,75 +455,85 @@ describe("WaypointDetailModal", () => {
     it("handles explanation fallbacks and empty strategies (Lines 315, 503-505)", () => {
       const fallbackPath = {
         ...richPath,
-        waypoints: [{
-          ...richPath.waypoints[0],
-          explanation: null,
-          reasoning: "Just reasoning",
-          strategies: []
-        }]
+        waypoints: [
+          {
+            ...richPath.waypoints[0],
+            explanation: null,
+            reasoning: "Just reasoning",
+            strategies: [],
+          },
+        ],
       } as any;
 
       // 1. Waypoint empty strategies
       const { unmount } = render(
         <WaypointDetailModal
           path={fallbackPath}
-          onClose={() => { }}
+          onClose={() => {}}
           waypointIndex={1}
-          onNavigate={() => { }}
+          onNavigate={() => {}}
         />
       );
       // Check reasoning fallback (Line 315)
       expect(screen.getByText("Just reasoning")).toBeInTheDocument();
       // Switch to How
       fireEvent.click(screen.getByText("🛤️ How to Transition"));
-      expect(screen.getByText("No specific strategies provided for this waypoint.")).toBeInTheDocument();
+      expect(
+        screen.getByText("No specific strategies provided for this waypoint.")
+      ).toBeInTheDocument();
       unmount();
 
       // 2. Start empty strategies
       const { unmount: unmount2 } = render(
         <WaypointDetailModal
           path={fallbackPath}
-          onClose={() => { }}
+          onClose={() => {}}
           waypointIndex={0} // Start
-          onNavigate={() => { }}
+          onNavigate={() => {}}
         />
       );
       fireEvent.click(screen.getByText("🛤️ How to Transition"));
-      expect(screen.getByText("Begin by acknowledging your current emotional state.")).toBeInTheDocument();
+      expect(
+        screen.getByText("Begin by acknowledging your current emotional state.")
+      ).toBeInTheDocument();
       unmount2();
 
       // 3. End empty strategies
       const { unmount: unmount3 } = render(
         <WaypointDetailModal
           path={fallbackPath}
-          onClose={() => { }}
+          onClose={() => {}}
           waypointIndex={2} // End
-          onNavigate={() => { }}
+          onNavigate={() => {}}
         />
       );
       fireEvent.click(screen.getByText("🛤️ How to Transition"));
-      expect(screen.getByText("You have reached your destination. Reflect on the journey.")).toBeInTheDocument();
+      expect(
+        screen.getByText("You have reached your destination. Reflect on the journey.")
+      ).toBeInTheDocument();
       unmount3();
     });
 
     it("handles ultimate fallback for description (Line 317)", () => {
       const minimalPath = {
         ...richPath,
-        waypoints: [{
-          ...richPath.waypoints[0],
-          explanation: null,
-          reasoning: null,
-          name: "Void",
-          emotion: "Void" // Ensure emotion property exists for display
-        }]
+        waypoints: [
+          {
+            ...richPath.waypoints[0],
+            explanation: null,
+            reasoning: null,
+            name: "Void",
+            emotion: "Void", // Ensure emotion property exists for display
+          },
+        ],
       } as any;
 
       render(
         <WaypointDetailModal
           path={minimalPath}
-          onClose={() => { }}
+          onClose={() => {}}
           waypointIndex={1}
-          onNavigate={() => { }}
+          onNavigate={() => {}}
         />
       );
       expect(screen.getByText("Void is a key state in this journey.")).toBeInTheDocument();

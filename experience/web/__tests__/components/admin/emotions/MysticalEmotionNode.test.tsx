@@ -1,4 +1,3 @@
-
 import { render, cleanup } from "@testing-library/react";
 import React from "react";
 import * as THREE from "three";
@@ -54,7 +53,7 @@ describe("MysticalEmotionNode", () => {
           return this._material;
         },
         configurable: true,
-      }
+      },
     });
   });
 
@@ -64,7 +63,7 @@ describe("MysticalEmotionNode", () => {
     vac: [0.8, 0.6, 0.7] as [number, number, number],
     category: "Positive",
     definition: "Happy",
-    quaternion: [0, 0, 0, 1] as [number, number, number, number]
+    quaternion: [0, 0, 0, 1] as [number, number, number, number],
   };
 
   const defaultProps = {
@@ -126,11 +125,11 @@ describe("MysticalEmotionNode", () => {
       const materials = Array.from(container.querySelectorAll("meshBasicMaterial") as any);
       const hasGolden = materials.some((mat: any) => {
         // prop `color` should be passed.
-        // But R3F renders props. 
+        // But R3F renders props.
         // We can check attributes or props if we mock that way.
         // Our mock is implicit html elements.
         // `color` attribute on `meshBasicMaterial` element?
-        // Since it's a prop, RTL might put it as an attribute if it's atomic value, 
+        // Since it's a prop, RTL might put it as an attribute if it's atomic value,
         // but Color object might be [object Object].
 
         // Alternatively, since we are using JSDOM and R3F mocks don't expand props to attributes perfectly for objects,
@@ -169,7 +168,9 @@ describe("MysticalEmotionNode", () => {
     const { container } = render(<MysticalEmotionNode {...defaultProps} isSelected={true} />);
     const meshes = container.querySelectorAll("mesh");
 
-    const { container: unselectedContainer } = render(<MysticalEmotionNode {...defaultProps} isSelected={false} />);
+    const { container: unselectedContainer } = render(
+      <MysticalEmotionNode {...defaultProps} isSelected={false} />
+    );
     const baseCount = unselectedContainer.querySelectorAll("mesh").length;
 
     expect(meshes.length).toBeGreaterThan(baseCount);

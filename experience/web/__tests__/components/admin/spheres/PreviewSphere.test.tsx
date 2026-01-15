@@ -12,9 +12,7 @@ jest.mock("@react-three/fiber", () => ({
 jest.mock("@/components/admin/spheres/BaseSphere", () => ({
   BaseSphere: ({ children }: any) => {
     return (
-      <div data-testid="base-sphere">
-        {typeof children === 'function' ? children() : children}
-      </div>
+      <div data-testid="base-sphere">{typeof children === "function" ? children() : children}</div>
     );
   },
   StandardLighting: () => <div data-testid="lighting" />,

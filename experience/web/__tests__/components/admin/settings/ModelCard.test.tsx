@@ -1,4 +1,3 @@
-
 import { render, screen, fireEvent } from "@testing-library/react";
 import { ModelCard } from "@/components/admin/settings/ModelCard";
 import type { ModelInfo } from "@/hooks/useOllamaModels";
@@ -116,7 +115,13 @@ describe("ModelCard", () => {
 
   describe("Rating Helpers", () => {
     const testCases = [
-      { size: "70b", speed: "Moderate", quality: "Excellent", ram: "48+ GB", badge: "Clinical Grade" },
+      {
+        size: "70b",
+        speed: "Moderate",
+        quality: "Excellent",
+        ram: "48+ GB",
+        badge: "Clinical Grade",
+      },
       { size: "34b", speed: "Moderate", quality: "Excellent", ram: "32 GB", badge: null },
       { size: "8x7b", speed: "Fast", quality: "Excellent", ram: "32 GB", badge: "High Quality" },
       { size: "13b", speed: "Fast", quality: "Very Good", ram: "16 GB", badge: null },
@@ -129,7 +134,11 @@ describe("ModelCard", () => {
       it(`renders correct ratings for ${size}`, () => {
         let expectedBadge = badge;
         if (size === "34b") expectedBadge = null;
-        const model = { ...mockModel, parameter_size: size, name: size.includes("3b") ? "mini" : "model" };
+        const model = {
+          ...mockModel,
+          parameter_size: size,
+          name: size.includes("3b") ? "mini" : "model",
+        };
 
         render(
           <ModelCard

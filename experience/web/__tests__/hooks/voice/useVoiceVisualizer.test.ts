@@ -38,11 +38,11 @@ describe("useVoiceVisualizer", () => {
     mockRAF.mockClear();
     mockCAF.mockClear();
 
-    Object.defineProperty(window, 'requestAnimationFrame', {
+    Object.defineProperty(window, "requestAnimationFrame", {
       writable: true,
       value: mockRAF,
     });
-    Object.defineProperty(window, 'cancelAnimationFrame', {
+    Object.defineProperty(window, "cancelAnimationFrame", {
       writable: true,
       value: mockCAF,
     });
@@ -51,11 +51,11 @@ describe("useVoiceVisualizer", () => {
   afterEach(() => {
     jest.useRealTimers();
     // Restore originals
-    Object.defineProperty(window, 'requestAnimationFrame', {
+    Object.defineProperty(window, "requestAnimationFrame", {
       writable: true,
       value: originalRAF,
     });
-    Object.defineProperty(window, 'cancelAnimationFrame', {
+    Object.defineProperty(window, "cancelAnimationFrame", {
       writable: true,
       value: originalCAF,
     });

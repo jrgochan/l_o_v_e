@@ -1,4 +1,3 @@
-
 import { render, screen } from "@testing-library/react";
 import { AlertBadge } from "@/components/admin/clinical/AlertBadge";
 
@@ -32,8 +31,8 @@ describe("AlertBadge", () => {
       {
         level: "warning" as const,
         type: "voice_quality" as const,
-        message: "Voice quality degrading"
-      }
+        message: "Voice quality degrading",
+      },
     ];
     render(<AlertBadge alerts={multipleAlerts} overallStatus="critical" />);
     expect(screen.getByText("2 Alerts")).toBeInTheDocument();

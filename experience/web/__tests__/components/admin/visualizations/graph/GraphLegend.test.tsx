@@ -1,4 +1,3 @@
-
 import { render, screen } from "@testing-library/react";
 import { GraphLegend } from "@/components/admin/visualizations/graph/GraphLegend";
 

@@ -31,7 +31,14 @@ jest.mock("@/components/command-palette/ActiveJourneyStatus", () => ({
   ActiveJourneyStatus: () => <div data-testid="active-journey-status" />,
 }));
 jest.mock("@/components/command-palette/PaletteResults", () => ({
-  PaletteResults: ({ quickActions, filteredEmotions, filteredPaths, onSelectEmotion, onSelectPath, onQuickAction }: any) => (
+  PaletteResults: ({
+    quickActions,
+    filteredEmotions,
+    filteredPaths,
+    onSelectEmotion,
+    onSelectPath,
+    onQuickAction,
+  }: any) => (
     <div data-testid="palette-results">
       {quickActions?.map((qa: any) => (
         <div
@@ -52,8 +59,15 @@ jest.mock("@/components/command-palette/PaletteResults", () => ({
         </div>
       ))}
 
-      <button data-testid="mock-emotion-select" onClick={() => onSelectEmotion({ id: "joy", name: "Joy" })}>Select Joy</button>
-      <button data-testid="mock-path-select" onClick={() => onSelectPath("path-1")}>Select Path</button>
+      <button
+        data-testid="mock-emotion-select"
+        onClick={() => onSelectEmotion({ id: "joy", name: "Joy" })}
+      >
+        Select Joy
+      </button>
+      <button data-testid="mock-path-select" onClick={() => onSelectPath("path-1")}>
+        Select Path
+      </button>
     </div>
   ),
 }));
@@ -63,7 +77,9 @@ jest.mock("@/components/command-palette/PaletteHelp", () => ({
 
 // We strictly mock data to avoid external dependency logic leaks
 jest.mock("@/data/journey-templates", () => ({
-  JOURNEY_TEMPLATES: [{ id: "calm", name: "Calm", icon: "😌", difficulty: "Easy", estimated_duration: "5m" }],
+  JOURNEY_TEMPLATES: [
+    { id: "calm", name: "Calm", icon: "😌", difficulty: "Easy", estimated_duration: "5m" },
+  ],
 }));
 
 describe("CommandPalette", () => {
@@ -114,7 +130,11 @@ describe("CommandPalette", () => {
     );
   });
 
-  const triggerKey = (key: string, modifiers: any = {}, eventType: "keydown" | "keyup" = "keydown") => {
+  const triggerKey = (
+    key: string,
+    modifiers: any = {},
+    eventType: "keydown" | "keyup" = "keydown"
+  ) => {
     act(() => {
       window.dispatchEvent(new KeyboardEvent(eventType, { key, ...modifiers }));
     });
@@ -265,39 +285,53 @@ describe("CommandPalette", () => {
     );
 
     // Command (Add)
-    act(() => { window.dispatchEvent(new KeyboardEvent("keydown", { key: "Meta", metaKey: true })); });
+    act(() => {
+      window.dispatchEvent(new KeyboardEvent("keydown", { key: "Meta", metaKey: true }));
+    });
     fireEvent.click(selectBtn);
     expect(palette.executeAction).toHaveBeenCalledWith(
       expect.objectContaining({ id: "joy" }),
       "add",
       expect.objectContaining({ command: true })
     );
-    act(() => { window.dispatchEvent(new KeyboardEvent("keyup", { key: "Meta", metaKey: false })); });
+    act(() => {
+      window.dispatchEvent(new KeyboardEvent("keyup", { key: "Meta", metaKey: false }));
+    });
 
     // Option (Focus)
-    act(() => { window.dispatchEvent(new KeyboardEvent("keydown", { key: "Alt", altKey: true })); });
+    act(() => {
+      window.dispatchEvent(new KeyboardEvent("keydown", { key: "Alt", altKey: true }));
+    });
     fireEvent.click(selectBtn);
     expect(palette.executeAction).toHaveBeenCalledWith(
       expect.objectContaining({ id: "joy" }),
       "focus",
       expect.objectContaining({ option: true })
     );
-    act(() => { window.dispatchEvent(new KeyboardEvent("keyup", { key: "Alt", altKey: false })); });
+    act(() => {
+      window.dispatchEvent(new KeyboardEvent("keyup", { key: "Alt", altKey: false }));
+    });
 
     // Shift (Navigate)
-    act(() => { window.dispatchEvent(new KeyboardEvent("keydown", { key: "Shift", shiftKey: true })); });
+    act(() => {
+      window.dispatchEvent(new KeyboardEvent("keydown", { key: "Shift", shiftKey: true }));
+    });
     fireEvent.click(selectBtn);
     expect(palette.executeAction).toHaveBeenCalledWith(
       expect.objectContaining({ id: "joy" }),
       "navigate",
       expect.objectContaining({ shift: true })
     );
-    act(() => { window.dispatchEvent(new KeyboardEvent("keyup", { key: "Shift", shiftKey: false })); });
+    act(() => {
+      window.dispatchEvent(new KeyboardEvent("keyup", { key: "Shift", shiftKey: false }));
+    });
 
     // Option + Shift (Isolate)
     act(() => {
       window.dispatchEvent(new KeyboardEvent("keydown", { key: "Alt", altKey: true }));
-      window.dispatchEvent(new KeyboardEvent("keydown", { key: "Shift", shiftKey: true, altKey: true }));
+      window.dispatchEvent(
+        new KeyboardEvent("keydown", { key: "Shift", shiftKey: true, altKey: true })
+      );
     });
     fireEvent.click(selectBtn);
     expect(palette.executeAction).toHaveBeenCalledWith(
@@ -314,7 +348,9 @@ describe("CommandPalette", () => {
     // Command + Shift (Toggle)
     act(() => {
       window.dispatchEvent(new KeyboardEvent("keydown", { key: "Meta", metaKey: true }));
-      window.dispatchEvent(new KeyboardEvent("keydown", { key: "Shift", shiftKey: true, metaKey: true }));
+      window.dispatchEvent(
+        new KeyboardEvent("keydown", { key: "Shift", shiftKey: true, metaKey: true })
+      );
     });
     fireEvent.click(selectBtn);
     expect(palette.executeAction).toHaveBeenCalledWith(
@@ -445,7 +481,6 @@ describe("CommandPalette", () => {
     expect(screen.getByTestId("qa-/session notes")).toBeInTheDocument();
     expect(screen.getByText("🟢 Session Active")).toBeInTheDocument();
 
-
     // 3. Paused Session
     (useExperienceStore as unknown as jest.Mock).mockImplementation((selector) =>
       selector({
@@ -461,48 +496,60 @@ describe("CommandPalette", () => {
   });
 
   it("should show correct filter label based on search prefix", () => {
-    (useCommandPalette as jest.Mock).mockReturnValue(createMockPalette({
-      search: "~Joy"
-    }));
+    (useCommandPalette as jest.Mock).mockReturnValue(
+      createMockPalette({
+        search: "~Joy",
+      })
+    );
     const { unmount: unmount1 } = render(<CommandPalette />);
     expect(screen.getByText("Similarity")).toBeInTheDocument();
     unmount1();
 
-    (useCommandPalette as jest.Mock).mockReturnValue(createMockPalette({
-      search: "!Joy"
-    }));
+    (useCommandPalette as jest.Mock).mockReturnValue(
+      createMockPalette({
+        search: "!Joy",
+      })
+    );
     const { unmount: unmount2 } = render(<CommandPalette />);
     expect(screen.getByText("Opposite")).toBeInTheDocument();
     unmount2();
 
     // Category >
-    (useCommandPalette as jest.Mock).mockReturnValue(createMockPalette({
-      search: ">Data"
-    }));
+    (useCommandPalette as jest.Mock).mockReturnValue(
+      createMockPalette({
+        search: ">Data",
+      })
+    );
     const { unmount: unmount3 } = render(<CommandPalette />);
     expect(screen.getByText("Category")).toBeInTheDocument();
     unmount3();
 
     // Favorites @
-    (useCommandPalette as jest.Mock).mockReturnValue(createMockPalette({
-      search: "@MyFav"
-    }));
+    (useCommandPalette as jest.Mock).mockReturnValue(
+      createMockPalette({
+        search: "@MyFav",
+      })
+    );
     const { unmount: unmount4 } = render(<CommandPalette />);
     expect(screen.getByText("Favorites")).toBeInTheDocument();
     unmount4();
 
     // VAC Filter
-    (useCommandPalette as jest.Mock).mockReturnValue(createMockPalette({
-      search: "valence > 0.5"
-    }));
+    (useCommandPalette as jest.Mock).mockReturnValue(
+      createMockPalette({
+        search: "valence > 0.5",
+      })
+    );
     const { unmount: unmount5 } = render(<CommandPalette />);
     expect(screen.getByText("VAC Filter")).toBeInTheDocument();
     unmount5();
 
     // Default Search
-    (useCommandPalette as jest.Mock).mockReturnValue(createMockPalette({
-      search: "Joy"
-    }));
+    (useCommandPalette as jest.Mock).mockReturnValue(
+      createMockPalette({
+        search: "Joy",
+      })
+    );
     const { unmount: unmount6 } = render(<CommandPalette />);
     expect(screen.getByText("Search")).toBeInTheDocument();
     unmount6();

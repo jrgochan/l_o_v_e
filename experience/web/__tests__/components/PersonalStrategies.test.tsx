@@ -44,7 +44,7 @@ describe("PersonalStrategies", () => {
   };
 
   it("renders loading state", () => {
-    mockGetUserEffectiveStrategies.mockReturnValue(new Promise(() => { }));
+    mockGetUserEffectiveStrategies.mockReturnValue(new Promise(() => {}));
     render(<PersonalStrategies userId={mockUserId} />);
     expect(screen.getByText("Loading your effective strategies...")).toBeInTheDocument();
   });

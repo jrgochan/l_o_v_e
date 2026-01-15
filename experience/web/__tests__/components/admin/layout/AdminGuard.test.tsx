@@ -15,12 +15,15 @@ jest.mock("next/link", () => {
 
 // Mock AuthModal
 jest.mock("@/components/auth/AuthModal", () => ({
-  AuthModal: ({ isOpen, onClose }: any) => (isOpen ? (
-    <div data-testid="auth-modal">
-      Auth Modal
-      <button data-testid="close-modal-btn" onClick={onClose}>Close</button>
-    </div>
-  ) : null),
+  AuthModal: ({ isOpen, onClose }: any) =>
+    isOpen ? (
+      <div data-testid="auth-modal">
+        Auth Modal
+        <button data-testid="close-modal-btn" onClick={onClose}>
+          Close
+        </button>
+      </div>
+    ) : null,
 }));
 
 describe("AdminGuard", () => {

@@ -96,7 +96,7 @@ describe("useSphereSender", () => {
     expect(sendMessage).toHaveBeenCalledWith(
       expect.objectContaining({
         path: { points: [] },
-        showPath: true
+        showPath: true,
       })
     );
   });
@@ -112,7 +112,7 @@ describe("useSphereSender", () => {
     });
 
     // We expect logger.warn to be called and execution to proceed without crash
-    /* eslint-disable-next-line @typescript-eslint/no-var-requires */
+
     const { logger } = require("@/utils/logger");
 
     const { result } = renderHook(() => useSphereSender("listener", sendMessage));
@@ -120,7 +120,11 @@ describe("useSphereSender", () => {
       result.current.broadcast();
     });
 
-    expect(logger.warn).toHaveBeenCalledWith("hooks", "Path serialization failed", expect.any(Error));
+    expect(logger.warn).toHaveBeenCalledWith(
+      "hooks",
+      "Path serialization failed",
+      expect.any(Error)
+    );
     expect(sendMessage).toHaveBeenCalled(); // Should still send partial message
   });
 
@@ -133,7 +137,7 @@ describe("useSphereSender", () => {
 
     expect(sendMessage).toHaveBeenCalledWith(
       expect.objectContaining({
-        selectedEmotionIds: ["DEBUG_TEST"]
+        selectedEmotionIds: ["DEBUG_TEST"],
       })
     );
   });

@@ -1,4 +1,3 @@
-
 import { render, screen, fireEvent, waitFor, within } from "@testing-library/react";
 import ClinicalAlertsTab from "@/components/admin/data/ClinicalAlertsTab";
 import { adminApi } from "@/utils/api";
@@ -22,7 +21,7 @@ describe("ClinicalAlertsTab", () => {
         version: "1.0",
         session_id: "sess1",
         triggered_by: { bpm: 120 },
-        threshold_used: { max_bpm: 100 }
+        threshold_used: { max_bpm: 100 },
       },
       {
         id: "alert2",
@@ -33,10 +32,10 @@ describe("ClinicalAlertsTab", () => {
         version: "1.1",
         session_id: "sess2",
         triggered_by: { anxiety_score: 0.6 },
-        threshold_used: { anxiety_limit: 0.5 }
-      }
+        threshold_used: { anxiety_limit: 0.5 },
+      },
     ],
-    total: 60 // Enable pagination
+    total: 60, // Enable pagination
   };
 
   beforeEach(() => {
@@ -44,7 +43,7 @@ describe("ClinicalAlertsTab", () => {
   });
 
   it("renders loading state", async () => {
-    (adminApi.getClinicalAlerts as jest.Mock).mockReturnValue(new Promise(() => { }));
+    (adminApi.getClinicalAlerts as jest.Mock).mockReturnValue(new Promise(() => {}));
     render(<ClinicalAlertsTab />);
     expect(screen.getByText("Loading alerts...")).toBeInTheDocument();
   });
@@ -110,7 +109,9 @@ describe("ClinicalAlertsTab", () => {
     await waitFor(() => expect(screen.getByText("High heart rate detected")).toBeInTheDocument());
 
     // Initial state: details placeholder
-    expect(screen.getByText("Select an alert to view full trigger details and thresholds.")).toBeInTheDocument();
+    expect(
+      screen.getByText("Select an alert to view full trigger details and thresholds.")
+    ).toBeInTheDocument();
 
     // Click item
     fireEvent.click(screen.getByLabelText("View alert details: High heart rate detected"));
@@ -123,7 +124,9 @@ describe("ClinicalAlertsTab", () => {
 
     // Close details
     fireEvent.click(screen.getByLabelText("Close Details"));
-    expect(screen.getByText("Select an alert to view full trigger details and thresholds.")).toBeInTheDocument();
+    expect(
+      screen.getByText("Select an alert to view full trigger details and thresholds.")
+    ).toBeInTheDocument();
   });
 
   it("handles keyboard interaction for selection", async () => {
@@ -156,7 +159,10 @@ describe("ClinicalAlertsTab", () => {
   it("handles refresh", async () => {
     (adminApi.getClinicalAlerts as jest.Mock)
       .mockResolvedValueOnce(mockAlerts)
-      .mockResolvedValueOnce({ ...mockAlerts, items: [{ ...mockAlerts.items[0], message: "Refreshed Alert" }] });
+      .mockResolvedValueOnce({
+        ...mockAlerts,
+        items: [{ ...mockAlerts.items[0], message: "Refreshed Alert" }],
+      });
 
     render(<ClinicalAlertsTab />);
     await waitFor(() => expect(screen.getByText("High heart rate detected")).toBeInTheDocument());
@@ -190,7 +196,7 @@ describe("ClinicalAlertsTab", () => {
         { ...mockAlerts.items[0], id: "a3", level: "attention" },
         { ...mockAlerts.items[0], id: "a4", level: "unknown" },
       ],
-      total: 4
+      total: 4,
     };
     (adminApi.getClinicalAlerts as jest.Mock).mockResolvedValue(mixedAlerts);
     render(<ClinicalAlertsTab />);

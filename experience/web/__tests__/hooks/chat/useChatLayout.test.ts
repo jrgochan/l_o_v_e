@@ -21,7 +21,7 @@ jest.mock("../../../hooks/chat/layout/useChatResize", () => ({
 }));
 
 jest.mock("../../../hooks/chat/layout/useChatShortcuts", () => ({
-  useChatShortcuts: () => { }, // No-op, just verify integration
+  useChatShortcuts: () => {}, // No-op, just verify integration
 }));
 
 describe("useChatLayout", () => {

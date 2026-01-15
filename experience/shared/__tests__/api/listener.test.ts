@@ -8,7 +8,7 @@ import {
 describe("Listener API", () => {
   const mockFetch = jest.fn();
   global.fetch = mockFetch;
-  const mockConsoleError = jest.spyOn(console, "error").mockImplementation(() => { });
+  const mockConsoleError = jest.spyOn(console, "error").mockImplementation(() => {});
 
   beforeEach(() => {
     jest.useRealTimers();
@@ -155,7 +155,7 @@ describe("Listener API", () => {
     });
 
     it("should trigger timeout callback in healthCheck", async () => {
-      mockFetch.mockImplementation(() => new Promise(() => { })); // Never resolves
+      mockFetch.mockImplementation(() => new Promise(() => {})); // Never resolves
       const client = new ListenerApiClient();
       const promise = client.healthCheck();
 
@@ -173,9 +173,9 @@ describe("Listener API", () => {
     });
 
     it("should trigger timeout callback in fetchWithRetry", async () => {
-      mockFetch.mockImplementation(() => new Promise(() => { }));
+      mockFetch.mockImplementation(() => new Promise(() => {}));
       const client = new ListenerApiClient();
-      // @ts-ignore
+      // @ts-expect-error -- Testing timeouts with invalid arguments
       client.fetchWithRetry("http://foo", {}, 1);
       jest.advanceTimersByTime(30000);
     });

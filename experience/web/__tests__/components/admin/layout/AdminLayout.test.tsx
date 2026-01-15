@@ -1,4 +1,3 @@
-
 import { render, screen } from "@testing-library/react";
 import { AdminLayout } from "@/components/admin/layout/AdminLayout";
 import { useAuthStore } from "@/stores/authStore";
@@ -10,7 +9,9 @@ jest.mock("next/navigation", () => ({
   usePathname: jest.fn(),
 }));
 jest.mock("@/components/admin/layout/AdminGuard", () => ({
-  AdminGuard: ({ children }: { children: React.ReactNode }) => <div data-testid="admin-guard">{children}</div>,
+  AdminGuard: ({ children }: { children: React.ReactNode }) => (
+    <div data-testid="admin-guard">{children}</div>
+  ),
 }));
 
 describe("AdminLayout", () => {

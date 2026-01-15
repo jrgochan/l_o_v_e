@@ -40,7 +40,7 @@ jest.mock("@/components/StrategyFeedbackModal", () => ({
       <button onClick={onSkip}>Simulate Skip</button>
       <button onClick={onClose}>Simulate Close</button>
     </div>
-  )
+  ),
 }));
 
 describe("JourneyProgress", () => {
@@ -53,7 +53,7 @@ describe("JourneyProgress", () => {
     });
     (global.fetch as jest.Mock).mockResolvedValue({
       ok: true,
-      json: async () => ({})
+      json: async () => ({}),
     });
   });
 
@@ -190,7 +190,7 @@ describe("JourneyProgress", () => {
         expect.stringContaining("/observer/journey/journey-123/waypoint-reached"),
         expect.objectContaining({
           method: "POST",
-          body: expect.stringContaining("strategies_tried")
+          body: expect.stringContaining("strategies_tried"),
         })
       );
 
@@ -215,7 +215,11 @@ describe("JourneyProgress", () => {
       });
 
       // Verify error handling
-      expect(logger.error).toHaveBeenCalledWith("api", "Failed to submit feedback", expect.any(Error));
+      expect(logger.error).toHaveBeenCalledWith(
+        "api",
+        "Failed to submit feedback",
+        expect.any(Error)
+      );
       expect(screen.getByText(/Failed to submit feedback/i)).toBeInTheDocument();
 
       // Store NOT updated
@@ -232,7 +236,7 @@ describe("JourneyProgress", () => {
           activeJourney: {
             ...mockJourney,
             current_waypoint: 1, // Last one (total 2)
-            waypoints_reached: [0]
+            waypoints_reached: [0],
           },
         });
       });
@@ -265,7 +269,7 @@ describe("JourneyProgress", () => {
           activeJourney: {
             ...mockJourney,
             current_waypoint: 1,
-            waypoints_reached: [0]
+            waypoints_reached: [0],
           },
         });
       });

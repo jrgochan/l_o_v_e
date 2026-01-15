@@ -7,7 +7,7 @@ jest.mock("@/hooks/admin/usePathComparison");
 describe("PathComparison", () => {
   const mockPaths = [
     { id: "p1", total_distance: 10 },
-    { id: "p2", total_distance: 20 }
+    { id: "p2", total_distance: 20 },
   ];
 
   beforeEach(() => {
@@ -15,7 +15,7 @@ describe("PathComparison", () => {
       shortestDistance: 10,
       longestDistance: 20,
       hasEasyPath: true,
-      noBridgePaths: 1
+      noBridgePaths: 1,
     });
   });
 
@@ -51,7 +51,7 @@ describe("PathComparison", () => {
       shortestDistance: 10,
       longestDistance: 20,
       hasEasyPath: false,
-      noBridgePaths: 2
+      noBridgePaths: 2,
     });
 
     render(<PathComparison paths={mockPaths as any} />);

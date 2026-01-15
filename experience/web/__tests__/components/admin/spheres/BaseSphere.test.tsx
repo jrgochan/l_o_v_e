@@ -1,9 +1,14 @@
-
 import { render, cleanup, act } from "@testing-library/react";
 import * as THREE from "three";
 import { useFrame } from "@react-three/fiber";
-import React from 'react';
-import { BaseSphere, getColorFromValence, getColorFromCategory, blendColors, StandardLighting } from "@/components/admin/spheres/BaseSphere";
+import React from "react";
+import {
+  BaseSphere,
+  getColorFromValence,
+  getColorFromCategory,
+  blendColors,
+  StandardLighting,
+} from "@/components/admin/spheres/BaseSphere";
 
 // Mock R3F
 jest.mock("@react-three/fiber", () => ({
@@ -12,26 +17,29 @@ jest.mock("@react-three/fiber", () => ({
 }));
 
 describe("BaseSphere Component & Helpers", () => {
-
   beforeAll(() => {
-    Object.defineProperty(HTMLElement.prototype, 'scale', {
+    Object.defineProperty(HTMLElement.prototype, "scale", {
       get() {
         if (!this._scale) this._scale = new THREE.Vector3(1, 1, 1);
         return this._scale;
       },
-      configurable: true
+      configurable: true,
     });
-    Object.defineProperty(HTMLElement.prototype, 'rotation', {
+    Object.defineProperty(HTMLElement.prototype, "rotation", {
       get() {
         if (!this._rotation) this._rotation = new THREE.Euler(0, 0, 0);
         return this._rotation;
       },
-      configurable: true
+      configurable: true,
     });
-    Object.defineProperty(HTMLElement.prototype, 'emissiveIntensity', {
-      get() { return this._emissiveIntensity || 0; },
-      set(v) { this._emissiveIntensity = v; },
-      configurable: true
+    Object.defineProperty(HTMLElement.prototype, "emissiveIntensity", {
+      get() {
+        return this._emissiveIntensity || 0;
+      },
+      set(v) {
+        this._emissiveIntensity = v;
+      },
+      configurable: true,
     });
   });
 
@@ -53,17 +61,17 @@ describe("BaseSphere Component & Helpers", () => {
       expect(getColorFromValence(-0.6)).toBeInstanceOf(THREE.Color);
     });
     it("getColorFromCategory handles unknown", () => {
-      const pal = { test: '#fff' };
-      expect(getColorFromCategory('test', pal).getHexString()).toBe('ffffff');
-      expect(getColorFromCategory('missing', pal).getHexString()).toBe('888888');
+      const pal = { test: "#fff" };
+      expect(getColorFromCategory("test", pal).getHexString()).toBe("ffffff");
+      expect(getColorFromCategory("missing", pal).getHexString()).toBe("888888");
     });
 
     it("blendColors handles weights", () => {
-      const c1 = new THREE.Color('red');
-      const c2 = new THREE.Color('blue');
+      const c1 = new THREE.Color("red");
+      const c2 = new THREE.Color("blue");
       expect(blendColors([c1, c2], [0.5, 0.5]).r).toBeCloseTo(0.5);
-      expect(blendColors([], []).getHexString()).toBe('fbbf24');
-      expect(blendColors([c1], [0]).getHexString()).toBe('fbbf24');
+      expect(blendColors([], []).getHexString()).toBe("fbbf24");
+      expect(blendColors([c1], [0]).getHexString()).toBe("fbbf24");
       expect(blendColors([c1], []).r).toBe(1);
     });
 
@@ -86,8 +94,8 @@ describe("BaseSphere Component & Helpers", () => {
           color="red"
           animation={{
             breathing: { enabled: true, rate: 1, amplitude: 0.1 },
-            rotation: { enabled: true, speed: 0.1, axis: 'x' },
-            glow: { enabled: true, intensity: 1, pulseSpeed: 1 }
+            rotation: { enabled: true, speed: 0.1, axis: "x" },
+            glow: { enabled: true, intensity: 1, pulseSpeed: 1 },
           }}
         />
       );
@@ -113,7 +121,10 @@ describe("BaseSphere Component & Helpers", () => {
 
       // 2. Test Y Axis
       const { container: containerY, unmount: unmountY } = render(
-        <BaseSphere color="blue" animation={{ rotation: { enabled: true, speed: 0.1, axis: 'y' } }} />
+        <BaseSphere
+          color="blue"
+          animation={{ rotation: { enabled: true, speed: 0.1, axis: "y" } }}
+        />
       );
       if (frameCallback) act(() => frameCallback({ clock: { elapsedTime: 0.5 } }, 1.0));
       const meshNodeY = containerY.querySelector("mesh") as any;
@@ -123,7 +134,10 @@ describe("BaseSphere Component & Helpers", () => {
 
       // 3. Test Z Axis
       const { container: containerZ, unmount: unmountZ } = render(
-        <BaseSphere color="green" animation={{ rotation: { enabled: true, speed: 0.1, axis: 'z' } }} />
+        <BaseSphere
+          color="green"
+          animation={{ rotation: { enabled: true, speed: 0.1, axis: "z" } }}
+        />
       );
       if (frameCallback) act(() => frameCallback({ clock: { elapsedTime: 0.5 } }, 1.0));
       const meshNodeZ = containerZ.querySelector("mesh") as any;
@@ -143,8 +157,8 @@ describe("BaseSphere Component & Helpers", () => {
           animation={{
             // Provide dummy values for required props even if disabled
             breathing: { enabled: false, rate: 1, amplitude: 1 },
-            rotation: { enabled: false, speed: 1, axis: 'y' },
-            glow: { enabled: false, intensity: 1, pulseSpeed: 1 }
+            rotation: { enabled: false, speed: 1, axis: "y" },
+            glow: { enabled: false, intensity: 1, pulseSpeed: 1 },
           }}
         />
       );
@@ -180,7 +194,7 @@ describe("BaseSphere Component & Helpers", () => {
 
     it("renders children and accepts object color", () => {
       const { getByTestId } = render(
-        <BaseSphere color={new THREE.Color('blue')}>
+        <BaseSphere color={new THREE.Color("blue")}>
           {(mesh, mat) => <group data-testid="child" />}
         </BaseSphere>
       );

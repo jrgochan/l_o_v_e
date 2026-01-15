@@ -86,8 +86,16 @@ describe("ChatMessageList", () => {
         content: "Detected emotions:",
         timestamp: new Date(),
         multiEmotionData: {
-          emotions: [{ emotion_name: "Joy", score: 0.9, confidence: 0.9, category: "Positive", coordinates: [1, 1, 1] }],
-          source_text: "happy"
+          emotions: [
+            {
+              emotion_name: "Joy",
+              score: 0.9,
+              confidence: 0.9,
+              category: "Positive",
+              coordinates: [1, 1, 1],
+            },
+          ],
+          source_text: "happy",
         },
       },
     ];
@@ -127,13 +135,23 @@ describe("ChatMessageList", () => {
         content: "Detected emotions:",
         timestamp: new Date(),
         multiEmotionData: {
-          emotions: [{ emotion_name: "Joy", score: 0.9, confidence: 0.9, category: "Positive", coordinates: [1, 1, 1] }],
-          source_text: "happy"
+          emotions: [
+            {
+              emotion_name: "Joy",
+              score: 0.9,
+              confidence: 0.9,
+              category: "Positive",
+              coordinates: [1, 1, 1],
+            },
+          ],
+          source_text: "happy",
         },
       },
     ];
     const onEmotionClick = jest.fn();
-    render(<ChatMessageList {...defaultProps} messages={messages} onEmotionClick={onEmotionClick} />);
+    render(
+      <ChatMessageList {...defaultProps} messages={messages} onEmotionClick={onEmotionClick} />
+    );
 
     // Simulate click in mock
     fireEvent.click(screen.getByText("Select Joy"));
@@ -151,7 +169,9 @@ describe("ChatMessageList", () => {
       },
     ];
     const onEmotionClick = jest.fn();
-    render(<ChatMessageList {...defaultProps} messages={messages} onEmotionClick={onEmotionClick} />);
+    render(
+      <ChatMessageList {...defaultProps} messages={messages} onEmotionClick={onEmotionClick} />
+    );
 
     fireEvent.click(screen.getByText("Trigger Emotion"));
     expect(onEmotionClick).toHaveBeenCalledWith("Wonder");
@@ -159,7 +179,7 @@ describe("ChatMessageList", () => {
 
   it("renders generic assistant message with default styling", () => {
     // Determine what falls into the default else block. message.type !== user, analysis, multi_emotion.
-    // Assuming "assistant" is a valid type or just "text" type if supported. 
+    // Assuming "assistant" is a valid type or just "text" type if supported.
     // If DisplayMessage type restricts this, I might need to cast or ensure the type exists.
     // Looking at the component, it handles `msg.type`.
     const messages: DisplayMessage[] = [
@@ -186,12 +206,14 @@ describe("ChatMessageList", () => {
         timestamp: new Date(),
         multiEmotionData: {
           emotions: [],
-          source_text: "happy"
+          source_text: "happy",
         },
       },
     ];
     const onEmotionClick = jest.fn();
-    render(<ChatMessageList {...defaultProps} messages={messages} onEmotionClick={onEmotionClick} />);
+    render(
+      <ChatMessageList {...defaultProps} messages={messages} onEmotionClick={onEmotionClick} />
+    );
 
     // Simulate click with object
     fireEvent.click(screen.getByText("Select Hope Object"));
@@ -207,12 +229,14 @@ describe("ChatMessageList", () => {
         timestamp: new Date(),
         multiEmotionData: {
           emotions: [],
-          source_text: "happy"
+          source_text: "happy",
         },
       },
     ];
     const onEmotionClick = jest.fn();
-    render(<ChatMessageList {...defaultProps} messages={messages} onEmotionClick={onEmotionClick} />);
+    render(
+      <ChatMessageList {...defaultProps} messages={messages} onEmotionClick={onEmotionClick} />
+    );
 
     fireEvent.click(screen.getByText("Select Empty"));
     expect(onEmotionClick).not.toHaveBeenCalled();
@@ -227,7 +251,7 @@ describe("ChatMessageList", () => {
         timestamp: new Date(),
         multiEmotionData: {
           emotions: [],
-          source_text: "happy"
+          source_text: "happy",
         },
       },
     ];

@@ -50,36 +50,20 @@ describe("ChatHeader", () => {
 
   it("shows connection status when expanded", () => {
     render(
-      <ChatHeader
-        {...defaultProps}
-        isExpanded={true}
-        isConnected={true}
-        isConnecting={false}
-      />
+      <ChatHeader {...defaultProps} isExpanded={true} isConnected={true} isConnecting={false} />
     );
     expect(screen.getByText("Connected")).toBeInTheDocument();
   });
 
   it("shows connecting status", () => {
     render(
-      <ChatHeader
-        {...defaultProps}
-        isExpanded={true}
-        isConnected={false}
-        isConnecting={true}
-      />
+      <ChatHeader {...defaultProps} isExpanded={true} isConnected={false} isConnecting={true} />
     );
     expect(screen.getByText("Connecting...")).toBeInTheDocument();
   });
 
   it("shows error message", () => {
-    render(
-      <ChatHeader
-        {...defaultProps}
-        isExpanded={true}
-        wsError="Connection failed"
-      />
-    );
+    render(<ChatHeader {...defaultProps} isExpanded={true} wsError="Connection failed" />);
     expect(screen.getByText("⚠️ Connection failed")).toBeInTheDocument();
   });
 

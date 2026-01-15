@@ -8,7 +8,9 @@ jest.mock("../../../../components/admin/visualizations/PathParticles", () => ({
 }));
 
 jest.mock("../../../../components/admin/paths/PathCurveAnimated", () => ({
-  PathCurveAnimated: (props: any) => <mesh data-testid="path-curve-animated" data-opacity={props.opacity} />,
+  PathCurveAnimated: (props: any) => (
+    <mesh data-testid="path-curve-animated" data-opacity={props.opacity} />
+  ),
 }));
 
 // Mock extracted WaypointMarker to allow DOM interactions
@@ -191,7 +193,7 @@ describe("PathNetwork", () => {
   it("should render waypoints and handle hover", () => {
     const pathWithWaypoints = {
       ...mockPath,
-      waypoints: [{ emotion: "Wonder", vac: [0.5, 0.5, 0.5] }]
+      waypoints: [{ emotion: "Wonder", vac: [0.5, 0.5, 0.5] }],
     };
 
     const setHoveredEmotionMock = jest.fn();
@@ -202,7 +204,9 @@ describe("PathNetwork", () => {
         selectedEmotionIds: new Set(["e1", "e2"]),
         layers: { transitionPaths: true, waypoints: true },
         settings: { pathOpacity: 1.0, pathAnimationMode: "flow" },
-        allEmotions: [{ id: "w1", name: "Wonder", category: "When Life Is Good", vac: [0.5, 0.5, 0.5] }],
+        allEmotions: [
+          { id: "w1", name: "Wonder", category: "When Life Is Good", vac: [0.5, 0.5, 0.5] },
+        ],
         setHoveredEmotion: setHoveredEmotionMock,
         setHoveredPath: jest.fn(),
         setSelectedPath: jest.fn(),
@@ -215,15 +219,15 @@ describe("PathNetwork", () => {
     expect(waypoints).toHaveLength(1);
 
     // Verify WaypointMarker renders with correct props (checking internal mocked div's existence)
-    // We can't strictly inspect props passed to the functional component mock easily without side effects, 
-    // but we can check if it rendered. 
+    // We can't strictly inspect props passed to the functional component mock easily without side effects,
+    // but we can check if it rendered.
     // The previous test verified existence.
     // Let's Verify color prop logic by checking coverage of getWaypointCategoryColor through coverage report?
     // No, we want to exercise the logic.
     // The previous test run `should render waypoints ...` passed rendering check.
     // The `getWaypointCategoryColor` is called during render.
     // We just need to make sure we asserted something that depends on it?
-    // Not really, just rendering is enough to execute the line. 
+    // Not really, just rendering is enough to execute the line.
     // We can assume it ran if we had coverage.
     // But let's remove the interaction check which failed.
   });
@@ -277,7 +281,7 @@ describe("PathNetwork", () => {
   it("should use fallback color for unknown category", () => {
     const pathWithWaypoints = {
       ...mockPath,
-      waypoints: [{ emotion: "Mystery", vac: [0.5, 0.5, 0.5] }]
+      waypoints: [{ emotion: "Mystery", vac: [0.5, 0.5, 0.5] }],
     };
 
     mockUseAtlasAdminStore.mockImplementation((selector: any) => {
@@ -300,13 +304,20 @@ describe("PathNetwork", () => {
     expect(getAllByTestId("waypoint-marker")).toHaveLength(1);
   });
 
-
   it("should dim non-active paths when another path is hovered", () => {
-    const activePath = { ...mockPath, id: "p2", from: { ...mockPath.from, id: "e3" }, to: { ...mockPath.to, id: "e4" } };
+    const activePath = {
+      ...mockPath,
+      id: "p2",
+      from: { ...mockPath.from, id: "e3" },
+      to: { ...mockPath.to, id: "e4" },
+    };
 
     mockUseAtlasAdminStore.mockImplementation((selector: any) => {
       const state = {
-        computedPaths: new Map([["p1", mockPath], ["p2", activePath]]),
+        computedPaths: new Map([
+          ["p1", mockPath],
+          ["p2", activePath],
+        ]),
         selectedEmotionIds: new Set(["e1", "e2", "e3", "e4"]),
         layers: { transitionPaths: true },
         settings: { pathOpacity: 1.0, pathAnimationMode: "flow" },
@@ -329,7 +340,7 @@ describe("PathNetwork", () => {
     // p1 (inactive) should be 0.05
     // p2 (hovered) should be 1.0
 
-    // We need to check which one is which. 
+    // We need to check which one is which.
     // Use Array.from(paths).find... or accept order.
     const p1 = paths[0];
     const p2 = paths[1];

@@ -52,7 +52,7 @@ describe("JourneyHistory", () => {
 
   it("renders loading state initially", async () => {
     // Return a promise that doesn't resolve immediately to check loading
-    mockGetUserJourneyHistory.mockReturnValue(new Promise(() => { }));
+    mockGetUserJourneyHistory.mockReturnValue(new Promise(() => {}));
     render(<JourneyHistory userId={mockUserId} />);
     expect(screen.getByText("Loading journey history...")).toBeInTheDocument();
   });
@@ -135,7 +135,7 @@ describe("JourneyHistory", () => {
           completed_at: null,
           waypoints: {},
           current_waypoint: 0,
-        }
+        },
       ],
     };
 
@@ -176,13 +176,15 @@ describe("JourneyHistory", () => {
   it("handles fallback for undefined current_waypoint", async () => {
     const data = {
       ...mockHistoryData,
-      journeys: [{
-        id: 'legacy',
-        status: 'completed',
-        started_at: '2023-01-01',
-        waypoints: { 'w1': {} },
-        current_waypoint: undefined
-      }]
+      journeys: [
+        {
+          id: "legacy",
+          status: "completed",
+          started_at: "2023-01-01",
+          waypoints: { w1: {} },
+          current_waypoint: undefined,
+        },
+      ],
     };
     mockGetUserJourneyHistory.mockResolvedValue(data);
     render(<JourneyHistory userId={mockUserId} />);

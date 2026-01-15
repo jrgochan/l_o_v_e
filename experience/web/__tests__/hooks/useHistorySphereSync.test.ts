@@ -47,8 +47,6 @@ describe("useHistorySphereSync", () => {
     });
   });
 
-
-
   afterEach(() => {
     jest.useRealTimers();
   });
@@ -249,7 +247,7 @@ describe("useHistorySphereSync", () => {
     currentAtlasState = { ...currentAtlasState, selectedEmotionIds: new Set() };
     currentHistoryState = {
       ...currentHistoryState,
-      entries: [{ id: joyHistoryId, emotion: joyName, isVisibleInSphere: false }]
+      entries: [{ id: joyHistoryId, emotion: joyName, isVisibleInSphere: false }],
     };
 
     const { rerender } = renderHook(() => useHistorySphereSync());

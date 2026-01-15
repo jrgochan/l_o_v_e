@@ -1,4 +1,3 @@
-
 import { render, cleanup } from "@testing-library/react";
 import React from "react";
 import * as THREE from "three";
@@ -8,7 +7,7 @@ import { useFrame } from "@react-three/fiber";
 // Mock R3F
 jest.mock("@react-three/fiber", () => ({
   useFrame: jest.fn(),
-  ThreeEvent: {}
+  ThreeEvent: {},
 }));
 
 // Mock Utils
@@ -72,13 +71,21 @@ describe("AnimatedEmotionNode", () => {
         configurable: true,
       },
       emissiveIntensity: {
-        get() { return this._emissiveIntensity || 0; },
-        set(v) { this._emissiveIntensity = v; },
+        get() {
+          return this._emissiveIntensity || 0;
+        },
+        set(v) {
+          this._emissiveIntensity = v;
+        },
         configurable: true,
       },
       opacity: {
-        get() { return this._opacity || 1; },
-        set(v) { this._opacity = v; },
+        get() {
+          return this._opacity || 1;
+        },
+        set(v) {
+          this._opacity = v;
+        },
         configurable: true,
       },
     });
@@ -90,7 +97,7 @@ describe("AnimatedEmotionNode", () => {
     vac: [0.8, 0.6, 0.7] as [number, number, number],
     category: "Positive",
     definition: "Happy",
-    quaternion: [0, 0, 0, 1] as [number, number, number, number]
+    quaternion: [0, 0, 0, 1] as [number, number, number, number],
   };
 
   const defaultProps = {
@@ -133,7 +140,7 @@ describe("AnimatedEmotionNode", () => {
     it("handles ORBITAL motion", () => {
       (getEmotionAnimationParams as jest.Mock).mockReturnValue({
         ...defaultAnimParams,
-        secondaryMotion: "orbital"
+        secondaryMotion: "orbital",
       });
       const { container } = render(<AnimatedEmotionNode {...defaultProps} />);
       const mesh = container.querySelector("mesh") as any;
@@ -150,7 +157,7 @@ describe("AnimatedEmotionNode", () => {
     it("handles RECOIL motion", () => {
       (getEmotionAnimationParams as jest.Mock).mockReturnValue({
         ...defaultAnimParams,
-        secondaryMotion: "recoil"
+        secondaryMotion: "recoil",
       });
       const { container } = render(<AnimatedEmotionNode {...defaultProps} mode="subtle" />);
       const mesh = container.querySelector("mesh") as any;
@@ -164,7 +171,7 @@ describe("AnimatedEmotionNode", () => {
     it("handles REACHING motion", () => {
       (getEmotionAnimationParams as jest.Mock).mockReturnValue({
         ...defaultAnimParams,
-        secondaryMotion: "reaching"
+        secondaryMotion: "reaching",
       });
       const { container } = render(<AnimatedEmotionNode {...defaultProps} />);
       const mesh = container.querySelector("mesh") as any;
@@ -178,7 +185,10 @@ describe("AnimatedEmotionNode", () => {
 
   describe("Mode specific logic", () => {
     it("Dynamic mode: applies jitter when arousal > 0.5", () => {
-      const highArousalEmotion = { ...mockEmotion, vac: [0.8, 0.9, 0.7] as [number, number, number] };
+      const highArousalEmotion = {
+        ...mockEmotion,
+        vac: [0.8, 0.9, 0.7] as [number, number, number],
+      };
 
       const { container } = render(
         <AnimatedEmotionNode {...defaultProps} emotion={highArousalEmotion} mode="dynamic" />
@@ -200,7 +210,10 @@ describe("AnimatedEmotionNode", () => {
     });
 
     it("Dynamic mode: does NOT apply jitter when arousal <= 0.5", () => {
-      const lowArousalEmotion = { ...mockEmotion, vac: [0.8, 0.4, 0.7] as [number, number, number] }; // Arousal 0.4
+      const lowArousalEmotion = {
+        ...mockEmotion,
+        vac: [0.8, 0.4, 0.7] as [number, number, number],
+      }; // Arousal 0.4
 
       const { container } = render(
         <AnimatedEmotionNode {...defaultProps} emotion={lowArousalEmotion} mode="dynamic" />
@@ -213,8 +226,8 @@ describe("AnimatedEmotionNode", () => {
 
       // Should have float (y) but NO jitter (x/z)
       expect(mesh.position.y).not.toBe(0); // Float
-      expect(mesh.position.x).toBe(0);     // No Jitter
-      expect(mesh.position.z).toBe(0);     // No Jitter
+      expect(mesh.position.x).toBe(0); // No Jitter
+      expect(mesh.position.z).toBe(0); // No Jitter
     });
 
     it("Mystical mode: applies figure-8 drift", () => {

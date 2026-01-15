@@ -435,10 +435,11 @@ export function PullModelDialog({
               <button
                 type="button"
                 onClick={handleClose}
-                className={`flex-1 px-4 py-2 text-white rounded transition font-medium ${currentPull.status === "success"
+                className={`flex-1 px-4 py-2 text-white rounded transition font-medium ${
+                  currentPull.status === "success"
                     ? "bg-green-600 hover:bg-green-500"
                     : "bg-red-600 hover:bg-red-500"
-                  }`}
+                }`}
               >
                 {currentPull.status === "success" ? "Done" : "Close"}
               </button>

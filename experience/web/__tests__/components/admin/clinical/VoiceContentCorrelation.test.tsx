@@ -1,4 +1,3 @@
-
 import { render, screen } from "@testing-library/react";
 import { VoiceContentCorrelation } from "@/components/admin/clinical/VoiceContentCorrelation";
 import type { VoiceContentCorrelation as VCCType } from "@/types/chat";
@@ -9,7 +8,7 @@ describe("VoiceContentCorrelation", () => {
     content_arousal: 0.7,
     discrepancy: 0.1,
     aligned: true,
-    interpretation: "Consistent expression"
+    interpretation: "Consistent expression",
   };
 
   const misalignedMetric: VCCType = {
@@ -17,7 +16,7 @@ describe("VoiceContentCorrelation", () => {
     content_arousal: 0.9,
     discrepancy: 0.7,
     aligned: false,
-    interpretation: "Potential suppression detected"
+    interpretation: "Potential suppression detected",
   };
 
   it("renders aligned state correctly", () => {
@@ -47,7 +46,7 @@ describe("VoiceContentCorrelation", () => {
     const mediumMetric: VCCType = {
       ...alignedMetric,
       discrepancy: 0.4, // Between 0.3 and 0.5 -> Yellow
-      aligned: false
+      aligned: false,
     };
     render(<VoiceContentCorrelation correlation={mediumMetric} />);
 

@@ -1,4 +1,3 @@
-
 import { render, screen, fireEvent } from "@testing-library/react";
 import { LayerControls } from "@/components/admin/panels/ControlPanel/LayerControls";
 import { ExportControls } from "@/components/admin/shared/ExportControls";

@@ -7,7 +7,9 @@ jest.mock("@/components/admin/clinical/VACQuadrantViz", () => ({
   VACQuadrantViz: () => <div data-testid="vac-quadrant-viz">Mock VACQuadrantViz</div>,
 }));
 jest.mock("@/components/admin/clinical/VoiceContentCorrelation", () => ({
-  VoiceContentCorrelation: () => <div data-testid="voice-content-correlation">Mock Correlation</div>,
+  VoiceContentCorrelation: () => (
+    <div data-testid="voice-content-correlation">Mock Correlation</div>
+  ),
 }));
 jest.mock("@/components/admin/clinical/ProsodyVisualization", () => ({
   ProsodyVisualization: () => <div data-testid="prosody-viz">Mock Prosody</div>,
@@ -19,7 +21,9 @@ jest.mock("@/components/admin/clinical/SessionTimeline", () => ({
   SessionTimeline: () => <div data-testid="session-timeline">Mock Timeline</div>,
 }));
 jest.mock("@/components/admin/clinical/MultiEmotionTable", () => ({
-  MultiEmotionTable: ({ emotions }: any) => <div data-testid="multi-emotion-table">{emotions.length} emotions</div>,
+  MultiEmotionTable: ({ emotions }: any) => (
+    <div data-testid="multi-emotion-table">{emotions.length} emotions</div>
+  ),
 }));
 jest.mock("@/components/admin/clinical/VoiceContentThreeWay", () => ({
   VoiceContentThreeWay: () => <div data-testid="three-way">Mock ThreeWay</div>,
@@ -47,7 +51,10 @@ const mockProps: any = {
   insights: {
     voice_content_correlation: { some: "data" },
   },
-  vacHistory: [{ valence: 0.5, arousal: 0.5, connection: 0.5 }, { valence: 0.6, arousal: 0.6, connection: 0.6 }],
+  vacHistory: [
+    { valence: 0.5, arousal: 0.5, connection: 0.5 },
+    { valence: 0.6, arousal: 0.6, connection: 0.6 },
+  ],
   emotionTimeline: [],
   audioBlob: new Blob(),
   multiEmotionData: {
@@ -97,7 +104,7 @@ describe("ExpandedView", () => {
         shimmer: 5.0, // Yellow (3-6)
         pitch_range: 200, // Orange (>150)
         rate: 6.0, // Orange (>5)
-      }
+      },
     };
     render(<ExpandedView {...props} />);
 
@@ -129,8 +136,11 @@ describe("ExpandedView", () => {
       },
       // Multiple emotions for pluralization
       multiEmotionData: {
-        emotions: [{ name: "A", score: 0.5 }, { name: "B", score: 0.5 }],
-      }
+        emotions: [
+          { name: "A", score: 0.5 },
+          { name: "B", score: 0.5 },
+        ],
+      },
     };
     render(<ExpandedView {...props} />);
 
@@ -173,7 +183,7 @@ describe("ExpandedView", () => {
     // Just render verify existence
     const props = {
       ...mockProps,
-      prosody: { ...mockProps.prosody, energy: 0.5 } // Blue-Cyan (0.4-0.7)
+      prosody: { ...mockProps.prosody, energy: 0.5 }, // Blue-Cyan (0.4-0.7)
     };
     render(<ExpandedView {...props} />);
     expect(screen.getByText("0.500")).toBeInTheDocument();
@@ -182,7 +192,7 @@ describe("ExpandedView", () => {
   it("should handle low energy color (blue)", () => {
     const props = {
       ...mockProps,
-      prosody: { ...mockProps.prosody, energy: 0.3 } // Blue (<0.4)
+      prosody: { ...mockProps.prosody, energy: 0.3 }, // Blue (<0.4)
     };
     render(<ExpandedView {...props} />);
     expect(screen.getByText("0.300")).toBeInTheDocument();
@@ -191,7 +201,7 @@ describe("ExpandedView", () => {
     const props = { ...mockProps, confidence: 0.65 };
     render(<ExpandedView {...props} />);
     expect(screen.getByText("65%")).toBeInTheDocument();
-    // Verify specific class not feasible easily without searching by class, 
+    // Verify specific class not feasible easily without searching by class,
     // but code path 0.6 <= x < 0.8 is covered by valid render
   });
 
@@ -204,7 +214,7 @@ describe("ExpandedView", () => {
         // Undefined detailed metrics to skip the jitter/shimmer/hnr block if check logic was stricter,
         // but logic is (jitter || shimmer || hnr). Let's provide NONE of them.
         pitch_mean: 220,
-      } as any
+      } as any,
     };
     render(<ExpandedView {...props} />);
     expect(screen.queryByText("Voice Quality")).not.toBeInTheDocument();

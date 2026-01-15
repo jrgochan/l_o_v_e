@@ -1,28 +1,30 @@
-
 import { render, screen, fireEvent } from "@testing-library/react";
 import { MultiEmotionCard } from "@/components/admin/emotion-display/MultiEmotionCard";
 import type { DetectedEmotion, EmotionRelationship, AggregateState } from "@/types/chat";
 
 // Mock the store
 jest.mock("@/stores/useAtlasAdminStore", () => ({
-  useAtlasAdminStore: (selector: any) => selector({
-    settings: { pathAnimationMode: "subtle" }
-  }),
+  useAtlasAdminStore: (selector: any) =>
+    selector({
+      settings: { pathAnimationMode: "subtle" },
+    }),
 }));
 
 // Mock child components
 jest.mock("@/components/admin/emotion-display/BaseEmotionChip", () => ({
   BaseEmotionChip: ({ emotion, onClick }: any) => (
-    <div data-testid="mock-chip" onClick={onClick}>{emotion}</div>
+    <div data-testid="mock-chip" onClick={onClick}>
+      {emotion}
+    </div>
   ),
 }));
 
 jest.mock("@/components/admin/emotion-display/EmotionMappingBadge", () => ({
-  EmotionMappingBadge: () => <div data-testid="mock-mapping-badge" />
+  EmotionMappingBadge: () => <div data-testid="mock-mapping-badge" />,
 }));
 
 jest.mock("@/components/admin/shared/RelationshipIndicator", () => ({
-  RelationshipList: () => <div data-testid="mock-relationship-list" />
+  RelationshipList: () => <div data-testid="mock-relationship-list" />,
 }));
 
 jest.mock("@/components/admin/visualizations/EmotionRelationshipGraph", () => ({
@@ -31,15 +33,15 @@ jest.mock("@/components/admin/visualizations/EmotionRelationshipGraph", () => ({
       data-testid="mock-relationship-graph"
       onClick={() => onEmotionClick({ emotion_name: "Joy" })}
     />
-  )
+  ),
 }));
 
 jest.mock("@/components/admin/spheres/AggregateSphere", () => ({
-  AggregateSphere: () => <div data-testid="mock-aggregate-sphere" />
+  AggregateSphere: () => <div data-testid="mock-aggregate-sphere" />,
 }));
 
 jest.mock("@/components/admin/state-display/AggregateStateCard", () => ({
-  AggregateStateCard: () => <div data-testid="mock-aggregate-state-card" />
+  AggregateStateCard: () => <div data-testid="mock-aggregate-state-card" />,
 }));
 
 describe("MultiEmotionCard", () => {
@@ -52,7 +54,7 @@ describe("MultiEmotionCard", () => {
       intensity: 5,
       prominence: "primary",
       vac: { valence: 0.8, arousal: 0.6, connection: 0.7 },
-      original_name: "Happy"
+      original_name: "Happy",
     },
     {
       id: "2",
@@ -61,7 +63,7 @@ describe("MultiEmotionCard", () => {
       confidence: 0.8,
       intensity: 3,
       prominence: "secondary",
-      vac: { valence: 0.5, arousal: 0.3, connection: 0.9 }
+      vac: { valence: 0.5, arousal: 0.3, connection: 0.9 },
     },
     {
       id: "3",
@@ -70,19 +72,26 @@ describe("MultiEmotionCard", () => {
       confidence: 0.4,
       intensity: 2,
       prominence: "underlying",
-      vac: { valence: 0.2, arousal: 0.5, connection: 0.5 }
+      vac: { valence: 0.2, arousal: 0.5, connection: 0.5 },
     },
   ];
 
   const mockRelationships: EmotionRelationship[] = [
-    { id: "r1", emotion_a: "Joy", emotion_b: "Trust", type: "sequential", description: "Joy leads to trust", strength: 0.8 }
+    {
+      id: "r1",
+      emotion_a: "Joy",
+      emotion_b: "Trust",
+      type: "sequential",
+      description: "Joy leads to trust",
+      strength: 0.8,
+    },
   ];
 
   const mockAggregate: AggregateState = {
     valence: 0.5,
     arousal: 0.5,
     connection: 0.5,
-    overall_mood: "Positive"
+    overall_mood: "Positive",
   };
 
   it("renders primary emotion details", () => {
@@ -131,7 +140,13 @@ describe("MultiEmotionCard", () => {
 
   it("renders relationships and toggles graph", () => {
     const onSelect = jest.fn();
-    render(<MultiEmotionCard emotions={mockEmotions} relationships={mockRelationships} onEmotionClick={onSelect} />);
+    render(
+      <MultiEmotionCard
+        emotions={mockEmotions}
+        relationships={mockRelationships}
+        onEmotionClick={onSelect}
+      />
+    );
     expect(screen.getByText("🔗 Emotion Relationships")).toBeInTheDocument();
     expect(screen.getByTestId("mock-relationship-list")).toBeInTheDocument();
 

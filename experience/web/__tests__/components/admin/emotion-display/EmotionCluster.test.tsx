@@ -1,4 +1,3 @@
-
 import { render, screen, fireEvent } from "@testing-library/react";
 import { EmotionCluster, EmotionList } from "@/components/admin/emotion-display/EmotionCluster";
 import type { DetectedEmotion } from "@/types/chat";
@@ -40,9 +39,7 @@ describe("EmotionCluster", () => {
   });
 
   it("handles emotions without IDs (fallback key)", () => {
-    const noIdEmotions: DetectedEmotion[] = [
-      { ...mockEmotions[0], id: undefined as any }
-    ];
+    const noIdEmotions: DetectedEmotion[] = [{ ...mockEmotions[0], id: undefined as any }];
     render(<EmotionCluster emotions={noIdEmotions} />);
     expect(screen.getByText("Joy")).toBeInTheDocument();
   });
@@ -60,9 +57,7 @@ describe("EmotionList", () => {
   ];
 
   it("handles emotions without IDs (fallback key)", () => {
-    const noIdEmotions: DetectedEmotion[] = [
-      { ...mockEmotions[0], id: undefined as any }
-    ];
+    const noIdEmotions: DetectedEmotion[] = [{ ...mockEmotions[0], id: undefined as any }];
     render(<EmotionList emotions={noIdEmotions} />);
     expect(screen.getByText("Joy")).toBeInTheDocument();
   });

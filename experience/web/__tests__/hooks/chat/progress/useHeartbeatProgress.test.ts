@@ -73,8 +73,7 @@ describe("useHeartbeatProgress", () => {
 
     act(() => {
       const stages = result.current.progressState.stages;
-      if (stages.length > 0)
-        result.current.updateProgress(stages[0].id, "completed", 50);
+      if (stages.length > 0) result.current.updateProgress(stages[0].id, "completed", 50);
     });
 
     // If simulation restarted, it would be running.
@@ -85,11 +84,12 @@ describe("useHeartbeatProgress", () => {
 
   it("should NOT restart simulation if percentage >= 90", () => {
     const { result } = renderHook(() => useHeartbeatProgress("warm", false));
-    act(() => { result.current.startProgress("semantic"); });
+    act(() => {
+      result.current.startProgress("semantic");
+    });
     act(() => {
       const stages = result.current.progressState.stages;
-      if (stages.length > 0)
-        result.current.updateProgress(stages[0].id, "in_progress", 95);
+      if (stages.length > 0) result.current.updateProgress(stages[0].id, "in_progress", 95);
     });
     // Logic check coverage
   });

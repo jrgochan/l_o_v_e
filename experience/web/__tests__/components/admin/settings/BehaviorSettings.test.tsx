@@ -1,4 +1,3 @@
-
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import { BehaviorSettings } from "@/components/admin/settings/BehaviorSettings";
 import { useSettingsStore } from "@/stores/useSettingsStore";

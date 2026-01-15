@@ -1,4 +1,3 @@
-
 import { render, screen, fireEvent } from "@testing-library/react";
 import { PathDetails } from "@/components/admin/panels/InfoPanel/PathDetails";
 import { useAtlasAdminStore } from "@/stores/useAtlasAdminStore";
@@ -10,7 +9,7 @@ describe("PathDetails", () => {
   const mockSetIsFlying = jest.fn();
   const mockGetState = jest.fn(() => ({
     isFlying: false,
-    setIsFlying: mockSetIsFlying
+    setIsFlying: mockSetIsFlying,
   }));
 
   const mockPath = {
@@ -18,17 +17,25 @@ describe("PathDetails", () => {
     from: { id: "e1", name: "Joy" },
     to: { id: "e2", name: "Peace" },
     waypoints: [
-      { emotion: "Wonder", strategies: [{ name: "Reflect" }], reasoning: "Why not?", estimated_time: "5m", difficulty: "Easy" }
+      {
+        emotion: "Wonder",
+        strategies: [{ name: "Reflect" }],
+        reasoning: "Why not?",
+        estimated_time: "5m",
+        difficulty: "Easy",
+      },
     ],
     total_distance: 12.5,
     estimated_time: "10m",
     difficulty: "Moderate",
     requires_bridge: true,
-    bridge_emotions: ["Vulnerability"]
+    bridge_emotions: ["Vulnerability"],
   };
 
   const mockAllEmotions = [
-    { id: "e1", name: "Joy" }, { id: "e2", name: "Peace" }, { id: "e3", name: "Wonder" }
+    { id: "e1", name: "Joy" },
+    { id: "e2", name: "Peace" },
+    { id: "e3", name: "Wonder" },
   ];
 
   beforeEach(() => {
@@ -44,7 +51,7 @@ describe("PathDetails", () => {
     (useAtlasAdminStore as unknown as jest.Mock).mockImplementation((selector) => {
       const state = {
         setHoveredEmotion: mockSetHoveredEmotion,
-        allEmotions: mockAllEmotions
+        allEmotions: mockAllEmotions,
       };
       return selector(state);
     });
@@ -98,7 +105,7 @@ describe("PathDetails", () => {
   it("renders specific warning for Awe bridge emotion", () => {
     const awePath = {
       ...mockPath,
-      bridge_emotions: ["Awe"]
+      bridge_emotions: ["Awe"],
     };
     render(<PathDetails path={awePath as any} onWaypointClick={jest.fn()} />);
     expect(screen.getByText(/Awe provides perspective shift/)).toBeInTheDocument();

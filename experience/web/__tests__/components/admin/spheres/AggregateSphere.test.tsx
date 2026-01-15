@@ -1,4 +1,3 @@
-
 import { render, act } from "@testing-library/react";
 import { AggregateSphere } from "@/components/admin/spheres/AggregateSphere";
 import * as THREE from "three";
@@ -133,7 +132,9 @@ describe("AggregateSphere", () => {
   });
 
   it("should dispose resources on unmount", () => {
-    const { unmount } = render(<AggregateSphere emotions={mockEmotions as any} aggregate={mockAggregate as any} />);
+    const { unmount } = render(
+      <AggregateSphere emotions={mockEmotions as any} aggregate={mockAggregate as any} />
+    );
     unmount();
     // Verify cleanup
     expect(mockCancelAnimationFrame).toHaveBeenCalled();
@@ -141,22 +142,24 @@ describe("AggregateSphere", () => {
 
   it("should handle resize", () => {
     render(
-      <AggregateSphere emotions={mockEmotions as any} aggregate={mockAggregate as any} width={500} height={500} />
+      <AggregateSphere
+        emotions={mockEmotions as any}
+        aggregate={mockAggregate as any}
+        width={500}
+        height={500}
+      />
     );
     expect(mockSetSize).toHaveBeenCalledWith(500, 500);
   });
 
   it("should constrain particles within bounds during animation", () => {
-    render(
-      <AggregateSphere emotions={mockEmotions as any} aggregate={mockAggregate as any} />
-    );
+    render(<AggregateSphere emotions={mockEmotions as any} aggregate={mockAggregate as any} />);
 
     // Get particles from mockAdd calls
     const addCalls = mockAdd.mock.calls;
-    const particles = addCalls.find(call =>
-      call[0].geometry &&
-      call[0].geometry.attributes &&
-      call[0].geometry.attributes.position
+    const particles = addCalls.find(
+      (call) =>
+        call[0].geometry && call[0].geometry.attributes && call[0].geometry.attributes.position
     )?.[0];
 
     expect(particles).toBeDefined();
@@ -186,7 +189,9 @@ describe("AggregateSphere", () => {
     render(
       <AggregateSphere
         emotions={mockEmotions as any}
-        aggregate={{ ...mockAggregate, vac: { ...mockAggregate.vac, arousal: 0.8, valence: 0.8 } } as any}
+        aggregate={
+          { ...mockAggregate, vac: { ...mockAggregate.vac, arousal: 0.8, valence: 0.8 } } as any
+        }
         mode="dynamic"
       />
     );
@@ -196,7 +201,9 @@ describe("AggregateSphere", () => {
     render(
       <AggregateSphere
         emotions={mockEmotions as any}
-        aggregate={{ ...mockAggregate, vac: { ...mockAggregate.vac, arousal: -0.5, valence: -0.5 } } as any}
+        aggregate={
+          { ...mockAggregate, vac: { ...mockAggregate.vac, arousal: -0.5, valence: -0.5 } } as any
+        }
         mode="mystical"
       />
     );
@@ -205,16 +212,25 @@ describe("AggregateSphere", () => {
   it("should display correct pluralization for multiple emotions", () => {
     const multiEmotions = [
       ...mockEmotions,
-      { id: "2", name: "Sadness", vac: { valence: -0.5, arousal: -0.2, connection: 0 }, confidence: 0.8 }
+      {
+        id: "2",
+        name: "Sadness",
+        vac: { valence: -0.5, arousal: -0.2, connection: 0 },
+        confidence: 0.8,
+      },
     ];
-    const { getByText } = render(<AggregateSphere emotions={multiEmotions as any} aggregate={mockAggregate as any} />);
+    const { getByText } = render(
+      <AggregateSphere emotions={multiEmotions as any} aggregate={mockAggregate as any} />
+    );
     expect(getByText(/2 emotions/i)).toBeInTheDocument();
   });
 
   it("should skip cancelAnimationFrame if frameId is missing (defensive check)", () => {
     // Force RAF to return 0/falsy
     (window.requestAnimationFrame as jest.Mock).mockReturnValueOnce(0);
-    const { unmount } = render(<AggregateSphere emotions={mockEmotions as any} aggregate={mockAggregate as any} />);
+    const { unmount } = render(
+      <AggregateSphere emotions={mockEmotions as any} aggregate={mockAggregate as any} />
+    );
 
     // Reset mock to isolate unmount call check
     mockCancelAnimationFrame.mockClear();

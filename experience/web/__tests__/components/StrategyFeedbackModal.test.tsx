@@ -147,7 +147,9 @@ describe("StrategyFeedbackModal", () => {
     fireEvent.click(screen.getByText("Deep Breathing"));
 
     // Check clean state
-    const notesInputReopened = screen.getByPlaceholderText("Any thoughts or observations...") as HTMLTextAreaElement;
+    const notesInputReopened = screen.getByPlaceholderText(
+      "Any thoughts or observations..."
+    ) as HTMLTextAreaElement;
     expect(notesInputReopened.value).toBe("");
   });
 

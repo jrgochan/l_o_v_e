@@ -236,7 +236,7 @@ describe("useNavigationShortcuts", () => {
       computedPaths: new Map([
         ["path1", { id: "path1", from: { id: "e1" }, to: { id: "e2" } }],
         ["path2", { id: "path2", from: { id: "e1" }, to: { id: "e3" } }],
-        ["path3", { id: "path3", from: { id: "e1" }, to: { id: "e4" } }]
+        ["path3", { id: "path3", from: { id: "e1" }, to: { id: "e4" } }],
       ]),
       selectedPathId: "path1", // Start at first
       selectedEmotionIds: new Set(["e1", "e2", "e3", "e4"]),
@@ -305,7 +305,6 @@ describe("useNavigationShortcuts", () => {
     });
     expect(mockSetSelectedPath).not.toHaveBeenCalled();
   });
-
 
   it("should not navigate if paths exist but filtering returns empty (empty computedPaths after filter)", () => {
     (useAtlasAdminStore as unknown as jest.Mock).mockImplementation((selector) => {

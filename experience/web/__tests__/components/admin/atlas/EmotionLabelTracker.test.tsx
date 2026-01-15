@@ -74,10 +74,7 @@ describe("EmotionLabelTracker", () => {
 
     // Add an ignored emotion (not selected, not hovered)
     mockUseAtlasAdminStore.mockReturnValue({
-      allEmotions: [
-        mockEmotion,
-        { id: "e2", name: "Ignored", vac: [1, 1, 1] }
-      ],
+      allEmotions: [mockEmotion, { id: "e2", name: "Ignored", vac: [1, 1, 1] }],
       selectedEmotionIds: new Set(["e1"]),
       hoveredEmotionId: null,
       layers: { emotionLabels: true },

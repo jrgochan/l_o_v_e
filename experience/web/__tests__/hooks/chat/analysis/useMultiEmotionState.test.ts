@@ -169,7 +169,13 @@ describe("useMultiEmotionState", () => {
     const { result } = renderHook(() => useMultiEmotionState(sessionId));
 
     act(() => {
-      result.current.addMultiEmotion("joy", "cat", { valence: 1, arousal: 1, connection: 1 }, 1, "primary");
+      result.current.addMultiEmotion(
+        "joy",
+        "cat",
+        { valence: 1, arousal: 1, connection: 1 },
+        1,
+        "primary"
+      );
     });
 
     // First update to set non-zero values

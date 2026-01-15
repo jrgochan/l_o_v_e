@@ -34,13 +34,13 @@ describe("StatisticsPanel", () => {
       error: null,
       isClearing: false,
       clearCache: mockClearCache,
-      ...statsOverrides // Allow overriding loading/error directly
+      ...statsOverrides, // Allow overriding loading/error directly
     });
 
     (useLoadCachedPaths as jest.Mock).mockReturnValue({
       loadTime: 120,
       error: null,
-      ...loadOverrides
+      ...loadOverrides,
     });
   };
 
@@ -124,7 +124,7 @@ describe("StatisticsPanel", () => {
         // Missing difficulty_distribution
         // Missing distance_stats
         // Missing last_computed
-      }
+      },
     });
     render(<StatisticsPanel />);
 
@@ -136,4 +136,3 @@ describe("StatisticsPanel", () => {
     expect(screen.getByText("N/A")).toBeInTheDocument();
   });
 });
-

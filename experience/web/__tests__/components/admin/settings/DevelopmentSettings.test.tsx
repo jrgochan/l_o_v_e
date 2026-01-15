@@ -1,4 +1,3 @@
-
 import { render, screen, fireEvent } from "@testing-library/react";
 import { DevelopmentSettings } from "@/components/admin/settings/DevelopmentSettings";
 import { useSettingsStore } from "@/stores/useSettingsStore";
@@ -108,7 +107,7 @@ describe("DevelopmentSettings", () => {
     const levels = {
       debug: "All logs including detailed debug information",
       warn: "Warnings and errors only",
-      error: "Errors only"
+      error: "Errors only",
     };
 
     Object.entries(levels).forEach(([level, text]) => {
@@ -139,7 +138,7 @@ describe("DevelopmentSettings", () => {
     expect(navigator.clipboard.writeText).toHaveBeenCalledWith("mock logs");
 
     // Clear Console
-    const consoleSpy = jest.spyOn(console, "clear").mockImplementation(() => { });
+    const consoleSpy = jest.spyOn(console, "clear").mockImplementation(() => {});
     fireEvent.click(screen.getByText("Clear Console"));
     expect(consoleSpy).toHaveBeenCalled();
     expect(logger.clearBuffer).toHaveBeenCalled();

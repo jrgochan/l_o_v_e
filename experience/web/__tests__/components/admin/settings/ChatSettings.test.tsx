@@ -1,4 +1,3 @@
-
 import { render, screen, fireEvent } from "@testing-library/react";
 import { ChatSettings } from "@/components/admin/settings/ChatSettings";
 import { useSettingsStore } from "@/stores/useSettingsStore";

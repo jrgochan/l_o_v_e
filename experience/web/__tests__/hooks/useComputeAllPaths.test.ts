@@ -95,8 +95,8 @@ describe("useComputeAllPaths", () => {
         distance: 10,
         estimated_time: "10m",
         difficulty: "easy",
-        requires_bridge: false
-      }
+        requires_bridge: false,
+      },
     ];
     (atlasService.getCachedPaths as jest.Mock).mockResolvedValue({ paths: mockPaths });
 
@@ -107,10 +107,12 @@ describe("useComputeAllPaths", () => {
 
     // 4. Verify addComputedPath was called
     expect(atlasService.getCachedPaths).toHaveBeenCalled();
-    expect(mockAddComputedPath).toHaveBeenCalledWith(expect.objectContaining({
-      id: "e1-e2",
-      total_distance: 10
-    }));
+    expect(mockAddComputedPath).toHaveBeenCalledWith(
+      expect.objectContaining({
+        id: "e1-e2",
+        total_distance: 10,
+      })
+    );
     expect(window.alert).toHaveBeenCalledWith(expect.stringContaining("complete"));
   });
 
@@ -131,7 +133,12 @@ describe("useComputeAllPaths", () => {
     let capturedOnFail: (msg: string) => void;
     (useBatchJob as jest.Mock).mockImplementation((onComplete, onFail) => {
       capturedOnFail = onFail;
-      return { startJob: mockStartJob, isComputing: false, progress: {}, setProgress: mockSetProgress };
+      return {
+        startJob: mockStartJob,
+        isComputing: false,
+        progress: {},
+        setProgress: mockSetProgress,
+      };
     });
 
     renderHook(() => useComputeAllPaths());
@@ -144,7 +151,12 @@ describe("useComputeAllPaths", () => {
     let capturedOnComplete: () => Promise<void>;
     (useBatchJob as jest.Mock).mockImplementation((onComplete) => {
       capturedOnComplete = onComplete;
-      return { startJob: mockStartJob, isComputing: false, progress: {}, setProgress: mockSetProgress };
+      return {
+        startJob: mockStartJob,
+        isComputing: false,
+        progress: {},
+        setProgress: mockSetProgress,
+      };
     });
 
     const mockPaths = [
@@ -155,7 +167,7 @@ describe("useComputeAllPaths", () => {
         distance: 0,
         estimated_time: "0",
         difficulty: "easy",
-        requires_bridge: false
+        requires_bridge: false,
       },
       {
         from_emotion: { id: "e1" },
@@ -164,8 +176,8 @@ describe("useComputeAllPaths", () => {
         distance: 10,
         estimated_time: "10m",
         difficulty: "easy",
-        requires_bridge: false
-      }
+        requires_bridge: false,
+      },
     ];
     (atlasService.getCachedPaths as jest.Mock).mockResolvedValue({ paths: mockPaths });
 
@@ -174,9 +186,11 @@ describe("useComputeAllPaths", () => {
 
     // Should skip the first one
     expect(mockAddComputedPath).toHaveBeenCalledTimes(1);
-    expect(mockAddComputedPath).toHaveBeenCalledWith(expect.objectContaining({
-      id: "e1-e2",
-      waypoints: expect.arrayContaining([expect.objectContaining({ emotion: "e_mid" })])
-    }));
+    expect(mockAddComputedPath).toHaveBeenCalledWith(
+      expect.objectContaining({
+        id: "e1-e2",
+        waypoints: expect.arrayContaining([expect.objectContaining({ emotion: "e_mid" })]),
+      })
+    );
   });
 });

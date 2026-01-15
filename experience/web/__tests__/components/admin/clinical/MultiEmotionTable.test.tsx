@@ -1,4 +1,3 @@
-
 import { render, screen, fireEvent, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { MultiEmotionTable } from "@/components/admin/clinical/MultiEmotionTable";
@@ -18,7 +17,7 @@ describe("MultiEmotionTable", () => {
       vac: { valence: 0.8, arousal: 0.6, connection: 0.7 },
       voice_alignment: 0.9,
       match_method: "exact",
-      category: "Positive"
+      category: "Positive",
     },
     {
       id: "e2",
@@ -30,7 +29,7 @@ describe("MultiEmotionTable", () => {
       match_method: "fuzzy",
       category: "Negative",
       original_name: "Worry",
-      match_confidence: 0.85
+      match_confidence: 0.85,
     },
     {
       id: "e3",
@@ -40,8 +39,8 @@ describe("MultiEmotionTable", () => {
       vac: { valence: -0.7, arousal: -0.5, connection: -0.3 },
       voice_alignment: 0.2, // Low alignment
       match_method: "vac",
-      category: "Negative"
-    }
+      category: "Negative",
+    },
   ];
 
   beforeEach(() => {
@@ -141,8 +140,8 @@ describe("MultiEmotionTable", () => {
         id: "e4",
         emotion_name: "NullVoice",
         voice_alignment: undefined,
-        match_method: undefined // Cover || "exact"
-      }
+        match_method: undefined, // Cover || "exact"
+      },
     ];
     render(<MultiEmotionTable emotions={mixedEmotions} />);
 
@@ -206,7 +205,7 @@ describe("MultiEmotionTable", () => {
     render(<MultiEmotionTable emotions={mockEmotions} />);
 
     // Click Prominence header (default is asc)
-    // First click should toggle to desc? Or set to asc if not active? 
+    // First click should toggle to desc? Or set to asc if not active?
     // It is active by default. So clicking checks toggle logic.
     await user.click(screen.getByText("Prominence"));
     // Verify sort changed (relying on implementation detail or just coverage)
@@ -232,26 +231,38 @@ describe("MultiEmotionTable", () => {
         ...mockEmotions[0],
         id: "v1",
         vac: { valence: 0.2, arousal: 0.2, connection: 0.2 }, // Somewhat positive/high/connected
-        confidence: 0.9, prominence: "primary", category: "Test", match_method: "exact"
+        confidence: 0.9,
+        prominence: "primary",
+        category: "Test",
+        match_method: "exact",
       },
       {
         ...mockEmotions[0],
         id: "v2",
         vac: { valence: 0, arousal: 0, connection: 0 }, // Neutral/Moderate
-        confidence: 0.9, prominence: "primary", category: "Test", match_method: "exact"
+        confidence: 0.9,
+        prominence: "primary",
+        category: "Test",
+        match_method: "exact",
       },
       {
         ...mockEmotions[0],
         id: "v3",
         vac: { valence: -0.2, arousal: -0.2, connection: -0.2 }, // Somewhat negative/low/disconnected
-        confidence: 0.9, prominence: "primary", category: "Test", match_method: "exact"
+        confidence: 0.9,
+        prominence: "primary",
+        category: "Test",
+        match_method: "exact",
       },
       {
         ...mockEmotions[0],
         id: "v4",
         vac: { valence: -0.8, arousal: -0.8, connection: -0.8 }, // Very negative/low/disconnected
-        confidence: 0.9, prominence: "primary", category: "Test", match_method: "exact"
-      }
+        confidence: 0.9,
+        prominence: "primary",
+        category: "Test",
+        match_method: "exact",
+      },
     ];
 
     const user = userEvent.setup();
@@ -292,7 +303,7 @@ describe("MultiEmotionTable", () => {
   it("handles voice alignment sorting (handling undefined)", async () => {
     const mixedEmotions = [
       ...mockEmotions,
-      { ...mockEmotions[0], id: "e4", emotion_name: "NullVoice", voice_alignment: undefined }
+      { ...mockEmotions[0], id: "e4", emotion_name: "NullVoice", voice_alignment: undefined },
     ];
     const user = userEvent.setup();
     render(<MultiEmotionTable emotions={mixedEmotions} />);
@@ -308,7 +319,7 @@ describe("MultiEmotionTable", () => {
     const invalidProminenceEmotion = {
       ...mockEmotions[0],
       id: "inv1",
-      prominence: "unknown_prominence" as any
+      prominence: "unknown_prominence" as any,
     };
     render(<MultiEmotionTable emotions={[invalidProminenceEmotion]} />);
 
@@ -338,7 +349,7 @@ describe("MultiEmotionTable", () => {
     const nullVoiceEmotion = {
       ...mockEmotions[0],
       id: "e_null",
-      voice_alignment: null as any
+      voice_alignment: null as any,
     };
     const normalEmotion = { ...mockEmotions[1], id: "e_normal" };
 
@@ -357,7 +368,7 @@ describe("MultiEmotionTable", () => {
     // Use mixed types for 'confidence' (string vs number)
     const mixedTypeEmotions = [
       { ...mockEmotions[0], id: "m1", confidence: 0.5 },
-      { ...mockEmotions[1], id: "m2", confidence: "0.9" as any } // String confidence
+      { ...mockEmotions[1], id: "m2", confidence: "0.9" as any }, // String confidence
     ];
 
     const user = userEvent.setup();

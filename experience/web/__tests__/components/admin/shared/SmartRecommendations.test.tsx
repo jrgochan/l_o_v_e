@@ -1,4 +1,3 @@
-
 import { render, screen, fireEvent, waitFor, act } from "@testing-library/react";
 import { SmartRecommendations } from "@/components/admin/shared/SmartRecommendations";
 import { useAtlasAdminStore } from "@/stores/useAtlasAdminStore";
@@ -35,7 +34,7 @@ const mockRecommendations = {
       name: "Joy",
       type: "Complementary",
       reason: "Balances sadness",
-    }
+    },
   ],
   problematic_transitions: [
     {
@@ -46,8 +45,8 @@ const mockRecommendations = {
       distance: 15,
       waypoint_count: 3,
       requires_bridge: true,
-    }
-  ]
+    },
+  ],
 };
 
 describe("SmartRecommendations", () => {
@@ -72,7 +71,7 @@ describe("SmartRecommendations", () => {
 
     // Default getState implementation
     mockUseAtlasAdminStore.getState.mockImplementation(() => ({
-      settings: { computeMode: "manual" }
+      settings: { computeMode: "manual" },
     }));
   });
 
@@ -128,7 +127,7 @@ describe("SmartRecommendations", () => {
         { ...mockRecommendations.curated_journeys[0], id: "j1", difficulty: "easy" },
         { ...mockRecommendations.curated_journeys[0], id: "j2", difficulty: "moderate" },
         { ...mockRecommendations.curated_journeys[0], id: "j3", difficulty: "hard" },
-      ]
+      ],
     };
 
     (global.fetch as jest.Mock).mockResolvedValue({
@@ -154,7 +153,9 @@ describe("SmartRecommendations", () => {
     });
 
     render(<SmartRecommendations />);
-    await waitFor(() => expect(screen.getByText("No recommendations available")).toBeInTheDocument());
+    await waitFor(() =>
+      expect(screen.getByText("No recommendations available")).toBeInTheDocument()
+    );
   });
 
   it("applies curated journey in manual mode", async () => {
@@ -165,7 +166,7 @@ describe("SmartRecommendations", () => {
 
     // Explicitly mock getState again to be sure
     mockUseAtlasAdminStore.getState.mockImplementation(() => ({
-      settings: { computeMode: "manual" }
+      settings: { computeMode: "manual" },
     }));
 
     render(<SmartRecommendations />);
@@ -194,7 +195,7 @@ describe("SmartRecommendations", () => {
     });
 
     mockUseAtlasAdminStore.getState.mockImplementation(() => ({
-      settings: { computeMode: "cache-first" }
+      settings: { computeMode: "cache-first" },
     }));
 
     render(<SmartRecommendations />);
@@ -262,7 +263,7 @@ describe("SmartRecommendations", () => {
   });
 
   it("displays loading spinner", async () => {
-    (global.fetch as jest.Mock).mockReturnValue(new Promise(() => { }));
+    (global.fetch as jest.Mock).mockReturnValue(new Promise(() => {}));
 
     const { container } = render(<SmartRecommendations />);
     expect(container.querySelector(".animate-spin")).toBeInTheDocument();

@@ -103,7 +103,7 @@ describe("useProgressSimulation", () => {
       jest.advanceTimersByTime(500);
     });
 
-    const clearIntervalSpy = jest.spyOn(global, 'clearInterval');
+    const clearIntervalSpy = jest.spyOn(global, "clearInterval");
 
     // Simulate the updater function being called when progress reaches 90%
     const updater = setProgress.mock.calls[0][0];
@@ -118,7 +118,7 @@ describe("useProgressSimulation", () => {
 
   it("should cleanup interval on unmount", () => {
     const setProgress = jest.fn();
-    const clearIntervalSpy = jest.spyOn(global, 'clearInterval');
+    const clearIntervalSpy = jest.spyOn(global, "clearInterval");
 
     const { result, unmount } = renderHook(() => useProgressSimulation(setProgress));
 
@@ -134,7 +134,7 @@ describe("useProgressSimulation", () => {
 
   it("should handle unmount when not running (branch coverage)", () => {
     const setProgress = jest.fn();
-    const clearIntervalSpy = jest.spyOn(global, 'clearInterval');
+    const clearIntervalSpy = jest.spyOn(global, "clearInterval");
 
     const { unmount } = renderHook(() => useProgressSimulation(setProgress));
 
@@ -148,7 +148,7 @@ describe("useProgressSimulation", () => {
 
   it("should not clear interval if ref is null when reaching 90% (defensive branch)", () => {
     const setProgress = jest.fn();
-    const clearIntervalSpy = jest.spyOn(global, 'clearInterval');
+    const clearIntervalSpy = jest.spyOn(global, "clearInterval");
 
     const { result } = renderHook(() => useProgressSimulation(setProgress));
 

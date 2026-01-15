@@ -2,7 +2,7 @@ import { render, screen } from "@testing-library/react";
 import { TrajectoryChart } from "@/components/admin/users/TrajectoryChart";
 import { VACHistoryPoint } from "@/types/chat";
 
-// Mock resize observer since it's used for responsive D3 charts usually, 
+// Mock resize observer since it's used for responsive D3 charts usually,
 // though this component uses clientWidth which might be 0 in JSDOM.
 // We might need to mock clientWidth.
 
@@ -30,7 +30,7 @@ jest.mock("d3", () => {
   // Attach methods to the function
   (axisMock as any).tickSize = jest.fn().mockReturnThis();
   (axisMock as any).tickFormat = jest.fn((fmt) => {
-    if (typeof fmt === 'function') fmt();
+    if (typeof fmt === "function") fmt();
     return axisMock;
   });
   (axisMock as any).ticks = jest.fn().mockReturnThis();
@@ -68,9 +68,9 @@ jest.mock("d3", () => {
           y: jest.fn((accessor) => {
             if (accessor) accessor({ date: new Date(), vac: { valence: 0, arousal: 0 } } as any);
             return {
-              curve: jest.fn().mockReturnThis()
+              curve: jest.fn().mockReturnThis(),
             };
-          })
+          }),
         };
       }),
       // Fallback if x is not called first (though it is in component)
@@ -78,8 +78,8 @@ jest.mock("d3", () => {
         if (accessor) accessor({ date: new Date(), vac: { valence: 0, arousal: 0 } } as any);
         return {
           x: jest.fn().mockReturnThis(),
-          curve: jest.fn().mockReturnThis()
-        }
+          curve: jest.fn().mockReturnThis(),
+        };
       }),
       curve: jest.fn().mockReturnThis(),
     })),
@@ -94,19 +94,18 @@ describe("TrajectoryChart", () => {
       vac: { valence: 0.5, arousal: 0.2, connection: 0.8 },
       emotion: "Joy",
       confidence: 0.9,
-
     },
     {
       timestamp: new Date("2024-01-01T10:05:00Z"),
       vac: { valence: 0.8, arousal: 0.9, connection: 0.9 },
       emotion: "Ecstasy",
-      confidence: 0.95
-    }
+      confidence: 0.95,
+    },
   ];
 
   beforeAll(() => {
     // Mock clientWidth for container
-    Object.defineProperty(HTMLElement.prototype, 'clientWidth', { configurable: true, value: 500 });
+    Object.defineProperty(HTMLElement.prototype, "clientWidth", { configurable: true, value: 500 });
   });
 
   it("renders chart container", () => {
@@ -120,7 +119,7 @@ describe("TrajectoryChart", () => {
     // Just verify no crash and d3 was called
     // Since D3 is mocked, no SVG elements will be created in the DOM
     // We implicitly assert success by reaching here.
-    const containerDiv = screen.getByText("Emotional Trajectory (Time Series)").closest('div');
+    const containerDiv = screen.getByText("Emotional Trajectory (Time Series)").closest("div");
     expect(containerDiv).toBeInTheDocument();
   });
 
@@ -136,8 +135,8 @@ describe("TrajectoryChart", () => {
         timestamp: new Date("2024-01-01T10:10:00Z"),
         vac: { valence: NaN, arousal: 0.5, connection: 0 },
         emotion: "Error",
-        confidence: 0
-      }
+        confidence: 0,
+      },
     ];
     render(<TrajectoryChart data={corruptedData} />);
     // Implicitly passed if no error
