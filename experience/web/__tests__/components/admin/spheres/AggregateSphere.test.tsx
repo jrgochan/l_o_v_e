@@ -107,6 +107,7 @@ describe("AggregateSphere", () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
+    frameId = 0; // Reset frameId
   });
 
   it("should render and initialize THREE resources", () => {
@@ -132,7 +133,7 @@ describe("AggregateSphere", () => {
   });
 
   it("should dispose resources on unmount", () => {
-    const { unmount } = render(<AggregateSphere emotions={mockEmotions as any} aggregate={mockAggregate as any} />); // Fixed: use explicit props instead of undefined defaultProps
+    const { unmount } = render(<AggregateSphere emotions={mockEmotions as any} aggregate={mockAggregate as any} />);
     unmount();
     // Verify cleanup
     expect(mockCancelAnimationFrame).toHaveBeenCalled();
@@ -151,9 +152,7 @@ describe("AggregateSphere", () => {
     );
 
     // Get particles from mockAdd calls
-    // mockAdd called ~4 times: AmbientLight, DirectionalLight, Sphere, Particles
     const addCalls = mockAdd.mock.calls;
-    // Find the one that has geometry.attributes.position (our Particles mock)
     const particles = addCalls.find(call =>
       call[0].geometry &&
       call[0].geometry.attributes &&
@@ -163,7 +162,6 @@ describe("AggregateSphere", () => {
     expect(particles).toBeDefined();
 
     // Access the array in the mock structure
-    // Mock definition: attributes.position.array is Float32Array(30)
     const positions = particles.geometry.attributes.position.array;
 
     // Set a particle out of bounds
@@ -173,10 +171,6 @@ describe("AggregateSphere", () => {
 
     // Trigger animation frame
     const calls = (window.requestAnimationFrame as jest.Mock).mock.calls;
-    // The last call is the most recent request for next frame.
-    // But animate() calls requestAnimationFrame immediately.
-    // And useEffect calls animate() once.
-    // So there should be at least one call.
     const animateCallback = calls[calls.length - 1][0];
 
     act(() => {
@@ -196,7 +190,6 @@ describe("AggregateSphere", () => {
         mode="dynamic"
       />
     );
-    // Just verify render doesn't crash and sizing logic runs
     expect(THREE.WebGLRenderer).toHaveBeenCalled();
 
     // Low arousal, Negative Valence
@@ -207,5 +200,27 @@ describe("AggregateSphere", () => {
         mode="mystical"
       />
     );
+  });
+
+  it("should display correct pluralization for multiple emotions", () => {
+    const multiEmotions = [
+      ...mockEmotions,
+      { id: "2", name: "Sadness", vac: { valence: -0.5, arousal: -0.2, connection: 0 }, confidence: 0.8 }
+    ];
+    const { getByText } = render(<AggregateSphere emotions={multiEmotions as any} aggregate={mockAggregate as any} />);
+    expect(getByText(/2 emotions/i)).toBeInTheDocument();
+  });
+
+  it("should skip cancelAnimationFrame if frameId is missing (defensive check)", () => {
+    // Force RAF to return 0/falsy
+    (window.requestAnimationFrame as jest.Mock).mockReturnValueOnce(0);
+    const { unmount } = render(<AggregateSphere emotions={mockEmotions as any} aggregate={mockAggregate as any} />);
+
+    // Reset mock to isolate unmount call check
+    mockCancelAnimationFrame.mockClear();
+
+    unmount();
+    // Should NOT call cancel if frameId was 0 (falsy)
+    expect(mockCancelAnimationFrame).not.toHaveBeenCalled();
   });
 });

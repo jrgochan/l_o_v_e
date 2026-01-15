@@ -80,6 +80,8 @@ export function WaypointDetailModal({
 
   // Construct unified steps array [Start, ...Waypoints, End]
   const allSteps = useMemo(() => {
+    if (!path) return [];
+
     const startStep = {
       emotion: path.from.name,
       vac: path.from.vac,
@@ -172,8 +174,8 @@ export function WaypointDetailModal({
 
   // Calculate VAC shifts (relative to previous, or neutral if start)
   const vacShifts = useMemo(() => {
-    if (!previousEmotion) {
-      // No shifts for start
+    if (!previousEmotion || !currentStep) {
+      // No shifts for start or invalid state
       return {
         valence: { change: "0.000", rawDelta: 0, direction: "Origin Point" },
         arousal: { change: "0.000", rawDelta: 0, direction: "Origin Point" },
@@ -216,6 +218,8 @@ export function WaypointDetailModal({
       },
     };
   }, [previousEmotion, currentStep]);
+
+  if (!currentStep) return null;
 
   return (
     <div

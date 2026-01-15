@@ -241,5 +241,19 @@ describe("MatrixGrid", () => {
     expect(cells[0]).toBeInTheDocument();
     expect(cells[0]).toHaveAttribute("title", expect.stringContaining("Difficulty: moderate"));
   });
-});
 
+  it("renders path details with undefined waypoints", () => {
+    (defaultProps.getPathForPair as jest.Mock).mockReturnValue({
+      id: "p-no-waypoints",
+      from: { name: "A" },
+      to: { name: "B" },
+      total_distance: 1,
+      difficulty: "easy",
+      waypoints: undefined,
+    });
+    render(<MatrixGrid {...defaultProps} />);
+    // Check title contains "Waypoints: 0"
+    const cells = screen.getAllByTitle(/Waypoints: 0/i);
+    expect(cells.length).toBeGreaterThan(0);
+  });
+});

@@ -70,13 +70,7 @@ jest.mock("@/hooks/visualizations/useGraphData", () => ({
 
 jest.mock("@/hooks/visualizations/useGraphSimulation", () => ({
   useGraphSimulation: jest.fn(({ onTick }) => {
-    // We can expose the onTick to update if we want, but the component passes it into hook?
-    // Use the onTick passed in props to mock simulation ticks
-    // Oops, the component passes `onTick` to `useGraphSimulation`.
-    // We should capture it.
     if (onTick) {
-      // We can manually invoke it later if we want to test tick logic
-      // Store it globally or on a mock
       (global as any).mockOnTick = onTick;
     }
     return {
@@ -100,7 +94,6 @@ jest.mock("@/components/admin/visualizations/graph/GraphNodeDetails", () => ({
 }));
 
 // Mock D3
-// We need a robust mock that executes functions passed to .attr() and stores event handlers
 const mockHandlers: Record<string, Function> = {};
 const mockSelections: any[] = [];
 
@@ -111,34 +104,31 @@ jest.mock("d3", () => {
     data: jest.fn().mockReturnThis(),
     join: jest.fn().mockReturnThis(),
     attr: jest.fn().mockImplementation(function (this: any, name, value) {
-      // Execute function values to cover branches
       if (typeof value === "function") {
-        // Execute with various data to hit branches
-        // We don't have the real data context here easily unless we track .data()
-        // But we can execute it with "dummy" data objects matching expected shapes
-
         try {
-          // Test Link Strength branches
-          value({ relationship: { strength: 0.8 } }); // >0.7
-          value({ relationship: { strength: 0.5 } }); // >0.4
-          value({ relationship: { strength: 0.2 } }); // <=0.4
+          // Link Strength
+          value({ relationship: { strength: 0.8 } });
+          value({ relationship: { strength: 0.5 } });
+          value({ relationship: { strength: 0.2 } });
         } catch (e) { }
 
         try {
-          // Test Node Prominence branches
+          // Node Prominence
           value({ emotion: { prominence: "primary" }, radius: 10 });
           value({ emotion: { prominence: "secondary" }, radius: 10 });
           value({ emotion: { prominence: "underlying" }, radius: 10 });
         } catch (e) { }
 
         try {
-          // Test coords (onTick)
+          // Coords (onTick) - Valid
           value({ x: 10, y: 10, source: { x: 0, y: 0 }, target: { x: 1, y: 1 } });
+          // Coords (onTick) - MISSING Target Coords (hits || 0 branch)
+          value({ x: 10, y: 10, source: { x: 0, y: 0 }, target: {} });
         } catch (e) { }
       }
       return this;
     }),
-    style: jest.fn().mockReturnThis(), // .style also takes functions
+    style: jest.fn().mockReturnThis(),
     on: jest.fn().mockImplementation(function (this: any, event, handler) {
       mockHandlers[event] = handler;
       return this;
@@ -173,7 +163,6 @@ describe("EmotionRelationshipGraph", () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
-    // Clear handlers
     Object.keys(mockHandlers).forEach(k => delete mockHandlers[k]);
   });
 
@@ -188,11 +177,9 @@ describe("EmotionRelationshipGraph", () => {
     // Simulate click to open Details
     if (mockHandlers["click"]) {
       const mockNode = { emotion: { emotion_name: "Joy", prominence: "primary" } };
-
       act(() => {
         mockHandlers["click"]({ stopPropagation: jest.fn() }, mockNode);
       });
-
       expect(screen.getByTestId("node-details")).toBeInTheDocument();
     }
 
@@ -215,8 +202,6 @@ describe("EmotionRelationshipGraph", () => {
 
   it("handles tick updates", () => {
     render(<EmotionRelationshipGraph {...defaultProps} />);
-
-    // Execute the captured onTick callback
     if ((global as any).mockOnTick) {
       (global as any).mockOnTick();
     }
@@ -225,25 +210,18 @@ describe("EmotionRelationshipGraph", () => {
   it("handles empty data gracefully", () => {
     (useGraphData as jest.Mock).mockReturnValue({ nodes: [], links: [] });
     render(<EmotionRelationshipGraph {...defaultProps} emotions={[]} relationships={[]} />);
-    // Effect checks nodes.length === 0 and returns early, skipping d3.select
     expect(d3.select).not.toHaveBeenCalled();
   });
 
-  it("handles tick when unmounted (null ref)", () => {
+  it("handles tick when unmounted", () => {
     const { unmount } = render(<EmotionRelationshipGraph {...defaultProps} />);
-
-    // Capture tick
     const tick = (global as any).mockOnTick;
     expect(tick).toBeDefined();
-
-    // Unmount -> svgRef.current becomes null
     unmount();
-
-    // Invoke tick - should return early (covering line 39)
     tick();
   });
+
   it("handles various link strengths for stroke dasharray", () => {
-    // Mock data with diverse strengths
     (useGraphData as jest.Mock).mockReturnValue({
       nodes: [
         { id: "1", color: "red", emotion: { prominence: "primary" } },
@@ -255,12 +233,11 @@ describe("EmotionRelationshipGraph", () => {
         { source: "1", target: "2", relationship: { strength: 0.1 } }  // Low
       ]
     });
-
     render(<EmotionRelationshipGraph {...defaultProps} />);
     expect(d3.select).toHaveBeenCalled();
   });
 
-  it("handles mouse over/out node transitions", () => {
+  it("handles mouse over/out node transitions including underlying", () => {
     render(<EmotionRelationshipGraph {...defaultProps} />);
 
     if (mockHandlers["mouseover"]) {
@@ -281,7 +258,7 @@ describe("EmotionRelationshipGraph", () => {
       });
     }
 
-    // Add secondary prominence mouseover test
+    // Secondary
     if (mockHandlers["mouseover"]) {
       const nodeDataSec = {
         radius: 15,
@@ -291,11 +268,40 @@ describe("EmotionRelationshipGraph", () => {
       act(() => {
         mockHandlers["mouseover"].call({}, { stopPropagation: () => { } }, nodeDataSec);
       });
-      // And mouseout
       act(() => {
         if (mockHandlers["mouseout"])
           mockHandlers["mouseout"].call({}, { stopPropagation: () => { } }, nodeDataSec);
       });
     }
+
+    // Underlying (Critical for line 139 coverage)
+    if (mockHandlers["mouseout"]) {
+      const nodeDataUnder = {
+        radius: 10,
+        emotion: { prominence: "underlying" },
+        id: "e3"
+      };
+      // We only need to check mouseout for the ternary
+      act(() => {
+        mockHandlers["mouseout"].call({}, { stopPropagation: () => { } }, nodeDataUnder);
+      });
+    }
+  });
+
+  it("handles links with missing target coordinates", () => {
+    (useGraphData as jest.Mock).mockReturnValue({
+      nodes: [{ id: "1", x: 10, y: 10, emotion: { prominence: "primary" } }],
+      links: [
+        {
+          source: { x: 10, y: 10 },
+          target: {},
+          color: "red",
+          width: 1,
+          relationship: { strength: 0.8 }
+        }
+      ]
+    });
+    render(<EmotionRelationshipGraph {...defaultProps} />);
+    expect(d3.select).toHaveBeenCalled();
   });
 });

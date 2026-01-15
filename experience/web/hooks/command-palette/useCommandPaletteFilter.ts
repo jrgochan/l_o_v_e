@@ -34,7 +34,9 @@ export function useCommandPaletteFilter({
   const recentEmotionsList = useMemo(() => {
     return recentEmotions
       .map((id) => allEmotions.find((e) => e.id === id))
-      .filter((e): e is AtlasEmotion => e !== undefined)
+      .filter((e): e is AtlasEmotion => {
+        return e !== undefined;
+      })
       .slice(0, 5);
   }, [recentEmotions, allEmotions]);
 
@@ -185,11 +187,18 @@ export function useCommandPaletteFilter({
         const toName = path.to.name.toLowerCase();
 
         // Check for explicit "X to Y" format
-        if (searchTerm.includes(" to ")) {
-          const [start, end] = searchTerm.split(" to ").map((s) => s.trim());
+        const parts = searchTerm.split(" to ");
+        let strictMatch = null;
+
+        if (parts.length >= 2) {
+          const [start, end] = parts.map((s) => s.trim());
           if (start && end) {
-            return fromName.includes(start) && toName.includes(end);
+            strictMatch = fromName.includes(start) && toName.includes(end);
           }
+        }
+
+        if (strictMatch !== null) {
+          return strictMatch;
         }
 
         // Check for deep match

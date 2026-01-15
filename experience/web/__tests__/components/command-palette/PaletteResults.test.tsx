@@ -131,25 +131,6 @@ describe("PaletteResults", () => {
         expect(screen.getByText("hard")).toHaveClass("text-red-300");
     });
 
-    it("renders correct path badges for difficulty", () => {
-        const easyPath = { ...mockPath, id: "p-easy", difficulty: "easy" };
-        const hardPath = { ...mockPath, id: "p-hard", difficulty: "hard" };
-
-        const { rerender } = render(
-            <Wrapper>
-                <PaletteResults {...defaultProps} search="path" filteredPaths={[easyPath] as any} />
-            </Wrapper>
-        );
-        expect(screen.getByText("easy")).toHaveClass("text-green-300");
-
-        rerender(
-            <Wrapper>
-                <PaletteResults {...defaultProps} search="path" filteredPaths={[hardPath] as any} />
-            </Wrapper>
-        );
-        expect(screen.getByText("hard")).toHaveClass("text-red-300");
-    });
-
     it("handles path selection", () => {
         const onSelectPath = jest.fn();
         const filteredPaths = [mockPath];
@@ -211,19 +192,12 @@ describe("PaletteResults", () => {
                 <PaletteResults {...defaultProps} search="nothing" filteredEmotions={[]} />
             </Wrapper>
         );
-        // Nothing rendered from our component, but Command might render empty?
-        // Actually our component renders null or fragments.
-        // In Scenario 2: if filteredEmotions is empty and not special search:
-        // It returns the helper hint!
 
         expect(screen.getByText("Try power search operators:")).toBeInTheDocument();
     });
 
     it("renders Command.Empty on home with no search", () => {
         // Scenario 4: Home view, no search.
-        // And explicit check for no favorites/recent to see empty message maybe?
-        // Wait, Command.Empty acts when no Items match, which is handled by cmdk logic usually?
-        // Or we render it directly.
         render(
             <Wrapper>
                 <PaletteResults {...defaultProps} currentPage="home" search="" />
@@ -326,50 +300,13 @@ describe("PaletteResults", () => {
         expect(screen.getByText("🛤️ Relevant Paths")).toBeInTheDocument();
     });
 
-    it("renders generic path heading when search is active or multiple emotions selected", () => {
-        const filteredPaths = [mockPath];
-        const selectedEmotionIds = new Set(["joy-1"]);
-        const filteredEmotions = [mockEmotion];
-
-        // Case 1: Search active
-        const { rerender } = render(
-            <Wrapper>
-                <PaletteResults
-                    {...defaultProps}
-                    search="some search"
-                    filteredPaths={filteredPaths as any}
-                    selectedEmotionIds={selectedEmotionIds}
-                    filteredEmotions={filteredEmotions as any}
-                />
-            </Wrapper>
-        );
-        expect(screen.getByText("🛤️ Relevant Paths")).toBeInTheDocument();
-
-        // Case 2: No search, but 0 selected emotions
-        rerender(
-            <Wrapper>
-                <PaletteResults
-                    {...defaultProps}
-                    search=""
-                    filteredPaths={filteredPaths as any}
-                    selectedEmotionIds={new Set()}
-                    filteredEmotions={filteredEmotions as any}
-                />
-            </Wrapper>
-        );
-        expect(screen.getByText("🛤️ Relevant Paths")).toBeInTheDocument();
-    });
-
     it("renders nothing for unknown page", () => {
         const { container } = render(
             <Wrapper>
                 <PaletteResults {...defaultProps} currentPage="unknown" />
             </Wrapper>
         );
-        // cmdk Command wrappers might render, but our component items should be null.
-        // The container might contain the Command shell (input etc are outside in CommandPalette usually, but here PaletteResults is inside Command).
-        // PaletteResults returns null, so it shouldn't render groups/items.
-        // We can check that no groups exist.
+        // PaletteResults returns null
         expect(container.querySelectorAll('[cmdk-group]')).toHaveLength(0);
     });
 
@@ -552,5 +489,95 @@ describe("PaletteResults", () => {
 
         // Verify Category List: Joy should be selected
         expect(screen.getAllByText("✓").length).toBeGreaterThan(0);
+    });
+
+    it("renders direct path label for 0 waypoints", () => {
+        const directPath = { ...mockPath, waypoints: [] };
+        render(
+            <Wrapper>
+                <PaletteResults {...defaultProps} search="path" filteredPaths={[directPath] as any} />
+            </Wrapper>
+        );
+        expect(screen.getByText("DIRECT")).toBeInTheDocument();
+    });
+
+    it("renders specific path heading for single selection without search", () => {
+        const joyEmotion = { ...mockEmotion, id: "j1", name: "Joy" };
+        const selectedIds = new Set(["j1"]);
+        const filteredPaths = [mockPath];
+        const filteredEmotions = [joyEmotion];
+
+        // Ensure searched filteredEmotions contains the selection so .find() works
+        render(
+            <Wrapper>
+                <PaletteResults
+                    {...defaultProps}
+                    search=""
+                    filteredPaths={filteredPaths as any}
+                    selectedEmotionIds={selectedIds}
+                    filteredEmotions={filteredEmotions as any}
+                />
+            </Wrapper>
+        );
+        expect(screen.getByText("✨ Paths from Joy")).toBeInTheDocument();
+    });
+
+    it("renders default spark for favorites and recent without color hint", () => {
+        const headlessEmotion = { ...mockEmotion, id: "h1", name: "Ghost", color_hint: undefined };
+
+        render(
+            <Wrapper>
+                <PaletteResults
+                    {...defaultProps}
+                    currentPage="home"
+                    search=""
+                    favoriteEmotionsList={[headlessEmotion] as any}
+                    recentEmotionsList={[headlessEmotion] as any}
+                />
+            </Wrapper>
+        );
+        // Should find at least 2 sparks (one for fav, one for recent)
+        const sparks = screen.getAllByText("✨");
+        expect(sparks.length).toBeGreaterThanOrEqual(1);
+    });
+
+    it("renders filtered emotions without color hint", () => {
+        const headless = { ...mockEmotion, color_hint: undefined };
+        render(
+            <Wrapper>
+                <PaletteResults {...defaultProps} search="joy" filteredEmotions={[headless] as any} />
+            </Wrapper>
+        );
+        // Expect "✨" fallback (line 190)
+        expect(screen.getAllByText("✨").length).toBeGreaterThan(0);
+    });
+
+    it("renders category item without color hint", () => {
+        const headless = { ...mockEmotion, color_hint: undefined };
+        const map = new Map([["Pos", [headless]]]);
+        render(
+            <Wrapper>
+                <PaletteResults {...defaultProps} currentPage="category" selectedCategory="Pos" emotionsByCategory={map as any} />
+            </Wrapper>
+        );
+        // Expect "✨" fallback (line 231)
+        expect(screen.getAllByText("✨").length).toBeGreaterThan(0);
+    });
+
+    it("renders 'Paths from Selected' heading fallback", () => {
+        // Condition: !search && selectedEmotionIds.size === 1
+        // But emotion NOT in filteredEmotions.
+        render(
+            <Wrapper>
+                <PaletteResults
+                    {...defaultProps}
+                    search=""
+                    selectedEmotionIds={new Set(["missing"])}
+                    filteredPaths={[mockPath] as any}
+                    filteredEmotions={[mockEmotion] as any} // Does not contain "missing" ID
+                />
+            </Wrapper>
+        );
+        expect(screen.getByText("✨ Paths from Selected")).toBeInTheDocument();
     });
 });

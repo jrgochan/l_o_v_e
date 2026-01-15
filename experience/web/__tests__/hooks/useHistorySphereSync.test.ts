@@ -239,5 +239,27 @@ describe("useHistorySphereSync", () => {
     // It should NOT crash, and mockSetVisibility should NOT be called for Ghost
     expect(mockSetVisibility).not.toHaveBeenCalledWith(ghostId, expect.any(Boolean));
   });
-});
 
+  it("should no-op when sphere is unselected and history is already hidden", () => {
+    // This covers logic where (!isSelectedInSphere && !entry.isVisibleInSphere)
+    // The code only handles else if (!isSelectedInSphere && entry.isVisibleInSphere)
+    // So !isVisibleInSphere falls through implicit else (no action).
+
+    // Start: Joy Unselected, History Hidden
+    currentAtlasState = { ...currentAtlasState, selectedEmotionIds: new Set() };
+    currentHistoryState = {
+      ...currentHistoryState,
+      entries: [{ id: joyHistoryId, emotion: joyName, isVisibleInSphere: false }]
+    };
+
+    const { rerender } = renderHook(() => useHistorySphereSync());
+
+    // Trigger an update (e.g. selection change to something else) to run effect
+    currentAtlasState = { ...currentAtlasState, selectedEmotionIds: new Set(["other"]) };
+
+    rerender();
+
+    // Should NOT call setVisibility (already hidden)
+    expect(mockSetVisibility).not.toHaveBeenCalled();
+  });
+});

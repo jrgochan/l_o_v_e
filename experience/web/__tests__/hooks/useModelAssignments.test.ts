@@ -38,6 +38,19 @@ describe("useModelAssignments", () => {
     expect(result.current.error).toBe("Fetch failed");
   });
 
+  it("should handle fetch assignments with non-Error failure", async () => {
+    (aiService.getAssignments as jest.Mock).mockRejectedValue("String Failure");
+
+    const { result } = renderHook(() => useModelAssignments());
+
+    await act(async () => {
+      await result.current.fetchAssignments();
+    });
+
+    expect(result.current.assignments).toBeNull();
+    expect(result.current.error).toBe("Failed to fetch assignments");
+  });
+
   it("should assign model success", async () => {
     (aiService.assignModel as jest.Mock).mockResolvedValue({});
     (aiService.getAssignments as jest.Mock).mockResolvedValue({ current_model: "new-model" });

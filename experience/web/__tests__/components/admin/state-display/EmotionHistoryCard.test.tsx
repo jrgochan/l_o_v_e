@@ -83,4 +83,14 @@ describe("EmotionHistoryCard", () => {
     // We can verify category text
     expect(screen.getByText("UnknownXYZ")).toBeInTheDocument();
   });
+
+  it("applies correct border style based on visibility", () => {
+    // Visible (mockEntry is visible=true)
+    const { rerender, container } = render(<EmotionHistoryCard entry={mockEntry} onToggleVisibility={onToggleVisibility} onRemove={onRemove} />);
+    expect(container.firstChild).toHaveClass("border-cyan-400");
+
+    // Hidden
+    rerender(<EmotionHistoryCard entry={{ ...mockEntry, isVisibleInSphere: false }} onToggleVisibility={onToggleVisibility} onRemove={onRemove} />);
+    expect(container.firstChild).toHaveClass("border-gray-700");
+  });
 });

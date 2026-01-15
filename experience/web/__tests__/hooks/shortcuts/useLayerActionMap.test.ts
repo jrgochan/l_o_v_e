@@ -17,31 +17,28 @@ describe("useLayerActionMap", () => {
   const mockUpdateVisualSetting = jest.fn();
   const mockUpdateBehaviorSetting = jest.fn();
 
+  const defaultState = {
+    layers: {
+      transitionPaths: true,
+      emotionLabels: true,
+      soulSphere: true,
+      legend: false,
+      emotionPoints: true,
+    },
+    showAxisLabels: true,
+    focusMode: false,
+    showMotionIndicators: true,
+    dataVisualizationMode: false,
+    pathAnimationMode: "subtle",
+    updateLayer: mockUpdateLayer,
+    updateVisualSetting: mockUpdateVisualSetting,
+    updateBehaviorSetting: mockUpdateBehaviorSetting,
+  };
+
   beforeEach(() => {
     jest.clearAllMocks();
-    (useSettingsStore as unknown as jest.Mock).mockReturnValue({
-      layers: {
-        transitionPaths: true,
-        emotionLabels: true,
-        soulSphere: true,
-        legend: false,
-        emotionPoints: true,
-      },
-      showAxisLabels: true,
-      focusMode: false,
-      showMotionIndicators: true,
-      dataVisualizationMode: false,
-      pathAnimationMode: "subtle",
-      // Important: Mock update functions to simulated state change for the *next* call if needed,
-      // but here we just want to verify the logic inside the hook, which uses the *current* state.
-      // To test the "ON" branch, we need to re-render or mock the return value to be false.
-      updateLayer: mockUpdateLayer,
-      updateVisualSetting: mockUpdateVisualSetting,
-      updateBehaviorSetting: mockUpdateBehaviorSetting,
-    });
+    (useSettingsStore as unknown as jest.Mock).mockReturnValue(defaultState);
   });
-
-  // ... existing tests ...
 
   it("should toggle all actions in both states to cover log branches", () => {
     // KEYS: l, s, g, e, p (Layers) | a, f, o, x (Visuals)
@@ -50,9 +47,6 @@ describe("useLayerActionMap", () => {
     const invertedKeys = ["g", "f", "x"]; // Initial: false (legend, focus, data)
 
     // 1. Initial State
-    // Layers: True, Legend: False
-    // Visual: Axis/Motion: True, Focus/Data: False
-
     const { result, rerender } = renderHook(() => useLayerActionMap());
     let actions = result.current.getActions();
 
@@ -72,6 +66,7 @@ describe("useLayerActionMap", () => {
 
     // 2. FLIP STATE
     (useSettingsStore as unknown as jest.Mock).mockReturnValue({
+      ...defaultState,
       layers: {
         transitionPaths: false,
         emotionLabels: false,
@@ -83,10 +78,6 @@ describe("useLayerActionMap", () => {
       focusMode: true, // Flipped
       showMotionIndicators: false, // Flipped
       dataVisualizationMode: true, // Flipped
-      pathAnimationMode: "subtle",
-      updateLayer: mockUpdateLayer,
-      updateVisualSetting: mockUpdateVisualSetting,
-      updateBehaviorSetting: mockUpdateBehaviorSetting,
     });
     rerender();
     actions = result.current.getActions();
@@ -114,7 +105,7 @@ describe("useLayerActionMap", () => {
 
     // 2. Dynamic -> Mystical
     (useSettingsStore as unknown as jest.Mock).mockReturnValue({
-      ...useSettingsStore(),
+      ...defaultState,
       pathAnimationMode: "dynamic",
     });
     rerender();
@@ -123,7 +114,7 @@ describe("useLayerActionMap", () => {
 
     // 3. Mystical -> Subtle
     (useSettingsStore as unknown as jest.Mock).mockReturnValue({
-      ...useSettingsStore(),
+      ...defaultState,
       pathAnimationMode: "mystical",
     });
     rerender();
@@ -133,7 +124,7 @@ describe("useLayerActionMap", () => {
 
   it("should default to subtle if mode is unknown", () => {
     (useSettingsStore as unknown as jest.Mock).mockReturnValue({
-      ...useSettingsStore(),
+      ...defaultState,
       pathAnimationMode: "invalid-mode",
     });
     const { result } = renderHook(() => useLayerActionMap());
