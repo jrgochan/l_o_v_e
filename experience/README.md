@@ -112,16 +112,34 @@ This starts all backend APIs + Experience web UI
 
 ## 🧪 Testing
 
-### Run Tests
+### Continuous Integration & Quality
+
+We enforce strict quality standards:
+
+- **100% Test Coverage** required (branches, functions, lines, statements)
+- **Zero Linting Errors** (ESLint + Prettier)
+- **Zero TypeScript Errors**
+
+Run the full quality check suite:
 
 ```bash
-# Test shared package utilities
-cd shared && npm test
+# Run from project root
+./infra/scripts/check-typescript-quality.sh
 ```
 
-**Test Results:**
+### Run Tests Manually
 
-- ✅ 43/43 quaternion tests passing
+```bash
+# Test shared package
+cd shared && npm test
+
+# Test web package
+cd web && npm test
+```
+
+**Current Status:**
+
+- ✅ 100% Coverage enforced
 - ✅ All utilities validated
 
 ---

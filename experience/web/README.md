@@ -136,11 +136,13 @@ The app includes 9 canonical emotions for testing:
 
 ### Running Tests
 
-From root experience directory:
+We enforce **100% coverage**. Failures in coverage will fail the build.
 
 ```bash
 npm test
 ```
+
+See [TESTING_GUIDE.md](./TESTING_GUIDE.md) for detailed patterns and instructions.
 
 ### Type Checking
 
