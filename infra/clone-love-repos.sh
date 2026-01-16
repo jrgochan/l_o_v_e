@@ -1,22 +1,18 @@
 #!/bin/sh
 # L.O.V.E. Stack - Repository Clone Script
-# POSIX-compliant script to clone all L.O.V.E. repositories from GitLab
+# POSIX-compliant script to clone the L.O.V.E. repository
 #
-# This script clones all seven repositories that make up the L.O.V.E. stack:
-#   - archive: Project documentation archive
-#   - docs: User-facing documentation
-#   - infra: Infrastructure and orchestration scripts
-#   - listener: Audio transcription & semantic VAC analysis
-#   - observer: Data persistence & vector search
-#   - versor: Quaternion mathematics engine
-#   - experience: Mobile 3D visualization
+# This script clones the L.O.V.E. stack.
+# By default, it clones the GitHub monorepo (jrgochan/l_o_v_e).
+# It can also clone the legacy multi-repo structure from GitLab.
 #
 # Usage:
 #   ./clone-love-repos.sh [OPTIONS]
 #   curl -fsSL <url> | sh
 #
 # Examples:
-#   ./clone-love-repos.sh                    # Clone with SSH (default)
+#   ./clone-love-repos.sh                    # Clone from GitHub (default)
+#   ./clone-love-repos.sh --gitlab           # Clone from GitLab (legacy multi-repo)
 #   ./clone-love-repos.sh --https            # Clone with HTTPS
 #   ./clone-love-repos.sh --shallow --yes    # Quick shallow clone
 #
@@ -27,19 +23,28 @@ set -e  # Exit on error
 # ============================================================================
 # CONFIGURATION
 # ============================================================================
-VERSION="1.0.0"
+VERSION="2.0.0"
 SCRIPT_NAME="clone-love-repos.sh"
 
-# Repository configuration
-REPOS="archive docs infra listener observer versor experience"
-GITLAB_HOST="gitlab.com"
-GITLAB_GROUP="l_o_v_e"
+# Default Provider
+DEFAULT_PROVIDER="github"
 DEFAULT_PROTOCOL="ssh"
 DEFAULT_BRANCH="main"
+
+# GitHub Configuration (Monorepo)
+GITHUB_HOST="github.com"
+GITHUB_USER="jrgochan"
+GITHUB_REPO="l_o_v_e"
+
+# GitLab Configuration (Polyrepo - Legacy)
+GITLAB_HOST="gitlab.com"
+GITLAB_GROUP="l_o_v_e"
+GITLAB_REPOS="archive docs infra listener observer versor experience"
 
 # ============================================================================
 # COMMAND-LINE OPTIONS
 # ============================================================================
+OPT_PROVIDER="$DEFAULT_PROVIDER"
 OPT_PROTOCOL="$DEFAULT_PROTOCOL"
 OPT_TARGET_DIR=""
 OPT_BRANCH="$DEFAULT_BRANCH"
@@ -119,25 +124,25 @@ show_help() {
 L.O.V.E. Stack - Repository Clone Script
 =========================================
 
-Clones all seven L.O.V.E. repositories from GitLab into the correct structure.
+Clones the L.O.V.E. stack. Supports both the GitHub monorepo (default)
+and the legacy GitLab multi-repo structure.
 
 USAGE:
     ./clone-love-repos.sh [OPTIONS]
     curl -fsSL <url> | sh
 
-REPOSITORIES:
-    archive      Project documentation archive
-    docs         User-facing documentation (MkDocs)
-    infra        Infrastructure and orchestration scripts
-    listener     Audio transcription & semantic VAC analysis
-    observer     Data persistence & vector search
-    versor       Quaternion mathematics engine
-    experience   Mobile 3D visualization
+PROVIDERS:
+    github       Monorepo at jrgochan/l_o_v_e (Default)
+    gitlab       Polyrepo at gitlab.com/l_o_v_e (Legacy)
 
 OPTIONS:
     -h, --help              Show this help message
     --version               Show version information
     -y, --yes               Skip confirmation prompts (non-interactive)
+    
+    Provider Selection:
+    --github                Use GitHub (default)
+    --gitlab                Use GitLab
     
     Protocol:
     --ssh                   Use SSH protocol (default)
@@ -150,7 +155,7 @@ OPTIONS:
     --branch BRANCH         Clone specific branch (default: main)
     --shallow               Shallow clone (--depth 1, faster but less history)
     
-    Repository Selection:
+    Legacy Options (GitLab only):
     --skip REPOS            Skip specific repos (comma-separated)
     --only REPOS            Clone only specific repos (comma-separated)
     
@@ -162,8 +167,11 @@ OPTIONS:
     -v, --verbose           Detailed output
 
 EXAMPLES:
-    # Clone with SSH (default)
+    # Clone from GitHub (default, monorepo)
     ./clone-love-repos.sh
+    
+    # Clone from GitLab (legacy multi-repo)
+    ./clone-love-repos.sh --gitlab
     
     # Clone with HTTPS
     ./clone-love-repos.sh --https
@@ -173,15 +181,6 @@ EXAMPLES:
     
     # Quick shallow clone without prompts
     ./clone-love-repos.sh --shallow --yes
-    
-    # Clone only specific repos
-    ./clone-love-repos.sh --only listener,observer,versor
-    
-    # Update existing repos
-    ./clone-love-repos.sh --update
-    
-    # Dry run to see what would happen
-    ./clone-love-repos.sh --dry-run
 
 AFTER CLONING:
     cd l_o_v_e/infra
@@ -189,6 +188,7 @@ AFTER CLONING:
     ./run-love-stack.sh      # Start the stack
 
 MORE INFO:
+    GitHub: https://github.com/jrgochan/l_o_v_e
     GitLab: https://gitlab.com/l_o_v_e
     Docs: See l_o_v_e/README.md after cloning
 
@@ -216,6 +216,14 @@ parse_arguments() {
                 ;;
             -y|--yes)
                 OPT_YES=true
+                shift
+                ;;
+            --github)
+                OPT_PROVIDER="github"
+                shift
+                ;;
+            --gitlab)
+                OPT_PROVIDER="gitlab"
                 shift
                 ;;
             --ssh)
@@ -309,15 +317,21 @@ check_prerequisites() {
         if [ -f "$HOME/.ssh/id_rsa" ] || [ -f "$HOME/.ssh/id_ed25519" ] || [ -f "$HOME/.ssh/id_ecdsa" ]; then
             [ "$OPT_QUIET" != true ] && print_success "SSH keys configured"
             
-            # Test SSH connectivity to GitLab
+            # Test connectivity
+            local host="$GITHUB_HOST"
+            local user="git"
+            [ "$OPT_PROVIDER" = "gitlab" ] && host="$GITLAB_HOST"
+            
             if [ "$OPT_VERBOSE" = true ]; then
-                print_info "Testing SSH connectivity to $GITLAB_HOST..."
+                print_info "Testing SSH connectivity to $host..."
             fi
             
-            if ssh -T "git@$GITLAB_HOST" 2>&1 | grep -q "Welcome to GitLab"; then
-                [ "$OPT_QUIET" != true ] && print_success "GitLab SSH connectivity verified"
+            # SSH test usually returns status 1 for GitHub even on success (auth success, no shell access)
+            # So we check the stderr/stdout output message
+            if ssh -T "$user@$host" 2>&1 | grep -E "successfully authenticated|Welcome to GitLab"; then
+                [ "$OPT_QUIET" != true ] && print_success "SSH connection to $host verified"
             else
-                print_warning "Could not verify SSH connectivity to GitLab"
+                print_warning "Could not verify SSH connectivity to $host"
                 print_info "If you don't have SSH access, use --https flag"
             fi
         else
@@ -360,18 +374,27 @@ check_prerequisites() {
 # REPOSITORY OPERATIONS
 # ============================================================================
 
-# Build git URL for a repository
+# Build git URL
 build_repo_url() {
-    local repo_name="$1"
+    local repo_identifier="$1"
     
-    if [ "$OPT_PROTOCOL" = "https" ]; then
-        echo "https://${GITLAB_HOST}/${GITLAB_GROUP}/${repo_name}.git"
+    if [ "$OPT_PROVIDER" = "github" ]; then
+        if [ "$OPT_PROTOCOL" = "https" ]; then
+            echo "https://${GITHUB_HOST}/${GITHUB_USER}/${repo_identifier}.git"
+        else
+            echo "git@${GITHUB_HOST}:${GITHUB_USER}/${repo_identifier}.git"
+        fi
     else
-        echo "git@${GITLAB_HOST}:${GITLAB_GROUP}/${repo_name}.git"
+        # GitLab
+        if [ "$OPT_PROTOCOL" = "https" ]; then
+            echo "https://${GITLAB_HOST}/${GITLAB_GROUP}/${repo_identifier}.git"
+        else
+            echo "git@${GITLAB_HOST}:${GITLAB_GROUP}/${repo_identifier}.git"
+        fi
     fi
 }
 
-# Check if repository should be processed
+# Check if repository should be processed (GitLab polyrepo only)
 should_process_repo() {
     local repo_name="$1"
     
@@ -393,49 +416,47 @@ should_process_repo() {
     return 0
 }
 
-# Clone a single repository
-clone_repository() {
-    local repo_name="$1"
-    local target_dir="$2"
-    local repo_path="$target_dir/$repo_name"
-    local repo_url
-    repo_url=$(build_repo_url "$repo_name")
+# Clone functionality
+perform_clone() {
+    local repo_url="$1"
+    local target_path="$2"
+    local name="$3"
     
     # Check if directory already exists
-    if [ -d "$repo_path" ]; then
+    if [ -d "$target_path" ]; then
         if [ "$OPT_UPDATE" = true ]; then
-            [ "$OPT_QUIET" != true ] && print_info "Updating $repo_name..."
+            [ "$OPT_QUIET" != true ] && print_info "Updating $name..."
             
             if [ "$OPT_DRY_RUN" = true ]; then
-                echo "  [DRY RUN] Would update: $repo_path"
+                echo "  [DRY RUN] Would update: $target_path"
                 return 0
             fi
             
-            if [ -d "$repo_path/.git" ]; then
-                cd "$repo_path"
+            if [ -d "$target_path/.git" ]; then
+                cd "$target_path"
                 if [ "$OPT_VERBOSE" = true ]; then
                     git pull origin "$OPT_BRANCH"
                 else
                     git pull origin "$OPT_BRANCH" >/dev/null 2>&1
                 fi
                 cd - >/dev/null
-                print_success "$repo_name updated"
+                print_success "$name updated"
                 return 0
             else
-                print_error "$repo_path exists but is not a git repository"
+                print_error "$target_path exists but is not a git repository"
                 return 1
             fi
         else
-            print_warning "$repo_name already exists (skipping)"
+            print_warning "$name already exists (skipping)"
             return 0
         fi
     fi
     
     # Clone repository
-    [ "$OPT_QUIET" != true ] && print_info "Cloning $repo_name..."
+    [ "$OPT_QUIET" != true ] && print_info "Cloning $name..."
     
     if [ "$OPT_DRY_RUN" = true ]; then
-        echo "  [DRY RUN] Would clone: $repo_url -> $repo_path"
+        echo "  [DRY RUN] Would clone: $repo_url -> $target_path"
         return 0
     fi
     
@@ -446,11 +467,11 @@ clone_repository() {
         clone_cmd="$clone_cmd --depth 1"
     fi
     
-    if [ "$OPT_BRANCH" != "main" ]; then
+    if [ "$OPT_BRANCH" != "main" ] && [ -n "$OPT_BRANCH" ]; then
         clone_cmd="$clone_cmd --branch $OPT_BRANCH"
     fi
     
-    clone_cmd="$clone_cmd $repo_url $repo_path"
+    clone_cmd="$clone_cmd $repo_url $target_path"
     
     # Execute clone
     if [ "$OPT_VERBOSE" = true ]; then
@@ -460,10 +481,10 @@ clone_repository() {
     fi
     
     if [ $? -eq 0 ]; then
-        print_success "$repo_name cloned successfully"
+        print_success "$name cloned successfully"
         return 0
     else
-        print_error "$repo_name clone failed"
+        print_error "$name clone failed"
         return 1
     fi
 }
@@ -484,47 +505,47 @@ main() {
         echo ""
     fi
     
-    # Determine target directory
+    # Determine base directory
     local target_base="${OPT_TARGET_DIR:-.}"
-    local target_dir="$target_base/l_o_v_e"
-    
-    # Create absolute path
     if [ -d "$target_base" ]; then
-        target_dir="$(cd "$target_base" && pwd)/l_o_v_e"
+        target_base="$(cd "$target_base" && pwd)"
     fi
+    local root_target_dir="$target_base/l_o_v_e"
     
     # Show configuration
     if [ "$OPT_QUIET" != true ]; then
         print_header "📋 Configuration"
+        echo "  Provider:      $OPT_PROVIDER"
         echo "  Protocol:      $OPT_PROTOCOL"
-        echo "  Host:          ${GITLAB_HOST}/${GITLAB_GROUP}"
-        echo "  Target:        $target_dir"
+        if [ "$OPT_PROVIDER" = "github" ]; then
+            echo "  Repo:          ${GITHUB_USER}/${GITHUB_REPO}"
+        else
+            echo "  Group:         ${GITLAB_HOST}/${GITLAB_GROUP}"
+        fi
+        echo "  Target:        $root_target_dir"
         echo "  Branch:        $OPT_BRANCH"
         [ "$OPT_SHALLOW" = true ] && echo "  Clone type:    Shallow (--depth 1)"
         [ "$OPT_DRY_RUN" = true ] && echo "  Mode:          DRY RUN (no changes will be made)"
-        [ "$OPT_UPDATE" = true ] && echo "  Mode:          UPDATE (pull existing repos)"
-        [ -n "$OPT_ONLY_REPOS" ] && echo "  Only repos:    $OPT_ONLY_REPOS"
-        [ -n "$OPT_SKIP_REPOS" ] && echo "  Skip repos:    $OPT_SKIP_REPOS"
+        [ "$OPT_UPDATE" = true ] && echo "  Mode:          UPDATE"
+        if [ "$OPT_PROVIDER" = "gitlab" ]; then
+            [ -n "$OPT_ONLY_REPOS" ] && echo "  Only repos:    $OPT_ONLY_REPOS"
+            [ -n "$OPT_SKIP_REPOS" ] && echo "  Skip repos:    $OPT_SKIP_REPOS"
+        fi
         echo ""
     fi
     
     # Run pre-flight checks
     check_prerequisites
     
-    # Create target directory if needed
-    if [ ! -d "$target_dir" ] && [ "$OPT_DRY_RUN" != true ]; then
-        mkdir -p "$target_dir"
-    fi
-    
     # Confirm before proceeding
     if [ "$OPT_YES" != true ] && [ "$OPT_DRY_RUN" != true ]; then
         if [ "$OPT_UPDATE" = true ]; then
-            if ! prompt_yes_no "Update repositories in $target_dir?"; then
+            if ! prompt_yes_no "Update repositories in $root_target_dir?"; then
                 print_info "Aborted by user"
                 exit 0
             fi
         else
-            if ! prompt_yes_no "Clone repositories into $target_dir?"; then
+            if ! prompt_yes_no "Clone into $root_target_dir?"; then
                 print_info "Aborted by user"
                 exit 0
             fi
@@ -533,67 +554,77 @@ main() {
     fi
     
     # Process repositories
-    [ "$OPT_QUIET" != true ] && print_header "📦 Processing Repositories"
+    [ "$OPT_QUIET" != true ] && print_header "📦 Processing"
     
-    local total=0
     local success=0
-    local skipped=0
     local failed=0
-    local failed_repos=""
+    local skipped=0
     
-    for repo in $REPOS; do
-        if ! should_process_repo "$repo"; then
-            skipped=$((skipped + 1))
-            continue
-        fi
+    if [ "$OPT_PROVIDER" = "github" ]; then
+        # Monorepo Clone
+        local repo_url
+        repo_url=$(build_repo_url "$GITHUB_REPO")
         
-        total=$((total + 1))
-        
-        if [ "$OPT_QUIET" != true ]; then
-            printf "  [%d/%d] %-12s" "$total" "$(echo $REPOS | wc -w | tr -d ' ')" "$repo"
-        fi
-        
-        if clone_repository "$repo" "$target_dir"; then
-            success=$((success + 1))
+        if perform_clone "$repo_url" "$root_target_dir" "$GITHUB_REPO"; then
+            success=1
         else
-            failed=$((failed + 1))
-            failed_repos="$failed_repos $repo"
-            if [ "$OPT_NO_EXIT_ON_ERROR" != true ]; then
-                echo ""
-                print_error "Repository clone failed: $repo"
-                exit 1
-            fi
+            failed=1
         fi
-    done
+        
+    else
+        # GitLab Polyrepo Clone
+        # Create root directory first
+        if [ ! -d "$root_target_dir" ] && [ "$OPT_DRY_RUN" != true ]; then
+            mkdir -p "$root_target_dir"
+        fi
+        
+        local total_repos=0
+        for r in $GITLAB_REPOS; do total_repos=$((total_repos + 1)); done
+        
+        local current=0
+        for repo in $GITLAB_REPOS; do
+            if ! should_process_repo "$repo"; then
+                skipped=$((skipped + 1))
+                continue
+            fi
+            
+            current=$((current + 1))
+            if [ "$OPT_QUIET" != true ]; then
+                printf "  [%d/%d] %-12s" "$current" "$total_repos" "$repo"
+            fi
+            
+            local repo_url
+            repo_url=$(build_repo_url "$repo")
+            
+            if perform_clone "$repo_url" "$root_target_dir/$repo" "$repo"; then
+                success=$((success + 1))
+            else
+                failed=$((failed + 1))
+                if [ "$OPT_NO_EXIT_ON_ERROR" != true ]; then
+                    exit 1
+                fi
+            fi
+        done
+    fi
     
     # Summary
     echo ""
     [ "$OPT_QUIET" != true ] && print_header "📊 Summary"
     
     if [ "$OPT_DRY_RUN" = true ]; then
-        print_info "DRY RUN completed - no changes were made"
-        echo ""
-        echo "Run without --dry-run to actually clone repositories"
+        print_info "DRY RUN completed"
     elif [ $failed -eq 0 ]; then
-        print_success "All repositories processed successfully!"
-        echo ""
-        echo "  Successful: $success"
-        [ $skipped -gt 0 ] && echo "  Skipped:    $skipped"
-        echo ""
+        print_success "Operation successful!"
         
-        # Next steps
+         # Next steps
         if [ "$OPT_UPDATE" != true ]; then
             print_info "Next steps:"
-            echo "  cd $target_dir/infra"
+            echo "  cd $root_target_dir/infra"
             echo "  ./setup-love-stack.sh    # Set up development environment"
             echo "  ./run-love-stack.sh      # Start the stack"
         fi
     else
-        print_error "Some repositories failed to process"
-        echo ""
-        echo "  Successful: $success"
-        echo "  Failed:     $failed ($failed_repos)"
-        [ $skipped -gt 0 ] && echo "  Skipped:    $skipped"
+        print_error "Operation failed with $failed errors"
         exit 1
     fi
     

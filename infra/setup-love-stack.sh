@@ -547,10 +547,21 @@ setup_python_module() {
     if [ "$module_name" = "Listener" ]; then
         print_info "Installing Spacy language model..."
         # Use direct URL to avoid download issues
-        pip install https://github.com/explosion/spacy-models/releases/download/en_core_web_sm-3.7.1/en_core_web_sm-3.7.1-py3-none-any.whl --quiet 2>/dev/null || {
-            print_warning "Spacy model installation failed, you may need to install it manually"
-            print_info "Run: pip install https://github.com/explosion/spacy-models/releases/download/en_core_web_sm-3.7.1/en_core_web_sm-3.7.1-py3-none-any.whl"
-        }
+        if python -c "import spacy; spacy.load('en_core_web_sm')" 2>/dev/null; then
+            print_success "Spacy model 'en_core_web_sm' already installed"
+        else
+            print_info "Downloading Spacy model 'en_core_web_sm'..."
+            # robust manual download and install
+            curl -L -o /tmp/en_core_web_sm-3.7.1-py3-none-any.whl https://github.com/explosion/spacy-models/releases/download/en_core_web_sm-3.7.1/en_core_web_sm-3.7.1-py3-none-any.whl --silent
+            if [ -f "/tmp/en_core_web_sm-3.7.1-py3-none-any.whl" ]; then
+                pip install /tmp/en_core_web_sm-3.7.1-py3-none-any.whl --quiet
+                rm /tmp/en_core_web_sm-3.7.1-py3-none-any.whl
+                print_success "Spacy model installed successfully"
+            else
+                print_error "Failed to download Spacy model"
+                print_info "Please install manually: python -m spacy download en_core_web_sm"
+            fi
+        fi
     fi
     
     # Verify Python version in venv
