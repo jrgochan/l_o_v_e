@@ -21,7 +21,12 @@ echo "📄 Generating PDF..."
 pandoc "$INPUT_FILE" \
     -o "$PDF_OUTPUT" \
     --pdf-engine=xelatex \
-    -V geometry:margin=1in
+    -V geometry:margin=1in \
+    -V papersize=letter \
+    -V mainfont="Times New Roman" \
+    -V colorlinks=false \
+    --variable linkcolor=black \
+    --variable urlcolor=black
 
 if [ $? -eq 0 ]; then
     echo "✅ PDF generated: $PDF_OUTPUT"

@@ -4,13 +4,9 @@
 
 **TITLE:** SYSTEM AND METHOD FOR GEOMETRIC REPRESENTATION, ANALYSIS, AND VISUALIZATION OF EMOTIONAL STATES USING QUATERNION MATHEMATICS
 
----
-
 ## ABSTRACT
 
 A system and method for processing, analyzing, and visualizing emotional states using a multi-dimensional geometric model. The system includes a listener module that ingests audio or text, a semantic analyzer that maps inputs to a novel three-dimensional Vector-Arousal-Connection (VAC) vector, and a versor engine that converts these vectors into quaternions. This approach distinguishes between emotional states with similar valence and arousal but differing levels of interpersonal connection (e.g., pity vs. compassion). The system further calculates an "emotional work" metric based on the angular distance between quaternions and detects emotional flooding by analyzing the rate of change (angular velocity) of these states over time.
-
----
 
 ## BACKGROUND OF THE INVENTION
 
@@ -19,8 +15,6 @@ The present invention relates generally to affective computing and human-compute
 
 **2. Description of Related Art**  
 Traditional emotion AI systems typically rely on the Circumplex Model of Affect, which maps emotions onto a two-dimensional plane defined by Valence (positivity/negativity) and Arousal (energy/activation). While useful for basic sentiment analysis, this model often fails to distinguish between complex social emotions. For example, "pity" and "compassion" may share similar negative valence and moderate arousal, yet they represent fundamentally different relational stances (separation vs. connection). Furthermore, existing systems often struggle with the "gimbal lock" problem or singularities when attempting to model continuous emotional transitions in 3D space using Euler angles. There is a need for a more robust mathematical framework that can accurately capture the relational dimension of emotion and model smooth, continuous transitions between states.
-
----
 
 ## SUMMARY OF THE INVENTION
 
@@ -42,29 +36,31 @@ The system architecture prioritizes privacy by performing transcription and sema
 
 **FIG. 1** is a block diagram illustrating the high-level architecture of the L.O.V.E. systems.
 
-![FIG. 1: System Architecture](figures/fig1.png){ width=75% }
+![FIG. 1: System Architecture](figures/fig1.png){ width=55% }
 
 **FIG. 2** is a conceptual diagram of the VAC (Valence-Arousal-Connection) Coordinate System.
 
-![FIG. 2: VAC Coordinate System](figures/fig2.png)
+![FIG. 2: VAC Coordinate System](figures/fig2.png){ width=95% }
 
 **FIG. 3** is a flowchart dealing with the Listener module's ingestion and semantic processing.
 
-![FIG. 3: Listener Pipeline](figures/fig3.png)
+![FIG. 3: Listener Pipeline](figures/fig3.png){ width=95% }
 
 **FIG. 4** is a flowchart of the Versor engine's mathematical operations.
 
-![FIG. 4: Versor Engine Logic](figures/fig4.png)
+![FIG. 4: Versor Engine Logic](figures/fig4.png){ width=55% }
 
 **FIG. 5** is an illustration of the "Soul Sphere" visualization interface.
 
-![FIG. 5: Soul Sphere Visualization](figures/fig5.png){ width=75% }
+![FIG. 5: Soul Sphere Visualization](figures/fig5.png){ width=95% }
 
 **FIG. 6** is a schematic of the "Emotional Atlas" data structure.
 
-![FIG. 6: Emotional Atlas Data Structure](figures/fig6.png){ width=75% }
+![FIG. 6: Emotional Atlas Data Structure](figures/fig6.png){ width=55% }
 
----
+**FIG. 7** is a screenshot of the system's graphical user interface during a live session.
+
+![FIG. 7: User Interface Screenshot](figures/love.png){ width=95% }
 
 \newpage
 
@@ -87,23 +83,23 @@ The semantic analyzer uses a few-shot prompting technique where the LLM is provi
 ### 2. Quaternion Representation (The Versor)
 The system eschews Cartesian vectors for state manipulation in favor of unit quaternions $q = w + xi + yj + zk$. The invention uses a **scalar-first convention** $[w, x, y, z]$.
 
-The conversion from the 3D VAC vector to a 4D quaternion is achieved by treating the VAC vector as an axis-angle rotation, where the magnitude of the emotion determines the angle $\theta$ and the normalized VAC vector defines the axis of rotation.
+The conversion from the 3D VAC vector to a 4D quaternion is achieved by treating the VAC vector as an axis-angle rotation, where the magnitude of the emotion determines the angle θ and the normalized VAC vector defines the axis of rotation.
 
-$$ w = \cos(\theta/2) $$
+$$ w = \cos(θ / 2) $$
 
-$$ x, y, z = \sin(\theta/2) \cdot \text{axis}_{x,y,z} $$
+$$ x, y, z = \sin(θ / 2) \cdot \text{axis}_{x,y,z} $$
 
 The transition between two emotional states $q_1$ and $q_2$ is calculated using **Spherical Linear Interpolation (SLERP)**:
 
-$$ \text{Slerp}(q_1, q_2; t) = \frac{\sin((1-t)\Omega)}{\sin(\Omega)}q_1 + \frac{\sin(t\Omega)}{\sin(\Omega)}q_2 $$
+$$ \text{Slerp}(q_1, q_2; t) = [\sin((1-t)\Omega) / \sin(\Omega)] \cdot q_1 + [\sin(t\Omega) / \sin(\Omega)] \cdot q_2 $$
 
 where $\Omega$ is the angle subtended by the arc. This ensures a constant-speed emotional transition in the visualization, representing a "natural" flow of feeling rather than a mechanical snap.
 
 ### 3. Emotional Work & Flooding
-The invention defines "Emotional Work" as the geodesic distance (angle $\theta$) traveled on the hypersphere between two states.
+The invention defines "Emotional Work" as the geodesic distance (angle θ) traveled on the hypersphere between two states.
 The invention further defines "Emotional Flooding" based on the rate of change:
 
-$$ \omega = \frac{d\theta}{dt} $$
+$$ \omega = dθ / dt $$
 
 This rate of change serves as a quantitative proxy for emotional volatility or intensity. Mathematically, a high angular velocity represents a rapid traversal across the emotional hypersphere; psychologically, this corresponds to the phenomenon of "flooding," where the speed of an emotional transition outpaces an individual's capacity to regulate it.
 
@@ -120,12 +116,19 @@ This "Atlas" serves as a immutable reference map, allowing the system to snap va
 
 ### 5. Privacy-Centric Architecture
 A key component of the invention is the **Local-First Processing Pipeline**.
+
 1.  **Ingestion**: Audio is captured on-device.
 2.  **Transcription**: A local instance of a speech-to-text model (e.g., `faster-whisper`) converts audio to text without sending data to the cloud.
 3.  **Analysis**: A local Large Language Model (e.g., `Ollama` running `Llama 3` or `Phi-3`) extracts the VAC parameters.
 4.  **Sanitization**: A Named Entity Recognition (NER) system identifies and scrubs Person Identifiable Information (PII) before any data is passed to the persistence layer (Observer).
 
----
+### 6. Industrial Applicability and Potential Embodiments
+While the preferred embodiment describes a personal emotional intelligence tool, the invention's geometric framework has broad industrial applicability across multiple domains:
+
+*   **Clinical & Mental Health:** Monitoring patient stability in real-time, detecting "flooding" events in trauma therapy, or tracking longitudinal emotional trajectories for diagnosis.
+*   **Artificial Intelligence & Robotics:** Providing autonomous agents or Non-Player Characters (NPCs) with continuous, non-binary emotional states, allowing for smoother behavioral transitions than finite-state machines.
+*   **Human-Computer Interaction (HCI):** Enhancing sentiment analysis in customer service bots to detect "connection" (empathy/pity) nuances that standard sentiment models miss.
+*   **Bio-Feedback Training:** Powering wearable devices that provide haptic or visual feedback based on the angular velocity of emotional change to train emotional regulation.
 
 \newpage
 
