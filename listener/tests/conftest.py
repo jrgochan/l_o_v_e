@@ -7,7 +7,20 @@ import pytest
 import os
 from pathlib import Path
 
+from pathlib import Path
+from app.main import app
+from app.api.deps import get_current_user
 
+@pytest.fixture(autouse=True)
+def override_auth():
+    """Mock authentication for all tests."""
+    app.dependency_overrides[get_current_user] = lambda: {"sub": "test@example.com", "role": "admin"}
+    # Need to import locally or global import to avoid circular dep issues in conftest?
+    # conftest usually can import app deps.
+    from app.api.deps import get_current_user_ws
+    app.dependency_overrides[get_current_user_ws] = lambda: {"sub": "test@example.com", "role": "admin"}
+    yield
+    app.dependency_overrides = {}
 @pytest.fixture
 def fixtures_dir() -> Path:
     """Get path to test fixtures directory"""

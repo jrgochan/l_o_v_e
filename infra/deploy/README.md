@@ -50,42 +50,59 @@ Microsoft Azure deployment guides:
 - ARM templates
 - Terraform configurations
 
-## Current Status: Native Deployment Only
+## 🚀 Deployment Instructions
 
-The L.O.V.E. stack currently runs natively on:
-- **macOS** (Homebrew-based)
-- **Linux** (APT/systemd-based)
-- **Windows** (via WSL/Ubuntu)
+### One-Command Deployment (Recommended)
 
-Use the platform-specific scripts:
+We provide a master script that orchestrates the entire deployment process, including the build-time injection of API URLs into the web application.
+
 ```bash
-# macOS/Linux
 cd infra
-./setup-love-stack.sh
-./run-love-stack.sh
-
-# Windows
-cd infra
-.\Setup-LoveStack.ps1
-.\Run-LoveStack.ps1
+./deploy-to-gcp.sh
 ```
 
-## Future: Container Deployment
+**What this script does:**
+1.  **Sets up Project:** Enables APIs and creates Artifact Registry.
+2.  **Deploys Backend:** Builds and deploys Versor, Observer, and Listener.
+3.  **Captures URLs:** retrieves the public Cloud Run URLs.
+4.  **Deploys Frontend:** Rebuilds the Experience web app with the backend URLs baked in, then deploys it.
 
-Once Phase 2 (Containerization) is complete, this directory will provide:
+### Manual Usage (Advanced)
 
-1. **Local Testing:**
-   - Kubernetes manifests for minikube/kind
-   - Docker Compose for simple deployments
+If you need to run specific phases manually:
 
-2. **Production Deployment:**
-   - Cloud provider templates
-   - Infrastructure as Code (Terraform)
-   - CI/CD pipeline configurations
+```bash
+cd infra/deploy/gcp
 
-3. **Hybrid Options:**
-   - Systemd services for traditional deployments
-   - Kubernetes for cloud-native deployments
+# 1. Setup
+./01-setup-project.sh
+
+# 2. Build & Push (Backend only)
+./02-build-push.sh backend
+
+# 3. Provision Infrastructure (DB, Redis, VM)
+./03-provision-infrastructure.sh
+
+# 4. Deploy Services (Backend only)
+./04-deploy-services.sh backend
+
+# 5. Build Frontend (requires backend URLs)
+./02-build-push.sh frontend \
+  --build-arg NEXT_PUBLIC_OBSERVER_URL=https://... \
+  --build-arg NEXT_PUBLIC_LISTENER_URL=https://...
+
+# 6. Deploy Frontend
+./04-deploy-services.sh frontend
+```
+
+## Architecture
+
+- **Web:** Cloud Run (Next.js)
+- **API:** Cloud Run (FastAPI/Python)
+- **DB:** Cloud SQL (PostgreSQL + pgvector)
+- **Cache:** Memorystore (Redis)
+- **AI:** Compute Engine VM (Ollama)
+
 
 ## Next Steps
 

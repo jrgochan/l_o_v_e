@@ -28,31 +28,31 @@ fi
 # Print colored success message
 # Usage: print_success "message"
 print_success() {
-    printf "%b%s %s%b\n" "$GREEN" "$CHECK" "$1" "$NC"
+    printf "%b%s %b%b\n" "$GREEN" "$CHECK" "$1" "$NC"
 }
 
 # Print colored error message
 # Usage: print_error "message"
 print_error() {
-    printf "%b%s %s%b\n" "$RED" "$CROSS" "$1" "$NC"
+    printf "%b%s %b%b\n" "$RED" "$CROSS" "$1" "$NC"
 }
 
 # Print colored warning message
 # Usage: print_warning "message"
 print_warning() {
-    printf "%b%s%s%b\n" "$YELLOW" "$WARN" "$1" "$NC"
+    printf "%b%s%b%b\n" "$YELLOW" "$WARN" "$1" "$NC"
 }
 
 # Print colored info message
 # Usage: print_info "message"
 print_info() {
-    printf "%b%s%s%b\n" "$BLUE" "$INFO" "$1" "$NC"
+    printf "%b%s%b%b\n" "$BLUE" "$INFO" "$1" "$NC"
 }
 
 # Print colored header
 # Usage: print_header "Header Text"
 print_header() {
-    printf "\n%b%s%b\n" "$BLUE" "$1" "$NC"
+    printf "\n%b%b%b\n" "$BLUE" "$1" "$NC"
     echo "----------------------------------------"
 }
 

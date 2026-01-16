@@ -4,9 +4,11 @@ Converts VAC to quaternion and computes all transition metrics.
 """
 
 import math
+from typing import Any
 
-from fastapi import APIRouter
+from fastapi import APIRouter, Depends
 
+from app.api.deps import get_current_user
 from app.api.models.request import StateRequest
 from app.api.models.response import QuaternionModel, TrajectoryResponse
 from app.config import settings
@@ -25,7 +27,10 @@ router = APIRouter()
 
 
 @router.post("/calculate", response_model=TrajectoryResponse)
-async def calculate_state(request: StateRequest) -> TrajectoryResponse:
+async def calculate_state(
+    request: StateRequest,
+    current_user: dict[str, Any] = Depends(get_current_user),  # pylint: disable=unused-argument
+) -> TrajectoryResponse:
     """Main calculation endpoint.
 
     Converts VAC to quaternion, calculates transition metrics,

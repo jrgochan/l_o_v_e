@@ -49,9 +49,10 @@ import asyncio
 import logging
 from typing import Any, Dict, List
 
-from fastapi import APIRouter, HTTPException, WebSocket, WebSocketDisconnect
+from fastapi import APIRouter, Depends, HTTPException, WebSocket, WebSocketDisconnect
 from pydantic import BaseModel
 
+from app.api.deps import get_current_user, get_current_user_ws
 from app.services.ollama_manager import ModelDetails, ModelInfo, OllamaManager
 
 logger = logging.getLogger(__name__)
@@ -98,7 +99,9 @@ active_pulls: Dict[str, Any] = {}
 
 
 @router.get("/local", response_model=List[ModelInfo])
-async def list_local_models() -> List[ModelInfo]:
+async def list_local_models(
+    current_user: dict[str, Any] = Depends(get_current_user),  # pylint: disable=unused-argument
+) -> List[ModelInfo]:
     """List all Ollama models currently installed locally.
 
     Returns:
@@ -115,7 +118,10 @@ async def list_local_models() -> List[ModelInfo]:
 
 
 @router.post("/pull", response_model=PullModelResponse)
-async def start_model_pull(request: PullModelRequest) -> PullModelResponse:
+async def start_model_pull(
+    request: PullModelRequest,
+    current_user: dict[str, Any] = Depends(get_current_user),  # pylint: disable=unused-argument
+) -> PullModelResponse:
     """Start pulling (downloading) a model from Ollama registry.
 
     Returns task_id for tracking progress via WebSocket.
@@ -141,7 +147,11 @@ async def start_model_pull(request: PullModelRequest) -> PullModelResponse:
 
 
 @router.websocket("/pull/{task_id}")
-async def stream_pull_progress(websocket: WebSocket, task_id: str) -> None:
+async def stream_pull_progress(
+    websocket: WebSocket,
+    task_id: str,
+    current_user: dict[str, Any] = Depends(get_current_user_ws),  # pylint: disable=unused-argument
+) -> None:
     """Websocket endpoint for streaming model pull progress.
 
     Sends progress updates as the model downloads.
@@ -198,7 +208,10 @@ async def stream_pull_progress(websocket: WebSocket, task_id: str) -> None:
 
 
 @router.delete("/{model_name}")
-async def delete_model(model_name: str) -> Dict[str, Any]:
+async def delete_model(
+    model_name: str,
+    current_user: dict[str, Any] = Depends(get_current_user),  # pylint: disable=unused-argument
+) -> Dict[str, Any]:
     """Delete a model from local storage.
 
     Args:
@@ -220,7 +233,10 @@ async def delete_model(model_name: str) -> Dict[str, Any]:
 
 
 @router.get("/{model_name}/details", response_model=ModelDetails)
-async def get_model_details(model_name: str) -> ModelDetails:
+async def get_model_details(
+    model_name: str,
+    current_user: dict[str, Any] = Depends(get_current_user),  # pylint: disable=unused-argument
+) -> ModelDetails:
     """Get detailed information about a specific model.
 
     Args:
@@ -240,7 +256,9 @@ async def get_model_details(model_name: str) -> ModelDetails:
 
 
 @router.get("/health")
-async def check_ollama_health() -> Dict[str, str]:
+async def check_ollama_health(
+    current_user: dict[str, Any] = Depends(get_current_user),  # pylint: disable=unused-argument
+) -> Dict[str, str]:
     """Check if Ollama is running and accessible.
 
     Returns:

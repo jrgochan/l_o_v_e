@@ -64,65 +64,30 @@ def mock_deps(mock_db_session, mock_chat_service):
             "insight_gen_cls": MockGen
         }
 
+@pytest.fixture
+def mock_user():
+    user = MagicMock()
+    user.id = uuid4()
+    user.email = "test@example.com"
+    return user
+
 # -----------------------------------------------------------------------------
 # AUTHENTICATION TESTS
 # -----------------------------------------------------------------------------
 
 @pytest.mark.asyncio
-async def test_auth_success(mock_websocket, mock_deps):
-    """Test successful authentication via token."""
-    user_id = uuid4()
-    token = jwt.encode({"sub": "test@example.com"}, settings.SECRET_KEY, algorithm=settings.ALGORITHM)
-    mock_websocket.query_params = {"token": token}
-    
-    # Mock User lookup
-    mock_result = MagicMock()
-    mock_user = MagicMock()
-    mock_user.id = user_id
-    mock_user.email = "test@example.com"
-    mock_result.scalars.return_value.first.return_value = mock_user
-    mock_deps["db_session"].execute.return_value = mock_result
-
+async def test_auth_success(mock_websocket, mock_deps, mock_user):
+    """Test successful authentication flow (dependency injected)."""
     # Force disconnect loop immediately
     mock_websocket.receive_json.side_effect = WebSocketDisconnect()
     
-    await chat_ws.chat_websocket(mock_websocket, "session1")
+    await chat_ws.chat_websocket(mock_websocket, "session1", current_user=mock_user)
     
     # Verify manager connected
     mock_deps["manager"].connect.assert_called_with("session1", mock_websocket)
 
-@pytest.mark.asyncio
-async def test_auth_failure_invalid_token(mock_websocket, mock_deps):
-    """Test handling of invalid token (falls back to guest)."""
-    mock_websocket.query_params = {"token": "invalid_token"}
-    mock_websocket.receive_json.side_effect = WebSocketDisconnect()
-    await chat_ws.chat_websocket(mock_websocket, "session1")
-    mock_deps["manager"].connect.assert_called()
-
-@pytest.mark.asyncio
-async def test_auth_failure_missing_email(mock_websocket, mock_deps):
-    """Test token valid structure but missing info."""
-    token = jwt.encode({}, settings.SECRET_KEY, algorithm=settings.ALGORITHM)
-    mock_websocket.query_params = {"token": token}
-    mock_websocket.receive_json.side_effect = WebSocketDisconnect()
-    await chat_ws.chat_websocket(mock_websocket, "session1")
-    # Should warn and continue
-    mock_deps["manager"].connect.assert_called()
-
-@pytest.mark.asyncio
-async def test_auth_failure_user_not_found(mock_websocket, mock_deps):
-    """Test valid email in token but user not in DB."""
-    token = jwt.encode({"sub": "missing@example.com"}, settings.SECRET_KEY, algorithm=settings.ALGORITHM)
-    mock_websocket.query_params = {"token": token}
-    
-    mock_result = MagicMock()
-    mock_result.scalars.return_value.first.return_value = None # User not found
-    mock_deps["db_session"].execute.return_value = mock_result
-    
-    mock_websocket.receive_json.side_effect = WebSocketDisconnect()
-    
-    await chat_ws.chat_websocket(mock_websocket, "session1")
-    mock_deps["manager"].connect.assert_called()
+# Removed test_auth_failure_* tests as manual token validation is removed
+# and replaced by get_current_user_ws dependency.
 
 # -----------------------------------------------------------------------------
 # LOOP & ROUTING TESTS
@@ -145,7 +110,7 @@ async def test_chat_loop_messages(mock_websocket, mock_deps):
     
     # Mock handle_user_message to avoid side effects in this loop test
     with patch("app.api.routes.chat_websocket.handle_user_message", new=AsyncMock()) as mock_handle:
-        await chat_ws.chat_websocket(mock_websocket, "session1")
+        await chat_ws.chat_websocket(mock_websocket, "session1", current_user=mock_deps.get("mock_user", MagicMock(id=uuid4(), email="test@test.com")))
         mock_handle.assert_awaited()
     
     # verify ping->pong
@@ -164,7 +129,7 @@ async def test_chat_loop_exception(mock_websocket, mock_deps):
     """Test general exception handling in main loop."""
     mock_websocket.receive_json.side_effect = Exception("General loop error")
     
-    await chat_ws.chat_websocket(mock_websocket, "session1")
+    await chat_ws.chat_websocket(mock_websocket, "session1", current_user=MagicMock(id=uuid4(), email="test@test.com"))
     
     # Should catch, log, send error, and disconnect
     mock_deps["manager"].send_message.assert_called_with(

@@ -58,6 +58,9 @@ class ApiClient {
       if (response.status === 401 && authenticated) {
         // Handle unauthorized (logout)
         useAuthStore.getState().logout();
+        if (typeof window !== "undefined") {
+          window.dispatchEvent(new CustomEvent("session-expired"));
+        }
       }
 
       const errorData = await response.json().catch(() => ({}));

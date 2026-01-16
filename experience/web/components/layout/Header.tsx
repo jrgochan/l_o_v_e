@@ -53,7 +53,7 @@ export function Header({ showAuth = true }: HeaderProps) {
 
               {user.role === UserRole.ADMIN && (
                 <Link
-                  href="/admin/users"
+                  href="/admin/atlas"
                   className="block px-4 py-2 text-sm text-cyan-400 hover:bg-gray-800 hover:text-cyan-300"
                   onClick={() => setIsProfileOpen(false)}
                 >

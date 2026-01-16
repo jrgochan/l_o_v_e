@@ -48,36 +48,24 @@ def mock_httpx_client():
 
 # === Auth Tests ===
 
-@pytest.mark.asyncio
-async def test_websocket_connect_no_auth(mock_websocket, mock_manager):
-    # Raise disconnect immediately to break loop after connect
-    mock_websocket.receive_json.side_effect = WebSocketDisconnect()
-    
-    await chat_websocket.chat_websocket(mock_websocket, "session1")
-    
-    # Check await count or just called
-    mock_manager.connect.assert_awaited_with("session1", mock_websocket)
-    # Should proceed as guest
-
-@pytest.mark.asyncio
-async def test_websocket_connect_auth_success(mock_websocket, mock_manager, mock_db_session_local):
-    token = jwt.encode({"sub": "test@example.com"}, settings.SECRET_KEY, algorithm=settings.ALGORITHM)
-    mock_websocket.query_params = {"token": token}
-    
-    # Mock DB user lookup
-    mock_res = MagicMock()
+@pytest.fixture
+def mock_user():
     user = MagicMock()
     user.id = uuid4()
     user.email = "test@example.com"
-    mock_res.scalars.return_value.first.return_value = user
-    mock_db_session_local.execute.return_value = mock_res
-    
+    return user
+
+# Removed test_websocket_connect_no_auth as guest mode is disabled
+
+@pytest.mark.asyncio
+async def test_websocket_connect_auth_success(mock_websocket, mock_manager, mock_user):
     # We need to interrupt the infinite loop by raising WebSocketDisconnect on receive_json
     mock_websocket.receive_json.side_effect = WebSocketDisconnect()
     
-    await chat_websocket.chat_websocket(mock_websocket, "session1")
+    await chat_websocket.chat_websocket(mock_websocket, "session1", current_user=mock_user)
     
-    mock_db_session_local.execute.assert_called()
+    # If connection was accepted and we reached receive_json, auth passed.
+    mock_manager.connect.assert_awaited()
 
 # === Message Handling Tests ===
 
@@ -127,11 +115,11 @@ async def test_handle_user_message_text(mock_websocket, mock_manager, mock_db_se
             mock_gen.assert_awaited()
 
 @pytest.mark.asyncio
-async def test_handle_ping(mock_websocket, mock_manager):
+async def test_handle_ping(mock_websocket, mock_manager, mock_user):
     # Setup loop to process one ping then disconnect
     mock_websocket.receive_json.side_effect = [{"type": "ping"}, WebSocketDisconnect()]
     
-    await chat_websocket.chat_websocket(mock_websocket, "session1")
+    await chat_websocket.chat_websocket(mock_websocket, "session1", current_user=mock_user)
     
     mock_manager.send_message.assert_called_with("session1", {"type": "pong"})
 
@@ -227,25 +215,10 @@ async def test_deep_feeling_flow(mock_manager, mock_db_session_local, mock_httpx
 
 # === New Tests for Phase 6 Coverage ===
 
-@pytest.mark.asyncio
-async def test_websocket_connect_auth_failure(mock_websocket, mock_manager):
-    # Test invalid token
-    mock_websocket.query_params = {"token": "invalid_token"}
-    
-    # We expect it to log a warning but proceed as guest or fail?
-    # Code says: logger.warning(...); user_identifier = "guest"
-    # So it connects as guest
-    
-    mock_websocket.receive_json.side_effect = WebSocketDisconnect()
-    
-    with patch("app.api.routes.chat_websocket.jwt.decode", side_effect=Exception("Invalid sig")):
-        await chat_websocket.chat_websocket(mock_websocket, "session1")
-    
-    # Should still connect (as guest)
-    mock_manager.connect.assert_awaited()
+# Removed test_websocket_connect_auth_failure as manual token validation is removed
 
 @pytest.mark.asyncio
-async def test_handle_tone_update(mock_websocket, mock_manager):
+async def test_handle_tone_update(mock_websocket, mock_manager, mock_user):
     session_id = "session1"
     
     with patch("app.api.routes.chat_websocket.handle_tone_update") as mock_handler:
@@ -254,11 +227,11 @@ async def test_handle_tone_update(mock_websocket, mock_manager):
             WebSocketDisconnect()
         ]
         
-        await chat_websocket.chat_websocket(mock_websocket, session_id)
+        await chat_websocket.chat_websocket(mock_websocket, session_id, current_user=mock_user)
         mock_handler.assert_awaited()
 
 @pytest.mark.asyncio
-async def test_handle_deep_feeling_update(mock_websocket, mock_manager):
+async def test_handle_deep_feeling_update(mock_websocket, mock_manager, mock_user):
     session_id = "session1"
     
     with patch("app.api.routes.chat_websocket.handle_deep_feeling_update") as mock_handler:
@@ -267,7 +240,7 @@ async def test_handle_deep_feeling_update(mock_websocket, mock_manager):
             WebSocketDisconnect()
         ]
         
-        await chat_websocket.chat_websocket(mock_websocket, session_id)
+        await chat_websocket.chat_websocket(mock_websocket, session_id, current_user=mock_user)
         mock_handler.assert_awaited()
 
 
@@ -288,13 +261,13 @@ async def test_handle_user_message_error(mock_websocket, mock_manager):
         assert "Processing boom" in args[0][1]["message"]
 
 @pytest.mark.asyncio
-async def test_unknown_message_type(mock_websocket, mock_manager):
+async def test_unknown_message_type(mock_websocket, mock_manager, mock_user):
     mock_websocket.receive_json.side_effect = [
         {"type": "unknown_type"},
         WebSocketDisconnect()
     ]
     
-    await chat_websocket.chat_websocket(mock_websocket, "session1")
+    await chat_websocket.chat_websocket(mock_websocket, "session1", current_user=mock_user)
     
     mock_manager.send_message.assert_called_with(
         "session1", 

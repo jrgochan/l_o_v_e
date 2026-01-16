@@ -241,9 +241,11 @@ from fastapi import APIRouter, Depends, HTTPException, Request
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.api.deps import get_current_user
 from app.api.schemas.common import EmotionInfo, MetricsInfo, QuaternionModel
 from app.api.schemas.state import StateInput, StateResponse
 from app.database import get_db
+from app.models.user import User
 from app.models.user_trajectory import UserTrajectory
 from app.services import (
     EmotionMapper,
@@ -260,7 +262,10 @@ router = APIRouter()
 
 @router.post("/observer/state", response_model=StateResponse, tags=["State"])
 async def record_state(
-    request: Request, input_data: StateInput, db: AsyncSession = Depends(get_db)
+    request: Request,
+    input_data: StateInput,
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user),
 ) -> StateResponse:
     """Record a new emotional state.
 
@@ -285,6 +290,12 @@ async def record_state(
     Returns:
         StateResponse with emotion, quaternion, and metrics
     """
+    # Authorization check: User can only record their own state
+    if str(current_user.id) != str(input_data.user_id):
+        raise HTTPException(
+            status_code=403, detail="Not authorized to record state for another user"
+        )
+
     try:
         logger.info(f"Recording state for user {input_data.user_id}")
 

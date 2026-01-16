@@ -16,15 +16,26 @@ def mock_db():
     return AsyncMock()
 
 @pytest.fixture
-def mock_input():
+def test_user_id():
+    return uuid4()
+
+@pytest.fixture
+def mock_input(test_user_id):
     return StateInput(
-        user_id=uuid4(),
+        user_id=test_user_id,
         session_id=uuid4(),
         input_text="I feel anxious",
         vac_scalars=VACVector(valence=-0.5, arousal=0.7, connection=-0.3),
         confidence=0.9,
         timestamp=datetime.now(timezone.utc)
     )
+
+@pytest.fixture
+def mock_user(test_user_id):
+    user = MagicMock()
+    user.id = test_user_id
+    user.email = "test@example.com"
+    return user
 
 @pytest.fixture
 def mock_deps():
@@ -77,7 +88,7 @@ def mock_deps():
         }
 
 @pytest.mark.asyncio
-async def test_record_state_success_no_previous(mock_db, mock_input, mock_deps):
+async def test_record_state_success_no_previous(mock_db, mock_input, mock_deps, mock_user):
     """Test standard flow with no previous state."""
     # Mock DB previous state lookup -> None
     mock_res = MagicMock()
@@ -85,7 +96,7 @@ async def test_record_state_success_no_previous(mock_db, mock_input, mock_deps):
     mock_db.execute.return_value = mock_res
     
     req = MagicMock(spec=Request)
-    resp = await state.record_state(req, mock_input, db=mock_db)
+    resp = await state.record_state(req, mock_input, db=mock_db, current_user=mock_user)
     
     assert resp.dominant_emotion.name == "Anxiety"
     assert resp.previous_quaternion is None
@@ -97,7 +108,7 @@ async def test_record_state_success_no_previous(mock_db, mock_input, mock_deps):
     mock_deps["ws"].send_state_update.assert_awaited_once()
 
 @pytest.mark.asyncio
-async def test_record_state_with_previous(mock_db, mock_input, mock_deps):
+async def test_record_state_with_previous(mock_db, mock_input, mock_deps, mock_user):
     """Test flow with previous state enabling metrics."""
     # Mock previous state
     prev = MagicMock(spec=UserTrajectory)
@@ -111,7 +122,7 @@ async def test_record_state_with_previous(mock_db, mock_input, mock_deps):
     mock_db.execute.return_value = mock_res
     
     req = MagicMock(spec=Request)
-    resp = await state.record_state(req, mock_input, db=mock_db)
+    resp = await state.record_state(req, mock_input, db=mock_db, current_user=mock_user)
     
     assert resp.previous_quaternion is not None
     # Elasticity comes from mock_mc (0.5)
@@ -119,7 +130,7 @@ async def test_record_state_with_previous(mock_db, mock_input, mock_deps):
     mock_deps["mc"].calculate_elasticity.assert_called()
 
 @pytest.mark.asyncio
-async def test_record_state_alerts(mock_db, mock_input, mock_deps):
+async def test_record_state_alerts(mock_db, mock_input, mock_deps, mock_user):
     """Test that alerts are added to response."""
     # Setup metrics to trigger alerts
     mock_deps["mc"].detect_flooding.return_value = True
@@ -130,13 +141,13 @@ async def test_record_state_alerts(mock_db, mock_input, mock_deps):
     mock_db.execute.return_value = mock_res
     
     req = MagicMock(spec=Request)
-    resp = await state.record_state(req, mock_input, db=mock_db)
+    resp = await state.record_state(req, mock_input, db=mock_db, current_user=mock_user)
     
     assert "flooding" in resp.metrics.alerts
     assert "stuckness" in resp.metrics.alerts
 
 @pytest.mark.asyncio
-async def test_record_state_ws_failure(mock_db, mock_input, mock_deps):
+async def test_record_state_ws_failure(mock_db, mock_input, mock_deps, mock_user):
     """Test WebSocket failure is caught and logged."""
     mock_deps["ws"].send_state_update.side_effect = Exception("WS Error")
     
@@ -146,18 +157,33 @@ async def test_record_state_ws_failure(mock_db, mock_input, mock_deps):
     
     req = MagicMock(spec=Request)
     # Should NOT raise exception
-    resp = await state.record_state(req, mock_input, db=mock_db)
+    resp = await state.record_state(req, mock_input, db=mock_db, current_user=mock_user)
     
     assert resp.dominant_emotion.name == "Anxiety"
 
 @pytest.mark.asyncio
-async def test_record_state_exception(mock_db, mock_input, mock_deps):
+async def test_record_state_exception(mock_db, mock_input, mock_deps, mock_user):
     """Test general exception triggers 500 and rollback."""
     mock_db.commit.side_effect = Exception("DB Crash")
     
     req = MagicMock(spec=Request)
     with pytest.raises(HTTPException) as exc:
-        await state.record_state(req, mock_input, db=mock_db)
+        await state.record_state(req, mock_input, db=mock_db, current_user=mock_user)
     
     assert exc.value.status_code == 500
     mock_db.rollback.assert_awaited_once()
+
+@pytest.mark.asyncio
+async def test_record_state_auth_failure(mock_db, mock_input, mock_deps):
+    """Test 403 when recording state for another user."""
+    # User ID mismatch
+    wrong_user = MagicMock()
+    wrong_user.id = uuid4() 
+    
+    req = MagicMock(spec=Request)
+    
+    with pytest.raises(HTTPException) as exc:
+        await state.record_state(req, mock_input, db=mock_db, current_user=wrong_user)
+    
+    assert exc.value.status_code == 403
+    assert "Not authorized" in exc.value.detail

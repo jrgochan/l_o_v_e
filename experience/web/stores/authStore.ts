@@ -17,6 +17,10 @@ interface AuthState {
   login: (email: string, password: string) => Promise<void>;
   register: (email: string, password: string, fullName?: string) => Promise<void>;
   fetchUser: () => Promise<void>;
+
+  // Selectors
+  isAuthenticated: () => boolean;
+  hasRole: (role: string) => boolean;
 }
 
 export const useAuthStore = create<AuthState>()(
@@ -113,6 +117,13 @@ export const useAuthStore = create<AuthState>()(
         } finally {
           set({ isLoading: false });
         }
+      },
+
+      isAuthenticated: () => !!get().token,
+
+      hasRole: (role: string) => {
+        const user = get().user;
+        return !!user && user.role === role;
       },
     }),
     {

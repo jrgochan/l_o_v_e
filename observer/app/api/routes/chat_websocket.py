@@ -226,10 +226,9 @@ from typing import Any, Dict, Optional
 from uuid import UUID
 
 import httpx
-from fastapi import APIRouter, WebSocket, WebSocketDisconnect
-from jose import jwt
-from sqlalchemy import select
+from fastapi import APIRouter, Depends, WebSocket, WebSocketDisconnect
 
+from app.api.deps import get_current_user_ws
 from app.config import settings
 from app.database import AsyncSessionLocal
 from app.models.user import User
@@ -300,34 +299,21 @@ async def send_progress(
 
 
 @router.websocket("/ws/chat/{session_id}")
-async def chat_websocket(websocket: WebSocket, session_id: str) -> None:
+async def chat_websocket(
+    websocket: WebSocket,
+    session_id: str,
+    current_user: User = Depends(get_current_user_ws),
+) -> None:
     """Websocket endpoint for real-time emotional analysis chat.
 
-    Supports authenticated sessions via 'token' query parameter.
+    Requires authentication via 'token' query parameter.
     """
     await manager.connect(session_id, websocket)
 
-    # Authentication
-    auth_user_id: Optional[UUID] = None
-    user_identifier: str = "guest"  # Default for demo/guest mode
-
-    token = websocket.query_params.get("token")
-    if token:
-        try:
-            payload = jwt.decode(token, settings.SECRET_KEY, algorithms=[settings.ALGORITHM])
-            email = payload.get("sub")
-            if email:
-                async with AsyncSessionLocal() as db:
-                    stmt = select(User).where(User.email == email)
-                    result = await db.execute(stmt)
-                    user = result.scalars().first()
-                    if user:
-                        auth_user_id = user.id
-                        # Use user_id as identifier for consistency
-                        user_identifier = str(user.id)
-                        logger.info(f"Authenticated session {session_id} for user {email}")
-        except Exception as e:
-            logger.warning(f"WebSocket authentication failed for session {session_id}: {e}")
+    # Authenticated user from dependency
+    auth_user_id = current_user.id
+    user_identifier = str(current_user.id)
+    logger.info(f"Authenticated session {session_id} for user {current_user.email}")
 
     try:
         # Get database session (we'll create one per message for simplicity)

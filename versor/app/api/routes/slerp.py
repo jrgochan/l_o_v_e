@@ -3,8 +3,11 @@
 Generates interpolation paths between two quaternions.
 """
 
-from fastapi import APIRouter
+from typing import Any
 
+from fastapi import APIRouter, Depends
+
+from app.api.deps import get_current_user
 from app.api.models.request import SLERPRequest
 from app.api.models.response import QuaternionModel, SLERPResponse
 from app.core import Quaternion, angular_distance, calculate_transition, generate_slerp_path
@@ -13,7 +16,10 @@ router = APIRouter()
 
 
 @router.post("/slerp", response_model=SLERPResponse)
-async def generate_path(request: SLERPRequest) -> SLERPResponse:
+async def generate_path(
+    request: SLERPRequest,
+    current_user: dict[str, Any] = Depends(get_current_user),  # pylint: disable=unused-argument
+) -> SLERPResponse:
     """Generate SLERP interpolation path between two quaternions.
 
     Useful for animating transitions when you already have quaternions

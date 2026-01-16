@@ -63,8 +63,9 @@ import aiofiles
 from arq import create_pool
 from arq.connections import RedisSettings
 from arq.jobs import Job
-from fastapi import APIRouter, File, Form, HTTPException, UploadFile
+from fastapi import APIRouter, Depends, File, Form, HTTPException, UploadFile
 
+from app.api.deps import get_current_user
 from app.config import settings
 
 router = APIRouter()
@@ -77,6 +78,7 @@ async def ingest(
     text: Optional[str] = Form(None),
     user_id: str = Form(...),
     session_id: str = Form(...),
+    current_user: dict[str, Any] = Depends(get_current_user),  # pylint: disable=unused-argument
 ) -> Dict[str, Any]:
     """Ingest audio or text for processing.
 
@@ -159,7 +161,10 @@ async def ingest(
 
 
 @router.get("/status/{job_id}")
-async def get_status(job_id: str) -> Dict[str, Any]:
+async def get_status(
+    job_id: str,
+    current_user: dict[str, Any] = Depends(get_current_user),  # pylint: disable=unused-argument
+) -> Dict[str, Any]:
     """Get processing status for a job.
 
     Args:
@@ -210,6 +215,7 @@ async def analyze_text(
     text: str = Form(...),
     user_id: Optional[str] = Form("demo-user"),
     session_id: Optional[str] = Form("demo-session"),
+    current_user: dict[str, Any] = Depends(get_current_user),  # pylint: disable=unused-argument
 ) -> Dict[str, Any]:
     """Synchronous text analysis endpoint.
 
@@ -286,6 +292,7 @@ async def analyze_multi_emotion(
     text: str = Form(...),
     user_id: Optional[str] = Form("demo-user"),
     session_id: Optional[str] = Form("demo-session"),
+    current_user: dict[str, Any] = Depends(get_current_user),  # pylint: disable=unused-argument
 ) -> Dict[str, Any]:
     """Synchronous multi-emotion analysis endpoint (Deep Feeling mode).
 
@@ -379,6 +386,7 @@ async def analyze_audio_sync(
     audio: UploadFile = File(...),
     user_id: str = Form("admin"),  # pylint: disable=unused-argument
     session_id: str = Form("chat-session"),  # pylint: disable=unused-argument
+    current_user: dict[str, Any] = Depends(get_current_user),  # pylint: disable=unused-argument
 ) -> Dict[str, Any]:
     """Synchronous audio analysis endpoint for chat.
 
@@ -474,6 +482,7 @@ async def analyze_audio_multi_emotion(
     audio: UploadFile = File(...),
     user_id: str = Form("admin"),  # pylint: disable=unused-argument
     session_id: str = Form("chat-session"),  # pylint: disable=unused-argument
+    current_user: dict[str, Any] = Depends(get_current_user),  # pylint: disable=unused-argument
 ) -> Dict[str, Any]:
     """Synchronous multi-emotion audio analysis endpoint (Deep Feeling mode).
 

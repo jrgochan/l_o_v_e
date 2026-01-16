@@ -492,7 +492,9 @@ export const adminPartialize = (state: AtlasAdminState) => {
   const isClientViewer =
     typeof window !== "undefined" && !window.location.pathname.startsWith("/admin");
 
-  console.log("DEBUG: partialize", { pathname: window.location.pathname, isClientViewer });
+  if (process.env.NODE_ENV === "development") {
+    console.log("DEBUG: partialize", { pathname: window.location.pathname, isClientViewer });
+  }
 
   if (isClientViewer) {
     // Client Viewer should ONLY persist selection state

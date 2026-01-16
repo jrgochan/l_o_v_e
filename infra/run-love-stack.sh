@@ -1,6 +1,6 @@
 #!/bin/bash
 # L.O.V.E. Stack - Run All Services and APIs
-# Cross-platform script to start the complete stack
+# Cross-platform script to start the complete stack with granular control.
 
 set -e
 
@@ -13,22 +13,54 @@ SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 . "$SCRIPT_DIR/lib/service-manager.sh"
 . "$SCRIPT_DIR/lib/common.sh"
 
-echo -e "${BLUE}${ROCKET} Starting L.O.V.E. Stack${NC}"
-echo "=========================="
-echo ""
+# ==========================================
+# Configuration & Defaults
+# ==========================================
 
-# Create logs directory
-ensure_directory "$SCRIPT_DIR/logs"
+# Default Execution Flags
+RUN_INFRA=true
+RUN_BACKEND=true
+RUN_FRONTEND=true
+RUN_DOCS=true
+CLEAN_MODE=false
+SKIP_INFRA_CHECKS=false
 
 # PID file to track running processes
+ensure_directory "$SCRIPT_DIR/logs"
 PID_FILE="$SCRIPT_DIR/logs/.love-stack.pids"
-rm -f "$PID_FILE"
 
-# Kill existing processes function
+# ==========================================
+# Helper Functions
+# ==========================================
+
+show_help() {
+    echo -e "${BLUE}L.O.V.E. Stack - Control Script${NC}"
+    echo "Usage: ./run-love-stack.sh [OPTIONS]"
+    echo ""
+    echo "Options:"
+    echo "  -h, --help        Show this help message"
+    echo "  --clean           Deep clean Experience module (rm node_modules/.next) before starting"
+    echo "  --backend         Run ONLY the Backend APIs (Versor, Observer, Listener) + Infra"
+    echo "                    (Disables Frontend)"
+    echo "  --frontend        Run ONLY the Experience Web Frontend"
+    echo "                    (Disables Infra, Backend, Docs. Assumes API is running at localhost:8000)"
+    echo "  --infra           Run ONLY Infrastructure (PostgreSQL, Redis, Ollama)"
+    echo "                    (Disables Backend, Frontend, Docs)"
+    echo "  --skip-infra      Skip infrastructure checks/startup"
+    echo "                    (Use if you know DB/Redis/Ollama are already running)"
+    echo ""
+    echo "Examples:"
+    echo "  ./run-love-stack.sh --clean       # Clean start"
+    echo "  ./run-love-stack.sh --backend     # Dev backend only"
+    echo "  ./run-love-stack.sh --frontend    # Dev frontend only"
+    echo ""
+}
+
+# Kill existing processes
 kill_existing_processes() {
     print_info "Checking for existing L.O.V.E. processes..."
     
-    # Kill existing Python APIs (Versor, Observer, Listener)
+    # Kill existing Python APIs
     pkill -f "uvicorn.*versor" 2>/dev/null || true
     pkill -f "uvicorn.*observer" 2>/dev/null || true
     pkill -f "uvicorn.*listener" 2>/dev/null || true
@@ -36,11 +68,10 @@ kill_existing_processes() {
     # Kill background workers
     pkill -f "arq.*app.workers" 2>/dev/null || true
     
-    # Kill existing Node.js processes (Experience web)
+    # Kill Node.js processes (Experience web)
     pkill -f "next dev.*experience/web" 2>/dev/null || true
     
     # Kill processes on specific ports
-    kill_process_on_port 3000 2>/dev/null || true
     kill_process_on_port 3000 2>/dev/null || true
     kill_process_on_port 3001 2>/dev/null || true
     kill_process_on_port 8003 2>/dev/null || true
@@ -48,21 +79,22 @@ kill_existing_processes() {
     # Kill mkdocs
     pkill -f "mkdocs serve" 2>/dev/null || true
     
-    # Clean up lock files
-    rm -f "$SCRIPT_DIR/../experience/web/.next/dev/lock" 2>/dev/null || true
+    # Clean up lock files (only if running frontend or clean mode)
+    if [ "$RUN_FRONTEND" = true ] || [ "$CLEAN_MODE" = true ]; then
+        rm -f "$SCRIPT_DIR/../experience/web/.next/dev/lock" 2>/dev/null || true
+    fi
     
-    sleep 2
+    sleep 1
     print_success "Existing processes cleaned up"
 }
 
-# Cleanup function
+# Cleanup function (trap)
 cleanup() {
     echo ""
     print_info "Stopping L.O.V.E. Stack..."
     
     # Stop Experience web
     pkill -f "next dev.*experience/web" 2>/dev/null || true
-    kill_process_on_port 3000 2>/dev/null || true
     kill_process_on_port 3000 2>/dev/null || true
     kill_process_on_port 3001 2>/dev/null || true
     kill_process_on_port 8003 2>/dev/null || true
@@ -83,17 +115,17 @@ cleanup() {
     # Ensure workers are dead
     pkill -f "arq.*app.workers" 2>/dev/null || true
     
-    print_success "All APIs stopped"
+    print_success "All managed services stopped"
     echo ""
-    print_info "Services (PostgreSQL, Redis, Ollama) are still running"
-    print_info "Stop them manually if needed (see stop-love-stack.sh)"
+    
+    if [ "$RUN_INFRA" = true ]; then
+        print_info "Infrastructure (PG, Redis, Ollama) checked/started may still be running."
+        print_info "Stop them manually if needed (see stop-love-stack.sh)"
+    fi
     exit 0
 }
 
-# Set trap for cleanup
-trap cleanup SIGINT SIGTERM
-
-# Function to start an API
+# Start API Helper
 start_api() {
     local name=$1
     local dir="$SCRIPT_DIR/../$2"
@@ -110,13 +142,14 @@ start_api() {
     # Install/update dependencies first
     cd "$dir"
     if [ -f "requirements.txt" ] && [ -d "venv" ]; then
-        echo -e "${CYAN}    Installing $name dependencies...${NC}"
+        # Check if we should update deps? For now, we assume setup script ran.
+        # But let's run a quick pip install to be safe if env exists.
+        # Using bash -c to ensure venv activation works
         bash -c ". venv/bin/activate && pip install -q -r requirements.txt" > /dev/null 2>&1 || {
-            print_warning "Some dependencies may have failed to install"
+            print_warning "Dependency check failed (non-fatal)"
         }
     fi
     
-    # Start uvicorn with venv activated
     if [ ! -d "venv" ]; then
         print_error "$name: Virtual environment not found. Run setup-love-stack.sh first"
         cd - > /dev/null
@@ -125,24 +158,20 @@ start_api() {
     
     bash -c ". venv/bin/activate && uvicorn app.main:app --host 0.0.0.0 --port $port --reload" > "$log_file" 2>&1 &
     local pid=$!
-    
-    # Save PID
     echo "$pid $name" >> "$PID_FILE"
     
     cd - > /dev/null
     
-    # Wait for API to be ready
     if wait_for_url "http://localhost:$port/health" 10; then
         print_success "$name API ready: ${CYAN}http://localhost:$port/docs${NC}"
         return 0
     else
-        print_warning "$name API took longer than expected to start"
+        print_warning "$name API took longer than expected"
         print_info "Check logs: tail -f $log_file"
         return 1
     fi
 }
 
-# Function to start a worker
 start_worker() {
     local name=$1
     local dir="$SCRIPT_DIR/../$2"
@@ -151,291 +180,214 @@ start_worker() {
     
     print_info "Starting $name Worker..."
     
-    if [ ! -d "$dir" ]; then
-        print_error "Module directory not found: $dir"
-        return 1
-    fi
-    
+    if [ ! -d "$dir" ]; then return 1; fi
     cd "$dir"
+    if [ ! -d "venv" ]; then return 1; fi
     
-    if [ ! -d "venv" ]; then
-        print_error "$name: Virtual environment not found for worker."
-        cd - > /dev/null
-        return 1
-    fi
-    
-    # Start arq worker
     bash -c ". venv/bin/activate && arq $worker_class" > "$log_file" 2>&1 &
     local pid=$!
-    
-    # Save PID
     echo "$pid ${name}-Worker" >> "$PID_FILE"
-    
     print_success "$name Worker started"
-    
     cd - > /dev/null
 }
 
-# Kill existing processes first
-kill_existing_processes
+# ==========================================
+# Argument Parsing
+# ==========================================
 
-echo ""
-
-# Verify database is initialized
-print_header "🔍 Checking Database Status"
-
-DB_HOST="${DB_HOST:-localhost}"
-DB_PORT="${DB_PORT:-5432}"
-DB_NAME="${DB_NAME:-love_db}"
-DB_USER="${DB_USER:-love_user}"
-DB_PASSWORD="${DB_PASSWORD:-love_password}"
-
-print_info "Checking if database is initialized..."
-
-if ! command_exists psql; then
-    print_warning "PostgreSQL client not found, skipping database check"
-else
-    # Check if database exists and has required tables
-    if PGPASSWORD="$DB_PASSWORD" psql -h "$DB_HOST" -p "$DB_PORT" -U "$DB_USER" -lqt 2>/dev/null | cut -d \| -f 1 | grep -qw "$DB_NAME"; then
-        # Check for atlas_definitions table
-        if PGPASSWORD="$DB_PASSWORD" psql -h "$DB_HOST" -p "$DB_PORT" -U "$DB_USER" -d "$DB_NAME" -c "\dt atlas_definitions" 2>/dev/null | grep -q "atlas_definitions"; then
-            atlas_count=$(PGPASSWORD="$DB_PASSWORD" psql -h "$DB_HOST" -p "$DB_PORT" -U "$DB_USER" -d "$DB_NAME" -t -c "SELECT COUNT(*) FROM atlas_definitions;" 2>/dev/null | xargs)
-            
-            if [ "$atlas_count" -ge 87 ]; then
-                print_success "Database ready: $atlas_count emotions loaded"
-            else
-                print_warning "Database has only $atlas_count emotions (expected 87+)"
-                print_info "Run: cd infra && ./init-database.sh"
-            fi
-        else
-            print_error "Database exists but tables not created"
-            echo ""
-            print_info "Initialize the database first:"
-            echo "  cd infra && ./init-database.sh"
-            echo ""
-            
-            if ! prompt_yes_no "Start stack anyway? (Observer API may fail)"; then
-                print_info "Aborted by user"
-                exit 1
-            fi
-        fi
-    else
-        print_error "Database '$DB_NAME' does not exist"
-        echo ""
-        print_info "Initialize the database first:"
-        echo "  cd infra && ./init-database.sh"
-        echo ""
-        
-        if ! prompt_yes_no "Start stack anyway? (Observer API may fail)"; then
-            print_info "Aborted by user"
+while [[ $# -gt 0 ]]; do
+    case $1 in
+        -h|--help)
+            show_help
+            exit 0
+            ;;
+        --clean)
+            CLEAN_MODE=true
+            shift
+            ;;
+        --backend)
+            RUN_FRONTEND=false
+            shift
+            ;;
+        --frontend)
+            RUN_BACKEND=false
+            RUN_INFRA=false
+            RUN_DOCS=false
+            shift
+            ;;
+        --infra)
+            RUN_BACKEND=false
+            RUN_FRONTEND=false
+            RUN_DOCS=false
+            shift
+            ;;
+        --skip-infra)
+            SKIP_INFRA_CHECKS=true
+            shift
+            ;;
+        *)
+            print_error "Unknown argument: $1"
+            show_help
             exit 1
-        fi
-    fi
-fi
-
-echo ""
-
-# Start services
-print_header "📋 Starting Services"
-
-# PostgreSQL
-print_info "Checking PostgreSQL..."
-if check_service_running postgresql; then
-    print_success "PostgreSQL already running"
-else
-    print_info "Starting PostgreSQL..."
-    # Capture stderr to handle bootstrap errors gracefully
-    start_output=$(start_service postgresql 2>&1)
-    start_exit_code=$?
-    
-    # Check if it's a bootstrap error (service already registered)
-    if [ $start_exit_code -ne 0 ] && echo "$start_output" | grep -q "Bootstrap failed"; then
-        # Service might already be running despite the error
-        if check_service_running postgresql; then
-            print_success "PostgreSQL already running (service was already registered)"
-        else
-            print_error "Failed to start PostgreSQL"
-            print_info "Try: brew services restart postgresql@16"
-            print_info "Or run setup-love-stack.sh"
-        fi
-    elif [ $start_exit_code -eq 0 ]; then
-        if wait_for_service postgresql 30; then
-            print_success "PostgreSQL started"
-        else
-            print_warning "PostgreSQL may not be ready yet"
-        fi
-    else
-        print_error "Failed to start PostgreSQL"
-        print_info "Start it manually or run setup-love-stack.sh"
-    fi
-fi
-
-# Redis
-print_info "Checking Redis..."
-if check_service_running redis; then
-    print_success "Redis already running"
-else
-    print_info "Starting Redis..."
-    if start_service redis; then
-        if wait_for_service redis 30; then
-            print_success "Redis started"
-        else
-            print_warning "Redis may not be ready yet"
-        fi
-    else
-        print_error "Failed to start Redis"
-        print_info "Start it manually or run setup-love-stack.sh"
-    fi
-fi
-
-# Ollama
-print_info "Checking Ollama..."
-if check_service_running ollama; then
-    print_success "Ollama already running"
-else
-    print_info "Starting Ollama..."
-    if start_ollama; then
-        print_success "Ollama started"
-    else
-        print_warning "Ollama may not have started"
-        print_info "You can start it manually: ollama serve &"
-    fi
-fi
-
-echo ""
-
-# Start APIs
-print_header "🎯 Starting Backend APIs"
-start_api "Versor" "versor" 8001
-start_api "Observer" "observer" 8000
-start_api "Listener" "listener" 8002
-start_worker "Listener" "listener" "app.workers.audio_processor.WorkerSettings"
-
-echo ""
-
-# Start Documentation (MkDocs)
-print_header "📚 Starting Documentation"
-DOCS_LOG="$SCRIPT_DIR/logs/Documentation.log"
-DOCS_PORT=8003
-
-print_info "Starting MkDocs on port $DOCS_PORT..."
-
-# Check and run serve-docs.sh
-DOCS_SCRIPT="$SCRIPT_DIR/../docs/serve-docs.sh"
-
-if [ -f "$DOCS_SCRIPT" ]; then
-    # Run the existing serve script with custom port
-    bash "$DOCS_SCRIPT" --port $DOCS_PORT > "$DOCS_LOG" 2>&1 &
-    docs_pid=$!
-    echo "$docs_pid Documentation" >> "$PID_FILE"
-    
-    # Wait for docs to be ready (give it time to install deps if needed)
-    if wait_for_url "http://localhost:$DOCS_PORT" 20; then
-        print_success "Documentation ready: ${CYAN}http://localhost:$DOCS_PORT${NC}"
-    else
-        print_warning "Documentation starting slowly (installing dependencies?)"
-        print_info "Check logs: tail -f $DOCS_LOG"
-    fi
-else
-    print_warning "Docs script not found: $DOCS_SCRIPT"
-fi
-
-echo ""
-
-# Verify APIs are healthy before starting Experience
-print_header "🏥 Verifying API Health"
-ALL_HEALTHY=true
-
-for service in "Versor:8001" "Observer:8000" "Listener:8002"; do
-    name="${service%:*}"
-    port="${service#*:}"
-    if check_url_responding "http://localhost:$port/health"; then
-        print_success "$name healthy"
-    else
-        print_error "$name not healthy"
-        ALL_HEALTHY=false
-    fi
+            ;;
+    esac
 done
 
+# ==========================================
+# Execution Flow
+# ==========================================
+
+echo -e "${BLUE}${ROCKET} Starting L.O.V.E. Stack${NC}"
+
+# 1. Cleanup before start
+rm -f "$PID_FILE"
+kill_existing_processes
+trap cleanup SIGINT SIGTERM
+
 echo ""
 
-# Start Experience Web (only if APIs are healthy)
-if [ "$ALL_HEALTHY" = true ]; then
-    print_header "🎨 Starting Experience Web UI"
+# 2. Infrastructure (Postgres, Redis, Ollama, Database tables)
+if [ "$RUN_INFRA" = true ] && [ "$SKIP_INFRA_CHECKS" = false ]; then
+    print_header "🔍 Checking Database & Infrastructure"
+
+    DB_HOST="${DB_HOST:-localhost}"
+    DB_PORT="${DB_PORT:-5432}"
+    DB_NAME="${DB_NAME:-love_db}"
+    DB_USER="${DB_USER:-love_user}"
+    DB_PASSWORD="${DB_PASSWORD:-love_password}"
+
+    # Database Status Check
+    if command_exists psql; then
+        if PGPASSWORD="$DB_PASSWORD" psql -h "$DB_HOST" -p "$DB_PORT" -U "$DB_USER" -lqt 2>/dev/null | grep -qw "$DB_NAME"; then
+            # Check for data presence
+            atlas_count=$(PGPASSWORD="$DB_PASSWORD" psql -h "$DB_HOST" -p "$DB_PORT" -U "$DB_USER" -d "$DB_NAME" -t -c "SELECT COUNT(*) FROM atlas_definitions;" 2>/dev/null | xargs)
+            if [ -n "$atlas_count" ] && [ "$atlas_count" -ge 87 ]; then
+                print_success "Database ready: $atlas_count emotions loaded"
+            else
+                print_warning "Database low count: ${atlas_count:-0} (expected 87+). Run ./init-database.sh"
+            fi
+        else
+            print_warning "Database '$DB_NAME' not found or not accessible."
+            print_info "If this fails, run: cd infra && ./init-database.sh"
+        fi
+    fi
+    echo ""
+
+    print_header "📋 Infrastructure Services"
     
-    EXPERIENCE_DIR="$SCRIPT_DIR/../experience/web"
-    EXPERIENCE_LOG="$SCRIPT_DIR/logs/Experience-Web.log"
-    
-    if [ ! -d "$EXPERIENCE_DIR" ]; then
-        print_error "Experience web directory not found"
+    # Postgres
+    if check_service_running postgresql; then
+        print_success "PostgreSQL running"
     else
-        # Ensure dependencies are installed in monorepo root
+        print_info "Starting PostgreSQL..."
+        start_service postgresql >/dev/null 2>&1 || print_warning "Failed to start PostgreSQL (check manual logs)"
+    fi
+
+    # Redis
+    if check_service_running redis; then
+        print_success "Redis running"
+    else
+        start_service redis >/dev/null 2>&1 && print_success "Redis started" || print_warning "Failed to start Redis"
+    fi
+
+    # Ollama
+    if check_service_running ollama; then
+        print_success "Ollama running"
+    else
+        start_ollama && print_success "Ollama started" || print_warning "Failed to start Ollama"
+    fi
+    echo ""
+fi
+
+# 3. Backend APIs
+if [ "$RUN_BACKEND" = true ]; then
+    print_header "🎯 Starting Backend APIs"
+    start_api "Versor" "versor" 8001
+    start_api "Observer" "observer" 8000
+    start_api "Listener" "listener" 8002
+    start_worker "Listener" "listener" "app.workers.audio_processor.WorkerSettings"
+    echo ""
+fi
+
+# 4. Documentation
+if [ "$RUN_DOCS" = true ]; then
+    print_header "📚 Starting Documentation"
+    DOCS_PORT=8003
+    DOCS_LOG="$SCRIPT_DIR/logs/Documentation.log"
+    DOCS_SCRIPT="$SCRIPT_DIR/../docs/serve-docs.sh"
+    
+    if [ -f "$DOCS_SCRIPT" ]; then
+        bash "$DOCS_SCRIPT" --port $DOCS_PORT > "$DOCS_LOG" 2>&1 &
+        echo "$! Documentation" >> "$PID_FILE"
+        if wait_for_url "http://localhost:$DOCS_PORT" 20; then
+            print_success "Documentation: ${CYAN}http://localhost:$DOCS_PORT${NC}"
+        else
+            print_warning "Docs slow start. Check logs."
+        fi
+    fi
+    echo ""
+fi
+
+# 5. Experience Web (Frontend)
+if [ "$RUN_FRONTEND" = true ]; then
+    # Verify Backend health first (unless we skipped it, e.g. frontend-only mode)
+    # In frontend-only mode, we assume backend is running elsewhere, so we might want a quick check or just proceed.
+    # Let's verify health ONLY if we ran backend ourselves.
+    ALL_HEALTHY=true
+    if [ "$RUN_BACKEND" = true ]; then
+        print_header "🏥 Verifying Backend Health"
+        for p in 8000 8001 8002; do
+            if ! check_url_responding "http://localhost:$p/health"; then ALL_HEALTHY=false; fi
+        done
+        if [ "$ALL_HEALTHY" = true ]; then print_success "Backends healthy"; else print_warning "Some backends unstable"; fi
+        echo ""
+    fi
+
+    if [ "$ALL_HEALTHY" = true ]; then
+        print_header "🎨 Starting Experience Web UI"
+        EXPERIENCE_DIR="$SCRIPT_DIR/../experience/web"
         EXPERIENCE_ROOT="$SCRIPT_DIR/../experience"
-        if [ -d "$EXPERIENCE_ROOT" ]; then
-             if [ ! -d "$EXPERIENCE_ROOT/node_modules" ]; then
-                 print_info "Experience dependencies not found. Installing..."
-                 cd "$EXPERIENCE_ROOT"
-                 npm install || print_warning "npm install failed"
-                 cd - > /dev/null
-                 print_success "Experience dependencies installed"
-             fi
+        EXPERIENCE_LOG="$SCRIPT_DIR/logs/Experience-Web.log"
+
+        if [ "$CLEAN_MODE" = true ]; then
+            print_header "🧹 Cleaning Experience Context"
+            echo -e "${YELLOW}Removing node_modules, .next...${NC}"
+            rm -rf "$EXPERIENCE_DIR/node_modules" "$EXPERIENCE_DIR/.next" "$EXPERIENCE_DIR/package-lock.json"
+            
+            echo -e "${CYAN}Reinstalling dependencies...${NC}"
+            if [ -d "$EXPERIENCE_ROOT" ]; then
+                cd "$EXPERIENCE_ROOT" && npm install && cd - >/dev/null
+            fi
+            print_success "Context cleaned and reinstalled."
+            echo ""
+        fi
+
+        # Install if missing (automatic)
+        if [ -d "$EXPERIENCE_ROOT" ] && [ ! -d "$EXPERIENCE_ROOT/node_modules" ]; then
+             print_info "Installing dependencies..."
+             cd "$EXPERIENCE_ROOT" && npm install && cd - >/dev/null
         fi
 
         cd "$EXPERIENCE_DIR"
-        
-        # Start Next.js dev server in background
         npm run dev > "$EXPERIENCE_LOG" 2>&1 &
-        experience_pid=$!
-        
-        echo "$experience_pid Experience-Web" >> "$PID_FILE"
-        
-        cd - > /dev/null
-        
-        # Wait for Next.js to be ready
-        print_info "Waiting for Next.js to compile..."
+        echo "$! Experience-Web" >> "$PID_FILE"
+        cd - >/dev/null
+
+        print_info "Waiting for Next.js compilation..."
         sleep 5
-        
-        # Check if running on port 3000 or 3001
         if check_url_responding "http://localhost:3000"; then
-            print_success "Experience Web ready: ${CYAN}http://localhost:3000${NC}"
-        elif check_url_responding "http://localhost:3001"; then
-            print_success "Experience Web ready: ${CYAN}http://localhost:3001${NC}"
+            print_success "Experience Web: ${CYAN}http://localhost:3000${NC}"
         else
-            print_warning "Experience Web may still be starting"
-            print_info "Check logs: tail -f $EXPERIENCE_LOG"
+            print_warning "Web UI starting (check $EXPERIENCE_LOG)"
         fi
     fi
-else
-    print_warning "Skipping Experience Web - APIs not healthy"
-    print_info "Fix API issues and restart the stack"
 fi
 
 echo ""
-print_success "${ROCKET} L.O.V.E. Stack Running!"
+print_success "${ROCKET} Stack Active!"
 print_separator "=" 40
-echo ""
-echo -e "${BLUE}Backend APIs:${NC}"
-echo -e "  • Versor:   ${CYAN}http://localhost:8001/docs${NC}"
-echo -e "  • Observer: ${CYAN}http://localhost:8000/docs${NC}"
-echo -e "  • Listener: ${CYAN}http://localhost:8002/docs${NC}
-  • MkDocs:   ${CYAN}http://localhost:8003${NC}"
-echo ""
-echo -e "${BLUE}Frontend:${NC}"
-echo -e "  • Main Experience:  ${CYAN}http://localhost:3000${NC} (or :3001)"
-echo -e "  • Admin Interface:  ${CYAN}http://localhost:3000/admin/atlas${NC}"
-echo ""
-echo -e "${BLUE}Logs:${NC}"
-echo "  • Versor:     tail -f $SCRIPT_DIR/logs/Versor.log"
-echo "  • Observer:   tail -f $SCRIPT_DIR/logs/Observer.log"
-echo "  • Listener:   tail -f $SCRIPT_DIR/logs/Listener.log"
-echo "  • Listener:   tail -f $SCRIPT_DIR/logs/Listener.log
-  • Experience: tail -f $SCRIPT_DIR/logs/Experience-Web.log
-  • MkDocs:     tail -f $SCRIPT_DIR/logs/Documentation.log"
-echo ""
-echo -e "${YELLOW}Press Ctrl+C to stop all services...${NC}"
+echo -e "${YELLOW}Press Ctrl+C to stop all services.${NC}"
 echo ""
 
-# Wait for interrupt
-while true; do
-    sleep 1
-done
+# Wait loop
+while true; do sleep 1; done

@@ -59,42 +59,34 @@ def mock_httpx_client():
     client_mock.__aexit__.return_value = None
     return client_mock
 
+@pytest.fixture
+def mock_user():
+    user = MagicMock()
+    user.id = uuid4()
+    user.email = "test@example.com"
+    return user
+
 # -----------------------------------------------------------------------------
 # Tests: Connection & Authentication
 # -----------------------------------------------------------------------------
 
+# Removed test_chat_websocket_connect_guest as guest mode is disabled
+
 @pytest.mark.asyncio
-async def test_chat_websocket_connect_guest(mock_websocket):
+async def test_chat_websocket_auth_success(mock_websocket, mock_auth_session_local, mock_user):
+    # Pass mock_user directly to verify the flow with a valid user
     with patch("app.api.routes.chat_websocket.manager.connect", new_callable=AsyncMock) as mock_connect:
-        # Raise WebSocketDisconnect to exit the loop
-        mock_websocket.receive_json.side_effect = WebSocketDisconnect()
-        await chat_websocket(mock_websocket, "session_123")
-        mock_connect.assert_called_once_with("session_123", mock_websocket)
-
-@pytest.mark.asyncio
-async def test_chat_websocket_auth_success(mock_websocket, mock_auth_session_local):
-    token = "valid_token"
-    mock_websocket.query_params = {"token": token}
-    user_mock = MagicMock()
-    user_mock.id = uuid4()
-    
-    with patch("app.api.routes.chat_websocket.jwt.decode", return_value={"sub": "test@example.com"}), \
-         patch("app.api.routes.chat_websocket.AsyncSessionLocal", new=mock_auth_session_local), \
-         patch("app.api.routes.chat_websocket.manager.connect", new_callable=AsyncMock):
-        
-        mock_result = MagicMock()
-        mock_result.scalars().first.return_value = user_mock
-        mock_auth_session_local.return_value.__aenter__.return_value.execute.return_value = mock_result
         
         mock_websocket.receive_json.side_effect = WebSocketDisconnect()
-        await chat_websocket(mock_websocket, "session_auth")
+        await chat_websocket(mock_websocket, "session_auth", current_user=mock_user)
+        mock_connect.assert_called_once_with("session_auth", mock_websocket)
 
 @pytest.mark.asyncio
-async def test_chat_websocket_ping_pong(mock_websocket):
+async def test_chat_websocket_ping_pong(mock_websocket, mock_user):
     mock_websocket.receive_json.side_effect = [{"type": "ping"}, WebSocketDisconnect()]
     with patch("app.api.routes.chat_websocket.manager.send_message", new_callable=AsyncMock) as mock_send, \
          patch("app.api.routes.chat_websocket.manager.connect", new_callable=AsyncMock):
-        await chat_websocket(mock_websocket, "session_ping")
+        await chat_websocket(mock_websocket, "session_ping", current_user=mock_user)
         mock_send.assert_called_with("session_ping", {"type": "pong"})
 
 # -----------------------------------------------------------------------------

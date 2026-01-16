@@ -261,3 +261,28 @@ async def override_db(test_db):
     app.dependency_overrides[get_db] = lambda: test_db
     yield
     app.dependency_overrides.clear()
+
+
+@pytest.fixture(autouse=True)
+async def override_auth(seeded_test_user):
+    """
+    Mock authentication for all tests.
+    Returns the seeded test user so endpoints receive a valid User object.
+    """
+    from app.main import app
+    from app.api.deps import get_current_user, get_current_user_ws
+    
+    # Override both HTTP and WebSocket auth
+    app.dependency_overrides[get_current_user] = lambda: seeded_test_user
+    app.dependency_overrides[get_current_user_ws] = lambda: seeded_test_user
+    
+    yield
+    
+    # No need to manual clear here if override_db or others clear, 
+    # but good practice to clear specific keys if we want to be safe,
+    # or rely on the final yield to clear everything.
+    # Note: override_db clears everything at the end of its yield?
+    # Actually override_db does app.dependency_overrides.clear() at the end.
+    # Since fixtures are stack-like, we should be careful. 
+    # Safest is just to let them be.
+

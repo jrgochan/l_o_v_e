@@ -42,6 +42,7 @@ Example:
 
 from typing import List
 
+from pydantic import Field
 from pydantic_settings import BaseSettings
 
 
@@ -236,6 +237,12 @@ class Settings(BaseSettings):
     - No stack traces to clients
     - Optimized for speed
     """
+
+    # Security
+    SECRET_KEY: str = Field(
+        validation_alias="JWT_SECRET_KEY", default="dev-secret-key-change-in-production"
+    )
+    ALGORITHM: str = "HS256"
 
     class Config:
         """Pydantic settings configuration."""

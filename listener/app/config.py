@@ -44,6 +44,7 @@ See Also:
 """
 from typing import Literal
 
+from pydantic import Field
 from pydantic_settings import BaseSettings
 
 
@@ -122,6 +123,12 @@ class Settings(BaseSettings):
 
     # Logging
     LOG_LEVEL: str = "INFO"
+
+    # Security
+    SECRET_KEY: str = Field(
+        validation_alias="JWT_SECRET_KEY", default="dev-secret-key-change-in-production"
+    )
+    ALGORITHM: str = "HS256"
 
     # Worker Configuration
     ARQ_MAX_JOBS: int = 5

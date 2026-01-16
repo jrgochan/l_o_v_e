@@ -5,7 +5,7 @@ Common dependencies for API routes, including database sessions and authenticati
 
 from typing import Annotated
 
-from fastapi import Depends, HTTPException, status
+from fastapi import Depends, HTTPException, Query, WebSocketException, status
 from fastapi.security import OAuth2PasswordBearer
 from jose import JWTError, jwt
 from pydantic import ValidationError
@@ -90,3 +90,41 @@ async def get_current_admin(
             status_code=status.HTTP_403_FORBIDDEN, detail="The user doesn't have enough privileges"
         )
     return current_user
+
+
+async def get_current_user_ws(
+    token: Annotated[str, Query()],
+    db: Annotated[AsyncSession, Depends(get_db)],
+) -> User:
+    """Validate JWT token from query parameter for WebSockets."""
+    credentials_exception = WebSocketException(
+        code=status.WS_1008_POLICY_VIOLATION,
+        reason="Could not validate credentials",
+    )
+
+    # Dev Bypass for testing
+    if token == "dev-token-bypass":
+        stmt = select(User).where(User.email == "dev@admin.com")
+        result = await db.execute(stmt)
+        user = result.scalars().first()
+        if user:
+            return user
+        # Fallthrough to normal check if dev user not found (or handle creation if needed)
+
+    try:
+        payload = jwt.decode(token, settings.SECRET_KEY, algorithms=[settings.ALGORITHM])
+        email: str = payload.get("sub")
+        if email is None:
+            raise credentials_exception
+        token_data = TokenData(email=email)
+    except (JWTError, ValidationError):
+        raise credentials_exception
+
+    stmt = select(User).where(User.email == token_data.email)
+    result = await db.execute(stmt)
+    user = result.scalars().first()
+
+    if user is None:
+        raise credentials_exception
+
+    return user
