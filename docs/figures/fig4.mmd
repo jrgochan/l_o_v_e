@@ -1,0 +1,11 @@
+flowchart TD
+    Input["VAC Vector"] --> Norm["Normalize to Unit Sphere"]
+    Norm --> Quat["Convert to Quaternion<br/>(w, x, y, z)"]
+    Quat --> Diff{"Compare w/ Prev State"}
+    
+    Diff -->|SLERP| Interp["Interpolate Path"]
+    Diff -->|"Angle / Time"| Velocity["Calc Angular Velocity"]
+    
+    Velocity --> Check{"> Threshold?"}
+    Check -- Yes --> Flood["Trigger: FLOODING"]
+    Check -- No --> Output["Output: State + Path"]

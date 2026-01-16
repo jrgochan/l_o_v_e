@@ -1,0 +1,30 @@
+classDiagram
+    class AtlasDefinition {
+        +UUID id
+        +String emotion_name
+        +String category
+        +Text definition
+        +Vector3 vac_vector
+        +Vector4 q_constant
+        +Vector384 semantic_embedding
+        +String haptic_pattern_id
+        +String color_hint
+        +DateTime created_at
+        +DateTime updated_at
+    }
+    
+    class VACVector {
+        +float valence
+        +float arousal
+        +float connection
+    }
+    
+    class Quaternion {
+        +float w
+        +float x
+        +float y
+        +float z
+    }
+    
+    AtlasDefinition "1" *-- "1" VACVector : has
+    AtlasDefinition "1" *-- "1" Quaternion : has

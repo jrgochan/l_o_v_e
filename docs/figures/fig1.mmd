@@ -1,0 +1,11 @@
+graph TD
+    User["User Input<br/>(Audio/Text)"] --> Listener
+    subgraph "Local Privacy Layer"
+        Listener["Listener Module"]
+        Listener -->|Transcript| Semant["Semantic Analyzer"]
+        Semant -->|VAC Vector| Obs["Observer Module"]
+    end
+    Obs -->|State History| DB[("Vector DB<br/>Postgres+pgvector")]
+    Obs -->|Current VAC| Versor["Versor Engine"]
+    Versor -->|Quaternion| Exp["Experience Module"]
+    Exp -->|3D Visualization| Screen["User Display"]

@@ -1,0 +1,14 @@
+sequenceDiagram
+    participant U as "User"
+    participant W as "Whisper (Local)"
+    participant L as "LLM (Local/Ollama)"
+    participant S as "Scrubber (NER)"
+    participant O as "Observer"
+    
+    U->>W: "Speak/Audio"
+    W->>L: "Text Transcript"
+    L->>L: "Analyze Semantics"
+    Note right of L: "Extract Valence, Arousal, <br/>and CONNECTION"
+    L->>S: "Raw Data"
+    S->>S: "Remove PII (Names, Locs)"
+    S->>O: "Sanitized VAC Vector"
