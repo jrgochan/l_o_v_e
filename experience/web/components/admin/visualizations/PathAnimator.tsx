@@ -111,6 +111,8 @@ interface PathAnimationControlsProps {
   onReset: () => void;
 }
 
+import { useAdminTheme } from "@/hooks/admin/useAdminTheme";
+
 export function PathAnimationControls({
   isPlaying,
   speed,
@@ -120,30 +122,32 @@ export function PathAnimationControls({
   onSpeedChange,
   onReset,
 }: PathAnimationControlsProps) {
+  const theme = useAdminTheme();
+
   return (
-    <div className="bg-gray-800 rounded-lg p-4 space-y-3">
+    <div className={`${theme.colors.background} rounded-lg p-4 space-y-3 border ${theme.colors.border}`}>
       <div className="flex items-center justify-between">
-        <h3 className="text-sm font-semibold text-gray-400">Path Animation</h3>
-        <button onClick={onReset} className="text-xs text-gray-400 hover:text-gray-300">
+        <h3 className={`text-sm font-semibold ${theme.colors.secondary}`}>Path Animation</h3>
+        <button onClick={onReset} className={`text-xs ${theme.colors.text.secondary} hover:${theme.colors.text.primary}`}>
           Reset
         </button>
       </div>
 
       {/* Current Position */}
       <div>
-        <h4 className="text-xs text-gray-400 mb-1">Current Emotion</h4>
-        <p className="text-sm font-medium text-white">{currentEmotion}</p>
+        <h4 className={`text-xs ${theme.colors.text.secondary} mb-1`}>Current Emotion</h4>
+        <p className={`text-sm font-medium ${theme.colors.text.primary}`}>{currentEmotion}</p>
       </div>
 
       {/* Progress Bar */}
       <div>
-        <div className="flex justify-between text-xs text-gray-400 mb-1">
+        <div className={`flex justify-between text-xs ${theme.colors.text.secondary} mb-1`}>
           <span>Progress</span>
           <span>{(progress * 100).toFixed(0)}%</span>
         </div>
-        <div className="w-full bg-gray-700 rounded-full h-2">
+        <div className="w-full bg-gray-700/50 rounded-full h-2">
           <div
-            className="bg-cyan-500 h-2 rounded-full transition-all"
+            className={`h-2 rounded-full transition-all ${isPlaying ? 'bg-cyan-500' : 'bg-gray-500'}`}
             style={{ width: `${progress * 100}%` }}
           />
         </div>
@@ -153,7 +157,7 @@ export function PathAnimationControls({
       <div className="flex items-center gap-2">
         <button
           onClick={onPlayPause}
-          className="flex-1 px-3 py-2 bg-cyan-600 hover:bg-cyan-500 text-white text-sm rounded transition"
+          className={`flex-1 px-3 py-2 ${isPlaying ? 'bg-cyan-600 hover:bg-cyan-500' : 'bg-green-600 hover:bg-green-500'} text-white text-sm rounded transition`}
         >
           {isPlaying ? "⏸️ Pause" : "▶️ Play"}
         </button>
@@ -161,7 +165,7 @@ export function PathAnimationControls({
 
       {/* Speed Control */}
       <div>
-        <div className="flex justify-between text-xs text-gray-400 mb-1">
+        <div className={`flex justify-between text-xs ${theme.colors.text.secondary} mb-1`}>
           <span>Speed</span>
           <span>{speed}x</span>
         </div>

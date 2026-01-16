@@ -230,6 +230,7 @@ from fastapi import APIRouter, Depends, WebSocket, WebSocketDisconnect
 
 from app.api.deps import get_current_user_ws
 from app.config import settings
+from app.core.security import create_access_token
 from app.database import AsyncSessionLocal
 from app.models.user import User
 from app.services.chat_service import ChatService
@@ -472,11 +473,16 @@ async def process_text_message(
     await send_progress(session_id, "emotions", "in_progress", 20)
 
     try:
+        # Generate internal service token (propagating user identity)
+        token = create_access_token(data={"sub": user_identifier})
+        headers = {"Authorization": f"Bearer {token}"}
+
         async with httpx.AsyncClient(timeout=timeout) as client:
             # Send to Listener
             response = await client.post(
                 listener_url,
                 data={"text": content, "user_id": user_identifier, "session_id": session_id},
+                headers=headers,
             )
 
             if response.status_code == 200:
@@ -588,7 +594,7 @@ async def process_audio_message(
     try:
         audio_bytes = base64.b64decode(audio_data)
 
-        with tempfile.NamedTemporaryFile(delete=False, suffix=".wav") as temp_audio:
+        with tempfile.NamedTemporaryFile(delete=False, suffix=".webm") as temp_audio:
             temp_audio.write(audio_bytes)
             audio_path = temp_audio.name
 
@@ -614,75 +620,130 @@ async def process_audio_message(
             )
 
         # Route to appropriate Listener endpoint based on deep_feeling mode
+        extract_url = f"{settings.LISTENER_API_URL}/listener/extract-audio-features"
+        
         if deep_feeling_enabled:
-            listener_url = f"{settings.LISTENER_API_URL}/listener/analyze-audio-multi-emotion"
-            timeout = 120.0  # 2 minutes for multi-emotion audio processing
+            # For Deep Feeling, we'll do a 2-step process
+            # 1. Extract features (fast) -> Stream transcription
+            # 2. Analyze multi-emotion (slower) -> Stream analysis
+            listener_url = f"{settings.LISTENER_API_URL}/listener/analyze-multi-emotion"
+            timeout = 120.0
         else:
+            # For standard mode, we can use the same pattern or keep audio flow
+            # Let's standardize on the 2-step process for immediate feedback
+            listener_url = f"{settings.LISTENER_API_URL}/listener/analyze-multi-emotion" # Use standardized endpoint? 
+            # Actually, let's keep it simple. If deep feeling, we split. If not, we could also split?
+            # Standard analyze-audio does everything at once.
             listener_url = f"{settings.LISTENER_API_URL}/listener/analyze-audio"
-            timeout = 120.0  # 2 minutes for audio processing
+            timeout = 120.0
+
+        # Generate internal service token (propagating user identity)
+        token = create_access_token(data={"sub": user_identifier})
+        headers = {"Authorization": f"Bearer {token}"}
+
+        # Progress: Uploading audio
+        await send_progress(session_id, "uploading", "uploading_audio", 10)
 
         async with httpx.AsyncClient(timeout=timeout) as client:
             with open(audio_path, "rb") as audio_file:
-                files = {"audio": ("recording.wav", audio_file, "audio/wav")}
+                files = {"audio": ("recording.webm", audio_file, "audio/webm")}
                 data = {"user_id": user_identifier, "session_id": session_id}
 
-                # Upload and process synchronously
-                response = await client.post(listener_url, files=files, data=data)
+                # Step 1: Extract features (Fast)
+                # We need to re-open file or just assume separate requests?
+                # Listener needs file upload for extraction.
+                
+                # Check if we should split pipeline (for granular feedback)
+                # Ideally we always want granular feedback.
+                
+                logger.info("Calling extract-audio-features for immediate feedback")
+                response = await client.post(extract_url, files=files, data=data, headers=headers)
+                
+                if response.status_code != 200:
+                     logger.error(f"Feature extraction failed: {response.text}")
+                     raise RuntimeError(f"Feature extraction failed: {response.status_code}")
 
-                if response.status_code == 200:
-                    result = response.json()
+                # Process extraction results immediately
+                result = response.json()
+                transcription = result.get("transcription")
+                prosody_data = result.get("prosody")
+                
+                if transcription:
+                    await manager.send_message(
+                        session_id, {"type": "transcription", "text": transcription}
+                    )
+                    transcription_time = int((time.time() - overall_start) * 1000)
+                    await send_progress(
+                        session_id, "transcription", "complete", 70, transcription_time
+                    )
+                
+                if prosody_data:
+                    await manager.send_message(
+                        session_id, {"type": "prosody", "data": prosody_data}
+                    )
+                    prosody_time = int((time.time() - overall_start) * 1000)
+                    await send_progress(session_id, "prosody", "complete", 80, prosody_time)
+                
+                # Step 2: Semantic Analysis (Heavy)
+                # Now we send the text and prosody to the analysis endpoint
+                # We don't need to re-upload audio!
+                
+                # Progress: Starting semantic analysis
+                await send_progress(session_id, "emotions", "in_progress", 90)
 
-                    # Stream transcription
-                    transcription = result.get("transcription")
-                    if transcription:
-                        await manager.send_message(
-                            session_id, {"type": "transcription", "text": transcription}
-                        )
-
-                        # Progress: Transcription complete
-                        transcription_time = int((time.time() - overall_start) * 1000)
-                        await send_progress(
-                            session_id, "transcription", "complete", 20, transcription_time
-                        )
-
-                    # Stream prosody data
-                    prosody_data = result.get("prosody")
-                    if prosody_data:
-                        await manager.send_message(
-                            session_id, {"type": "prosody", "data": prosody_data}
-                        )
-
-                        # Progress: Prosody complete
-                        prosody_time = int((time.time() - overall_start) * 1000)
-                        await send_progress(session_id, "prosody", "complete", 35, prosody_time)
-
-                    # Progress: Emotion detection started
-                    await send_progress(session_id, "emotions", "in_progress", 40)
-
-                    # Handle response based on mode
-                    if deep_feeling_enabled:
-                        # Multi-emotion response
+                # Prepare payload for step 2
+                import json
+                analyze_data = {
+                    "text": transcription,
+                    "user_id": user_identifier,
+                    "session_id": session_id,
+                    "prosody_data_json": json.dumps(prosody_data) if prosody_data else None
+                }
+                
+                # Call appropriate analysis endpoint
+                if deep_feeling_enabled:
+                     # Multi-emotion (2-step completed)
+                     analyze_response = await client.post(
+                        f"{settings.LISTENER_API_URL}/listener/analyze-multi-emotion",
+                        data=analyze_data,
+                        headers=headers
+                     )
+                     
+                     if analyze_response.status_code == 200:
+                        final_result = analyze_response.json()
                         await handle_multi_emotion_result(
                             session_id=session_id,
                             db_session_id=db_session_id,
                             user_msg_id=user_msg.id,
-                            analysis_result=result,
+                            analysis_result=final_result,
                             tone_preference=tone_preference,
                             websocket=websocket,
                         )
-                    else:
-                        # Single emotion response
+                     else:
+                        raise RuntimeError(f"Multi-emotion analysis failed: {analyze_response.status_code}")
+
+                else:
+                    # Standard analysis (text-based)
+                    # We use /analyze endpoint which takes text
+                    analyze_response = await client.post(
+                        f"{settings.LISTENER_API_URL}/listener/analyze",
+                        data={"text": transcription, "user_id": user_identifier, "session_id": session_id},
+                        headers=headers
+                    )
+                    
+                    if analyze_response.status_code == 200:
+                        final_result = analyze_response.json()
+                        # Pass prosody data manually since /analyze doesn't return it
                         await handle_single_emotion_result(
                             session_id=session_id,
                             db_session_id=db_session_id,
-                            analysis_result=result,
+                            analysis_result=final_result,
                             tone_preference=tone_preference,
                             websocket=websocket,
                             prosody_data=prosody_data,
                         )
-                else:
-                    logger.error(f"Listener audio processing error: {response.text}")
-                    raise RuntimeError(f"Listener audio analysis failed: {response.status_code}")
+                    else:
+                        raise RuntimeError(f"Analysis failed: {analyze_response.status_code}")
 
     except Exception as e:
         import traceback

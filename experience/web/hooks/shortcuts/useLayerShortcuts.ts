@@ -15,7 +15,7 @@ export function useLayerShortcuts() {
       const action = actions[e.key.toLowerCase()];
 
       if (action) {
-        action();
+        action(e);
       }
     },
     [getActions, shouldExecuteShortcut]

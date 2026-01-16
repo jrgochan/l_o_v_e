@@ -42,13 +42,18 @@ export function getEmotionAnimationParams(
   const [valence, arousal, connection] = vac;
 
   // Base parameters modified by mode
-  const modeMultipliers = {
+  // Using explicit type declaration to enforce consistency with PathAnimationMode
+  const modeMultipliers: Record<string, { breathingMult: number; speedMult: number; amplitudeMult: number }> = {
     subtle: { breathingMult: 1.0, speedMult: 0.5, amplitudeMult: 0.7 },
     dynamic: { breathingMult: 0.5, speedMult: 1.5, amplitudeMult: 1.3 },
     mystical: { breathingMult: 0.7, speedMult: 1.0, amplitudeMult: 1.0 },
+    crystalline: { breathingMult: 0.0, speedMult: 0.1, amplitudeMult: 0.0 }, // Static
+    luminous: { breathingMult: 2.0, speedMult: 0.0, amplitudeMult: 0.2 }, // Fast pulse, no rotation
+    liquid: { breathingMult: 0.8, speedMult: 0.3, amplitudeMult: 1.5 }, // Slow, deep shape change
+    glitch: { breathingMult: 10.0, speedMult: 0.0, amplitudeMult: 0.1 }, // Strobe flicker
   };
 
-  const mult = modeMultipliers[mode];
+  const mult = modeMultipliers[mode] || modeMultipliers.subtle; // Fallback to subtle
 
   // 1. BREATHING RATE from AROUSAL
   // High arousal = faster breathing (agitated, activated)

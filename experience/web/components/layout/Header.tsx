@@ -7,6 +7,8 @@ import { AuthModal } from "@/components/auth/AuthModal";
 import { Settings } from "@/components/Settings";
 import { UserRole } from "@/types/auth";
 
+import { useAdminTheme } from "@/hooks/admin/useAdminTheme";
+
 interface HeaderProps {
   showAuth?: boolean;
 }
@@ -16,6 +18,7 @@ export function Header({ showAuth = true }: HeaderProps) {
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const profileRef = useRef<HTMLDivElement>(null);
+  const theme = useAdminTheme();
 
   // Close profile dropdown when clicking outside
   useEffect(() => {
@@ -34,27 +37,27 @@ export function Header({ showAuth = true }: HeaderProps) {
         <div className="relative" ref={profileRef}>
           <button
             onClick={() => setIsProfileOpen(!isProfileOpen)}
-            className="flex items-center gap-2 px-3 py-2 bg-gray-900/80 hover:bg-gray-800 border border-gray-700/50 rounded-full transition-colors backdrop-blur-sm group"
+            className={`flex items-center gap-2 px-3 py-2 border rounded-full transition-colors backdrop-blur-sm group ${theme.colors.border} ${theme.colors.background}`}
           >
-            <div className="w-6 h-6 rounded-full bg-cyan-900 flex items-center justify-center text-xs text-cyan-200 border border-cyan-700">
+            <div className={`w-6 h-6 rounded-full flex items-center justify-center text-xs border ${theme.colors.primary} ${theme.colors.border}`}>
               {user.full_name ? user.full_name[0].toUpperCase() : user.email[0].toUpperCase()}
             </div>
-            <span className="text-sm text-gray-300 group-hover:text-white max-w-[100px] truncate hidden sm:block">
+            <span className={`text-sm max-w-[100px] truncate hidden sm:block ${theme.colors.text.secondary} group-hover:${theme.colors.text.primary}`}>
               {user.full_name || user.email.split("@")[0]}
             </span>
           </button>
 
           {isProfileOpen && (
-            <div className="absolute right-0 mt-2 w-48 bg-gray-900 border border-gray-700 rounded-lg shadow-xl overflow-hidden py-1">
-              <div className="px-4 py-2 border-b border-gray-800">
-                <p className="text-xs text-gray-500">Signed in as</p>
-                <p className="text-sm text-white truncate">{user.email}</p>
+            <div className={`absolute right-0 mt-2 w-48 border rounded-lg shadow-xl overflow-hidden py-1 ${theme.colors.background} ${theme.colors.border}`}>
+              <div className={`px-4 py-2 border-b ${theme.colors.border}`}>
+                <p className={`text-xs ${theme.colors.text.muted}`}>Signed in as</p>
+                <p className={`text-sm truncate ${theme.colors.text.primary}`}>{user.email}</p>
               </div>
 
               {user.role === UserRole.ADMIN && (
                 <Link
                   href="/admin/atlas"
-                  className="block px-4 py-2 text-sm text-cyan-400 hover:bg-gray-800 hover:text-cyan-300"
+                  className={`block px-4 py-2 text-sm hover:bg-white/10 ${theme.colors.primary}`}
                   onClick={() => setIsProfileOpen(false)}
                 >
                   ⚡ Admin Dashboard
@@ -63,7 +66,7 @@ export function Header({ showAuth = true }: HeaderProps) {
 
               <Link
                 href="/users/profile"
-                className="block px-4 py-2 text-sm text-gray-300 hover:bg-gray-800 hover:text-white"
+                className={`block px-4 py-2 text-sm hover:bg-white/10 ${theme.colors.text.secondary} hover:${theme.colors.text.primary}`}
                 onClick={() => setIsProfileOpen(false)}
               >
                 👤 Profile
@@ -74,7 +77,7 @@ export function Header({ showAuth = true }: HeaderProps) {
                   logout();
                   setIsProfileOpen(false);
                 }}
-                className="w-full text-left px-4 py-2 text-sm text-red-400 hover:bg-gray-800 hover:text-red-300"
+                className="w-full text-left px-4 py-2 text-sm text-red-400 hover:bg-white/10 hover:text-red-300"
               >
                 🚪 Sign out
               </button>
@@ -84,14 +87,14 @@ export function Header({ showAuth = true }: HeaderProps) {
       ) : showAuth ? (
         <button
           onClick={() => setIsAuthModalOpen(true)}
-          className="px-4 py-2 bg-cyan-600/90 hover:bg-cyan-500 text-white text-sm font-medium rounded-full shadow-lg backdrop-blur-sm transition-all"
+          className={`px-4 py-2 text-sm font-medium rounded-full shadow-lg backdrop-blur-sm transition-all ${theme.colors.primary} ${theme.effects.glass}`}
         >
           Sign In
         </button>
       ) : null}
 
       {/* Settings Component (existing) - styled as icon button */}
-      <div className="bg-gray-900/80 hover:bg-gray-800 border border-gray-700/50 rounded-full backdrop-blur-sm flex items-center justify-center w-10 h-10 transition-colors">
+      <div className={`border rounded-full backdrop-blur-sm flex items-center justify-center w-10 h-10 transition-colors ${theme.colors.background} ${theme.colors.border} hover:bg-white/10`}>
         <Settings />
       </div>
 

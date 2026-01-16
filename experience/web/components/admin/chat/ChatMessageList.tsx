@@ -13,6 +13,7 @@ import { AnalysisProgressIndicator } from "../shared/AnalysisProgressIndicator";
 import type { DisplayMessage } from "@/hooks/chat/useChatMessages";
 import type { ToneMode, ProgressStage, DetectedEmotion } from "@/types/chat";
 import { logger } from "@/utils/logger";
+import { useAdminTheme } from "@/hooks/admin/useAdminTheme";
 
 interface ChatMessageListProps {
   messages: DisplayMessage[];
@@ -38,10 +39,11 @@ export function ChatMessageList({
   messagesEndRef,
   onEmotionClick,
 }: ChatMessageListProps) {
+  const theme = useAdminTheme();
   return (
     <div className="flex-1 overflow-y-auto space-y-3">
       {messages.length === 0 && (
-        <div className="text-center text-gray-400 py-8">
+        <div className={`text-center py-8 ${theme.colors.text.muted}`}>
           <p className="text-lg mb-2">👋 How are you feeling?</p>
           <p className="text-sm">Type or record a message to start</p>
         </div>
@@ -65,13 +67,12 @@ export function ChatMessageList({
             </div>
           ) : (
             <div
-              className={`max-w-[70%] rounded-lg px-4 py-3 ${
-                msg.type === "user"
+              className={`max-w-[70%] rounded-lg px-4 py-3 ${msg.type === "user"
                   ? "bg-cyan-600 text-white"
                   : msg.type === "analysis" || msg.type === "multi_emotion"
-                    ? "bg-purple-900/50 border border-purple-500/30 text-white"
-                    : "bg-gray-700 text-gray-200"
-              }`}
+                    ? `bg-purple-900/50 border border-purple-500/30 text-white`
+                    : `bg-white/5 ${theme.colors.text.secondary} border ${theme.colors.border}`
+                }`}
             >
               {/* Message Content */}
               <div className="text-sm whitespace-pre-wrap">{msg.content}</div>

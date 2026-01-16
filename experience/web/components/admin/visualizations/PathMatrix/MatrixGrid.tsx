@@ -34,6 +34,11 @@ interface MatrixGridProps {
 /**
  * Renders the matrix grid (emotions or categories)
  */
+import { useAdminTheme } from "@/hooks/admin/useAdminTheme";
+
+/**
+ * Renders the matrix grid (emotions or categories)
+ */
 export function MatrixGrid({
   viewMode,
   sortedEmotions,
@@ -47,20 +52,22 @@ export function MatrixGrid({
   onLeaveCell,
   onCellClick,
 }: MatrixGridProps) {
+  const theme = useAdminTheme();
+
   if (viewMode === "categories") {
     // Category View (13×13)
     return (
       <div className="inline-block">
         {/* Header Row - Category Names */}
         <div className="flex">
-          <div className="w-48 h-12 flex-shrink-0 sticky left-0 bg-gray-900 z-20" />
+          <div className={`w-48 h-12 flex-shrink-0 sticky left-0 ${theme.colors.background} z-20`} />
           {categories.map((category) => (
             <div
               key={category}
-              className="w-16 h-12 flex-shrink-0 sticky top-0 bg-gray-900 z-10 flex items-center justify-center"
+              className={`w-16 h-12 flex-shrink-0 sticky top-0 ${theme.colors.background} z-10 flex items-center justify-center`}
               style={{ writingMode: "vertical-rl" }}
             >
-              <span className="text-xs text-gray-400 truncate">{category}</span>
+              <span className={`text-xs ${theme.colors.text.secondary} truncate`}>{category}</span>
             </div>
           ))}
         </div>
@@ -69,8 +76,8 @@ export function MatrixGrid({
         {categories.map((fromCategory) => (
           <div key={fromCategory} className="flex">
             {/* Row Header */}
-            <div className="w-48 h-16 flex-shrink-0 sticky left-0 bg-gray-900 z-10 flex items-center px-3 border-r border-gray-700">
-              <span className="text-sm text-gray-300 truncate">{fromCategory}</span>
+            <div className={`w-48 h-16 flex-shrink-0 sticky left-0 ${theme.colors.background} z-10 flex items-center px-3 border-r ${theme.colors.border}`}>
+              <span className={`text-sm ${theme.colors.text.primary} truncate`}>{fromCategory}</span>
             </div>
 
             {/* Cells */}
@@ -83,9 +90,8 @@ export function MatrixGrid({
               return (
                 <div
                   key={toCategory}
-                  className={`w-16 h-16 flex-shrink-0 border border-gray-800 cursor-pointer transition-all flex items-center justify-center ${
-                    isHovered ? "ring-2 ring-cyan-400 z-30 scale-110 shadow-xl" : ""
-                  }`}
+                  className={`w-16 h-16 flex-shrink-0 border ${theme.colors.border} cursor-pointer transition-all flex items-center justify-center ${isHovered ? "ring-2 ring-cyan-400 z-30 scale-110 shadow-xl" : ""
+                    }`}
                   style={{
                     backgroundColor: getCategoryCellColor(fromCategory, toCategory),
                   }}
@@ -100,7 +106,7 @@ export function MatrixGrid({
                   }
                 >
                   {stats && !isSelf && (
-                    <span className="text-[10px] text-white font-mono opacity-70 font-semibold">
+                    <span className="text-[10px] text-white font-mono opacity-70 font-semibold" style={{ textShadow: "0 1px 2px rgba(0,0,0,0.8)" }}>
                       {stats.avgDistance.toFixed(1)}
                     </span>
                   )}
@@ -118,14 +124,14 @@ export function MatrixGrid({
     <div className="inline-block">
       {/* Header Row - Emotion Names (To) */}
       <div className="flex">
-        <div className="w-32 h-8 flex-shrink-0 sticky left-0 bg-gray-900 z-20" />
+        <div className={`w-32 h-8 flex-shrink-0 sticky left-0 ${theme.colors.background} z-20`} />
         {sortedEmotions.map((emotion) => (
           <div
             key={emotion.id}
-            className="w-8 h-8 flex-shrink-0 sticky top-0 bg-gray-900 z-10"
+            className={`w-8 h-8 flex-shrink-0 sticky top-0 ${theme.colors.background} z-10`}
             style={{ writingMode: "vertical-rl" }}
           >
-            <span className="text-[10px] text-gray-400 truncate">{emotion.name}</span>
+            <span className={`text-[10px] ${theme.colors.text.secondary} truncate`}>{emotion.name}</span>
           </div>
         ))}
       </div>
@@ -134,8 +140,8 @@ export function MatrixGrid({
       {sortedEmotions.map((fromEmotion) => (
         <div key={fromEmotion.id} className="flex">
           {/* Row Header - Emotion Name (From) */}
-          <div className="w-32 h-8 flex-shrink-0 sticky left-0 bg-gray-900 z-10 flex items-center px-2 border-r border-gray-700">
-            <span className="text-[10px] text-gray-300 truncate">{fromEmotion.name}</span>
+          <div className={`w-32 h-8 flex-shrink-0 sticky left-0 ${theme.colors.background} z-10 flex items-center px-2 border-r ${theme.colors.border}`}>
+            <span className={`text-[10px] ${theme.colors.text.secondary} truncate`}>{fromEmotion.name}</span>
           </div>
 
           {/* Cells */}
@@ -148,9 +154,8 @@ export function MatrixGrid({
             return (
               <div
                 key={toEmotion.id}
-                className={`w-8 h-8 flex-shrink-0 border border-gray-800 cursor-pointer transition-all ${
-                  isHovered ? "ring-2 ring-cyan-400 z-30 scale-125 shadow-xl" : "hover:scale-105"
-                }`}
+                className={`w-8 h-8 flex-shrink-0 border ${theme.colors.border} cursor-pointer transition-all ${isHovered ? "ring-2 ring-cyan-400 z-30 scale-125 shadow-xl" : "hover:scale-105"
+                  }`}
                 style={{
                   backgroundColor: getCellColor(fromEmotion, toEmotion),
                 }}

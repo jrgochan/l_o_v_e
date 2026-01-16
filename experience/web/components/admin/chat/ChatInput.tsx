@@ -1,5 +1,6 @@
 import { VoiceRecorder } from "../shared/VoiceRecorder";
 import { useState } from "react";
+import { useAdminTheme } from "@/hooks/admin/useAdminTheme";
 
 interface ChatInputProps {
   inputText: string;
@@ -18,10 +19,11 @@ export function ChatInput({
   isConnected,
   isProcessing,
 }: ChatInputProps) {
+  const theme = useAdminTheme();
   const [showVoiceRecorder, setShowVoiceRecorder] = useState(false);
 
   return (
-    <div className="border-t border-gray-700 p-4 bg-gray-900">
+    <div className={`p-4 border-t ${theme.colors.border} ${theme.colors.background}`}>
       <div className="flex items-center gap-2 max-w-6xl mx-auto">
         <input
           type="text"
@@ -30,7 +32,7 @@ export function ChatInput({
           onKeyPress={(e) => e.key === "Enter" && onSend()}
           placeholder="How are you feeling?"
           disabled={!isConnected}
-          className="flex-1 px-4 py-3 bg-gray-800 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-cyan-500 disabled:opacity-50"
+          className={`flex-1 px-4 py-3 bg-white/5 border ${theme.colors.border} rounded-lg ${theme.colors.text.primary} placeholder-gray-400 focus:outline-none focus:border-cyan-500 disabled:opacity-50`}
         />
 
         <button

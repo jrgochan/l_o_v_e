@@ -287,9 +287,85 @@ async def analyze_text(
         raise HTTPException(status_code=500, detail=f"Analysis failed: {e}")
 
 
+@router.post("/extract-audio-features")
+async def extract_audio_features(
+    audio: UploadFile = File(...),
+    user_id: str = Form("admin"),  # pylint: disable=unused-argument
+    session_id: str = Form("chat-session"),  # pylint: disable=unused-argument
+    current_user: dict[str, Any] = Depends(get_current_user),  # pylint: disable=unused-argument
+) -> Dict[str, Any]:
+    """Extract audio features (transcription + prosody) without full analysis.
+
+    Fast endpoint for getting immediate feedback (transcription) to the user.
+    Returns text and prosody data that can be passed to analyze-multi-emotion.
+
+    Args:
+        audio: Audio file
+        user_id: User identifier
+        session_id: Session identifier
+
+    Returns:
+        JSON with transcription and prosody data
+    """
+    import time
+
+    from app.services.prosody_analyzer import get_prosody_analyzer
+    from app.services.transcription import get_transcription_service
+
+    start_time = time.time()
+
+    # Save audio file temporarily
+    filename = audio.filename or "unknown.wav"
+    file_extension = os.path.splitext(filename)[1]
+    unique_filename = f"{uuid.uuid4()}{file_extension}"
+    audio_path = os.path.join(tempfile.gettempdir(), unique_filename)
+
+    try:
+        # Save uploaded file
+        async with aiofiles.open(audio_path, "wb") as f:
+            content = await audio.read()
+            await f.write(content)
+
+        logger.info(
+            f"Extracting audio features: {audio_path} ({len(content)} bytes)"
+        )
+
+        # Step 1: Transcription
+        transcription_service = get_transcription_service()
+        transcription = transcription_service.transcribe(audio_path)
+        input_text = transcription.text
+
+        logger.info(f"Transcription: {input_text}")
+
+        # Step 2: Prosody Analysis
+        prosody_analyzer = get_prosody_analyzer()
+        prosody_data = prosody_analyzer.analyze(audio_path)
+
+        processing_time = time.time() - start_time
+
+        return {
+            "status": "success",
+            "transcription": input_text,
+            "prosody": prosody_data,
+            "processing_time_seconds": processing_time,
+        }
+
+    except Exception as e:
+        logger.error(f"Feature extraction failed: {e}", exc_info=True)
+        raise HTTPException(
+            status_code=500, detail=f"Feature extraction failed: {str(e)}"
+        )
+
+    finally:
+        # Cleanup temp file
+        if os.path.exists(audio_path):
+            os.remove(audio_path)
+
+
 @router.post("/analyze-multi-emotion")
 async def analyze_multi_emotion(
     text: str = Form(...),
+    prosody_data_json: Optional[str] = Form(None),
     user_id: Optional[str] = Form("demo-user"),
     session_id: Optional[str] = Form("demo-session"),
     current_user: dict[str, Any] = Depends(get_current_user),  # pylint: disable=unused-argument
@@ -297,15 +373,18 @@ async def analyze_multi_emotion(
     """Synchronous multi-emotion analysis endpoint (Deep Feeling mode).
 
     Detects up to 3 concurrent emotions with relationships and aggregate state.
+    Can optionally include prosody data for 3-way analysis.
 
     Args:
         text: Text to analyze
+        prosody_data_json: Optional JSON string of prosody data (pitch, energy, etc.)
         user_id: User identifier
         session_id: Session identifier
 
     Returns:
         Multi-emotion analysis with emotions, relationships, and aggregate state
     """
+    import json
     import time
 
     from app.services.multi_emotion_analyzer import get_multi_emotion_analyzer
@@ -314,9 +393,77 @@ async def analyze_multi_emotion(
     start_time = time.time()
 
     try:
+        # Parse prosody data if provided
+        prosody_data = None
+        if prosody_data_json:
+            try:
+                prosody_data = json.loads(prosody_data_json)
+            except json.JSONDecodeError:
+                logger.warning("Failed to parse prosody_data_json")
+
         # Analyze with multi-emotion engine
         analyzer = get_multi_emotion_analyzer()
-        multi_analysis = await analyzer.analyze(text)
+
+        if prosody_data:
+            # Run 3-way analysis if prosody is available
+            three_way_result = await analyzer.analyze_three_way(text, prosody_data)
+            
+            # Use blended result as the primary for standard fields
+            multi_analysis = three_way_result["blended"]
+            
+            # Helper for response formatting
+            def to_dict(analysis: Any) -> Dict[str, Any]:
+                return {
+                    "emotions": [
+                        {
+                            "emotion_name": e.emotion_name,
+                            "category": e.category,
+                            "vac": {
+                                "valence": e.vac.valence,
+                                "arousal": e.vac.arousal,
+                                "connection": e.vac.connection,
+                            },
+                            "confidence": e.confidence,
+                            "prominence": e.prominence,
+                        }
+                        for e in analysis.emotions
+                    ],
+                    "relationships": [
+                        {
+                            "emotion_a": r.emotion_a,
+                            "emotion_b": r.emotion_b,
+                            "type": r.type,
+                            "strength": r.strength,
+                            "description": r.description,
+                        }
+                        for r in analysis.relationships
+                    ],
+                    "aggregate_vac": {
+                        "valence": analysis.aggregate_vac.valence,
+                        "arousal": analysis.aggregate_vac.arousal,
+                        "connection": analysis.aggregate_vac.connection,
+                    },
+                    "complexity_score": analysis.complexity_score,
+                    "emotional_clarity": analysis.emotional_clarity,
+                    "temporal_pattern": analysis.temporal_pattern,
+                    "reasoning": analysis.reasoning,
+                }
+                
+            # Extra data for 3-way
+            extra_response_data = {
+                "three_way_analysis": {
+                    "content_only": to_dict(three_way_result["content_only"]),
+                    "voice_only": to_dict(three_way_result["voice_only"]) if three_way_result["voice_only"] else None,
+                    "blended": to_dict(three_way_result["blended"]),
+                    "discrepancy": three_way_result["discrepancy"],
+                },
+                "prosody": prosody_data
+            }
+            
+        else:
+            # Standard text-only analysis
+            multi_analysis = await analyzer.analyze(text)
+            extra_response_data = {}
 
         # Scrub PII
         scrubber = get_pii_scrubber()
@@ -357,8 +504,8 @@ async def analyze_multi_emotion(
             for r in multi_analysis.relationships
         ]
 
-        # Return complete multi-emotion analysis
-        return {
+        # Base response
+        response = {
             "user_id": user_id,
             "session_id": session_id,
             "transcription": text,
@@ -375,6 +522,11 @@ async def analyze_multi_emotion(
             "reasoning": multi_analysis.reasoning,
             "processing_time_ms": processing_time_ms,
         }
+        
+        # Add 3-way data if available
+        response.update(extra_response_data)
+        
+        return response
 
     except Exception as e:
         logger.error(f"Multi-emotion analysis failed: {e}", exc_info=True)

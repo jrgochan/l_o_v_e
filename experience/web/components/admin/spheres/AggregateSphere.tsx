@@ -15,6 +15,7 @@ import { useEffect, useRef } from "react";
 import * as THREE from "three";
 import { blendColors, getColorFromValence } from "./BaseSphere";
 import type { DetectedEmotion, AggregateState } from "@/types/chat";
+import type { PathAnimationMode } from "@/types/atlas-admin";
 
 interface AggregateSphereProps {
   emotions: DetectedEmotion[];
@@ -22,7 +23,7 @@ interface AggregateSphereProps {
   width?: number;
   height?: number;
   className?: string;
-  mode?: "subtle" | "dynamic" | "mystical";
+  mode?: PathAnimationMode;
 }
 
 export function AggregateSphere({
@@ -100,12 +101,16 @@ export function AggregateSphere({
     particlesRef.current = particles;
 
     // Mode-based animation parameters
-    const modeParams = {
+    const modeParams: Record<string, { rotationSpeed: number; swirlMult: number }> = {
       subtle: { rotationSpeed: 0.001, swirlMult: 1.0 },
       dynamic: { rotationSpeed: 0.003, swirlMult: 2.0 },
       mystical: { rotationSpeed: 0.002, swirlMult: 1.5 },
+      crystalline: { rotationSpeed: 0.0005, swirlMult: 0.5 },
+      luminous: { rotationSpeed: 0.004, swirlMult: 2.5 },
+      liquid: { rotationSpeed: 0.002, swirlMult: 1.2 },
+      glitch: { rotationSpeed: 0.01, swirlMult: 5.0 },
     };
-    const params = modeParams[mode];
+    const params = modeParams[mode] || modeParams["subtle"];
 
     // Animation loop
     const animate = () => {

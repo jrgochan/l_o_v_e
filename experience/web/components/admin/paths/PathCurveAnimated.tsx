@@ -11,6 +11,7 @@ import type { PathAnimationMode } from "@/types/atlas-admin";
 import { SubtleElegantPath } from "./SubtleElegantPath";
 import { DynamicPlayfulPath } from "./DynamicPlayfulPath";
 import { MysticalEtherealPath } from "./MysticalEtherealPath";
+import { AdvancedPath } from "./AdvancedPath";
 
 interface PathCurveAnimatedProps {
   mode: PathAnimationMode;
@@ -43,6 +44,12 @@ export function PathCurveAnimated({
 
     case "mystical":
       return <MysticalEtherealPath {...sharedProps} />;
+
+    case "crystalline":
+    case "luminous":
+    case "liquid":
+    case "glitch":
+      return <AdvancedPath mode={mode} {...sharedProps} />;
 
     default:
       // Fallback to subtle if unknown mode

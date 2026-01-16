@@ -21,6 +21,7 @@ import type {
 import { useEmotionNavigation } from "@/hooks/useEmotionNavigation";
 import { ClinicalDashboard } from "../ClinicalDashboard";
 import { MultiEmotionCard } from "../emotion-display/MultiEmotionCard";
+import { useAdminTheme } from "@/hooks/admin/useAdminTheme";
 
 interface AnalysisPanelProps {
   // Single emotion mode props
@@ -71,6 +72,7 @@ export function AnalysisPanel({
 
   // Navigation hooks for Soul Sphere integration
   const { viewInSphere, addToSelection } = useEmotionNavigation();
+  const theme = useAdminTheme();
 
   // Get expansion icon based on state
   const getExpansionIcon = () => {
@@ -87,9 +89,9 @@ export function AnalysisPanel({
   };
 
   return (
-    <div className="flex flex-col h-full bg-gray-800/50 rounded-lg border border-gray-700 overflow-hidden">
+    <div className={`flex flex-col h-full ${theme.colors.background} rounded-lg border ${theme.colors.border} overflow-hidden`}>
       {/* Header with expansion control */}
-      <div className="flex items-center justify-between px-4 py-3 border-b border-gray-700 bg-gray-800/80">
+      <div className={`flex items-center justify-between px-4 py-3 border-b ${theme.colors.border} ${theme.colors.background}/80`}>
         <h4 className="text-sm font-semibold text-cyan-400 flex items-center gap-2">
           📊 Clinical Analysis
           {expandState !== "normal" && (
@@ -112,7 +114,7 @@ export function AnalysisPanel({
       <div className="flex-1 overflow-y-auto">
         {/* Clinical Dashboard - Always visible when there's data */}
         {hasData && (
-          <div className="p-4 border-b border-gray-700">
+          <div className={`p-4 border-b ${theme.colors.border}`}>
             <ClinicalDashboard
               emotion={emotion}
               category={category}
@@ -128,10 +130,10 @@ export function AnalysisPanel({
               multiEmotionData={
                 multiEmotionAnalysis
                   ? {
-                      emotions: multiEmotionAnalysis.emotions,
-                      relationships: multiEmotionAnalysis.relationships,
-                      aggregate: multiEmotionAnalysis.aggregate,
-                    }
+                    emotions: multiEmotionAnalysis.emotions,
+                    relationships: multiEmotionAnalysis.relationships,
+                    aggregate: multiEmotionAnalysis.aggregate,
+                  }
                   : null
               }
               threeWayAnalysis={threeWayAnalysis}
@@ -141,7 +143,7 @@ export function AnalysisPanel({
         )}
 
         {!hasData && (
-          <div className="flex-1 flex items-center justify-center p-8 text-center text-gray-400">
+          <div className={`flex-1 flex items-center justify-center p-8 text-center ${theme.colors.text.muted}`}>
             <div>
               <p className="text-lg mb-2">📊 Analysis Panel</p>
               <p className="text-sm">Send a message or voice recording to see analysis data here</p>

@@ -16,12 +16,12 @@
 import { CharacterSphere } from "@/components/admin/spheres/CharacterSphere";
 import { PreviewSphere } from "@/components/admin/spheres/PreviewSphere";
 import { BRIDGE_EMOTIONS, CATEGORY_COLORS } from "@/types/atlas-admin";
-import type { AtlasEmotion } from "@/types/atlas-admin";
+import type { AtlasEmotion, PathAnimationMode } from "@/types/atlas-admin";
 
 interface EmotionDetailsProps {
   emotion: AtlasEmotion;
   isHovered?: boolean;
-  animationMode: "subtle" | "dynamic" | "mystical";
+  animationMode: PathAnimationMode;
 }
 
 export function EmotionDetails({ emotion, isHovered = false, animationMode }: EmotionDetailsProps) {
@@ -37,11 +37,10 @@ export function EmotionDetails({ emotion, isHovered = false, animationMode }: Em
       </div>
 
       <div
-        className={`rounded-lg p-4 space-y-4 transition-all ${
-          isHovered
+        className={`rounded-lg p-4 space-y-4 transition-all ${isHovered
             ? "bg-cyan-900/30 border border-cyan-700/50 shadow-[0_0_20px_rgba(34,211,238,0.15)]"
             : "bg-gray-800/50 border border-gray-700/50"
-        }`}
+          }`}
       >
         {/* Dual sphere view: Character + VAC Position */}
         <div className="flex gap-3 justify-center items-start">

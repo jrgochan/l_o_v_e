@@ -3,6 +3,7 @@ import type { AtlasEmotion } from "@/types";
 import type { TransitionPathResponse } from "@love/experience-shared";
 import { useExperienceStore } from "@/stores/useExperienceStore";
 import { useSettingsStore } from "@/stores/useSettingsStore";
+import type { PathAnimationMode } from "@/types/atlas-admin";
 
 interface UseZenKeyboardShortcutsProps {
   initAudio: () => void;
@@ -22,7 +23,6 @@ export function useZenKeyboardShortcuts({
   emotions,
 }: UseZenKeyboardShortcutsProps) {
   const settings = useSettingsStore();
-  // console.log("ZenShortcuts: Init", { layers: settings?.layers, emotionsLength: emotions?.length });
 
   const isFlying = useExperienceStore((state) => state.isFlying);
   const setIsFlying = useExperienceStore((state) => state.setIsFlying);
@@ -30,6 +30,8 @@ export function useZenKeyboardShortcuts({
 
   useEffect(() => {
     const handleKeyPress = (e: KeyboardEvent) => {
+      // Input check skipped for brevity, keeping existing structure
+
       if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) return;
 
       switch (e.key.toLowerCase()) {
@@ -50,10 +52,14 @@ export function useZenKeyboardShortcuts({
         case "v":
           // Cycle Visual Modes
           if (!e.ctrlKey && !e.metaKey) {
-            const modes: Array<"subtle" | "dynamic" | "mystical"> = [
+            const modes: PathAnimationMode[] = [
               "subtle",
               "dynamic",
               "mystical",
+              "crystalline",
+              "luminous",
+              "liquid",
+              "glitch",
             ];
             const nextIndex = (modes.indexOf(settings.pathAnimationMode) + 1) % modes.length;
             settings.updateVisualSetting("pathAnimationMode", modes[nextIndex]);

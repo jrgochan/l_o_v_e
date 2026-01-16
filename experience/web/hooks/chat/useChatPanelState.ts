@@ -96,6 +96,15 @@ export function useChatPanelState() {
   // Re-adding the keydown logic properly
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
+      // Ignore if typing in an input
+      if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) return;
+
+      // Toggle Chat (C)
+      if (e.key.toLowerCase() === "c" && !e.ctrlKey && !e.metaKey && !e.shiftKey) {
+        e.preventDefault();
+        handleToggleExpand();
+      }
+
       if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key.toLowerCase() === "a") {
         e.preventDefault();
         handleToggleAnalysisExpansion();
@@ -128,6 +137,7 @@ export function useChatPanelState() {
     isExpanded,
     isFullscreen,
     analysisExpandState,
+    handleToggleExpand,
     handleToggleAnalysisExpansion,
     handleToggleFullscreen,
   ]);

@@ -5,13 +5,14 @@ import { ThreeEvent } from "@react-three/fiber";
 import * as THREE from "three";
 import { useAtlasAdminStore } from "@/stores/useAtlasAdminStore";
 import { useWaypointPulse } from "./useWaypointPulse";
+import type { PathAnimationMode } from "@/types/atlas-admin";
 
 interface WaypointMarkerProps {
   position: [number, number, number];
   emotionName: string;
   categoryColor: string;
   isHighlighted: boolean;
-  mode: "subtle" | "dynamic" | "mystical";
+  mode: PathAnimationMode;
   opacity: number;
 }
 

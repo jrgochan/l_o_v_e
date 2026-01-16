@@ -1,15 +1,16 @@
 /**
- * Analysis Progress Indicator - Heartbeat Analyzer
+ * Analysis Progress Indicator - Focus Card Design
  *
- * Beautiful, adaptive progress indicator that shows real-time analysis progress
- * with pulsing animations, stage tracking, and contextual messaging.
+ * A sleek, "Focus Card" visualization for real-time analysis.
+ * Highlights the active stage with animated iconography and minimalist progress.
  */
 
 "use client";
 
 import { useMemo, useState, useEffect } from "react";
-
-export interface ProgressStage {
+import { ProgressStage } from "@/types/chat"; // Assuming type is here or locally defined, keeping local if needed for now
+// Re-defining interface locally to match previous file if not exported centrally
+interface LocalProgressStage {
   id: string;
   label: string;
   icon: string;
@@ -19,7 +20,7 @@ export interface ProgressStage {
 }
 
 interface AnalysisProgressIndicatorProps {
-  stages: ProgressStage[];
+  stages: LocalProgressStage[];
   currentStage: string;
   overallPercentage: number;
   currentMessage: string;
@@ -37,261 +38,208 @@ export function AnalysisProgressIndicator({
   deepFeelingMode,
   className = "",
 }: AnalysisProgressIndicatorProps) {
-  const [elapsedSeconds, setElapsedSeconds] = useState(0);
+  // --- Visual Config per Stage ---
+  const stageConfig = useMemo(() => {
+    return {
+      started: {
+        icon: "🎙️",
+        color: "text-gray-400",
+        bg: "bg-gray-500/20",
+        animation: "animate-pulse",
+      },
+      transcription: {
+        icon: "🗣️",
+        color: "text-cyan-400",
+        bg: "bg-cyan-500/20",
+        animation: "animate-pulse",
+      },
+      prosody: {
+        icon: "🎵",
+        color: "text-indigo-400",
+        bg: "bg-indigo-500/20",
+        animation: "animate-bounce",
+      },
+      emotions: {
+        icon: "❤️",
+        color: deepFeelingMode ? "text-pink-400" : "text-rose-400",
+        bg: deepFeelingMode ? "bg-pink-500/20" : "bg-rose-500/20",
+        animation: "animate-pulse-fast",
+      },
+      relationships: {
+        icon: "🔗",
+        color: "text-purple-400",
+        bg: "bg-purple-500/20",
+        animation: "animate-spin-slow",
+      },
+      aggregate: {
+        icon: "🧬",
+        color: "text-fuchsia-400",
+        bg: "bg-fuchsia-500/20",
+        animation: "animate-pulse",
+      },
+      insights: {
+        icon: "✨",
+        color: "text-amber-300",
+        bg: "bg-amber-500/20",
+        animation: "animate-pulse",
+      },
+      complete: {
+        icon: "✅",
+        color: "text-emerald-400",
+        bg: "bg-emerald-500/20",
+        animation: "",
+      },
+    };
+  }, [deepFeelingMode]);
 
-  // Elapsed time counter
+  // Determine current visual state
+  const activeStage = stages.find((s) => s.id === currentStage) || stages[0];
+  const config =
+    stageConfig[activeStage.id as keyof typeof stageConfig] || stageConfig.started;
+
+  const isComplete = overallPercentage >= 100;
+
+  // --- Simulated Progress for Smooth UX ---
+  // If we are in an active state but backend is silent (processing), simulate progress
+  const [simulatedPercentage, setSimulatedPercentage] = useState(overallPercentage);
+
   useEffect(() => {
-    const startTime = Date.now();
-    const interval = setInterval(() => {
-      setElapsedSeconds(Math.floor((Date.now() - startTime) / 1000));
-    }, 100); // Update every 100ms for smooth counting
+    // Sync with real percentage if it jumps ahead
+    if (overallPercentage > simulatedPercentage) {
+      setSimulatedPercentage(overallPercentage);
+    }
 
-    return () => clearInterval(interval);
-  }, []);
+    // Auto-increment if not complete and in an active stage
+    if (!isComplete && overallPercentage < 90) {
+      const interval = setInterval(() => {
+        setSimulatedPercentage((prev: number) => {
+          // Asymptotic approach to 90%
+          const remaining = 95 - prev;
+          if (remaining <= 0) return prev;
+          return prev + Math.max(0.2, remaining * 0.05); // Fast then slow
+        });
+      }, 100);
+      return () => clearInterval(interval);
+    }
+  }, [overallPercentage, isComplete]);
+
+  const displayPercentage = Math.max(overallPercentage, Math.floor(simulatedPercentage));
 
   return (
     <div
       className={`
-      bg-gradient-to-br from-gray-800 to-gray-900 
-      rounded-xl p-6 border border-cyan-500/30 shadow-2xl
-      max-w-md w-full
+      relative overflow-hidden
+      w-full max-w-sm mx-auto
+      rounded-2xl p-6
+      bg-black/60 backdrop-blur-xl
+      border border-white/10
+      shadow-[0_8px_32px_rgba(0,0,0,0.5)]
+      transition-all duration-500
       ${className}
     `}
     >
-      {/* Header with Elapsed Time */}
-      <div className="text-center mb-6">
-        <h3 className="text-lg font-semibold text-cyan-300 flex items-center justify-center gap-2">
-          {deepFeelingMode ? (
-            <>
-              <span>🌊</span>
-              <span>Deep Feeling Analysis</span>
-            </>
-          ) : (
-            <>
-              <span>💜</span>
-              <span>Emotional Analysis</span>
-            </>
-          )}
-        </h3>
-        <div className="text-xs text-gray-400 mt-1 font-mono">
-          {elapsedSeconds.toFixed(1)}s elapsed
-        </div>
-      </div>
-
-      {/* Pulsing Gradient Orb */}
-      <PulsingOrb percentage={overallPercentage} />
-
-      {/* Progress Bar */}
-      <ProgressBar percentage={overallPercentage} />
-
-      {/* Current Stage (prominent) */}
-      <CurrentStage stage={currentStage} stages={stages} />
-
-      {/* Stages Checklist */}
-      <StageChecklist stages={stages} />
-
-      {/* Contextual Message with Processing Dots */}
-      <AdaptiveMessage
-        message={currentMessage}
-        toneMode={toneMode}
-        isProcessing={overallPercentage < 100}
+      {/* Background Ambient Glow */}
+      <div
+        className={`
+          absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2
+          w-32 h-32 rounded-full blur-[60px] opacity-40
+          transition-colors duration-700
+          ${config.bg.replace("/20", "/60")}
+        `}
       />
-    </div>
-  );
-}
 
-/**
- * Pulsing Orb - The heartbeat animation
- */
-function PulsingOrb({ percentage }: { percentage: number }) {
-  // Color shifts based on progress
-  const getGradientColors = () => {
-    if (percentage < 33) return "from-cyan-500 via-cyan-400 to-cyan-600";
-    if (percentage < 67) return "from-purple-500 via-purple-400 to-purple-600";
-    return "from-pink-500 via-pink-400 to-pink-600";
-  };
+      {/* Main Content */}
+      <div className="relative z-10 flex flex-col items-center justify-center text-center space-y-4">
 
-  // Pulse speed increases as we get closer to completion
-  const getPulseSpeed = () => {
-    if (percentage < 50) return "animate-pulse-slow"; // 2s
-    if (percentage < 80) return "animate-pulse-medium"; // 1.5s
-    return "animate-pulse-fast"; // 1s (excitement!)
-  };
+        {/* Animated Hero Icon */}
+        <div className="relative">
+          {/* Ring */}
+          <div className={`
+             absolute inset-0 rounded-full border-2 border-dashed opacity-30
+             ${config.color} animate-[spin_10s_linear_infinite]
+          `} />
 
-  return (
-    <div className="flex justify-center mb-6">
-      <div className="relative w-24 h-24">
-        {/* Main pulsing orb */}
-        <div
-          className={`
-          absolute inset-0 rounded-full 
-          bg-gradient-to-br ${getGradientColors()}
-          ${getPulseSpeed()}
-          shadow-lg
-        `}
-        />
-
-        {/* Ping ring */}
-        <div
-          className={`
-          absolute inset-0 rounded-full 
-          bg-gradient-to-br ${getGradientColors()}
-          opacity-50 animate-ping-slow
-        `}
-        />
-
-        {/* Percentage overlay */}
-        <div className="absolute inset-0 flex items-center justify-center z-10">
-          <span className="text-white font-bold text-xl drop-shadow-lg">{percentage}%</span>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-/**
- * Progress Bar - Smooth gradient fill
- */
-function ProgressBar({ percentage }: { percentage: number }) {
-  return (
-    <div className="mb-6">
-      <div className="flex justify-between text-xs text-gray-400 mb-2">
-        <span>Overall Progress</span>
-        <span className="font-mono text-cyan-400">{percentage}%</span>
-      </div>
-      <div className="h-2 bg-gray-700 rounded-full overflow-hidden relative">
-        <div
-          className="
-            h-full 
-            bg-gradient-to-r from-cyan-500 via-purple-500 to-pink-500 
-            transition-all duration-500 ease-out
-            shadow-[0_0_10px_rgba(6,182,212,0.5)]
-          "
-          style={{ width: `${percentage}%` }}
-        />
-      </div>
-    </div>
-  );
-}
-
-/**
- * Current Stage - Highlights the active stage
- */
-function CurrentStage({ stage, stages }: { stage: string; stages: ProgressStage[] }) {
-  const current = useMemo(() => stages.find((s) => s.id === stage), [stage, stages]);
-
-  if (!current || current.status === "complete") return null;
-
-  return (
-    <div className="text-center my-4 py-3 bg-cyan-500/10 rounded-lg border border-cyan-500/30">
-      <div className="text-white font-medium flex items-center justify-center gap-2">
-        <span>{current.icon}</span>
-        <span>{current.label}</span>
-        {current.status === "in_progress" && <div className="animate-spin text-cyan-400">⏳</div>}
-      </div>
-    </div>
-  );
-}
-
-/**
- * Stage Checklist - Shows all stages with status icons
- */
-function StageChecklist({ stages }: { stages: ProgressStage[] }) {
-  return (
-    <div className="space-y-2 mb-6 max-h-48 overflow-y-auto">
-      {stages.map((stage) => (
-        <div
-          key={stage.id}
-          className={`
-            flex items-center gap-3 px-3 py-2 rounded
-            transition-all duration-300
-            ${stage.status === "in_progress" ? "bg-cyan-500/10 border border-cyan-500/30" : ""}
-            ${stage.status === "complete" ? "opacity-60" : ""}
+          <div
+            className={`
+            w-20 h-20 rounded-full
+            flex items-center justify-center
+            text-4xl shadow-lg
+            transition-all duration-500
+            ${config.bg}
+            ${config.color}
+            border border-white/10
           `}
-        >
-          {/* Status Icon */}
-          <div className="flex-shrink-0 w-6 flex justify-center">
-            {stage.status === "complete" && (
-              <span className="text-green-400 animate-fade-in">✅</span>
-            )}
-            {stage.status === "in_progress" && <div className="animate-spin text-cyan-400">⏳</div>}
-            {stage.status === "pending" && <span className="text-gray-600">⬜</span>}
-          </div>
-
-          {/* Stage Info */}
-          <div className="flex-1 flex items-center justify-between">
-            <span
-              className={`
-              flex items-center gap-2 text-sm
-              ${stage.status === "complete" ? "text-gray-400" : "text-white"}
-              ${stage.status === "in_progress" ? "font-semibold" : ""}
-            `}
-            >
-              <span>{stage.icon}</span>
-              <span>{stage.label}</span>
-            </span>
-
-            {/* Elapsed Time (if complete) */}
-            {stage.elapsed_ms && stage.status === "complete" && (
-              <span className="text-xs text-gray-500 font-mono">
-                {(stage.elapsed_ms / 1000).toFixed(1)}s
-              </span>
-            )}
+          >
+            <span className={`block ${config.animation}`}>{config.icon}</span>
           </div>
         </div>
-      ))}
+
+        {/* Text Status */}
+        <div className="space-y-1">
+          <h3 className="text-lg font-semibold text-white tracking-wide">
+            {isComplete ? "Analysis Complete" : activeStage.label}
+          </h3>
+          <p className={`text-xs font-medium uppercase tracking-wider opacity-80 ${config.color}`}>
+            {isComplete ? "Ready for insight" : "Processing..."}
+          </p>
+        </div>
+
+        {/* Dynamic Context Message */}
+        <div className="h-6 flex items-center justify-center">
+          <p className="text-xs text-gray-400 italic animate-fade-in line-clamp-1">
+            {currentMessage}
+          </p>
+        </div>
+
+      </div>
+
+      {/* Footer: Minimalist Progress Track */}
+      {/* Footer: Minimalist Progress Track */}
+      <div className="relative mt-6 pt-6 border-t border-white/5">
+
+        {/* Continuous Progress Bar */}
+        <div className="absolute top-0 left-0 w-full h-[2px] bg-white/5">
+          <div
+            className="h-full bg-cyan-400 shadow-[0_0_10px_rgba(34,211,238,0.5)] transition-all duration-300 ease-out"
+            style={{ width: `${displayPercentage}%` }}
+          />
+        </div>
+
+        {/* Steps and Percentage */}
+        <div className="flex justify-between items-center text-[10px] text-gray-500 font-mono mb-2">
+          <span>0%</span>
+          <span className={isComplete ? "text-emerald-400" : "text-cyan-400"}>
+            {displayPercentage}%
+          </span>
+        </div>
+
+        <div className="flex justify-between items-center gap-1">
+          {stages.map((stage, idx) => {
+            const isActive = stage.id === currentStage;
+            const isDone = stage.status === "complete";
+
+            return (
+              <div
+                key={stage.id}
+                className="flex-1 flex flex-col items-center gap-1 group"
+                title={stage.label}
+              >
+                {/* Step indicator (dot) */}
+                <div className={`
+                      h-1 w-1 rounded-full transition-all duration-500
+                      ${isActive ? `bg-white shadow-[0_0_4px_white] scale-125` : ""}
+                      ${isDone ? `bg-white/40` : ""}
+                      ${!isActive && !isDone ? "bg-white/10" : ""}
+                  `} />
+              </div>
+            );
+          })}
+        </div>
+      </div>
     </div>
   );
 }
 
-/**
- * Adaptive Message - Changes based on tone mode with processing dots
- */
-function AdaptiveMessage({
-  message,
-  toneMode,
-  isProcessing,
-}: {
-  message: string;
-  toneMode: "warm" | "clinical";
-  isProcessing: boolean;
-}) {
-  const [dots, setDots] = useState("");
-
-  // Animated dots when processing
-  useEffect(() => {
-    if (!isProcessing) {
-      // Reset dots when not processing, but do it via setInterval to avoid setState in effect
-      const resetTimer = setTimeout(() => setDots(""), 0);
-      return () => clearTimeout(resetTimer);
-    }
-
-    const interval = setInterval(() => {
-      setDots((prev) => {
-        if (prev === "...") return "";
-        return prev + ".";
-      });
-    }, 500);
-
-    return () => clearInterval(interval);
-  }, [isProcessing]);
-
-  return (
-    <div
-      className={`
-      text-center text-sm italic px-4 py-3 rounded-lg
-      transition-all duration-500
-      ${
-        toneMode === "warm"
-          ? "text-cyan-300 bg-cyan-500/10 border border-cyan-500/20"
-          : "text-blue-300 bg-blue-500/10 border border-blue-500/20"
-      }
-    `}
-    >
-      <p className="leading-relaxed">
-        {message}
-        {isProcessing && <span className="inline-block w-6 text-left">{dots}</span>}
-      </p>
-    </div>
-  );
+function postProcessPercentage(val: number) {
+  return Math.min(100, Math.max(0, Math.round(val)));
 }

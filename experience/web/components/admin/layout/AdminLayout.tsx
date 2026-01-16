@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useAuthStore } from "@/stores/authStore";
 import { AdminGuard } from "@/components/admin/layout/AdminGuard";
+import { useAdminTheme } from "@/hooks/admin/useAdminTheme";
 
 interface AdminLayoutProps {
   children: React.ReactNode;
@@ -20,6 +21,7 @@ export function AdminLayout({ children }: AdminLayoutProps) {
 function AdminLayoutContent({ children }: { children: React.ReactNode }) {
   const { user } = useAuthStore();
   const pathname = usePathname();
+  const theme = useAdminTheme();
 
   const navItems = [
     { label: "Users", href: "/admin/users", icon: "👥" },
@@ -29,11 +31,11 @@ function AdminLayoutContent({ children }: { children: React.ReactNode }) {
   ];
 
   return (
-    <div className="min-h-screen bg-gray-950 flex">
+    <div className={`min-h-screen flex transition-colors duration-500 ${theme.colors.background}`}>
       {/* Sidebar */}
-      <aside className="w-64 bg-gray-900 border-r border-gray-800 flex flex-col">
-        <div className="p-6 border-b border-gray-800">
-          <h1 className="text-xl font-bold text-white flex items-center gap-2">
+      <aside className={`w-64 border-r flex flex-col transition-colors duration-500 ${theme.colors.background} ${theme.colors.border}`}>
+        <div className={`p-6 border-b ${theme.colors.border}`}>
+          <h1 className={`text-xl font-bold flex items-center gap-2 ${theme.colors.text.primary}`}>
             <span>⚡</span> Admin
           </h1>
         </div>
@@ -45,11 +47,10 @@ function AdminLayoutContent({ children }: { children: React.ReactNode }) {
               <Link
                 key={item.href}
                 href={item.href}
-                className={`flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-colors ${
-                  isActive
-                    ? "bg-cyan-900/30 text-cyan-400 border border-cyan-800/50"
-                    : "text-gray-400 hover:bg-gray-800 hover:text-white"
-                }`}
+                className={`flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-colors ${isActive
+                    ? `${theme.colors.primary} ${theme.colors.border} border bg-white/5`
+                    : `${theme.colors.text.secondary} hover:bg-white/5 hover:${theme.colors.text.primary}`
+                  }`}
               >
                 <span>{item.icon}</span>
                 {item.label}
@@ -58,14 +59,14 @@ function AdminLayoutContent({ children }: { children: React.ReactNode }) {
           })}
         </nav>
 
-        <div className="p-4 border-t border-gray-800">
+        <div className={`p-4 border-t ${theme.colors.border}`}>
           <div className="mb-4 px-4">
-            <p className="text-xs text-gray-500">Logged in as</p>
-            <p className="text-sm text-white font-medium truncate">{user?.email}</p>
+            <p className={`text-xs ${theme.colors.text.muted}`}>Logged in as</p>
+            <p className={`text-sm font-medium truncate ${theme.colors.text.primary}`}>{user?.email}</p>
           </div>
           <Link
             href="/"
-            className="flex items-center gap-3 px-4 py-2 text-gray-400 hover:text-white hover:bg-gray-800 rounded-lg transition-colors text-sm"
+            className={`flex items-center gap-3 px-4 py-2 rounded-lg transition-colors text-sm ${theme.colors.text.secondary} hover:${theme.colors.text.primary} hover:bg-white/5`}
           >
             <span>🚪</span> Exit Admin
           </Link>
@@ -74,7 +75,7 @@ function AdminLayoutContent({ children }: { children: React.ReactNode }) {
 
       {/* Main Content */}
       <main className="flex-1 overflow-auto">
-        <div className="max-w-7xl mx-auto p-8">{children}</div>
+        <div className={`max-w-7xl mx-auto p-8 ${theme.colors.text.primary}`}>{children}</div>
       </main>
     </div>
   );

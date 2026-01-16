@@ -86,11 +86,14 @@ export function Scene() {
         <pointLight position={[10, 10, 10]} intensity={0.8} />
         <pointLight position={[-10, -10, -10]} intensity={0.3} />
 
-        {/* Soul Sphere */}
+        {/* Soul Sphere (Single or Cloud) */}
+        {/* Soul Sphere Layer */}
         {layers.soulSphere && <SoulSphere />}
 
-        {/* Emotion Cloud (Points) with Viewer-specific floating labels */}
-        <EmotionCloud enableFloatingLabels={true} />
+        {/* Emotion Cloud (Points) */}
+        <group renderOrder={3}>
+          <EmotionCloud enableFloatingLabels={true} />
+        </group>
 
         {/* Transition Path (if generated and enabled) */}
         {showPath && transitionPath && layers.transitionPaths && (
@@ -128,12 +131,12 @@ export function Scene() {
           position={hoveredWaypoint.screenPos}
           waypointState={
             hoveredWaypoint.state as
-              | "start"
-              | "goal"
-              | "reached"
-              | "current"
-              | "locked"
-              | "waypoint"
+            | "start"
+            | "goal"
+            | "reached"
+            | "current"
+            | "locked"
+            | "waypoint"
           }
         />
       )}

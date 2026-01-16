@@ -9,6 +9,7 @@
 
 import { useState, useMemo } from "react";
 import { useAtlasAdminStore } from "@/stores/useAtlasAdminStore";
+import { useSettingsStore } from "@/stores/useSettingsStore";
 import { BRIDGE_EMOTIONS } from "@/types/atlas-admin";
 import { useEmotionSearch } from "@/hooks/admin/useEmotionSearch";
 import { useCategoryState } from "@/hooks/admin/useCategoryState";
@@ -17,6 +18,7 @@ import { QuickActions } from "./QuickActions";
 import { CategoryBrowser } from "./CategoryBrowser";
 import { AnimationModeSelector } from "./AnimationModeSelector";
 import { LayerControls } from "./LayerControls";
+import { useAdminTheme } from "@/hooks/admin/useAdminTheme";
 
 type TabType = "explore" | "view";
 
@@ -74,30 +76,34 @@ export function ControlPanel() {
     }
   };
 
+  // Theme
+  const theme = useAdminTheme();
+
   return (
-    <div className="h-full flex flex-col bg-gray-900/95">
+    <div
+      className={`h-full flex flex-col transition-colors duration-500 ${theme.colors.background} ${theme.effects.backdropBlur} border-r ${theme.colors.border}`}
+      style={{ fontFamily: theme.typography.fontFamily === "font-mono" ? "monospace" : undefined }} // Font fallback logic
+    >
       {/* Tab Navigation */}
-      <div className="flex-shrink-0 p-3 border-b border-gray-800/50 bg-gray-950/50">
-        <div className="flex gap-1 bg-gray-900 p-1 rounded-lg border border-gray-800">
+      <div className={`flex-shrink-0 p-3 border-b ${theme.colors.border} bg-black/20`}>
+        <div className={`flex gap-1 p-1 ${theme.layout.borderRadius} border ${theme.colors.border} bg-black/20`}>
           <button
             onClick={() => setActiveTab("explore")}
-            className={`flex-1 px-4 py-2 text-sm font-medium rounded-md transition-all ${
-              activeTab === "explore"
-                ? "bg-cyan-900/40 text-cyan-100 shadow-sm border border-cyan-700/50"
-                : "text-gray-400 hover:text-gray-200 hover:bg-gray-800/50"
-            }`}
+            className={`flex-1 px-4 py-2 text-sm font-medium transition-all ${theme.layout.borderRadius} ${activeTab === "explore"
+              ? `${theme.colors.primary} ${theme.effects.glass} shadow-sm`
+              : `${theme.colors.text.secondary} hover:${theme.colors.text.primary} hover:bg-white/5`
+              }`}
           >
-            🔍 Explore
+            <span className={theme.typography.tracking}>EXPLORE</span>
           </button>
           <button
             onClick={() => setActiveTab("view")}
-            className={`flex-1 px-4 py-2 text-sm font-medium rounded-md transition-all ${
-              activeTab === "view"
-                ? "bg-cyan-900/40 text-cyan-100 shadow-sm border border-cyan-700/50"
-                : "text-gray-400 hover:text-gray-200 hover:bg-gray-800/50"
-            }`}
+            className={`flex-1 px-4 py-2 text-sm font-medium transition-all ${theme.layout.borderRadius} ${activeTab === "view"
+              ? `${theme.colors.primary} ${theme.effects.glass} shadow-sm`
+              : `${theme.colors.text.secondary} hover:${theme.colors.text.primary} hover:bg-white/5`
+              }`}
           >
-            👁️ View
+            <span className={theme.typography.tracking}>VIEW</span>
           </button>
         </div>
       </div>
@@ -146,7 +152,7 @@ export function ControlPanel() {
             {/* Animation Mode Selector */}
             <AnimationModeSelector
               currentMode={settings.pathAnimationMode}
-              onModeChange={(mode) => updateSetting("pathAnimationMode", mode)}
+              onModeChange={(mode) => useSettingsStore.getState().updateVisualSetting("pathAnimationMode", mode)}
             />
 
             {/* Layer Controls */}

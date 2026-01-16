@@ -10,8 +10,10 @@
 import { useEmotionHistoryStore } from "@/stores/useEmotionHistoryStore";
 import { EmotionHistoryCard } from "../state-display/EmotionHistoryCard";
 import { EmotionTimeline } from "../visualizations/EmotionTimeline";
+import { useAdminTheme } from "@/hooks/admin/useAdminTheme";
 
 export function EmotionHistoryPanel() {
+  const theme = useAdminTheme();
   const entries = useEmotionHistoryStore((state) => state.entries);
   const viewMode = useEmotionHistoryStore((state) => state.viewMode);
   const isCollapsed = useEmotionHistoryStore((state) => state.isCollapsed);
@@ -30,7 +32,7 @@ export function EmotionHistoryPanel() {
   // Collapsed state - just icon bar
   if (isCollapsed) {
     return (
-      <div className="w-10 bg-gray-800/80 border-r border-gray-700 flex flex-col items-center py-4">
+      <div className={`w-10 ${theme.colors.background}/80 border-r ${theme.colors.border} flex flex-col items-center py-4`}>
         <button
           onClick={toggleCollapsed}
           className="text-gray-400 hover:text-white transition rotate-180"
@@ -50,9 +52,9 @@ export function EmotionHistoryPanel() {
   }
 
   return (
-    <div className="w-72 bg-gray-800/80 border-r border-gray-700 flex flex-col">
+    <div className={`w-72 ${theme.colors.background}/80 border-r ${theme.colors.border} flex flex-col`}>
       {/* Header */}
-      <div className="p-3 border-b border-gray-700 space-y-2">
+      <div className={`p-3 border-b ${theme.colors.border} space-y-2`}>
         <div className="flex items-center justify-between">
           <h3 className="text-sm font-semibold text-white flex items-center gap-2">
             📊 History
@@ -73,21 +75,19 @@ export function EmotionHistoryPanel() {
         <div className="flex items-center gap-2">
           <button
             onClick={toggleViewMode}
-            className={`flex-1 px-2 py-1 rounded text-xs transition ${
-              viewMode === "list"
-                ? "bg-cyan-600 text-white"
-                : "bg-gray-700 text-gray-300 hover:bg-gray-600"
-            }`}
+            className={`flex-1 px-2 py-1 rounded text-xs transition ${viewMode === "list"
+              ? "bg-cyan-600 text-white"
+              : "bg-gray-700 text-gray-300 hover:bg-gray-600"
+              }`}
           >
             📋 List
           </button>
           <button
             onClick={toggleViewMode}
-            className={`flex-1 px-2 py-1 rounded text-xs transition ${
-              viewMode === "timeline"
-                ? "bg-cyan-600 text-white"
-                : "bg-gray-700 text-gray-300 hover:bg-gray-600"
-            }`}
+            className={`flex-1 px-2 py-1 rounded text-xs transition ${viewMode === "timeline"
+              ? "bg-cyan-600 text-white"
+              : "bg-gray-700 text-gray-300 hover:bg-gray-600"
+              }`}
           >
             📊 Timeline
           </button>
@@ -135,7 +135,7 @@ export function EmotionHistoryPanel() {
 
       {/* Bulk Actions Footer */}
       {entries.length > 0 && (
-        <div className="p-3 border-t border-gray-700 space-y-2">
+        <div className={`p-3 border-t ${theme.colors.border} space-y-2`}>
           <div className="grid grid-cols-2 gap-2">
             <button
               onClick={selectAllForSphere}

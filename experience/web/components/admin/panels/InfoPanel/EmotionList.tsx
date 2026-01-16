@@ -14,14 +14,15 @@
 
 import { CharacterSphere } from "@/components/admin/spheres/CharacterSphere";
 import { CATEGORY_COLORS } from "@/types/atlas-admin";
-import type { AtlasEmotion } from "@/types/atlas-admin";
+import type { AtlasEmotion, PathAnimationMode } from "@/types/atlas-admin";
 
 interface EmotionListProps {
   emotions: AtlasEmotion[];
-  animationMode: "subtle" | "dynamic" | "mystical";
+  animationMode: PathAnimationMode;
+  onRemove?: (id: string) => void;
 }
 
-export function EmotionList({ emotions, animationMode }: EmotionListProps) {
+export function EmotionList({ emotions, animationMode, onRemove }: EmotionListProps) {
   if (emotions.length === 0) {
     return (
       <section>
@@ -57,7 +58,21 @@ export function EmotionList({ emotions, animationMode }: EmotionListProps) {
 
               {/* Emotion Info */}
               <div className="flex-1 min-w-0">
-                <div className="font-semibold text-white text-sm mb-1">{emotion.name}</div>
+                <div className="flex justify-between items-start">
+                  <div className="font-semibold text-white text-sm mb-1">{emotion.name}</div>
+                  {onRemove && (
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        onRemove(emotion.id);
+                      }}
+                      className="text-gray-500 hover:text-red-400 p-1 -mt-1 -mr-1 transition-colors"
+                      title="Remove from selection"
+                    >
+                      ✕
+                    </button>
+                  )}
+                </div>
                 <div
                   className="text-xs font-semibold mb-2 uppercase tracking-wide"
                   style={{ color: CATEGORY_COLORS[emotion.category] || "#888888" }}

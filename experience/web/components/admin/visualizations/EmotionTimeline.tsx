@@ -9,6 +9,7 @@
 
 import type { EmotionHistoryEntry } from "@/stores/useEmotionHistoryStore";
 import { CATEGORY_COLORS } from "@/types/atlas-admin";
+import { useAdminTheme } from "@/hooks/admin/useAdminTheme";
 
 interface EmotionTimelineProps {
   entries: EmotionHistoryEntry[];
@@ -16,6 +17,8 @@ interface EmotionTimelineProps {
 }
 
 export function EmotionTimeline({ entries, onToggleVisibility }: EmotionTimelineProps) {
+  const theme = useAdminTheme();
+
   if (entries.length === 0) return null;
 
   return (
@@ -33,7 +36,7 @@ export function EmotionTimeline({ entries, onToggleVisibility }: EmotionTimeline
         return (
           <div key={entry.id} className="relative">
             {/* Connecting Line */}
-            {!isFirst && <div className="absolute left-[13px] -top-3 w-0.5 h-3 bg-gray-600" />}
+            {!isFirst && <div className={`absolute left-[13px] -top-3 w-0.5 h-3 ${theme.colors.border.replace('border', 'bg').replace('/20', '/50') || 'bg-gray-600'}`} />}
 
             {/* Timeline Node */}
             <div className="flex items-start gap-3">
@@ -41,38 +44,38 @@ export function EmotionTimeline({ entries, onToggleVisibility }: EmotionTimeline
               <div className="relative flex-shrink-0">
                 <button
                   onClick={() => onToggleVisibility(entry.id)}
-                  className={`w-7 h-7 rounded-full border-2 flex items-center justify-center transition ${
-                    entry.isVisibleInSphere
+                  className={`w-7 h-7 rounded-full border-2 flex items-center justify-center transition ${entry.isVisibleInSphere
                       ? "border-cyan-400 bg-cyan-500"
-                      : "border-gray-600 bg-gray-700 hover:border-gray-500"
-                  }`}
+                      : `${theme.colors.border} ${theme.colors.background} hover:brightness-125`
+                    }`}
                   style={{
                     backgroundColor: entry.isVisibleInSphere ? categoryColor : undefined,
                   }}
                   title={`${entry.isVisibleInSphere ? "Hide from" : "Show in"} sphere`}
                 >
-                  <span className="text-xs">{entry.isVisibleInSphere ? "✓" : "○"}</span>
+                  <span className={`text-xs ${entry.isVisibleInSphere ? 'text-white' : theme.colors.text.secondary}`}>
+                    {entry.isVisibleInSphere ? "✓" : "○"}
+                  </span>
                 </button>
               </div>
 
               {/* Entry Info */}
-              <div className="flex-1 min-w-0 bg-gray-800/50 rounded-lg p-2 border border-gray-700">
+              <div className={`flex-1 min-w-0 ${theme.colors.background} rounded-lg p-2 border ${theme.colors.border}`}>
                 <div className="flex items-center justify-between gap-2 mb-1">
-                  <h4 className="text-sm font-medium text-white truncate">{entry.emotion}</h4>
-                  <span className="text-xs text-gray-500 whitespace-nowrap">{timeStr}</span>
+                  <h4 className={`text-sm font-medium ${theme.colors.text.primary} truncate`}>{entry.emotion}</h4>
+                  <span className={`text-xs ${theme.colors.text.secondary} whitespace-nowrap`}>{timeStr}</span>
                 </div>
 
-                <div className="text-xs text-gray-400 mb-1 truncate">{entry.category}</div>
+                <div className={`text-xs ${theme.colors.text.secondary} mb-1 truncate`}>{entry.category}</div>
 
                 {/* Mini VAC bar chart */}
                 <div className="flex gap-1 mt-2">
                   <div className="flex-1">
-                    <div className="text-xs text-gray-500 mb-0.5">V</div>
-                    <div className="h-1.5 bg-gray-700 rounded overflow-hidden">
+                    <div className={`text-xs ${theme.colors.text.muted} mb-0.5`}>V</div>
+                    <div className="h-1.5 bg-gray-700/50 rounded overflow-hidden">
                       <div
-                        className={`h-full transition-all ${
-                          entry.vac.valence >= 0 ? "bg-cyan-400" : "bg-red-400"
-                        }`}
+                        className={`h-full transition-all ${entry.vac.valence >= 0 ? "bg-cyan-400" : "bg-red-400"
+                          }`}
                         style={{
                           width: `${Math.abs(entry.vac.valence) * 100}%`,
                         }}
@@ -80,8 +83,8 @@ export function EmotionTimeline({ entries, onToggleVisibility }: EmotionTimeline
                     </div>
                   </div>
                   <div className="flex-1">
-                    <div className="text-xs text-gray-500 mb-0.5">A</div>
-                    <div className="h-1.5 bg-gray-700 rounded overflow-hidden">
+                    <div className={`text-xs ${theme.colors.text.muted} mb-0.5`}>A</div>
+                    <div className="h-1.5 bg-gray-700/50 rounded overflow-hidden">
                       <div
                         className="h-full bg-orange-400 transition-all"
                         style={{
@@ -91,12 +94,11 @@ export function EmotionTimeline({ entries, onToggleVisibility }: EmotionTimeline
                     </div>
                   </div>
                   <div className="flex-1">
-                    <div className="text-xs text-gray-500 mb-0.5">C</div>
-                    <div className="h-1.5 bg-gray-700 rounded overflow-hidden">
+                    <div className={`text-xs ${theme.colors.text.muted} mb-0.5`}>C</div>
+                    <div className="h-1.5 bg-gray-700/50 rounded overflow-hidden">
                       <div
-                        className={`h-full transition-all ${
-                          entry.vac.connection >= 0 ? "bg-purple-400" : "bg-pink-400"
-                        }`}
+                        className={`h-full transition-all ${entry.vac.connection >= 0 ? "bg-purple-400" : "bg-pink-400"
+                          }`}
                         style={{
                           width: `${Math.abs(entry.vac.connection) * 100}%`,
                         }}

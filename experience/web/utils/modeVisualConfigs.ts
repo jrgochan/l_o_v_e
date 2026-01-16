@@ -1,10 +1,14 @@
 /**
- * Visual Configuration for Three Emotion Rendering Modes
+ * Visual Configuration for Seven Emotion Rendering Modes
  *
  * Defines distinct visual identities for:
  * - SUBTLE: Clinical clarity, professional therapeutic
  * - DYNAMIC: Living energy, vibrant and kinetic
  * - MYSTICAL: Cosmic consciousness, ethereal and transcendent
+ * - CRYSTALLINE: Structural clarity, sharp and faceted
+ * - LUMINOUS: Energetic spirit, glowing and intense
+ * - LIQUID: Deep immersion, flowing and organic
+ * - GLITCH: Digital reality, raw and chaotic
  */
 
 import type { PathAnimationMode } from "@/types/atlas-admin";
@@ -149,7 +153,7 @@ export const SUBTLE_MODE_CONFIG: ModeVisualConfig = {
 
   animations: {
     breathingSpeedMultiplier: 1.0,
-    breathingAmplitudeMultiplier: 0.5, // Reduced from 0.7 for more subtle presence
+    breathingAmplitudeMultiplier: 0.5,
     rotationSpeedMultiplier: 0.5,
     secondaryMotionMultiplier: 0.7,
     easingFunction: "ease-in-out",
@@ -204,7 +208,7 @@ export const DYNAMIC_MODE_CONFIG: ModeVisualConfig = {
     saturationMultiplier: 1.3,
     luminosityMultiplier: 1.1,
     useGradients: true,
-    valenceTempShift: 0.6, // Enhanced from 0.4 for more dramatic color shifts
+    valenceTempShift: 0.6,
     arousalBrightnessRange: [0.7, 1.4],
   },
 
@@ -227,9 +231,9 @@ export const DYNAMIC_MODE_CONFIG: ModeVisualConfig = {
     rotationSpeedMultiplier: 1.5,
     secondaryMotionMultiplier: 1.3,
     easingFunction: "cubic-bezier(0.68, -0.55, 0.265, 1.55)", // Overshoot for bouncy feel
-    floatEnabled: true, // Enable bouncy floating for kinetic energy
-    floatAmplitude: 0.12, // Larger amplitude than mystical for bouncy character
-    floatSpeed: 0.8, // Faster than mystical for energetic feel
+    floatEnabled: true,
+    floatAmplitude: 0.12,
+    floatSpeed: 0.8,
   },
 
   particles: {
@@ -332,19 +336,320 @@ export const MYSTICAL_MODE_CONFIG: ModeVisualConfig = {
 };
 
 /**
+ * CRYSTALLINE MODE: Structural Clarity
+ * Sharp, clear, defined, angular
+ */
+export const CRYSTALLINE_MODE_CONFIG: ModeVisualConfig = {
+  name: "Crystalline",
+  description: "Structural Clarity - Sharp and Faceted",
+
+  materials: {
+    metalness: 0.9,
+    roughness: 0.1,
+    emissiveIntensityBase: 0.8,
+    emissiveIntensityRange: [0.5, 1.2],
+    transparent: true,
+    opacityBase: 0.8,
+    fresnelStrength: 1.0, // High reflection
+  },
+
+  colors: {
+    saturationMultiplier: 0.9,
+    luminosityMultiplier: 1.2,
+    useGradients: false,
+    valenceTempShift: 0.1,
+    arousalBrightnessRange: [0.9, 1.1],
+  },
+
+  lighting: {
+    ambientIntensity: 0.5,
+    keyLightIntensity: 1.8, // Bright highlights
+    keyLightPosition: [10, 10, 5],
+    fillLightIntensity: 0.4,
+    fillLightPosition: [-5, 0, -5],
+    enableEmotionLights: true,
+    emotionLightIntensity: 0.5,
+    emotionLightDistance: 2.0,
+    castShadows: true,
+    shadowIntensity: 0.8, // Sharp shadows
+  },
+
+  animations: {
+    breathingSpeedMultiplier: 0.0, // Static
+    breathingAmplitudeMultiplier: 0.0,
+    rotationSpeedMultiplier: 0.1, // Very slow rotation
+    secondaryMotionMultiplier: 0.0,
+    easingFunction: "linear",
+    floatEnabled: false,
+    floatAmplitude: 0.0,
+    floatSpeed: 0.0,
+  },
+
+  particles: {
+    enabled: true,
+    density: 5,
+    particleSize: 0.03, // Large sparkles
+    speedMultiplier: 0.1, // Slow moving
+    maxDistance: 0.3,
+    opacity: 0.8,
+    enableTrails: false,
+    enableBursts: true,
+    enableAuras: false,
+  },
+
+  postProcessing: {
+    bloomEnabled: true,
+    bloomStrength: 0.5,
+    bloomRadius: 0.2,
+    bloomThreshold: 0.9,
+    vignetteEnabled: false,
+    vignetteIntensity: 0.0,
+    chromaticAberrationEnabled: true,
+    chromaticAberrationStrength: 0.005, // Prismatic edge
+  },
+};
+
+/**
+ * LUMINOUS MODE: Energetic Spirit
+ * Glowing, bright, pure light
+ */
+export const LUMINOUS_MODE_CONFIG: ModeVisualConfig = {
+  name: "Luminous",
+  description: "Energetic Spirit - Glowing and Intense",
+
+  materials: {
+    metalness: 0.1,
+    roughness: 0.9,
+    emissiveIntensityBase: 3.0,
+    emissiveIntensityRange: [2.0, 5.0],
+    transparent: true,
+    opacityBase: 0.4,
+    fresnelStrength: 0.5,
+  },
+
+  colors: {
+    saturationMultiplier: 1.5,
+    luminosityMultiplier: 2.0, // Very bright
+    useGradients: true,
+    valenceTempShift: 0.5,
+    arousalBrightnessRange: [1.0, 2.0],
+  },
+
+  lighting: {
+    ambientIntensity: 0.1, // Dark ambient to let emission pop
+    keyLightIntensity: 0.2,
+    keyLightPosition: [0, 10, 0],
+    fillLightIntensity: 0.1,
+    fillLightPosition: [0, -10, 0],
+    enableEmotionLights: true,
+    emotionLightIntensity: 2.0,
+    emotionLightDistance: 8.0,
+    castShadows: false,
+    shadowIntensity: 0.0,
+  },
+
+  animations: {
+    breathingSpeedMultiplier: 2.0, // Fast pulsing
+    breathingAmplitudeMultiplier: 0.2,
+    rotationSpeedMultiplier: 0.0,
+    secondaryMotionMultiplier: 2.0,
+    easingFunction: "ease-in-out",
+    floatEnabled: true,
+    floatAmplitude: 0.2,
+    floatSpeed: 1.5,
+  },
+
+  particles: {
+    enabled: true,
+    density: 50, // High density
+    particleSize: 0.01,
+    speedMultiplier: 3.0, // Fast moving
+    maxDistance: 2.0,
+    opacity: 0.6,
+    enableTrails: true,
+    enableBursts: true,
+    enableAuras: true,
+  },
+
+  postProcessing: {
+    bloomEnabled: true,
+    bloomStrength: 3.0,
+    bloomRadius: 1.0,
+    bloomThreshold: 0.2,
+    vignetteEnabled: true,
+    vignetteIntensity: 0.6,
+    chromaticAberrationEnabled: false,
+    chromaticAberrationStrength: 0.0,
+  },
+};
+
+/**
+ * LIQUID MODE: Deep Immersion
+ * Flowing, smooth, organic, glossy
+ */
+export const LIQUID_MODE_CONFIG: ModeVisualConfig = {
+  name: "Liquid",
+  description: "Deep Immersion - Flowing and Organic",
+
+  materials: {
+    metalness: 0.3,
+    roughness: 0.05, // Very glossy
+    emissiveIntensityBase: 0.6,
+    emissiveIntensityRange: [0.4, 0.9],
+    transparent: true,
+    opacityBase: 0.7,
+    fresnelStrength: 0.9,
+  },
+
+  colors: {
+    saturationMultiplier: 1.1,
+    luminosityMultiplier: 0.9,
+    useGradients: true,
+    undertone: "#001133", // Deep blue undertone
+    valenceTempShift: 0.2,
+    arousalBrightnessRange: [0.8, 1.2],
+  },
+
+  lighting: {
+    ambientIntensity: 0.3,
+    keyLightIntensity: 1.2,
+    keyLightPosition: [2, 5, 8],
+    fillLightIntensity: 0.8, // High fill for underwater feel
+    fillLightPosition: [2, -5, -2],
+    enableEmotionLights: true,
+    emotionLightIntensity: 0.6,
+    emotionLightDistance: 3.0,
+    castShadows: false,
+    shadowIntensity: 0.0,
+  },
+
+  animations: {
+    breathingSpeedMultiplier: 0.8,
+    breathingAmplitudeMultiplier: 1.5, // Large slow deformation
+    rotationSpeedMultiplier: 0.3,
+    secondaryMotionMultiplier: 0.5,
+    easingFunction: "ease-in-out",
+    floatEnabled: true,
+    floatAmplitude: 0.1,
+    floatSpeed: 0.5,
+  },
+
+  particles: {
+    enabled: true,
+    density: 10,
+    particleSize: 0.04, // Bubbles
+    speedMultiplier: 0.4,
+    maxDistance: 1.5,
+    opacity: 0.4,
+    enableTrails: false,
+    enableBursts: false,
+    enableAuras: false,
+  },
+
+  postProcessing: {
+    bloomEnabled: true,
+    bloomStrength: 0.6,
+    bloomRadius: 0.6,
+    bloomThreshold: 0.7,
+    vignetteEnabled: true,
+    vignetteIntensity: 0.4,
+    chromaticAberrationEnabled: true,
+    chromaticAberrationStrength: 0.003, // Water distortion
+  },
+};
+
+/**
+ * GLITCH MODE: Digital Reality
+ * Chaotic, raw, tech
+ */
+export const GLITCH_MODE_CONFIG: ModeVisualConfig = {
+  name: "Glitch",
+  description: "Digital Reality - Raw and Chaotic",
+
+  materials: {
+    metalness: 0.5,
+    roughness: 0.5,
+    emissiveIntensityBase: 1.0,
+    emissiveIntensityRange: [0.0, 5.0], // Massive flicker range
+    transparent: false,
+    opacityBase: 1.0,
+    fresnelStrength: 0.0,
+  },
+
+  colors: {
+    saturationMultiplier: 2.0, // Hyper saturated
+    luminosityMultiplier: 1.0,
+    useGradients: false,
+    valenceTempShift: 0.0,
+    arousalBrightnessRange: [0.5, 2.0],
+  },
+
+  lighting: {
+    ambientIntensity: 0.1,
+    keyLightIntensity: 2.0,
+    keyLightPosition: [0, 0, 10], // Direct flash
+    fillLightIntensity: 0.1,
+    fillLightPosition: [0, 0, -10],
+    enableEmotionLights: false,
+    emotionLightIntensity: 0.0,
+    emotionLightDistance: 0.0,
+    castShadows: false,
+    shadowIntensity: 0.0,
+  },
+
+  animations: {
+    breathingSpeedMultiplier: 10.0, // Strobe
+    breathingAmplitudeMultiplier: 0.1,
+    rotationSpeedMultiplier: 0.0,
+    secondaryMotionMultiplier: 5.0,
+    easingFunction: "steps(4)", // Jerky movement
+    floatEnabled: false,
+    floatAmplitude: 0.0,
+    floatSpeed: 0.0,
+  },
+
+  particles: {
+    enabled: true,
+    density: 5,
+    particleSize: 0.01,
+    speedMultiplier: 10.0, // Matrix rain speed
+    maxDistance: 0.2, // Short duration
+    opacity: 1.0,
+    enableTrails: true,
+    enableBursts: true,
+    enableAuras: false,
+  },
+
+  postProcessing: {
+    bloomEnabled: true,
+    bloomStrength: 0.8,
+    bloomRadius: 0.1,
+    bloomThreshold: 0.5,
+    vignetteEnabled: true,
+    vignetteIntensity: 0.8, // CRT border
+    chromaticAberrationEnabled: true,
+    chromaticAberrationStrength: 0.02, // Heavy separation
+  },
+};
+
+/**
  * Map PathAnimationMode to ModeVisualConfig
  */
 export const MODE_CONFIGS: Record<PathAnimationMode, ModeVisualConfig> = {
   subtle: SUBTLE_MODE_CONFIG,
   dynamic: DYNAMIC_MODE_CONFIG,
   mystical: MYSTICAL_MODE_CONFIG,
+  crystalline: CRYSTALLINE_MODE_CONFIG,
+  luminous: LUMINOUS_MODE_CONFIG,
+  liquid: LIQUID_MODE_CONFIG,
+  glitch: GLITCH_MODE_CONFIG,
 };
 
 /**
  * Get visual config for a mode
  */
 export function getModeConfig(mode: PathAnimationMode): ModeVisualConfig {
-  return MODE_CONFIGS[mode];
+  return MODE_CONFIGS[mode] || SUBTLE_MODE_CONFIG; // Fallback to subtle
 }
 
 /**

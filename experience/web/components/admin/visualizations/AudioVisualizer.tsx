@@ -7,6 +7,7 @@
 "use client";
 
 import { useEffect, useRef } from "react";
+import { useAdminTheme } from "@/hooks/admin/useAdminTheme";
 
 interface AudioVisualizerProps {
   audioLevel: number; // 0-1
@@ -24,6 +25,7 @@ export function AudioVisualizer({
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const levelsRef = useRef<number[]>([]);
   const animationRef = useRef<number | null>(null);
+  const theme = useAdminTheme();
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -40,9 +42,8 @@ export function AudioVisualizer({
     const draw = () => {
       // ctx and canvas are guaranteed to be defined here due to early returns above
 
-      // Clear canvas
-      ctx.fillStyle = "#1f2937"; // gray-800
-      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      // Clear canvas (Transparent to let CSS background show)
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
 
       // Update levels array when recording
       if (isRecording) {
@@ -82,14 +83,16 @@ export function AudioVisualizer({
         });
       }
 
-      // Draw center line
-      ctx.shadowBlur = 0; // Reset shadow
-      ctx.strokeStyle = "rgba(107, 114, 128, 0.3)"; // gray-500
-      ctx.lineWidth = 1;
-      ctx.beginPath();
-      ctx.moveTo(0, canvas.height / 2);
-      ctx.lineTo(canvas.width, canvas.height / 2);
-      ctx.stroke();
+      // Draw center line if empty
+      if (levels.length === 0) {
+        ctx.shadowBlur = 0; // Reset shadow
+        ctx.strokeStyle = "rgba(107, 114, 128, 0.3)"; // gray-500
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.moveTo(0, canvas.height / 2);
+        ctx.lineTo(canvas.width, canvas.height / 2);
+        ctx.stroke();
+      }
 
       // Continue animation loop when recording
       if (isRecording) {
@@ -118,20 +121,20 @@ export function AudioVisualizer({
     <div className="relative">
       <canvas
         ref={canvasRef}
-        className="rounded-lg border border-gray-700 bg-gray-800"
+        className={`rounded-lg border ${theme.colors.border} ${theme.colors.background}`}
         style={{ width: `${width}px`, height: `${height}px` }}
       />
 
       {/* Level meter overlay */}
       <div className="mt-2 flex items-center gap-2">
-        <span className="text-xs text-gray-400">Level:</span>
-        <div className="flex-1 h-2 bg-gray-700 rounded-full overflow-hidden">
+        <span className={`text-xs ${theme.colors.text.secondary}`}>Level:</span>
+        <div className="flex-1 h-2 bg-gray-700/50 rounded-full overflow-hidden">
           <div
             className="h-full bg-gradient-to-r from-cyan-500 to-cyan-400 transition-all duration-100"
             style={{ width: `${audioLevel * 100}%` }}
           />
         </div>
-        <span className="text-xs text-gray-400 font-mono w-10">
+        <span className={`text-xs ${theme.colors.text.secondary} font-mono w-10`}>
           {Math.round(audioLevel * 100)}%
         </span>
       </div>

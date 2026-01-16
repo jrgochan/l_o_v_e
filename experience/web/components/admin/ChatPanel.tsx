@@ -13,6 +13,7 @@ import { logger } from "@/utils/logger";
 import { useEmotionNavigation } from "@/hooks/useEmotionNavigation";
 import { useHistorySphereSync } from "@/hooks/useHistorySphereSync";
 import { useEmotionHistoryStore } from "@/stores/useEmotionHistoryStore";
+import { useAtlasAdminStore } from "@/stores/useAtlasAdminStore";
 
 // Hooks
 import { useChatPanelState } from "@/hooks/chat/useChatPanelState";
@@ -23,9 +24,11 @@ import {
   initializeProgressStages,
   getAdaptiveMessage,
 } from "@/hooks/chat/useChatProgress";
+import { useAdminTheme } from "@/hooks/admin/useAdminTheme";
 
 // Components
 import { ChatHeader } from "./chat/ChatHeader";
+import { ChatToggleFAB } from "./chat/ChatToggleFAB";
 import { ChatInput } from "./chat/ChatInput";
 import { ChatMessages } from "./chat/ChatMessages";
 import { AnalysisPanel } from "./panels/AnalysisPanel";
@@ -104,7 +107,10 @@ export function ChatPanel({ sessionId }: ChatPanelProps) {
     progressSimulationRef,
   } = useChatProgress();
 
+  const theme = useAdminTheme();
+
   // --- Local State ---
+  const viewMode = useAtlasAdminStore((state) => state.viewMode);
   const [messages, setMessages] = useState<DisplayMessage[]>([]);
   const [isProcessing, setIsProcessing] = useState(false);
 
@@ -483,54 +489,87 @@ export function ChatPanel({ sessionId }: ChatPanelProps) {
   };
 
   return (
-    <div
-      className={`fixed ${
-        isFullscreen ? "inset-0 z-50" : "bottom-0 left-0 right-0 z-40"
-      } bg-gray-900/98 backdrop-blur-sm border-t-2 border-cyan-500/50 shadow-[0_-4px_20px_rgba(6,182,212,0.3)] flex flex-col transition-all duration-300`}
-      style={{ height: isFullscreen ? "100vh" : `${height}px` }}
-    >
-      {/* Resize Handle */}
-      {isExpanded && (
-        <div
-          onMouseDown={handleMouseDown}
-          className={`w-full h-2 cursor-row-resize hover:bg-cyan-500/30 transition flex items-center justify-center ${
-            isResizing ? "bg-cyan-500/50" : ""
-          }`}
-        >
-          <div className="w-12 h-1 bg-gray-600 rounded-full" />
-        </div>
+    <>
+      {/* FAB - Show ONLY when collapsed AND in Zen/Cinema mode */}
+      {!isExpanded && viewMode !== "default" && (
+        <ChatToggleFAB onClick={handleToggleExpand} />
       )}
 
-      {/* Header */}
-      <ChatHeader
-        isExpanded={isExpanded}
-        isFullscreen={isFullscreen}
-        isConnecting={isConnecting}
-        isConnected={isConnected}
-        wsError={wsError}
-        toneMode={toneMode}
-        useAtlasMapping={useAtlasMapping}
-        deepFeelingMode={deepFeelingMode}
-        onToggleExpand={handleToggleExpand}
-        onToggleFullscreen={handleToggleFullscreen}
-        onToneModeChange={toggleToneMode}
-        onUseAtlasMappingChange={setUseAtlasMapping}
-        onDeepFeelingModeChange={setDeepFeelingMode}
-      />
 
-      {/* Collapsed State Prompt */}
-      {!isExpanded && (
+      {/* Collapsed Bar - Show ONLY when collapsed AND in Default mode */}
+      {!isExpanded && viewMode === "default" && (
         <button
           onClick={handleToggleExpand}
-          className="flex-1 flex items-center justify-center text-gray-400 hover:text-gray-300 text-sm transition hover:bg-gray-800/50 cursor-pointer"
+          className={`
+            fixed bottom-0 left-0 right-0 z-40
+            h-[60px] 
+            flex items-center justify-between px-6
+            ${theme.colors.background} ${theme.effects.backdropBlur}
+            border-t border-cyan-500/30
+            hover:bg-cyan-500/5 transition-all duration-300
+            group
+          `}
         >
-          <span>Click here or press ▲ to open chat and analyze your emotions</span>
+          <div className="flex items-center gap-3">
+            <div className={`
+              w-2 h-2 rounded-full 
+              ${isConnected ? "bg-green-500 animate-pulse" : "bg-red-500"}
+              shadow-[0_0_8px_current]
+            `} />
+            <span className={`text-sm font-medium ${theme.colors.text.primary}`}>
+              Emotional Intelligence
+            </span>
+            <span className={`text-xs ${theme.colors.text.muted} px-2 py-0.5 rounded-full bg-white/5`}>
+              {isConnected ? "Connected" : "Disconnected"}
+            </span>
+          </div>
+
+          <div className="flex items-center gap-4">
+            {/* Preview of latest message could go here */}
+            <div className="flex items-center gap-2 text-cyan-400 group-hover:translate-y-[-2px] transition-transform">
+              <span className="text-sm font-medium">Open Chat</span>
+              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 15l7-7 7 7" />
+              </svg>
+            </div>
+          </div>
         </button>
       )}
 
-      {/* Expanded Content */}
+      {/* Main Panel Container - Show ONLY when expanded */}
       {isExpanded && (
-        <>
+        <div
+          className={`fixed ${isFullscreen ? "inset-0 z-50" : "bottom-0 left-0 right-0 z-40"
+            } ${theme.colors.background} ${theme.effects.backdropBlur} border-t-2 ${theme.colors.border.replace('border-', 'border-t-')} shadow-[0_-4px_20px_rgba(6,182,212,0.3)] flex flex-col transition-all duration-300`}
+          style={{ height: isFullscreen ? "100vh" : `${height}px` }}
+        >
+          {/* Resize Handle */}
+          <div
+            onMouseDown={handleMouseDown}
+            className={`w-full h-2 cursor-row-resize hover:bg-cyan-500/30 transition flex items-center justify-center ${isResizing ? "bg-cyan-500/50" : ""
+              }`}
+          >
+            <div className="w-12 h-1 bg-gray-600 rounded-full" />
+          </div>
+
+          {/* Header */}
+          <ChatHeader
+            isExpanded={isExpanded}
+            isFullscreen={isFullscreen}
+            isConnecting={isConnecting}
+            isConnected={isConnected}
+            wsError={wsError}
+            toneMode={toneMode}
+            useAtlasMapping={useAtlasMapping}
+            deepFeelingMode={deepFeelingMode}
+            onToggleExpand={handleToggleExpand}
+            onToggleFullscreen={handleToggleFullscreen}
+            onToneModeChange={toggleToneMode}
+            onUseAtlasMappingChange={setUseAtlasMapping}
+            onDeepFeelingModeChange={setDeepFeelingMode}
+          />
+
+          {/* Expanded Content */}
           <div className="flex-1 flex gap-4 px-6 py-4 overflow-hidden">
             {/* Left: Emotion History */}
             {analysisExpandState !== "fullscreen" && <EmotionHistoryPanel />}
@@ -549,13 +588,12 @@ export function ChatPanel({ sessionId }: ChatPanelProps) {
 
             {/* Right: Analysis Panel */}
             <div
-              className={`flex-shrink-0 transition-all duration-300 ease-in-out ${
-                analysisExpandState === "normal"
-                  ? "w-96"
-                  : analysisExpandState === "expanded"
-                    ? "w-[calc(100%-18rem)]" // approximate width calc
-                    : "w-full"
-              }`}
+              className={`flex-shrink-0 transition-all duration-300 ease-in-out ${analysisExpandState === "normal"
+                ? "w-96"
+                : analysisExpandState === "expanded"
+                  ? "w-[calc(100%-18rem)]" // approximate width calc
+                  : "w-full"
+                }`}
             >
               <AnalysisPanel
                 transcription={currentAnalysis.transcription}
@@ -587,8 +625,9 @@ export function ChatPanel({ sessionId }: ChatPanelProps) {
             isConnected={isConnected}
             isProcessing={isProcessing}
           />
-        </>
+        </div>
       )}
-    </div>
+    </>
   );
 }
+

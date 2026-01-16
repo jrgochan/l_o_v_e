@@ -23,7 +23,7 @@ class AudioProcessor:
     """Audio file processing and normalization."""
 
     # Supported input formats
-    SUPPORTED_FORMATS = {".wav", ".m4a", ".aac", ".mp3", ".ogg", ".flac"}
+    SUPPORTED_FORMATS = {".wav", ".m4a", ".aac", ".mp3", ".ogg", ".flac", ".webm"}
 
     # Target format for Whisper
     TARGET_SAMPLE_RATE = 16000

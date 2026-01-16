@@ -10,7 +10,7 @@
 import { Suspense, useState, useEffect } from "react";
 import Link from "next/link";
 import { Canvas } from "@react-three/fiber";
-import { OrbitControls as DreiOrbitControls } from "@react-three/drei";
+import { OrbitControls as DreiOrbitControls, Stars } from "@react-three/drei";
 
 import { useEmotionAtlas } from "@/hooks/useEmotionAtlas";
 import { usePathCalculator } from "@/hooks/usePathCalculator";
@@ -45,6 +45,7 @@ import { useAmbientAudio } from "@/hooks/useAmbientAudio";
 import { VACAnimator } from "@/components/VACAnimator";
 import { DebugBroadcaster } from "@/components/DebugBroadcaster";
 import { PathDetailsOverlay } from "@/components/PathDetailsOverlay";
+import { useAdminTheme } from "@/hooks/admin/useAdminTheme";
 
 const AtlasAdminContent = () => {
   // Load emotions and set up path calculator
@@ -278,16 +279,20 @@ const AtlasAdminContent = () => {
     );
   }
 
+  // Theme
+  const theme = useAdminTheme();
+
   return (
     <div className="relative w-screen h-screen bg-gray-950 overflow-hidden">
       {/* Header - Hidden in Zen Mode or Intro */}
       <header
-        className={`absolute top-0 left-0 right-0 z-30 bg-gray-900/90 backdrop-blur-sm border-b border-gray-800 transition-transform duration-500 ${!isHeaderVisible ? "-translate-y-full" : "translate-y-0"}`}
+        className={`absolute top-0 left-0 right-0 z-30 transition-all duration-500 border-b ${theme.colors.background} ${theme.effects.backdropBlur} ${theme.colors.border} ${!isHeaderVisible ? "-translate-y-full" : "translate-y-0"}`}
+        style={{ fontFamily: theme.typography.fontFamily === "font-mono" ? "monospace" : undefined }}
       >
         <div className="flex items-center justify-between px-6 py-4">
           <div>
-            <h1 className="text-2xl font-bold text-white">Soul Sphere Atlas</h1>
-            <p className="text-sm text-gray-400">Admin Interface - 87 Emotions Visualization</p>
+            <h1 className={`text-2xl font-bold ${theme.colors.text.primary}`}>Soul Sphere Atlas</h1>
+            <p className={`text-sm ${theme.colors.text.secondary}`}>Admin Interface - 87 Emotions Visualization</p>
           </div>
 
           {/* Center: Aggregate VAC Display */}
@@ -301,38 +306,37 @@ const AtlasAdminContent = () => {
                 toggleMute();
                 playClickSound();
               }}
-              className={`px-3 py-2 rounded transition flex items-center gap-2 text-sm ${
-                isMuted
-                  ? "bg-red-900/50 text-red-200 hover:bg-red-800/50"
-                  : "bg-gray-700 text-white hover:bg-gray-600"
-              }`}
+              className={`px-3 py-2 ${theme.layout.borderRadius} transition-all duration-300 flex items-center gap-2 text-sm border ${isMuted
+                ? `bg-red-900/50 border-red-800 text-red-200 hover:bg-red-800/50`
+                : `${theme.colors.background} ${theme.colors.border} ${theme.colors.text.secondary} hover:${theme.colors.text.primary}`
+                }`}
               title={isMuted ? "Unmute Audio" : "Mute Audio"}
             >
               {isMuted ? "🔇" : "🔊"}
             </button>
             <Link
               href="/admin/users"
-              className="px-4 py-2 bg-cyan-700 hover:bg-cyan-600 text-white text-sm rounded transition inline-flex items-center gap-2"
+              className={`px-4 py-2 text-sm transition-all duration-300 inline-flex items-center gap-2 ${theme.layout.borderRadius} ${theme.colors.primary} ${theme.effects.glass} hover:brightness-110 shadow-lg`}
               title="Return to Admin Dashboard"
             >
               ⚡ Dashboard
             </Link>
             <Link
               href="/admin/settings"
-              className="px-4 py-2 bg-gray-700 hover:bg-gray-600 text-white text-sm rounded transition inline-flex items-center gap-2"
+              className={`px-4 py-2 text-sm transition-all duration-300 inline-flex items-center gap-2 ${theme.layout.borderRadius} hover:bg-white/10 ${theme.colors.text.secondary} hover:${theme.colors.text.primary}`}
               title="Settings (Ctrl/Cmd+,)"
             >
               ⚙️ Settings
             </Link>
             <button
               onClick={() => setShowHelp(true)}
-              className="px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white text-sm rounded transition"
+              className={`px-4 py-2 text-sm transition-all duration-300 ${theme.layout.borderRadius} hover:bg-white/10 ${theme.colors.text.secondary} hover:${theme.colors.text.primary}`}
             >
               📖 Help
             </button>
             <button
               onClick={() => setShowMatrix(true)}
-              className="px-4 py-2 bg-purple-600 hover:bg-purple-500 text-white text-sm rounded transition"
+              className={`px-4 py-2 text-sm transition-all duration-300 ${theme.layout.borderRadius} hover:bg-white/10 ${theme.colors.text.secondary} hover:${theme.colors.text.primary}`}
             >
               📊 Path Matrix
             </button>
@@ -352,7 +356,7 @@ const AtlasAdminContent = () => {
       >
         {/* Left Control Panel */}
         {areSidebarsVisible && (
-          <aside className="w-80 flex-shrink-0 bg-gray-900/95 backdrop-blur-sm border-r border-gray-800 overflow-y-auto">
+          <aside className={`w-80 flex-shrink-0 border-r overflow-y-auto transition-colors duration-500 ${theme.colors.background} ${theme.effects.backdropBlur} ${theme.colors.border}`}>
             <ControlPanel />
           </aside>
         )}
@@ -379,6 +383,9 @@ const AtlasAdminContent = () => {
 
                 {/* Animator Driver */}
                 <VACAnimator />
+
+                {/* Background */}
+                <Stars radius={100} depth={50} count={5000} factor={4} saturation={0} fade speed={1} />
 
                 {/* Main Content */}
                 <AtlasScene />
@@ -409,7 +416,10 @@ const AtlasAdminContent = () => {
             </Suspense>
             <div className="absolute inset-0 pointer-events-none">
               {layers.legend && <LegendOverlay />}
-              <EmotionLabelOverlay labels={labelPositions} />
+              <div className="absolute inset-0 pointer-events-none">
+                {layers.legend && <LegendOverlay />}
+                <EmotionLabelOverlay labels={labelPositions} />
+              </div>
             </div>
           </main>
         )}
@@ -419,28 +429,27 @@ const AtlasAdminContent = () => {
           <div
             data-testid="resize-handle"
             onMouseDown={handleMouseDown}
-            className={`w-2 flex-shrink-0 bg-gray-700 hover:bg-cyan-500 cursor-col-resize transition flex items-center justify-center ${
-              isResizing ? "bg-cyan-500" : ""
-            }`}
+            className={`w-2 flex-shrink-0 cursor-col-resize transition flex items-center justify-center hover:bg-cyan-500/50 ${isResizing ? "bg-cyan-500" : "bg-transparent"
+              }`}
             style={{ touchAction: "none" }}
           >
-            <div className="w-px h-8 bg-gray-500" />
+            <div className={`w-px h-8 ${theme.colors.border} bg-current opacity-50`} />
           </div>
         )}
 
         {/* Right Info Panel - Resizable/Expandable */}
         {areSidebarsVisible && (
           <aside
-            className="flex-shrink-0 bg-gray-900/95 backdrop-blur-sm border-l border-gray-800 overflow-y-auto flex flex-col"
+            className={`flex-shrink-0 border-l overflow-y-auto flex flex-col transition-colors duration-500 ${theme.colors.background} ${theme.effects.backdropBlur} ${theme.colors.border}`}
             style={{
               width: isInfoPanelExpanded ? "calc(100% - 320px)" : `${infoPanelWidth}px`,
             }}
           >
             {/* Expand/Collapse Button */}
-            <div className="p-2 border-b border-gray-700 flex justify-end">
+            <div className={`p-2 border-b flex justify-end ${theme.colors.border}`}>
               <button
                 onClick={() => setIsInfoPanelExpanded(!isInfoPanelExpanded)}
-                className="px-3 py-1 bg-gray-700 hover:bg-gray-600 text-white text-xs rounded transition"
+                className={`px-3 py-1 text-xs transition ${theme.layout.borderRadius} ${theme.colors.background} hover:brightness-125 border ${theme.colors.border} ${theme.colors.text.secondary}`}
                 title={isInfoPanelExpanded ? "Collapse panel" : "Expand panel"}
               >
                 {isInfoPanelExpanded ? "◀ Collapse" : "▶ Expand"}

@@ -1,5 +1,6 @@
 import { Toggle, ToggleGroup } from "@/components/ui/Toggle";
 import type { ToneMode } from "@/types/chat";
+import { useAdminTheme } from "@/hooks/admin/useAdminTheme";
 
 interface ChatHeaderProps {
   isExpanded: boolean;
@@ -32,19 +33,20 @@ export function ChatHeader({
   onUseAtlasMappingChange,
   onDeepFeelingModeChange,
 }: ChatHeaderProps) {
+  const theme = useAdminTheme();
   return (
-    <div className="flex items-center justify-between px-6 py-3 border-b border-gray-700 bg-gray-900">
+    <div className={`flex items-center justify-between px-6 py-3 border-b ${theme.colors.border} ${theme.colors.background}`}>
       <div className="flex items-center gap-4">
         {/* Expand/Collapse Button */}
         <button
           onClick={onToggleExpand}
-          className="text-white hover:text-cyan-400 transition text-lg"
+          className={`text-white hover:text-cyan-400 transition text-lg`}
           title={isExpanded ? "Collapse chat" : "Expand chat"}
         >
           {isExpanded ? "▼" : "▲"}
         </button>
 
-        <h3 className="text-lg font-semibold text-white flex items-center gap-2">
+        <h3 className={`text-lg font-semibold ${theme.colors.text.primary} flex items-center gap-2`}>
           💬 Emotional Chat
         </h3>
 

@@ -34,6 +34,7 @@ export function AtlasScene() {
       )}
 
       {/* Optional: Background Soul Sphere for context (render second with depth write disabled) */}
+      {/* Optional: Background Soul Sphere for context (render second with depth write disabled) */}
       {layers.soulSphere && (
         <group scale={0.8} position={[0, 0, 0]} renderOrder={0}>
           <SoulSphere />

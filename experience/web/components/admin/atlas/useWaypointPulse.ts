@@ -1,10 +1,11 @@
 import { useFrame } from "@react-three/fiber";
 import { RefObject } from "react";
 import * as THREE from "three";
+import type { PathAnimationMode } from "@/types/atlas-admin";
 
 export function useWaypointPulse(
   meshRef: RefObject<THREE.Mesh | null>,
-  mode: "subtle" | "dynamic" | "mystical"
+  mode: PathAnimationMode
 ) {
   useFrame((state) => {
     if (!meshRef.current) return;
@@ -13,11 +14,6 @@ export function useWaypointPulse(
     let pulse = 1.0;
 
     switch (mode) {
-      case "subtle":
-        // Gentle pulsing (2.0 Hz, 10% amplitude)
-        pulse = 1.0 + Math.sin(time * 2.0) * 0.1;
-        break;
-
       case "dynamic": {
         // Bouncy pulsing (3.5 Hz, 20% amplitude with harmonic overshoot)
         const base = Math.sin(time * 3.5) * 0.2;
@@ -34,6 +30,12 @@ export function useWaypointPulse(
         pulse = 1.0 + wave1 + wave2 + wave3;
         break;
       }
+
+      case "subtle":
+      default:
+        // Gentle pulsing (2.0 Hz, 10% amplitude)
+        pulse = 1.0 + Math.sin(time * 2.0) * 0.1;
+        break;
     }
 
     meshRef.current.scale.setScalar(pulse);

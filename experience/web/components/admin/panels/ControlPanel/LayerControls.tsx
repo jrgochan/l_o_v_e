@@ -27,6 +27,8 @@ interface LayerControlsProps {
   onToggleLayer: (layer: keyof LayerVisibility) => void;
 }
 
+import { useAdminTheme } from "@/hooks/admin/useAdminTheme";
+
 /**
  * Renders layer visibility controls, settings, and keyboard shortcuts
  */
@@ -40,35 +42,37 @@ export function LayerControls({
   onUpdateSetting,
   onToggleLayer,
 }: LayerControlsProps) {
+  const theme = useAdminTheme();
+
   return (
     <>
       {/* Visibility Filters (Scene Rendering) */}
       <section>
         <div className="flex items-center justify-between mb-2">
-          <h2 className="text-sm font-semibold text-gray-400">
-            Visibility <span className="text-xs text-gray-500">(Scene)</span>
+          <h2 className={`text-sm font-semibold ${theme.colors.text.secondary}`}>
+            Visibility <span className={`text-xs ${theme.colors.text.muted}`}>(Scene)</span>
           </h2>
           <button
             onClick={onToggleAllCategories}
-            className="text-xs text-cyan-400 hover:text-cyan-300"
+            className={`text-xs ${theme.colors.primary} hover:${theme.colors.secondary}`}
           >
             {allCategoriesEnabled ? "Hide All" : "Show All"}
           </button>
         </div>
-        <div className="space-y-1 max-h-32 overflow-y-auto">
+        <div className="space-y-1 max-h-32 overflow-y-auto custom-scrollbar">
           {Array.from(categoryFilters.values()).map((filter) => (
             <label
               key={filter.name}
-              className="flex items-center gap-2 px-2 py-1.5 hover:bg-gray-800 rounded cursor-pointer"
+              className={`flex items-center gap-2 px-2 py-1.5 ${theme.layout.borderRadius} cursor-pointer transition-colors ${theme.colors.hover}`}
             >
               <input
                 type="checkbox"
                 checked={filter.enabled}
                 onChange={() => onToggleCategoryFilter(filter.name)}
-                className="rounded"
+                className={`rounded border-gray-600 bg-transparent focus:ring-1 focus:ring-offset-0 ${theme.colors.primary}`}
               />
-              <div className="w-3 h-3 rounded" style={{ backgroundColor: filter.color }} />
-              <span className="text-sm text-gray-300 flex-1 truncate" title={filter.name}>
+              <div className="w-3 h-3 rounded-full" style={{ backgroundColor: filter.color }} />
+              <span className={`text-sm flex-1 truncate ${theme.colors.text.secondary}`} title={filter.name}>
                 {filter.name}
               </span>
             </label>
@@ -78,95 +82,55 @@ export function LayerControls({
 
       {/* Settings */}
       <section>
-        <h2 className="text-sm font-semibold text-gray-400 mb-2">Settings</h2>
+        <h2 className={`text-sm font-semibold mb-2 ${theme.colors.text.secondary}`}>Settings</h2>
         <div className="space-y-2">
-          <label className="flex items-center gap-2 cursor-pointer">
+          <label className={`flex items-center gap-2 cursor-pointer ${theme.colors.text.secondary} hover:${theme.colors.text.primary}`}>
             <input
               type="checkbox"
               checked={settings.computeMode !== "manual"}
               onChange={(e) =>
                 onUpdateSetting("computeMode", e.target.checked ? "cache-first" : "manual")
               }
-              className="rounded"
+              className="rounded border-gray-600 bg-transparent"
             />
-            <span className="text-sm text-gray-300">Auto-compute paths</span>
+            <span className="text-sm">Auto-compute paths</span>
           </label>
 
-          <label className="flex items-center gap-2 cursor-pointer">
+          <label className={`flex items-center gap-2 cursor-pointer ${theme.colors.text.secondary} hover:${theme.colors.text.primary}`}>
             <input
               type="checkbox"
               checked={settings.enableAnimations}
               onChange={(e) => onUpdateSetting("enableAnimations", e.target.checked)}
-              className="rounded"
+              className="rounded border-gray-600 bg-transparent"
             />
-            <span className="text-sm text-gray-300">Enable animations</span>
+            <span className="text-sm">Enable animations</span>
           </label>
         </div>
       </section>
 
       {/* Layer Toggles */}
       <section>
-        <h2 className="text-sm font-semibold text-gray-400 mb-2">Layers</h2>
+        <h2 className={`text-sm font-semibold mb-2 ${theme.colors.text.secondary}`}>Layers</h2>
         <div className="space-y-2">
-          <label className="flex items-center gap-2 cursor-pointer">
-            <input
-              type="checkbox"
-              checked={layers.soulSphere}
-              onChange={() => onToggleLayer("soulSphere")}
-              className="rounded"
-            />
-            <span className="text-sm text-gray-300">Soul Sphere</span>
-          </label>
-
-          <label className="flex items-center gap-2 cursor-pointer">
-            <input
-              type="checkbox"
-              checked={layers.emotionPoints}
-              onChange={() => onToggleLayer("emotionPoints")}
-              className="rounded"
-            />
-            <span className="text-sm text-gray-300">Emotion Points</span>
-          </label>
-
-          <label className="flex items-center gap-2 cursor-pointer">
-            <input
-              type="checkbox"
-              checked={layers.emotionLabels}
-              onChange={() => onToggleLayer("emotionLabels")}
-              className="rounded"
-            />
-            <span className="text-sm text-gray-300">Labels</span>
-          </label>
-
-          <label className="flex items-center gap-2 cursor-pointer">
-            <input
-              type="checkbox"
-              checked={layers.transitionPaths}
-              onChange={() => onToggleLayer("transitionPaths")}
-              className="rounded"
-            />
-            <span className="text-sm text-gray-300">Paths</span>
-          </label>
-
-          <label className="flex items-center gap-2 cursor-pointer">
-            <input
-              type="checkbox"
-              checked={layers.waypoints}
-              onChange={() => onToggleLayer("waypoints")}
-              className="rounded"
-            />
-            <span className="text-sm text-gray-300">Waypoints</span>
-          </label>
-
-          <label className="flex items-center gap-2 cursor-pointer">
-            <input
-              type="checkbox"
-              checked={layers.legend}
-              onChange={() => onToggleLayer("legend")}
-              className="rounded"
-            />
-            <span className="text-sm text-gray-300">Legend</span>
-          </label>
+          {Object.entries(layers).map(([key, value]) => {
+            if (key === "viewerShortcuts" || key === "vacDisplay") return null; // Skip some layers
+            return (
+              <label
+                key={key}
+                className={`flex items-center gap-2 cursor-pointer ${theme.colors.text.secondary} hover:${theme.colors.text.primary}`}
+              >
+                <input
+                  type="checkbox"
+                  checked={value}
+                  onChange={() => onToggleLayer(key as keyof LayerVisibility)}
+                  className="rounded border-gray-600 bg-transparent"
+                />
+                <span className="text-sm capitalize">
+                  {key.replace(/([A-Z])/g, " $1").trim()} {/* Proper Case */}
+                </span>
+              </label>
+            );
+          })}
         </div>
       </section>
 
@@ -177,47 +141,19 @@ export function LayerControls({
 
       {/* Keyboard Shortcuts Help */}
       <section>
-        <h2 className="text-sm font-semibold text-gray-400 mb-2">Shortcuts</h2>
-        <div className="text-xs text-gray-400 space-y-1">
+        <h2 className={`text-sm font-semibold mb-2 ${theme.colors.text.secondary}`}>Shortcuts</h2>
+        <div className={`text-xs space-y-1 ${theme.colors.text.muted}`}>
           <div className="flex items-center gap-2">
-            <kbd className="px-1.5 py-0.5 bg-gray-700 rounded">Esc</kbd>
+            <kbd className={`px-1.5 py-0.5 rounded bg-gray-800 border ${theme.colors.border}`}>Esc</kbd>
             <span>Clear selection</span>
           </div>
           <div className="flex items-center gap-2">
-            <kbd className="px-1.5 py-0.5 bg-gray-700 rounded">B</kbd>
-            <span>Select bridge emotions</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <kbd className="px-1.5 py-0.5 bg-purple-700 rounded">M</kbd>
+            <kbd className={`px-1.5 py-0.5 rounded bg-gray-800 border ${theme.colors.border}`}>M</kbd>
             <span>Cycle animation modes</span>
           </div>
           <div className="flex items-center gap-2">
-            <kbd className="px-1.5 py-0.5 bg-gray-700 rounded">Space</kbd>
+            <kbd className={`px-1.5 py-0.5 rounded bg-gray-800 border ${theme.colors.border}`}>Space</kbd>
             <span>Toggle paths</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <kbd className="px-1.5 py-0.5 bg-gray-700 rounded">F</kbd>
-            <span>Toggle focus mode</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <kbd className="px-1.5 py-0.5 bg-gray-700 rounded">L</kbd>
-            <span>Toggle labels</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <kbd className="px-1.5 py-0.5 bg-gray-700 rounded">S</kbd>
-            <span>Toggle sphere</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <kbd className="px-1.5 py-0.5 bg-gray-700 rounded">O</kbd>
-            <span>Toggle motion</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <kbd className="px-1.5 py-0.5 bg-gray-700 rounded">A</kbd>
-            <span>Toggle axes</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <kbd className="px-1.5 py-0.5 bg-gray-700 rounded">H</kbd>
-            <span>Help (console)</span>
           </div>
         </div>
       </section>

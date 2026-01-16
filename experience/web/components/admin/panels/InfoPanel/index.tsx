@@ -22,6 +22,7 @@ import { PathDetails } from "./PathDetails";
 import { PathComparison } from "./PathComparison";
 import { PathSummaryList } from "./PathSummaryList";
 import { ActionSuggestions } from "./ActionSuggestions";
+import { useAdminTheme } from "@/hooks/admin/useAdminTheme";
 
 export function InfoPanel() {
   const {
@@ -35,34 +36,37 @@ export function InfoPanel() {
     selectedPaths,
     isComputingPaths,
     pathAnimationMode,
+    deselectEmotion,
   } = useInfoPanelState();
+
+  const theme = useAdminTheme();
 
   // Local state for full journey navigation (Start -> Waypoints -> End)
   // This allows visiting Start/End nodes which aren't in 'selectedWaypoint' type
   const [modalStepIndex, setModalStepIndex] = useState<number | null>(null);
 
   return (
-    <div className="h-full flex flex-col bg-gray-900/95">
+    <div className={`h-full flex flex-col transition-colors duration-500 ${theme.colors.background} ${theme.effects.backdropBlur}`}>
       {/* Tab Navigation */}
-      <div className="flex-shrink-0 p-3 border-b border-gray-800/50 bg-gray-950/50">
-        <div className="flex gap-1 bg-gray-900 p-1 rounded-lg border border-gray-800">
+      <div className={`flex-shrink-0 p-3 border-b ${theme.colors.border} bg-black/10`}>
+        <div className={`flex gap-1 p-1 border ${theme.layout.borderRadius} ${theme.colors.border} bg-black/20`}>
           <button
             onClick={() => setActiveTab("info")}
-            className={`flex-1 px-4 py-2 text-sm font-medium rounded-md transition-all ${
-              activeTab === "info"
-                ? "bg-cyan-900/40 text-cyan-100 shadow-sm border border-cyan-700/50"
-                : "text-gray-400 hover:text-gray-200 hover:bg-gray-800/50"
-            }`}
+            className={`flex-1 px-4 py-2 text-sm font-medium transition-all ${theme.layout.borderRadius} ${activeTab === "info"
+              ? `${theme.colors.primary} border border-white/10 shadow-sm bg-white/10`
+              : `${theme.colors.text.secondary} hover:${theme.colors.text.primary} hover:bg-white/5`
+              }`}
+            style={{ fontFamily: theme.typography.fontFamily === "font-mono" ? "monospace" : undefined }}
           >
             📋 Info & Paths
           </button>
           <button
             onClick={() => setActiveTab("stats")}
-            className={`flex-1 px-4 py-2 text-sm font-medium rounded-md transition-all ${
-              activeTab === "stats"
-                ? "bg-cyan-900/40 text-cyan-100 shadow-sm border border-cyan-700/50"
-                : "text-gray-400 hover:text-gray-200 hover:bg-gray-800/50"
-            }`}
+            className={`flex-1 px-4 py-2 text-sm font-medium transition-all ${theme.layout.borderRadius} ${activeTab === "stats"
+              ? `${theme.colors.primary} border border-white/10 shadow-sm bg-white/10`
+              : `${theme.colors.text.secondary} hover:${theme.colors.text.primary} hover:bg-white/5`
+              }`}
+            style={{ fontFamily: theme.typography.fontFamily === "font-mono" ? "monospace" : undefined }}
           >
             📊 Statistics
           </button>
@@ -87,7 +91,11 @@ export function InfoPanel() {
                   animationMode={pathAnimationMode}
                 />
               ) : selectedEmotions.length > 0 ? (
-                <EmotionList emotions={selectedEmotions} animationMode={pathAnimationMode} />
+                <EmotionList
+                  emotions={selectedEmotions}
+                  animationMode={pathAnimationMode}
+                  onRemove={deselectEmotion}
+                />
               ) : null}
 
               {/* Path Details */}
@@ -132,40 +140,40 @@ export function InfoPanel() {
               {/* Enhanced Empty State */}
               {selectedEmotions.length === 0 && selectedPaths.length === 0 && (
                 <section className="mt-8">
-                  <div className="bg-gray-800/50 border border-gray-700/50 rounded-lg p-6 space-y-4">
+                  <div className={`border rounded-lg p-6 space-y-4 bg-white/5 ${theme.colors.border}`}>
                     <div className="text-center mb-4">
                       <div className="text-4xl mb-2">💡</div>
-                      <h2 className="text-lg font-semibold text-gray-300">Getting Started</h2>
+                      <h2 className={`text-lg font-semibold ${theme.colors.text.primary}`}>Getting Started</h2>
                     </div>
 
-                    <div className="space-y-3 text-sm text-gray-400">
-                      <div className="flex items-start gap-3 p-3 bg-gray-900/50 rounded-md border border-gray-700/30">
-                        <span className="text-cyan-400 text-lg flex-shrink-0">1.</span>
+                    <div className={`space-y-3 text-sm ${theme.colors.text.secondary}`}>
+                      <div className={`flex items-start gap-3 p-3 rounded-md border bg-black/20 ${theme.colors.border}`}>
+                        <span className={`text-lg flex-shrink-0 ${theme.colors.primary.replace('bg-', 'text-').replace('border-', 'text-')}`}>1.</span>
                         <div>
-                          <strong className="text-gray-300">Select emotions</strong> from the left
+                          <strong className={theme.colors.text.primary}>Select emotions</strong> from the left
                           panel or click them in the 3D view
                         </div>
                       </div>
 
-                      <div className="flex items-start gap-3 p-3 bg-gray-900/50 rounded-md border border-gray-700/30">
-                        <span className="text-cyan-400 text-lg flex-shrink-0">2.</span>
+                      <div className={`flex items-start gap-3 p-3 rounded-md border bg-black/20 ${theme.colors.border}`}>
+                        <span className={`text-lg flex-shrink-0 ${theme.colors.primary.replace('bg-', 'text-').replace('border-', 'text-')}`}>2.</span>
                         <div>
-                          <strong className="text-gray-300">Paths</strong> are automatically
+                          <strong className={theme.colors.text.primary}>Paths</strong> are automatically
                           computed between selected emotions
                         </div>
                       </div>
 
-                      <div className="flex items-start gap-3 p-3 bg-gray-900/50 rounded-md border border-gray-700/30">
-                        <span className="text-cyan-400 text-lg flex-shrink-0">3.</span>
+                      <div className={`flex items-start gap-3 p-3 rounded-md border bg-black/20 ${theme.colors.border}`}>
+                        <span className={`text-lg flex-shrink-0 ${theme.colors.primary.replace('bg-', 'text-').replace('border-', 'text-')}`}>3.</span>
                         <div>
-                          <strong className="text-gray-300">Hover</strong> over emotions and paths
+                          <strong className={theme.colors.text.primary}>Hover</strong> over emotions and paths
                           to see detailed information here
                         </div>
                       </div>
                     </div>
 
-                    <div className="mt-4 pt-4 border-t border-gray-700/50">
-                      <div className="flex items-center gap-2 text-xs text-gray-500">
+                    <div className={`mt-4 pt-4 border-t ${theme.colors.border}`}>
+                      <div className={`flex items-center gap-2 text-xs ${theme.colors.text.muted}`}>
                         <span className="text-yellow-400 text-base">★</span>
                         <span>
                           <strong className="text-yellow-400">Bridge Emotions</strong> are gateway

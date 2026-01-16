@@ -55,4 +55,20 @@ describe("EmotionList", () => {
     // Assuming "basic" might not be in the real map, let's check the fallback behavior which we confirmed is #888888 (rgb(136, 136, 136))
     expect(categoryEl).toHaveStyle({ color: "#888888" }); // Fallback color
   });
+
+  it("calls onRemove when remove button is clicked", () => {
+    const onRemove = jest.fn();
+    render(
+      <EmotionList
+        emotions={[mockEmotions[0]] as any}
+        animationMode="dynamic"
+        onRemove={onRemove}
+      />
+    );
+
+    const removeButton = screen.getByTitle("Remove from selection");
+    removeButton.click();
+
+    expect(onRemove).toHaveBeenCalledWith(mockEmotions[0].id);
+  });
 });

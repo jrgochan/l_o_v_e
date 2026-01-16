@@ -19,7 +19,7 @@ interface PathParticlesProps {
   size?: number;
   opacity?: number;
   isHighlighted?: boolean;
-  mode?: "subtle" | "dynamic" | "mystical";
+  mode?: string; // Using string to accept all modes easily without circular dep on types
 }
 
 export function PathParticles({
@@ -32,10 +32,16 @@ export function PathParticles({
   mode = "subtle",
 }: PathParticlesProps) {
   // Adjust particle parameters based on animation mode
-  const modeParams = {
+  // Using explicit type cast to allow indexing by any PathAnimationMode string if needed,
+  // or just ensuring keys match the string union.
+  const modeParams: Record<string, { count: number; speedMult: number; sizeMult: number; glowMult: number }> = {
     subtle: { count: 10, speedMult: 0.6, sizeMult: 0.8, glowMult: 2.0 },
     dynamic: { count: 18, speedMult: 1.0, sizeMult: 1.2, glowMult: 2.5 },
     mystical: { count: 28, speedMult: 0.8, sizeMult: 1.0, glowMult: 3.0 },
+    crystalline: { count: 15, speedMult: 0.0, sizeMult: 0.6, glowMult: 4.0 }, // Static sparkles
+    luminous: { count: 40, speedMult: 2.0, sizeMult: 1.5, glowMult: 5.0 }, // High speed flow
+    liquid: { count: 25, speedMult: 0.5, sizeMult: 1.1, glowMult: 2.0 }, // Slow flow
+    glitch: { count: 5, speedMult: 10.0, sizeMult: 0.5, glowMult: 10.0 }, // Random chaotic
   };
 
   const params = modeParams[mode];
