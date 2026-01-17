@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import { useAuthStore } from "@/stores/authStore";
 import { UserRole } from "@/types/auth";
@@ -16,19 +16,31 @@ export function AuthGuard({ children, requiredRole, fallback }: AuthGuardProps) 
   const pathname = usePathname();
   const { user, isLoading } = useAuthStore();
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated());
+  const [mounted, setMounted] = useState(false);
 
   // Derived state (no useState needed)
   const isAuthorized = !requiredRole || user?.role === requiredRole;
 
   useEffect(() => {
-    // Only redirect if not loading and not authenticated
-    if (!isLoading && !isAuthenticated) {
+    setMounted(true);
+  }, []);
+
+  useEffect(() => {
+    // Only redirect if mounted, not loading, and not authenticated
+    if (mounted && !isLoading && !isAuthenticated) {
       if (process.env.NODE_ENV === "development") {
         console.log(`[AuthGuard] Unauthenticated access attempt to ${pathname}`);
       }
       router.push("/");
     }
-  }, [isLoading, isAuthenticated, pathname, router]);
+  }, [mounted, isLoading, isAuthenticated, pathname, router]);
+
+  // Prevent mismatch: Server renders null (since hooks don't run fully/store is default),
+  // but Client might render loading spinner immediately depending on store state.
+  // We force null until mounted to ensure hydration matches.
+  if (!mounted) {
+    return null;
+  }
 
   // Loading state
   if (isLoading) {

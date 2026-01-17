@@ -1,4 +1,4 @@
-FROM python:3.11-slim
+FROM python:3.14-slim
 
 WORKDIR /app
 
@@ -8,13 +8,13 @@ WORKDIR /app
 # build-essential: compilation tools
 # curl: healthcheck
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    curl \
-    ffmpeg \
-    libsndfile1 \
-    build-essential \
-    cmake \
-    ninja-build \
-    && rm -rf /var/lib/apt/lists/*
+  curl \
+  ffmpeg \
+  libsndfile1 \
+  build-essential \
+  cmake \
+  ninja-build \
+  && rm -rf /var/lib/apt/lists/*
 
 # Install Python dependencies
 COPY requirements.txt .

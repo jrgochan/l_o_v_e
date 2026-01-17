@@ -15,7 +15,7 @@ This directory contains all orchestration scripts, configuration, and documentat
   - Intelligent pre-flight checks and error handling
 
 - **`setup-love-stack.sh`** - Initial environment setup
-  - Verifies Python 3.11+ installation
+  - Verifies Python 3.14+ installation
   - Checks system dependencies (PostgreSQL, Redis, Ollama, ffmpeg)
   - Creates virtual environments for all modules
   - Installs Python dependencies
@@ -314,8 +314,8 @@ Copy from `.env.example` files if needed.
 
 ### Python Version
 
-The stack requires Python 3.11+. The setup script will:
-1. Try to find Python 3.11 or 3.12
+The stack requires Python 3.14+. The setup script will:
+1. Try to find Python 3.14
 2. Save the command to `.python_cmd`
 3. Use this version for all modules
 

@@ -147,7 +147,7 @@ logger.info("audio_ingested", extra={
 Before production:
 
 - [ ] Audio deleted immediately after processing
-- [ ] PII scrubbing active (Spacy NER)
+- [ ] PII scrubbing active (Transformers NER)
 - [ ] Secondary PII check in Observer
 - [ ] GDPR delete endpoint implemented
 - [ ] Audit logging for all processing

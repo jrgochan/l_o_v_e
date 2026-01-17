@@ -1,50 +1,51 @@
 # Listener Module - Dependencies
-# Python 3.11+
+# Python 3.14+
 
 # FastAPI & Server
-fastapi==0.109.0
-uvicorn[standard]==0.27.0
-python-multipart==0.0.6
+fastapi[all]==0.115.6
+uvicorn[standard]==0.34.0
+python-multipart==0.0.20
 
 # Audio Transcription (Local)
-openai-whisper==20231117  # Official OpenAI Whisper (compatible with modern ffmpeg)
-ffmpeg-python==0.2.0  # Audio processing utilities
+openai-whisper==20250625
+ffmpeg-python==0.2.0
 
 # Prosody Analysis
-librosa==0.10.1
-soundfile==0.12.1
-praat-parselmouth==0.4.3
+librosa==0.10.2.post1
+numba>=0.63.0
+soundfile==0.13.0
+praat-parselmouth==0.4.7
 
 # LLM & NLP (Local)
-langchain==0.1.20
-langchain-community==0.0.38
-ollama==0.1.6
-spacy==3.7.2
+langchain==0.3.14
+langchain-community==0.3.14
+ollama==0.4.6
+transformers>=4.48.0
+
+# Core AI - Explicit version pinning for Python 3.14 compatibility
+torch==2.9.1
+numpy==2.3.1
 
 # Task Queue
-arq==0.25.0
-redis==5.0.1
+arq==0.26.1
+redis==5.2.1
 
 # Data Models & Validation
-pydantic==2.5.3
-pydantic-settings==2.1.0
+pydantic==2.12.5
+pydantic-settings==2.7.0
 python-jose[cryptography]==3.3.0
 
 # HTTP Client
-# httpx version managed by langchain dependency
-aiofiles==23.2.1
+aiofiles==24.1.0
+httpx==0.27.2
 
 # Testing
-pytest==7.4.4
-pytest-asyncio==0.23.3
-pytest-cov==4.1.0
-pytest-mock==3.12.0
+pytest==8.3.4
+pytest-asyncio==0.25.0
+pytest-cov==6.0.0
+pytest-mock==3.14.0
 
 # Development
-python-dotenv==1.0.0
-
-# Dev dependencies
-flake8
-mypy
-
-
+python-dotenv==1.0.1
+flake8==7.1.1
+mypy==1.14.0

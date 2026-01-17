@@ -1,4 +1,4 @@
-FROM python:3.11-slim
+FROM python:3.14-slim
 
 WORKDIR /app
 
@@ -7,10 +7,10 @@ WORKDIR /app
 # but we use psycopg2-binary. However asyncpg might need it too or basic gcc.
 # git is often needed for some pip installs or tools.
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    curl \
-    gcc \
-    libpq-dev \
-    && rm -rf /var/lib/apt/lists/*
+  curl \
+  gcc \
+  libpq-dev \
+  && rm -rf /var/lib/apt/lists/*
 
 # Install Python dependencies
 COPY requirements.txt .

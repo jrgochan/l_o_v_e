@@ -14,7 +14,7 @@ The **Listener Module** is the input layer of the L.O.V.E. platform—it transfo
 **Key Facts:**
 
 - **Purpose:** Convert voice/text → VAC coordinates (Valence, Arousal, Connection)
-- **Technology:** Python 3.11 + FastAPI + Local LLM (Ollama)
+- **Technology:** Python 3.14 + FastAPI + Local LLM (Ollama)
 - **Performance:** ~2s per analysis (within target)
 - **Status:** ✅ Production ready
 - **Team Size:** 2-3 engineers recommended
@@ -162,7 +162,7 @@ For active development and maintenance:
 
 | Skill | Importance | Current Team Coverage |
 |-------|------------|----------------------|
-| Python 3.11+ | ⭐⭐⭐⭐⭐ | ✅ Strong |
+| Python 3.14+ | ⭐⭐⭐⭐⭐ | ✅ Strong |
 | FastAPI | ⭐⭐⭐⭐ | ✅ Strong |
 | LLM/Prompt Engineering | ⭐⭐⭐⭐ | ✅ Strong |
 | Async Programming | ⭐⭐⭐ | ✅ Good |

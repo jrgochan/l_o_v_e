@@ -1,6 +1,6 @@
 # L.O.V.E. Stack - Complete Setup Guide
 
-This guide helps you set up the entire L.O.V.E. stack (Listener-Observer-Versor-Experience) with consistent Python 3.11 environments across all modules.
+This guide helps you set up the entire L.O.V.E. stack (Listener-Observer-Versor-Experience) with consistent Python 3.14 environments across all modules.
 
 ## 🚀 Quick Start
 
@@ -11,7 +11,7 @@ This guide helps you set up the entire L.O.V.E. stack (Listener-Observer-Versor-
 ```
 
 This script will:
-- ✅ Check for Python 3.11+ (install if needed)
+- ✅ Check for Python 3.14+ (install if needed)
 - ✅ Verify system dependencies (PostgreSQL, Redis, Ollama, ffmpeg)
 - ✅ Create virtual environments for all Python modules
 - ✅ Install all dependencies
@@ -39,7 +39,7 @@ This script will:
 
 1. **macOS** (or Linux with adjustments)
 2. **Homebrew** package manager
-3. **Python 3.11+** (script can install)
+3. **Python 3.14+** (script can install)
 4. **Node.js 18+** (for Experience module)
 
 ### System Dependencies
@@ -55,11 +55,11 @@ The setup script will check and optionally install:
 
 ## 🔧 Manual Setup (If Needed)
 
-### Install Python 3.11
+### Install Python 3.14
 
 **Option 1: Homebrew**
 ```bash
-brew install python@3.11
+brew install python@3.14
 ```
 
 **Option 2: pyenv (for version management)**
@@ -386,7 +386,7 @@ for module in versor observer listener; do
 done
 ```
 
-Should output Python 3.11.x (or 3.12.x) for all three.
+Should output Python 3.14.x for all three.
 
 ### Test End-to-End Pipeline
 
@@ -468,7 +468,7 @@ pytest tests/semantic/test_connection_axis.py -v
 You'll know setup is complete when:
 
 ✅ `./test-love-stack.sh` shows 🟢 HEALTHY  
-✅ All three modules use Python 3.11+  
+✅ All three modules use Python 3.14+  
 ✅ PostgreSQL, Redis, and Ollama are running  
 ✅ All fast tests pass  
 ✅ Critical semantic test validates Connection axis  

@@ -68,7 +68,7 @@ The Listener employs a **Hybrid Edge-Cloud** architecture to balance real-time r
 │  │  Step 2: LangChain + LLM                               │  │
 │  │    └─ Text → VAC extraction                            │  │
 │  │                                                         │  │
-│  │  Step 3: Spacy NER                                     │  │
+│  │  Step 3: Transformers NER                              │  │
 │  │    └─ PII scrubbing                                    │  │
 │  │                                                         │  │
 │  │  Step 4: Call Observer API                             │  │
@@ -115,7 +115,7 @@ listener/
 │   │   ├── services/
 │   │   │   ├── transcription.py     # faster-whisper
 │   │   │   ├── semantic_analyzer.py # LangChain + LLM
-│   │   │   ├── pii_scrubber.py      # Spacy NER
+│   │   │   ├── pii_scrubber.py      # Transformers NER
 │   │   │   └── observer_client.py   # Observer API calls
 │   │   │
 │   │   ├── workers/
@@ -165,7 +165,7 @@ listener/
    ↓
 14. LLM returns structured JSON (Pydantic validated)
    ↓
-15. Spacy NER scrubs PII
+15. Transformers NER scrubs PII
    ↓
 16. Observer API called → Store state
    ↓

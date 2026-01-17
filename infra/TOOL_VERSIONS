@@ -3,7 +3,7 @@
 # Update this file and run: infra/scripts/sync-versions.sh
 
 # === Python Toolchain ===
-PYTHON_MIN_VERSION=3.11
+PYTHON_MIN_VERSION=3.14
 
 # === Python Quality Tools ===
 BLACK_VERSION=23.12.1
@@ -51,7 +51,7 @@ PRECOMMIT_HOOKS_REV=v4.5.0
 # === Database & Infrastructure Tools ===
 # Version strategy: Use latest available, validate against minimum requirements
 # PostgreSQL - Version agnostic (auto-detects installed version)
-POSTGRESQL_MIN_VERSION=14.0
+POSTGRESQL_MIN_VERSION=18.0
 POSTGRESQL_STRATEGY=version-agnostic
 PGVECTOR_MIN_VERSION=0.5.0
 

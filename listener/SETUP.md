@@ -95,11 +95,7 @@ pip install --upgrade pip
 pip install -r requirements.txt
 ```
 
-### Step 3: Install Spacy Language Model
 
-```bash
-python -m spacy download en_core_web_sm
-```
 
 ### Step 4: Download Ollama Model
 

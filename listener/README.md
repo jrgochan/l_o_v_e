@@ -10,7 +10,7 @@ The Listener Module is the first point of contact between human expression and t
 
 - **🎤 Audio Transcription**: Local Whisper model (faster-whisper) - no API keys needed
 - **🧠 Semantic VAC Extraction**: Local LLM (Ollama + Llama 3.1) - complete privacy
-- **🔐 PII Sanitization**: Automatic removal of personal information (Spacy NER)
+- **🔐 PII Sanitization**: Automatic removal of personal information (Transformers/BERT NER)
 - **⚡ Async Processing**: Redis + Arq for non-blocking operations
 - **🎯 Connection Axis**: Novel dimension not found in standard sentiment analysis
 
@@ -42,7 +42,7 @@ Audio/Text Input
 └──────────┬──────────────┘
            ↓
 ┌─────────────────────────┐
-│  PII Scrubber           │  Spacy NER
+│  PII Scrubber           │  Transformers NER
 │  └─ Privacy protection  │
 └──────────┬──────────────┘
            ↓
@@ -59,7 +59,7 @@ Audio/Text Input
 | **Transcription** | faster-whisper | Local speech-to-text |
 | **LLM** | Ollama (Llama 3.1 8B) | Local semantic analysis |
 | **Task Queue** | Redis + Arq | Async job processing |
-| **NER** | Spacy | PII detection |
+| **NER** | Transformers (BERT) | PII detection |
 | **API** | FastAPI | REST endpoints |
 | **Validation** | Pydantic | Type-safe schemas |
 
@@ -88,7 +88,7 @@ cd listener
 python3.11 -m venv venv
 source venv/bin/activate
 pip install -r requirements.txt
-python -m spacy download en_core_web_sm
+
 ```
 
 ### Run
@@ -203,7 +203,7 @@ listener/
 │   ├── services/
 │   │   ├── transcription.py    # faster-whisper
 │   │   ├── semantic_analyzer.py # Ollama + LangChain
-│   │   ├── pii_scrubber.py     # Spacy NER
+│   │   ├── pii_scrubber.py     # Transformers NER
 │   │   └── observer_client.py  # Observer API
 │   ├── workers/
 │   │   └── audio_processor.py  # Arq worker

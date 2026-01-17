@@ -9,10 +9,10 @@ SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 PROJECT_ROOT="$(cd "$SCRIPT_DIR/../.." && pwd)"
 
 # Source cross-platform libraries
-. "$PROJECT_ROOT/infra/scripts/lib/os-detect.sh"
-. "$PROJECT_ROOT/infra/scripts/lib/package-manager.sh"
-. "$PROJECT_ROOT/infra/scripts/lib/service-manager.sh"
-. "$PROJECT_ROOT/infra/scripts/lib/common.sh"
+. "$PROJECT_ROOT/infra/lib/os-detect.sh"
+. "$PROJECT_ROOT/infra/lib/package-manager.sh"
+. "$PROJECT_ROOT/infra/lib/service-manager.sh"
+. "$PROJECT_ROOT/infra/lib/common.sh"
 
 # ==========================================
 # Configuration & Defaults
@@ -129,7 +129,7 @@ cleanup() {
 # Start API Helper
 start_api() {
     local name=$1
-    local dir="$SCRIPT_DIR/../$2"
+    local dir="$PROJECT_ROOT/$2"
     local port=$3
     local log_file="$SCRIPT_DIR/logs/${name}.log"
     
@@ -175,7 +175,7 @@ start_api() {
 
 start_worker() {
     local name=$1
-    local dir="$SCRIPT_DIR/../$2"
+    local dir="$PROJECT_ROOT/$2"
     local worker_class=$3
     local log_file="$SCRIPT_DIR/logs/${name}-Worker.log"
     
@@ -346,8 +346,8 @@ if [ "$RUN_FRONTEND" = true ]; then
 
     if [ "$ALL_HEALTHY" = true ]; then
         print_header "🎨 Starting Experience Web UI"
-        EXPERIENCE_DIR="$SCRIPT_DIR/../experience/web"
-        EXPERIENCE_ROOT="$SCRIPT_DIR/../experience"
+        EXPERIENCE_DIR="$PROJECT_ROOT/experience/web"
+        EXPERIENCE_ROOT="$PROJECT_ROOT/experience"
         EXPERIENCE_LOG="$SCRIPT_DIR/logs/Experience-Web.log"
 
         if [ "$CLEAN_MODE" = true ]; then

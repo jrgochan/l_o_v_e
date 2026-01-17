@@ -91,11 +91,7 @@ pytest==7.4.4
 pytest-asyncio==0.23.3
 ```
 
-### Install Spacy Model
 
-```bash
-python -m spacy download en_core_web_sm
-```
 
 ### Install Redis
 

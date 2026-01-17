@@ -17,26 +17,20 @@ map_package_name() {
     pkg_mgr=$(detect_package_manager)
     
     case "$pkg" in
-        python3.11)
+
+        python3.14)
             case "$pkg_mgr" in
-                brew) echo "python@3.11" ;;
-                apt) echo "python3.11 python3.11-venv python3.11-dev" ;;
-                dnf|yum) echo "python3.11 python3.11-devel" ;;
+                brew) echo "python@3.14" ;;
+                apt) echo "python3.14 python3.14-venv python3.14-dev" ;;
+                dnf|yum) echo "python3.14 python3.14-devel" ;;
                 *) echo "$pkg" ;;
             esac
             ;;
         postgresql)
             case "$pkg_mgr" in
                 brew)
-                    # Use latest available PostgreSQL (currently 17)
-                    # Check if any PostgreSQL is installed
-                    if brew list | grep -q "^postgresql@"; then
-                        # Return the installed versioned PostgreSQL
-                        brew list | grep "^postgresql@" | head -1
-                    else
-                        # Install latest available
-                        echo "postgresql"
-                    fi
+                    # Use PostgreSQL 18
+                    echo "postgresql@18"
                     ;;
                 apt) echo "postgresql postgresql-contrib" ;;
                 dnf|yum) echo "postgresql-server" ;;
@@ -278,9 +272,9 @@ install_dev_tools() {
     esac
 }
 
-# Install Python 3.11 (handles special cases like PPA on Ubuntu)
-# Usage: install_python_311
-install_python_311() {
+# Install Python 3.14 (handles special cases like PPA on Ubuntu)
+# Usage: install_python_314
+install_python_314() {
     local pkg_mgr
     pkg_mgr=$(detect_package_manager)
     
@@ -289,13 +283,13 @@ install_python_311() {
         add_repository python-deadsnakes
     fi
     
-    # Install Python 3.11
-    install_package python3.11 --no-confirm
+    # Install Python 3.14
+    install_package python3.14 --no-confirm
 }
 
-# Install PostgreSQL 16 (handles special cases like official repo)
-# Usage: install_postgresql_16
-install_postgresql_16() {
+# Install PostgreSQL 18 (handles special cases like official repo)
+# Usage: install_postgresql_18
+install_postgresql_18() {
     local pkg_mgr
     pkg_mgr=$(detect_package_manager)
     
@@ -304,7 +298,7 @@ install_postgresql_16() {
         add_repository postgresql-official
     fi
     
-    # Install PostgreSQL 16
+    # Install PostgreSQL 18
     install_package postgresql --no-confirm
 }
 

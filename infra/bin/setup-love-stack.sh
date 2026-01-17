@@ -1,6 +1,6 @@
 #!/bin/bash
 # L.O.V.E. Stack - Complete Setup Script
-# Cross-platform setup for Python modules with Python 3.11+
+# Cross-platform setup for Python modules with Python 3.14+
 #
 # This script sets up the complete L.O.V.E. (Listener-Observer-Versor-Experience) Stack
 # development environment from a fresh clone. It handles:
@@ -11,7 +11,7 @@
 #   - Service configuration
 #
 # Requirements:
-#   - Python 3.11+
+#   - Python 3.14+
 #   - PostgreSQL 14+ (auto-detects version)
 #   - Redis
 #   - Ollama
@@ -32,14 +32,14 @@ SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 PROJECT_ROOT="$(cd "$SCRIPT_DIR/../.." && pwd)"
 
 # Source cross-platform libraries
-. "$PROJECT_ROOT/infra/scripts/lib/os-detect.sh"
-. "$PROJECT_ROOT/infra/scripts/lib/package-manager.sh"
-. "$PROJECT_ROOT/infra/scripts/lib/service-manager.sh"
-. "$PROJECT_ROOT/infra/scripts/lib/common.sh"
+. "$PROJECT_ROOT/infra/lib/os-detect.sh"
+. "$PROJECT_ROOT/infra/lib/package-manager.sh"
+. "$PROJECT_ROOT/infra/lib/service-manager.sh"
+. "$PROJECT_ROOT/infra/lib/common.sh"
 
 # Required Python version
 REQUIRED_PYTHON_MAJOR=3
-REQUIRED_PYTHON_MINOR=11
+REQUIRED_PYTHON_MINOR=14
 
 # Parse command line arguments
 SKIP_DATABASE=false
@@ -194,6 +194,18 @@ if [ "$MINIMAL_MODE" = true ]; then
     print_info "Minimal mode: Skipping database, Ollama, using update mode (fastest)"
 fi
 
+# Set verbosity flags
+if [ "$VERBOSE" = true ]; then
+    PIP_ARGS=""
+    NPM_ARGS=""
+    CURL_ARGS=""
+    print_info "Verbose mode enabled"
+else
+    PIP_ARGS="--quiet"
+    NPM_ARGS="--silent"
+    CURL_ARGS="--silent"
+fi
+
 if [ "$CLEAN_MODE" = true ]; then
     print_info "Clean mode: Dropping database, removing venvs, complete fresh install"
     
@@ -247,15 +259,15 @@ if [ "$CLEAN_MODE" = true ]; then
     
     # Remove all venvs
     for module in versor observer listener; do
-        if [ -d "$SCRIPT_DIR/../$module/venv" ]; then
+        if [ -d "$PROJECT_ROOT/$module/venv" ]; then
             print_info "Removing $module venv..."
-            rm -rf "$SCRIPT_DIR/../$module/venv"
+            rm -rf "$PROJECT_ROOT/$module/venv"
         fi
     done
     print_success "All virtual environments removed"
 
     # Clean Experience module artifacts
-    EXPERIENCE_DIR="$SCRIPT_DIR/../experience/web"
+    EXPERIENCE_DIR="$PROJECT_ROOT/experience/web"
     if [ -d "$EXPERIENCE_DIR" ]; then
         print_info "Cleaning Experience module artifacts..."
         rm -rf "$EXPERIENCE_DIR/node_modules"
@@ -275,12 +287,12 @@ print_info "Package Manager: $(detect_package_manager)"
 print_info "Init System: $(detect_init_system)"
 echo ""
 
-# Check Python 3.11 availability
+# Check Python 3.14 availability
 check_python() {
-    print_header "📋 Checking Python 3.11+"
+    print_header "📋 Checking Python 3.14+"
     
-    # Try to find Python 3.11+
-    PYTHON_CMD=$(find_python_311)
+    # Try to find Python 3.14+
+    PYTHON_CMD=$(find_python_314)
     
     if [ -n "$PYTHON_CMD" ]; then
         VERSION=$($PYTHON_CMD --version 2>&1 | grep -oE '[0-9]+\.[0-9]+' | head -1)
@@ -289,22 +301,22 @@ check_python() {
         return 0
     fi
     
-    print_error "Python 3.11+ not found"
+    print_error "Python 3.14+ not found"
     echo ""
-    echo "Python 3.11+ is required for the L.O.V.E. stack."
+    echo "Python 3.14+ is required for the L.O.V.E. stack."
     echo ""
     
-    if prompt_yes_no "Would you like to install Python 3.11 now?"; then
-        print_info "Installing Python 3.11..."
-        if install_python_311; then
-            PYTHON_CMD=$(find_python_311)
+    if prompt_yes_no "Would you like to install Python 3.14 now?"; then
+        print_info "Installing Python 3.14..."
+        if install_python_314; then
+            PYTHON_CMD=$(find_python_314)
             if [ -n "$PYTHON_CMD" ]; then
-                print_success "Python 3.11 installed"
+                print_success "Python 3.14 installed"
                 echo "$PYTHON_CMD" > "$SCRIPT_DIR/.python_cmd"
                 return 0
             fi
         fi
-        print_error "Failed to install Python 3.11"
+        print_error "Failed to install Python 3.14"
         return 1
     else
         print_warning "Skipping Python installation. Please install manually."
@@ -320,8 +332,8 @@ check_dependencies() {
     
     # Load version requirements from TOOL_VERSIONS
     local pg_min_version
-    pg_min_version=$(grep "^POSTGRESQL_MIN_VERSION=" "$SCRIPT_DIR/TOOL_VERSIONS" 2>/dev/null | cut -d= -f2)
-    pg_min_version=${pg_min_version:-14.0}
+    pg_min_version=$(grep "^POSTGRESQL_MIN_VERSION=" "$PROJECT_ROOT/infra/TOOL_VERSIONS" 2>/dev/null | cut -d= -f2)
+    pg_min_version=${pg_min_version:-18.0}
     
     # Check PostgreSQL
     if check_command psql || check_command postgres; then
@@ -333,9 +345,12 @@ check_dependencies() {
             
             # Validate minimum version
             pg_major=$(echo "$pg_version" | cut -d. -f1)
-            if [ "$pg_major" -lt 14 ]; then
+            pg_min_major=$(echo "$pg_min_version" | cut -d. -f1)
+            
+            if [ "$pg_major" -lt "$pg_min_major" ]; then
                 print_warning "PostgreSQL $pg_version is below minimum $pg_min_version"
-                print_info "Consider upgrading to PostgreSQL $pg_min_version or higher"
+                print_info "Marking for upgrade to PostgreSQL $pg_min_version+"
+                missing_deps+=("postgresql")
             fi
         else
             print_success "PostgreSQL installed"
@@ -410,7 +425,7 @@ check_dependencies() {
                     case $dep in
                         "postgresql")
                             print_info "Installing PostgreSQL..."
-                            install_postgresql_16
+                            install_postgresql_18
                             ;;
                         "redis")
                             print_info "Installing Redis..."
@@ -440,7 +455,7 @@ check_dependencies() {
 setup_experience_module() {
     print_header "🎨 Setting up Experience Module"
     
-    local experience_path="$SCRIPT_DIR/../experience/web"
+    local experience_path="$PROJECT_ROOT/experience/web"
     
     if [ ! -d "$experience_path" ]; then
         print_error "Experience module directory not found: $experience_path"
@@ -462,15 +477,15 @@ setup_experience_module() {
     # Handle npm install based on UPDATE_MODE
     if [ "$UPDATE_MODE" = true ] && [ -d "node_modules" ]; then
         print_info "Update mode: Updating npm dependencies..."
-        npm install --silent
+        npm install $NPM_ARGS
     else
         # Check if node_modules exists
         if [ -d "node_modules" ]; then
             print_info "Dependencies already installed, updating..."
-            npm install --silent
+            npm install $NPM_ARGS
         else
             print_info "Installing npm dependencies (this may take a moment)..."
-            npm install --silent
+            npm install $NPM_ARGS
         fi
     fi
     
@@ -488,7 +503,7 @@ setup_experience_module() {
 # Setup Python module
 setup_python_module() {
     local module_name=$1
-    local module_path="$SCRIPT_DIR/../$2"
+    local module_path="$PROJECT_ROOT/$2"
     
     print_header "🐍 Setting up $module_name"
     
@@ -503,11 +518,11 @@ setup_python_module() {
     if [ -f "$SCRIPT_DIR/.python_cmd" ]; then
         PYTHON_CMD=$(cat "$SCRIPT_DIR/.python_cmd")
     else
-        PYTHON_CMD=$(find_python_311)
+        PYTHON_CMD=$(find_python_314)
     fi
     
     if [ -z "$PYTHON_CMD" ]; then
-        print_error "Python 3.11+ not found"
+        print_error "Python 3.14+ not found"
         cd - > /dev/null
         return 1
     fi
@@ -532,38 +547,19 @@ setup_python_module() {
         
         # Upgrade pip
         print_info "Upgrading pip..."
-        pip install --upgrade pip --quiet
+        pip install --upgrade pip $PIP_ARGS
     fi
     
     # Install dependencies
     if [ -f "requirements.txt" ]; then
         print_info "Installing dependencies..."
-        pip install -r requirements.txt --quiet
+        pip install -r requirements.txt $PIP_ARGS
         print_success "$module_name dependencies installed"
     else
         print_warning "No requirements.txt found"
     fi
     
-    # Install spacy model if needed (for Listener)
-    if [ "$module_name" = "Listener" ]; then
-        print_info "Installing Spacy language model..."
-        # Use direct URL to avoid download issues
-        if python -c "import spacy; spacy.load('en_core_web_sm')" 2>/dev/null; then
-            print_success "Spacy model 'en_core_web_sm' already installed"
-        else
-            print_info "Downloading Spacy model 'en_core_web_sm'..."
-            # robust manual download and install
-            curl -L -o /tmp/en_core_web_sm-3.7.1-py3-none-any.whl https://github.com/explosion/spacy-models/releases/download/en_core_web_sm-3.7.1/en_core_web_sm-3.7.1-py3-none-any.whl --silent
-            if [ -f "/tmp/en_core_web_sm-3.7.1-py3-none-any.whl" ]; then
-                pip install /tmp/en_core_web_sm-3.7.1-py3-none-any.whl --quiet
-                rm /tmp/en_core_web_sm-3.7.1-py3-none-any.whl
-                print_success "Spacy model installed successfully"
-            else
-                print_error "Failed to download Spacy model"
-                print_info "Please install manually: python -m spacy download en_core_web_sm"
-            fi
-        fi
-    fi
+
     
     # Verify Python version in venv
     VENV_PYTHON_VERSION=$(python --version 2>&1 | grep -oE '[0-9]+\.[0-9]+' | head -1)
@@ -578,8 +574,8 @@ setup_configs() {
     print_header "⚙️  Setting up Configuration Files"
     
     for module in versor observer listener; do
-        if [ -f "$SCRIPT_DIR/../$module/.env.example" ] && [ ! -f "$SCRIPT_DIR/../$module/.env" ]; then
-            cp "$SCRIPT_DIR/../$module/.env.example" "$SCRIPT_DIR/../$module/.env"
+        if [ -f "$PROJECT_ROOT/$module/.env.example" ] && [ ! -f "$PROJECT_ROOT/$module/.env" ]; then
+            cp "$PROJECT_ROOT/$module/.env.example" "$PROJECT_ROOT/$module/.env"
             print_success "$module: .env created from .env.example"
         fi
     done
@@ -626,8 +622,27 @@ main() {
     
     # Check Python
     if ! check_python; then
-        print_error "Setup cannot continue without Python 3.11+"
+        print_error "Setup cannot continue without Python 3.14+"
         exit 1
+    fi
+    
+    # Configure build environment for macOS (OpenBLAS for scipy/numpy)
+    if [ "$(detect_os)" = "macos" ] && [ -d "/opt/homebrew/opt/openblas" ]; then
+        print_info "Configuring build environment for OpenBLAS (macOS)..."
+        export LDFLAGS="-L/opt/homebrew/opt/openblas/lib"
+        export CPPFLAGS="-I/opt/homebrew/opt/openblas/include"
+        export PKG_CONFIG_PATH="/opt/homebrew/opt/openblas/lib/pkgconfig"
+        
+        # Use GCC if available to avoid Clang OpenMP issues with Scipy
+        if command -v gcc-15 >/dev/null; then
+            print_info "Using gcc-15 for compilation (fixes OpenMP issues)"
+            export CC=gcc-15
+            export CXX=g++-15
+        elif command -v gcc-14 >/dev/null; then
+            print_info "Using gcc-14 for compilation (fixes OpenMP issues)"
+            export CC=gcc-14
+            export CXX=g++-14
+        fi
     fi
     
     # Install development tools
@@ -693,7 +708,7 @@ fi
 # Summary
 print_header "📊 Setup Complete!"
 echo ""
-print_success "All Python modules configured with Python 3.11+"
+print_success "All Python modules configured with Python 3.14+"
 print_success "Experience module configured with Node.js dependencies"
 print_success "Virtual environments created for all modules"
 print_success "Dependencies installed"

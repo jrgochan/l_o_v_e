@@ -49,6 +49,14 @@ print_info() {
     printf "%b%s%b%b\n" "$BLUE" "$INFO" "$1" "$NC"
 }
 
+# Print verbose message (only if VERBOSE is true)
+# Usage: print_verbose "message"
+print_verbose() {
+    if [ "${VERBOSE:-false}" = true ]; then
+        printf "%b%s [VERBOSE] %s%b%b\n" "$CYAN" "$INFO" "$1" "$NC"
+    fi
+}
+
 # Print colored header
 # Usage: print_header "Header Text"
 print_header() {
@@ -330,14 +338,14 @@ check_python_version() {
     return 1
 }
 
-# Find Python 3.11+ command
-# Usage: find_python_311
+# Find Python 3.14+ command
+# Usage: find_python_314
 # Returns: python command via echo, or empty if not found
-find_python_311() {
+find_python_314() {
     local python_cmd
     
-    for cmd in python3.11 python3.12 python3.13 python3 python; do
-        if check_python_version "$cmd" 3 11; then
+    for cmd in python3.14 python3 python; do
+        if check_python_version "$cmd" 3 14; then
             echo "$cmd"
             return 0
         fi

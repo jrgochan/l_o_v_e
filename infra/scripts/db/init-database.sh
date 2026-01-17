@@ -9,8 +9,8 @@ SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 PROJECT_ROOT="$(cd "$SCRIPT_DIR/../../.." && pwd)"
 
 # Source cross-platform libraries
-. "$PROJECT_ROOT/infra/scripts/lib/os-detect.sh"
-. "$PROJECT_ROOT/infra/scripts/lib/common.sh"
+. "$PROJECT_ROOT/infra/lib/os-detect.sh"
+. "$PROJECT_ROOT/infra/lib/common.sh"
 
 # Database configuration (from Observer .env or defaults)
 DB_HOST="${DB_HOST:-localhost}"
