@@ -24,8 +24,25 @@ class TestFullPipeline:
         Flow: Text → Semantic Analysis → PII Scrubbing
         """
         # Step 1: Semantic Analysis
-        analyzer = SemanticAnalyzer()
-        emotion = await analyzer.analyze(sample_text)
+        # Mock the analyzer to avoid external LLM ambiguity/hangs during CI
+        # The goal is to test the pipeline flow, not the LLM itself
+        with patch('app.services.semantic_analyzer.SemanticAnalyzer.analyze', new_callable=AsyncMock) as mock_analyze:
+             # Create a valid EmotionalClassification object
+            from app.models.vac_response import EmotionalClassification, VACVector
+            mock_emotion = EmotionalClassification(
+                primary_emotion="Compassion",
+                category="Places We Go With Others",
+                vac=VACVector(valence=0.5, arousal=0.2, connection=0.9),
+                confidence=0.95,
+                reasoning="Mocked reasoning"
+            )
+            mock_analyze.return_value = mock_emotion
+            
+            print("DEBUG: Instantiating SemanticAnalyzer")
+            analyzer = SemanticAnalyzer(fetch_dynamic_model=False)
+            print("DEBUG: Calling analyze")
+            emotion = await analyzer.analyze(sample_text)
+            print("DEBUG: Analysis complete")
         
         # Verify emotion extraction
         assert emotion.primary_emotion is not None
@@ -35,8 +52,11 @@ class TestFullPipeline:
         assert 0.0 <= emotion.confidence <= 1.0
         
         # Step 2: PII Scrubbing
+        print("DEBUG: Instantiating PIIScrubber")
         scrubber = PIIScrubber()
+        print("DEBUG: Calling scrub")
         sanitized = scrubber.scrub(sample_text)
+        print("DEBUG: Scrubbing complete")
         
         # Verify scrubbing doesn't break text
         assert len(sanitized) > 0
@@ -142,7 +162,7 @@ class TestComponentIntegration:
         
         scrubber = get_pii_scrubber()
         assert scrubber is not None
-        assert scrubber.model_name == "en_core_web_sm"
+        assert scrubber.model_name == "dslim/bert-base-NER"
         
         # Verify singleton pattern
         scrubber2 = get_pii_scrubber()

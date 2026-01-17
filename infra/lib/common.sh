@@ -25,6 +25,13 @@ else
     ROCKET=">>>"
 fi
 
+# Fix for macOS: Prepend PostgreSQL 18 bin to PATH if it exists
+if [ "$(uname)" = "Darwin" ]; then
+    if [ -d "/opt/homebrew/opt/postgresql@18/bin" ]; then
+        export PATH="/opt/homebrew/opt/postgresql@18/bin:$PATH"
+    fi
+fi
+
 # Print colored success message
 # Usage: print_success "message"
 print_success() {

@@ -67,6 +67,7 @@ data/**/*
 !data/**/
 !data/**/.gitkeep
 infra/logs/
+infra/models/
 *.pid
 
 # Misc

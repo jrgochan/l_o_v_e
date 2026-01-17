@@ -4,7 +4,7 @@ Integration tests for Transition Routes.
 """
 import pytest
 import uuid
-from httpx import AsyncClient
+from httpx import AsyncClient, ASGITransport
 from sqlalchemy.ext.asyncio import AsyncSession
 from app.main import app
 from tests.test_data import COMPASSION_VAC, PITY_VAC
@@ -13,7 +13,7 @@ from tests.test_data import COMPASSION_VAC, PITY_VAC
 @pytest.mark.asyncio
 async def test_find_transition_path(test_db: AsyncSession, seeded_test_atlas):
     """Test finding a path between two emotions."""
-    async with AsyncClient(app=app, base_url="http://test") as client:
+    async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as client:
         # Use random user ID
         user_id = str(uuid.uuid4())
         
@@ -45,7 +45,7 @@ async def test_find_transition_path(test_db: AsyncSession, seeded_test_atlas):
 @pytest.mark.asyncio
 async def test_start_journey(test_db: AsyncSession, seeded_test_atlas, seeded_test_user, test_user_id):
     """Test starting a therapeutic journey."""
-    async with AsyncClient(app=app, base_url="http://test") as client:
+    async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as client:
         payload = {
             "user_id": str(test_user_id),
             "path_id": str(uuid.uuid4()),
@@ -94,7 +94,7 @@ async def test_mark_waypoint_reached(test_db: AsyncSession, seeded_test_user, te
     test_db.add(waypoint)
     await test_db.commit()
     
-    async with AsyncClient(app=app, base_url="http://test") as client:
+    async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as client:
         payload = {
             "waypoint_index": 0,
             "self_assessment": {"confidence": 0.8},
@@ -128,7 +128,7 @@ async def test_get_journey_status(test_db: AsyncSession, seeded_test_user, test_
     test_db.add(journey)
     await test_db.commit()
     
-    async with AsyncClient(app=app, base_url="http://test") as client:
+    async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as client:
         response = await client.get(f"/observer/journey/{journey_id}")
         assert response.status_code == 200
         data = response.json()
@@ -168,7 +168,7 @@ async def test_user_journey_history(test_db: AsyncSession, seeded_test_user, tes
     test_db.add(j2)
     await test_db.commit()
     
-    async with AsyncClient(app=app, base_url="http://test") as client:
+    async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as client:
         response = await client.get(f"/observer/user/{test_user_id}/journey-history")
         assert response.status_code == 200
         data = response.json()

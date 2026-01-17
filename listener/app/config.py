@@ -42,10 +42,10 @@ See Also:
     - .env.example - Template file
     - Deployment: docs/modules/listener/senior-developers/01-deep-dive-architecture.md
 """
-from typing import Literal
+from typing import Literal, Optional
 
 from pydantic import Field
-from pydantic_settings import BaseSettings
+from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
 class Settings(BaseSettings):
@@ -123,6 +123,9 @@ class Settings(BaseSettings):
 
     # Logging
     LOG_LEVEL: str = "INFO"
+    
+    # AI Model Configuration
+    PII_MODEL_PATH: Optional[str] = None
 
     # Security
     SECRET_KEY: str = Field(
@@ -134,11 +137,11 @@ class Settings(BaseSettings):
     ARQ_MAX_JOBS: int = 5
     ARQ_JOB_TIMEOUT: int = 300
 
-    class Config:
-        """Pydantic configuration."""
-
-        env_file = ".env"
-        case_sensitive = True
+    model_config = SettingsConfigDict(
+        env_file=".env",
+        case_sensitive=True,
+        extra="ignore" # Changed from forbid to allow potential legacy/extra env vars, or just add the field
+    )
 
 
 # Global settings instance

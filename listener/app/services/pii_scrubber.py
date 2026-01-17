@@ -42,6 +42,7 @@ See Also:
     - Tests: tests/unit/test_pii_scrubber.py
 """
 import logging
+import os
 from typing import Any, List, Optional, Tuple, Dict
 
 # Replace spacy with transformers
@@ -81,6 +82,11 @@ class PIIScrubber:
         Args:
             model_name: HuggingFace model hub path
         """
+        # Allow override via environment variable (useful for local offline models)
+        env_model = os.getenv("PII_MODEL_PATH")
+        if env_model:
+            model_name = env_model
+            
         self.model_name = model_name
         self._nlp: Optional[Any] = None
 

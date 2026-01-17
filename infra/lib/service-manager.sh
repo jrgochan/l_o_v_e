@@ -24,8 +24,11 @@ map_service_name() {
             case "$init_system" in
                 brew-services)
                     # Detect installed PostgreSQL version dynamically
-                    if brew services list | grep -q "^postgresql@"; then
-                        brew services list | grep "^postgresql@" | awk '{print $1}' | head -1
+                    # Prioritize postgresql@18, then sort by version descending
+                    if brew services list | grep -q "^postgresql@18"; then
+                         echo "postgresql@18"
+                    elif brew services list | grep -q "^postgresql@"; then
+                        brew services list | grep "^postgresql@" | awk '{print $1}' | sort -r | head -1
                     else
                         echo "postgresql"
                     fi

@@ -337,6 +337,11 @@ check_dependencies() {
     
     # Check PostgreSQL
     if check_command psql || check_command postgres; then
+        # Force binaries from postgresql@18 if available (Homebrew)
+        if [ -d "/opt/homebrew/opt/postgresql@18/bin" ]; then
+            export PATH="/opt/homebrew/opt/postgresql@18/bin:$PATH"
+        fi
+        
         # Get PostgreSQL version
         pg_version=$(psql -d postgres -t -c "SHOW server_version;" 2>/dev/null | grep -oE '[0-9]+\.[0-9]+' | head -1)
         
@@ -349,11 +354,28 @@ check_dependencies() {
             
             if [ "$pg_major" -lt "$pg_min_major" ]; then
                 print_warning "PostgreSQL $pg_version is below minimum $pg_min_version"
-                print_info "Marking for upgrade to PostgreSQL $pg_min_version+"
-                missing_deps+=("postgresql")
+                
+                if [ -d "/opt/homebrew/opt/postgresql@18/bin" ]; then
+                     print_info "Found postgresql@18. Switching services..."
+                     brew services stop postgresql@17 2>/dev/null || true
+                     brew services stop postgresql@14 2>/dev/null || true
+                     brew services start postgresql@18
+                     sleep 3
+                     print_success "Switched to postgresql@18"
+                else
+                    print_info "Marking for upgrade to PostgreSQL $pg_min_version+"
+                    missing_deps+=("postgresql")
+                fi
             fi
         else
-            print_success "PostgreSQL installed"
+            # Service might not be running, try to find 18 bin
+             if [ -d "/opt/homebrew/opt/postgresql@18/bin" ]; then
+                 print_success "Found postgresql@18 binaries"
+                 brew services start postgresql@18
+                 sleep 3
+             else 
+                print_success "PostgreSQL installed"
+             fi
         fi
         
         # Check for pgvector extension availability
@@ -615,6 +637,67 @@ setup_ollama() {
     fi
 }
 
+# Setup AI Models (HuggingFace)
+setup_ai_models() {
+    print_header "🧠 Setting up AI Models"
+    
+    # 1. Listener Models (BERT for PII)
+    if [ -d "$PROJECT_ROOT/listener/venv" ]; then
+        print_info "Downloading Listener models (BERT for PII)..."
+        . "$PROJECT_ROOT/listener/venv/bin/activate"
+        
+        # Use robust curl-based script
+        if python "$PROJECT_ROOT/infra/scripts/download_models.py" listener --project-root "$PROJECT_ROOT"; then
+            print_success "Listener PII model downloaded"
+            
+            # Configure Listener to use local model
+            ENV_FILE="$PROJECT_ROOT/listener/.env"
+            LOCAL_MODEL_PATH="$PROJECT_ROOT/infra/models/dslim_bert-base-NER"
+            
+            if ! grep -q "PII_MODEL_PATH" "$ENV_FILE" 2>/dev/null; then
+                echo "" >> "$ENV_FILE"
+                echo "# Local Model Path (set by setup script)" >> "$ENV_FILE"
+                echo "PII_MODEL_PATH=$LOCAL_MODEL_PATH" >> "$ENV_FILE"
+                print_info "Updated listener/.env with PII_MODEL_PATH"
+            else
+                # Update existing
+                # simplistic update, assumes single line
+                perl -pi -e "s|PII_MODEL_PATH=.*|PII_MODEL_PATH=$LOCAL_MODEL_PATH|" "$ENV_FILE"
+            fi
+        else
+            print_error "Failed to download Listener PII model"
+        fi
+        deactivate
+    fi
+
+    # 2. Observer Models (Sentence Transformers)
+    if [ -d "$PROJECT_ROOT/observer/venv" ]; then
+        print_info "Downloading Observer models (Sentence Transformers)..."
+        . "$PROJECT_ROOT/observer/venv/bin/activate"
+        
+        # Use robust curl-based script
+        if python "$PROJECT_ROOT/infra/scripts/download_models.py" observer --project-root "$PROJECT_ROOT"; then
+            print_success "Observer embedding model downloaded"
+            
+            # Configure Observer to use local model
+            ENV_FILE="$PROJECT_ROOT/observer/.env"
+            LOCAL_MODEL_PATH="$PROJECT_ROOT/infra/models/sentence-transformers_all-MiniLM-L6-v2"
+             
+             if ! grep -q "EMBEDDING_MODEL" "$ENV_FILE" 2>/dev/null; then
+                echo "" >> "$ENV_FILE"
+                echo "# Local Model Path (set by setup script)" >> "$ENV_FILE"
+                echo "EMBEDDING_MODEL=$LOCAL_MODEL_PATH" >> "$ENV_FILE"
+                print_info "Updated observer/.env with EMBEDDING_MODEL"
+            else
+                perl -pi -e "s|EMBEDDING_MODEL=.*|EMBEDDING_MODEL=$LOCAL_MODEL_PATH|" "$ENV_FILE"
+            fi
+        else
+            print_error "Failed to download Observer embedding model"
+        fi
+        deactivate
+    fi
+}
+
 # Main setup flow
 main() {
     print_info "Starting L.O.V.E. Stack setup..."
@@ -665,6 +748,12 @@ main() {
     # Setup configs
     setup_configs
     
+    # Setup AI models
+    setup_ai_models
+    
+# Setup AI Models (HuggingFace)
+
+
 # Setup Ollama
 setup_ollama
 

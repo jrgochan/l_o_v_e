@@ -68,14 +68,24 @@ done
 check_postgresql() {
     print_header "🔍 Checking PostgreSQL"
     
+    # Fix for macOS: Prepend PostgreSQL 18 bin to PATH if it exists
+    if [[ "$OSTYPE" == "darwin"* ]]; then
+        if [ -d "/opt/homebrew/opt/postgresql@18/bin" ]; then
+            export PATH="/opt/homebrew/opt/postgresql@18/bin:$PATH"
+            print_info "Added postgresql@18 to PATH"
+        fi
+    fi
+    
     if command_exists psql; then
-        print_success "PostgreSQL client installed"
+        # Check version
+        psql_version=$(psql --version | awk '{print $3}')
+        print_success "PostgreSQL client installed (v$psql_version)"
         return 0
     else
         print_error "PostgreSQL client not found"
         echo ""
         echo "PostgreSQL is required. Install it using:"
-        echo "  macOS:   brew install postgresql@16"
+        echo "  macOS:   brew install postgresql@18"
         echo "  Ubuntu:  sudo apt install postgresql postgresql-contrib"
         echo ""
         return 1
@@ -86,18 +96,90 @@ check_postgresql() {
 check_postgresql_running() {
     print_info "Checking if PostgreSQL is running..."
     
-    # Try to connect to PostgreSQL
-    if PGPASSWORD="$DB_PASSWORD" psql -h "$DB_HOST" -p "$DB_PORT" -U "$DB_USER" -d postgres -c '\q' 2>/dev/null; then
-        print_success "PostgreSQL is running and accessible"
+    # Use pg_isready if available (standard and robust)
+    if command_exists pg_isready; then
+        if pg_isready -h "$DB_HOST" -p "$DB_PORT" >/dev/null 2>&1; then
+            print_success "PostgreSQL is running and accepting connections"
+            return 0
+        fi
+    else
+        # Fallback: Try to list databases as current user (should work for owner/superuser)
+        if psql -h "$DB_HOST" -p "$DB_PORT" -d postgres -lqt >/dev/null 2>&1; then
+             print_success "PostgreSQL is running and accessible"
+             return 0
+        fi
+    fi
+
+    print_warning "Cannot connect to PostgreSQL"
+    
+    # Auto-start attempt for macOS
+    if [[ "$OSTYPE" == "darwin"* ]] && command_exists brew; then
+        print_info "Attempting to start postgresql@18..."
+        brew services start postgresql@18
+        
+        # Wait for it to start
+        print_info "Waiting for database to initialize..."
+        for i in {1..10}; do
+            if command_exists pg_isready; then
+                 if pg_isready -h "$DB_HOST" -p "$DB_PORT" >/dev/null 2>&1; then
+                    print_success "PostgreSQL started successfully"
+                    return 0
+                 fi
+            elif psql -h "$DB_HOST" -p "$DB_PORT" -d postgres -c '\q' >/dev/null 2>&1; then
+                print_success "PostgreSQL started successfully"
+                return 0
+            fi
+            sleep 1
+        done
+        
+        # Try restart if start didn't work (maybe stuck state)
+        print_info "Attempting restart..."
+        brew services restart postgresql@18
+        sleep 5
+        if pg_isready -h "$DB_HOST" -p "$DB_PORT" >/dev/null 2>&1; then
+            print_success "PostgreSQL restarted successfully"
+            return 0
+        fi
+    fi
+
+    print_error "PostgreSQL not running or not accessible"
+    echo ""
+    echo "Start PostgreSQL manually using:"
+    echo "  macOS:   brew services start postgresql@18"
+    echo "  Ubuntu:  sudo systemctl start postgresql"
+    echo "  Manual:  pg_ctl -D /path/to/data start"
+    echo ""
+    return 1
+}
+
+# Create database user if it doesn't exist
+create_user() {
+    print_header "👤 Creating Database User"
+    
+    print_info "Checking if user '$DB_USER' exists..."
+    
+    # Check if user exists
+    if psql -d postgres -tAc "SELECT 1 FROM pg_roles WHERE rolname='$DB_USER'" 2>/dev/null | grep -q 1; then
+        print_success "User '$DB_USER' already exists"
+        return 0
+    elif PGPASSWORD="$DB_PASSWORD" psql -h "$DB_HOST" -p "$DB_PORT" -U postgres -d postgres -tAc "SELECT 1 FROM pg_roles WHERE rolname='$DB_USER'" 2>/dev/null | grep -q 1; then
+        print_success "User '$DB_USER' already exists"
+        return 0
+    fi
+    
+    print_info "Creating user '$DB_USER'..."
+    
+    # Create user
+    # Try using the local user first (macOS default), fallback to postgres user
+    if psql -d postgres -c "CREATE USER $DB_USER WITH PASSWORD '$DB_PASSWORD' CREATEDB;" 2>/dev/null; then
+        print_success "User '$DB_USER' created"
+        return 0
+    elif PGPASSWORD="$DB_PASSWORD" psql -h "$DB_HOST" -p "$DB_PORT" -U postgres -d postgres -c "CREATE USER $DB_USER WITH PASSWORD '$DB_PASSWORD' CREATEDB;" 2>/dev/null; then
+        print_success "User '$DB_USER' created"
         return 0
     else
-        print_error "Cannot connect to PostgreSQL"
-        echo ""
-        echo "Start PostgreSQL using:"
-        echo "  macOS:   brew services start postgresql@16"
-        echo "  Ubuntu:  sudo systemctl start postgresql"
-        echo "  Manual:  pg_ctl -D /path/to/data start"
-        echo ""
+        print_error "Failed to create user '$DB_USER' (requires superuser)"
+        print_info "Try running manually: psql -d postgres -c \"CREATE USER $DB_USER WITH PASSWORD '$DB_PASSWORD' CREATEDB;\""
         return 1
     fi
 }
@@ -113,6 +195,8 @@ create_database() {
         print_success "Database '$DB_NAME' already exists"
         return 0
     fi
+    # Also check as current user/postgres if above failed due to auth but DB exists?
+    # Actually if DB exists but we can't connect, that's an issue. But let's assume if we created user, we can connect.
     
     print_info "Creating database '$DB_NAME'..."
     
@@ -509,13 +593,19 @@ main() {
         exit 1
     fi
     
-    # Step 3: Create database
+    # Step 3: Create user
+    if ! create_user; then
+        print_error "Failed to create database user"
+        exit 1
+    fi
+    
+    # Step 4: Create database
     if ! create_database; then
         print_error "Failed to create database"
         exit 1
     fi
     
-    # Step 4: Initialize extensions
+    # Step 5: Initialize extensions
     if ! initialize_extensions; then
         print_error "Failed to initialize extensions"
         exit 1
