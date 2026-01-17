@@ -107,9 +107,23 @@ async def get_current_user_ws(
         stmt = select(User).where(User.email == "dev@admin.com")
         result = await db.execute(stmt)
         user = result.scalars().first()
-        if user:
-            return user
-        # Fallthrough to normal check if dev user not found (or handle creation if needed)
+        if not user:
+            # Auto-create dev admin if not exists (same logic as HTTP auth)
+            from app.core.security import get_password_hash
+            from app.models.user import UserRole
+
+            user = User(
+                email="dev@admin.com",
+                full_name="Dev Admin",
+                role=UserRole.ADMIN,
+                is_active=True,
+                password_hash=get_password_hash("dev"),
+            )
+            db.add(user)
+            await db.commit()
+            await db.refresh(user)
+
+        return user
 
     try:
         payload = jwt.decode(token, settings.SECRET_KEY, algorithms=[settings.ALGORITHM])

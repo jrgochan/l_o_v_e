@@ -11,6 +11,11 @@ def mock_db():
     # add/flush are async/sync depending on implementation, but db interface is usually async for execute/commit
     # SQLAlchemy's AsyncSession.add is synchronous
     m.add = MagicMock()
+    m.delete = MagicMock()
+    m.commit = AsyncMock()
+    m.rollback = AsyncMock()
+    m.refresh = AsyncMock()
+    m.flush = AsyncMock()
     return m
 
 @pytest.fixture

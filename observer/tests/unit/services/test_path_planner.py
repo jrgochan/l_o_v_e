@@ -9,7 +9,8 @@ from app.models.transition_strategy import CategoryTransition
 
 @pytest.fixture
 def mock_session():
-    db = AsyncMock(spec=AsyncSession)
+    # Remove spec=AsyncSession to act as Generic AsyncMock
+    db = AsyncMock()
     db.execute = AsyncMock(return_value=MagicMock())
     db.add = MagicMock()
     db.delete = MagicMock()

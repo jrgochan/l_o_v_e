@@ -205,3 +205,27 @@ async def test_pull_model_empty_line(mock_httpx):
     
     assert len(updates) == 1
     assert updates[0].status == "success"
+
+@pytest.mark.asyncio
+async def test_pull_model_empty_stream(mock_httpx):
+    """Test completely empty stream (natural loop exit)."""
+    stream_context = AsyncMock()
+    mock_response = AsyncMock()
+    mock_response.raise_for_status = MagicMock()
+    
+    # Empty generator
+    async def line_gen():
+        if False: yield # make it a generator
+    
+    mock_response.aiter_lines = MagicMock(return_value=line_gen())
+    stream_context.__aenter__.return_value = mock_response
+    mock_httpx.stream.return_value = stream_context
+    
+    manager = OllamaManager()
+    updates = []
+    async for p in manager.pull_model("m"):
+        updates.append(p)
+    
+    # Should exit loop naturally with 0 updates
+    assert len(updates) == 0
+

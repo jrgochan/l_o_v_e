@@ -71,6 +71,10 @@ addopts = [
 ]
 filterwarnings = [
     "ignore::pydantic.warnings.PydanticDeprecatedSince20",
+    # Suppress Python 3.16 deprecation warnings from libraries (FastAPI/Starlette/pytest-asyncio)
+    "ignore:.*asyncio.iscoroutinefunction.*is deprecated:DeprecationWarning",
+    "ignore:.*asyncio.get_event_loop_policy.*is deprecated:DeprecationWarning",
+    "ignore:.*asyncio.set_event_loop_policy.*is deprecated:DeprecationWarning",
 ]
 markers = [
     "unit: Unit tests (no external dependencies)",

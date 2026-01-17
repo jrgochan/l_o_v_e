@@ -14,6 +14,7 @@ export function middleware(request: NextRequest) {
     script-src 'self' 'unsafe-eval' 'unsafe-inline' https:;
     style-src 'self' 'unsafe-inline' https:;
     img-src 'self' blob: data: https:;
+    media-src 'self' blob: https:;
     font-src 'self' data: https:;
     connect-src 'self' ws: wss: http: https:; 
     object-src 'none';

@@ -15,6 +15,10 @@ def mock_db():
     mock_db.add = MagicMock()
     mock_db.delete = MagicMock()
     mock_db.commit = AsyncMock()
+    mock_db.rollback = AsyncMock()
+    mock_db.refresh = AsyncMock()
+    # Flush is async
+    mock_db.flush = AsyncMock()
     return mock_db
 
 @pytest.fixture
@@ -27,6 +31,10 @@ def insight_generator():
     mock_db.execute = AsyncMock(return_value=MagicMock())
     mock_db.add = MagicMock()
     mock_db.delete = MagicMock()
+    mock_db.commit = AsyncMock()
+    mock_db.rollback = AsyncMock()
+    mock_db.refresh = AsyncMock()
+    mock_db.flush = AsyncMock()
     return InsightGenerator(mock_db)
 
 class MockAsyncDb:

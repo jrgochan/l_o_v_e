@@ -15,6 +15,7 @@ def mock_db():
     mock_db.add = MagicMock()
     mock_db.delete = MagicMock()
     mock_db.commit = AsyncMock()
+    mock_db.close = AsyncMock()
     return mock_db
 
 @pytest.fixture

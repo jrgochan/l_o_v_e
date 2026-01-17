@@ -7,10 +7,13 @@ from app.services.recommendation_engine import RecommendationEngine, CURATED_JOU
 
 @pytest.fixture
 def mock_session():
-    db = AsyncMock(spec=AsyncSession)
+    # Remove spec=AsyncSession to avoid auto-creation of async mocks for internal attributes
+    # that might not be consumed/awaited, causing RuntimeWarnings.
+    db = AsyncMock()
     db.execute = AsyncMock(return_value=MagicMock())
     db.add = MagicMock()
     db.delete = MagicMock()
+    db.close = AsyncMock()
     return db
 
 @pytest.fixture

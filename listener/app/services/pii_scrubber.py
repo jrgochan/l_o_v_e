@@ -77,6 +77,22 @@ class PIIScrubber:
         "GPE": "[LOCATION]",
     }
 
+    # Regex patterns for fallback detection
+    REGEX_PATTERNS = {
+        "DATE": [
+            r"\b(Monday|Tuesday|Wednesday|Thursday|Friday|Saturday|Sunday)\b",
+            r"\b(January|February|March|April|May|June|July|August|September|October|November|December)\s+\d{1,2}(?:st|nd|rd|th)?(?:,\s+\d{4})?\b",
+            r"\b\d{1,2}/\d{1,2}/\d{2,4}\b",
+            r"\b\d{4}-\d{1,2}-\d{1,2}\b",
+        ],
+        "EMAIL": [
+            r"\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b"
+        ],
+        "PHONE": [
+            r"\b(?:\+\d{1,2}\s?)?\(?\d{3}\)?[\s.-]?\d{3}[\s.-]?\d{4}\b"
+        ]
+    }
+
     def __init__(self, model_name: str = "dslim/bert-base-NER"):
         """Initialize PII scrubber with HF model.
 
@@ -90,6 +106,12 @@ class PIIScrubber:
 
         self.model_name = model_name
         self._nlp: Optional[Any] = None
+        
+        # Pre-compile regexes
+        import re
+        self._compiled_patterns = {}
+        for label, patterns in self.REGEX_PATTERNS.items():
+            self._compiled_patterns[label] = [re.compile(p, re.IGNORECASE) for p in patterns]
 
         logger.info(f"PIIScrubber initialized with model: {model_name}")
 
@@ -112,8 +134,18 @@ class PIIScrubber:
 
         return self._nlp
 
+    def _detect_regex_entities(self, text: str) -> List[Tuple[int, int, str, str]]:
+        """Detect entities using regex patterns."""
+        entities = []
+        for label, patterns in self._compiled_patterns.items():
+            for pattern in patterns:
+                for match in pattern.finditer(text):
+                    # (start, end, label, text)
+                    entities.append((match.start(), match.end(), f"[{label}]", match.group()))
+        return entities
+
     def scrub(self, text: str, keep_structure: bool = True) -> str:
-        """Remove personally identifiable information from text using NER.
+        """Remove personally identifiable information from text using NER + Regex.
 
         Args:
             text: Input text.
@@ -125,31 +157,42 @@ class PIIScrubber:
         if not text or len(text.strip()) == 0:
             return text
 
+        # 1. BERT Detection
         nlp = self._load_model()
-
-        # Run inference
-        # Output is list of dicts: {'entity_group': 'PER', 'score': 0.99, 'word': 'Smith', 'start': 6, 'end': 11}
-        entities = nlp(text)
+        bert_entities = nlp(text)
 
         # Collect entities to scrub
+        # Format: (start, end, replacement, original_text)
         entities_to_scrub = []
-        for ent in entities:
-            # HF 'simple' aggregation uses 'entity_group', raw uses 'entity'
+        
+        # Add BERT entities
+        for ent in bert_entities:
+            # HF 'simple' aggregation uses 'entity_group'
             label = ent.get("entity_group", ent.get("entity"))
             if label in self.PII_ENTITIES:
-                entities_to_scrub.append((ent["start"], ent["end"], label))
+                replacement = self.PII_ENTITIES.get(label, "[REDACTED]")
+                entities_to_scrub.append((ent["start"], ent["end"], replacement, ent.get("word", "")))
+
+        # 2. Regex Detection (Fallback for Dates, Emails, etc.)
+        regex_matches = self._detect_regex_entities(text)
+        for start, end, label, word in regex_matches:
+            # Check overlap
+            is_overlap = any(
+                (start < e[1] and end > e[0]) for e in entities_to_scrub
+            )
+            if not is_overlap:
+                entities_to_scrub.append((start, end, label, word))
 
         # Sort by start position in reverse order (to replace safely)
         entities_to_scrub.sort(key=lambda x: x[0], reverse=True)
 
         scrubbed = text
-        for start, end, label in entities_to_scrub:
-            if keep_structure:
-                replacement = self.PII_ENTITIES.get(label, "[REDACTED]")
-            else:
+        for start, end, replacement, _ in entities_to_scrub:
+            if not keep_structure:
                 replacement = ""
 
             # Replace slice
+            # Ensure we don't mess up if overlap logic failed slightly (though masked above)
             scrubbed = scrubbed[:start] + replacement + scrubbed[end:]
 
         if entities_to_scrub:
@@ -164,15 +207,36 @@ class PIIScrubber:
         if not text or len(text.strip()) == 0:
             return []
 
+        # 1. BERT
         nlp = self._load_model()
-        entities = nlp(text)
+        bert_entities = nlp(text)
 
         pii_found = []
-        for ent in entities:
+        covered_ranges = []
+
+        for ent in bert_entities:
             label = ent.get("entity_group", ent.get("entity"))
             if label in self.PII_ENTITIES:
                 # (text, type, start, end)
                 pii_found.append((ent.get("word", ""), label, ent["start"], ent["end"]))
+                covered_ranges.append((ent["start"], ent["end"]))
+
+        # 2. Regex
+        regex_matches = self._detect_regex_entities(text)
+        for start, end, label, word in regex_matches:
+            # Check overlap
+            is_overlap = any(
+                (start < c_end and end > c_start) for c_start, c_end in covered_ranges
+            )
+            if not is_overlap:
+                # Strip brackets for consistent type string if needed, or keep as is
+                # label is like '[DATE]', BERT is like 'PER'. 
+                # Let's clean the label to 'DATE' for consistency with type return?
+                # Actually detect_pii returns (word, type, start, end). 
+                # PII_ENTITIES maps 'PER' -> '[NAME]'. 
+                # Here regex label is '[DATE]'.
+                clean_type = label.strip('[]')
+                pii_found.append((word, clean_type, start, end))
 
         return pii_found
 

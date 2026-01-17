@@ -15,9 +15,12 @@ from app.models.atlas_definition import AtlasDefinition
 def mock_db():
     mock_db = AsyncMock()
     mock_db.execute = AsyncMock(return_value=MagicMock())
+    # SQLAlchemy add/delete are synchronous on the session object
     mock_db.add = MagicMock()
     mock_db.delete = MagicMock()
     mock_db.commit = AsyncMock()
+    mock_db.rollback = AsyncMock()
+    mock_db.refresh = AsyncMock()
     return mock_db
 
 @pytest.fixture
@@ -100,7 +103,7 @@ async def test_record_state_success_no_previous(mock_db, mock_input, mock_deps, 
     mock_res.scalar_one_or_none.return_value = None
     mock_db.execute.return_value = mock_res
     
-    req = MagicMock(spec=Request)
+    req = MagicMock()
     resp = await state.record_state(req, mock_input, db=mock_db, current_user=mock_user)
     
     assert resp.dominant_emotion.name == "Anxiety"
@@ -126,7 +129,7 @@ async def test_record_state_with_previous(mock_db, mock_input, mock_deps, mock_u
     mock_res.scalar_one_or_none.return_value = prev
     mock_db.execute.return_value = mock_res
     
-    req = MagicMock(spec=Request)
+    req = MagicMock()
     resp = await state.record_state(req, mock_input, db=mock_db, current_user=mock_user)
     
     assert resp.previous_quaternion is not None
@@ -145,7 +148,7 @@ async def test_record_state_alerts(mock_db, mock_input, mock_deps, mock_user):
     mock_res.scalar_one_or_none.return_value = None
     mock_db.execute.return_value = mock_res
     
-    req = MagicMock(spec=Request)
+    req = MagicMock()
     resp = await state.record_state(req, mock_input, db=mock_db, current_user=mock_user)
     
     assert "flooding" in resp.metrics.alerts
@@ -160,7 +163,7 @@ async def test_record_state_ws_failure(mock_db, mock_input, mock_deps, mock_user
     mock_res.scalar_one_or_none.return_value = None
     mock_db.execute.return_value = mock_res
     
-    req = MagicMock(spec=Request)
+    req = MagicMock()
     # Should NOT raise exception
     resp = await state.record_state(req, mock_input, db=mock_db, current_user=mock_user)
     
@@ -171,7 +174,7 @@ async def test_record_state_exception(mock_db, mock_input, mock_deps, mock_user)
     """Test general exception triggers 500 and rollback."""
     mock_db.commit.side_effect = Exception("DB Crash")
     
-    req = MagicMock(spec=Request)
+    req = MagicMock()
     with pytest.raises(HTTPException) as exc:
         await state.record_state(req, mock_input, db=mock_db, current_user=mock_user)
     
@@ -185,7 +188,7 @@ async def test_record_state_auth_failure(mock_db, mock_input, mock_deps):
     wrong_user = MagicMock()
     wrong_user.id = uuid4() 
     
-    req = MagicMock(spec=Request)
+    req = MagicMock()
     
     with pytest.raises(HTTPException) as exc:
         await state.record_state(req, mock_input, db=mock_db, current_user=wrong_user)
