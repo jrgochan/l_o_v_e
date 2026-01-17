@@ -12,7 +12,15 @@ import type {
 
 export interface MessageHandlers {
   onTranscription?: (text: string) => void;
-  onAnalysis?: (emotion: string, category: string, vac: VAC, confidence: number) => void;
+  onAnalysis?: (
+    emotion: string,
+    category: string,
+    vac: VAC,
+    confidence: number,
+    originalEmotion?: string,
+    matchMethod?: string,
+    matchConfidence?: number
+  ) => void;
   onProsody?: (data: ProsodyData) => void;
   onInsight?: (insights: InsightData) => void;
   onError?: (error: string) => void;
@@ -21,7 +29,10 @@ export interface MessageHandlers {
     category: string,
     vac: VAC,
     confidence: number,
-    prominence: EmotionProminence
+    prominence: EmotionProminence,
+    originalEmotion?: string,
+    matchMethod?: string,
+    matchConfidence?: number
   ) => void;
   onRelationship?: (
     emotionA: string,
@@ -71,7 +82,15 @@ export const dispatchMessage = (
       break;
 
     case "analysis":
-      onAnalysis?.(message.emotion, message.category, message.vac, message.confidence);
+      onAnalysis?.(
+        message.emotion,
+        message.category,
+        message.vac,
+        message.confidence,
+        message.original_emotion,
+        message.match_method,
+        message.match_confidence
+      );
       break;
 
     case "insight":
@@ -91,7 +110,10 @@ export const dispatchMessage = (
           message.category || "",
           message.vac,
           message.confidence || 0,
-          message.prominence
+          message.prominence,
+          message.original_emotion,
+          message.match_method,
+          message.match_confidence
         );
       }
       break;

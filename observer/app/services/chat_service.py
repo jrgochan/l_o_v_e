@@ -224,7 +224,7 @@ from app.models.multi_emotion_analysis import (
     EmotionRelationship,
     MultiEmotionAnalysis,
 )
-from app.services.atlas_mapper import AtlasMapper
+from app.services.atlas_mapper import AtlasMapper, MappingResult
 
 logger = logging.getLogger(__name__)
 
@@ -389,13 +389,23 @@ class ChatService:
             New ChatMessage instance
         """
         # Find emotion ID from emotion name
-        emotion_id = await self._find_emotion_id(emotion_name)
+        mapping = await self._resolve_emotion(emotion_name)
+        
+        emotion_id = None
+        if mapping.atlas_id:
+            from uuid import UUID
+            emotion_id = UUID(mapping.atlas_id)
+        else:
+            logger.warning(f"Emotion not found: {emotion_name}")
 
         message = ChatMessage(
             session_id=session_id,
             message_type="system_analysis",
             content=content,
             emotion_id=emotion_id,
+            original_emotion_name=mapping.original_name,
+            match_method=mapping.match_method,
+            match_confidence=mapping.match_confidence,
             vac_coordinates=vac_coordinates,
             confidence=confidence,
             tone_mode=tone_mode,
@@ -553,22 +563,14 @@ class ChatService:
             "ended_at": session.ended_at.isoformat() if session.ended_at else None,
         }
 
-    async def _find_emotion_id(self, emotion_name: str) -> Optional[UUID]:
-        """Find emotion ID by name using AtlasMapper.
+    async def _resolve_emotion(self, emotion_name: str) -> MappingResult:
+        """Resolve emotion name to Atlas emotion using AtlasMapper.
 
-        Uses fuzzy matching to handle AI variations and typos.
+        Returns full mapping result including method and confidence.
         """
         # Use AtlasMapper for comprehensive matching
         atlas_mapper = AtlasMapper(self.db)
-        mapping = await atlas_mapper.map_emotion(emotion_name)
-
-        if mapping.atlas_id:
-            from uuid import UUID
-
-            return UUID(mapping.atlas_id)
-
-        logger.warning(f"Emotion not found: {emotion_name}")
-        return None
+        return await atlas_mapper.map_emotion(emotion_name)
 
     async def delete_session(self, session_id: UUID) -> bool:
         """Delete a session and all its messages (cascade).
@@ -698,7 +700,12 @@ class ChatService:
         for emotion_data in emotions:
             # Resolve emotion name to atlas ID (handles typos, variations)
             # Example: "joyful" → Joy, "anxious" → Anxiety
-            emotion_id = await self._find_emotion_id(emotion_data["emotion_name"])
+            mapping = await self._resolve_emotion(emotion_data["emotion_name"])
+            
+            emotion_id = None
+            if mapping.atlas_id:
+                from uuid import UUID
+                emotion_id = UUID(mapping.atlas_id)
 
             # Create detected emotion record
             # prominence: Relative strength (all emotions sum to 1.0)
@@ -706,6 +713,9 @@ class ChatService:
             detected_emotion = DetectedEmotion(
                 analysis_id=analysis.id,  # Foreign key to parent analysis
                 emotion_id=emotion_id,  # Foreign key to atlas_definitions
+                original_name=mapping.original_name,
+                match_method=mapping.match_method,
+                match_confidence=mapping.match_confidence,
                 confidence=emotion_data["confidence"],
                 prominence=emotion_data["prominence"],
                 vac=[

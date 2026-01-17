@@ -27,6 +27,9 @@ interface DisplayMessage {
   vac?: VAC;
   confidence?: number;
   insights?: InsightData;
+  originalEmotion?: string;
+  matchMethod?: string;
+  matchConfidence?: number;
 }
 
 export function ChatDrawer({ isOpen, onToggle, sessionId }: ChatDrawerProps) {
@@ -67,16 +70,27 @@ export function ChatDrawer({ isOpen, onToggle, sessionId }: ChatDrawerProps) {
         timestamp,
       });
     },
-    onAnalysis: (emotion: string, category: string, vac: VAC, confidence: number) => {
+    onAnalysis: (
+      emotion: string,
+      category: string,
+      vac: VAC,
+      confidence: number,
+      originalEmotion?: string,
+      matchMethod?: string,
+      matchConfidence?: number
+    ) => {
       const timestamp = new Date();
       addMessage({
         id: timestamp.getTime().toString(),
         type: "analysis",
-        content: `Detected: ${emotion}`,
+        content: `Detected: ${emotion}${originalEmotion && originalEmotion !== emotion ? ` (mapped from "${originalEmotion}")` : ""}`,
         emotion,
         category,
         vac,
         confidence,
+        originalEmotion,
+        matchMethod,
+        matchConfidence,
         timestamp,
       });
     },
@@ -185,9 +199,8 @@ export function ChatDrawer({ isOpen, onToggle, sessionId }: ChatDrawerProps) {
       <div
         onMouseDown={handleMouseDown}
         data-testid="resize-handle"
-        className={`w-full h-2 cursor-row-resize hover:bg-cyan-500/30 transition flex items-center justify-center ${
-          isResizing ? "bg-cyan-500/50" : ""
-        }`}
+        className={`w-full h-2 cursor-row-resize hover:bg-cyan-500/30 transition flex items-center justify-center ${isResizing ? "bg-cyan-500/50" : ""
+          }`}
       >
         <div className="w-12 h-1 bg-gray-600 rounded-full" />
       </div>
@@ -219,9 +232,8 @@ export function ChatDrawer({ isOpen, onToggle, sessionId }: ChatDrawerProps) {
           {/* Tone Toggle */}
           <button
             onClick={handleToneToggle}
-            className={`px-4 py-2 rounded text-sm font-medium transition ${
-              toneMode === "clinical" ? "bg-blue-600 text-white" : "bg-amber-600 text-white"
-            }`}
+            className={`px-4 py-2 rounded text-sm font-medium transition ${toneMode === "clinical" ? "bg-blue-600 text-white" : "bg-amber-600 text-white"
+              }`}
             title={`Switch to ${toneMode === "clinical" ? "warm" : "clinical"} mode`}
           >
             {toneMode === "clinical" ? "🔬 Clinical" : "💗 Warm"}
@@ -252,15 +264,14 @@ export function ChatDrawer({ isOpen, onToggle, sessionId }: ChatDrawerProps) {
             className={`flex ${msg.type === "user" ? "justify-end" : "justify-start"}`}
           >
             <div
-              className={`max-w-[70%] rounded-lg px-4 py-3 ${
-                msg.type === "user"
+              className={`max-w-[70%] rounded-lg px-4 py-3 ${msg.type === "user"
                   ? "bg-cyan-600 text-white"
                   : msg.type === "analysis"
                     ? "bg-purple-900/50 border border-purple-500/30 text-white"
                     : msg.type === "insight"
                       ? "bg-gray-800 border border-gray-600 text-white"
                       : "bg-gray-700 text-gray-200"
-              }`}
+                }`}
             >
               {/* Message Content */}
               <div className="text-sm whitespace-pre-wrap">{msg.content}</div>
@@ -281,9 +292,15 @@ export function ChatDrawer({ isOpen, onToggle, sessionId }: ChatDrawerProps) {
                     <span className="font-mono">{msg.vac.connection.toFixed(2)}</span>
                   </div>
                   {msg.confidence && (
-                    <div className="flex justify-between mt-1">
+                    <div className="flex justify-between mt-1 pt-1 border-t border-purple-500/20">
                       <span className="text-purple-300">Confidence:</span>
                       <span className="font-mono">{(msg.confidence * 100).toFixed(0)}%</span>
+                    </div>
+                  )}
+                  {msg.matchMethod && msg.matchMethod !== "exact" && (
+                    <div className="flex justify-between text-purple-400/80 italic">
+                      <span>Mapping:</span>
+                      <span>{msg.matchMethod} ({((msg.matchConfidence || 0) * 100).toFixed(0)}%)</span>
                     </div>
                   )}
                 </div>

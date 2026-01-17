@@ -37,6 +37,19 @@ target_metadata = Base.metadata
 # ... etc.
 
 
+
+def include_object(object, name, type_, reflected, compare_to):
+    """Exclude specific tables from autogenerate."""
+    if type_ == "table" and name in [
+        "path_matrix_cache",
+        "path_computation_jobs",
+        "waypoint_explanation_templates",
+        "model_performance_metrics",
+    ]:
+        return False
+    return True
+
+
 def run_migrations_offline() -> None:
     """Run migrations in 'offline' mode.
 
@@ -57,6 +70,7 @@ def run_migrations_offline() -> None:
         dialect_opts={"paramstyle": "named"},
         compare_type=True,
         compare_server_default=True,
+        include_object=include_object,
     )
 
     with context.begin_transaction():
@@ -70,6 +84,7 @@ def do_run_migrations(connection: Connection) -> None:
         target_metadata=target_metadata,
         compare_type=True,
         compare_server_default=True,
+        include_object=include_object,
     )
 
     with context.begin_transaction():

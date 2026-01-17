@@ -486,6 +486,11 @@ class ChatMessage(Base):
     )  # [valence, arousal, connection]
     confidence: Mapped[Optional[float]] = mapped_column(Float)
 
+    # Emotion Mapping Details
+    original_emotion_name: Mapped[Optional[str]] = mapped_column(String(100))
+    match_method: Mapped[Optional[str]] = mapped_column(String(50))  # exact, fuzzy, vac
+    match_confidence: Mapped[Optional[float]] = mapped_column(Float)
+
     # Prosody data (voice characteristics)
     prosody_pitch_mean: Mapped[Optional[float]] = mapped_column(Float)
     prosody_pitch_std: Mapped[Optional[float]] = mapped_column(Float)
@@ -526,6 +531,9 @@ class ChatMessage(Base):
             "emotion_id": str(self.emotion_id) if self.emotion_id else None,
             "vac_coordinates": self.vac_coordinates,
             "confidence": self.confidence,
+            "original_emotion_name": self.original_emotion_name,
+            "match_method": self.match_method,
+            "match_confidence": self.match_confidence,
             "tone_mode": self.tone_mode,
             "created_at": self.created_at.isoformat() if self.created_at else None,
         }

@@ -577,6 +577,11 @@ class DetectedEmotion(Base):
     )  # 'primary', 'secondary', 'underlying'
     vac: Mapped[List[float]] = mapped_column(ARRAY(Float))  # [valence, arousal, connection]
 
+    # Mapping Details
+    original_name: Mapped[Optional[str]] = mapped_column(String(100))
+    match_method: Mapped[Optional[str]] = mapped_column(String(50))
+    match_confidence: Mapped[Optional[float]] = mapped_column(Float)
+
     # Voice-content alignment
     voice_alignment: Mapped[Optional[float]] = mapped_column(Float)  # 0-1, how well voice matches
     voice_interpretation_vac: Mapped[Optional[List[float]]] = mapped_column(
@@ -623,6 +628,9 @@ class DetectedEmotion(Base):
                 if self.vac
                 else None
             ),
+            "original_name": self.original_name,
+            "match_method": self.match_method,
+            "match_confidence": self.match_confidence,
             "voice_alignment": self.voice_alignment,
             "created_at": self.created_at.isoformat() if self.created_at else None,
         }

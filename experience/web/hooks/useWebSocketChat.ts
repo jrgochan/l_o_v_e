@@ -28,7 +28,15 @@ export interface UseWebSocketChatOptions {
   deepFeelingEnabled?: boolean; // Deep Feeling mode (default: false)
   onMessage?: (message: ServerMessage | DeepFeelingServerMessage) => void;
   onTranscription?: (text: string) => void;
-  onAnalysis?: (emotion: string, category: string, vac: VAC, confidence: number) => void;
+  onAnalysis?: (
+    emotion: string,
+    category: string,
+    vac: VAC,
+    confidence: number,
+    originalEmotion?: string,
+    matchMethod?: string,
+    matchConfidence?: number
+  ) => void;
   onProsody?: (data: ProsodyData) => void;
   onInsight?: (insights: InsightData) => void;
   onError?: (error: string) => void;
@@ -38,7 +46,10 @@ export interface UseWebSocketChatOptions {
     category: string,
     vac: VAC,
     confidence: number,
-    prominence: EmotionProminence
+    prominence: EmotionProminence,
+    originalEmotion?: string,
+    matchMethod?: string,
+    matchConfidence?: number
   ) => void;
   onRelationship?: (
     emotionA: string,

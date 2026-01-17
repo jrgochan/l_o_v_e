@@ -5,7 +5,15 @@ from app.models.bootstrap_data import BootstrapData
 from app.models.chat_message import ChatMessage
 from app.models.chat_session import ChatSession
 from app.models.clinical_alert import ClinicalAlert
+from app.models.multi_emotion_analysis import (
+    DetectedEmotion,
+    EmotionRelationship,
+    MultiEmotionAnalysis,
+    EmotionGoal,
+)
 from app.models.session_analytics import SessionAnalytics
+from app.models.model_assignment import ModelAssignment
+from app.models.prompt_template import PromptTemplate
 from app.models.transition_strategy import (
     CategoryTransition,
     JourneyWaypoint,
@@ -34,4 +42,10 @@ __all__ = [
     "ClinicalAlert",
     "SessionAnalytics",
     "BootstrapData",
+    "MultiEmotionAnalysis",
+    "DetectedEmotion",
+    "EmotionRelationship",
+    "EmotionGoal",
+    "ModelAssignment",
+    "PromptTemplate",
 ]
