@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 # L.O.V.E. Stack - Service Manager Library
 # POSIX-compliant service management abstraction
 
@@ -14,10 +14,9 @@ fi
 map_service_name() {
     local service="$1"
     local init_system
-    local pkg_mgr
     
     init_system=$(detect_init_system)
-    pkg_mgr=$(detect_package_manager)
+    detect_package_manager >/dev/null
     
     case "$service" in
         postgresql)

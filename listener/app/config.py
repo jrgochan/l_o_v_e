@@ -42,6 +42,7 @@ See Also:
     - .env.example - Template file
     - Deployment: docs/modules/listener/senior-developers/01-deep-dive-architecture.md
 """
+
 from typing import Literal, Optional
 
 from pydantic import Field
@@ -123,7 +124,7 @@ class Settings(BaseSettings):
 
     # Logging
     LOG_LEVEL: str = "INFO"
-    
+
     # AI Model Configuration
     PII_MODEL_PATH: Optional[str] = None
 
@@ -140,7 +141,7 @@ class Settings(BaseSettings):
     model_config = SettingsConfigDict(
         env_file=".env",
         case_sensitive=True,
-        extra="ignore" # Changed from forbid to allow potential legacy/extra env vars, or just add the field
+        extra="ignore",  # Changed from forbid to allow potential legacy/extra env vars, or just add the field
     )
 
 

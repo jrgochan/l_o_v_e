@@ -317,14 +317,16 @@ async def get_all_emotions(
                         float(emotion.vac_vector[1]),
                         float(emotion.vac_vector[2]),
                     ],
-                    "quaternion": [
-                        float(emotion.q_constant[0]),
-                        float(emotion.q_constant[1]),
-                        float(emotion.q_constant[2]),
-                        float(emotion.q_constant[3]),
-                    ]
-                    if emotion.q_constant is not None
-                    else [1.0, 0.0, 0.0, 0.0],
+                    "quaternion": (
+                        [
+                            float(emotion.q_constant[0]),
+                            float(emotion.q_constant[1]),
+                            float(emotion.q_constant[2]),
+                            float(emotion.q_constant[3]),
+                        ]
+                        if emotion.q_constant is not None
+                        else [1.0, 0.0, 0.0, 0.0]
+                    ),
                 }
                 for emotion in emotions
             ],
@@ -389,14 +391,16 @@ async def get_emotion_by_id(emotion_id: str, db: AsyncSession = Depends(get_db))
                 float(emotion.vac_vector[1]),
                 float(emotion.vac_vector[2]),
             ],
-            "quaternion": [
-                float(emotion.q_constant[0]),
-                float(emotion.q_constant[1]),
-                float(emotion.q_constant[2]),
-                float(emotion.q_constant[3]),
-            ]
-            if emotion.q_constant is not None
-            else [1.0, 0.0, 0.0, 0.0],
+            "quaternion": (
+                [
+                    float(emotion.q_constant[0]),
+                    float(emotion.q_constant[1]),
+                    float(emotion.q_constant[2]),
+                    float(emotion.q_constant[3]),
+                ]
+                if emotion.q_constant is not None
+                else [1.0, 0.0, 0.0, 0.0]
+            ),
             "color_hint": emotion.color_hint,
         }
 

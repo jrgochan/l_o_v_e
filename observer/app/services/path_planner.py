@@ -240,9 +240,9 @@ class PathPlanner:
         #   - path: List[Any] of emotions from start to current
         #
         # PriorityQueue.get() always returns lowest f_cost first (optimal A*)
-        open_set: PriorityQueue[
-            Tuple[float, int, AtlasDefinition, List[AtlasDefinition]]
-        ] = PriorityQueue()
+        open_set: PriorityQueue[Tuple[float, int, AtlasDefinition, List[AtlasDefinition]]] = (
+            PriorityQueue()
+        )
         counter = 0
         open_set.put((0.0, counter, start, [start]))  # f(start) = 0
         counter += 1

@@ -33,6 +33,7 @@ See Also:
     - Documentation: docs/modules/listener/senior-developers/02-semantic-analysis-internals.md
     - Models: app/models/vac_response.py
 """
+
 import json
 import logging
 import time

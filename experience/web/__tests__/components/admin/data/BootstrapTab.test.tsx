@@ -48,7 +48,7 @@ describe("BootstrapTab", () => {
   });
 
   it("renders loading state", async () => {
-    (adminApi.getBootstrapData as jest.Mock).mockReturnValue(new Promise(() => { }));
+    (adminApi.getBootstrapData as jest.Mock).mockReturnValue(new Promise(() => {}));
     const { container } = render(<BootstrapTab />);
     expect(container.querySelector(".animate-spin")).toBeInTheDocument();
   });

@@ -31,6 +31,7 @@ See Also:
     - Semantic Analyzer: app/services/semantic_analyzer.py (creates these)
     - Tests: tests/unit/test_vac_models.py
 """
+
 from pydantic import BaseModel, Field, field_validator
 
 

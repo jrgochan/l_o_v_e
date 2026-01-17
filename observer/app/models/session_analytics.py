@@ -433,9 +433,9 @@ class SessionAnalytics(Base):
             "average_confidence": self.average_confidence,
             "dominant_category": self.dominant_category,
             "start_time": self.start_time.isoformat(),
-            "last_emotion_time": self.last_emotion_time.isoformat()
-            if self.last_emotion_time
-            else None,
+            "last_emotion_time": (
+                self.last_emotion_time.isoformat() if self.last_emotion_time else None
+            ),
             "total_duration_seconds": self.total_duration_seconds,
             "alert_counts": {
                 "critical": self.critical_alert_count,

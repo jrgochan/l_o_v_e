@@ -1061,9 +1061,11 @@ class InsightGenerator:
                     "name": emotion.emotion_name,
                     "category": emotion.category,
                     "definition": emotion.definition,
-                    "vac": [float(vac_list[0]), float(vac_list[1]), float(vac_list[2])]
-                    if vac_list is not None
-                    else None,
+                    "vac": (
+                        [float(vac_list[0]), float(vac_list[1]), float(vac_list[2])]
+                        if vac_list is not None
+                        else None
+                    ),
                     "matched_by": "exact",
                 }
             return None
@@ -1090,9 +1092,9 @@ class InsightGenerator:
                         "definition": emotion.definition,
                         "vac": mapping.vac,
                         "matched_by": mapping.match_method,
-                        "original_emotion": mapping.original_name
-                        if mapping.match_method != "exact"
-                        else None,
+                        "original_emotion": (
+                            mapping.original_name if mapping.match_method != "exact" else None
+                        ),
                         "match_confidence": mapping.match_confidence,
                     }
             except Exception as e:
@@ -1330,18 +1332,18 @@ class InsightGenerator:
         # Add interpretation
         if energy_discrepancy > 0.5:
             if tone_mode == "clinical":
-                correlation[
-                    "interpretation"
-                ] = f"Significant discrepancy detected: voice energy ({voice_energy:.2f}) vs content arousal ({content_arousal:+.2f})"
+                correlation["interpretation"] = (
+                    f"Significant discrepancy detected: voice energy ({voice_energy:.2f}) vs content arousal ({content_arousal:+.2f})"
+                )
             else:
                 if voice_energy > normalized_arousal:
-                    correlation[
-                        "interpretation"
-                    ] = "Your voice shows more intensity than your words suggest - there might be stronger feelings beneath the surface."
+                    correlation["interpretation"] = (
+                        "Your voice shows more intensity than your words suggest - there might be stronger feelings beneath the surface."
+                    )
                 else:
-                    correlation[
-                        "interpretation"
-                    ] = "Your words suggest high emotion, but your voice is calmer - you might be managing intense feelings."
+                    correlation["interpretation"] = (
+                        "Your words suggest high emotion, but your voice is calmer - you might be managing intense feelings."
+                    )
         else:
             correlation["interpretation"] = "Voice and content are well aligned."
 
@@ -1359,9 +1361,11 @@ class InsightGenerator:
             formatted.append(
                 {
                     "type": "similar_emotions",
-                    "title": "Related Emotions"
-                    if tone_mode == "clinical"
-                    else "You might also be feeling...",
+                    "title": (
+                        "Related Emotions"
+                        if tone_mode == "clinical"
+                        else "You might also be feeling..."
+                    ),
                     "items": [
                         {
                             "name": emotion["name"],
@@ -1379,9 +1383,9 @@ class InsightGenerator:
             formatted.append(
                 {
                     "type": "journeys",
-                    "title": "Therapeutic Paths"
-                    if tone_mode == "clinical"
-                    else "Paths to explore...",
+                    "title": (
+                        "Therapeutic Paths" if tone_mode == "clinical" else "Paths to explore..."
+                    ),
                     "items": [
                         {
                             "from": journey["from"]["name"],

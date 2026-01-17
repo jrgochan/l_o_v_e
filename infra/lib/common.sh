@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 # L.O.V.E. Stack - Common Utilities
 # POSIX-compliant shared functions and utilities
 
@@ -12,17 +12,17 @@ NC='\033[0m'  # No Color
 
 # Unicode symbols (with ASCII fallbacks)
 if [ -n "$TERM" ] && [ "$TERM" != "dumb" ]; then
-    CHECK="✅"
-    CROSS="❌"
-    WARN="⚠️ "
-    INFO="ℹ️ "
-    ROCKET="🚀"
+    export CHECK="✅"
+    export CROSS="❌"
+    export WARN="⚠️ "
+    export INFO="ℹ️ "
+    export ROCKET="🚀"
 else
-    CHECK="[OK]"
-    CROSS="[ERR]"
-    WARN="[WARN]"
-    INFO="[INFO]"
-    ROCKET=">>>"
+    export CHECK="[OK]"
+    export CROSS="[ERR]"
+    export WARN="[WARN]"
+    export INFO="[INFO]"
+    export ROCKET=">>>"
 fi
 
 # Fix for macOS: Prepend PostgreSQL 18 bin to PATH if it exists
@@ -60,7 +60,7 @@ print_info() {
 # Usage: print_verbose "message"
 print_verbose() {
     if [ "${VERBOSE:-false}" = true ]; then
-        printf "%b%s [VERBOSE] %s%b%b\n" "$CYAN" "$INFO" "$1" "$NC"
+        printf "%b%s [VERBOSE] %s%b\n" "$CYAN" "$INFO" "$1" "$NC"
     fi
 }
 
@@ -173,8 +173,10 @@ get_absolute_path() {
     if [ -d "$path" ]; then
         (cd "$path" && pwd)
     elif [ -f "$path" ]; then
-        local dir=$(dirname "$path")
-        local file=$(basename "$path")
+        local dir
+        local file
+        dir=$(dirname "$path")
+        file=$(basename "$path")
         echo "$(cd "$dir" && pwd)/$file"
     else
         echo "$path"
@@ -309,7 +311,8 @@ backup_file() {
     local file="$1"
     
     if [ -f "$file" ]; then
-        local backup="${file}.backup.$(date +%Y%m%d_%H%M%S)"
+        local backup
+        backup="${file}.backup.$(date +%Y%m%d_%H%M%S)"
         cp "$file" "$backup"
         echo "$backup"
     fi
@@ -447,8 +450,8 @@ get_script_dir() {
     local script_path
     
     # Get the directory of the current script
-    if [ -n "$BASH_SOURCE" ]; then
-        script_path="$BASH_SOURCE"
+    if [ -n "${BASH_SOURCE[0]}" ]; then
+        script_path="${BASH_SOURCE[0]}"
     else
         script_path="$0"
     fi

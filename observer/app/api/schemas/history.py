@@ -78,7 +78,6 @@ class TrajectoryPoint(BaseModel):
     emotion: str = Field(description="Dominant emotion name")
     elasticity: float = Field(description="Speed of change (rad/s)")
 
-
     model_config = ConfigDict(
         json_schema_extra={
             "example": {

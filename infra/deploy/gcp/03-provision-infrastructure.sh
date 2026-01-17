@@ -23,17 +23,17 @@ fi
 
 # 2. Private Service Access (for SQL/Redis)
 echo "Configuring Private Service Access..."
-gcloud compute addresses create google-managed-services-$VPC_NAME \
+gcloud compute addresses create google-managed-services-"$VPC_NAME" \
     --global \
     --purpose=VPC_PEERING \
     --prefix-length=16 \
-    --description="Peering for Google managed services" \
+    --description="Peering for Google Managed Services" \
     --network="$VPC_NAME" \
     --project="$PROJECT_ID" 2>/dev/null || echo "Address range likely exists or overlaps (skipping)"
 
 gcloud services vpc-peerings connect \
     --service=servicenetworking.googleapis.com \
-    --ranges=google-managed-services-$VPC_NAME \
+    --ranges=google-managed-services-"$VPC_NAME" \
     --network="$VPC_NAME" \
     --project="$PROJECT_ID" 2>/dev/null || echo "Peering likely already active (skipping)"
 

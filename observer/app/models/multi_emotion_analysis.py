@@ -492,13 +492,15 @@ class MultiEmotionAnalysis(Base):
             "message_id": str(self.message_id) if self.message_id else None,
             "session_id": str(self.session_id) if self.session_id else None,
             "deep_feeling_enabled": self.deep_feeling_enabled,
-            "aggregate_vac": {
-                "valence": self.aggregate_vac[0] if self.aggregate_vac else 0.0,
-                "arousal": self.aggregate_vac[1] if self.aggregate_vac else 0.0,
-                "connection": self.aggregate_vac[2] if self.aggregate_vac else 0.0,
-            }
-            if self.aggregate_vac
-            else None,
+            "aggregate_vac": (
+                {
+                    "valence": self.aggregate_vac[0] if self.aggregate_vac else 0.0,
+                    "arousal": self.aggregate_vac[1] if self.aggregate_vac else 0.0,
+                    "connection": self.aggregate_vac[2] if self.aggregate_vac else 0.0,
+                }
+                if self.aggregate_vac
+                else None
+            ),
             "complexity_score": self.complexity_score,
             "emotional_clarity": self.emotional_clarity,
             "temporal_pattern": self.temporal_pattern,
@@ -612,13 +614,15 @@ class DetectedEmotion(Base):
             "emotion_id": str(self.emotion_id) if self.emotion_id else None,
             "confidence": self.confidence,
             "prominence": self.prominence,
-            "vac": {
-                "valence": self.vac[0] if self.vac else 0.0,
-                "arousal": self.vac[1] if self.vac else 0.0,
-                "connection": self.vac[2] if self.vac else 0.0,
-            }
-            if self.vac
-            else None,
+            "vac": (
+                {
+                    "valence": self.vac[0] if self.vac else 0.0,
+                    "arousal": self.vac[1] if self.vac else 0.0,
+                    "connection": self.vac[2] if self.vac else 0.0,
+                }
+                if self.vac
+                else None
+            ),
             "voice_alignment": self.voice_alignment,
             "created_at": self.created_at.isoformat() if self.created_at else None,
         }
@@ -639,13 +643,15 @@ class DetectedEmotion(Base):
                 "name": self.emotion.emotion_name,
                 "category": self.emotion.category,
                 "definition": self.emotion.definition,
-                "atlas_vac": [
-                    float(self.emotion.vac_vector[0]),
-                    float(self.emotion.vac_vector[1]),
-                    float(self.emotion.vac_vector[2]),
-                ]
-                if self.emotion.vac_vector
-                else None,
+                "atlas_vac": (
+                    [
+                        float(self.emotion.vac_vector[0]),
+                        float(self.emotion.vac_vector[1]),
+                        float(self.emotion.vac_vector[2]),
+                    ]
+                    if self.emotion.vac_vector
+                    else None
+                ),
             }
             data["emotion"] = emotion_detail_dict
 
@@ -813,13 +819,15 @@ class EmotionGoal(Base):
                 "name": self.goal_emotion.emotion_name,
                 "category": self.goal_emotion.category,
                 "definition": self.goal_emotion.definition,
-                "vac": [
-                    float(self.goal_emotion.vac_vector[0]),
-                    float(self.goal_emotion.vac_vector[1]),
-                    float(self.goal_emotion.vac_vector[2]),
-                ]
-                if self.goal_emotion.vac_vector
-                else None,
+                "vac": (
+                    [
+                        float(self.goal_emotion.vac_vector[0]),
+                        float(self.goal_emotion.vac_vector[1]),
+                        float(self.goal_emotion.vac_vector[2]),
+                    ]
+                    if self.goal_emotion.vac_vector
+                    else None
+                ),
             }
             data["goal_emotion"] = goal_emotion_dict  # type: ignore[assignment]
 

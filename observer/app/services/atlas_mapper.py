@@ -240,9 +240,11 @@ class AtlasMapper:
                     "id": str(emotion.id),
                     "name": name,
                     "category": emotion.category,
-                    "vac": [float(vac_list[0]), float(vac_list[1]), float(vac_list[2])]
-                    if vac_list
-                    else None,
+                    "vac": (
+                        [float(vac_list[0]), float(vac_list[1]), float(vac_list[2])]
+                        if vac_list
+                        else None
+                    ),
                 }
                 self.emotion_names.append(name)
 
@@ -478,9 +480,11 @@ class AtlasMapper:
                         "id": str(emotion_id),
                         "name": emotion_name,
                         "category": category,
-                        "vac": [float(vac_list[0]), float(vac_list[1]), float(vac_list[2])]
-                        if vac_list
-                        else None,
+                        "vac": (
+                            [float(vac_list[0]), float(vac_list[1]), float(vac_list[2])]
+                            if vac_list
+                            else None
+                        ),
                         "distance": distance,
                     }
 

@@ -43,6 +43,7 @@ See Also:
     - Models: app/models/multi_emotion_response.py
     - Tests: tests/integration/test_multi_emotion.py
 """
+
 import json
 import logging
 import time
@@ -1035,12 +1036,12 @@ class MultiEmotionAnalyzer:
             "voice_blended_distance": round(voice_blended_distance, 3),
             "flags": flags,
             "interpretation": interpretation,
-            "content_primary": content_only.emotions[0].emotion_name
-            if content_only.emotions
-            else "Unknown",
-            "voice_primary": voice_only.emotions[0].emotion_name
-            if voice_only and voice_only.emotions
-            else None,
+            "content_primary": (
+                content_only.emotions[0].emotion_name if content_only.emotions else "Unknown"
+            ),
+            "voice_primary": (
+                voice_only.emotions[0].emotion_name if voice_only and voice_only.emotions else None
+            ),
             "blended_primary": blended.emotions[0].emotion_name if blended.emotions else "Unknown",
         }
 

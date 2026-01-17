@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 # L.O.V.E. Stack - OS Detection Library
 # POSIX-compliant platform detection functions
 

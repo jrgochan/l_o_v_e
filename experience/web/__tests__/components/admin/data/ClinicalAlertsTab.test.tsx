@@ -52,7 +52,7 @@ describe("ClinicalAlertsTab", () => {
   });
 
   it("renders loading state", async () => {
-    (adminApi.getClinicalAlerts as jest.Mock).mockReturnValue(new Promise(() => { }));
+    (adminApi.getClinicalAlerts as jest.Mock).mockReturnValue(new Promise(() => {}));
     render(<ClinicalAlertsTab />);
     expect(screen.getByText("Loading alerts...")).toBeInTheDocument();
   });

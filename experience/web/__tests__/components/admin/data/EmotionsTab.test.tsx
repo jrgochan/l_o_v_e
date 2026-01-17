@@ -43,10 +43,7 @@ describe("EmotionsTab", () => {
     const originalConsoleError = console.error;
     console.error = (...args) => {
       const msg = args[0]?.toString() || "";
-      if (
-        msg.includes("Failed to load emotions") ||
-        msg.includes("Not implemented: navigation")
-      ) {
+      if (msg.includes("Failed to load emotions") || msg.includes("Not implemented: navigation")) {
         return;
       }
       originalConsoleError(...args);
@@ -58,7 +55,7 @@ describe("EmotionsTab", () => {
   });
 
   it("renders loading state", async () => {
-    (adminApi.getAtlasEmotions as jest.Mock).mockReturnValue(new Promise(() => { }));
+    (adminApi.getAtlasEmotions as jest.Mock).mockReturnValue(new Promise(() => {}));
     const { container } = render(<EmotionsTab />);
     // Check for loader by class or role
     expect(container.querySelector(".animate-spin")).toBeInTheDocument();
@@ -553,7 +550,7 @@ describe("EmotionsTab", () => {
   it("handles unmount during import to cover finally block ref check", async () => {
     (adminApi.getAtlasEmotions as jest.Mock).mockResolvedValue(mockEmotions);
     // Mock import to pending forever (or long enough) but we won't wait for it
-    let resolveImport: (val: any) => void = () => { };
+    let resolveImport: (val: any) => void = () => {};
     (adminApi.importAtlasData as jest.Mock).mockImplementation(() => {
       return new Promise((resolve) => {
         resolveImport = resolve;

@@ -22,6 +22,7 @@ export function AuthGuard({ children, requiredRole, fallback }: AuthGuardProps) 
   const isAuthorized = !requiredRole || user?.role === requiredRole;
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setMounted(true);
   }, []);
 
@@ -59,7 +60,9 @@ export function AuthGuard({ children, requiredRole, fallback }: AuthGuardProps) 
 
   if (!isAuthorized) {
     if (process.env.NODE_ENV === "development") {
-      console.log(`[AuthGuard] Unauthorized role access. Required: ${requiredRole}, Current: ${user?.role}`);
+      console.log(
+        `[AuthGuard] Unauthorized role access. Required: ${requiredRole}, Current: ${user?.role}`
+      );
     }
     if (fallback) return <>{fallback}</>;
 

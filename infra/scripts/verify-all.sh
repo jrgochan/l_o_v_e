@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 # Master verification script - runs all quality checks
 # POSIX-compliant, comprehensive, production-ready
 
@@ -57,20 +57,21 @@ while [ $# -gt 0 ]; do
 done
 
 # Build command flags
-fix_flag=""
-quick_flag=""
-module_flag=""
+# Build command flags
+fix_args=()
+quick_args=()
+module_args=()
 
 if [ $FIX_MODE -eq 1 ]; then
-    fix_flag="--fix"
+    fix_args+=("--fix")
 fi
 
 if [ $QUICK_MODE -eq 1 ]; then
-    quick_flag="--quick"
+    quick_args+=("--quick")
 fi
 
 if [ -n "$TARGET_MODULE" ]; then
-    module_flag="--module=$TARGET_MODULE"
+    module_args+=("--module=$TARGET_MODULE")
 fi
 
 print_header "L.O.V.E. Platform - Comprehensive Verification"
@@ -105,7 +106,7 @@ fi
 if [ -z "$TARGET_MODULE" ] || [ "$TARGET_MODULE" != "experience" ]; then
     print_header "Step 2/5: Python Code Quality"
     
-    if "$SCRIPT_DIR/check-python-quality.sh" $fix_flag $module_flag; then
+    if "$SCRIPT_DIR/check-python-quality.sh" "${fix_args[@]}" "${module_args[@]}"; then
         print_success "Python quality check passed"
     else
         print_error "Python quality check failed"
@@ -121,7 +122,7 @@ fi
 if [ -z "$TARGET_MODULE" ] || [ "$TARGET_MODULE" = "experience" ]; then
     print_header "Step 3/5: TypeScript Code Quality"
     
-    if "$SCRIPT_DIR/check-typescript-quality.sh" $fix_flag; then
+    if "$SCRIPT_DIR/check-typescript-quality.sh" "${fix_args[@]}"; then
         print_success "TypeScript quality check passed"
     else
         print_error "TypeScript quality check failed"
@@ -137,7 +138,7 @@ fi
 if [ $QUICK_MODE -eq 0 ]; then
     print_header "Step 4/5: Running Test Suites"
     
-    if "$SCRIPT_DIR/run-tests.sh" $module_flag; then
+    if "$SCRIPT_DIR/run-tests.sh" "${module_args[@]}"; then
         print_success "All tests passed with 100% coverage"
     else
         print_error "Tests failed or coverage below 100%"
@@ -146,7 +147,7 @@ if [ $QUICK_MODE -eq 0 ]; then
 else
     print_header "Step 4/5: Running Quick Tests"
     
-    if "$SCRIPT_DIR/run-tests.sh" --quick $module_flag; then
+    if "$SCRIPT_DIR/run-tests.sh" --quick "${module_args[@]}"; then
         print_success "Quick tests passed"
     else
         print_error "Quick tests failed"

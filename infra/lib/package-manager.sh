@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 # L.O.V.E. Stack - Package Manager Library
 # POSIX-compliant package management abstraction
 
@@ -123,37 +123,37 @@ install_package() {
         brew)
             # Homebrew doesn't need sudo
             if [ "$no_confirm" = "--no-confirm" ]; then
-                HOMEBREW_NO_AUTO_UPDATE=1 brew install $mapped_pkg
+                HOMEBREW_NO_AUTO_UPDATE=1 brew install "$mapped_pkg"
             else
-                brew install $mapped_pkg
+                brew install "$mapped_pkg"
             fi
             ;;
         apt)
             if [ "$no_confirm" = "--no-confirm" ]; then
-                $sudo_cmd apt-get install -y $mapped_pkg
+                $sudo_cmd apt-get install -y "$mapped_pkg"
             else
-                $sudo_cmd apt-get install $mapped_pkg
+                $sudo_cmd apt-get install "$mapped_pkg"
             fi
             ;;
         dnf)
             if [ "$no_confirm" = "--no-confirm" ]; then
-                $sudo_cmd dnf install -y $mapped_pkg
+                $sudo_cmd dnf install -y "$mapped_pkg"
             else
-                $sudo_cmd dnf install $mapped_pkg
+                $sudo_cmd dnf install "$mapped_pkg"
             fi
             ;;
         yum)
             if [ "$no_confirm" = "--no-confirm" ]; then
-                $sudo_cmd yum install -y $mapped_pkg
+                $sudo_cmd yum install -y "$mapped_pkg"
             else
-                $sudo_cmd yum install $mapped_pkg
+                $sudo_cmd yum install "$mapped_pkg"
             fi
             ;;
         pacman)
             if [ "$no_confirm" = "--no-confirm" ]; then
-                $sudo_cmd pacman -S --noconfirm $mapped_pkg
+                $sudo_cmd pacman -S --noconfirm "$mapped_pkg"
             else
-                $sudo_cmd pacman -S $mapped_pkg
+                $sudo_cmd pacman -S "$mapped_pkg"
             fi
             ;;
         *)
@@ -221,6 +221,7 @@ add_repository() {
             if [ "$pkg_mgr" = "apt" ]; then
                 # Add PostgreSQL APT repository
                 if [ ! -f /etc/apt/sources.list.d/pgdg.list ]; then
+                    # shellcheck disable=SC2016
                     $sudo_cmd sh -c 'echo "deb http://apt.postgresql.org/pub/repos/apt $(lsb_release -cs)-pgdg main" > /etc/apt/sources.list.d/pgdg.list'
                     wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | $sudo_cmd apt-key add -
                     $sudo_cmd apt-get update

@@ -219,7 +219,6 @@ References:
     - Listener integration: listener/app/api/routes/ingest.py
 """
 
-
 import json
 import logging
 import time

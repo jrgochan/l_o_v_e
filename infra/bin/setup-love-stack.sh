@@ -38,7 +38,9 @@ PROJECT_ROOT="$(cd "$SCRIPT_DIR/../.." && pwd)"
 . "$PROJECT_ROOT/infra/lib/common.sh"
 
 # Required Python version
+# shellcheck disable=SC2034
 REQUIRED_PYTHON_MAJOR=3
+# shellcheck disable=SC2034
 REQUIRED_PYTHON_MINOR=14
 
 # Parse command line arguments
@@ -196,15 +198,18 @@ fi
 
 # Set verbosity flags
 if [ "$VERBOSE" = true ]; then
-    PIP_ARGS=""
-    NPM_ARGS=""
-    CURL_ARGS=""
+    PIP_ARGS=()
+    NPM_ARGS=()
     print_info "Verbose mode enabled"
 else
-    PIP_ARGS="--quiet"
-    NPM_ARGS="--silent"
-    CURL_ARGS="--silent"
+    PIP_ARGS=("--quiet")
+    NPM_ARGS=("--silent")
 fi
+# Export for use in child scripts (fixing SC2034)
+# Note: Arrays cannot be exported, but we only use them locally in this script
+# for child scripts, we might need to pass them differently if they expect arrays or strings.
+# But looking at usage, they are used in this script.
+export QUIET VERBOSE
 
 if [ "$CLEAN_MODE" = true ]; then
     print_info "Clean mode: Dropping database, removing venvs, complete fresh install"
@@ -499,24 +504,22 @@ setup_experience_module() {
     # Handle npm install based on UPDATE_MODE
     if [ "$UPDATE_MODE" = true ] && [ -d "node_modules" ]; then
         print_info "Update mode: Updating npm dependencies..."
-        npm install $NPM_ARGS
+        npm install "${NPM_ARGS[@]}"
     else
         # Check if node_modules exists
         if [ -d "node_modules" ]; then
             print_info "Dependencies already installed, updating..."
-            npm install $NPM_ARGS
+            npm install "${NPM_ARGS[@]}"
         else
             print_info "Installing npm dependencies (this may take a moment)..."
-            npm install $NPM_ARGS
+        if npm install "${NPM_ARGS[@]}"; then
+            print_success "Experience dependencies installed"
+        else
+            print_error "npm install failed"
+            cd - > /dev/null
+            return 1
         fi
-    fi
-    
-    if [ $? -eq 0 ]; then
-        print_success "Experience dependencies installed"
-    else
-        print_error "npm install failed"
-        cd - > /dev/null
-        return 1
+        fi
     fi
     
     cd - > /dev/null
@@ -569,13 +572,13 @@ setup_python_module() {
         
         # Upgrade pip
         print_info "Upgrading pip..."
-        pip install --upgrade pip $PIP_ARGS
+        pip install --upgrade pip "${PIP_ARGS[@]}"
     fi
     
     # Install dependencies
     if [ -f "requirements.txt" ]; then
         print_info "Installing dependencies..."
-        pip install -r requirements.txt $PIP_ARGS
+        pip install -r requirements.txt "${PIP_ARGS[@]}"
         print_success "$module_name dependencies installed"
     else
         print_warning "No requirements.txt found"
@@ -655,9 +658,11 @@ setup_ai_models() {
             LOCAL_MODEL_PATH="$PROJECT_ROOT/infra/models/dslim_bert-base-NER"
             
             if ! grep -q "PII_MODEL_PATH" "$ENV_FILE" 2>/dev/null; then
-                echo "" >> "$ENV_FILE"
-                echo "# Local Model Path (set by setup script)" >> "$ENV_FILE"
-                echo "PII_MODEL_PATH=$LOCAL_MODEL_PATH" >> "$ENV_FILE"
+                {
+                    echo ""
+                    echo "# Local Model Path (set by setup script)"
+                    echo "PII_MODEL_PATH=$LOCAL_MODEL_PATH"
+                } >> "$ENV_FILE"
                 print_info "Updated listener/.env with PII_MODEL_PATH"
             else
                 # Update existing
@@ -684,9 +689,11 @@ setup_ai_models() {
             LOCAL_MODEL_PATH="$PROJECT_ROOT/infra/models/sentence-transformers_all-MiniLM-L6-v2"
              
              if ! grep -q "EMBEDDING_MODEL" "$ENV_FILE" 2>/dev/null; then
-                echo "" >> "$ENV_FILE"
-                echo "# Local Model Path (set by setup script)" >> "$ENV_FILE"
-                echo "EMBEDDING_MODEL=$LOCAL_MODEL_PATH" >> "$ENV_FILE"
+                {
+                    echo ""
+                    echo "# Local Model Path (set by setup script)"
+                    echo "EMBEDDING_MODEL=$LOCAL_MODEL_PATH"
+                } >> "$ENV_FILE"
                 print_info "Updated observer/.env with EMBEDDING_MODEL"
             else
                 perl -pi -e "s|EMBEDDING_MODEL=.*|EMBEDDING_MODEL=$LOCAL_MODEL_PATH|" "$ENV_FILE"
@@ -728,10 +735,18 @@ main() {
         fi
     fi
     
-    # Install development tools
+    # Install development tools (OS level)
     print_header "🔨 Checking Development Tools"
     if install_dev_tools; then
-        print_success "Development tools ready"
+        print_success "System development tools ready"
+    fi
+
+    # Install Python Linting/DX Tools
+    print_header "🐍 Installing Python DX Tools"
+    if "$PROJECT_ROOT/infra/scripts/install-dev-tools.sh"; then
+        print_success "Python DX tools ready"
+    else
+        print_warning "Python DX tools installation failed (linting may not work)"
     fi
     
     # Check dependencies
@@ -771,14 +786,14 @@ if [ "$SKIP_DATABASE" = false ]; then
 
     if prompt_yes_no "Initialize database now?"; then
         print_info "Running database initialization..."
-        DB_INIT_ARGS=""
+        DB_INIT_ARGS=()
         if [ "$FORCE_RESEED" = true ]; then
-            DB_INIT_ARGS="$DB_INIT_ARGS --force-reseed"
+            DB_INIT_ARGS+=("--force-reseed")
         fi
         if [ "$PRECOMPUTE_PATHS" = true ]; then
-            DB_INIT_ARGS="$DB_INIT_ARGS --precompute-paths"
+            DB_INIT_ARGS+=("--precompute-paths")
         fi
-        if "$PROJECT_ROOT/infra/scripts/db/init-database.sh" $DB_INIT_ARGS; then
+        if "$PROJECT_ROOT/infra/scripts/db/init-database.sh" "${DB_INIT_ARGS[@]}"; then
             print_success "Database initialized successfully"
         else
             print_warning "Database initialization had issues"

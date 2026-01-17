@@ -174,7 +174,6 @@ class VACVector(BaseModel):
     arousal: float = Field(ge=-1.0, le=1.0, description="Energy level [-1, 1]")
     connection: float = Field(ge=-1.0, le=1.0, description="Relational alignment [-1, 1]")
 
-
     model_config = ConfigDict(
         json_schema_extra={"example": {"valence": 0.9, "arousal": 0.7, "connection": 0.8}}
     )

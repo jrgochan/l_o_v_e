@@ -119,7 +119,7 @@ check_postgresql_running() {
         
         # Wait for it to start
         print_info "Waiting for database to initialize..."
-        for i in {1..10}; do
+        for _ in {1..10}; do
             if command_exists pg_isready; then
                  if pg_isready -h "$DB_HOST" -p "$DB_PORT" >/dev/null 2>&1; then
                     print_success "PostgreSQL started successfully"
@@ -133,13 +133,14 @@ check_postgresql_running() {
         done
         
         # Try restart if start didn't work (maybe stuck state)
-        print_info "Attempting restart..."
-        brew services restart postgresql@18
-        sleep 5
-        if pg_isready -h "$DB_HOST" -p "$DB_PORT" >/dev/null 2>&1; then
-            print_success "PostgreSQL restarted successfully"
+        print_info "Waiting up to 30 seconds for database to accept connections..."
+    for _ in {1..30}; do
+        if pg_isready -h "$DB_HOST" -p "$DB_PORT" -U "$DB_USER" >/dev/null 2>&1; then
+            print_success "Database is ready!"
             return 0
         fi
+        sleep 1
+    done
     fi
 
     print_error "PostgreSQL not running or not accessible"
@@ -419,7 +420,7 @@ seed_database() {
         
         # Wait for Versor to be ready
         print_info "Waiting for Versor to start..."
-        for i in {1..30}; do
+        for _ in {1..30}; do
             if curl -s http://localhost:8080/health > /dev/null 2>&1; then
                 print_success "Versor API started (PID: $VERSOR_PID)"
                 break
@@ -485,7 +486,7 @@ seed_database() {
     echo ""
     
     # Run seed_all.py
-    if python scripts/seed_all.py $seed_args; then
+    if python scripts/seed_all.py "$seed_args"; then
         echo ""
         print_success "Database seeding completed"
         deactivate

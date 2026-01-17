@@ -52,6 +52,7 @@ See Also:
     - API Reference: docs/modules/listener/reference/api-reference.md
     - Tests: tests/integration/test_full_pipeline.py
 """
+
 import logging
 import os
 import tempfile
@@ -449,9 +450,11 @@ async def analyze_multi_emotion(
             extra_response_data = {
                 "three_way_analysis": {
                     "content_only": to_dict(three_way_result["content_only"]),
-                    "voice_only": to_dict(three_way_result["voice_only"])
-                    if three_way_result["voice_only"]
-                    else None,
+                    "voice_only": (
+                        to_dict(three_way_result["voice_only"])
+                        if three_way_result["voice_only"]
+                        else None
+                    ),
                     "blended": to_dict(three_way_result["blended"]),
                     "discrepancy": three_way_result["discrepancy"],
                 },

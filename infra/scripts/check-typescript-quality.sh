@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 # Check TypeScript/Experience module code quality
 # POSIX-compliant, supports --fix flag
 

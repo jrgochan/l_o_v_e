@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 # Check for all required development tools
 # POSIX-compliant, idempotent, provides installation guidance
 

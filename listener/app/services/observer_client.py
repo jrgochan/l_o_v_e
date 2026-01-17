@@ -46,6 +46,7 @@ See Also:
     - Documentation: docs/modules/listener/managers/02-integration-points.md
     - ADR: Why non-blocking - docs/modules/listener/senior-developers/07-architecture-decisions.md
 """
+
 import logging
 from datetime import datetime
 from typing import Any, Dict, Optional, cast
@@ -310,9 +311,11 @@ class ObserverClient:
                 "arousal": emotion.vac.arousal,
                 "connection": emotion.vac.connection,
             },
-            "timestamp": timestamp.isoformat() + "Z"
-            if not timestamp.isoformat().endswith("Z")
-            else timestamp.isoformat(),
+            "timestamp": (
+                timestamp.isoformat() + "Z"
+                if not timestamp.isoformat().endswith("Z")
+                else timestamp.isoformat()
+            ),
         }
 
         logger.info(

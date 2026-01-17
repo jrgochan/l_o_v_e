@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 # Check Python code quality across all modules
 # POSIX-compliant, supports --fix flag, mypy --strict
 
@@ -37,9 +37,9 @@ done
 
 # Python modules to check
 if [ -n "$TARGET_MODULE" ]; then
-    MODULES="$TARGET_MODULE"
+    MODULES=("$TARGET_MODULE")
 else
-    MODULES="observer listener versor"
+    MODULES=(observer listener versor)
 fi
 
 print_header "Python Code Quality Check"
@@ -62,7 +62,7 @@ fi
 total_failures=0
 
 # === Check each module ===
-for module in $MODULES; do
+for module in "${MODULES[@]}"; do
     if [ ! -d "$module" ]; then
         print_warning "Skipping $module (directory not found)"
         continue

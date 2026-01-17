@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 # Run comprehensive test suites across all modules
 # POSIX-compliant, parallel execution, 100% coverage target
 
@@ -42,9 +42,9 @@ done
 
 # Python modules to test
 if [ -n "$TARGET_MODULE" ]; then
-    MODULES="$TARGET_MODULE"
+    MODULES=("$TARGET_MODULE")
 else
-    MODULES="observer listener versor"
+    MODULES=(observer listener versor)
 fi
 
 print_header "Running Test Suites"
@@ -71,7 +71,7 @@ total_coverage=0
 module_count=0
 
 # === Python Module Tests ===
-for module in $MODULES; do
+for module in "${MODULES[@]}"; do
     if [ ! -d "$module" ]; then
         print_warning "Skipping $module (directory not found)"
         continue

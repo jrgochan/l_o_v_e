@@ -232,9 +232,9 @@ async def websocket_endpoint(
                     },
                     "quaternion": list(state.quaternion_state),
                     "metrics": {
-                        "elasticity": float(state.elasticity_metric)
-                        if state.elasticity_metric
-                        else 0.0,
+                        "elasticity": (
+                            float(state.elasticity_metric) if state.elasticity_metric else 0.0
+                        ),
                         "rigidity": float(state.rigidity_score) if state.rigidity_score else 0.0,
                         "alerts": [],
                     },

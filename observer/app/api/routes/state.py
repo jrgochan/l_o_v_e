@@ -233,7 +233,6 @@ References:
     - Listener integration: listener/app/services/observer_client.py
 """
 
-
 import logging
 from datetime import datetime
 

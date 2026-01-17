@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 # Auto-format all code (Python + TypeScript)
 # POSIX-compliant, idempotent, safe
 
@@ -47,12 +47,12 @@ total_failures=0
 if [ -z "$TARGET_MODULE" ] || [ "$TARGET_MODULE" != "experience" ]; then
     # Determine which Python modules to format
     if [ -n "$TARGET_MODULE" ] && [ "$TARGET_MODULE" != "experience" ]; then
-        PY_MODULES="$TARGET_MODULE"
+        PY_MODULES=("$TARGET_MODULE")
     else
-        PY_MODULES="observer listener versor"
+        PY_MODULES=(observer listener versor)
     fi
     
-    for module in $PY_MODULES; do
+    for module in "${PY_MODULES[@]}"; do
         if [ ! -d "$module" ]; then
             print_warning "Skipping $module (directory not found)"
             continue

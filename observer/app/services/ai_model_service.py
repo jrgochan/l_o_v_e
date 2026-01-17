@@ -446,9 +446,9 @@ class AIModelService:
                     "model": assignment.ai_model_name,
                     "avg_latency_ms": assignment.avg_latency_ms,
                     "total_invocations": assignment.total_invocations or 0,
-                    "last_used": assignment.last_used_at.isoformat()
-                    if assignment.last_used_at
-                    else None,
+                    "last_used": (
+                        assignment.last_used_at.isoformat() if assignment.last_used_at else None
+                    ),
                 }
 
             return stats

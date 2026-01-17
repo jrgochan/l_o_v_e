@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 # L.O.V.E. Stack - Project Archive Script
 # POSIX-compliant script to clone and archive the entire project
 #
@@ -35,8 +35,8 @@ OPT_FILENAME=""
 OPT_KEEP_TEMP=false
 OPT_QUIET=false
 OPT_VERBOSE=false
-OPT_YES=false
-OPT_SKIP_DEPS=false
+# OPT_YES=false # Unused
+# OPT_SKIP_DEPS=false # Unused
 
 # Git options to pass through
 OPT_GIT_PROTOCOL="ssh"
@@ -141,7 +141,7 @@ parse_arguments() {
                 show_version
                 ;;
             -y|--yes)
-                OPT_YES=true
+                # OPT_YES=true # Unused
                 shift
                 ;;
             -o|--output-dir)
@@ -283,7 +283,8 @@ main() {
     
     # Setup temporary directory
     local temp_root="${OPT_TEMP_DIR:-${TMPDIR:-/tmp}}"
-    local work_dir="$temp_root/love-archive-$(get_timestamp)"
+    local work_dir
+    work_dir="$temp_root/love-archive-$(get_timestamp)"
     
     # Register cleanup trap
     trap 'cleanup "$work_dir" "$OPT_KEEP_TEMP"' EXIT INT TERM
@@ -303,16 +304,16 @@ main() {
     fi
     
     # Build clone options
-    local clone_opts="--target-dir $work_dir --yes"
+    local clone_opts="--target-dir \"$work_dir\" --yes"
     
     [ "$OPT_GIT_PROTOCOL" = "https" ] && clone_opts="$clone_opts --https"
-    [ "$OPT_GIT_BRANCH" != "main" ] && clone_opts="$clone_opts --branch $OPT_GIT_BRANCH"
+    [ "$OPT_GIT_BRANCH" != "main" ] && clone_opts="$clone_opts --branch \"$OPT_GIT_BRANCH\""
     [ "$OPT_GIT_SHALLOW" = true ] && clone_opts="$clone_opts --shallow"
     [ "$OPT_QUIET" = true ] && clone_opts="$clone_opts --quiet"
     [ "$OPT_VERBOSE" = true ] && clone_opts="$clone_opts --verbose"
     
     # Run the clone script
-    if ! "$clone_script" $clone_opts; then
+    if ! eval "$clone_script" "$clone_opts"; then
         print_error "Failed to clone repositories."
         exit 1
     fi
@@ -340,7 +341,6 @@ main() {
     # ------------------------------------------------------------------------
     [ "$OPT_QUIET" != true ] && print_info "Step 2/3: Compressing files..."
     
-    local archive_msg=""
     local final_archive_path=""
     
     cd "$work_dir"

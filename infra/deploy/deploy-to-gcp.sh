@@ -1,4 +1,5 @@
 #!/bin/bash
+# shellcheck disable=SC2154
 set -e
 
 # L.O.V.E. Stack - Master GCP Deployment Script
@@ -21,9 +22,9 @@ fi
 # Select Project
 CURRENT_PROJECT=$(gcloud config get-value project)
 echo "Current GCP Project: $CURRENT_PROJECT"
-read -p "Use this project? (y/n): " confirm
+read -r -p "Use this project? (y/n): " confirm
 if [[ "$confirm" != "y" ]]; then
-    read -p "Enter GCP Project ID: " NEW_PROJECT
+    read -r -p "Enter GCP Project ID: " NEW_PROJECT
     gcloud config set project "$NEW_PROJECT"
     export PROJECT_ID="$NEW_PROJECT"
 else

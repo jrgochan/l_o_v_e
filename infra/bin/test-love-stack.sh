@@ -303,7 +303,7 @@ run_pytest() {
         return 0
     fi
 
-    (
+    if (
         cd "$module"
         if [ ! -d "venv" ]; then
             print_warning "Skipping $name (no venv)"
@@ -324,9 +324,7 @@ run_pytest() {
         else
             exit 1
         fi
-    )
-    
-    if [ $? -eq 0 ]; then
+    ); then
         print_success "$name tests passed"
     else
         print_error "$name tests failed"
@@ -339,6 +337,7 @@ run_npm_test() {
     
     print_info "Testing Experience (Web)..."
     
+    local npm_exit_code=0
     (
         cd "experience/web"
         if [ ! -d "node_modules" ]; then
@@ -346,25 +345,20 @@ run_npm_test() {
             exit 1
         fi
         
-        local args="--workspaces -- --passWithNoTests"
+        # SC2178/SC2128: Use array for arguments
+        local args=("--workspaces" "--" "--passWithNoTests")
         if [[ "$VERBOSE" != "true" ]]; then
-            args="$args --silent"
+            args+=("--silent")
         fi
         
         if [[ "$VERBOSE" == "true" ]]; then
-             npm test $args
+             npm test "${args[@]}"
         else
-             npm test $args >/dev/null 2>&1
+             npm test "${args[@]}" >/dev/null 2>&1
         fi
-        
-        if [ $? -eq 0 ]; then
-             exit 0
-        else
-             exit 1
-        fi
-    )
+    ) || npm_exit_code=$?
     
-    if [ $? -eq 0 ]; then
+    if [ $npm_exit_code -eq 0 ]; then
         print_success "Experience tests passed"
     else
         print_error "Experience tests failed"
@@ -392,6 +386,7 @@ check_critical() {
 
     print_header "🎯 Critical Validation"
     
+    local critical_failed=false
     (
         cd listener
         if [ -x "venv/bin/pytest" ]; then
@@ -402,8 +397,9 @@ check_critical() {
                  exit 1
              fi
         fi
-    )
-    if [ $? -ne 0 ]; then
+    ) || critical_failed=true
+
+    if [ "$critical_failed" = true ]; then
         EXIT_CODE=1
     fi
 }

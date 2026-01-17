@@ -552,13 +552,15 @@ class ChatMessage(Base):
                 "name": self.emotion.emotion_name,
                 "category": self.emotion.category,
                 "definition": self.emotion.definition,
-                "vac": [
-                    float(self.emotion.vac_vector[0]),
-                    float(self.emotion.vac_vector[1]),
-                    float(self.emotion.vac_vector[2]),
-                ]
-                if self.emotion.vac_vector
-                else None,
+                "vac": (
+                    [
+                        float(self.emotion.vac_vector[0]),
+                        float(self.emotion.vac_vector[1]),
+                        float(self.emotion.vac_vector[2]),
+                    ]
+                    if self.emotion.vac_vector
+                    else None
+                ),
             }
             data["emotion"] = emotion_dict  # type: ignore[assignment]
 

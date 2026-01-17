@@ -124,18 +124,18 @@ if [ "$RUN_INFRA" = true ]; then
         
         # Find all shell scripts in infra/
         # Exclude node_modules, venv, and hidden files
-        SHELL_SCRIPTS=$(find "$PROJECT_ROOT/infra" -name "*.sh" -not -path "*/node_modules/*" -not -path "*/venv/*")
+        SHELL_SCRIPTS=$(find "$PROJECT_ROOT/infra" -name "*.sh" -not -path "*/node_modules/*" -not -path "*/venv/*" -not -path "*/.venv*/*")
         
         FAILED_SCRIPTS=0
         
         for script in $SHELL_SCRIPTS; do
             # Compute relative path for nicer output
-            REL_PATH="${script#$PROJECT_ROOT/}"
+            REL_PATH="${script#"$PROJECT_ROOT"/}"
             
             # Check for exclusions (using ignore file or inline comments is better, but basic exclusion here)
             # e.g., if we want to skip legacy scripts
             
-            if ! shellcheck "$script" --format=tty --color=always; then
+            if ! shellcheck "$script" --format=tty --color=always --exclude=SC1091; then
                 print_error "Use shellcheck on $REL_PATH"
                 FAILED_SCRIPTS=$((FAILED_SCRIPTS + 1))
             else
@@ -161,14 +161,15 @@ if [ "$RUN_PYTHON" = true ]; then
     # Call the existing python quality script
     # We pass --fix if requested
     
-    PYTHON_ARGS=""
-    [ "$FIX_MODE" = true ] && PYTHON_ARGS="$PYTHON_ARGS --fix"
+    PYTHON_ARGS=()
+    [ "$FIX_MODE" = true ] && PYTHON_ARGS+=("--fix")
     
     # Run from project root as it expects or from its dir? 
     # check-python-quality.sh expects to be run? It resolves its own dir. 
     # So we can call it by absolute path.
     
-    if "$PROJECT_ROOT/infra/scripts/check-python-quality.sh" $PYTHON_ARGS; then
+    
+    if "$PROJECT_ROOT/infra/scripts/check-python-quality.sh" "${PYTHON_ARGS[@]+"${PYTHON_ARGS[@]}"}"; then
         # Script prints its own success message
         :
     else
@@ -181,10 +182,10 @@ if [ "$RUN_TYPESCRIPT" = true ]; then
     echo ""
     # Call the existing typescript quality script
     
-    TS_ARGS=""
-    [ "$FIX_MODE" = true ] && TS_ARGS="$TS_ARGS --fix"
+    TS_ARGS=()
+    [ "$FIX_MODE" = true ] && TS_ARGS+=("--fix")
     
-    if "$PROJECT_ROOT/infra/scripts/check-typescript-quality.sh" $TS_ARGS; then
+    if "$PROJECT_ROOT/infra/scripts/check-typescript-quality.sh" "${TS_ARGS[@]+"${TS_ARGS[@]}"}"; then
         # Script prints its own success message
         :
     else

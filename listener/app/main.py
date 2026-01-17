@@ -47,6 +47,7 @@ See Also:
     - Deployment: docs/modules/listener/senior-developers/01-deep-dive-architecture.md
     - ADR: Why FastAPI - docs/modules/listener/senior-developers/07-architecture-decisions.md
 """
+
 import logging
 from typing import Any, Dict
 

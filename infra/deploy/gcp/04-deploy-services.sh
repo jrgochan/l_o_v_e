@@ -38,17 +38,13 @@ echo "  Ollama: $OLLAMA_URL"
 # Parse command line arguments
 TARGET=$1
 
-# Track deployed URLs for the summary
-VERSOR_URL=""
-OBSERVER_URL=""
-LISTENER_URL=""
-EXP_URL=""
+# Track deployed URLs for the summary (via temp file)
 
 deploy_service() {
     local service=$1
     local image="${REGISTRY}/${service}:latest"
     local port=$2
-    local extra_env=""
+    local port=$2
     
     # Custom config per service
     local svc_cpu=$CPU
@@ -79,11 +75,12 @@ deploy_service() {
         --set-env-vars "OLLAMA_BASE_URL=$OLLAMA_URL" \
         --set-env-vars "OLLAMA_BASE_URL=$OLLAMA_URL" \
         --set-secrets "JWT_SECRET_KEY=${JWT_SECRET_REF}" \
-        --set-secrets "DB_PASSWORD=${APP_NAME}-db-password:latest" \
+        --set-secrets "DB_PASSWORD=${DB_SECRET_VERSION}" \
         --project "$PROJECT_ID" >/dev/null 2>&1
         
     # Retrieve and print URL
-    local url=$(gcloud run services describe "${APP_NAME}-${service}" --platform managed --region "$REGION" --project "$PROJECT_ID" --format 'value(status.url)')
+    local url
+    url=$(gcloud run services describe "${APP_NAME}-${service}" --platform managed --region "$REGION" --project "$PROJECT_ID" --format 'value(status.url)')
     echo "  -> Deployed to: $url"
     
     # Export for master script usage

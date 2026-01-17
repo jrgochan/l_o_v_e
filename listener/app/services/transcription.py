@@ -39,6 +39,7 @@ See Also:
     - Models: app/models/vac_response.py (TranscriptionResult)
     - Audio Utils: app/utils/audio_utils.py
 """
+
 import logging
 import time
 from typing import Any, Dict, Optional

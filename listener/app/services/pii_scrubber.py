@@ -41,9 +41,10 @@ Examples:
 See Also:
     - Tests: tests/unit/test_pii_scrubber.py
 """
+
 import logging
 import os
-from typing import Any, List, Optional, Tuple, Dict
+from typing import Any, List, Optional, Tuple
 
 # Replace spacy with transformers
 # import spacy
@@ -86,7 +87,7 @@ class PIIScrubber:
         env_model = os.getenv("PII_MODEL_PATH")
         if env_model:
             model_name = env_model
-            
+
         self.model_name = model_name
         self._nlp: Optional[Any] = None
 
@@ -102,7 +103,7 @@ class PIIScrubber:
                     "token-classification",
                     model=self.model_name,
                     tokenizer=self.model_name,
-                    aggregation_strategy="simple"
+                    aggregation_strategy="simple",
                 )
                 logger.info(f"Transformers model loaded: {self.model_name}")
             except Exception as e:
@@ -125,7 +126,7 @@ class PIIScrubber:
             return text
 
         nlp = self._load_model()
-        
+
         # Run inference
         # Output is list of dicts: {'entity_group': 'PER', 'score': 0.99, 'word': 'Smith', 'start': 6, 'end': 11}
         entities = nlp(text)
