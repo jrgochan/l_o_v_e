@@ -13,13 +13,25 @@ from app.api.routes import chat_websocket as chat_ws
 
 @pytest.fixture
 def mock_websocket():
-    ws = AsyncMock(spec=WebSocket)
+    ws = MagicMock(spec=WebSocket)
+    ws.send_text = AsyncMock()
+    ws.send_json = AsyncMock()
+    ws.receive_text = AsyncMock()
+    ws.receive_json = AsyncMock()
+    ws.close = AsyncMock()
+    ws.accept = AsyncMock()
     ws.query_params = {}
     return ws
 
 @pytest.fixture
 def mock_db_session():
     mock_session = AsyncMock()
+    mock_session.add = MagicMock()
+    mock_session.delete = MagicMock()
+    mock_session.expunge = MagicMock()
+    mock_session.commit = AsyncMock()
+    mock_session.refresh = AsyncMock()
+    mock_session.execute = AsyncMock(return_value=MagicMock())
     return mock_session
 
 @pytest.fixture
@@ -55,6 +67,8 @@ def mock_deps(mock_db_session, mock_chat_service):
         
         # Configure HTTP mock
         mock_http_client = MockHttp.return_value.__aenter__.return_value
+        mock_http_client.post = AsyncMock()
+        mock_http_client.get = AsyncMock()
         
         yield {
             "manager": mock_manager,
@@ -393,7 +407,9 @@ async def test_handle_multi_emotion_no_primary(mock_websocket, mock_deps):
 @pytest.mark.asyncio
 async def test_handle_single_emotion_db_error(mock_websocket, mock_deps):
     """Test DB error handling in single emotion handler."""
-    mock_deps["chat_service"].save_analysis_message.side_effect = Exception("DB Fail")
+    async def raise_db_fail(*args, **kwargs):
+        raise Exception("DB Fail")
+    mock_deps["chat_service"].save_analysis_message.side_effect = raise_db_fail
     result = {"emotion": "Joy", "vac": {}, "confidence": 1.0}
     
     with patch("app.api.routes.chat_websocket.generate_insights", new=AsyncMock()) as mock_insights:
@@ -414,7 +430,9 @@ async def test_process_text_db_save_failure_catch(mock_websocket, mock_deps):
     mock_deps["http_client"].post.return_value = mock_resp
 
     # Make save fail
-    mock_deps["chat_service"].save_analysis_message.side_effect = Exception("DB Fail")
+    async def raise_db_fail(*args, **kwargs):
+        raise Exception("DB Fail")
+    mock_deps["chat_service"].save_analysis_message.side_effect = raise_db_fail
     
     with patch("app.api.routes.chat_websocket.generate_insights", new=AsyncMock()) as mock_gen, \
          patch("app.api.routes.chat_websocket.handle_single_emotion_result", new=AsyncMock()): # Mock handle_single to isolate 536 block
@@ -428,7 +446,9 @@ async def test_process_text_db_save_failure_catch(mock_websocket, mock_deps):
 @pytest.mark.asyncio
 async def test_handle_multi_emotion_db_error(mock_websocket, mock_deps):
     """Test correct handling of DB error during multi-emotion save."""
-    mock_deps["chat_service"].save_multi_emotion_analysis.side_effect = Exception("DB Fail")
+    async def raise_db_fail(*args, **kwargs):
+        raise Exception("DB Fail")
+    mock_deps["chat_service"].save_multi_emotion_analysis.side_effect = raise_db_fail
     result = {"emotions": [{"prominence": "primary", "emotion_name": "A"}]}
     
     with patch("app.api.routes.chat_websocket.generate_insights", new=AsyncMock()) as mock_insights:

@@ -67,7 +67,7 @@ from datetime import datetime
 from typing import Optional
 from uuid import UUID
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, ConfigDict, Field
 
 from app.api.schemas.common import EmotionInfo, MetricsInfo, QuaternionModel, VACVector
 
@@ -81,10 +81,8 @@ class StateInput(BaseModel):
     vac_scalars: VACVector = Field(description="VAC coordinates from Listener")
     timestamp: Optional[datetime] = Field(default=None, description="Timestamp (defaults to now)")
 
-    class Config:
-        """JSON Schema configuration."""
-
-        json_schema_extra = {
+    model_config = ConfigDict(
+        json_schema_extra={
             "example": {
                 "user_id": "123e4567-e89b-12d3-a456-426614174000",
                 "session_id": "789e0123-e89b-12d3-a456-426614174001",
@@ -93,6 +91,7 @@ class StateInput(BaseModel):
                 "timestamp": "2025-12-03T09:45:00Z",
             }
         }
+    )
 
 
 class StateResponse(BaseModel):
@@ -107,10 +106,8 @@ class StateResponse(BaseModel):
     metrics: MetricsInfo = Field(description="Temporal metrics")
     timestamp: datetime = Field(description="Recorded timestamp")
 
-    class Config:
-        """JSON Schema configuration."""
-
-        json_schema_extra = {
+    model_config = ConfigDict(
+        json_schema_extra={
             "example": {
                 "state_id": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
                 "dominant_emotion": {
@@ -130,3 +127,4 @@ class StateResponse(BaseModel):
                 "timestamp": "2025-12-03T09:45:00Z",
             }
         }
+    )

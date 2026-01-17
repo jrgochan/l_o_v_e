@@ -66,7 +66,7 @@ References:
 from datetime import datetime
 from typing import List, Optional
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, ConfigDict, Field
 
 
 class TrajectoryPoint(BaseModel):
@@ -78,10 +78,9 @@ class TrajectoryPoint(BaseModel):
     emotion: str = Field(description="Dominant emotion name")
     elasticity: float = Field(description="Speed of change (rad/s)")
 
-    class Config:
-        """JSON Schema configuration."""
 
-        json_schema_extra = {
+    model_config = ConfigDict(
+        json_schema_extra={
             "example": {
                 "timestamp": "2025-12-03T16:00:00Z",
                 "vac": [0.9, 0.7, 0.8],
@@ -90,6 +89,7 @@ class TrajectoryPoint(BaseModel):
                 "elasticity": 0.3,
             }
         }
+    )
 
 
 class HistoryResponse(BaseModel):
@@ -101,10 +101,8 @@ class HistoryResponse(BaseModel):
     data_points: int = Field(description="Number of points returned")
     trajectory: List[TrajectoryPoint] = Field(description="Emotional journey data")
 
-    class Config:
-        """JSON Schema configuration."""
-
-        json_schema_extra = {
+    model_config = ConfigDict(
+        json_schema_extra={
             "example": {
                 "user_id": "123e4567-e89b-12d3-a456-426614174000",
                 "start_date": "2025-12-01T00:00:00Z",
@@ -121,3 +119,4 @@ class HistoryResponse(BaseModel):
                 ],
             }
         }
+    )

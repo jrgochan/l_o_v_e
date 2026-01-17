@@ -8,15 +8,26 @@ from app.models.atlas_definition import AtlasDefinition
 
 @pytest.fixture
 def mock_db():
-    return AsyncMock()
+    mock_db = AsyncMock()
+    mock_db.execute = AsyncMock()
+    # FIX: db.execute(...) returns a coroutine, which returns a Result object (MagicMock)
+    mock_db.execute.return_value = MagicMock()
+    mock_db.add = MagicMock()
+    mock_db.delete = MagicMock()
+    mock_db.commit = AsyncMock()
+    return mock_db
 
 @pytest.fixture
-def generator(mock_db):
+def insight_generator_service(mock_db):
     return InsightGenerator(mock_db)
 
 @pytest.fixture
 def insight_generator():
-    return InsightGenerator(AsyncMock())
+    mock_db = AsyncMock()
+    mock_db.execute = AsyncMock(return_value=MagicMock())
+    mock_db.add = MagicMock()
+    mock_db.delete = MagicMock()
+    return InsightGenerator(mock_db)
 
 class MockAsyncDb:
     def __init__(self, result=None, exception=None):
@@ -164,25 +175,25 @@ async def test_get_emotion_details_no_vac_vector_direct():
     details = await generator._get_emotion_details("Joy", use_atlas_mapping=False)
     assert details["vac"] is None
 @pytest.mark.asyncio
-async def test_generate_insights_warm_flow(generator, mock_db):
+async def test_generate_insights_warm_flow(insight_generator_service, mock_db):
     """Test standard warm mode flow."""
     emotion_name = "Joy"
     vac_data = {"valence": 0.8, "arousal": 0.5, "connection": 0.6}
     confidence = 0.95
     prosody_data = {"energy": 0.8, "rate": 4.5}
     
-    with patch.object(generator, '_get_emotion_details') as mock_get_details:
+    with patch.object(insight_generator_service, '_get_emotion_details') as mock_get_details:
         mock_get_details.return_value = {
             "id": uuid4(),
             "name": "Joy",
             "category": "Happiness",
             "definition": "A feeling of great pleasure and happiness.",
         }
-        generator.recommendation_engine.get_recommendations.return_value = {
+        insight_generator_service.recommendation_engine.get_recommendations.return_value = {
             "similar_emotions": [{"name": "Delight", "category": "Happiness"}]
         }
         
-        res = await generator.generate_insights(
+        res = await insight_generator_service.generate_insights(
             emotion_name, vac_data, confidence, tone_mode="warm", prosody_data=prosody_data
         )
         
@@ -193,14 +204,14 @@ async def test_generate_insights_warm_flow(generator, mock_db):
 
 
 @pytest.mark.asyncio
-async def test_generate_insights_clinical_flow_with_analytics(generator, mock_db):
+async def test_generate_insights_clinical_flow_with_analytics(insight_generator_service, mock_db):
     """Test clinical mode flow with session integration."""
     emotion_name = "Anxiety"
     vac_data = {"valence": -0.5, "arousal": 0.8, "connection": -0.2}
     confidence = 0.85
     session_id = str(uuid4())
     
-    with patch.object(generator, '_get_emotion_details') as mock_get_details, \
+    with patch.object(insight_generator_service, '_get_emotion_details') as mock_get_details, \
          patch("app.services.insight_generator.SessionAnalyticsService") as MockAnalyticsService, \
          patch("app.services.insight_generator.ClinicalAlertService") as MockAlertService:
             
@@ -221,7 +232,12 @@ async def test_generate_insights_clinical_flow_with_analytics(generator, mock_db
         mock_alert_svc.evaluate_alerts = AsyncMock(return_value=[])
         mock_alert_svc.determine_overall_status = MagicMock(return_value="stable")
         
-        res = await generator.generate_insights(
+        # FIX: update_metrics is AsyncMock, returns MagicMock when awaited
+        mock_metrics_result = MagicMock() 
+        mock_metrics_result.to_dict.return_value = {"metrics": "test"}
+        mock_analytics_svc.update_metrics.return_value = mock_metrics_result
+
+        res = await insight_generator_service.generate_insights(
             emotion_name, vac_data, confidence, tone_mode="clinical", session_id=session_id
         )
         
@@ -246,18 +262,24 @@ async def test_generate_insights_errors_graceful(insight_generator):
         }
         
         # Mock recommendation engine on the instance
-        insight_generator.recommendation_engine = AsyncMock()
-        insight_generator.recommendation_engine.get_recommendations.side_effect = Exception("RecFail")
+        # Mock recommendation engine on the instance
+        async def raise_rec_fail(*args, **kwargs):
+            raise Exception("RecFail")
+        insight_generator.recommendation_engine.get_recommendations = raise_rec_fail
+        
+        
+        # Mock session analytics (class patch)
         with patch("app.services.insight_generator.SessionAnalyticsService") as MockAnalyticsService:
             MockAnalyticsService.side_effect = Exception("AnalyticsFail")
             res = await insight_generator.generate_insights("Test", vac_data, 1.0, session_id="sess1")
+            
             assert res["emotion"] == "Test"
             assert res["recommendations"] == []
             assert "session_analytics" not in res
 
 
 @pytest.mark.asyncio
-async def test_get_emotion_details_logic(generator, mock_db):
+async def test_get_emotion_details_logic(insight_generator_service, mock_db):
     """Test emotion lookup logic."""
     mock_emotion = MagicMock()
     mock_emotion.vac_vector = [0.1, 0.2, 0.3]
@@ -270,16 +292,16 @@ async def test_get_emotion_details_logic(generator, mock_db):
     mock_res.scalar_one_or_none.return_value = mock_emotion
     mock_db.execute.return_value = mock_res
     
-    res1 = await generator._get_emotion_details("Joy", use_atlas_mapping=False)
+    res1 = await insight_generator_service._get_emotion_details("Joy", use_atlas_mapping=False)
     assert res1["name"] == "Joy"
     assert res1["vac"] == [0.1, 0.2, 0.3]
     
     mock_emotion.vac_vector = json.dumps([0.5, 0.5, 0.5])
-    res2 = await generator._get_emotion_details("Joy", use_atlas_mapping=False)
+    res2 = await insight_generator_service._get_emotion_details("Joy", use_atlas_mapping=False)
     assert res2["vac"] == [0.5, 0.5, 0.5]
     
     mock_res.scalar_one_or_none.return_value = None
-    res3 = await generator._get_emotion_details("Unknown", use_atlas_mapping=False)
+    res3 = await insight_generator_service._get_emotion_details("Unknown", use_atlas_mapping=False)
     assert res3 is None
     
     with patch("app.services.insight_generator.AtlasMapper") as MockMapper:
@@ -291,7 +313,7 @@ async def test_get_emotion_details_logic(generator, mock_db):
         MockMapper.return_value.map_emotion = AsyncMock(return_value=mock_map_res)
         
         mock_res.scalar_one_or_none.return_value = mock_emotion
-        res4 = await generator._get_emotion_details("Joyful", use_atlas_mapping=True)
+        res4 = await insight_generator_service._get_emotion_details("Joyful", use_atlas_mapping=True)
         assert res4["name"] == "Joy"
         assert res4["matched_by"] == "fuzzy"
 
@@ -322,17 +344,17 @@ async def test_private_helpers_coverage(insight_generator):
 
 
 @pytest.mark.asyncio
-async def test_generate_insights_prosody_coverage(generator, mock_db):
+async def test_generate_insights_prosody_coverage(insight_generator_service, mock_db):
     """Cover all branches of voice metrics interpretation."""
     emotion_name = "Joy"
     vac_data = {"valence": 0.5, "arousal": 0.5, "connection": 0.5}
     confidence = 0.9
     
-    with patch.object(generator, '_get_emotion_details') as mock_get:
+    with patch.object(insight_generator_service, '_get_emotion_details') as mock_get:
         mock_get.return_value = {"id": uuid4(), "name": "Joy", "category": "Happiness", "definition": "Def"}
         
         prosody_low = {"energy": 0.1, "pitch_mean": 90.0, "rate": 2.0, "jitter": 0.03, "shimmer": 0.07}
-        res_low = await generator.generate_insights(
+        res_low = await insight_generator_service.generate_insights(
             emotion_name, vac_data, confidence, tone_mode="clinical", prosody_data=prosody_low
         )
         metrics = {m["label"]: m for m in res_low["voice_metrics"]}
@@ -343,7 +365,7 @@ async def test_generate_insights_prosody_coverage(generator, mock_db):
         assert "Elevated" in metrics["Shimmer"]["interpretation"]
         
         prosody_high = {"energy": 0.9, "pitch_mean": 200.0, "rate": 6.0, "jitter": 0.01, "shimmer": 0.01}
-        res_high = await generator.generate_insights(
+        res_high = await insight_generator_service.generate_insights(
             emotion_name, vac_data, confidence, tone_mode="clinical", prosody_data=prosody_high
         )
         metrics = {m["label"]: m for m in res_high["voice_metrics"]}
@@ -425,41 +447,41 @@ async def test_generate_clinical_structure_reasoning(insight_generator):
         assert res.get("analysis_reasoning") == "Because I said so"
 
 @pytest.mark.asyncio
-async def test_generate_warm_opening(generator):
+async def test_generate_warm_opening(insight_generator_service):
     # Test various valence ranges
-    assert "completely valid" in generator._generate_warm_opening("Anxiety", -0.5)
-    assert "wonderful" in generator._generate_warm_opening("Joy", 0.8)
-    assert "meaningful" in generator._generate_warm_opening("Contentment", 0.2)
+    assert "completely valid" in insight_generator_service._generate_warm_opening("Anxiety", -0.5)
+    assert "wonderful" in insight_generator_service._generate_warm_opening("Joy", 0.8)
+    assert "meaningful" in insight_generator_service._generate_warm_opening("Contentment", 0.2)
     
     # Test context logic
-    assert "protect you" in generator._generate_warm_opening("Anxiety", -0.5)
-    assert "lights you up" in generator._generate_warm_opening("Excitement", 0.8)
+    assert "protect you" in insight_generator_service._generate_warm_opening("Anxiety", -0.5)
+    assert "lights you up" in insight_generator_service._generate_warm_opening("Excitement", 0.8)
 
 @pytest.mark.asyncio
-async def test_generate_voice_observations_warm(generator):
+async def test_generate_voice_observations_warm(insight_generator_service):
     # High energy/pitch
-    obs = generator._generate_voice_observations_warm(
+    obs = insight_generator_service._generate_voice_observations_warm(
         {"energy": 0.8, "pitch_mean": 180}, {}
     )
     assert any("energy and tension" in o for o in obs)
     
     # Low energy
-    obs = generator._generate_voice_observations_warm(
+    obs = insight_generator_service._generate_voice_observations_warm(
         {"energy": 0.2, "pitch_mean": 100}, {}
     )
     assert any("heaviness" in o for o in obs)
 
 @pytest.mark.asyncio
-async def test_generate_clinical_opening(generator):
-    opening = generator._generate_clinical_opening("Anxiety", 0.9, "Fear")
+async def test_generate_clinical_opening(insight_generator_service):
+    opening = insight_generator_service._generate_clinical_opening("Anxiety", 0.9, "Fear")
     assert "High confidence detection" in opening
     assert "90%" in opening
     assert "Fear category" in opening
 
 @pytest.mark.asyncio
-async def test_generate_voice_metrics_clinical(generator):
+async def test_generate_voice_metrics_clinical(insight_generator_service):
     data = {"pitch_mean": 190, "energy": 0.8, "rate": 6.0, "jitter": 0.03}
-    metrics = generator._generate_voice_metrics_clinical(data)
+    metrics = insight_generator_service._generate_voice_metrics_clinical(data)
     
     # Verify structure
     assert len(metrics) > 0
@@ -468,20 +490,20 @@ async def test_generate_voice_metrics_clinical(generator):
     assert "Elevated" in pitch["interpretation"]
 
 @pytest.mark.asyncio
-async def test_assess_risk_indicators(generator):
+async def test_assess_risk_indicators(insight_generator_service):
     # High risk case
     vac = {"valence": -0.8, "arousal": 0.9, "connection": -0.7}
-    indicators = generator._assess_risk_indicators(vac)
+    indicators = insight_generator_service._assess_risk_indicators(vac)
     assert any("High arousal + negative valence" in i for i in indicators)
     assert any("isolation risk" in i for i in indicators)
     
     # Low risk case
     vac_safe = {"valence": 0.5, "arousal": 0.0, "connection": 0.5}
-    indicators = generator._assess_risk_indicators(vac_safe)
+    indicators = insight_generator_service._assess_risk_indicators(vac_safe)
     assert len(indicators) == 0
 
 @pytest.mark.asyncio
-async def test_generate_insights_warm_flow(generator, mock_db):
+async def test_generate_insights_warm_flow(insight_generator_service, mock_db):
     # Mock AtlasMapper
     with patch("app.services.insight_generator.AtlasMapper") as MockMapper:
         mapper = AsyncMock()
@@ -499,7 +521,7 @@ async def test_generate_insights_warm_flow(generator, mock_db):
         mock_db.execute.return_value = result_mock
         
         # Run generation
-        insights = await generator.generate_insights(
+        insights = await insight_generator_service.generate_insights(
             emotion_name="Joy",
             vac_data={"valence": 0.8, "arousal": 0.5, "connection": 0.6},
             confidence=0.9,
@@ -513,7 +535,7 @@ async def test_generate_insights_warm_flow(generator, mock_db):
         assert len(insights["gentle_invitations"]) >= 2
 
 @pytest.mark.asyncio
-async def test_generate_insights_clinical_flow(generator, mock_db):
+async def test_generate_insights_clinical_flow(insight_generator_service, mock_db):
     # Mock AtlasMapper
     with patch("app.services.insight_generator.AtlasMapper") as MockMapper:
         mapper = AsyncMock()
@@ -540,11 +562,12 @@ async def test_generate_insights_clinical_flow(generator, mock_db):
                 # Ensure update_metrics returns something with to_dict
                 metrics_result = MagicMock()
                 metrics_result.to_dict.return_value = {"msg_count": 5}
+                # FIX: return_value of AsyncMock is what is returned when awaited
                 analytics_service.update_metrics.return_value = metrics_result
                 
                 MockAnalytics.return_value = analytics_service
                 
-                insights = await generator.generate_insights(
+                insights = await insight_generator_service.generate_insights(
                     emotion_name="Anxiety",
                     vac_data={"valence": -0.6, "arousal": 0.8, "connection": -0.2},
                     confidence=0.9,
@@ -562,17 +585,18 @@ async def test_generate_insights_clinical_flow(generator, mock_db):
                 analytics_service.update_metrics.assert_called()
 
 @pytest.mark.asyncio
-async def test_generate_insights_no_mapping(generator, mock_db):
+async def test_generate_insights_no_mapping(insight_generator_service, mock_db):
     # Test fallback when AtlasMapper returns no ID
     with patch("app.services.insight_generator.AtlasMapper") as MockMapper:
-        mapper = AsyncMock()
+        mapper = MagicMock()
+        mapper.map_emotion = AsyncMock()
         MockMapper.return_value = mapper
         mapping = MagicMock()
         mapping.atlas_name = None  # Explicitly None to trigger fallback
         mapping.atlas_id = None
         mapper.map_emotion.return_value = mapping
         
-        insights = await generator.generate_insights(
+        insights = await insight_generator_service.generate_insights(
             emotion_name="UnknownEmotion",
             vac_data={"valence": 0, "arousal": 0, "connection": 0},
             confidence=0.5
@@ -582,66 +606,72 @@ async def test_generate_insights_no_mapping(generator, mock_db):
         assert insights["emotion"] == "UnknownEmotion"
         assert "summary" in insights
 
-def test_generate_clinical_recommendations(generator):
+@pytest.mark.asyncio
+@pytest.mark.filterwarnings("ignore::RuntimeWarning")
+async def test_generate_clinical_recommendations(insight_generator_service):
     """Test clinical recommendation triggers."""
     # Arousal Reduction
-    recs = generator._generate_clinical_recommendations(
+    recs = insight_generator_service._generate_clinical_recommendations(
         "Any", {"valence": 0, "arousal": 0.7, "connection": 0}, "Cat"
     )
     assert any(r["title"] == "Arousal Reduction" for r in recs)
     
     # Activation Strategy
-    recs = generator._generate_clinical_recommendations(
+    recs = insight_generator_service._generate_clinical_recommendations(
         "Any", {"valence": 0, "arousal": -0.7, "connection": 0}, "Cat"
     )
     assert any(r["title"] == "Activation Strategy" for r in recs)
     
     # Mood Assessment
-    recs = generator._generate_clinical_recommendations(
+    recs = insight_generator_service._generate_clinical_recommendations(
         "Any", {"valence": -0.6, "arousal": 0, "connection": 0}, "Cat"
     )
     assert any(r["title"] == "Mood Assessment" for r in recs)
     
     # Social Connection
-    recs = generator._generate_clinical_recommendations(
+    recs = insight_generator_service._generate_clinical_recommendations(
         "Any", {"valence": 0, "arousal": 0, "connection": -0.5}, "Cat"
     )
     assert any(r["title"] == "Social Connection" for r in recs)
     
     # Anxiety specific
-    recs = generator._generate_clinical_recommendations(
+    recs = insight_generator_service._generate_clinical_recommendations(
         "Anxiety", {"valence": 0, "arousal": 0, "connection": 0}, "Cat"
     )
     assert any(r["title"] == "Anxiety Management" for r in recs)
     
     # Depression specific
-    recs = generator._generate_clinical_recommendations(
+    recs = insight_generator_service._generate_clinical_recommendations(
         "Depression", {"valence": 0, "arousal": 0, "connection": 0}, "Cat"
     )
     assert any(r["title"] == "Depression Screening" for r in recs)
 
 @pytest.mark.asyncio
-async def test_insight_generation_error_resilience(generator, mock_db):
+async def test_insight_generation_error_resilience(insight_generator_service, mock_db):
     """Test graceful degradation when dependencies fail."""
     
     # Mock _get_emotion_details to return something valid so we reach later steps
-    with patch.object(generator, '_get_emotion_details', new_callable=AsyncMock) as mock_details:
-        mock_details.return_value = {
+    async def get_details_mock(*args, **kwargs):
+        return {
             "id": uuid4(), "name": "Joy", "category": "Happiness", "definition": "Def", "vac": [0.8, 0.5, 0.6]
         }
+    
+    with patch.object(insight_generator_service, '_get_emotion_details', side_effect=get_details_mock):
         
         # 1. Message Count Error
         # Mock SessionAnalyticsService to raise error on init
         with patch('app.services.insight_generator.SessionAnalyticsService', side_effect=Exception("Analytics Down")):
              # 2. Recommendations Error
-            generator.recommendation_engine = AsyncMock()
-            generator.recommendation_engine.get_recommendations.side_effect = Exception("Recs Down")
+            async def raise_recs_down(*args, **kwargs):
+                raise Exception("Recs Down")
+            # We don't replace the whole engine with AsyncMock, just the method
+            insight_generator_service.recommendation_engine.get_recommendations = raise_recs_down
             
             # 3. Clinical Alerts Error
             with patch('app.services.insight_generator.ClinicalAlertService', side_effect=Exception("Alerts Down")):
                 
                 # Run generation
-                insights = await generator.generate_insights(
+                insights = await insight_generator_service.generate_insights(
                     "Joy", {"valence": 0.8, "arousal": 0.5, "connection": 0.6}, 0.9, session_id="sess1"
                 )
                 
@@ -651,16 +681,16 @@ async def test_insight_generation_error_resilience(generator, mock_db):
                 assert insights.get("clinical_alerts") == [] # Fallback
 
 @pytest.mark.asyncio
-async def test_voice_observations_low_rate(generator):
+async def test_voice_observations_low_rate(insight_generator_service):
     """Test voice observation for low speech rate."""
     prosody = {"rate": 2.5} # < 3.0
     vac = {"arousal": 0}
-    obs = generator._generate_voice_observations(prosody, vac)
+    obs = insight_generator_service._generate_voice_observations(prosody, vac)
     assert "**I notice:**" in obs
     assert "speaking slowly and deliberately" in obs
 
 @pytest.mark.asyncio
-async def test_format_recommendations_full(generator):
+async def test_format_recommendations_full(insight_generator_service):
     """Test format recommendations with both similar emotions and journeys."""
     raw_recs = {
         "similar_emotions": [
@@ -672,7 +702,7 @@ async def test_format_recommendations_full(generator):
         ]
     }
     
-    formatted = generator._format_recommendations(raw_recs, tone_mode="warm")
+    formatted = insight_generator_service._format_recommendations(raw_recs, tone_mode="warm")
     assert len(formatted) == 2
     
     sim_block = next(item for item in formatted if item["type"] == "similar_emotions")
@@ -687,12 +717,12 @@ def test_insight_generator_slow_speech():
     Test InsightGenerator._generate_voice_observations for slow speech.
     Covers line 1241: elif rate < 3.0:
     """
-    generator = InsightGenerator(MagicMock())
+    insight_generator_service = InsightGenerator(MagicMock())
     prosody_data = {"rate": 2.0}
     vac_data = {}
     
     # Correct method name found via view_file
-    obs = generator._generate_voice_observations(prosody_data, vac_data)
+    obs = insight_generator_service._generate_voice_observations(prosody_data, vac_data)
     
     assert "speaking slowly" in obs
 
@@ -701,7 +731,7 @@ def test_insight_generator_with_journeys():
     Test InsightGenerator._format_recommendations with curated journeys.
     Covers line 1378: if journeys:
     """
-    generator = InsightGenerator(MagicMock())
+    insight_generator_service = InsightGenerator(MagicMock())
     recs = {
         "curated_journeys": [
             {
@@ -712,7 +742,7 @@ def test_insight_generator_with_journeys():
         ]
     }
     
-    formatted = generator._format_recommendations(recs, tone_mode="general")
+    formatted = insight_generator_service._format_recommendations(recs, tone_mode="general")
     
     journey_section = next((item for item in formatted if item["type"] == "journeys"), None)
     assert journey_section is not None
@@ -724,12 +754,12 @@ def test_insight_generator_no_journeys():
     Test InsightGenerator._format_recommendations with NO curated journeys.
     Covers line 1378->1396 (False branch).
     """
-    generator = InsightGenerator(MagicMock())
+    insight_generator_service = InsightGenerator(MagicMock())
     recs = {
         "curated_journeys": [] # Empty list
     }
     
-    formatted = generator._format_recommendations(recs, tone_mode="general")
+    formatted = insight_generator_service._format_recommendations(recs, tone_mode="general")
     
     journey_section = next((item for item in formatted if item["type"] == "journeys"), None)
     assert journey_section is None
@@ -739,11 +769,11 @@ def test_insight_generator_normal_speech():
     Test InsightGenerator for normal speech rate (falls through logic).
     Covers implicit else for rate checks (1241->1244).
     """
-    generator = InsightGenerator(MagicMock())
+    insight_generator_service = InsightGenerator(MagicMock())
     prosody_data = {"rate": 4.0}
     vac_data = {}
     
-    obs = generator._generate_voice_observations(prosody_data, vac_data)
+    obs = insight_generator_service._generate_voice_observations(prosody_data, vac_data)
     
     # Should not contain slow or fast observations
     assert "speaking slowly" not in obs
@@ -751,32 +781,32 @@ def test_insight_generator_normal_speech():
 
 def test_insight_generator_high_energy_arousal():
     """Test observation for high energy and arousal."""
-    generator = InsightGenerator(MagicMock())
+    insight_generator_service = InsightGenerator(MagicMock())
     prosody = {"energy": 0.8}
     vac = {"arousal": 0.6}
-    obs = generator._generate_voice_observations(prosody, vac)
+    obs = insight_generator_service._generate_voice_observations(prosody, vac)
     assert "intensity" in obs
 
 def test_insight_generator_low_energy_arousal():
     """Test observation for low energy and arousal."""
-    generator = InsightGenerator(MagicMock())
+    insight_generator_service = InsightGenerator(MagicMock())
     prosody = {"energy": 0.2}
     vac = {"arousal": -0.1}
-    obs = generator._generate_voice_observations(prosody, vac)
+    obs = insight_generator_service._generate_voice_observations(prosody, vac)
     assert "quiet or subdued" in obs
 
 def test_insight_generator_fast_speech():
     """Test observation for fast speech rate."""
-    generator = InsightGenerator(MagicMock())
+    insight_generator_service = InsightGenerator(MagicMock())
     prosody = {"rate": 6.0}
     vac = {}
-    obs = generator._generate_voice_observations(prosody, vac)
+    obs = insight_generator_service._generate_voice_observations(prosody, vac)
     assert "speaking quickly" in obs
 
 def test_insight_generator_no_observations():
     """Test no observations generated (normal values)."""
-    generator = InsightGenerator(MagicMock())
+    insight_generator_service = InsightGenerator(MagicMock())
     prosody = {"energy": 0.5, "rate": 4.0}
     vac = {"arousal": 0.0}
-    obs = generator._generate_voice_observations(prosody, vac)
+    obs = insight_generator_service._generate_voice_observations(prosody, vac)
     assert obs == ""

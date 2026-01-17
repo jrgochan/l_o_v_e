@@ -9,6 +9,8 @@ from app.api.routes import atlas
 def mock_db():
     session = AsyncMock()
     session.execute = AsyncMock()
+    session.add = MagicMock()
+    session.delete = MagicMock()
     return session
 
 @pytest.mark.asyncio

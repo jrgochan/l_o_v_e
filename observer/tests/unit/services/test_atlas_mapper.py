@@ -6,7 +6,12 @@ from app.models.atlas_definition import AtlasDefinition
 
 @pytest.fixture
 def mock_session():
-    return AsyncMock()
+    mock_db = AsyncMock()
+    mock_db.execute = AsyncMock(return_value=MagicMock())
+    mock_db.add = MagicMock()
+    mock_db.delete = MagicMock()
+    mock_db.commit = AsyncMock()
+    return mock_db
 
 @pytest.fixture
 def mapper(mock_session):
@@ -80,7 +85,7 @@ async def test_ensure_loaded_vac_parsing_variants():
 
     mock_result = MagicMock()
     mock_result.scalars.return_value.all.return_value = [mock_emotion_str, mock_emotion_list]
-    mock_db.execute.return_value = mock_result
+    mock_db.execute.return_value = mock_result # This is what await returns
     
     await mapper.ensure_loaded()
     
@@ -103,7 +108,7 @@ async def test_vac_match_parsing_and_success():
     
     mock_result = MagicMock()
     mock_result.first.return_value = row
-    mock_db.execute.return_value = mock_result
+    mock_db.execute.return_value = mock_result # This is what await returns
     
     vac_input = {"valence": 0.9, "arousal": 0.8, "connection": 0.7}
     
@@ -153,7 +158,7 @@ async def test_ensure_loaded_none_vac_vector():
     
     mock_result = MagicMock()
     mock_result.scalars.return_value.all.return_value = [mock_emotion]
-    mock_db.execute.return_value = mock_result
+    mock_db.execute.return_value = mock_result # This is what await returns
     
     await mapper.ensure_loaded()
     assert "apathy" in mapper.atlas_emotions
@@ -169,7 +174,7 @@ async def test_vac_match_distance_threshold_exceeded():
     
     mock_result = MagicMock()
     mock_result.first.return_value = row
-    mapper.db.execute.return_value = mock_result
+    mapper.db.execute.return_value = mock_result # This is what await returns
     
     result = await mapper._vac_match({"valence":0, "arousal":0, "connection":0})
     assert result is None
@@ -184,7 +189,7 @@ async def test_vac_match_none_vac_vector_in_row():
     
     mock_result = MagicMock()
     mock_result.first.return_value = row
-    mapper.db.execute.return_value = mock_result
+    mapper.db.execute.return_value = mock_result # This is what await returns
     
     result = await mapper._vac_match({"valence":0, "arousal":0, "connection":0})
     
@@ -196,7 +201,9 @@ async def test_vac_match_none_vac_vector_in_row():
 async def test_vac_match_no_db_result():
     """Test _vac_match when DB returns no rows."""
     mapper = AtlasMapper(AsyncMock())
-    mapper.db.execute.return_value.first.return_value = None
+    mock_result = MagicMock()
+    mock_result.first.return_value = None
+    mapper.db.execute.return_value = mock_result
     
     result = await mapper._vac_match({"valence":0, "arousal":0, "connection":0})
     assert result is None

@@ -12,6 +12,8 @@ from app.models.user import User, UserRole
 def mock_db():
     db = AsyncMock()
     db.execute = AsyncMock()
+    db.delete = MagicMock()
+    db.add = MagicMock()
     return db
 
 @pytest.fixture

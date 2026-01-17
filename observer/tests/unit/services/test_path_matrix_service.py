@@ -13,6 +13,8 @@ from app.models.atlas_definition import AtlasDefinition
 def mock_session():
     db = AsyncMock()
     db.execute = AsyncMock()
+    db.add = MagicMock()
+    db.delete = MagicMock()
     return db
 
 @pytest.fixture

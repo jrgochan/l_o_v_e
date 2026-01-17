@@ -17,7 +17,12 @@ from app.models.transition_strategy import UserJourney, JourneyWaypoint, Strateg
 
 @pytest.fixture
 def mock_db():
-    return AsyncMock()
+    mock_db = AsyncMock()
+    mock_db.add = MagicMock()
+    mock_db.delete = MagicMock()
+    mock_db.execute = AsyncMock()
+    mock_db.commit = AsyncMock()
+    return mock_db
 
 @pytest.fixture
 def mock_path_planner():
@@ -39,7 +44,8 @@ def mock_quaternion_builder():
         builder = AsyncMock()
         MockBuilder.return_value = builder
         # Setup from_vac to return a list [w, x, y, z]
-        builder.from_vac.return_value = [1.0, 0.0, 0.0, 0.0]
+        # FIX: from_vac is asynchronous and returns a coroutine
+        builder.from_vac = AsyncMock(return_value=[1.0, 0.0, 0.0, 0.0])
         yield builder
 
 @pytest.fixture
@@ -125,13 +131,15 @@ async def test_generate_transition_path_success(
     
     # Check dependencies called
     mock_path_planner.find_transition_path.assert_awaited_once()
-    mock_quaternion_builder.from_vac.assert_awaited()
+    mock_quaternion_builder.from_vac.assert_called()
     mock_waypoint_explainer.explain_waypoint.assert_awaited()
 
 @pytest.mark.asyncio
 async def test_mark_waypoint_reached_incomplete():
     """Test mark_waypoint_reached when journey not completed."""
     mock_db = AsyncMock()
+    mock_db.add = MagicMock()
+    mock_db.delete = MagicMock()
     journey_id = uuid4()
     mock_journey = MagicMock(); mock_journey.id = journey_id; mock_journey.status = "in_progress"
     mock_waypoint = MagicMock(); mock_waypoint.journey_id = journey_id; mock_waypoint.reached = False
@@ -157,7 +165,9 @@ async def test_mark_waypoint_reached_incomplete():
 async def test_start_journey_exception():
     """Test start_journey exception handling."""
     mock_db = AsyncMock()
-    mock_db.add.side_effect = Exception("DB Insert Fail")
+    mock_db.add = MagicMock()
+    mock_db.delete = MagicMock()
+    mock_db.add = MagicMock(side_effect=Exception("DB Insert Fail"))
     
     with pytest.raises(Exception) as exc:
         await start_journey(MagicMock(), db=mock_db) # Changed transitions.start_journey to start_journey
@@ -167,6 +177,8 @@ async def test_start_journey_exception():
 async def test_mark_waypoint_journey_completion():
     """Test mark_waypoint_reached auto-completion."""
     mock_db = AsyncMock()
+    mock_db.add = MagicMock()
+    mock_db.delete = MagicMock()
     
     mock_journey = MagicMock(spec=UserJourney)
     mock_journey.id = uuid4()
@@ -201,6 +213,8 @@ async def test_mark_waypoint_journey_completion():
 async def test_journey_status_no_started_at():
     """Test get_journey_status with no started_at."""
     mock_db = AsyncMock()
+    mock_db.add = MagicMock()
+    mock_db.delete = MagicMock()
     
     mock_journey = MagicMock()
     mock_journey.id = uuid4()
@@ -228,6 +242,8 @@ async def test_journey_status_no_started_at():
 async def test_journey_status_exception():
     """Test get_journey_status exception handling."""
     mock_db = AsyncMock()
+    mock_db.add = MagicMock()
+    mock_db.delete = MagicMock()
     mock_db.execute.side_effect = Exception("DB Fail")
     
     with pytest.raises(Exception):
@@ -237,6 +253,8 @@ async def test_journey_status_exception():
 async def test_journey_history_exception():
     """Test get_user_journey_history exception handling."""
     mock_db = AsyncMock()
+    mock_db.add = MagicMock()
+    mock_db.delete = MagicMock()
     mock_db.execute.side_effect = Exception("DB Fail")
     
     with pytest.raises(Exception):
@@ -246,6 +264,8 @@ async def test_journey_history_exception():
 async def test_effective_strategies_exception():
     """Test get_user_effective_strategies exception handling."""
     mock_db = AsyncMock()
+    mock_db.add = MagicMock()
+    mock_db.delete = MagicMock()
     mock_db.execute.side_effect = Exception("DB Fail")
     
     with pytest.raises(Exception):
@@ -458,6 +478,8 @@ async def test_get_user_effective_strategies(mock_db):
 async def test_mark_waypoint_reached_incomplete():
     """Test marking waypoint when waypoints remain."""
     mock_db = AsyncMock()
+    mock_db.add = MagicMock()
+    mock_db.delete = MagicMock()
     journey_id = uuid4()
     mock_journey = MagicMock(); mock_journey.id = journey_id; mock_journey.status = "in_progress"
     mock_waypoint = MagicMock(); mock_waypoint.journey_id = journey_id; mock_waypoint.reached = False

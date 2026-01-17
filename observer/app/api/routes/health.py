@@ -230,7 +230,7 @@ import logging
 from datetime import datetime
 
 from fastapi import APIRouter, Depends, HTTPException
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, ConfigDict, Field
 from sqlalchemy import func, select, text
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -251,10 +251,8 @@ class HealthResponse(BaseModel):
     atlas_emotions_count: int = Field(description="Number of emotions in Atlas")
     timestamp: datetime = Field(description="Check timestamp")
 
-    class Config:
-        """JSON Schema configuration."""
-
-        json_schema_extra = {
+    model_config = ConfigDict(
+        json_schema_extra={
             "example": {
                 "status": "healthy",
                 "database": "connected",
@@ -263,6 +261,7 @@ class HealthResponse(BaseModel):
                 "timestamp": "2025-12-03T09:45:00Z",
             }
         }
+    )
 
 
 @router.get("/health", response_model=HealthResponse, tags=["Health"])

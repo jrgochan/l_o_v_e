@@ -17,35 +17,36 @@ def client():
 # Tests: Startup & Shutdown Events
 # -----------------------------------------------------------------------------
 
-@pytest.mark.asyncio
-async def test_startup_event_success():
-    """Test successful startup initialization."""
+def test_lifespan_startup_success():
+    """Test successful startup initialization via lifespan."""
     with patch("app.main.init_db", new_callable=AsyncMock) as mock_init:
-        # Trigger startup event manually
-        await app.router.startup()
-        mock_init.assert_awaited_once()
+        with TestClient(app):
+            mock_init.assert_awaited_once()
 
-@pytest.mark.asyncio
-async def test_startup_event_failure():
-    """Test startup failure handling."""
-    with patch("app.main.init_db", side_effect=Exception("DB fail")), \
-         pytest.raises(Exception, match="DB fail"):
-        await app.router.startup()
+def test_lifespan_startup_failure():
+    """Test startup failure handling via lifespan."""
+    with patch("app.main.init_db", new_callable=AsyncMock) as mock_init:
+        mock_init.side_effect = Exception("DB fail")
+        with pytest.raises(Exception, match="DB fail"):
+            with TestClient(app):
+                pass
 
-@pytest.mark.asyncio
-async def test_shutdown_event_success():
-    """Test successful shutdown cleanup."""
-    with patch("app.main.close_db", new_callable=AsyncMock) as mock_close:
-        # Trigger shutdown event manually
-        await app.router.shutdown()
+def test_lifespan_shutdown_success():
+    """Test successful shutdown cleanup via lifespan."""
+    with patch("app.main.init_db", new_callable=AsyncMock), \
+         patch("app.main.close_db", new_callable=AsyncMock) as mock_close:
+        with TestClient(app):
+            pass  # Application runs here
         mock_close.assert_awaited_once()
 
-@pytest.mark.asyncio
-async def test_shutdown_event_failure():
-    """Test shutdown failure handling (should not raise)."""
-    with patch("app.main.close_db", side_effect=Exception("Cleanup fail")):
+def test_lifespan_shutdown_failure():
+    """Test shutdown failure handling via lifespan (should not raise)."""
+    with patch("app.main.init_db", new_callable=AsyncMock), \
+         patch("app.main.close_db", new_callable=AsyncMock) as mock_close:
+        mock_close.side_effect = Exception("Cleanup fail")
         # Should catch and log error, not raise
-        await app.router.shutdown()
+        with TestClient(app):
+            pass
 
 # -----------------------------------------------------------------------------
 # Tests: Root Endpoint

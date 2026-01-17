@@ -9,7 +9,9 @@ from app.models.multi_emotion_analysis import MultiEmotionAnalysis
 
 @pytest.fixture
 def mock_session():
-    return AsyncMock()
+    session = AsyncMock()
+    session.add = MagicMock()
+    return session
 
 @pytest.fixture
 def chat_service(mock_session):

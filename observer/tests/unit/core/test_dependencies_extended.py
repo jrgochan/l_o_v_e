@@ -52,6 +52,8 @@ def test_create_access_token_custom_expiry():
 def mock_db():
     session = AsyncMock()
     session.execute = AsyncMock()
+    session.add = MagicMock()
+    session.delete = MagicMock()
     return session
 
 @pytest.mark.asyncio

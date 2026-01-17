@@ -15,7 +15,8 @@ from app.schemas.bootstrap import BootstrapDataUpdate
 @pytest.fixture
 def mock_db():
     session = AsyncMock()
-    session.execute = AsyncMock()
+    session.execute = AsyncMock(return_value=MagicMock())
+    session.delete = MagicMock()
     session.add = MagicMock()
     session.commit = AsyncMock()
     session.refresh = AsyncMock()

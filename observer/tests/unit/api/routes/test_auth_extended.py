@@ -10,6 +10,7 @@ from app.schemas.user import UserCreate
 def mock_db():
     session = AsyncMock()
     session.execute = AsyncMock()
+    session.delete = MagicMock()
     session.add = MagicMock()
     session.commit = AsyncMock()
     session.refresh = AsyncMock()

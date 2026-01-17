@@ -13,7 +13,12 @@ from app.models.atlas_definition import AtlasDefinition
 
 @pytest.fixture
 def mock_db():
-    return AsyncMock()
+    mock_db = AsyncMock()
+    mock_db.execute = AsyncMock(return_value=MagicMock())
+    mock_db.add = MagicMock()
+    mock_db.delete = MagicMock()
+    mock_db.commit = AsyncMock()
+    return mock_db
 
 @pytest.fixture
 def test_user_id():

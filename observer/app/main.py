@@ -4,6 +4,7 @@ The memory and contextual core of the L.O.V.E. stack.
 """
 
 import logging
+from contextlib import asynccontextmanager
 from typing import Any, Dict
 
 from fastapi import FastAPI
@@ -35,33 +36,16 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
-# Initialize FastAPI application
-app = FastAPI(
-    title=settings.APP_NAME,
-    description=settings.APP_DESCRIPTION,
-    version=settings.API_VERSION,
-    docs_url="/docs",
-    redoc_url="/redoc",
-    openapi_url="/openapi.json",
-)
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    """Application lifespan events.
 
-# CORS middleware for cross-origin requests (Experience module)
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=settings.ALLOWED_ORIGINS_LIST,
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
-
-
-@app.on_event("startup")
-async def startup_event() -> None:
-    """Application startup tasks.
-
+    Handles startup and shutdown tasks:
     - Initialize database connection pool
     - Log configuration
+    - Close database connections
     """
+    # Startup
     logger.info("Starting Observer Module...")
     logger.info(f"Environment: {'DEBUG' if settings.DEBUG else 'PRODUCTION'}")
     logger.info(
@@ -77,13 +61,9 @@ async def startup_event() -> None:
         logger.error(f"Failed to initialize database: {e}")
         raise
 
+    yield
 
-@app.on_event("shutdown")
-async def shutdown_event() -> None:
-    """Application shutdown tasks.
-
-    - Close database connections
-    """
+    # Shutdown
     logger.info("Shutting down Observer Module...")
 
     try:
@@ -91,7 +71,27 @@ async def shutdown_event() -> None:
         logger.info("Database connections closed")
     except Exception as e:
         logger.error(f"Error during shutdown: {e}")
-        # No return needed - function is async def -> None
+
+
+# Initialize FastAPI application
+app = FastAPI(
+    title=settings.APP_NAME,
+    description=settings.APP_DESCRIPTION,
+    version=settings.API_VERSION,
+    docs_url="/docs",
+    redoc_url="/redoc",
+    openapi_url="/openapi.json",
+    lifespan=lifespan,
+)
+
+# CORS middleware for cross-origin requests (Experience module)
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=settings.ALLOWED_ORIGINS_LIST,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 
 # Register route modules

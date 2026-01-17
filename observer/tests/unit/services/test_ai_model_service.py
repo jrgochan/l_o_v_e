@@ -8,7 +8,11 @@ from app.services.ai_model_service import AIModelService, get_ai_model_service
 def mock_db():
     db = AsyncMock()
     # Ensure execute returns a MagicMock (the Result object) when awaited
-    db.execute = AsyncMock() 
+    db.execute = AsyncMock()
+    # FIX: db.execute(...) returns a coroutine, which returns a Result object (MagicMock)
+    db.execute.return_value = MagicMock()
+    db.add = MagicMock()
+    db.delete = MagicMock() 
     return db
 
 @pytest.fixture
@@ -214,6 +218,8 @@ async def test_error_handling_update_metrics(service, mock_db):
 @pytest.mark.asyncio
 async def test_error_handling_get_stats(service, mock_db):
     """Test error handling in get_performance_stats."""
+    # Force an exception to test the error handler (lines 455-457)
+    mock_db.execute.side_effect = Exception("Stats Fail")
     stats = await service.get_performance_stats()
     assert stats == {}
 

@@ -4,7 +4,7 @@ from datetime import datetime
 from typing import Any, Dict, List, Optional
 from uuid import UUID
 
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
 
 
 class PromptTemplateBase(BaseModel):
@@ -41,10 +41,7 @@ class PromptTemplateResponse(PromptTemplateBase):
     updated_at: Optional[datetime] = None
     created_by: Optional[str] = None
 
-    class Config:
-        """Pydantic configuration."""
-
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)
 
 
 class PromptTestRequest(BaseModel):

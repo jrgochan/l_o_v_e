@@ -749,7 +749,7 @@ async def delete_bootstrap_data(
     if not item:
         raise HTTPException(status_code=404, detail="Item not found")
 
-    await db.delete(item)
+    db.delete(item)
     await db.commit()
     return {"status": "success", "id": str(item_id)}
 

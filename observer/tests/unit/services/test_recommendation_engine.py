@@ -7,7 +7,11 @@ from app.services.recommendation_engine import RecommendationEngine, CURATED_JOU
 
 @pytest.fixture
 def mock_session():
-    return AsyncMock(spec=AsyncSession)
+    db = AsyncMock(spec=AsyncSession)
+    db.execute = AsyncMock(return_value=MagicMock())
+    db.add = MagicMock()
+    db.delete = MagicMock()
+    return db
 
 @pytest.fixture
 def engine(mock_session):

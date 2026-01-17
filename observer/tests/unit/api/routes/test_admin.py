@@ -23,11 +23,9 @@ def mock_db():
     db = AsyncMock()
     # execute needs to return an AsyncMock that returns a MagicMock result
     # Actually just execute.return_value = MagicMock() is sufficient if we await execute()
-    db.execute = AsyncMock() 
-    # Fix RuntimeWarning: add/delete are synchronous methods in SQLAlchemy AsyncSession
+    db.execute = AsyncMock()
     db.add = MagicMock()
-    db.delete = AsyncMock()
-    # ensure async methods are AsyncMock (default for AsyncMock children, but being explicit helps)
+    db.delete = MagicMock()
     db.commit = AsyncMock()
     db.refresh = AsyncMock()
     return db

@@ -8,7 +8,12 @@ from app.models.transition_strategy import TransitionPattern, TransitionStrategy
 
 @pytest.fixture
 def mock_session():
-    return AsyncMock()
+    mock_db = AsyncMock()
+    mock_db.execute = AsyncMock()
+    mock_db.add = MagicMock()
+    mock_db.delete = MagicMock()
+    mock_db.commit = AsyncMock()
+    return mock_db
 
 @pytest.fixture
 def recommender(mock_session):

@@ -14,13 +14,18 @@ from app.api.routes.chat_websocket import chat_websocket
 
 @pytest.fixture
 def mock_websocket():
-    ws = AsyncMock(spec=WebSocket)
+    ws = AsyncMock()
     ws.query_params = {}
+    ws.close = AsyncMock()
+    ws.accept = AsyncMock()
     return ws
 
 @pytest.fixture
 def mock_db_session():
     mock = AsyncMock()
+    mock.add = MagicMock()
+    mock.delete = MagicMock()
+    mock.expunge = MagicMock()
     return mock
 
 @pytest.fixture
@@ -57,6 +62,7 @@ def mock_httpx_client():
     client_mock = AsyncMock()
     client_mock.__aenter__.return_value = client_mock
     client_mock.__aexit__.return_value = None
+    client_mock.aclose = AsyncMock()
     return client_mock
 
 @pytest.fixture
@@ -259,6 +265,7 @@ async def test_handle_multi_emotion_result(mock_websocket, mock_auth_session_loc
         mock_insights.assert_called_once()
 
 @pytest.mark.asyncio
+@pytest.mark.filterwarnings("ignore::RuntimeWarning")
 async def test_process_text_message_new_session(mock_websocket, mock_auth_session_local, mock_chat_service, mock_httpx_client):
     """Test process_text_message handles new session creation."""
     from app.api.routes.chat_websocket import process_text_message

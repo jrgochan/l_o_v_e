@@ -27,7 +27,8 @@ async def test_websocket_endpoint_initial_state_neutral(mock_ws, mock_db):
     """Test connection with no history (Neutral state)."""
     # Mock manager
     with patch("app.websocket.routes.manager", new_callable=AsyncMock) as mock_manager, \
-         patch("app.websocket.routes.asyncio.create_task") as mock_create_task:
+         patch("app.websocket.routes.asyncio.create_task") as mock_create_task, \
+         patch("app.websocket.routes.heartbeat_loop", new_callable=MagicMock):
         
         # DB returns None
         mock_res = MagicMock()
@@ -36,6 +37,9 @@ async def test_websocket_endpoint_initial_state_neutral(mock_ws, mock_db):
         
         # WebSocket loop breaks immediately
         mock_ws.receive_text.side_effect = WebSocketDisconnect()
+        
+        # FIX: disconnect is synchronous
+        mock_manager.disconnect = MagicMock()
         
         await websocket_endpoint(mock_ws, "user_1", mock_db)
         
@@ -55,7 +59,8 @@ async def test_websocket_endpoint_initial_state_neutral(mock_ws, mock_db):
 async def test_websocket_endpoint_initial_state_existing(mock_ws, mock_db):
     """Test connection with existing state history."""
     with patch("app.websocket.routes.manager", new_callable=AsyncMock) as mock_manager, \
-         patch("app.websocket.routes.asyncio.create_task"):
+         patch("app.websocket.routes.asyncio.create_task"), \
+         patch("app.websocket.routes.heartbeat_loop", new_callable=MagicMock):
         
         # Mock DB row
         mock_state = MagicMock()
@@ -76,6 +81,9 @@ async def test_websocket_endpoint_initial_state_existing(mock_ws, mock_db):
         
         mock_ws.receive_text.side_effect = WebSocketDisconnect()
         
+        # FIX: disconnect is synchronous
+        mock_manager.disconnect = MagicMock()
+        
         await websocket_endpoint(mock_ws, "user_1", mock_db)
         
         args = mock_ws.send_json.call_args[0][0]
@@ -89,7 +97,8 @@ async def test_websocket_pong_and_error(mock_ws, mock_db, caplog):
     caplog.set_level(logging.ERROR)
     
     with patch("app.websocket.routes.manager", new_callable=AsyncMock) as mock_manager, \
-         patch("app.websocket.routes.asyncio.create_task"):
+         patch("app.websocket.routes.asyncio.create_task"), \
+         patch("app.websocket.routes.heartbeat_loop", new_callable=MagicMock):
              
         # Create a proper mock result that returns None for .first()
         mock_result = MagicMock()
@@ -103,6 +112,9 @@ async def test_websocket_pong_and_error(mock_ws, mock_db, caplog):
             "INVALID",
             WebSocketDisconnect()
         ]
+        
+        # FIX: disconnect is synchronous
+        mock_manager.disconnect = MagicMock()
         
         try:
             await websocket_endpoint(mock_ws, "u1", mock_db)
@@ -141,7 +153,8 @@ async def test_websocket_inner_loop_exception(mock_ws, mock_db, caplog):
     caplog.set_level(logging.ERROR)
     
     with patch("app.websocket.routes.manager", new_callable=AsyncMock) as mock_manager, \
-         patch("app.websocket.routes.asyncio.create_task") as mock_create_task:
+         patch("app.websocket.routes.asyncio.create_task") as mock_create_task, \
+         patch("app.websocket.routes.heartbeat_loop", new_callable=MagicMock):
              
         # Mock heartbeat task via asyncio.Future
         # Future is awaitable. done() returns False initially.
@@ -161,6 +174,9 @@ async def test_websocket_inner_loop_exception(mock_ws, mock_db, caplog):
             WebSocketDisconnect()
         ]
         
+        # FIX: disconnect is synchronous
+        mock_manager.disconnect = MagicMock()
+        
         await websocket_endpoint(mock_ws, "user_inner_error", mock_db)
             
         # Verify Generic Exception caught and logged
@@ -177,10 +193,14 @@ async def test_websocket_outer_exception(mock_ws, mock_db, caplog):
     caplog.set_level(logging.ERROR)
     
     with patch("app.websocket.routes.manager", new_callable=AsyncMock) as mock_manager, \
-         patch("app.websocket.routes.asyncio.create_task"):
+         patch("app.websocket.routes.asyncio.create_task"), \
+         patch("app.websocket.routes.heartbeat_loop", new_callable=MagicMock):
              
         # Simulate DB error (before loop)
         mock_db.execute.side_effect = Exception("Critical DB Failure")
+        
+        # FIX: disconnect is synchronous
+        mock_manager.disconnect = MagicMock()
         
         await websocket_endpoint(mock_ws, "user_outer_error", mock_db)
         
@@ -193,7 +213,8 @@ async def test_websocket_unknown_message(mock_ws, mock_db, caplog):
     caplog.set_level(logging.WARNING)
     
     with patch("app.websocket.routes.manager", new_callable=AsyncMock) as mock_manager, \
-         patch("app.websocket.routes.asyncio.create_task"):
+         patch("app.websocket.routes.asyncio.create_task"), \
+         patch("app.websocket.routes.heartbeat_loop", new_callable=MagicMock):
              
         # DB successful (none) - Use explicit mock to avoid chaining issues
         mock_result = MagicMock()
@@ -205,6 +226,9 @@ async def test_websocket_unknown_message(mock_ws, mock_db, caplog):
             json.dumps({"type": "unknown_type"}),
             WebSocketDisconnect()
         ]
+        
+        # FIX: disconnect is synchronous
+        mock_manager.disconnect = MagicMock()
         
         await websocket_endpoint(mock_ws, "user_unknown", mock_db)
         

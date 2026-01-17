@@ -10,6 +10,8 @@ from app.models.user import User
 def mock_db():
     session = AsyncMock()
     session.execute = AsyncMock()
+    session.add = MagicMock()
+    session.delete = MagicMock()
     return session
 
 # --- Health API Tests ---

@@ -91,7 +91,7 @@ from datetime import datetime
 from typing import Any, Dict, List, Optional
 from uuid import UUID
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, ConfigDict, Field
 
 # ============================================================================
 # REQUEST SCHEMAS
@@ -109,10 +109,8 @@ class TransitionPathRequest(BaseModel):
     max_waypoints: int = Field(default=3, ge=1, le=5)
     include_alternatives: bool = False
 
-    class Config:
-        """JSON Schema configuration."""
-
-        json_schema_extra = {
+    model_config = ConfigDict(
+        json_schema_extra={
             "example": {
                 "user_id": "123e4567-e89b-12d3-a456-426614174000",
                 "current_emotion": "Anxiety",
@@ -123,6 +121,7 @@ class TransitionPathRequest(BaseModel):
                 "include_alternatives": True,
             }
         }
+    )
 
 
 class JourneyStartRequest(BaseModel):
@@ -135,10 +134,8 @@ class JourneyStartRequest(BaseModel):
         default=None, description="Context: location, time_of_day, has_support, energy_level"
     )
 
-    class Config:
-        """JSON Schema configuration."""
-
-        json_schema_extra = {
+    model_config = ConfigDict(
+        json_schema_extra={
             "example": {
                 "user_id": "123e4567-e89b-12d3-a456-426614174000",
                 "path_id": "anxiety-to-calm-001",
@@ -150,6 +147,7 @@ class JourneyStartRequest(BaseModel):
                 },
             }
         }
+    )
 
 
 class WaypointReachedRequest(BaseModel):
@@ -163,10 +161,8 @@ class WaypointReachedRequest(BaseModel):
     strategies_tried: List[Dict[str, Any]]
     current_state_description: Optional[str] = None
 
-    class Config:
-        """JSON Schema configuration."""
-
-        json_schema_extra = {
+    model_config = ConfigDict(
+        json_schema_extra={
             "example": {
                 "waypoint_index": 1,
                 "self_assessment": {
@@ -186,6 +182,7 @@ class WaypointReachedRequest(BaseModel):
                 "current_state_description": "I feel much calmer now, less racing thoughts",
             }
         }
+    )
 
 
 # ============================================================================
@@ -201,10 +198,8 @@ class EmotionState(BaseModel):
     vac: List[float]
     quaternion: List[float]
 
-    class Config:
-        """JSON Schema configuration."""
-
-        json_schema_extra = {
+    model_config = ConfigDict(
+        json_schema_extra={
             "example": {
                 "emotion": "Anxiety",
                 "category": "Places We Go When Things Are Uncertain or Too Much",
@@ -212,6 +207,7 @@ class EmotionState(BaseModel):
                 "quaternion": [0.707, -0.353, 0.494, -0.283],
             }
         }
+    )
 
 
 class StrategyInfo(BaseModel):

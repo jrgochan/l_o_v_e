@@ -164,7 +164,7 @@ References:
 
 from typing import List
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, ConfigDict, Field
 
 
 class VACVector(BaseModel):
@@ -174,10 +174,10 @@ class VACVector(BaseModel):
     arousal: float = Field(ge=-1.0, le=1.0, description="Energy level [-1, 1]")
     connection: float = Field(ge=-1.0, le=1.0, description="Relational alignment [-1, 1]")
 
-    class Config:
-        """JSON Schema configuration."""
 
-        json_schema_extra = {"example": {"valence": 0.9, "arousal": 0.7, "connection": 0.8}}
+    model_config = ConfigDict(
+        json_schema_extra={"example": {"valence": 0.9, "arousal": 0.7, "connection": 0.8}}
+    )
 
 
 class QuaternionModel(BaseModel):
@@ -188,10 +188,9 @@ class QuaternionModel(BaseModel):
     y: float = Field(description="j component")
     z: float = Field(description="k component")
 
-    class Config:
-        """JSON Schema configuration."""
-
-        json_schema_extra = {"example": {"w": 0.68, "x": 0.50, "y": 0.39, "z": 0.45}}
+    model_config = ConfigDict(
+        json_schema_extra={"example": {"w": 0.68, "x": 0.50, "y": 0.39, "z": 0.45}}
+    )
 
     @staticmethod
     def from_list(q: List[float]) -> "QuaternionModel":
@@ -211,10 +210,8 @@ class EmotionInfo(BaseModel):
     category: str = Field(description="Atlas category")
     vac: List[float] = Field(description="VAC coordinates [v, a, c]")
 
-    class Config:
-        """JSON Schema configuration."""
-
-        json_schema_extra = {
+    model_config = ConfigDict(
+        json_schema_extra={
             "example": {
                 "id": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
                 "name": "Joy",
@@ -222,6 +219,7 @@ class EmotionInfo(BaseModel):
                 "vac": [0.9, 0.7, 0.8],
             }
         }
+    )
 
 
 class MetricsInfo(BaseModel):
@@ -232,9 +230,8 @@ class MetricsInfo(BaseModel):
     angular_distance: float = Field(description="Angular distance from previous state (radians)")
     alerts: List[str] = Field(default=[], description="Alert flags (flooding, stuckness)")
 
-    class Config:
-        """JSON Schema configuration."""
-
-        json_schema_extra = {
+    model_config = ConfigDict(
+        json_schema_extra={
             "example": {"elasticity": 0.8, "rigidity": 0.2, "angular_distance": 1.2, "alerts": []}
         }
+    )
