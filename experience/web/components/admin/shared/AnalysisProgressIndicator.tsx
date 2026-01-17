@@ -8,7 +8,6 @@
 "use client";
 
 import { useMemo, useState, useEffect } from "react";
-import { ProgressStage } from "@/types/chat"; // Assuming type is here or locally defined, keeping local if needed for now
 // Re-defining interface locally to match previous file if not exported centrally
 interface LocalProgressStage {
   id: string;
@@ -34,7 +33,6 @@ export function AnalysisProgressIndicator({
   currentStage,
   overallPercentage,
   currentMessage,
-  toneMode,
   deepFeelingMode,
   className = "",
 }: AnalysisProgressIndicatorProps) {
@@ -94,8 +92,7 @@ export function AnalysisProgressIndicator({
 
   // Determine current visual state
   const activeStage = stages.find((s) => s.id === currentStage) || stages[0];
-  const config =
-    stageConfig[activeStage.id as keyof typeof stageConfig] || stageConfig.started;
+  const config = stageConfig[activeStage.id as keyof typeof stageConfig] || stageConfig.started;
 
   const isComplete = overallPercentage >= 100;
 
@@ -103,12 +100,12 @@ export function AnalysisProgressIndicator({
   // If we are in an active state but backend is silent (processing), simulate progress
   const [simulatedPercentage, setSimulatedPercentage] = useState(overallPercentage);
 
-  useEffect(() => {
-    // Sync with real percentage if it jumps ahead
-    if (overallPercentage > simulatedPercentage) {
-      setSimulatedPercentage(overallPercentage);
-    }
+  // Sync state when prop updates (using pattern that avoids render loop if careful)
+  if (overallPercentage > simulatedPercentage) {
+    setSimulatedPercentage(overallPercentage);
+  }
 
+  useEffect(() => {
     // Auto-increment if not complete and in an active stage
     if (!isComplete && overallPercentage < 90) {
       const interval = setInterval(() => {
@@ -150,14 +147,15 @@ export function AnalysisProgressIndicator({
 
       {/* Main Content */}
       <div className="relative z-10 flex flex-col items-center justify-center text-center space-y-4">
-
         {/* Animated Hero Icon */}
         <div className="relative">
           {/* Ring */}
-          <div className={`
+          <div
+            className={`
              absolute inset-0 rounded-full border-2 border-dashed opacity-30
              ${config.color} animate-[spin_10s_linear_infinite]
-          `} />
+          `}
+          />
 
           <div
             className={`
@@ -190,13 +188,11 @@ export function AnalysisProgressIndicator({
             {currentMessage}
           </p>
         </div>
-
       </div>
 
       {/* Footer: Minimalist Progress Track */}
       {/* Footer: Minimalist Progress Track */}
       <div className="relative mt-6 pt-6 border-t border-white/5">
-
         {/* Continuous Progress Bar */}
         <div className="absolute top-0 left-0 w-full h-[2px] bg-white/5">
           <div
@@ -214,7 +210,7 @@ export function AnalysisProgressIndicator({
         </div>
 
         <div className="flex justify-between items-center gap-1">
-          {stages.map((stage, idx) => {
+          {stages.map((stage) => {
             const isActive = stage.id === currentStage;
             const isDone = stage.status === "complete";
 
@@ -225,12 +221,14 @@ export function AnalysisProgressIndicator({
                 title={stage.label}
               >
                 {/* Step indicator (dot) */}
-                <div className={`
+                <div
+                  className={`
                       h-1 w-1 rounded-full transition-all duration-500
                       ${isActive ? `bg-white shadow-[0_0_4px_white] scale-125` : ""}
                       ${isDone ? `bg-white/40` : ""}
                       ${!isActive && !isDone ? "bg-white/10" : ""}
-                  `} />
+                  `}
+                />
               </div>
             );
           })}
@@ -239,5 +237,3 @@ export function AnalysisProgressIndicator({
     </div>
   );
 }
-
-

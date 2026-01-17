@@ -38,6 +38,19 @@ describe("EmotionsTab", () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
+
+    // Suppress expected errors
+    const originalConsoleError = console.error;
+    console.error = (...args) => {
+      const msg = args[0]?.toString() || "";
+      if (
+        msg.includes("Failed to load emotions") ||
+        msg.includes("Not implemented: navigation")
+      ) {
+        return;
+      }
+      originalConsoleError(...args);
+    };
   });
 
   afterEach(() => {

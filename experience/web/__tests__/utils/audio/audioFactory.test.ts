@@ -50,6 +50,18 @@ describe("createAudioEngineInstance", () => {
     (window as any).webkitAudioContext = jest.fn(() => mockAudioContext);
   });
 
+  // Suppress "Audio Engine Init Failed" error
+  const originalConsoleError = console.error;
+  beforeAll(() => {
+    console.error = (...args) => {
+      if (/Audio Engine Init Failed/.test(args[0])) return;
+      originalConsoleError(...args);
+    };
+  });
+  afterAll(() => {
+    console.error = originalConsoleError;
+  });
+
   it("should create an audio engine instance", () => {
     const engine = createAudioEngineInstance(false);
     expect(engine).toBeDefined();

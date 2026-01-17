@@ -15,7 +15,7 @@ jest.mock("zustand/middleware", () => ({
     if (options && options.partialize) {
       try {
         options.partialize(get());
-      } catch (e) { }
+      } catch (e) {}
     }
     return config(set, get, api);
   },

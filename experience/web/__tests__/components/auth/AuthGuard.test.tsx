@@ -29,21 +29,17 @@ describe("AuthGuard", () => {
 
         // Setup selector mock
         (useAuthStore as unknown as jest.Mock).mockImplementation((selector: any) => {
-            if (selector) {
-                // Mock the isAuthenticated() selector
-                // simplistic check if code invokes selector(state)
-                const state = {
-                    token: "valid-token",
-                    user: { id: "1", role: UserRole.USER },
-                    isAuthenticated: mockIsAuthenticated
-                };
-                return selector(state);
-            }
-            return {
-                user: { id: "1", role: UserRole.USER },
+            const state = {
+                user: { id: "1", role: UserRole.USER, email: "test@example.com" },
                 token: "valid-token",
                 isLoading: false,
+                isAuthenticated: mockIsAuthenticated,
             };
+
+            if (selector) {
+                return selector(state);
+            }
+            return state;
         });
 
         mockIsAuthenticated.mockReturnValue(true);
@@ -68,10 +64,16 @@ describe("AuthGuard", () => {
     });
 
     it("redirects to home if unauthenticated", async () => {
-        (useAuthStore as unknown as jest.Mock).mockReturnValue({
-            user: null,
-            token: null,
-            isLoading: false,
+        mockIsAuthenticated.mockReturnValue(false);
+        (useAuthStore as unknown as jest.Mock).mockImplementation((selector) => {
+            const state = {
+                user: null,
+                token: null,
+                isLoading: false,
+                isAuthenticated: () => false
+            };
+            if (selector) return selector(state);
+            return state;
         });
 
         render(
@@ -124,7 +126,7 @@ describe("AuthGuard", () => {
                     isAuthenticated: () => false,
                     user: null,
                     token: null,
-                    isLoading: false
+                    isLoading: false,
                 });
             }
             return {
@@ -147,11 +149,16 @@ describe("AuthGuard", () => {
     });
 
     it("shows forbidden screen when authenticated but insufficient role", () => {
-        (useAuthStore as unknown as jest.Mock).mockReturnValue({
-            isAuthenticated: true,
-            isLoading: false,
-            user: { id: "1", role: UserRole.USER },
-            token: "valid-token"
+        mockIsAuthenticated.mockReturnValue(true);
+        (useAuthStore as unknown as jest.Mock).mockImplementation((selector) => {
+            const state = {
+                isAuthenticated: () => true,
+                isLoading: false,
+                user: { id: "1", role: UserRole.USER },
+                token: "valid-token",
+            };
+            if (selector) return selector(state);
+            return state;
         });
 
         render(
@@ -169,11 +176,15 @@ describe("AuthGuard", () => {
         process.env = { ...originalEnv, NODE_ENV: "development" };
         const consoleSpy = jest.spyOn(console, "log").mockImplementation();
 
-        (useAuthStore as unknown as jest.Mock).mockReturnValue({
-            isAuthenticated: false,
-            isLoading: false,
-            token: null,
-            user: null,
+        (useAuthStore as unknown as jest.Mock).mockImplementation((selector) => {
+            const state = {
+                isAuthenticated: () => false,
+                isLoading: false,
+                token: null,
+                user: null,
+            };
+            if (selector) return selector(state);
+            return state;
         });
 
         render(
@@ -182,7 +193,9 @@ describe("AuthGuard", () => {
             </AuthGuard>
         );
 
-        expect(consoleSpy).toHaveBeenCalledWith(expect.stringContaining("[AuthGuard] Unauthenticated access"));
+        expect(consoleSpy).toHaveBeenCalledWith(
+            expect.stringContaining("[AuthGuard] Unauthenticated access")
+        );
 
         consoleSpy.mockRestore();
         process.env = originalEnv;
@@ -193,11 +206,16 @@ describe("AuthGuard", () => {
         process.env = { ...originalEnv, NODE_ENV: "development" };
         const consoleSpy = jest.spyOn(console, "log").mockImplementation();
 
-        (useAuthStore as unknown as jest.Mock).mockReturnValue({
-            isAuthenticated: true,
-            isLoading: false,
-            user: { id: "1", role: UserRole.USER },
-            token: "valid-token"
+        mockIsAuthenticated.mockReturnValue(true);
+        (useAuthStore as unknown as jest.Mock).mockImplementation((selector) => {
+            const state = {
+                isAuthenticated: () => true,
+                isLoading: false,
+                user: { id: "1", role: UserRole.USER },
+                token: "valid-token",
+            };
+            if (selector) return selector(state);
+            return state;
         });
 
         render(
@@ -206,17 +224,25 @@ describe("AuthGuard", () => {
             </AuthGuard>
         );
 
-        expect(consoleSpy).toHaveBeenCalledWith(expect.stringContaining("[AuthGuard] Unauthorized role access"));
+        expect(consoleSpy).toHaveBeenCalledWith(
+            expect.stringContaining("[AuthGuard] Unauthorized role access")
+        );
 
         consoleSpy.mockRestore();
         process.env = originalEnv;
     });
 
     it("handles return home button click", () => {
-        (useAuthStore as unknown as jest.Mock).mockReturnValue({
-            isAuthenticated: true,
-            isLoading: false,
-            user: { id: "1", role: UserRole.USER },
+        mockIsAuthenticated.mockReturnValue(true);
+        (useAuthStore as unknown as jest.Mock).mockImplementation((selector) => {
+            const state = {
+                isAuthenticated: () => true,
+                isLoading: false,
+                user: { id: "1", role: UserRole.USER },
+                token: "valid-token",
+            };
+            if (selector) return selector(state);
+            return state;
         });
 
         render(
@@ -231,13 +257,17 @@ describe("AuthGuard", () => {
     });
 
     it("shows fallback if user lacks required role", () => {
-        (useAuthStore as unknown as jest.Mock).mockReturnValue({
-            user: { id: "1", role: UserRole.USER },
-            token: "valid-token",
-            isLoading: false,
-        });
-
         mockIsAuthenticated.mockReturnValue(true);
+        (useAuthStore as unknown as jest.Mock).mockImplementation((selector) => {
+            const state = {
+                isAuthenticated: () => true,
+                isLoading: false,
+                user: { id: "1", role: UserRole.USER },
+                token: "valid-token",
+            };
+            if (selector) return selector(state);
+            return state;
+        });
 
         render(
             <AuthGuard requiredRole={UserRole.ADMIN} fallback={<div>Access Denied Custom</div>}>
@@ -250,10 +280,16 @@ describe("AuthGuard", () => {
     });
 
     it("shows default forbidden message if user lacks required role and no fallback provided", () => {
-        (useAuthStore as unknown as jest.Mock).mockReturnValue({
-            user: { id: "1", role: UserRole.USER },
-            token: "valid-token",
-            isLoading: false,
+        mockIsAuthenticated.mockReturnValue(true);
+        (useAuthStore as unknown as jest.Mock).mockImplementation((selector) => {
+            const state = {
+                isAuthenticated: () => true,
+                isLoading: false,
+                user: { id: "1", role: UserRole.USER },
+                token: "valid-token",
+            };
+            if (selector) return selector(state);
+            return state;
         });
 
         render(

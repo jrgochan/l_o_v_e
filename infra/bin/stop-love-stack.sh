@@ -2,14 +2,15 @@
 # L.O.V.E. Stack - Stop All APIs
 # Cross-platform script to stop all running APIs (keeps services running)
 
-# Get script directory
+# Get script directory (infra/bin)
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+PROJECT_ROOT="$(cd "$SCRIPT_DIR/../.." && pwd)"
 
 # Source cross-platform libraries
-. "$SCRIPT_DIR/lib/os-detect.sh"
-. "$SCRIPT_DIR/lib/package-manager.sh"
-. "$SCRIPT_DIR/lib/service-manager.sh"
-. "$SCRIPT_DIR/lib/common.sh"
+. "$PROJECT_ROOT/infra/scripts/lib/os-detect.sh"
+. "$PROJECT_ROOT/infra/scripts/lib/package-manager.sh"
+. "$PROJECT_ROOT/infra/scripts/lib/service-manager.sh"
+. "$PROJECT_ROOT/infra/scripts/lib/common.sh"
 
 PID_FILE="$SCRIPT_DIR/logs/.love-stack.pids"
 

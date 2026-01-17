@@ -131,12 +131,12 @@ export function Scene() {
           position={hoveredWaypoint.screenPos}
           waypointState={
             hoveredWaypoint.state as
-            | "start"
-            | "goal"
-            | "reached"
-            | "current"
-            | "locked"
-            | "waypoint"
+              | "start"
+              | "goal"
+              | "reached"
+              | "current"
+              | "locked"
+              | "waypoint"
           }
         />
       )}

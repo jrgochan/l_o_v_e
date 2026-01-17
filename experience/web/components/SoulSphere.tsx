@@ -230,14 +230,22 @@ export function SoulSphere() {
   // Map mode string to integer for shader
   const modeInt = useMemo(() => {
     switch (pathAnimationMode) {
-      case "subtle": return 0;
-      case "dynamic": return 1;
-      case "mystical": return 2;
-      case "crystalline": return 3;
-      case "luminous": return 4;
-      case "liquid": return 5;
-      case "glitch": return 6;
-      default: return 0;
+      case "subtle":
+        return 0;
+      case "dynamic":
+        return 1;
+      case "mystical":
+        return 2;
+      case "crystalline":
+        return 3;
+      case "luminous":
+        return 4;
+      case "liquid":
+        return 5;
+      case "glitch":
+        return 6;
+      default:
+        return 0;
     }
   }, [pathAnimationMode]);
 
@@ -291,11 +299,7 @@ export function SoulSphere() {
   });
 
   return (
-    <mesh
-      ref={meshRef}
-      geometry={geometry}
-      scale={1.5}
-    >
+    <mesh ref={meshRef} geometry={geometry} scale={1.5}>
       <shaderMaterial
         ref={materialRef}
         attach="material"

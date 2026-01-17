@@ -4,14 +4,15 @@
 
 set -e
 
-# Get script directory
+# Get script directory (infra/bin)
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+PROJECT_ROOT="$(cd "$SCRIPT_DIR/../.." && pwd)"
 
 # Source cross-platform libraries
-. "$SCRIPT_DIR/lib/os-detect.sh"
-. "$SCRIPT_DIR/lib/package-manager.sh"
-. "$SCRIPT_DIR/lib/service-manager.sh"
-. "$SCRIPT_DIR/lib/common.sh"
+. "$PROJECT_ROOT/infra/scripts/lib/os-detect.sh"
+. "$PROJECT_ROOT/infra/scripts/lib/package-manager.sh"
+. "$PROJECT_ROOT/infra/scripts/lib/service-manager.sh"
+. "$PROJECT_ROOT/infra/scripts/lib/common.sh"
 
 # ==========================================
 # Configuration & Defaults
@@ -268,7 +269,7 @@ if [ "$RUN_INFRA" = true ] && [ "$SKIP_INFRA_CHECKS" = false ]; then
             fi
         else
             print_warning "Database '$DB_NAME' not found or not accessible."
-            print_info "If this fails, run: cd infra && ./init-database.sh"
+            print_info "If this fails, run: ./infra/scripts/db/init-database.sh"
         fi
     fi
     echo ""
@@ -314,7 +315,7 @@ if [ "$RUN_DOCS" = true ]; then
     print_header "📚 Starting Documentation"
     DOCS_PORT=8003
     DOCS_LOG="$SCRIPT_DIR/logs/Documentation.log"
-    DOCS_SCRIPT="$SCRIPT_DIR/../docs/serve-docs.sh"
+    DOCS_SCRIPT="$PROJECT_ROOT/docs/serve-docs.sh"
     
     if [ -f "$DOCS_SCRIPT" ]; then
         bash "$DOCS_SCRIPT" --port $DOCS_PORT > "$DOCS_LOG" 2>&1 &

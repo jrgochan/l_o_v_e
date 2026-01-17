@@ -34,7 +34,10 @@ export function PathParticles({
   // Adjust particle parameters based on animation mode
   // Using explicit type cast to allow indexing by any PathAnimationMode string if needed,
   // or just ensuring keys match the string union.
-  const modeParams: Record<string, { count: number; speedMult: number; sizeMult: number; glowMult: number }> = {
+  const modeParams: Record<
+    string,
+    { count: number; speedMult: number; sizeMult: number; glowMult: number }
+  > = {
     subtle: { count: 10, speedMult: 0.6, sizeMult: 0.8, glowMult: 2.0 },
     dynamic: { count: 18, speedMult: 1.0, sizeMult: 1.2, glowMult: 2.5 },
     mystical: { count: 28, speedMult: 0.8, sizeMult: 1.0, glowMult: 3.0 },

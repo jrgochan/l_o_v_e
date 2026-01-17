@@ -27,14 +27,15 @@
 
 set -e  # Exit on error
 
-# Get script directory
+# Get script directory (infra/bin)
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+PROJECT_ROOT="$(cd "$SCRIPT_DIR/../.." && pwd)"
 
 # Source cross-platform libraries
-. "$SCRIPT_DIR/lib/os-detect.sh"
-. "$SCRIPT_DIR/lib/package-manager.sh"
-. "$SCRIPT_DIR/lib/service-manager.sh"
-. "$SCRIPT_DIR/lib/common.sh"
+. "$PROJECT_ROOT/infra/scripts/lib/os-detect.sh"
+. "$PROJECT_ROOT/infra/scripts/lib/package-manager.sh"
+. "$PROJECT_ROOT/infra/scripts/lib/service-manager.sh"
+. "$PROJECT_ROOT/infra/scripts/lib/common.sh"
 
 # Required Python version
 REQUIRED_PYTHON_MAJOR=3
@@ -284,7 +285,7 @@ check_python() {
     if [ -n "$PYTHON_CMD" ]; then
         VERSION=$($PYTHON_CMD --version 2>&1 | grep -oE '[0-9]+\.[0-9]+' | head -1)
         print_success "Found $PYTHON_CMD (version $VERSION)"
-        echo "$PYTHON_CMD" > "$SCRIPT_DIR/.python_cmd"
+        echo "$PYTHON_CMD" > "$PROJECT_ROOT/infra/.python_cmd"
         return 0
     fi
     
@@ -673,7 +674,7 @@ if [ "$SKIP_DATABASE" = false ]; then
         if [ "$PRECOMPUTE_PATHS" = true ]; then
             DB_INIT_ARGS="$DB_INIT_ARGS --precompute-paths"
         fi
-        if "$SCRIPT_DIR/init-database.sh" $DB_INIT_ARGS; then
+        if "$PROJECT_ROOT/infra/scripts/db/init-database.sh" $DB_INIT_ARGS; then
             print_success "Database initialized successfully"
         else
             print_warning "Database initialization had issues"
@@ -698,9 +699,9 @@ print_success "Virtual environments created for all modules"
 print_success "Dependencies installed"
 echo ""
 print_info "Next steps:"
-echo "  1. Initialize database (if skipped): cd infra && ./init-database.sh"
-echo "  2. Run 'cd infra && ./test-love-stack.sh' to verify setup"
-echo "  3. Run 'cd infra && ./run-love-stack.sh' to start the stack"
+echo "  1. Initialize database (if skipped): $PROJECT_ROOT/infra/scripts/db/init-database.sh"
+echo "  2. Run '$PROJECT_ROOT/infra/bin/test-love-stack.sh' to verify setup"
+echo "  3. Run '$PROJECT_ROOT/infra/bin/run-love-stack.sh' to start the stack"
 echo ""
 print_info "Platform: $(detect_os) | Package Manager: $(detect_package_manager)"
 echo ""

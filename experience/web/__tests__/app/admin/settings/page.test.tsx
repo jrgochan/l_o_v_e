@@ -46,6 +46,15 @@ describe("SettingsPage", () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
+
+    // Suppress "Not implemented: navigation" error from JSDOM (triggered by file downloads/links)
+    const originalConsoleError = console.error;
+    console.error = (...args) => {
+      if (args[0] && args[0].toString().includes("Not implemented: navigation")) {
+        return;
+      }
+      originalConsoleError(...args);
+    };
     mockImportSettings.mockReturnValue(true); // Default to success
     (useSettingsStore as unknown as jest.Mock).mockImplementation((selector) => {
       const state = {
@@ -80,8 +89,6 @@ describe("SettingsPage", () => {
     // Check dismissal
     expect(screen.queryByText("Settings copied to clipboard!")).not.toBeInTheDocument();
   });
-
-
 
   it("renders header and default tab", () => {
     render(<SettingsPage />);

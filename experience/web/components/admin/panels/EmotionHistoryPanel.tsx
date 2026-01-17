@@ -32,7 +32,9 @@ export function EmotionHistoryPanel() {
   // Collapsed state - just icon bar
   if (isCollapsed) {
     return (
-      <div className={`w-10 ${theme.colors.background}/80 border-r ${theme.colors.border} flex flex-col items-center py-4`}>
+      <div
+        className={`w-10 ${theme.colors.background}/80 border-r ${theme.colors.border} flex flex-col items-center py-4`}
+      >
         <button
           onClick={toggleCollapsed}
           className="text-gray-400 hover:text-white transition rotate-180"
@@ -52,7 +54,9 @@ export function EmotionHistoryPanel() {
   }
 
   return (
-    <div className={`w-72 ${theme.colors.background}/80 border-r ${theme.colors.border} flex flex-col`}>
+    <div
+      className={`w-72 ${theme.colors.background}/80 border-r ${theme.colors.border} flex flex-col`}
+    >
       {/* Header */}
       <div className={`p-3 border-b ${theme.colors.border} space-y-2`}>
         <div className="flex items-center justify-between">
@@ -75,19 +79,21 @@ export function EmotionHistoryPanel() {
         <div className="flex items-center gap-2">
           <button
             onClick={toggleViewMode}
-            className={`flex-1 px-2 py-1 rounded text-xs transition ${viewMode === "list"
-              ? "bg-cyan-600 text-white"
-              : "bg-gray-700 text-gray-300 hover:bg-gray-600"
-              }`}
+            className={`flex-1 px-2 py-1 rounded text-xs transition ${
+              viewMode === "list"
+                ? "bg-cyan-600 text-white"
+                : "bg-gray-700 text-gray-300 hover:bg-gray-600"
+            }`}
           >
             📋 List
           </button>
           <button
             onClick={toggleViewMode}
-            className={`flex-1 px-2 py-1 rounded text-xs transition ${viewMode === "timeline"
-              ? "bg-cyan-600 text-white"
-              : "bg-gray-700 text-gray-300 hover:bg-gray-600"
-              }`}
+            className={`flex-1 px-2 py-1 rounded text-xs transition ${
+              viewMode === "timeline"
+                ? "bg-cyan-600 text-white"
+                : "bg-gray-700 text-gray-300 hover:bg-gray-600"
+            }`}
           >
             📊 Timeline
           </button>

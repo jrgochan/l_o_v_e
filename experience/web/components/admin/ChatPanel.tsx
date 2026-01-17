@@ -491,10 +491,7 @@ export function ChatPanel({ sessionId }: ChatPanelProps) {
   return (
     <>
       {/* FAB - Show ONLY when collapsed AND in Zen/Cinema mode */}
-      {!isExpanded && viewMode !== "default" && (
-        <ChatToggleFAB onClick={handleToggleExpand} />
-      )}
-
+      {!isExpanded && viewMode !== "default" && <ChatToggleFAB onClick={handleToggleExpand} />}
 
       {/* Collapsed Bar - Show ONLY when collapsed AND in Default mode */}
       {!isExpanded && viewMode === "default" && (
@@ -511,15 +508,19 @@ export function ChatPanel({ sessionId }: ChatPanelProps) {
           `}
         >
           <div className="flex items-center gap-3">
-            <div className={`
+            <div
+              className={`
               w-2 h-2 rounded-full 
               ${isConnected ? "bg-green-500 animate-pulse" : "bg-red-500"}
               shadow-[0_0_8px_current]
-            `} />
+            `}
+            />
             <span className={`text-sm font-medium ${theme.colors.text.primary}`}>
               Emotional Intelligence
             </span>
-            <span className={`text-xs ${theme.colors.text.muted} px-2 py-0.5 rounded-full bg-white/5`}>
+            <span
+              className={`text-xs ${theme.colors.text.muted} px-2 py-0.5 rounded-full bg-white/5`}
+            >
               {isConnected ? "Connected" : "Disconnected"}
             </span>
           </div>
@@ -529,7 +530,12 @@ export function ChatPanel({ sessionId }: ChatPanelProps) {
             <div className="flex items-center gap-2 text-cyan-400 group-hover:translate-y-[-2px] transition-transform">
               <span className="text-sm font-medium">Open Chat</span>
               <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 15l7-7 7 7" />
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M5 15l7-7 7 7"
+                />
               </svg>
             </div>
           </div>
@@ -540,15 +546,17 @@ export function ChatPanel({ sessionId }: ChatPanelProps) {
       {isExpanded && (
         <div
           data-testid="chat-panel-container"
-          className={`fixed ${isFullscreen ? "inset-0 z-50" : "bottom-0 left-0 right-0 z-40"
-            } ${theme.colors.background} ${theme.effects.backdropBlur} border-t-2 ${theme.colors.border.replace('border-', 'border-t-')} shadow-[0_-4px_20px_rgba(6,182,212,0.3)] flex flex-col transition-all duration-300`}
+          className={`fixed ${
+            isFullscreen ? "inset-0 z-50" : "bottom-0 left-0 right-0 z-40"
+          } ${theme.colors.background} ${theme.effects.backdropBlur} border-t-2 ${theme.colors.border.replace("border-", "border-t-")} shadow-[0_-4px_20px_rgba(6,182,212,0.3)] flex flex-col transition-all duration-300`}
           style={{ height: isFullscreen ? "100vh" : `${height}px` }}
         >
           {/* Resize Handle */}
           <div
             onMouseDown={handleMouseDown}
-            className={`w-full h-2 cursor-row-resize hover:bg-cyan-500/30 transition flex items-center justify-center ${isResizing ? "bg-cyan-500/50" : ""
-              }`}
+            className={`w-full h-2 cursor-row-resize hover:bg-cyan-500/30 transition flex items-center justify-center ${
+              isResizing ? "bg-cyan-500/50" : ""
+            }`}
           >
             <div className="w-12 h-1 bg-gray-600 rounded-full" />
           </div>
@@ -589,12 +597,13 @@ export function ChatPanel({ sessionId }: ChatPanelProps) {
 
             {/* Right: Analysis Panel */}
             <div
-              className={`flex-shrink-0 transition-all duration-300 ease-in-out ${analysisExpandState === "normal"
-                ? "w-96"
-                : analysisExpandState === "expanded"
-                  ? "w-[calc(100%-18rem)]" // approximate width calc
-                  : "w-full"
-                }`}
+              className={`flex-shrink-0 transition-all duration-300 ease-in-out ${
+                analysisExpandState === "normal"
+                  ? "w-96"
+                  : analysisExpandState === "expanded"
+                    ? "w-[calc(100%-18rem)]" // approximate width calc
+                    : "w-full"
+              }`}
             >
               <AnalysisPanel
                 transcription={currentAnalysis.transcription}
@@ -631,4 +640,3 @@ export function ChatPanel({ sessionId }: ChatPanelProps) {
     </>
   );
 }
-

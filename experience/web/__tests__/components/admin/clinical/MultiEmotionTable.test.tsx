@@ -45,6 +45,16 @@ describe("MultiEmotionTable", () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
+
+    // Suppress "Not implemented: navigation" error
+    const originalConsoleError = console.error;
+    console.error = (...args) => {
+      const msg = args[0]?.toString() || "";
+      if (msg.includes("Not implemented: navigation")) {
+        return;
+      }
+      originalConsoleError(...args);
+    };
   });
 
   it("renders empty state", () => {

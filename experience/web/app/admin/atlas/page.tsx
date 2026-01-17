@@ -264,6 +264,9 @@ const AtlasAdminContent = () => {
     // console.log("[DEBUG] ViewMode Changed:", viewMode);
   }, [viewMode, isHeaderVisible, areSidebarsVisible]);
 
+  // Theme
+  const theme = useAdminTheme();
+
   if (error) {
     return (
       <div className="flex items-center justify-center min-h-screen bg-gray-900 text-white">
@@ -279,20 +282,21 @@ const AtlasAdminContent = () => {
     );
   }
 
-  // Theme
-  const theme = useAdminTheme();
-
   return (
     <div className="relative w-screen h-screen bg-gray-950 overflow-hidden">
       {/* Header - Hidden in Zen Mode or Intro */}
       <header
         className={`absolute top-0 left-0 right-0 z-30 transition-all duration-500 border-b ${theme.colors.background} ${theme.effects.backdropBlur} ${theme.colors.border} ${!isHeaderVisible ? "-translate-y-full" : "translate-y-0"}`}
-        style={{ fontFamily: theme.typography.fontFamily === "font-mono" ? "monospace" : undefined }}
+        style={{
+          fontFamily: theme.typography.fontFamily === "font-mono" ? "monospace" : undefined,
+        }}
       >
         <div className="flex items-center justify-between px-6 py-4">
           <div>
             <h1 className={`text-2xl font-bold ${theme.colors.text.primary}`}>Soul Sphere Atlas</h1>
-            <p className={`text-sm ${theme.colors.text.secondary}`}>Admin Interface - 87 Emotions Visualization</p>
+            <p className={`text-sm ${theme.colors.text.secondary}`}>
+              Admin Interface - 87 Emotions Visualization
+            </p>
           </div>
 
           {/* Center: Aggregate VAC Display */}
@@ -306,10 +310,11 @@ const AtlasAdminContent = () => {
                 toggleMute();
                 playClickSound();
               }}
-              className={`px-3 py-2 ${theme.layout.borderRadius} transition-all duration-300 flex items-center gap-2 text-sm border ${isMuted
-                ? `bg-red-900/50 border-red-800 text-red-200 hover:bg-red-800/50`
-                : `${theme.colors.background} ${theme.colors.border} ${theme.colors.text.secondary} hover:${theme.colors.text.primary}`
-                }`}
+              className={`px-3 py-2 ${theme.layout.borderRadius} transition-all duration-300 flex items-center gap-2 text-sm border ${
+                isMuted
+                  ? `bg-red-900/50 border-red-800 text-red-200 hover:bg-red-800/50`
+                  : `${theme.colors.background} ${theme.colors.border} ${theme.colors.text.secondary} hover:${theme.colors.text.primary}`
+              }`}
               title={isMuted ? "Unmute Audio" : "Mute Audio"}
             >
               {isMuted ? "🔇" : "🔊"}
@@ -356,7 +361,9 @@ const AtlasAdminContent = () => {
       >
         {/* Left Control Panel */}
         {areSidebarsVisible && (
-          <aside className={`w-80 flex-shrink-0 border-r overflow-y-auto transition-colors duration-500 ${theme.colors.background} ${theme.effects.backdropBlur} ${theme.colors.border}`}>
+          <aside
+            className={`w-80 flex-shrink-0 border-r overflow-y-auto transition-colors duration-500 ${theme.colors.background} ${theme.effects.backdropBlur} ${theme.colors.border}`}
+          >
             <ControlPanel />
           </aside>
         )}
@@ -385,7 +392,15 @@ const AtlasAdminContent = () => {
                 <VACAnimator />
 
                 {/* Background */}
-                <Stars radius={100} depth={50} count={5000} factor={4} saturation={0} fade speed={1} />
+                <Stars
+                  radius={100}
+                  depth={50}
+                  count={5000}
+                  factor={4}
+                  saturation={0}
+                  fade
+                  speed={1}
+                />
 
                 {/* Main Content */}
                 <AtlasScene />
@@ -429,8 +444,9 @@ const AtlasAdminContent = () => {
           <div
             data-testid="resize-handle"
             onMouseDown={handleMouseDown}
-            className={`w-2 flex-shrink-0 cursor-col-resize transition flex items-center justify-center hover:bg-cyan-500/50 ${isResizing ? "bg-cyan-500" : "bg-transparent"
-              }`}
+            className={`w-2 flex-shrink-0 cursor-col-resize transition flex items-center justify-center hover:bg-cyan-500/50 ${
+              isResizing ? "bg-cyan-500" : "bg-transparent"
+            }`}
             style={{ touchAction: "none" }}
           >
             <div className={`w-px h-8 ${theme.colors.border} bg-current opacity-50`} />

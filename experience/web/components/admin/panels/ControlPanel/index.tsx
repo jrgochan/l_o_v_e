@@ -86,22 +86,26 @@ export function ControlPanel() {
     >
       {/* Tab Navigation */}
       <div className={`flex-shrink-0 p-3 border-b ${theme.colors.border} bg-black/20`}>
-        <div className={`flex gap-1 p-1 ${theme.layout.borderRadius} border ${theme.colors.border} bg-black/20`}>
+        <div
+          className={`flex gap-1 p-1 ${theme.layout.borderRadius} border ${theme.colors.border} bg-black/20`}
+        >
           <button
             onClick={() => setActiveTab("explore")}
-            className={`flex-1 px-4 py-2 text-sm font-medium transition-all ${theme.layout.borderRadius} ${activeTab === "explore"
-              ? `${theme.colors.primary} ${theme.effects.glass} shadow-sm`
-              : `${theme.colors.text.secondary} hover:${theme.colors.text.primary} hover:bg-white/5`
-              }`}
+            className={`flex-1 px-4 py-2 text-sm font-medium transition-all ${theme.layout.borderRadius} ${
+              activeTab === "explore"
+                ? `${theme.colors.primary} ${theme.effects.glass} shadow-sm`
+                : `${theme.colors.text.secondary} hover:${theme.colors.text.primary} hover:bg-white/5`
+            }`}
           >
             <span className={theme.typography.tracking}>EXPLORE</span>
           </button>
           <button
             onClick={() => setActiveTab("view")}
-            className={`flex-1 px-4 py-2 text-sm font-medium transition-all ${theme.layout.borderRadius} ${activeTab === "view"
-              ? `${theme.colors.primary} ${theme.effects.glass} shadow-sm`
-              : `${theme.colors.text.secondary} hover:${theme.colors.text.primary} hover:bg-white/5`
-              }`}
+            className={`flex-1 px-4 py-2 text-sm font-medium transition-all ${theme.layout.borderRadius} ${
+              activeTab === "view"
+                ? `${theme.colors.primary} ${theme.effects.glass} shadow-sm`
+                : `${theme.colors.text.secondary} hover:${theme.colors.text.primary} hover:bg-white/5`
+            }`}
           >
             <span className={theme.typography.tracking}>VIEW</span>
           </button>
@@ -152,7 +156,9 @@ export function ControlPanel() {
             {/* Animation Mode Selector */}
             <AnimationModeSelector
               currentMode={settings.pathAnimationMode}
-              onModeChange={(mode) => useSettingsStore.getState().updateVisualSetting("pathAnimationMode", mode)}
+              onModeChange={(mode) =>
+                useSettingsStore.getState().updateVisualSetting("pathAnimationMode", mode)
+              }
             />
 
             {/* Layer Controls */}

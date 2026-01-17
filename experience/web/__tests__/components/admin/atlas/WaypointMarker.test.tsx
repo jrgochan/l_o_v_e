@@ -12,8 +12,8 @@ jest.mock("@/stores/useAtlasAdminStore", () => ({
 // Mock R3F elements since JSDOM doesn't support them natively with all props
 // We want to verify props passed to meshStandardMaterial
 jest.mock("@react-three/fiber", () => ({
-  ...jest.requireActual("@react-three/fiber"),
   useFrame: jest.fn(),
+  extend: jest.fn(),
 }));
 
 describe("WaypointMarker", () => {

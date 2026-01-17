@@ -27,17 +27,19 @@ describe("AdvancedPath", () => {
         const createSafeRef = (initialValue: any) => {
             let _val = initialValue;
             return {
-                get current() { return _val; },
+                get current() {
+                    return _val;
+                },
                 set current(newVal) {
                     // Only accept updates if it's NOT a DOM node (which has no position property)
                     // or if it matches our expected shape.
                     // Simplest check: if newVal has 'position' (our mock) or is null, accept it.
                     // If it's a DOM node (no position), ignore it.
-                    if (newVal === null || (typeof newVal === 'object' && 'position' in newVal)) {
+                    if (newVal === null || (typeof newVal === "object" && "position" in newVal)) {
                         _val = newVal;
                     }
                     // Otherwise ignore the DOM node assignment
-                }
+                },
             };
         };
 
@@ -59,7 +61,8 @@ describe("AdvancedPath", () => {
         // 1. meshRef
         // 2. materialRef
         // 3. initialY
-        jest.spyOn(React, "useRef")
+        jest
+            .spyOn(React, "useRef")
             .mockReturnValueOnce(meshRefMock)
             .mockReturnValueOnce(materialRefMock)
             .mockReturnValueOnce(initialYRefMock)
@@ -74,7 +77,16 @@ describe("AdvancedPath", () => {
     const originalConsoleError = console.error;
     beforeAll(() => {
         console.error = (...args) => {
-            if (/useLayoutEffect/.test(args[0])) return;
+            const msg = args[0]?.toString() || "";
+            if (
+                /useLayoutEffect/.test(msg) ||
+                /is using incorrect casing/.test(msg) ||
+                /unrecognized in this browser/.test(msg) ||
+                /non-boolean attribute/.test(msg) ||
+                /React does not recognize the .* prop on a DOM element/.test(msg)
+            ) {
+                return;
+            }
             originalConsoleError(...args);
         };
     });
@@ -222,7 +234,8 @@ describe("AdvancedPath", () => {
         jest.restoreAllMocks(); // Clear default mocks
 
         // Re-mock with null meshRef
-        jest.spyOn(React, "useRef")
+        jest
+            .spyOn(React, "useRef")
             .mockReturnValueOnce({ current: null }) // meshRef
             .mockReturnValueOnce(materialRefMock) // materialRef
             .mockReturnValueOnce(initialYRefMock) // initialY

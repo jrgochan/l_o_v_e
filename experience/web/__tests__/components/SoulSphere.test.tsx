@@ -63,7 +63,9 @@ describe("SoulSphere", () => {
     mockGetState.mockReturnValue({
       currentVAC: [0, 0, 0],
     });
-    mockUseSettingsStore.mockImplementation((selector: any) => selector({ pathAnimationMode: "subtle" }));
+    mockUseSettingsStore.mockImplementation((selector: any) =>
+      selector({ pathAnimationMode: "subtle" })
+    );
   });
 
   afterEach(() => {
@@ -80,7 +82,9 @@ describe("SoulSphere", () => {
     ["glitch", 6],
     ["invalid_mode", 0], // Hits default
   ])("should update uniform for mode %s (index %d)", (mode, index) => {
-    mockUseSettingsStore.mockImplementation((selector: any) => selector({ pathAnimationMode: mode }));
+    mockUseSettingsStore.mockImplementation((selector: any) =>
+      selector({ pathAnimationMode: mode })
+    );
     const { container } = render(<SoulSphere />);
 
     const shaderMaterial = container.querySelector("shaderMaterial");
@@ -93,7 +97,7 @@ describe("SoulSphere", () => {
       uValence: { value: 0 },
       uArousal: { value: 0 },
       uConnection: { value: 0 },
-      uCameraPosition: { value: { copy: jest.fn() } }
+      uCameraPosition: { value: { copy: jest.fn() } },
     };
     (shaderMaterial as any).uniforms = mockUniforms;
 
@@ -115,7 +119,9 @@ describe("SoulSphere", () => {
 
   it("should update mode uniform when ref exists in frame loop", () => {
     // This targets lines 270-272 specifically
-    mockUseSettingsStore.mockImplementation((selector: any) => selector({ pathAnimationMode: "dynamic" }));
+    mockUseSettingsStore.mockImplementation((selector: any) =>
+      selector({ pathAnimationMode: "dynamic" })
+    );
     const { container } = render(<SoulSphere />);
 
     const shaderMaterial = container.querySelector("shaderMaterial");

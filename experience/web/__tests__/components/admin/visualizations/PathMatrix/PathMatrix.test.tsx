@@ -15,6 +15,20 @@ global.fetch = jest.fn();
 global.URL.createObjectURL = jest.fn();
 global.URL.revokeObjectURL = jest.fn();
 
+// Suppress "Not implemented: navigation" error from JSDOM (triggered by CSV download link click)
+const originalConsoleError = console.error;
+beforeAll(() => {
+  console.error = (...args) => {
+    if (args[0] && args[0].toString().includes("Not implemented: navigation")) {
+      return;
+    }
+    originalConsoleError(...args);
+  };
+});
+afterAll(() => {
+  console.error = originalConsoleError;
+});
+
 const MOCK_EMOTIONS: AtlasEmotion[] = [
   {
     id: "1",

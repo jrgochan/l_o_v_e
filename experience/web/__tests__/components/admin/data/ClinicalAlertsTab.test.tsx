@@ -40,10 +40,19 @@ describe("ClinicalAlertsTab", () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
+
+    // Suppress "Failed to load alerts" error logs
+    const originalConsoleError = console.error;
+    console.error = (...args) => {
+      if (args[0] && args[0].includes("Failed to load alerts")) {
+        return;
+      }
+      originalConsoleError(...args);
+    };
   });
 
   it("renders loading state", async () => {
-    (adminApi.getClinicalAlerts as jest.Mock).mockReturnValue(new Promise(() => {}));
+    (adminApi.getClinicalAlerts as jest.Mock).mockReturnValue(new Promise(() => { }));
     render(<ClinicalAlertsTab />);
     expect(screen.getByText("Loading alerts...")).toBeInTheDocument();
   });

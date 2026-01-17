@@ -43,7 +43,10 @@ export function getEmotionAnimationParams(
 
   // Base parameters modified by mode
   // Using explicit type declaration to enforce consistency with PathAnimationMode
-  const modeMultipliers: Record<string, { breathingMult: number; speedMult: number; amplitudeMult: number }> = {
+  const modeMultipliers: Record<
+    string,
+    { breathingMult: number; speedMult: number; amplitudeMult: number }
+  > = {
     subtle: { breathingMult: 1.0, speedMult: 0.5, amplitudeMult: 0.7 },
     dynamic: { breathingMult: 0.5, speedMult: 1.5, amplitudeMult: 1.3 },
     mystical: { breathingMult: 0.7, speedMult: 1.0, amplitudeMult: 1.0 },

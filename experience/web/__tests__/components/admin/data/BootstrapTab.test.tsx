@@ -31,10 +31,24 @@ describe("BootstrapTab", () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
+
+    // Suppress expected error logs from failure tests
+    const originalConsoleError = console.error;
+    console.error = (...args) => {
+      const msg = args[0]?.toString() || "";
+      if (
+        msg.includes("Failed to load bootstrap data") ||
+        msg.includes("Failed to save item") ||
+        msg.includes("Failed to delete item")
+      ) {
+        return;
+      }
+      originalConsoleError(...args);
+    };
   });
 
   it("renders loading state", async () => {
-    (adminApi.getBootstrapData as jest.Mock).mockReturnValue(new Promise(() => {}));
+    (adminApi.getBootstrapData as jest.Mock).mockReturnValue(new Promise(() => { }));
     const { container } = render(<BootstrapTab />);
     expect(container.querySelector(".animate-spin")).toBeInTheDocument();
   });

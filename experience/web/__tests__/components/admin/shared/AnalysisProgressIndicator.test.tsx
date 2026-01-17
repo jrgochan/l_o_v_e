@@ -1,7 +1,5 @@
 import { render, screen, act } from "@testing-library/react";
-import {
-  AnalysisProgressIndicator,
-} from "@/components/admin/shared/AnalysisProgressIndicator";
+import { AnalysisProgressIndicator } from "@/components/admin/shared/AnalysisProgressIndicator";
 import type { ProgressStage } from "@/types/chat";
 
 const mockStages: ProgressStage[] = [
@@ -23,7 +21,9 @@ describe("AnalysisProgressIndicator", () => {
   });
 
   afterEach(() => {
-    jest.runOnlyPendingTimers();
+    act(() => {
+      jest.runOnlyPendingTimers();
+    });
     jest.useRealTimers();
   });
 

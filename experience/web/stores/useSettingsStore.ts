@@ -539,20 +539,20 @@ export const useSettingsStore = create<SettingsState>()(
           const newEndpoints =
             mode === "local"
               ? {
-                observer: "http://localhost:8000",
-                listener: "http://localhost:8002",
-                versor: "http://localhost:8001",
-              }
+                  observer: "http://localhost:8000",
+                  listener: "http://localhost:8002",
+                  versor: "http://localhost:8001",
+                }
               : {
-                observer:
-                  process.env.NEXT_PUBLIC_OBSERVER_URL ||
-                  "https://api.love-platform.com/observer",
-                listener:
-                  process.env.NEXT_PUBLIC_LISTENER_URL ||
-                  "https://api.love-platform.com/listener",
-                versor:
-                  process.env.NEXT_PUBLIC_VERSOR_URL || "https://api.love-platform.com/versor",
-              };
+                  observer:
+                    process.env.NEXT_PUBLIC_OBSERVER_URL ||
+                    "https://api.love-platform.com/observer",
+                  listener:
+                    process.env.NEXT_PUBLIC_LISTENER_URL ||
+                    "https://api.love-platform.com/listener",
+                  versor:
+                    process.env.NEXT_PUBLIC_VERSOR_URL || "https://api.love-platform.com/versor",
+                };
 
           return {
             network: {

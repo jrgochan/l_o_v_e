@@ -6,49 +6,49 @@ import { useAdminTheme } from "@/hooks/admin/useAdminTheme";
 jest.mock("@/hooks/admin/useAdminTheme");
 
 describe("ChatToggleFAB", () => {
-    const mockTheme = {
-        colors: {
-            primary: "bg-cyan-500",
-            border: "border-cyan-200",
-        },
-        effects: {
-            glass: "backdrop-blur-md",
-        },
-    };
+  const mockTheme = {
+    colors: {
+      primary: "bg-cyan-500",
+      border: "border-cyan-200",
+    },
+    effects: {
+      glass: "backdrop-blur-md",
+    },
+  };
 
-    beforeEach(() => {
-        (useAdminTheme as jest.Mock).mockReturnValue(mockTheme);
-    });
+  beforeEach(() => {
+    (useAdminTheme as jest.Mock).mockReturnValue(mockTheme);
+  });
 
-    it("renders with correct theme classes", () => {
-        render(<ChatToggleFAB onClick={jest.fn()} />);
+  it("renders with correct theme classes", () => {
+    render(<ChatToggleFAB onClick={jest.fn()} />);
 
-        const button = screen.getByRole("button", { name: /open emotional chat/i });
-        expect(button).toHaveClass("bg-cyan-500");
-        expect(button).toHaveClass("backdrop-blur-md");
-    });
+    const button = screen.getByRole("button", { name: /open emotional chat/i });
+    expect(button).toHaveClass("bg-cyan-500");
+    expect(button).toHaveClass("backdrop-blur-md");
+  });
 
-    it("calls onClick handler when clicked", () => {
-        const handleClick = jest.fn();
-        render(<ChatToggleFAB onClick={handleClick} />);
+  it("calls onClick handler when clicked", () => {
+    const handleClick = jest.fn();
+    render(<ChatToggleFAB onClick={handleClick} />);
 
-        fireEvent.click(screen.getByRole("button"));
-        expect(handleClick).toHaveBeenCalledTimes(1);
-    });
+    fireEvent.click(screen.getByRole("button"));
+    expect(handleClick).toHaveBeenCalledTimes(1);
+  });
 
-    it("shows unread badge when isUnread is true", () => {
-        const { container } = render(<ChatToggleFAB onClick={jest.fn()} isUnread={true} />);
+  it("shows unread badge when isUnread is true", () => {
+    const { container } = render(<ChatToggleFAB onClick={jest.fn()} isUnread={true} />);
 
-        // The badge is an empty span with bg-red-500
-        // We can query by class or assume structure
-        const badge = container.querySelector(".bg-red-500");
-        expect(badge).toBeInTheDocument();
-    });
+    // The badge is an empty span with bg-red-500
+    // We can query by class or assume structure
+    const badge = container.querySelector(".bg-red-500");
+    expect(badge).toBeInTheDocument();
+  });
 
-    it("hides unread badge when isUnread is false", () => {
-        const { container } = render(<ChatToggleFAB onClick={jest.fn()} isUnread={false} />);
+  it("hides unread badge when isUnread is false", () => {
+    const { container } = render(<ChatToggleFAB onClick={jest.fn()} isUnread={false} />);
 
-        const badge = container.querySelector(".bg-red-500");
-        expect(badge).not.toBeInTheDocument();
-    });
+    const badge = container.querySelector(".bg-red-500");
+    expect(badge).not.toBeInTheDocument();
+  });
 });

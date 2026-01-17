@@ -91,12 +91,13 @@ export function getLabelStyle(
     case "subtle":
       // Clean, professional labels
       return {
-        containerClass: `px-3 py-1.5 rounded-lg ${isHovered
+        containerClass: `px-3 py-1.5 rounded-lg ${
+          isHovered
             ? "bg-gray-800/95 border-2 border-cyan-400"
             : isSelected
               ? "bg-gray-900/90 border-2"
               : "bg-gray-800/85 border border-gray-700"
-          }`,
+        }`,
         containerStyle: {
           borderColor: isSelected && !isHovered ? categoryColor : undefined,
           boxShadow: isSelected ? "0 4px 12px rgba(0,0,0,0.3)" : "0 2px 6px rgba(0,0,0,0.2)",
@@ -111,12 +112,13 @@ export function getLabelStyle(
     case "dynamic":
       // Vibrant, energetic labels
       return {
-        containerClass: `px-4 py-2 rounded-xl font-semibold ${isHovered
+        containerClass: `px-4 py-2 rounded-xl font-semibold ${
+          isHovered
             ? "bg-cyan-500 border-2 border-cyan-300"
             : isSelected
               ? "bg-gray-900/95 border-2"
               : "bg-gray-800/90 border-2 border-gray-600"
-          }`,
+        }`,
         containerStyle: {
           borderColor: isSelected && !isHovered ? categoryColor : undefined,
           boxShadow: isHovered
@@ -135,12 +137,13 @@ export function getLabelStyle(
     case "mystical":
       // Ethereal, cosmic labels
       return {
-        containerClass: `px-4 py-2 rounded-2xl ${isHovered
+        containerClass: `px-4 py-2 rounded-2xl ${
+          isHovered
             ? "bg-purple-900/40 border border-purple-300/50 backdrop-blur-md"
             : isSelected
               ? "bg-purple-950/30 border border-purple-400/40 backdrop-blur-md"
               : "bg-gray-900/20 border border-purple-500/20 backdrop-blur-sm"
-          }`,
+        }`,
         containerStyle: {
           boxShadow: isHovered
             ? `0 0 24px ${categoryColor}40, 0 0 12px rgba(138,43,226,0.3), 0 8px 20px rgba(0,0,0,0.3)`
@@ -158,12 +161,13 @@ export function getLabelStyle(
     case "crystalline":
       // Sharp, angular, high contrast
       return {
-        containerClass: `px-3 py-1 rounded-none skew-x-[-10deg] ${isHovered
+        containerClass: `px-3 py-1 rounded-none skew-x-[-10deg] ${
+          isHovered
             ? "bg-white/10 border border-white/60 backdrop-blur-xl"
             : isSelected
               ? "bg-white/5 border border-white/40"
               : "bg-black/40 border border-white/20"
-          }`,
+        }`,
         containerStyle: {
           borderColor: categoryColor,
         },
@@ -177,12 +181,13 @@ export function getLabelStyle(
     case "luminous":
       // Glowing, energetic
       return {
-        containerClass: `px-5 py-2 rounded-full ${isHovered
+        containerClass: `px-5 py-2 rounded-full ${
+          isHovered
             ? "bg-white/20 border-2 border-white/80"
             : isSelected
               ? "bg-white/10 border border-white/60"
               : "bg-black/20 border border-white/30"
-          }`,
+        }`,
         containerStyle: {
           boxShadow: `0 0 15px ${categoryColor}`,
           borderColor: categoryColor,
@@ -197,12 +202,13 @@ export function getLabelStyle(
     case "liquid":
       // Soft, rounded, fluid
       return {
-        containerClass: `px-4 py-2 rounded-[20px] ${isHovered
+        containerClass: `px-4 py-2 rounded-[20px] ${
+          isHovered
             ? "bg-blue-900/40 border-2 border-blue-300/50 backdrop-blur-md"
             : isSelected
               ? "bg-blue-950/30 border border-blue-400/30"
               : "bg-blue-900/10 border border-blue-500/10"
-          }`,
+        }`,
         containerStyle: {
           boxShadow: isHovered ? `0 4px 20px ${categoryColor}40` : "none",
         },
@@ -216,8 +222,9 @@ export function getLabelStyle(
     case "glitch":
       // Raw, matrix-like
       return {
-        containerClass: `px-2 py-0 border-l-4 ${isHovered ? "bg-black/90 border-green-500" : "bg-black/70 border-green-700"
-          }`,
+        containerClass: `px-2 py-0 border-l-4 ${
+          isHovered ? "bg-black/90 border-green-500" : "bg-black/70 border-green-700"
+        }`,
         containerStyle: {
           borderColor: categoryColor,
         },
@@ -231,12 +238,13 @@ export function getLabelStyle(
     default:
       // Fallback to subtle
       return {
-        containerClass: `px-3 py-1.5 rounded-lg ${isHovered
+        containerClass: `px-3 py-1.5 rounded-lg ${
+          isHovered
             ? "bg-gray-800/95 border-2 border-cyan-400"
             : isSelected
               ? "bg-gray-900/90 border-2"
               : "bg-gray-800/85 border border-gray-700"
-          }`,
+        }`,
         containerStyle: {
           borderColor: isSelected && !isHovered ? categoryColor : undefined,
           boxShadow: isSelected ? "0 4px 12px rgba(0,0,0,0.3)" : "0 2px 6px rgba(0,0,0,0.2)",

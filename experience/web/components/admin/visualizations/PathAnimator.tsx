@@ -125,10 +125,15 @@ export function PathAnimationControls({
   const theme = useAdminTheme();
 
   return (
-    <div className={`${theme.colors.background} rounded-lg p-4 space-y-3 border ${theme.colors.border}`}>
+    <div
+      className={`${theme.colors.background} rounded-lg p-4 space-y-3 border ${theme.colors.border}`}
+    >
       <div className="flex items-center justify-between">
         <h3 className={`text-sm font-semibold ${theme.colors.secondary}`}>Path Animation</h3>
-        <button onClick={onReset} className={`text-xs ${theme.colors.text.secondary} hover:${theme.colors.text.primary}`}>
+        <button
+          onClick={onReset}
+          className={`text-xs ${theme.colors.text.secondary} hover:${theme.colors.text.primary}`}
+        >
           Reset
         </button>
       </div>
@@ -147,7 +152,7 @@ export function PathAnimationControls({
         </div>
         <div className="w-full bg-gray-700/50 rounded-full h-2">
           <div
-            className={`h-2 rounded-full transition-all ${isPlaying ? 'bg-cyan-500' : 'bg-gray-500'}`}
+            className={`h-2 rounded-full transition-all ${isPlaying ? "bg-cyan-500" : "bg-gray-500"}`}
             style={{ width: `${progress * 100}%` }}
           />
         </div>
@@ -157,7 +162,7 @@ export function PathAnimationControls({
       <div className="flex items-center gap-2">
         <button
           onClick={onPlayPause}
-          className={`flex-1 px-3 py-2 ${isPlaying ? 'bg-cyan-600 hover:bg-cyan-500' : 'bg-green-600 hover:bg-green-500'} text-white text-sm rounded transition`}
+          className={`flex-1 px-3 py-2 ${isPlaying ? "bg-cyan-600 hover:bg-cyan-500" : "bg-green-600 hover:bg-green-500"} text-white text-sm rounded transition`}
         >
           {isPlaying ? "⏸️ Pause" : "▶️ Play"}
         </button>

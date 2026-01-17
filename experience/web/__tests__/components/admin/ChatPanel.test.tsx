@@ -848,7 +848,7 @@ describe("ChatPanel", () => {
     // Disconnected
     (useWebSocketChat as jest.Mock).mockReturnValue({
       ...defaultWebSocketState,
-      isConnected: false
+      isConnected: false,
     });
 
     const { rerender } = render(<ChatPanel sessionId="sess1" />);
@@ -858,7 +858,7 @@ describe("ChatPanel", () => {
     // Connected
     (useWebSocketChat as jest.Mock).mockReturnValue({
       ...defaultWebSocketState,
-      isConnected: true
+      isConnected: true,
     });
 
     // Force re-render with new mock

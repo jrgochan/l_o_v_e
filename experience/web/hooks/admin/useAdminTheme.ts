@@ -9,6 +9,6 @@ import { useSettingsStore } from "@/stores/useSettingsStore";
 import { getAdminTheme, AdminUITheme } from "@/utils/adminThemeConfigs";
 
 export function useAdminTheme(): AdminUITheme {
-    const mode = useSettingsStore((state) => state.pathAnimationMode);
-    return getAdminTheme(mode);
+  const mode = useSettingsStore((state) => state.pathAnimationMode);
+  return getAdminTheme(mode);
 }

@@ -35,7 +35,9 @@ export function ChatHeader({
 }: ChatHeaderProps) {
   const theme = useAdminTheme();
   return (
-    <div className={`flex items-center justify-between px-6 py-3 border-b ${theme.colors.border} ${theme.colors.background}`}>
+    <div
+      className={`flex items-center justify-between px-6 py-3 border-b ${theme.colors.border} ${theme.colors.background}`}
+    >
       <div className="flex items-center gap-4">
         {/* Expand/Collapse Button */}
         <button
@@ -46,7 +48,9 @@ export function ChatHeader({
           {isExpanded ? "▼" : "▲"}
         </button>
 
-        <h3 className={`text-lg font-semibold ${theme.colors.text.primary} flex items-center gap-2`}>
+        <h3
+          className={`text-lg font-semibold ${theme.colors.text.primary} flex items-center gap-2`}
+        >
           💬 Emotional Chat
         </h3>
 

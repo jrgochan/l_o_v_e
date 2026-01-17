@@ -1,4 +1,4 @@
-import { render, screen, fireEvent } from "@testing-library/react";
+import { render, screen, fireEvent, act } from "@testing-library/react";
 import { Toggle, ToggleGroup } from "@/components/ui/Toggle";
 
 describe("Toggle", () => {
@@ -40,7 +40,9 @@ describe("Toggle", () => {
     render(<Toggle {...defaultProps} />);
 
     const switchEl = screen.getByRole("switch");
-    switchEl.focus();
+    act(() => {
+      switchEl.focus();
+    });
     fireEvent.keyDown(switchEl, { key: "Enter" });
 
     expect(mockOnChange).toHaveBeenCalledWith(true);
@@ -50,7 +52,9 @@ describe("Toggle", () => {
     render(<Toggle {...defaultProps} />);
 
     const switchEl = screen.getByRole("switch");
-    switchEl.focus();
+    act(() => {
+      switchEl.focus();
+    });
     fireEvent.keyDown(switchEl, { key: " " });
 
     expect(mockOnChange).toHaveBeenCalledWith(true);
@@ -60,7 +64,9 @@ describe("Toggle", () => {
     render(<Toggle {...defaultProps} />);
 
     const switchEl = screen.getByRole("switch");
-    switchEl.focus();
+    act(() => {
+      switchEl.focus();
+    });
     fireEvent.keyDown(switchEl, { key: "ArrowRight" });
 
     expect(mockOnChange).not.toHaveBeenCalled();
@@ -88,10 +94,14 @@ describe("Toggle", () => {
     render(<Toggle {...defaultProps} />);
     const switchEl = screen.getByRole("switch");
 
-    fireEvent.focus(switchEl);
+    act(() => {
+      fireEvent.focus(switchEl);
+    });
     expect(switchEl).toHaveClass("ring-2");
 
-    fireEvent.blur(switchEl);
+    act(() => {
+      fireEvent.blur(switchEl);
+    });
     expect(switchEl).not.toHaveClass("ring-2");
   });
 

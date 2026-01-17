@@ -54,7 +54,7 @@ describe("DebugBroadcaster", () => {
       writable: true,
     });
 
-    const consoleSpy = jest.spyOn(console, "error").mockImplementation(() => { });
+    const consoleSpy = jest.spyOn(console, "error").mockImplementation(() => {});
 
     try {
       render(<DebugBroadcaster />);
@@ -176,7 +176,7 @@ describe("DebugBroadcaster", () => {
       writable: true,
     });
 
-    const consoleSpy = jest.spyOn(console, "error").mockImplementation(() => { });
+    const consoleSpy = jest.spyOn(console, "error").mockImplementation(() => {});
 
     try {
       render(<DebugBroadcaster />);

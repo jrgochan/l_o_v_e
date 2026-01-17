@@ -156,7 +156,6 @@ export function EmotionRelationshipGraph({
       .attr("dy", (d) => d.radius + 15)
       .style("pointer-events", "none")
       .style("text-shadow", "0 1px 4px rgba(0,0,0,0.8)"); // Ensure contrast on any background
-
   }, [nodes, links, width, height, onEmotionClick, createDragBehavior, theme]); // Added theme dependency
 
   return (

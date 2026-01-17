@@ -9,7 +9,7 @@ import { VACHistoryPoint } from "@/types/chat";
 // Mock d3
 // Mock d3
 jest.mock("d3", () => {
-  console.log("Setting up D3 mock"); // Debug log
+  // console.log("Setting up D3 mock"); // Debug log
 
   const selectionMock = {
     selectAll: jest.fn().mockReturnThis(),

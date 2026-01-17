@@ -41,7 +41,7 @@ class MockMediaRecorder {
   ondataavailable: Function | null = null;
   onstop: Function | null = null;
 
-  constructor(stream: any) { }
+  constructor(stream: any) {}
 }
 
 global.MediaRecorder = MockMediaRecorder as any;
@@ -326,7 +326,9 @@ describe("useMediaRecorder Advanced", () => {
     const onErrorMock = jest.fn();
 
     // Mock getUserMedia to fail
-    (global.navigator.mediaDevices.getUserMedia as jest.Mock).mockRejectedValueOnce(new Error(errorMsg));
+    (global.navigator.mediaDevices.getUserMedia as jest.Mock).mockRejectedValueOnce(
+      new Error(errorMsg)
+    );
 
     const { result } = renderHook(() =>
       useMediaRecorder({ state: mockState, actions: mockActions, onError: onErrorMock })
@@ -344,10 +346,12 @@ describe("useMediaRecorder Advanced", () => {
     const errorMsg = "Microphone access denied";
 
     // Mock getUserMedia to fail
-    (global.navigator.mediaDevices.getUserMedia as jest.Mock).mockRejectedValueOnce(new Error(errorMsg));
+    (global.navigator.mediaDevices.getUserMedia as jest.Mock).mockRejectedValueOnce(
+      new Error(errorMsg)
+    );
 
-    const { result } = renderHook(() =>
-      useMediaRecorder({ state: mockState, actions: mockActions }) // No onError
+    const { result } = renderHook(
+      () => useMediaRecorder({ state: mockState, actions: mockActions }) // No onError
     );
 
     await act(async () => {

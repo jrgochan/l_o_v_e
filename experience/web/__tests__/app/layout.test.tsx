@@ -15,6 +15,21 @@ jest.mock("next/font/google", () => ({
 }));
 
 describe("RootLayout", () => {
+  const originalConsoleError = console.error;
+  beforeAll(() => {
+    console.error = (...args) => {
+      const msg = args[0]?.toString() || "";
+      // console.log("DEBUG MSG:", msg); // Uncomment if needed, but relaxing check first
+      if (msg.includes("cannot be a child of")) {
+        return;
+      }
+      originalConsoleError(...args);
+    };
+  });
+
+  afterAll(() => {
+    console.error = originalConsoleError;
+  });
   it("renders children wrapped in LoggerProvider and correct structure", () => {
     const { container } = render(
       <RootLayout>

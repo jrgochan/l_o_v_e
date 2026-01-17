@@ -5,7 +5,7 @@ set -e
 # Orchestrates the 2-stage deployment pipeline
 
 DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-GCP_DIR="$DIR/deploy/gcp"
+GCP_DIR="$DIR/gcp"
 
 echo "=================================================="
 echo "❤️  L.O.V.E. Stack - GCP Deployment"

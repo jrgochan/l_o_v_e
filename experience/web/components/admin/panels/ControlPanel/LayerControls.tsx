@@ -72,7 +72,10 @@ export function LayerControls({
                 className={`rounded border-gray-600 bg-transparent focus:ring-1 focus:ring-offset-0 ${theme.colors.primary}`}
               />
               <div className="w-3 h-3 rounded-full" style={{ backgroundColor: filter.color }} />
-              <span className={`text-sm flex-1 truncate ${theme.colors.text.secondary}`} title={filter.name}>
+              <span
+                className={`text-sm flex-1 truncate ${theme.colors.text.secondary}`}
+                title={filter.name}
+              >
                 {filter.name}
               </span>
             </label>
@@ -84,7 +87,9 @@ export function LayerControls({
       <section>
         <h2 className={`text-sm font-semibold mb-2 ${theme.colors.text.secondary}`}>Settings</h2>
         <div className="space-y-2">
-          <label className={`flex items-center gap-2 cursor-pointer ${theme.colors.text.secondary} hover:${theme.colors.text.primary}`}>
+          <label
+            className={`flex items-center gap-2 cursor-pointer ${theme.colors.text.secondary} hover:${theme.colors.text.primary}`}
+          >
             <input
               type="checkbox"
               checked={settings.computeMode !== "manual"}
@@ -96,7 +101,9 @@ export function LayerControls({
             <span className="text-sm">Auto-compute paths</span>
           </label>
 
-          <label className={`flex items-center gap-2 cursor-pointer ${theme.colors.text.secondary} hover:${theme.colors.text.primary}`}>
+          <label
+            className={`flex items-center gap-2 cursor-pointer ${theme.colors.text.secondary} hover:${theme.colors.text.primary}`}
+          >
             <input
               type="checkbox"
               checked={settings.enableAnimations}
@@ -144,15 +151,21 @@ export function LayerControls({
         <h2 className={`text-sm font-semibold mb-2 ${theme.colors.text.secondary}`}>Shortcuts</h2>
         <div className={`text-xs space-y-1 ${theme.colors.text.muted}`}>
           <div className="flex items-center gap-2">
-            <kbd className={`px-1.5 py-0.5 rounded bg-gray-800 border ${theme.colors.border}`}>Esc</kbd>
+            <kbd className={`px-1.5 py-0.5 rounded bg-gray-800 border ${theme.colors.border}`}>
+              Esc
+            </kbd>
             <span>Clear selection</span>
           </div>
           <div className="flex items-center gap-2">
-            <kbd className={`px-1.5 py-0.5 rounded bg-gray-800 border ${theme.colors.border}`}>M</kbd>
+            <kbd className={`px-1.5 py-0.5 rounded bg-gray-800 border ${theme.colors.border}`}>
+              M
+            </kbd>
             <span>Cycle animation modes</span>
           </div>
           <div className="flex items-center gap-2">
-            <kbd className={`px-1.5 py-0.5 rounded bg-gray-800 border ${theme.colors.border}`}>Space</kbd>
+            <kbd className={`px-1.5 py-0.5 rounded bg-gray-800 border ${theme.colors.border}`}>
+              Space
+            </kbd>
             <span>Toggle paths</span>
           </div>
         </div>

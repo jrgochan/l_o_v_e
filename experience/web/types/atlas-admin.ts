@@ -167,7 +167,14 @@ export interface LayerVisibility {
 /**
  * Path animation mode - visual style for path rendering
  */
-export type PathAnimationMode = "subtle" | "dynamic" | "mystical" | "crystalline" | "luminous" | "liquid" | "glitch";
+export type PathAnimationMode =
+  | "subtle"
+  | "dynamic"
+  | "mystical"
+  | "crystalline"
+  | "luminous"
+  | "liquid"
+  | "glitch";
 
 /**
  * Path computation mode - how paths are calculated

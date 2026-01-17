@@ -81,7 +81,6 @@ describe("IntroSequence", () => {
     expect(setIntroActive).toHaveBeenCalledWith(false);
   });
 
-
   it("fades out title after delay", () => {
     render(<IntroSequence />);
 

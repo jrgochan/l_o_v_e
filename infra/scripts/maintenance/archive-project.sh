@@ -47,12 +47,13 @@ OPT_GIT_SHALLOW=false
 # UTILITIES
 # ============================================================================
 
-# Detect script directory
+# Detect script directory (infra/scripts/maintenance)
 SCRIPT_DIR="$(cd "$(dirname "$0")" 2>/dev/null && pwd)" || SCRIPT_DIR="."
+PROJECT_ROOT="$(cd "$SCRIPT_DIR/../../.." && pwd)"
 
 # Source common utilities if available
-if [ -f "$SCRIPT_DIR/lib/common.sh" ]; then
-    . "$SCRIPT_DIR/lib/common.sh"
+if [ -f "$PROJECT_ROOT/infra/scripts/lib/common.sh" ]; then
+    . "$PROJECT_ROOT/infra/scripts/lib/common.sh"
 else
     # Minimal fallback utilities
     RED='\033[0;31m'
@@ -295,7 +296,7 @@ main() {
     # ------------------------------------------------------------------------
     [ "$OPT_QUIET" != true ] && print_info "Step 1/3: Cloning repositories..."
     
-    local clone_script="$SCRIPT_DIR/clone-love-repos.sh"
+    local clone_script="$PROJECT_ROOT/infra/scripts/setup/clone-love-repos.sh"
     if [ ! -f "$clone_script" ]; then
         print_error "Clone script not found at: $clone_script"
         exit 1

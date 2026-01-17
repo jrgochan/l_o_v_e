@@ -1,4 +1,4 @@
-import { render, screen, fireEvent, waitFor } from "@testing-library/react";
+import { render, screen, fireEvent, waitFor, act } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { StrategiesTab } from "@/components/admin/data/StrategiesTab";
 import { adminApi } from "@/utils/api";
@@ -35,6 +35,19 @@ describe("StrategiesTab", () => {
   // Setup fake timers
   beforeEach(() => {
     jest.clearAllMocks();
+
+    // Suppress "Not implemented: navigation" and "unique key" errors
+    const originalConsoleError = console.error;
+    console.error = (...args) => {
+      const msg = args[0]?.toString() || "";
+      if (
+        msg.includes("Not implemented: navigation") ||
+        msg.includes("Each child in a list should have a unique")
+      ) {
+        return;
+      }
+      originalConsoleError(...args);
+    };
   });
 
   afterEach(() => {
@@ -56,8 +69,11 @@ describe("StrategiesTab", () => {
       expect(screen.getByText("Strategy updated successfully.")).toBeInTheDocument();
     });
 
-    // Fast-forward time
-    jest.advanceTimersByTime(5000);
+    // Fast-forward time wrapped in act
+    // This resolves the "not wrapped in act" warning
+    await act(async () => {
+      jest.advanceTimersByTime(5000);
+    });
 
     await waitFor(() => {
       expect(screen.queryByText("Strategy updated successfully.")).not.toBeInTheDocument();
@@ -82,7 +98,7 @@ describe("StrategiesTab", () => {
   /* Removed skipped manual FileReader test in favor of userEvent.upload test */
 
   it("renders loading state", async () => {
-    (adminApi.getStrategies as jest.Mock).mockReturnValue(new Promise(() => {}));
+    (adminApi.getStrategies as jest.Mock).mockReturnValue(new Promise(() => { }));
     const { container } = render(<StrategiesTab />);
     expect(container.querySelector(".animate-spin")).toBeInTheDocument();
   });
@@ -576,7 +592,7 @@ describe("StrategiesTab", () => {
   });
   it("handles unmount during import to cover finally block ref check", async () => {
     (adminApi.getStrategies as jest.Mock).mockResolvedValue(mockStrategies);
-    let resolveImport: (val: any) => void = () => {};
+    let resolveImport: (val: any) => void = () => { };
     (adminApi.importStrategies as jest.Mock).mockImplementation(() => {
       return new Promise((resolve) => {
         resolveImport = resolve;

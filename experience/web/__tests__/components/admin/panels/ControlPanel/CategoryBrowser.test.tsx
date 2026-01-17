@@ -55,7 +55,7 @@ describe("CategoryBrowser", () => {
         text: {
           muted: "text-gray-500",
           secondary: "text-gray-400",
-          primary: "text-white"
+          primary: "text-white",
         },
         border: "border-gray-700",
         secondary: "bg-gray-700",
@@ -182,7 +182,7 @@ describe("CategoryBrowser", () => {
         text: {
           muted: "text-gray-500",
           secondary: "text-gray-400",
-          primary: "text-white"
+          primary: "text-white",
         },
         border: "border-gray-700",
         secondary: "bg-gray-700",
@@ -193,7 +193,9 @@ describe("CategoryBrowser", () => {
     });
 
     const expanded = new Set(["Cat1"]);
-    const { getByText } = render(<CategoryBrowser {...defaultProps} expandedCategories={expanded} />);
+    const { getByText } = render(
+      <CategoryBrowser {...defaultProps} expandedCategories={expanded} />
+    );
 
     // 1. Verify Category Name Button
     const categoryButton = getByText("Cat1");

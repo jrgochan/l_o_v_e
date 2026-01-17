@@ -37,7 +37,9 @@ export function QuickActions({
       {/* Selected Count & Clear All */}
       <section>
         <div className="flex items-center justify-between mb-2">
-          <h2 className={`text-sm font-semibold ${theme.colors.text.secondary}`}>Selected ({selectedCount})</h2>
+          <h2 className={`text-sm font-semibold ${theme.colors.text.secondary}`}>
+            Selected ({selectedCount})
+          </h2>
           {selectedCount > 0 && (
             <button onClick={onClearSelection} className="text-xs text-red-400 hover:text-red-300">
               Clear All
@@ -49,7 +51,9 @@ export function QuickActions({
           <button
             onClick={onSelectBridgeEmotions}
             className={`w-full px-3 py-2 text-sm transition ${theme.layout.borderRadius} ${theme.colors.secondary} hover:brightness-110 shadow-sm`}
-            style={{ fontFamily: theme.typography.fontFamily === "font-mono" ? "monospace" : undefined }}
+            style={{
+              fontFamily: theme.typography.fontFamily === "font-mono" ? "monospace" : undefined,
+            }}
           >
             Select Bridge Emotions (6)
           </button>
@@ -61,7 +65,9 @@ export function QuickActions({
         <button
           onClick={onToggleRecommendations}
           className={`w-full flex items-center justify-between px-3 py-2 text-sm transition mb-2 ${theme.layout.borderRadius} ${theme.colors.primary} hover:brightness-110 shadow-sm`}
-          style={{ fontFamily: theme.typography.fontFamily === "font-mono" ? "monospace" : undefined }}
+          style={{
+            fontFamily: theme.typography.fontFamily === "font-mono" ? "monospace" : undefined,
+          }}
         >
           <span>✨ Smart Recommendations</span>
           <span className="text-xs">{showRecommendations ? "▼" : "▶"}</span>

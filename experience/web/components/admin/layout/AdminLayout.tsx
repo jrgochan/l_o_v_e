@@ -33,7 +33,9 @@ function AdminLayoutContent({ children }: { children: React.ReactNode }) {
   return (
     <div className={`min-h-screen flex transition-colors duration-500 ${theme.colors.background}`}>
       {/* Sidebar */}
-      <aside className={`w-64 border-r flex flex-col transition-colors duration-500 ${theme.colors.background} ${theme.colors.border}`}>
+      <aside
+        className={`w-64 border-r flex flex-col transition-colors duration-500 ${theme.colors.background} ${theme.colors.border}`}
+      >
         <div className={`p-6 border-b ${theme.colors.border}`}>
           <h1 className={`text-xl font-bold flex items-center gap-2 ${theme.colors.text.primary}`}>
             <span>⚡</span> Admin
@@ -47,10 +49,11 @@ function AdminLayoutContent({ children }: { children: React.ReactNode }) {
               <Link
                 key={item.href}
                 href={item.href}
-                className={`flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-colors ${isActive
+                className={`flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-colors ${
+                  isActive
                     ? `${theme.colors.primary} ${theme.colors.border} border bg-white/5`
                     : `${theme.colors.text.secondary} hover:bg-white/5 hover:${theme.colors.text.primary}`
-                  }`}
+                }`}
               >
                 <span>{item.icon}</span>
                 {item.label}
@@ -62,7 +65,9 @@ function AdminLayoutContent({ children }: { children: React.ReactNode }) {
         <div className={`p-4 border-t ${theme.colors.border}`}>
           <div className="mb-4 px-4">
             <p className={`text-xs ${theme.colors.text.muted}`}>Logged in as</p>
-            <p className={`text-sm font-medium truncate ${theme.colors.text.primary}`}>{user?.email}</p>
+            <p className={`text-sm font-medium truncate ${theme.colors.text.primary}`}>
+              {user?.email}
+            </p>
           </div>
           <Link
             href="/"

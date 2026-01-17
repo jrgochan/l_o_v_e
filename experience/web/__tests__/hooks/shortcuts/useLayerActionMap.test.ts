@@ -38,7 +38,9 @@ describe("useLayerActionMap", () => {
   beforeEach(() => {
     jest.clearAllMocks();
     (useSettingsStore as unknown as jest.Mock).mockReturnValue(defaultState);
-    (useSettingsStore as any).getState = jest.fn(() => (useSettingsStore as unknown as jest.Mock)());
+    (useSettingsStore as any).getState = jest.fn(() =>
+      (useSettingsStore as unknown as jest.Mock)()
+    );
   });
 
   it("should toggle all actions in both states to cover log branches", () => {

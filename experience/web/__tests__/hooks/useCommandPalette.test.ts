@@ -63,8 +63,8 @@ jest.mock("@/stores/useAtlasAdminStore", () => ({
   useAtlasAdminStore: jest.fn((selector) =>
     selector
       ? selector({
-        selectedEmotionIds: [],
-      })
+          selectedEmotionIds: [],
+        })
       : []
   ),
 }));

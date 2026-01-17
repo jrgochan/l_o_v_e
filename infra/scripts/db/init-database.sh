@@ -4,12 +4,13 @@
 
 set -e
 
-# Get script directory
+# Get script directory (infra/scripts/db)
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+PROJECT_ROOT="$(cd "$SCRIPT_DIR/../../.." && pwd)"
 
 # Source cross-platform libraries
-. "$SCRIPT_DIR/lib/os-detect.sh"
-. "$SCRIPT_DIR/lib/common.sh"
+. "$PROJECT_ROOT/infra/scripts/lib/os-detect.sh"
+. "$PROJECT_ROOT/infra/scripts/lib/common.sh"
 
 # Database configuration (from Observer .env or defaults)
 DB_HOST="${DB_HOST:-localhost}"
@@ -19,7 +20,7 @@ DB_USER="${DB_USER:-love_user}"
 DB_PASSWORD="${DB_PASSWORD:-love_password}"
 
 # Observer module path
-OBSERVER_DIR="$SCRIPT_DIR/../observer"
+OBSERVER_DIR="$PROJECT_ROOT/observer"
 
 # Flags
 SKIP_SEED=false
@@ -310,7 +311,7 @@ seed_database() {
     
     # Seeding requires Versor API for quaternion calculation
     print_info "Checking Versor availability..."
-    VERSOR_DIR="$SCRIPT_DIR/../versor"
+    VERSOR_DIR="$PROJECT_ROOT/versor"
     
     if [ ! -d "$VERSOR_DIR/venv" ]; then
         print_error "Versor virtual environment not found"

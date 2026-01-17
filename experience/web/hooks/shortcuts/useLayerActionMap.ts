@@ -74,15 +74,9 @@ export function useLayerActionMap() {
       },
       v: () => {
         const state = useSettingsStore.getState();
-        const modes: Array<"subtle" | "dynamic" | "mystical" | "crystalline" | "luminous" | "liquid" | "glitch"> = [
-          "subtle",
-          "dynamic",
-          "mystical",
-          "crystalline",
-          "luminous",
-          "liquid",
-          "glitch",
-        ];
+        const modes: Array<
+          "subtle" | "dynamic" | "mystical" | "crystalline" | "luminous" | "liquid" | "glitch"
+        > = ["subtle", "dynamic", "mystical", "crystalline", "luminous", "liquid", "glitch"];
         const currentIndex = modes.indexOf(state.pathAnimationMode);
         const nextIndex = (currentIndex + 1) % modes.length;
         const nextMode = modes[nextIndex];

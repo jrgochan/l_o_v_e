@@ -3,10 +3,7 @@ import { RefObject } from "react";
 import * as THREE from "three";
 import type { PathAnimationMode } from "@/types/atlas-admin";
 
-export function useWaypointPulse(
-  meshRef: RefObject<THREE.Mesh | null>,
-  mode: PathAnimationMode
-) {
+export function useWaypointPulse(meshRef: RefObject<THREE.Mesh | null>, mode: PathAnimationMode) {
   useFrame((state) => {
     if (!meshRef.current) return;
 

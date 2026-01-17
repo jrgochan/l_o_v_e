@@ -64,11 +64,12 @@ OPT_NO_EXIT_ON_ERROR=false
 
 # Detect if we're running standalone (via curl | sh) or from repo
 SCRIPT_DIR="$(cd "$(dirname "$0")" 2>/dev/null && pwd)" || SCRIPT_DIR="."
+PROJECT_ROOT="$(cd "$SCRIPT_DIR/../../.." && pwd)"
 STANDALONE=false
 
 # Try to source common utilities if available
-if [ -f "$SCRIPT_DIR/lib/common.sh" ]; then
-    . "$SCRIPT_DIR/lib/common.sh"
+if [ -f "$PROJECT_ROOT/infra/scripts/lib/common.sh" ]; then
+    . "$PROJECT_ROOT/infra/scripts/lib/common.sh"
 else
     # Standalone mode - inline minimal utilities
     STANDALONE=true
@@ -183,7 +184,7 @@ EXAMPLES:
     ./clone-love-repos.sh --shallow --yes
 
 AFTER CLONING:
-    cd l_o_v_e/infra
+    cd l_o_v_e/infra/bin
     ./setup-love-stack.sh    # Set up development environment
     ./run-love-stack.sh      # Start the stack
 

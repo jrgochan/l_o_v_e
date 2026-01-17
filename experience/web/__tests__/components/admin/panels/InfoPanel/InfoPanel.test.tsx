@@ -240,7 +240,7 @@ describe("InfoPanel", () => {
         text: {
           muted: "text-gray-500",
           secondary: "text-gray-400",
-          primary: "text-white"
+          primary: "text-white",
         },
         border: "border-gray-700",
         secondary: "bg-gray-700",

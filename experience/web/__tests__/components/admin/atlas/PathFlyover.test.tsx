@@ -61,6 +61,18 @@ jest.mock("@/hooks/useAmbientAudio", () => ({
   useAmbientAudio: () => ({ playWhoosh: jest.fn() }),
 }));
 
+// Suppress expected warnings
+const originalConsoleWarn = console.warn;
+beforeAll(() => {
+  console.warn = (...args) => {
+    if (/Selected path not found/.test(args[0])) return;
+    originalConsoleWarn(...args);
+  };
+});
+afterAll(() => {
+  console.warn = originalConsoleWarn;
+});
+
 describe("PathFlyover", () => {
   const mockPath = {
     id: "p1",

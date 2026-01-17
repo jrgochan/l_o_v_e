@@ -30,10 +30,11 @@ export function AnimationModeSelector({ currentMode, onModeChange }: AnimationMo
       <div className="space-y-2">
         <button
           onClick={() => onModeChange("subtle")}
-          className={`w-full px-3 py-2 rounded text-left text-sm transition ${currentMode === "subtle"
-            ? "bg-blue-600 text-white ring-2 ring-blue-400"
-            : "bg-gray-800 text-gray-300 hover:bg-gray-700"
-            }`}
+          className={`w-full px-3 py-2 rounded text-left text-sm transition ${
+            currentMode === "subtle"
+              ? "bg-blue-600 text-white ring-2 ring-blue-400"
+              : "bg-gray-800 text-gray-300 hover:bg-gray-700"
+          }`}
         >
           <div className="flex items-center justify-between">
             <span className="font-medium">😌 Subtle Elegant</span>
@@ -44,10 +45,11 @@ export function AnimationModeSelector({ currentMode, onModeChange }: AnimationMo
 
         <button
           onClick={() => onModeChange("dynamic")}
-          className={`w-full px-3 py-2 rounded text-left text-sm transition ${currentMode === "dynamic"
-            ? "bg-orange-600 text-white ring-2 ring-orange-400"
-            : "bg-gray-800 text-gray-300 hover:bg-gray-700"
-            }`}
+          className={`w-full px-3 py-2 rounded text-left text-sm transition ${
+            currentMode === "dynamic"
+              ? "bg-orange-600 text-white ring-2 ring-orange-400"
+              : "bg-gray-800 text-gray-300 hover:bg-gray-700"
+          }`}
         >
           <div className="flex items-center justify-between">
             <span className="font-medium">😊 Dynamic Playful</span>
@@ -58,10 +60,11 @@ export function AnimationModeSelector({ currentMode, onModeChange }: AnimationMo
 
         <button
           onClick={() => onModeChange("mystical")}
-          className={`w-full px-3 py-2 rounded text-left text-sm transition ${currentMode === "mystical"
-            ? "bg-purple-600 text-white ring-2 ring-purple-400"
-            : "bg-gray-800 text-gray-300 hover:bg-gray-700"
-            }`}
+          className={`w-full px-3 py-2 rounded text-left text-sm transition ${
+            currentMode === "mystical"
+              ? "bg-purple-600 text-white ring-2 ring-purple-400"
+              : "bg-gray-800 text-gray-300 hover:bg-gray-700"
+          }`}
         >
           <div className="flex items-center justify-between">
             <span className="font-medium">🔮 Mystical Ethereal</span>
@@ -72,10 +75,11 @@ export function AnimationModeSelector({ currentMode, onModeChange }: AnimationMo
 
         <button
           onClick={() => onModeChange("crystalline")}
-          className={`w-full px-3 py-2 rounded text-left text-sm transition ${currentMode === "crystalline"
-            ? "bg-cyan-600 text-white ring-2 ring-cyan-400"
-            : "bg-gray-800 text-gray-300 hover:bg-gray-700"
-            }`}
+          className={`w-full px-3 py-2 rounded text-left text-sm transition ${
+            currentMode === "crystalline"
+              ? "bg-cyan-600 text-white ring-2 ring-cyan-400"
+              : "bg-gray-800 text-gray-300 hover:bg-gray-700"
+          }`}
         >
           <div className="flex items-center justify-between">
             <span className="font-medium">💎 Crystalline</span>
@@ -86,10 +90,11 @@ export function AnimationModeSelector({ currentMode, onModeChange }: AnimationMo
 
         <button
           onClick={() => onModeChange("luminous")}
-          className={`w-full px-3 py-2 rounded text-left text-sm transition ${currentMode === "luminous"
-            ? "bg-yellow-600 text-white ring-2 ring-yellow-400"
-            : "bg-gray-800 text-gray-300 hover:bg-gray-700"
-            }`}
+          className={`w-full px-3 py-2 rounded text-left text-sm transition ${
+            currentMode === "luminous"
+              ? "bg-yellow-600 text-white ring-2 ring-yellow-400"
+              : "bg-gray-800 text-gray-300 hover:bg-gray-700"
+          }`}
         >
           <div className="flex items-center justify-between">
             <span className="font-medium">✨ Luminous</span>
@@ -100,10 +105,11 @@ export function AnimationModeSelector({ currentMode, onModeChange }: AnimationMo
 
         <button
           onClick={() => onModeChange("liquid")}
-          className={`w-full px-3 py-2 rounded text-left text-sm transition ${currentMode === "liquid"
-            ? "bg-blue-500 text-white ring-2 ring-blue-300"
-            : "bg-gray-800 text-gray-300 hover:bg-gray-700"
-            }`}
+          className={`w-full px-3 py-2 rounded text-left text-sm transition ${
+            currentMode === "liquid"
+              ? "bg-blue-500 text-white ring-2 ring-blue-300"
+              : "bg-gray-800 text-gray-300 hover:bg-gray-700"
+          }`}
         >
           <div className="flex items-center justify-between">
             <span className="font-medium">🌊 Liquid</span>
@@ -114,10 +120,11 @@ export function AnimationModeSelector({ currentMode, onModeChange }: AnimationMo
 
         <button
           onClick={() => onModeChange("glitch")}
-          className={`w-full px-3 py-2 rounded text-left text-sm transition ${currentMode === "glitch"
-            ? "bg-green-700 text-white ring-2 ring-green-500 font-mono"
-            : "bg-gray-800 text-gray-300 hover:bg-gray-700"
-            }`}
+          className={`w-full px-3 py-2 rounded text-left text-sm transition ${
+            currentMode === "glitch"
+              ? "bg-green-700 text-white ring-2 ring-green-500 font-mono"
+              : "bg-gray-800 text-gray-300 hover:bg-gray-700"
+          }`}
         >
           <div className="flex items-center justify-between">
             <span className="font-medium">👾 Glitch</span>

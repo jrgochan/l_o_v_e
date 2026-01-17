@@ -83,6 +83,16 @@ describe("Settings Component", () => {
     (useSettingsStore as unknown as jest.Mock).mockReturnValue(mockStore);
     global.confirm = jest.fn(() => true);
     global.alert = jest.fn();
+
+    // Suppress "Not implemented: navigation" error
+    const originalConsoleError = console.error;
+    console.error = (...args) => {
+      const msg = args[0]?.toString() || "";
+      if (msg.includes("Not implemented: navigation")) {
+        return;
+      }
+      originalConsoleError(...args);
+    };
   });
 
   const openSettings = () => {

@@ -48,7 +48,9 @@ export function CategoryBrowser({
         <h2 className={`text-xs font-semibold uppercase tracking-wider ${theme.colors.text.muted}`}>
           Categories & Emotions
         </h2>
-        <span className={`text-xs px-2 py-0.5 rounded-full border ${theme.colors.border} ${theme.colors.text.secondary} bg-black/20`}>
+        <span
+          className={`text-xs px-2 py-0.5 rounded-full border ${theme.colors.border} ${theme.colors.text.secondary} bg-black/20`}
+        >
           {Array.from(categoryFilters.values()).filter((f) => f.enabled).length} Active
         </span>
       </div>
@@ -66,8 +68,9 @@ export function CategoryBrowser({
             >
               {/* Category Header */}
               <div
-                className={`flex items-center gap-2 px-2 py-2 transition-colors duration-200 ${isExpanded ? "bg-white/5" : "bg-transparent hover:bg-white/5"
-                  }`}
+                className={`flex items-center gap-2 px-2 py-2 transition-colors duration-200 ${
+                  isExpanded ? "bg-white/5" : "bg-transparent hover:bg-white/5"
+                }`}
               >
                 {/* Expand/Collapse Arrow */}
                 <button
@@ -89,22 +92,28 @@ export function CategoryBrowser({
                   onClick={() => onToggleCategoryExpansion(filter.name)}
                   className={`text-sm flex-1 text-left ${theme.colors.text.secondary} hover:${theme.colors.text.primary}`}
                   title="Click to expand/collapse"
-                  style={{ fontFamily: theme.typography.fontFamily === "font-mono" ? "monospace" : undefined }}
+                  style={{
+                    fontFamily:
+                      theme.typography.fontFamily === "font-mono" ? "monospace" : undefined,
+                  }}
                 >
                   {filter.name}
                 </button>
 
-                <span className={`text-xs ${theme.colors.text.muted}`}>({filter.emotionCount})</span>
+                <span className={`text-xs ${theme.colors.text.muted}`}>
+                  ({filter.emotionCount})
+                </span>
 
                 {/* Add/Remove Category Button */}
                 <button
                   onClick={() => onToggleCategory(filter.name)}
-                  className={`px-2 py-1 text-xs font-medium transition-colors ${theme.layout.borderRadius} ${selectionState === "all"
+                  className={`px-2 py-1 text-xs font-medium transition-colors ${theme.layout.borderRadius} ${
+                    selectionState === "all"
                       ? `${theme.colors.primary} bg-white/10`
                       : selectionState === "some"
                         ? `${theme.colors.secondary} bg-white/5`
                         : `${theme.colors.text.muted} hover:${theme.colors.text.primary} hover:bg-white/10`
-                    }`}
+                  }`}
                   title={
                     selectionState === "all"
                       ? "Remove all emotions from category"
@@ -132,11 +141,15 @@ export function CategoryBrowser({
                       <button
                         key={emotion.id}
                         onClick={() => onToggleEmotion(emotion.id)}
-                        className={`w-full flex items-center gap-2 px-8 py-1.5 text-left text-sm transition-colors duration-200 ${isSelected
+                        className={`w-full flex items-center gap-2 px-8 py-1.5 text-left text-sm transition-colors duration-200 ${
+                          isSelected
                             ? `${theme.colors.primary} bg-white/5`
                             : `${theme.colors.text.secondary} hover:${theme.colors.text.primary} hover:bg-white/5`
-                          }`}
-                        style={{ fontFamily: theme.typography.fontFamily === "font-mono" ? "monospace" : undefined }}
+                        }`}
+                        style={{
+                          fontFamily:
+                            theme.typography.fontFamily === "font-mono" ? "monospace" : undefined,
+                        }}
                       >
                         <span className="text-xs">{isSelected ? "✓" : "○"}</span>
                         <span className="flex-1">

@@ -504,7 +504,6 @@ describe("AIModelsSettings", () => {
     await waitFor(() => expect(screen.getByText(/Assignment Sync Failed/)).toBeInTheDocument());
   });
 
-
   it("clears notification after timeout", async () => {
     jest.useFakeTimers();
     render(<AIModelsSettings />);
