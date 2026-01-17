@@ -121,9 +121,9 @@ describe("useZenKeyboardShortcuts", () => {
   });
 
   it("should cycle 'v' from last mode to first", () => {
-    mockSettingsStore.pathAnimationMode = "mystical";
+    mockSettingsStore.pathAnimationMode = "glitch";
     renderHook(() => useZenKeyboardShortcuts(getProps()));
-    dispatchKey("v"); // mystical -> subtle
+    dispatchKey("v"); // glitch -> subtle
     expect(mockSettingsStore.updateVisualSetting).toHaveBeenCalledWith(
       "pathAnimationMode",
       "subtle"

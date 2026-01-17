@@ -146,7 +146,7 @@ describe("useAuthStore", () => {
       });
 
       // Mock console.error
-      const mockError = jest.spyOn(console, "error").mockImplementation(() => {});
+      const mockError = jest.spyOn(console, "error").mockImplementation(() => { });
       (api.get as jest.Mock).mockRejectedValueOnce(new Error("Network"));
 
       await act(async () => {
@@ -217,6 +217,24 @@ describe("useAuthStore", () => {
         }
       });
       expect(result.current.error).toBe("Registration failed");
+    });
+  });
+  describe("selectors", () => {
+    it("should check authentication", () => {
+      const { result } = renderHook(() => useAuthStore());
+      expect(result.current.isAuthenticated()).toBe(false);
+
+      act(() => result.current.setToken("token"));
+      expect(result.current.isAuthenticated()).toBe(true);
+    });
+
+    it("should check role", () => {
+      const { result } = renderHook(() => useAuthStore());
+      expect(result.current.hasRole("admin")).toBe(false);
+
+      act(() => result.current.setUser({ role: "user" } as any));
+      expect(result.current.hasRole("user")).toBe(true);
+      expect(result.current.hasRole("admin")).toBe(false);
     });
   });
 });

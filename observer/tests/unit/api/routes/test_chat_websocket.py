@@ -594,9 +594,14 @@ async def test_process_audio_deep_feeling_mode(mock_deps, mock_websocket, mock_c
             user_identifier="user1"
         )
 
-        # Assert listener called with correct URL
-        args, _ = mock_http_client.post.call_args
-        assert "analyze-audio-multi-emotion" in args[0]
+        # Assert listener called twice: 1. Extract, 2. Analyze
+        assert mock_http_client.post.call_count == 2
+        
+        # Verify second call is analyze-audio-multi-emotion
+        call_args_list = mock_http_client.post.call_args_list
+        second_call = call_args_list[1]
+        args, _ = second_call
+        assert "analyze-multi-emotion" in args[0]
         
         # Assert multi-emotion handler called
         mock_chat_service.save_multi_emotion_analysis.assert_called()
@@ -634,11 +639,49 @@ async def test_process_audio_listener_error(mock_deps, mock_websocket):
         )
         
         # Verify error message sent to client
-        manager.send_message.assert_called_with(
-            session_id, 
-            {"type": "error", "message": "Audio processing failed: Listener audio analysis failed: 500"}
-        )
+        args, _ = manager.send_message.call_args
+        assert args[0] == session_id
+        assert args[1]["type"] == "error"
+        assert "Audio processing failed" in args[1]["message"]
 
+
+@pytest.mark.asyncio
+async def test_process_audio_analysis_phase_error(mock_deps, mock_websocket):
+    """Test handling of Listener API errors during the analysis phase (2nd call)."""
+    session_id = str(uuid4())
+    manager = mock_deps["manager"]
+    mock_http_client = mock_deps["http_client"]
+    
+    # Mock sequence: 
+    # 1. Extraction: Success
+    # 2. Analysis: Failure (500)
+    mock_http_client.post.side_effect = [
+        MagicMock(status_code=200, json=lambda: {"transcription": "hi"}),
+        MagicMock(status_code=500, text="Internal Analysis Error")
+    ]
+
+    with patch("builtins.open", MagicMock()), \
+         patch("base64.b64decode", return_value=b"audio"), \
+         patch("tempfile.NamedTemporaryFile") as mock_temp:
+        
+        mock_temp.return_value.__enter__.return_value.name = "/tmp/test.wav"
+        
+        # Act & Assert
+        await chat_ws.process_audio_message(
+            session_id, 
+            "base64audio", 
+            None, 
+            "warm", 
+            False, 
+            mock_websocket,
+            user_identifier="user1"
+        )
+        
+        # Verify error message sent to client
+        args, _ = manager.send_message.call_args
+        assert args[0] == session_id
+        assert "Audio processing failed" in args[1]["message"]
+        assert "500" in args[1]["message"]
 
 @pytest.mark.asyncio
 async def test_handle_deep_feeling_update_no_db_session(mock_deps):

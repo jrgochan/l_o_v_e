@@ -9,78 +9,68 @@ export function useLayerActionMap() {
     const actions: Record<string, (e?: KeyboardEvent) => void> = {
       l: () => {
         const state = useSettingsStore.getState();
-        state.updateLayer("emotionLabels", !state.layers.emotionLabels);
-        logger.info(
-          "user-interaction",
-          `Labels: ${!state.layers.emotionLabels ? "ON" : "OFF"}`
-        );
+        const newVal = !state.layers.emotionLabels;
+        state.updateLayer("emotionLabels", newVal);
+        const status = newVal ? "ON" : "OFF";
+        logger.info("user-interaction", `Labels: ${status}`);
       },
       s: () => {
         const state = useSettingsStore.getState();
-        state.updateLayer("soulSphere", !state.layers.soulSphere);
-        logger.info(
-          "user-interaction",
-          `Soul Sphere: ${!state.layers.soulSphere ? "ON" : "OFF"}`
-        );
+        const newVal = !state.layers.soulSphere;
+        state.updateLayer("soulSphere", newVal);
+        const status = newVal ? "ON" : "OFF";
+        logger.info("user-interaction", `Soul Sphere: ${status}`);
       },
       g: () => {
         const state = useSettingsStore.getState();
-        state.updateLayer("legend", !state.layers.legend);
-        logger.info("user-interaction", `Legend: ${!state.layers.legend ? "ON" : "OFF"}`);
+        const newVal = !state.layers.legend;
+        state.updateLayer("legend", newVal);
+        const status = newVal ? "ON" : "OFF";
+        logger.info("user-interaction", `Legend: ${status}`);
       },
       a: () => {
         const state = useSettingsStore.getState();
-        state.updateVisualSetting("showAxisLabels", !state.showAxisLabels);
-        logger.info(
-          "user-interaction",
-          `Axis Labels & Grids: ${!state.showAxisLabels ? "ON - Showing VAC axes" : "OFF - Hidden"
-          }`
-        );
+        const newVal = !state.showAxisLabels;
+        state.updateVisualSetting("showAxisLabels", newVal);
+        const status = newVal ? "ON - Showing VAC axes" : "OFF - Hidden";
+        logger.info("user-interaction", `Axis Labels & Grids: ${status}`);
       },
       f: () => {
         const state = useSettingsStore.getState();
-        state.updateBehaviorSetting("focusMode", !state.focusMode);
-        logger.info(
-          "user-interaction",
-          `Focus mode: ${!state.focusMode ? "ON - Hiding unselected emotions" : "OFF - Showing all"
-          }`
-        );
+        const newVal = !state.focusMode;
+        state.updateBehaviorSetting("focusMode", newVal);
+        const status = newVal ? "ON - Hiding unselected emotions" : "OFF - Showing all";
+        logger.info("user-interaction", `Focus mode: ${status}`);
       },
       e: () => {
         const state = useSettingsStore.getState();
-        state.updateLayer("emotionPoints", !state.layers.emotionPoints);
-        logger.info(
-          "user-interaction",
-          `Emotion Points: ${!state.layers.emotionPoints ? "ON" : "OFF"}`
-        );
+        const newVal = !state.layers.emotionPoints;
+        state.updateLayer("emotionPoints", newVal);
+        const status = newVal ? "ON" : "OFF";
+        logger.info("user-interaction", `Emotion Points: ${status}`);
       },
       p: () => {
         const state = useSettingsStore.getState();
-        state.updateLayer("transitionPaths", !state.layers.transitionPaths);
-        logger.info(
-          "user-interaction",
-          `Paths: ${!state.layers.transitionPaths ? "ON" : "OFF"}`
-        );
+        const newVal = !state.layers.transitionPaths;
+        state.updateLayer("transitionPaths", newVal);
+        const status = newVal ? "ON" : "OFF";
+        logger.info("user-interaction", `Paths: ${status}`);
       },
       o: () => {
         const state = useSettingsStore.getState();
-        state.updateVisualSetting("showMotionIndicators", !state.showMotionIndicators);
-        logger.info(
-          "user-interaction",
-          `Motion Indicators: ${!state.showMotionIndicators ? "ON - Showing category motion types" : "OFF - Hidden"
-          }`
-        );
+        const newVal = !state.showMotionIndicators;
+        state.updateVisualSetting("showMotionIndicators", newVal);
+        const status = newVal ? "ON - Showing category motion types" : "OFF - Hidden";
+        logger.info("user-interaction", `Motion Indicators: ${status}`);
       },
       x: () => {
         const state = useSettingsStore.getState();
-        state.updateVisualSetting("dataVisualizationMode", !state.dataVisualizationMode);
-        logger.info(
-          "user-interaction",
-          `Data Visualization Mode: ${!state.dataVisualizationMode
-            ? "ON - Showing all 87 emotions with VAC coordinates"
-            : "OFF - Normal view"
-          }`
-        );
+        const newVal = !state.dataVisualizationMode;
+        state.updateVisualSetting("dataVisualizationMode", newVal);
+        const status = newVal
+          ? "ON - Showing all 87 emotions with VAC coordinates"
+          : "OFF - Normal view";
+        logger.info("user-interaction", `Data Visualization Mode: ${status}`);
       },
       v: () => {
         const state = useSettingsStore.getState();

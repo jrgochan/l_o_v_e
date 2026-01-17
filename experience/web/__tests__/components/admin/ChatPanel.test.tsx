@@ -30,6 +30,9 @@ jest.mock("@/hooks/useHistorySphereSync", () => ({
 jest.mock("@/stores/useEmotionHistoryStore", () => ({
   useEmotionHistoryStore: jest.fn(),
 }));
+jest.mock("@/stores/useAtlasAdminStore", () => ({
+  useAtlasAdminStore: jest.fn(),
+}));
 
 jest.mock("@/utils/logger", () => ({
   logger: {
@@ -83,6 +86,7 @@ import { useChatProgress } from "@/hooks/chat/useChatProgress";
 import { useWebSocketChat } from "@/hooks/useWebSocketChat";
 import { useEmotionNavigation } from "@/hooks/useEmotionNavigation";
 import { useEmotionHistoryStore } from "@/stores/useEmotionHistoryStore";
+import { useAtlasAdminStore } from "@/stores/useAtlasAdminStore";
 
 describe("ChatPanel", () => {
   // Spies
@@ -110,11 +114,22 @@ describe("ChatPanel", () => {
       }
     });
 
+  const createArrayFunctionalSetter = (spy: jest.Mock) =>
+    jest.fn((val) => {
+      spy(val);
+      if (typeof val === "function") {
+        val([]);
+      }
+    });
+
   const mockSetSessionMetricsSpy = jest.fn();
   const mockSetSessionMetrics = createFunctionalSetter(mockSetSessionMetricsSpy);
 
-  const mockSetVacHistory = jest.fn();
-  const mockSetEmotionTimeline = jest.fn();
+  const mockSetVacHistorySpy = jest.fn();
+  const mockSetVacHistory = createArrayFunctionalSetter(mockSetVacHistorySpy);
+
+  const mockSetEmotionTimelineSpy = jest.fn();
+  const mockSetEmotionTimeline = createArrayFunctionalSetter(mockSetEmotionTimelineSpy);
 
   const mockSetCurrentAnalysisSpy = jest.fn();
   const mockSetCurrentAnalysis = createFunctionalSetter(mockSetCurrentAnalysisSpy);
@@ -210,7 +225,14 @@ describe("ChatPanel", () => {
       viewInSphere: mockViewInSphere,
     });
 
-    (useEmotionHistoryStore as unknown as jest.Mock).mockReturnValue(mockAddHistoryEntry);
+    (useEmotionHistoryStore as unknown as jest.Mock).mockImplementation((selector) => {
+      // Execute selector with mock state
+      return selector({ addEntry: mockAddHistoryEntry });
+    });
+
+    (useAtlasAdminStore as unknown as jest.Mock).mockImplementation((selector) => {
+      return selector({ viewMode: "default" });
+    });
   });
 
   const getSocketCallbacks = () => {
@@ -220,7 +242,7 @@ describe("ChatPanel", () => {
 
   it("renders collapsed state correctly", () => {
     render(<ChatPanel sessionId="test-session" />);
-    expect(screen.getByText("Chat Header")).toBeInTheDocument();
+    expect(screen.getByText("Emotional Intelligence")).toBeInTheDocument();
   });
 
   it("renders expanded state correctly", () => {
@@ -360,6 +382,27 @@ describe("ChatPanel", () => {
       callbacks.onProgressUpdate("stage1", "complete", "Done", 100);
     });
     expect(mockRef.current).toBeNull();
+  });
+
+  it("handles WebSocket callbacks: onProgressUpdate (In Progress > 90)", async () => {
+    (useChatProgress as jest.Mock).mockReturnValue({
+      progressState: { stages: [{ id: "stage1", status: "pending", percentage: 0 }] },
+      setProgressState: createFunctionalSetter(jest.fn()),
+      showProgress: true,
+      setShowProgress: jest.fn(),
+      startProgressSimulation: mockStartProgressSimulation,
+      progressSimulationRef: { current: null },
+    });
+
+    render(<ChatPanel sessionId="sess1" />);
+    const callbacks = getSocketCallbacks();
+
+    await act(async () => {
+      callbacks.onProgressUpdate("stage1", "in_progress", "Almost done", 95);
+    });
+
+    // Should NOT restart simulation if > 90
+    expect(mockStartProgressSimulation).not.toHaveBeenCalled();
   });
 
   it("handles user interactions: Send Message", async () => {
@@ -795,15 +838,44 @@ describe("ChatPanel", () => {
     expect(wrapper).toHaveClass("w-full");
   });
 
+  it("renders connection status in collapsed mode", () => {
+    (useChatPanelState as jest.Mock).mockReturnValue({
+      ...defaultChatPanelState,
+      isExpanded: false,
+      viewMode: "default",
+    });
+
+    // Disconnected
+    (useWebSocketChat as jest.Mock).mockReturnValue({
+      ...defaultWebSocketState,
+      isConnected: false
+    });
+
+    const { rerender } = render(<ChatPanel sessionId="sess1" />);
+    // "Disconnected" text
+    expect(screen.getByText("Disconnected")).toBeInTheDocument();
+
+    // Connected
+    (useWebSocketChat as jest.Mock).mockReturnValue({
+      ...defaultWebSocketState,
+      isConnected: true
+    });
+
+    // Force re-render with new mock
+    rerender(<ChatPanel sessionId="sess1" />);
+    expect(screen.getByText("Connected")).toBeInTheDocument();
+  });
+
   it("renders fullscreen chat mode", () => {
     (useChatPanelState as jest.Mock).mockReturnValue({
       ...defaultChatPanelState,
+      isExpanded: true,
       isFullscreen: true,
     });
 
     const { container } = render(<ChatPanel sessionId="sess1" />);
     // The main div should have style height: 100vh
-    const mainDiv = container.firstChild;
+    const mainDiv = screen.getByTestId("chat-panel-container");
     expect(mainDiv).toHaveStyle({ height: "100vh" });
     expect(mainDiv).toHaveClass("inset-0");
   });

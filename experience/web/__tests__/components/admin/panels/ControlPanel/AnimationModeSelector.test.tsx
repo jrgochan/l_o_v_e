@@ -1,53 +1,70 @@
-import { render, fireEvent } from "@testing-library/react";
-import { AnimationModeSelector } from "../../../../../components/admin/panels/ControlPanel/AnimationModeSelector";
+import { render, screen, fireEvent } from "@testing-library/react";
+import { AnimationModeSelector } from "@/components/admin/panels/ControlPanel/AnimationModeSelector";
+import { PathAnimationMode } from "@/types/atlas-admin";
 
 describe("AnimationModeSelector", () => {
-  it("should render all options", () => {
-    const { getByText } = render(
-      <AnimationModeSelector currentMode="subtle" onModeChange={jest.fn()} />
-    );
-    expect(getByText(/Subtle/)).toBeInTheDocument();
-    expect(getByText(/Dynamic/)).toBeInTheDocument();
-    expect(getByText(/Mystical/)).toBeInTheDocument();
+  const mockOnModeChange = jest.fn();
+
+  beforeEach(() => {
+    jest.clearAllMocks();
   });
 
-  it("should highlight active mode", () => {
-    const { getByText } = render(
-      <AnimationModeSelector currentMode="dynamic" onModeChange={jest.fn()} />
-    );
-    // Dynamic should have bg-orange-600 (or visually distinct style, checking text presence of visible indicator logic)
-    // The component renders a checkmark "✓" only for active mode
-    // We can check if checkmark is near Dynamic?
-    // Or check classes.
-    // Let's check classes for simplicity and robustness if classes are stable.
-    const dynamicButton = getByText("😊 Dynamic Playful").closest("button");
-    expect(dynamicButton).toHaveClass("bg-orange-600");
-
-    const subtleButton = getByText("😌 Subtle Elegant").closest("button");
-    expect(subtleButton).not.toHaveClass("bg-blue-600");
+  it("renders all animation modes", () => {
+    render(<AnimationModeSelector currentMode="subtle" onModeChange={mockOnModeChange} />);
+    expect(screen.getByText(/Path Animation/i)).toBeInTheDocument();
+    expect(screen.getByText(/Subtle/i)).toBeInTheDocument();
+    expect(screen.getByText(/Glitch/i)).toBeInTheDocument();
   });
 
-  it("should highlight mystical mode", () => {
-    const { getByText } = render(
-      <AnimationModeSelector currentMode="mystical" onModeChange={jest.fn()} />
-    );
-    const mysticalButton = getByText("🔮 Mystical Ethereal").closest("button");
-    expect(mysticalButton).toHaveClass("bg-purple-600");
+  it.each([
+    ["Subtle", "subtle"],
+    ["Dynamic", "dynamic"],
+    ["Mystical", "mystical"],
+    ["Crystalline", "crystalline"],
+    ["Luminous", "luminous"],
+    ["Liquid", "liquid"],
+    ["Glitch", "glitch"],
+  ])("calls onModeChange when %s is clicked", (text, mode) => {
+    render(<AnimationModeSelector currentMode="subtle" onModeChange={mockOnModeChange} />);
+    const button = screen.getByText(new RegExp(text, "i"));
+    fireEvent.click(button);
+    expect(mockOnModeChange).toHaveBeenCalledWith(mode);
   });
 
-  it("should call onModeChange when clicked", () => {
-    const onChangeMock = jest.fn();
-    const { getByText } = render(
-      <AnimationModeSelector currentMode="subtle" onModeChange={onChangeMock} />
-    );
+  it.each([
+    ["subtle", "bg-blue-600"],
+    ["dynamic", "bg-orange-600"],
+    ["mystical", "bg-purple-600"],
+    ["crystalline", "bg-cyan-600"],
+    ["luminous", "bg-yellow-600"],
+    ["liquid", "bg-blue-500"],
+    ["glitch", "bg-green-700"],
+  ] as const)("highlights active mode %s with correct color", (mode, expectedClass) => {
+    render(<AnimationModeSelector currentMode={mode} onModeChange={mockOnModeChange} />);
 
-    fireEvent.click(getByText("🔮 Mystical Ethereal"));
-    expect(onChangeMock).toHaveBeenCalledWith("mystical");
+    // Find the button for the mode (by text inside it, simplified)
+    // We map mode to text snippet
+    const modeTextMap: Record<PathAnimationMode, string> = {
+      subtle: "Subtle",
+      dynamic: "Dynamic",
+      mystical: "Mystical",
+      crystalline: "Crystalline",
+      luminous: "Luminous",
+      liquid: "Liquid",
+      glitch: "Glitch",
+    };
 
-    fireEvent.click(getByText("😊 Dynamic Playful"));
-    expect(onChangeMock).toHaveBeenCalledWith("dynamic");
+    const button = screen.getByText(new RegExp(modeTextMap[mode], "i")).closest("button");
+    expect(button).toHaveClass(expectedClass);
+    expect(button).toHaveClass("text-white");
+  });
 
-    fireEvent.click(getByText("😌 Subtle Elegant"));
-    expect(onChangeMock).toHaveBeenCalledWith("subtle");
+  it("renders non-active modes with default style", () => {
+    // Render with 'glitch' active, so 'subtle' should be inactive
+    render(<AnimationModeSelector currentMode="glitch" onModeChange={mockOnModeChange} />);
+
+    const subtleButton = screen.getByText(/Subtle/i).closest("button");
+    expect(subtleButton).toHaveClass("bg-gray-800");
+    expect(subtleButton).toHaveClass("text-gray-300");
   });
 });

@@ -1,4 +1,4 @@
-import { render, screen, fireEvent, waitFor } from "@testing-library/react";
+import { render, screen, fireEvent, waitFor, act } from "@testing-library/react";
 import SettingsPage from "@/app/admin/settings/page";
 import { useSettingsStore } from "@/stores/useSettingsStore";
 
@@ -55,7 +55,33 @@ describe("SettingsPage", () => {
       };
       return selector(state);
     });
+    jest.useFakeTimers();
   });
+
+  afterEach(() => {
+    jest.useRealTimers();
+  });
+
+  it("should dismiss notification after timeout", async () => {
+    render(<SettingsPage />);
+    // Trigger notification (e.g. copy)
+    fireEvent.click(screen.getByRole("button", { name: /Copy/i }));
+
+    // Wait for notification to appear
+    await waitFor(() => {
+      expect(screen.getByText("Settings copied to clipboard!")).toBeInTheDocument();
+    });
+
+    // Advance timers
+    act(() => {
+      jest.advanceTimersByTime(3100);
+    });
+
+    // Check dismissal
+    expect(screen.queryByText("Settings copied to clipboard!")).not.toBeInTheDocument();
+  });
+
+
 
   it("renders header and default tab", () => {
     render(<SettingsPage />);

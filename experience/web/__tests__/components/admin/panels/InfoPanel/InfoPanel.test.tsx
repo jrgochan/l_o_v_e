@@ -1,9 +1,11 @@
 import { render, screen, fireEvent, act } from "@testing-library/react";
 import { InfoPanel } from "@/components/admin/panels/InfoPanel/index";
 import { useInfoPanelState } from "@/hooks/admin/useInfoPanelState";
+import { useAdminTheme } from "@/hooks/admin/useAdminTheme";
 
 // Mock hooks
 jest.mock("@/hooks/admin/useInfoPanelState");
+jest.mock("@/hooks/admin/useAdminTheme");
 
 // Mock sub-components
 jest.mock("@/components/admin/panels/StatisticsPanel", () => ({
@@ -88,11 +90,26 @@ describe("InfoPanel", () => {
   beforeEach(() => {
     jest.clearAllMocks();
     (useInfoPanelState as jest.Mock).mockReturnValue(defaultState);
+    (useAdminTheme as jest.Mock).mockReturnValue({
+      colors: {
+        background: "bg-black",
+        border: "border-gray-800",
+        primary: "bg-blue-600",
+        text: {
+          secondary: "text-gray-400",
+          primary: "text-white",
+          muted: "text-gray-500",
+        },
+      },
+      layout: { borderRadius: "rounded-lg" },
+      effects: { backdropBlur: "backdrop-blur" },
+      typography: { fontFamily: "font-sans" },
+    });
   });
 
   it("renders Info tab by default with empty state", () => {
     render(<InfoPanel />);
-    expect(screen.getByText("📋 Info & Paths")).toHaveClass("bg-cyan-900/40");
+    expect(screen.getByText("📋 Info & Paths")).toHaveClass("bg-white/10");
     expect(screen.getByText("Getting Started")).toBeInTheDocument();
     expect(screen.getByText("Select emotions")).toBeInTheDocument();
     expect(screen.getByText("Bridge Emotions")).toBeInTheDocument(); // Verify deep render
@@ -111,6 +128,10 @@ describe("InfoPanel", () => {
     render(<InfoPanel />);
     fireEvent.click(screen.getByText("📊 Statistics"));
     expect(mockSetActiveTab).toHaveBeenCalledWith("stats");
+
+    // Click back to Info
+    fireEvent.click(screen.getByText("📋 Info & Paths"));
+    expect(mockSetActiveTab).toHaveBeenCalledWith("info");
   });
 
   it("renders EmotionDetails when displayEmotion is present", () => {
@@ -160,6 +181,28 @@ describe("InfoPanel", () => {
     expect(mockSetSelectedWaypoint).toHaveBeenCalledWith({ waypoint: { id: "wp1" }, index: 1 });
   });
 
+  it("renders EmotionList when selectedEmotions > 0 and no displayEmotion", () => {
+    (useInfoPanelState as jest.Mock).mockReturnValue({
+      ...defaultState,
+      displayEmotion: null,
+      selectedEmotions: [{ id: "e1", name: "Joy" }],
+    });
+    render(<InfoPanel />);
+    expect(screen.getByTestId("emotion-list")).toBeInTheDocument();
+  });
+
+  it("renders PathComparison when selectedPaths > 1 and no displayPath", () => {
+    (useInfoPanelState as jest.Mock).mockReturnValue({
+      ...defaultState,
+      displayPath: null,
+      selectedPaths: [{ id: "p1" }, { id: "p2" }],
+    });
+    render(<InfoPanel />);
+    expect(screen.getByTestId("path-comparison")).toBeInTheDocument();
+    // PathSummaryList should also be present since length > 0
+    expect(screen.getByTestId("path-summary-list")).toBeInTheDocument();
+  });
+
   it("opens modal at start when Show Details clicked", () => {
     const mockPath = { id: "p1", waypoints: [] };
     (useInfoPanelState as jest.Mock).mockReturnValue({
@@ -189,5 +232,29 @@ describe("InfoPanel", () => {
     fireEvent.click(screen.getByText("Start Step"));
     // 0 - 1 = -1 -> < 0 -> else branch
     expect(mockSetSelectedWaypoint).toHaveBeenCalledWith(null);
+  });
+
+  it("applies monospace font when theme is font-mono", () => {
+    (useAdminTheme as jest.Mock).mockReturnValue({
+      colors: {
+        text: {
+          muted: "text-gray-500",
+          secondary: "text-gray-400",
+          primary: "text-white"
+        },
+        border: "border-gray-700",
+        secondary: "bg-gray-700",
+        primary: "bg-blue-600",
+      },
+      layout: { borderRadius: "rounded-lg" },
+      effects: { backdropBlur: "backdrop-blur-md" },
+      typography: { fontFamily: "font-mono" },
+    });
+
+    render(<InfoPanel />);
+    const infoTab = screen.getByText("📋 Info & Paths");
+    const statsTab = screen.getByText("📊 Statistics");
+    expect(infoTab).toHaveStyle({ fontFamily: "monospace" });
+    expect(statsTab).toHaveStyle({ fontFamily: "monospace" });
   });
 });

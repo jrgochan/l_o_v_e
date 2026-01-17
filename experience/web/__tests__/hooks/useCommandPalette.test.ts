@@ -60,7 +60,13 @@ jest.mock("../../hooks/command-palette/useCommandPaletteNavigation", () => ({
 }));
 
 jest.mock("@/stores/useAtlasAdminStore", () => ({
-  useAtlasAdminStore: () => [],
+  useAtlasAdminStore: jest.fn((selector) =>
+    selector
+      ? selector({
+        selectedEmotionIds: [],
+      })
+      : []
+  ),
 }));
 
 describe("useCommandPalette", () => {

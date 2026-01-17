@@ -13,6 +13,7 @@ export function ChatToggleFAB({ onClick, isUnread = false }: ChatToggleFABProps)
             onClick={onClick}
             className={`fixed bottom-6 right-6 z-50 w-14 h-14 rounded-full flex items-center justify-center shadow-lg transition-all duration-300 transform hover:scale-105 active:scale-95 ${theme.colors.primary} ${theme.effects.glass} border ${theme.colors.border}`}
             title="Open Emotional Chat"
+            aria-label="Open Emotional Chat"
         >
             <span className="text-2xl">💬</span>
             {isUnread && (

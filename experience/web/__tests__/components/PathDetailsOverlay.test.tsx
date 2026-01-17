@@ -29,7 +29,7 @@ jest.mock("@react-spring/web", () => ({
       try {
         if (Array.isArray(items)) items.forEach((i) => config.keys(i));
         else config.keys(items);
-      } catch (e) {}
+      } catch (e) { }
     }
     return (fn: any) => (items ? fn({ opacity: 1 }, items) : null);
   },
@@ -401,5 +401,34 @@ describe("PathDetailsOverlay", () => {
     expect(screen.queryByTitle("Category Index")).not.toBeInTheDocument();
     // But control deck should be visible because path exists (verify via title)
     expect(screen.getByTitle("Start Flyover")).toBeInTheDocument();
+  });
+
+  it("should position lower in cinema mode", () => {
+    (useAtlasAdminStore as unknown as jest.Mock).mockImplementation((selector: any) =>
+      selector({
+        allEmotions: [],
+        viewMode: "cinema",
+        cycleSelectedPath: mockCycleSelectedPath,
+        setIsFlying: mockAdminSetIsFlying,
+      })
+    );
+
+    (useExperienceStore as unknown as jest.Mock).mockImplementation((selector: any) =>
+      selector({
+        transitionPath: mockPath,
+        flyoverProgress: 0,
+        flyoverSpeed: 1.0,
+        isFlying: false,
+        setFlyoverProgress: mockSetFlyoverProgress,
+        setFlyoverSpeed: mockSetFlyoverSpeed,
+        setIsFlying: mockSetIsFlying,
+      })
+    );
+
+    const { container } = render(<PathDetailsOverlay />);
+    // The outermost div has the class
+    // We can find it by verifying position class
+    const wrapper = container.firstChild;
+    expect(wrapper).toHaveClass("top-28");
   });
 });

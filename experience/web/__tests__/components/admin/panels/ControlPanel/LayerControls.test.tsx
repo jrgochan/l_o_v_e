@@ -121,20 +121,20 @@ describe("LayerControls", () => {
 
   it("renders layer toggles", () => {
     render(<LayerControls {...defaultProps} />);
-    expect(screen.getByLabelText("Soul Sphere")).toBeChecked();
-    expect(screen.getByLabelText("Paths")).not.toBeChecked();
+    expect(screen.getByLabelText("soul Sphere")).toBeChecked();
+    expect(screen.getByLabelText("transition Paths")).not.toBeChecked();
   });
 
   it("toggles all layer types", () => {
     render(<LayerControls {...defaultProps} />);
 
     const layers = [
-      { label: "Soul Sphere", key: "soulSphere" },
-      { label: "Emotion Points", key: "emotionPoints" },
-      { label: "Labels", key: "emotionLabels" },
-      { label: "Paths", key: "transitionPaths" },
-      { label: "Waypoints", key: "waypoints" },
-      { label: "Legend", key: "legend" },
+      { label: "soul Sphere", key: "soulSphere" },
+      { label: "emotion Points", key: "emotionPoints" },
+      { label: "emotion Labels", key: "emotionLabels" },
+      { label: "transition Paths", key: "transitionPaths" },
+      { label: "waypoints", key: "waypoints" },
+      { label: "legend", key: "legend" },
     ];
 
     layers.forEach(({ label, key }) => {

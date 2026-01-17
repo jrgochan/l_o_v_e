@@ -242,6 +242,34 @@ describe("AnimatedEmotionNode", () => {
       expect(mesh.position.y).not.toBe(0);
       expect(mesh.rotation.x).not.toBe(0); // Precession wobble
     });
+
+    it("Other floating mode: applies no specific jitter/drift (fallback)", () => {
+      // Force floatEnabled for a non-dynamic/mystical mode
+      (require("@/utils/modeVisualConfigs").getModeConfig as jest.Mock).mockReturnValue({
+        colors: { hueShift: 0, saturation: 1, lightness: 1 },
+        materials: { metalness: 0, roughness: 1, transparent: false, opacityBase: 1 },
+        animations: {
+          floatEnabled: true,
+          floatSpeed: 0.5,
+          floatAmplitude: 0.5,
+        },
+      });
+
+      const { container } = render(<AnimatedEmotionNode {...defaultProps} mode="subtle" />);
+      const mesh = container.querySelector("mesh") as any;
+      const frameCallback = (useFrame as jest.Mock).mock.calls[0][0];
+
+      frameCallback({ clock: { elapsedTime: 1.0 } });
+
+      // Should enter float block but match neither if/else-if
+      // Then it just adds secondaryOffset (which is 0 if stable) to initialPosition
+      // So no change beyond secondary (stable=0)
+      // Wait, line 139: meshRef.current.position.copy(initialPosition.current).add(secondaryOffset);
+      // It executes this.
+      // So position should be initial (0,0,0) + secondary(0,0,0) = 0,0,0
+      expect(mesh.position.y).toBe(0);
+      expect(mesh.position.x).toBe(0);
+    });
   });
 
   describe("Interactive States", () => {

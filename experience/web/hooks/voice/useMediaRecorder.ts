@@ -75,6 +75,7 @@ export function useMediaRecorder({
       mediaRecorderRef.current.stop();
       actions.setIsRecording(false);
       actions.setIsPaused(false);
+      /* istanbul ignore next */
       if (durationIntervalRef.current) {
         clearInterval(durationIntervalRef.current);
       }

@@ -1,4 +1,4 @@
-import { renderHook } from "@testing-library/react";
+import { renderHook, act } from "@testing-library/react";
 import { useHistorySphereSync } from "@/hooks/useHistorySphereSync";
 import { useEmotionHistoryStore } from "@/stores/useEmotionHistoryStore";
 import { useAtlasAdminStore } from "@/stores/useAtlasAdminStore";
@@ -66,6 +66,11 @@ describe("useHistorySphereSync", () => {
     rerender();
 
     expect(mockSelectEmotion).toHaveBeenCalledWith(joyId);
+
+    // Cover timeout callback
+    act(() => {
+      jest.advanceTimersByTime(200);
+    });
   });
 
   it("should sync sphere selection back to history visibility (enable)", () => {
@@ -131,6 +136,11 @@ describe("useHistorySphereSync", () => {
     rerender();
 
     expect(mockDeselectEmotion).toHaveBeenCalledWith(joyId);
+
+    // Cover timeout callback
+    act(() => {
+      jest.advanceTimersByTime(200);
+    });
   });
 
   it("should NOT deselect sphere if another history entry keeps it visible", () => {

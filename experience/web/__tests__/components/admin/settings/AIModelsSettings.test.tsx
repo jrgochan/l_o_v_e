@@ -503,4 +503,30 @@ describe("AIModelsSettings", () => {
     render(<AIModelsSettings />);
     await waitFor(() => expect(screen.getByText(/Assignment Sync Failed/)).toBeInTheDocument());
   });
+
+
+  it("clears notification after timeout", async () => {
+    jest.useFakeTimers();
+    render(<AIModelsSettings />);
+    await waitFor(() => expect(screen.getByText(/Local Models/i)).toBeInTheDocument());
+
+    // Trigger notification via bulk assign (mocked success)
+    const assignBtn = screen.getAllByText("Assign")[0];
+    fireEvent.click(assignBtn);
+    const bulkBtn = screen.getByText(/ASSIGN TO ALL FUNCTIONS/);
+    fireEvent.click(bulkBtn);
+
+    // Notification appears
+    await waitFor(() => expect(screen.getByText(/Assigned to/)).toBeInTheDocument());
+
+    // Advance timers (4000ms)
+    act(() => {
+      jest.advanceTimersByTime(4100);
+    });
+
+    // Notification gone
+    expect(screen.queryByText(/Assigned to/)).not.toBeInTheDocument();
+
+    jest.useRealTimers();
+  });
 });

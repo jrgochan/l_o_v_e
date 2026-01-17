@@ -80,4 +80,27 @@ describe("IntroSequence", () => {
     });
     expect(setIntroActive).toHaveBeenCalledWith(false);
   });
+
+
+  it("fades out title after delay", () => {
+    render(<IntroSequence />);
+
+    // Advance past fade out time (4500ms)
+    act(() => {
+      jest.advanceTimersByTime(4600);
+    });
+
+    // Should not be visible (opacity 0)
+    expect(screen.getByText("ATLAS").closest("div")).toHaveClass("opacity-0");
+  });
+
+  it("cleans up timers on unmount", () => {
+    const clearTimeoutSpy = jest.spyOn(window, "clearTimeout");
+    const { unmount } = render(<IntroSequence />);
+
+    unmount();
+
+    // Should clear 2 timers
+    expect(clearTimeoutSpy).toHaveBeenCalledTimes(2);
+  });
 });

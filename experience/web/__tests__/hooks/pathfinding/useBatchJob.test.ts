@@ -215,4 +215,27 @@ describe("useBatchJob", () => {
 
     expect(result.current.isComputing).toBe(false);
   });
+
+  it("should clear interval on unmount while computing", async () => {
+    (global.fetch as any).mockResolvedValue({
+      ok: true,
+      json: async () => ({
+        status: "processing",
+        completed_paths: 10,
+        total_paths: 100,
+        percentage: 10,
+      }),
+    });
+
+    const { result, unmount } = renderHook(() => useBatchJob());
+
+    await act(async () => {
+      result.current.startJob("job-unmount", 100);
+    });
+
+    expect(result.current.isComputing).toBe(true);
+
+    // Unmount while computing to trigger cleanup check
+    unmount();
+  });
 });

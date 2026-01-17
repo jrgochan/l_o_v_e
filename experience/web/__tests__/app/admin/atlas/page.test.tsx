@@ -5,6 +5,7 @@ import { useSphereSync } from "@/hooks/useSphereSync";
 import { useAtlasAdminStore } from "@/stores/useAtlasAdminStore";
 import { useExperienceStore } from "@/stores/useExperienceStore";
 import { useEmotionAtlas } from "@/hooks/useEmotionAtlas";
+import { useAdminTheme } from "@/hooks/admin/useAdminTheme";
 
 // --- MOCK COMPONENTS ---
 jest.mock("@/components/admin/atlas/AtlasScene", () => ({
@@ -96,6 +97,7 @@ jest.mock("@react-three/fiber", () => ({
 // Fix casing for lights in mock by just rendering divs
 jest.mock("@react-three/drei", () => ({
   OrbitControls: () => <div data-testid="orbit-controls" />,
+  Stars: () => <div data-testid="stars" />,
 }));
 // We can't easily fix the light casing unless we mock intrinsic elements or modify the component code.
 // The component is using <ambientLight> which is correct for R3F but Jest React sees it as HTML.
@@ -127,6 +129,10 @@ jest.mock("@/hooks/useCommandPalette", () => ({
     registerCommand: jest.fn(),
     open: jest.fn(),
   })),
+}));
+
+jest.mock("@/hooks/admin/useAdminTheme", () => ({
+  useAdminTheme: jest.fn(),
 }));
 
 // --- MOCK STORES ---
@@ -171,6 +177,18 @@ describe("AtlasAdminPage", () => {
         isFlying: false,
       })
     );
+
+    (useAdminTheme as jest.Mock).mockReturnValue({
+      colors: {
+        background: "bg-black",
+        border: "border-gray-700",
+        text: { secondary: "text-gray-400", primary: "text-white", muted: "text-gray-500" },
+        primary: "bg-blue-600",
+      },
+      effects: { backdropBlur: "backdrop-blur-md", glass: "bg-white/10" },
+      layout: { borderRadius: "rounded-lg" },
+      typography: { fontFamily: "font-sans", tracking: "tracking-wide" },
+    });
   });
 
   it("renders core layout components", () => {
@@ -582,5 +600,23 @@ describe("AtlasAdminPage", () => {
     render(<AtlasAdminPage />);
     const btn = screen.getByTitle("Unmute Audio");
     expect(btn).toHaveClass("bg-red-900/50");
+  });
+
+  it("applies monospace font when theme is font-mono", () => {
+    (useAdminTheme as jest.Mock).mockReturnValue({
+      colors: {
+        background: "bg-black",
+        border: "border-gray-700",
+        text: { secondary: "text-gray-400", primary: "text-white", muted: "text-gray-500" },
+        primary: "bg-blue-600",
+      },
+      effects: { backdropBlur: "backdrop-blur-md", glass: "bg-white/10" },
+      layout: { borderRadius: "rounded-lg" },
+      typography: { fontFamily: "font-mono", tracking: "tracking-wide" },
+    });
+
+    render(<AtlasAdminPage />);
+    const header = screen.getByText("Soul Sphere Atlas").closest("header");
+    expect(header).toHaveStyle({ fontFamily: "monospace" });
   });
 });

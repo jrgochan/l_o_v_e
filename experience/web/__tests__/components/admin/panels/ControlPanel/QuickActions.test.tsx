@@ -6,6 +6,11 @@ jest.mock("@/components/admin/shared/SmartRecommendations", () => ({
   SmartRecommendations: () => <div data-testid="smart-recommendations">Mock Recommendations</div>,
 }));
 
+const mockUseAdminTheme = jest.fn();
+jest.mock("@/hooks/admin/useAdminTheme", () => ({
+  useAdminTheme: () => mockUseAdminTheme(),
+}));
+
 describe("QuickActions", () => {
   const defaultProps = {
     selectedCount: 0,
@@ -17,6 +22,16 @@ describe("QuickActions", () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
+    mockUseAdminTheme.mockReturnValue({
+      colors: {
+        text: { secondary: "text-gray-400" },
+        secondary: "bg-gray-700",
+        primary: "bg-blue-600",
+        border: "border-gray-700",
+      },
+      layout: { borderRadius: "rounded-lg" },
+      typography: { fontFamily: "font-sans" },
+    });
   });
 
   it("should render selection controls", () => {
@@ -73,5 +88,27 @@ describe("QuickActions", () => {
   it("should show collapsed arrow when hidden", () => {
     const { getByText } = render(<QuickActions {...defaultProps} showRecommendations={false} />);
     expect(getByText("▶")).toBeInTheDocument(); // Collapsed arrow
+  });
+
+  it("should apply monospace font when theme is font-mono", () => {
+    mockUseAdminTheme.mockReturnValue({
+      colors: {
+        text: { secondary: "text-gray-400" },
+        secondary: "bg-gray-700",
+        primary: "bg-blue-600",
+        border: "border-gray-700",
+      },
+      layout: { borderRadius: "rounded-lg" },
+      typography: { fontFamily: "font-mono" },
+    });
+
+    const { getByText } = render(<QuickActions {...defaultProps} />);
+
+    // Check if style applies
+    const bridgeBtn = getByText(/Select Bridge Emotions/);
+    expect(bridgeBtn).toHaveStyle({ fontFamily: "monospace" });
+
+    const recBtn = getByText(/Smart Recommendations/).closest("button");
+    expect(recBtn).toHaveStyle({ fontFamily: "monospace" });
   });
 });

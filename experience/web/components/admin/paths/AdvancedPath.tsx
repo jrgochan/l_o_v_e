@@ -36,7 +36,7 @@ export function AdvancedPath({
 
     // Store initial position
     useEffect(() => {
-        if (meshRef.current) {
+        if (meshRef.current?.position) {
             initialY.current = meshRef.current.position.y;
         }
     }, []);

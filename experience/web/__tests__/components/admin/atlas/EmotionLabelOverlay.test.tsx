@@ -214,6 +214,212 @@ describe("EmotionLabelOverlay", () => {
     });
   });
 
+  describe("Mode: Crystalline", () => {
+    beforeEach(() => {
+      mockUseAtlasAdminStore.mockReturnValue({
+        selectedEmotionIds: new Set(),
+        hoveredEmotionId: null,
+        layers: { emotionLabels: true },
+        settings: { pathAnimationMode: "crystalline" },
+      });
+    });
+
+    it("renders default style", () => {
+      render(<EmotionLabelOverlay labels={mockLabels} />);
+      const container = screen.getByText("Joy").closest(".skew-x-\\[-10deg\\]");
+      expect(container).toHaveClass("bg-black/40");
+      expect(container).toHaveClass("border-white/20");
+    });
+
+    it("renders hovered style", () => {
+      mockUseAtlasAdminStore.mockReturnValue({
+        selectedEmotionIds: new Set(),
+        hoveredEmotionId: "e1",
+        layers: { emotionLabels: true },
+        settings: { pathAnimationMode: "crystalline" },
+      });
+      render(<EmotionLabelOverlay labels={mockLabels} />);
+      const container = screen.getByText("Joy").closest(".skew-x-\\[-10deg\\]");
+      expect(container).toHaveClass("bg-white/10");
+      expect(container).toHaveClass("backdrop-blur-xl");
+    });
+
+    it("renders selected style", () => {
+      mockUseAtlasAdminStore.mockReturnValue({
+        selectedEmotionIds: new Set(["e1"]),
+        hoveredEmotionId: null,
+        layers: { emotionLabels: true },
+        settings: { pathAnimationMode: "crystalline" },
+      });
+      render(<EmotionLabelOverlay labels={mockLabels} />);
+      const container = screen.getByText("Joy").closest(".skew-x-\\[-10deg\\]");
+      expect(container).toHaveClass("bg-white/5");
+      expect(container).toHaveClass("border-white/40");
+    });
+  });
+
+  describe("Mode: Luminous", () => {
+    beforeEach(() => {
+      mockUseAtlasAdminStore.mockReturnValue({
+        selectedEmotionIds: new Set(),
+        hoveredEmotionId: null,
+        layers: { emotionLabels: true },
+        settings: { pathAnimationMode: "luminous" },
+      });
+    });
+
+    it("renders default style", () => {
+      render(<EmotionLabelOverlay labels={mockLabels} />);
+      const container = screen.getByText("Joy").closest(".rounded-full");
+      expect(container).toHaveClass("bg-black/20");
+    });
+
+    it("renders hovered style", () => {
+      mockUseAtlasAdminStore.mockReturnValue({
+        selectedEmotionIds: new Set(),
+        hoveredEmotionId: "e1",
+        layers: { emotionLabels: true },
+        settings: { pathAnimationMode: "luminous" },
+      });
+      render(<EmotionLabelOverlay labels={mockLabels} />);
+      const container = screen.getByText("Joy").closest(".rounded-full");
+      expect(container).toHaveClass("bg-white/20");
+      expect(container).toHaveClass("border-white/80");
+    });
+
+    it("renders selected style", () => {
+      mockUseAtlasAdminStore.mockReturnValue({
+        selectedEmotionIds: new Set(["e1"]),
+        hoveredEmotionId: null,
+        layers: { emotionLabels: true },
+        settings: { pathAnimationMode: "luminous" },
+      });
+      render(<EmotionLabelOverlay labels={mockLabels} />);
+      const container = screen.getByText("Joy").closest(".rounded-full");
+      expect(container).toHaveClass("bg-white/10");
+      expect(container).toHaveClass("border-white/60");
+    });
+  });
+
+  describe("Mode: Liquid", () => {
+    beforeEach(() => {
+      mockUseAtlasAdminStore.mockReturnValue({
+        selectedEmotionIds: new Set(),
+        hoveredEmotionId: null,
+        layers: { emotionLabels: true },
+        settings: { pathAnimationMode: "liquid" },
+      });
+    });
+
+    it("renders default style", () => {
+      render(<EmotionLabelOverlay labels={mockLabels} />);
+      const container = screen.getByText("Joy").closest(".rounded-\\[20px\\]");
+      expect(container).toHaveClass("bg-blue-900/10");
+    });
+
+    it("renders hovered style", () => {
+      mockUseAtlasAdminStore.mockReturnValue({
+        selectedEmotionIds: new Set(),
+        hoveredEmotionId: "e1",
+        layers: { emotionLabels: true },
+        settings: { pathAnimationMode: "liquid" },
+      });
+      render(<EmotionLabelOverlay labels={mockLabels} />);
+      const container = screen.getByText("Joy").closest(".rounded-\\[20px\\]");
+      expect(container).toHaveClass("bg-blue-900/40");
+      expect(container).toHaveClass("backdrop-blur-md");
+      expect(container).toHaveStyle({ boxShadow: "0 4px 20px #88888840" });
+    });
+
+    it("renders selected style", () => {
+      mockUseAtlasAdminStore.mockReturnValue({
+        selectedEmotionIds: new Set(["e1"]),
+        hoveredEmotionId: null,
+        layers: { emotionLabels: true },
+        settings: { pathAnimationMode: "liquid" },
+      });
+      render(<EmotionLabelOverlay labels={mockLabels} />);
+      const container = screen.getByText("Joy").closest(".rounded-\\[20px\\]");
+      expect(container).toHaveClass("bg-blue-950/30");
+      expect(container).toHaveClass("border-blue-400/30");
+    });
+  });
+
+  describe("Mode: Glitch", () => {
+    beforeEach(() => {
+      mockUseAtlasAdminStore.mockReturnValue({
+        selectedEmotionIds: new Set(),
+        hoveredEmotionId: null,
+        layers: { emotionLabels: true },
+        settings: { pathAnimationMode: "glitch" },
+      });
+    });
+
+    it("renders default style", () => {
+      render(<EmotionLabelOverlay labels={mockLabels} />);
+      const container = screen.getByText("Joy").closest(".border-l-4");
+      expect(container).toHaveClass("bg-black/70");
+      expect(container).toHaveClass("border-green-700");
+    });
+
+    it("renders hovered style", () => {
+      mockUseAtlasAdminStore.mockReturnValue({
+        selectedEmotionIds: new Set(),
+        hoveredEmotionId: "e1",
+        layers: { emotionLabels: true },
+        settings: { pathAnimationMode: "glitch" },
+      });
+      render(<EmotionLabelOverlay labels={mockLabels} />);
+      const container = screen.getByText("Joy").closest(".border-l-4");
+      expect(container).toHaveClass("bg-black/90");
+      expect(container).toHaveClass("border-green-500");
+    });
+  });
+
+  describe("Mode: Unknown/Default", () => {
+    beforeEach(() => {
+      mockUseAtlasAdminStore.mockReturnValue({
+        selectedEmotionIds: new Set(),
+        hoveredEmotionId: null,
+        layers: { emotionLabels: true },
+        settings: { pathAnimationMode: "unknown_mode_test" },
+      });
+    });
+
+    it("renders default fallback style (subtle)", () => {
+      render(<EmotionLabelOverlay labels={mockLabels} />);
+      // Fallback is subtle style
+      const container = screen.getByText("Joy").closest("div.rounded-lg");
+      expect(container).toHaveClass("bg-gray-800/85");
+      expect(container).toHaveClass("border-gray-700");
+    });
+
+    it("renders hovered style in default mode", () => {
+      mockUseAtlasAdminStore.mockReturnValue({
+        selectedEmotionIds: new Set(),
+        hoveredEmotionId: "e1",
+        layers: { emotionLabels: true },
+        settings: { pathAnimationMode: "unknown_mode_test" },
+      });
+      render(<EmotionLabelOverlay labels={mockLabels} />);
+      const container = screen.getByText("Joy").closest("div.rounded-lg");
+      expect(container).toHaveClass("bg-gray-800/95");
+      expect(container).toHaveClass("border-cyan-400");
+    });
+
+    it("renders selected style in default mode", () => {
+      mockUseAtlasAdminStore.mockReturnValue({
+        selectedEmotionIds: new Set(["e1"]),
+        hoveredEmotionId: null,
+        layers: { emotionLabels: true },
+        settings: { pathAnimationMode: "unknown_mode_test" },
+      });
+      render(<EmotionLabelOverlay labels={mockLabels} />);
+      const container = screen.getByText("Joy").closest("div.rounded-lg");
+      expect(container).toHaveClass("bg-gray-900/90");
+    });
+  });
+
   it("renders bridge emotion icon for known bridge emotions", () => {
     // "Awe" is in BRIDGE_EMOTIONS constant
     const bridgeLabel = {
@@ -251,5 +457,30 @@ describe("getLabelStyle", () => {
     // @ts-ignore
     const s3 = getLabelStyle("mystical", false, true, "#fff");
     expect(s3.containerClass).toContain("bg-purple-900/40");
+
+    // Crystalline
+    // @ts-ignore
+    const s4 = getLabelStyle("crystalline", false, false, "#fff");
+    expect(s4.containerClass).toContain("skew-x-[-10deg]");
+
+    // Luminous
+    // @ts-ignore
+    const s5 = getLabelStyle("luminous", false, false, "#fff");
+    expect(s5.containerClass).toContain("rounded-full");
+
+    // Liquid
+    // @ts-ignore
+    const s6 = getLabelStyle("liquid", false, false, "#fff");
+    expect(s6.containerClass).toContain("rounded-[20px]");
+
+    // Glitch
+    // @ts-ignore
+    const s7 = getLabelStyle("glitch", false, false, "#fff");
+    expect(s7.containerClass).toContain("border-l-4");
+
+    // Default / Invalid
+    // @ts-ignore
+    const s8 = getLabelStyle("invalid", false, false, "#fff");
+    expect(s8.containerClass).toContain("bg-gray-800/85");
   });
 });

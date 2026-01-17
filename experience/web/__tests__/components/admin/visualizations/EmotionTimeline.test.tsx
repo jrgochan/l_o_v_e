@@ -1,6 +1,9 @@
 import { render, screen, fireEvent } from "@testing-library/react";
 import { EmotionTimeline } from "@/components/admin/visualizations/EmotionTimeline";
 import { EmotionHistoryEntry } from "@/stores/useEmotionHistoryStore";
+import { useAdminTheme } from "@/hooks/admin/useAdminTheme";
+
+jest.mock("@/hooks/admin/useAdminTheme");
 
 const mockEntries: EmotionHistoryEntry[] = [
   {
@@ -26,6 +29,16 @@ const mockEntries: EmotionHistoryEntry[] = [
 ];
 
 describe("EmotionTimeline", () => {
+  beforeEach(() => {
+    (useAdminTheme as jest.Mock).mockReturnValue({
+      colors: {
+        border: "border-white/20",
+        background: "bg-black",
+        text: { primary: "text-white", secondary: "text-gray", muted: "text-gray-500" },
+      },
+    });
+  });
+
   it("renders nothing when entries are empty", () => {
     const { container } = render(<EmotionTimeline entries={[]} onToggleVisibility={jest.fn()} />);
     expect(container).toBeEmptyDOMElement();
@@ -75,5 +88,23 @@ describe("EmotionTimeline", () => {
     // We expect "bg-pink-400" to be present for negative connection
     const pinkBars = document.getElementsByClassName("bg-pink-400");
     expect(pinkBars.length).toBeGreaterThan(0);
+  });
+
+  it("uses fallback color for connecting line when theme border is missing", () => {
+    (useAdminTheme as jest.Mock).mockReturnValue({
+      colors: {
+        border: "", // Empty border to trigger fallback
+        background: "bg-black",
+        text: { primary: "text-white", secondary: "text-gray" },
+      },
+    });
+
+    render(<EmotionTimeline entries={mockEntries} onToggleVisibility={jest.fn()} />);
+    // The connecting line should have bg-gray-600
+    // It's the div with absolute positioning
+    // We can verify this by checking if any div has class bg-gray-600 (that isn't in default theme)
+    // Actually the fallback is 'bg-gray-600'
+    const fallbackLines = document.getElementsByClassName("bg-gray-600");
+    expect(fallbackLines.length).toBeGreaterThan(0);
   });
 });

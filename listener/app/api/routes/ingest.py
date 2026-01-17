@@ -326,9 +326,7 @@ async def extract_audio_features(
             content = await audio.read()
             await f.write(content)
 
-        logger.info(
-            f"Extracting audio features: {audio_path} ({len(content)} bytes)"
-        )
+        logger.info(f"Extracting audio features: {audio_path} ({len(content)} bytes)")
 
         # Step 1: Transcription
         transcription_service = get_transcription_service()
@@ -352,9 +350,7 @@ async def extract_audio_features(
 
     except Exception as e:
         logger.error(f"Feature extraction failed: {e}", exc_info=True)
-        raise HTTPException(
-            status_code=500, detail=f"Feature extraction failed: {str(e)}"
-        )
+        raise HTTPException(status_code=500, detail=f"Feature extraction failed: {str(e)}")
 
     finally:
         # Cleanup temp file
@@ -407,10 +403,10 @@ async def analyze_multi_emotion(
         if prosody_data:
             # Run 3-way analysis if prosody is available
             three_way_result = await analyzer.analyze_three_way(text, prosody_data)
-            
+
             # Use blended result as the primary for standard fields
             multi_analysis = three_way_result["blended"]
-            
+
             # Helper for response formatting
             def to_dict(analysis: Any) -> Dict[str, Any]:
                 return {
@@ -448,18 +444,20 @@ async def analyze_multi_emotion(
                     "temporal_pattern": analysis.temporal_pattern,
                     "reasoning": analysis.reasoning,
                 }
-                
+
             # Extra data for 3-way
             extra_response_data = {
                 "three_way_analysis": {
                     "content_only": to_dict(three_way_result["content_only"]),
-                    "voice_only": to_dict(three_way_result["voice_only"]) if three_way_result["voice_only"] else None,
+                    "voice_only": to_dict(three_way_result["voice_only"])
+                    if three_way_result["voice_only"]
+                    else None,
                     "blended": to_dict(three_way_result["blended"]),
                     "discrepancy": three_way_result["discrepancy"],
                 },
-                "prosody": prosody_data
+                "prosody": prosody_data,
             }
-            
+
         else:
             # Standard text-only analysis
             multi_analysis = await analyzer.analyze(text)
@@ -522,10 +520,10 @@ async def analyze_multi_emotion(
             "reasoning": multi_analysis.reasoning,
             "processing_time_ms": processing_time_ms,
         }
-        
+
         # Add 3-way data if available
         response.update(extra_response_data)
-        
+
         return response
 
     except Exception as e:

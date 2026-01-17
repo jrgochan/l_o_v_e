@@ -12,6 +12,9 @@ jest.mock("@/components/admin/paths/DynamicPlayfulPath", () => ({
 jest.mock("@/components/admin/paths/MysticalEtherealPath", () => ({
   MysticalEtherealPath: () => <div data-testid="mystical-path" />,
 }));
+jest.mock("@/components/admin/paths/AdvancedPath", () => ({
+  AdvancedPath: () => <div data-testid="advanced-path" />,
+}));
 
 describe("PathCurveAnimated", () => {
   const mockProps = {
@@ -35,5 +38,30 @@ describe("PathCurveAnimated", () => {
   it("renders Mystical path when mode is mystical", () => {
     render(<PathCurveAnimated {...mockProps} mode="mystical" />);
     expect(screen.getByTestId("mystical-path")).toBeInTheDocument();
+  });
+
+  it("renders Advanced path when mode is crystalline", () => {
+    render(<PathCurveAnimated {...mockProps} mode="crystalline" />);
+    expect(screen.getByTestId("advanced-path")).toBeInTheDocument();
+  });
+
+  it("renders Advanced path when mode is luminous", () => {
+    render(<PathCurveAnimated {...mockProps} mode="luminous" />);
+    expect(screen.getByTestId("advanced-path")).toBeInTheDocument();
+  });
+
+  it("renders Advanced path when mode is liquid", () => {
+    render(<PathCurveAnimated {...mockProps} mode="liquid" />);
+    expect(screen.getByTestId("advanced-path")).toBeInTheDocument();
+  });
+
+  it("renders Advanced path when mode is glitch", () => {
+    render(<PathCurveAnimated {...mockProps} mode="glitch" />);
+    expect(screen.getByTestId("advanced-path")).toBeInTheDocument();
+  });
+
+  it("falls back to Subtle path for unknown mode", () => {
+    render(<PathCurveAnimated {...mockProps} mode={"unknown" as any} />);
+    expect(screen.getByTestId("subtle-path")).toBeInTheDocument();
   });
 });

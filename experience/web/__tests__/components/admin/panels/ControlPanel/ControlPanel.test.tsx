@@ -6,8 +6,15 @@ import { useCategoryState } from "@/hooks/admin/useCategoryState";
 
 // Mock hooks
 jest.mock("@/stores/useAtlasAdminStore");
+import { useSettingsStore } from "@/stores/useSettingsStore";
+jest.mock("@/stores/useSettingsStore");
 jest.mock("@/hooks/admin/useEmotionSearch");
 jest.mock("@/hooks/admin/useCategoryState");
+
+const mockUseAdminTheme = jest.fn();
+jest.mock("@/hooks/admin/useAdminTheme", () => ({
+  useAdminTheme: () => mockUseAdminTheme(),
+}));
 
 // Mock sub-components
 // Mock sub-components with interactive triggers
@@ -101,8 +108,27 @@ describe("ControlPanel", () => {
     (useAtlasAdminStore as unknown as jest.Mock).mockImplementation((selector) =>
       selector(mockStore)
     );
+    (useSettingsStore as unknown as jest.Mock).mockImplementation(() => ({
+      pathAnimationMode: "default",
+      updateVisualSetting: mockStore.updateSetting,
+    }));
+    (useSettingsStore as any).getState = jest.fn(() => ({
+      pathAnimationMode: "default",
+      updateVisualSetting: mockStore.updateSetting,
+    }));
     (useEmotionSearch as jest.Mock).mockReturnValue(mockSearchHook);
     (useCategoryState as jest.Mock).mockReturnValue(mockCategoryHook);
+    mockUseAdminTheme.mockReturnValue({
+      colors: {
+        background: "bg-black",
+        border: "border-gray-700",
+        text: { secondary: "text-gray-400", primary: "text-white", muted: "text-gray-500" },
+        primary: "bg-blue-600",
+      },
+      effects: { backdropBlur: "backdrop-blur-md", glass: "bg-white/10" },
+      layout: { borderRadius: "rounded-lg" },
+      typography: { fontFamily: "font-sans", tracking: "tracking-wide" },
+    });
   });
 
   it("renders default Explore tab", () => {
@@ -110,18 +136,18 @@ describe("ControlPanel", () => {
     expect(screen.getByTestId("emotion-search")).toBeInTheDocument();
     expect(screen.getByTestId("quick-actions")).toBeInTheDocument();
     expect(screen.getByTestId("category-browser")).toBeInTheDocument();
-    expect(screen.getByText("🔍 Explore")).toHaveClass("bg-cyan-900/40");
+    expect(screen.getByRole("button", { name: /explore/i })).toHaveClass("bg-blue-600");
   });
 
   it("switches to View tab", () => {
     render(<ControlPanel />);
-    const viewTab = screen.getByText("👁️ View");
+    const viewTab = screen.getByRole("button", { name: /view/i });
     fireEvent.click(viewTab);
 
     expect(screen.queryByTestId("emotion-search")).not.toBeInTheDocument();
     expect(screen.getByTestId("animation-selector")).toBeInTheDocument();
     expect(screen.getByTestId("layer-controls")).toBeInTheDocument();
-    expect(viewTab).toHaveClass("bg-cyan-900/40");
+    expect(viewTab).toHaveClass("bg-blue-600");
   });
 
   it("hides quick actions and category browser when searching", () => {
@@ -158,7 +184,7 @@ describe("ControlPanel", () => {
 
   it("handles animation mode change", () => {
     render(<ControlPanel />);
-    fireEvent.click(screen.getByText("👁️ View"));
+    fireEvent.click(screen.getByRole("button", { name: /view/i }));
     fireEvent.click(screen.getByTestId("trigger-mode"));
     expect(mockStore.updateSetting).toHaveBeenCalledWith("pathAnimationMode", "dynamic");
   });
@@ -166,7 +192,7 @@ describe("ControlPanel", () => {
   it("toggles all categories (enable)", () => {
     // Currently Mixed (Positive: true, Negative: false) -> Should Enable All
     render(<ControlPanel />);
-    fireEvent.click(screen.getByText("👁️ View"));
+    fireEvent.click(screen.getByRole("button", { name: /view/i }));
     fireEvent.click(screen.getByTestId("trigger-toggle-all"));
     expect(mockStore.enableAllCategories).toHaveBeenCalled();
   });
@@ -174,12 +200,12 @@ describe("ControlPanel", () => {
   it("switches tabs explicitly", () => {
     render(<ControlPanel />);
     // Switch to View
-    fireEvent.click(screen.getByText("👁️ View"));
-    expect(screen.getByText("👁️ View")).toHaveClass("bg-cyan-900/40");
+    fireEvent.click(screen.getByRole("button", { name: /view/i }));
+    expect(screen.getByRole("button", { name: /view/i })).toHaveClass("bg-blue-600");
 
     // Switch back to Explore
-    fireEvent.click(screen.getByText("🔍 Explore"));
-    expect(screen.getByText("🔍 Explore")).toHaveClass("bg-cyan-900/40");
+    fireEvent.click(screen.getByRole("button", { name: /explore/i }));
+    expect(screen.getByRole("button", { name: /explore/i })).toHaveClass("bg-blue-600");
     expect(screen.getByTestId("emotion-search")).toBeInTheDocument();
   });
 
@@ -200,8 +226,27 @@ describe("ControlPanel", () => {
     ]);
 
     render(<ControlPanel />);
-    fireEvent.click(screen.getByText("👁️ View"));
+    fireEvent.click(screen.getByRole("button", { name: /view/i }));
+    fireEvent.click(screen.getByTestId("trigger-toggle-all"));
     fireEvent.click(screen.getByTestId("trigger-toggle-all"));
     expect(mockStore.disableAllCategories).toHaveBeenCalled();
+  });
+
+  it("applies monospace font when theme is font-mono", () => {
+    mockUseAdminTheme.mockReturnValue({
+      colors: {
+        background: "bg-black",
+        border: "border-gray-700",
+        text: { secondary: "text-gray-400", primary: "text-white", muted: "text-gray-500" },
+        primary: "bg-blue-600",
+      },
+      effects: { backdropBlur: "backdrop-blur-md", glass: "bg-white/10" },
+      layout: { borderRadius: "rounded-lg" },
+      typography: { fontFamily: "font-mono", tracking: "tracking-wide" },
+    });
+
+    const { container } = render(<ControlPanel />);
+    // The main div has the style
+    expect(container.firstChild).toHaveStyle({ fontFamily: "monospace" });
   });
 });

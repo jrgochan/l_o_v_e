@@ -459,5 +459,21 @@ describe("useCommandPaletteFilter coverage sweep", () => {
     );
     expect(result.current.filteredPaths).toHaveLength(1);
     expect(result.current.filteredPaths[0].from.name).toBe("Joy to World");
+    expect(result.current.filteredPaths[0].from.name).toBe("Joy to World");
+  });
+
+  it("handles partial strict match input (Valid Start, Invalid End)", () => {
+    const { result } = renderHook(() =>
+      useCommandPaletteFilter({
+        search: "Joy to ", // Note the trailing space
+        selectedCategory: null,
+        favoriteEmotions: [],
+        recentEmotions: [],
+        selectedEmotionIds: new Set(),
+      })
+    );
+    // Should split to ["Joy", ""]. start="Joy", end="". strictMatch block skipped.
+    // Fallback to deep match. "Joy to " not found in names unless mock data has it.
+    expect(result.current.filteredPaths).toEqual([]);
   });
 });

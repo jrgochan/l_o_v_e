@@ -2,6 +2,12 @@ import { render, fireEvent } from "@testing-library/react";
 import { CategoryBrowser } from "../../../../../components/admin/panels/ControlPanel/CategoryBrowser";
 import { AtlasEmotion, CategoryFilter } from "@/types/atlas-admin";
 
+// Use a mock setup for theme
+const mockUseAdminTheme = jest.fn();
+jest.mock("@/hooks/admin/useAdminTheme", () => ({
+  useAdminTheme: () => mockUseAdminTheme(),
+}));
+
 describe("CategoryBrowser", () => {
   const mockFilters = new Map<string, CategoryFilter>([
     ["Cat1", { name: "Cat1", enabled: true, color: "#FF0000", emotionCount: 2 }],
@@ -44,6 +50,20 @@ describe("CategoryBrowser", () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
+    mockUseAdminTheme.mockReturnValue({
+      colors: {
+        text: {
+          muted: "text-gray-500",
+          secondary: "text-gray-400",
+          primary: "text-white"
+        },
+        border: "border-gray-700",
+        secondary: "bg-gray-700",
+        primary: "bg-blue-600",
+      },
+      layout: { borderRadius: "rounded-lg" },
+      typography: { fontFamily: "font-sans" },
+    });
   });
 
   it("should render categories", () => {
@@ -144,7 +164,7 @@ describe("CategoryBrowser", () => {
     // Unselected is "○".
     // We can verify class or text content near Joy.
     const joyBtn = getByText("Joy").closest("button");
-    expect(joyBtn).toHaveClass("text-cyan-200");
+    expect(joyBtn).toHaveClass("bg-blue-600");
   });
 
   it("should handle empty category map", () => {
@@ -154,5 +174,34 @@ describe("CategoryBrowser", () => {
 
     const { getByText } = render(<CategoryBrowser {...defaultProps} categoryFilters={filters} />);
     expect(getByText("Cat2")).toBeInTheDocument();
+  });
+
+  it("applies monospace font when theme is font-mono", () => {
+    mockUseAdminTheme.mockReturnValue({
+      colors: {
+        text: {
+          muted: "text-gray-500",
+          secondary: "text-gray-400",
+          primary: "text-white"
+        },
+        border: "border-gray-700",
+        secondary: "bg-gray-700",
+        primary: "bg-blue-600",
+      },
+      layout: { borderRadius: "rounded-lg" },
+      typography: { fontFamily: "font-mono" },
+    });
+
+    const expanded = new Set(["Cat1"]);
+    const { getByText } = render(<CategoryBrowser {...defaultProps} expandedCategories={expanded} />);
+
+    // 1. Verify Category Name Button
+    const categoryButton = getByText("Cat1");
+    expect(categoryButton).toHaveStyle({ fontFamily: "monospace" });
+
+    // 2. Verify Emotion Button (e.g. Joy)
+    // Joy is in emotions map for Cat1
+    const emotionButton = getByText("Joy").closest("button");
+    expect(emotionButton).toHaveStyle({ fontFamily: "monospace" });
   });
 });

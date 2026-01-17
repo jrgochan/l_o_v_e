@@ -227,6 +227,10 @@ async def cleanup_test_data(test_db: AsyncSession):
         # Deleting cache tables that reference atlas
         await test_db.execute(text("DELETE FROM path_matrix_cache"))
         
+        # Chat tables
+        await test_db.execute(text("DELETE FROM chat_messages"))
+        await test_db.execute(text("DELETE FROM chat_sessions"))
+        
         # Parent tables last
         await test_db.execute(text("DELETE FROM atlas_definitions"))
         await test_db.execute(text("DELETE FROM users"))

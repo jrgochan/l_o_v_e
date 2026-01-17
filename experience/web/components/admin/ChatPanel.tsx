@@ -539,6 +539,7 @@ export function ChatPanel({ sessionId }: ChatPanelProps) {
       {/* Main Panel Container - Show ONLY when expanded */}
       {isExpanded && (
         <div
+          data-testid="chat-panel-container"
           className={`fixed ${isFullscreen ? "inset-0 z-50" : "bottom-0 left-0 right-0 z-40"
             } ${theme.colors.background} ${theme.effects.backdropBlur} border-t-2 ${theme.colors.border.replace('border-', 'border-t-')} shadow-[0_-4px_20px_rgba(6,182,212,0.3)] flex flex-col transition-all duration-300`}
           style={{ height: isFullscreen ? "100vh" : `${height}px` }}

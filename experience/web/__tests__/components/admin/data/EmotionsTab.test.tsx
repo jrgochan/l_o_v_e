@@ -1,4 +1,4 @@
-import { render, screen, fireEvent, waitFor, within } from "@testing-library/react";
+import { render, screen, fireEvent, waitFor, within, act } from "@testing-library/react";
 import { EmotionsTab } from "@/components/admin/data/EmotionsTab";
 import { adminApi } from "@/utils/api";
 import userEvent from "@testing-library/user-event";
@@ -33,7 +33,6 @@ describe("EmotionsTab", () => {
       category: "Negative",
       definition: "Feeling sorrow.",
       vac_vector: [-0.5, -0.2, -0.1],
-      // missing optional fields
     },
   ];
 
@@ -41,8 +40,12 @@ describe("EmotionsTab", () => {
     jest.clearAllMocks();
   });
 
+  afterEach(() => {
+    jest.useRealTimers();
+  });
+
   it("renders loading state", async () => {
-    (adminApi.getAtlasEmotions as jest.Mock).mockReturnValue(new Promise(() => {}));
+    (adminApi.getAtlasEmotions as jest.Mock).mockReturnValue(new Promise(() => { }));
     const { container } = render(<EmotionsTab />);
     // Check for loader by class or role
     expect(container.querySelector(".animate-spin")).toBeInTheDocument();
@@ -174,6 +177,7 @@ describe("EmotionsTab", () => {
   });
 
   it("handles export", async () => {
+    jest.useFakeTimers();
     (adminApi.getAtlasEmotions as jest.Mock).mockResolvedValue(mockEmotions);
     (adminApi.exportAtlasData as jest.Mock).mockResolvedValue({ emotions: mockEmotions });
 
@@ -186,6 +190,17 @@ describe("EmotionsTab", () => {
       expect(adminApi.exportAtlasData).toHaveBeenCalled();
       expect(global.URL.createObjectURL).toHaveBeenCalled();
     });
+
+    // Check success message appears
+    expect(screen.getByText("Export downloaded successfully.")).toBeInTheDocument();
+
+    // Advance timers to clear message
+    act(() => {
+      jest.advanceTimersByTime(5000);
+    });
+
+    // Verify message gone
+    expect(screen.queryByText("Export downloaded successfully.")).not.toBeInTheDocument();
   });
 
   it("handles export error", async () => {
@@ -525,7 +540,7 @@ describe("EmotionsTab", () => {
   it("handles unmount during import to cover finally block ref check", async () => {
     (adminApi.getAtlasEmotions as jest.Mock).mockResolvedValue(mockEmotions);
     // Mock import to pending forever (or long enough) but we won't wait for it
-    let resolveImport: (val: any) => void = () => {};
+    let resolveImport: (val: any) => void = () => { };
     (adminApi.importAtlasData as jest.Mock).mockImplementation(() => {
       return new Promise((resolve) => {
         resolveImport = resolve;

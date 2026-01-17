@@ -38,6 +38,7 @@ describe("useLayerActionMap", () => {
   beforeEach(() => {
     jest.clearAllMocks();
     (useSettingsStore as unknown as jest.Mock).mockReturnValue(defaultState);
+    (useSettingsStore as any).getState = jest.fn(() => (useSettingsStore as unknown as jest.Mock)());
   });
 
   it("should toggle all actions in both states to cover log branches", () => {
@@ -119,7 +120,7 @@ describe("useLayerActionMap", () => {
     });
     rerender();
     findAction(result.current.getActions(), "v")();
-    expect(mockUpdateVisualSetting).toHaveBeenCalledWith("pathAnimationMode", "subtle");
+    expect(mockUpdateVisualSetting).toHaveBeenCalledWith("pathAnimationMode", "crystalline");
   });
 
   it("should default to subtle if mode is unknown", () => {

@@ -41,7 +41,7 @@ class MockMediaRecorder {
   ondataavailable: Function | null = null;
   onstop: Function | null = null;
 
-  constructor(stream: any) {}
+  constructor(stream: any) { }
 }
 
 global.MediaRecorder = MockMediaRecorder as any;
@@ -319,5 +319,41 @@ describe("useMediaRecorder Advanced", () => {
       jest.advanceTimersByTime(200);
     });
     expect(mockActions.setDuration).not.toHaveBeenCalled();
+  });
+
+  it("should handle start error with onError callback", async () => {
+    const errorMsg = "Microphone access denied";
+    const onErrorMock = jest.fn();
+
+    // Mock getUserMedia to fail
+    (global.navigator.mediaDevices.getUserMedia as jest.Mock).mockRejectedValueOnce(new Error(errorMsg));
+
+    const { result } = renderHook(() =>
+      useMediaRecorder({ state: mockState, actions: mockActions, onError: onErrorMock })
+    );
+
+    await act(async () => {
+      await result.current.startMediaRecorder();
+    });
+
+    expect(mockActions.setError).toHaveBeenCalledWith(errorMsg);
+    expect(onErrorMock).toHaveBeenCalledWith(errorMsg);
+  });
+
+  it("should handle start error without onError callback", async () => {
+    const errorMsg = "Microphone access denied";
+
+    // Mock getUserMedia to fail
+    (global.navigator.mediaDevices.getUserMedia as jest.Mock).mockRejectedValueOnce(new Error(errorMsg));
+
+    const { result } = renderHook(() =>
+      useMediaRecorder({ state: mockState, actions: mockActions }) // No onError
+    );
+
+    await act(async () => {
+      await result.current.startMediaRecorder();
+    });
+
+    expect(mockActions.setError).toHaveBeenCalledWith(errorMsg);
   });
 });

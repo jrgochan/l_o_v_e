@@ -16,8 +16,13 @@ describe("DebugBroadcaster", () => {
     localStorage.clear();
     jest.useFakeTimers();
 
-    (useAtlasAdminStore as unknown as jest.Mock).mockReturnValue(mockSelectedIds);
-    (useExperienceStore as unknown as jest.Mock).mockReturnValue(mockTargetVAC);
+    (useAtlasAdminStore as unknown as jest.Mock).mockImplementation((selector) => {
+      // Execute selector with mock state
+      return selector({ selectedEmotionIds: mockSelectedIds });
+    });
+    (useExperienceStore as unknown as jest.Mock).mockImplementation((selector) => {
+      return selector({ targetVAC: mockTargetVAC });
+    });
   });
 
   afterEach(() => {
@@ -49,7 +54,7 @@ describe("DebugBroadcaster", () => {
       writable: true,
     });
 
-    const consoleSpy = jest.spyOn(console, "error").mockImplementation(() => {});
+    const consoleSpy = jest.spyOn(console, "error").mockImplementation(() => { });
 
     try {
       render(<DebugBroadcaster />);
@@ -171,7 +176,7 @@ describe("DebugBroadcaster", () => {
       writable: true,
     });
 
-    const consoleSpy = jest.spyOn(console, "error").mockImplementation(() => {});
+    const consoleSpy = jest.spyOn(console, "error").mockImplementation(() => { });
 
     try {
       render(<DebugBroadcaster />);

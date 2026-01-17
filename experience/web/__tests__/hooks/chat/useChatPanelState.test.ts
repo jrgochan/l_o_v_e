@@ -129,6 +129,29 @@ describe("useChatPanelState", () => {
   it("should handle keyboard shortcuts", () => {
     const { result } = renderHook(() => useChatPanelState());
 
+    // 'c' -> Toggle Expand
+    act(() => {
+      const event = new KeyboardEvent("keydown", {
+        key: "c",
+        cancelable: true,
+      });
+      jest.spyOn(event, "preventDefault");
+      window.dispatchEvent(event);
+      expect(event.preventDefault).toHaveBeenCalled();
+    });
+    expect(result.current.isExpanded).toBe(true);
+    expect(result.current.height).toBe(400);
+
+    // 'c' again -> Collapse
+    act(() => {
+      const event = new KeyboardEvent("keydown", {
+        key: "c",
+        cancelable: true,
+      });
+      window.dispatchEvent(event);
+    });
+    expect(result.current.isExpanded).toBe(false);
+
     // Ctrl+Shift+A -> Analysis toggle
     act(() => {
       const event = new KeyboardEvent("keydown", {
@@ -219,6 +242,24 @@ describe("useChatPanelState", () => {
       window.dispatchEvent(event);
     });
     expect(result.current.analysisExpandState).toBe("normal");
+
+    // Reset state for input test
+    act(() => {
+      result.current.setIsExpanded(false);
+    });
+
+    // Input ignoring test
+    act(() => {
+      const input = document.createElement("input");
+      document.body.appendChild(input);
+      const event = new KeyboardEvent("keydown", { key: "c", bubbles: true });
+      jest.spyOn(event, "preventDefault");
+      input.dispatchEvent(event);
+      document.body.removeChild(input);
+      expect(event.preventDefault).not.toHaveBeenCalled();
+    });
+    // Should NOT have toggled (was false before this block - normal state)
+    expect(result.current.isExpanded).toBe(false);
   });
 
   it("should ignore resize when collapsed", () => {

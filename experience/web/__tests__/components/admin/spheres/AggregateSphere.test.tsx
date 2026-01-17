@@ -237,6 +237,19 @@ describe("AggregateSphere", () => {
 
     unmount();
     // Should NOT call cancel if frameId was 0 (falsy)
+    // Should NOT call cancel if frameId was 0 (falsy)
     expect(mockCancelAnimationFrame).not.toHaveBeenCalled();
+  });
+
+  it("should handle unknown mode by falling back to subtle", () => {
+    render(
+      <AggregateSphere
+        emotions={mockEmotions as any}
+        aggregate={mockAggregate as any}
+        mode={"unknown_mode" as any}
+      />
+    );
+    // Should render without error
+    expect(THREE.WebGLRenderer).toHaveBeenCalled();
   });
 });

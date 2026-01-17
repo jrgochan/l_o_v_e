@@ -15,7 +15,7 @@ jest.mock("zustand/middleware", () => ({
     if (options && options.partialize) {
       try {
         options.partialize(get());
-      } catch (e) {}
+      } catch (e) { }
     }
     return config(set, get, api);
   },
@@ -670,6 +670,26 @@ describe("Additional Actions & Helpers", () => {
 
       // Restore
       window.history.pushState({}, "Root", originalPath);
+    });
+    it("should log usage in development mode", () => {
+      const originalEnv = process.env.NODE_ENV;
+      Object.defineProperty(process.env, "NODE_ENV", {
+        value: "development",
+        configurable: true,
+      });
+      const consoleSpy = jest.spyOn(console, "log").mockImplementation();
+
+      // Trigger persistence logic
+      const state = useAtlasAdminStore.getState();
+      adminPartialize(state); // Manual call to trigger log
+
+      expect(consoleSpy).toHaveBeenCalledWith("DEBUG: partialize", expect.anything());
+
+      consoleSpy.mockRestore();
+      Object.defineProperty(process.env, "NODE_ENV", {
+        value: originalEnv,
+        configurable: true,
+      });
     });
   });
 });

@@ -200,7 +200,8 @@ async def test_process_audio_message_flow(mock_websocket, mock_auth_session_loca
             "sess_audio", dummy_audio, None, "warm", False, mock_websocket
         )
         
-        mock_httpx_client.post.assert_called_once()
+        # Called twice: 1. Extract, 2. Analyze
+        assert mock_httpx_client.post.call_count == 2
         mock_handle.assert_called_once()
 
 @pytest.mark.asyncio

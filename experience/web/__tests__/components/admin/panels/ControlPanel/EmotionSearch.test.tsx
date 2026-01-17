@@ -2,6 +2,11 @@ import { render, fireEvent } from "@testing-library/react";
 import { EmotionSearch } from "../../../../../components/admin/panels/ControlPanel/EmotionSearch";
 import { AtlasEmotion } from "@/types/atlas-admin";
 
+const mockUseAdminTheme = jest.fn();
+jest.mock("@/hooks/admin/useAdminTheme", () => ({
+  useAdminTheme: () => mockUseAdminTheme(),
+}));
+
 describe("EmotionSearch", () => {
   const mockEmotions: AtlasEmotion[] = [
     {
@@ -33,6 +38,17 @@ describe("EmotionSearch", () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
+    mockUseAdminTheme.mockReturnValue({
+      colors: {
+        background: "bg-black",
+        border: "border-gray-700",
+        text: { secondary: "text-gray-400", primary: "text-white", muted: "text-gray-500" },
+        primary: "text-blue-600",
+      },
+      effects: { glass: "backdrop-blur-md" },
+      layout: { borderRadius: "rounded-lg" },
+      typography: { fontFamily: "font-sans" },
+    });
   });
 
   it("should render search input", () => {
@@ -94,7 +110,7 @@ describe("EmotionSearch", () => {
     expect(getByText("SELECTED")).toBeInTheDocument();
     // Joy should have specific class
     const joyBtn = getByText("Joy").closest("button");
-    expect(joyBtn).toHaveClass("bg-cyan-900/40");
+    expect(joyBtn).toHaveClass("text-blue-600");
 
     // Click to unselect (execution path for isSelected=true)
     fireEvent.click(getByText("Joy"));
@@ -107,7 +123,7 @@ describe("EmotionSearch", () => {
     expect(getByText("SELECTED")).toBeInTheDocument();
     // Joy should have specific class
     const joyBtn = getByText("Joy").closest("button");
-    expect(joyBtn).toHaveClass("bg-cyan-900/40");
+    expect(joyBtn).toHaveClass("text-blue-600");
   });
 
   it("should highlight bridge emotions", () => {
@@ -134,5 +150,25 @@ describe("EmotionSearch", () => {
     const { queryByText } = render(<EmotionSearch {...defaultProps} showResults={false} />);
     expect(queryByText("Results")).not.toBeInTheDocument();
     expect(queryByText("Joy")).not.toBeInTheDocument();
+  });
+
+  it("applies monospace font when theme is font-mono", () => {
+    mockUseAdminTheme.mockReturnValue({
+      colors: {
+        background: "bg-black",
+        border: "border-gray-700",
+        text: { secondary: "text-gray-400", primary: "text-white", muted: "text-gray-500" },
+        primary: "text-blue-600",
+      },
+      effects: { glass: "backdrop-blur-md" },
+      layout: { borderRadius: "rounded-lg" },
+      typography: { fontFamily: "font-mono" },
+    });
+
+    const { getByPlaceholderText } = render(<EmotionSearch {...defaultProps} />);
+
+    // Input should have mono style
+    const input = getByPlaceholderText("Search emotions...");
+    expect(input).toHaveStyle({ fontFamily: "monospace" });
   });
 });
