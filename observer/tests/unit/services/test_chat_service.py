@@ -100,8 +100,14 @@ async def test_save_analysis_message(chat_service, mock_session):
     session = ChatSession(id=session_id, message_count=5)
     
     with patch.object(chat_service, 'get_session', return_value=session):
-        # Mock _find_emotion_id
-        with patch.object(chat_service, '_find_emotion_id', return_value=uuid4()):
+        # Mock _resolve_emotion to return a mock MappingResult
+        mock_mapping = MagicMock()
+        mock_mapping.atlas_id = str(uuid4())
+        mock_mapping.original_name = "Joy"
+        mock_mapping.match_method = "exact"
+        mock_mapping.confidence = 1.0
+
+        with patch.object(chat_service, '_resolve_emotion', return_value=mock_mapping):
             msg = await chat_service.save_analysis_message(
                 session_id, "Joy", [0.8, 0.5, 0.6], 0.9, "Detected Joy", "warm",
                 prosody_data={"pitch_mean": 100.0}
@@ -111,6 +117,7 @@ async def test_save_analysis_message(chat_service, mock_session):
             assert msg.vac_coordinates == [0.8, 0.5, 0.6]
             assert msg.prosody_pitch_mean == 100.0
             assert session.message_count == 6
+
 
 @pytest.mark.asyncio
 async def test_save_insight_message(chat_service, mock_session):
@@ -153,56 +160,6 @@ async def test_get_session_statistics(chat_service, mock_session):
         assert stats["total_messages"] == 10
         assert stats["message_counts"]["user_text"] == 5
         assert stats["detected_emotions_count"] == 2
-
-@pytest.mark.asyncio
-async def test_find_emotion_id(chat_service, mock_session):
-    # Mock AtlasMapper
-    with patch("app.services.chat_service.AtlasMapper") as MockMapper:
-        mapper_instance = AsyncMock()
-        MockMapper.return_value = mapper_instance
-        
-        # Found case
-        mock_mapping = MagicMock()
-        mock_mapping.atlas_id = str(uuid4())
-        mapper_instance.map_emotion.return_value = mock_mapping
-        
-        res = await chat_service._find_emotion_id("Joy")
-        assert res is not None
-        
-        # Not found case
-        mock_mapping_none = MagicMock()
-        mock_mapping_none.atlas_id = None
-        mapper_instance.map_emotion.return_value = mock_mapping_none
-        
-        res_none = await chat_service._find_emotion_id("UnknownXYZ")
-        assert res_none is None
-
-@pytest.mark.asyncio
-async def test_save_multi_emotion_analysis(chat_service, mock_session):
-    message_id = uuid4()
-    session_id = uuid4()
-    
-    emotions = [{
-        "emotion_name": "Joy", 
-        "confidence": 0.9, 
-        "prominence": 0.6, 
-        "vac": {"valence": 0.8, "arousal": 0.5, "connection": 0.6}
-    }]
-    relationships = []
-    
-    with patch.object(chat_service, '_find_emotion_id', return_value=uuid4()):
-        analysis = await chat_service.save_multi_emotion_analysis(
-            message_id, session_id, emotions, relationships, 
-            [0.8, 0.5, 0.6], 0.5, 0.8, "concurrent"
-        )
-        
-        assert analysis.message_id == message_id
-        assert analysis.deep_feeling_enabled
-        
-        # Verify calls
-        # 1 analysis + 1 detected emotion + 0 relationships = 2 adds (approx)
-        assert mock_session.add.call_count >= 2
-        mock_session.commit.assert_awaited()
 
 @pytest.mark.asyncio
 async def test_delete_session(chat_service, mock_session):
@@ -292,41 +249,6 @@ async def test_update_deep_feeling_mode(chat_service, mock_session):
         mock_session.commit.assert_awaited()
 
 @pytest.mark.asyncio
-async def test_save_multi_emotion_analysis_full(chat_service, mock_session):
-    """Test saving analysis with 3-way data and relationships."""
-    message_id = uuid4()
-    session_id = uuid4()
-    
-    emotions = [
-        {"emotion_name": "Joy", "confidence": 0.9, "prominence": 0.6, "vac": {"valence": 0.8, "arousal": 0.5, "connection": 0.6}},
-        {"emotion_name": "Sadness", "confidence": 0.4, "prominence": 0.4, "vac": {"valence": -0.5, "arousal": -0.2, "connection": 0.0}}
-    ]
-    
-    relationships = [
-        {"emotion_a": "Joy", "emotion_b": "Sadness", "type": "bittersweet", "strength": 0.8}
-    ]
-    
-    three_way = {
-        "content_only": {"emotion": "Joy"},
-        "voice_only": {"emotion": "Sadness"},
-        "discrepancy": {"content_voice_distance": 0.5}
-    }
-    
-    with patch.object(chat_service, '_find_emotion_id', side_effect=[uuid4(), uuid4()]):
-        analysis = await chat_service.save_multi_emotion_analysis(
-            message_id, session_id, emotions, relationships, 
-            [0.1, 0.1, 0.1], 0.5, 0.8, "concurrent",
-            three_way_data=three_way
-        )
-        
-        assert analysis.three_way_enabled
-        assert analysis.discrepancy_metrics["content_voice_distance"] == 0.5
-        
-        # Verify DetectedEmotion adds (2) + Relationship add (1) + Analysis add (1)
-        # We can loosely check call count
-        assert mock_session.add.call_count >= 4
-
-@pytest.mark.asyncio
 async def test_get_multi_emotion_analysis(chat_service, mock_session):
     """Test retrieving analysis."""
     message_id = uuid4()
@@ -370,7 +292,6 @@ async def test_get_session_statistics_not_found(chat_service, mock_session):
         stats = await chat_service.get_session_statistics(uuid4())
         assert stats == {}
 
-
 @pytest.mark.asyncio
 async def test_get_session_statistics_duration(chat_service, mock_session):
     """Test duration calculation in stats."""
@@ -396,6 +317,176 @@ async def test_get_session_statistics_duration(chat_service, mock_session):
         stats = await chat_service.get_session_statistics(session_id)
         assert stats["duration_seconds"] == 3600.0
 
+@pytest.mark.asyncio
+async def test_save_analysis_message_emotion_not_found(chat_service, mock_session):
+    """Test saving analysis message when emotion mapping fails."""
+    session_id = uuid4()
+    session = ChatSession(id=session_id, message_count=5)
+    
+    with patch.object(chat_service, 'get_session', return_value=session):
+        # Mock _resolve_emotion to return None ID
+        mock_mapping = MagicMock()
+        mock_mapping.atlas_id = None
+        mock_mapping.original_name = "Unknown"
+        mock_mapping.match_method = "fuzzy"
+        mock_mapping.match_confidence = 0.5
+
+        with patch.object(chat_service, '_resolve_emotion', return_value=mock_mapping):
+            msg = await chat_service.save_analysis_message(
+                session_id, "Unknown", [0.1, 0.1, 0.1], 0.5, "Analysis", "warm"
+            )
+            
+            assert msg.emotion_id is None
+            assert msg.original_emotion_name == "Unknown"
+            assert session.message_count == 6
+
+@pytest.mark.asyncio
+async def test_save_multi_emotion_analysis_emotion_not_found(chat_service, mock_session):
+    """Test saving multi-emotion analysis when one emotion mapping fails."""
+    message_id = uuid4()
+    session_id = uuid4()
+    
+    emotions = [{
+        "emotion_name": "Unknown", 
+        "confidence": 0.5, 
+        "prominence": 1.0, 
+        "vac": {"valence": 0.1, "arousal": 0.1, "connection": 0.1}
+    }]
+    relationships = []
+    
+    mock_mapping = MagicMock()
+    mock_mapping.atlas_id = None
+    mock_mapping.original_name = "Unknown"
+    mock_mapping.match_method = "fuzzy"
+    mock_mapping.match_confidence = 0.5
+    
+    with patch.object(chat_service, '_resolve_emotion', return_value=mock_mapping):
+        analysis = await chat_service.save_multi_emotion_analysis(
+            message_id, session_id, emotions, relationships, 
+            [0.1, 0.1, 0.1], 0.5, 0.5, "concurrent"
+        )
+        
+        # Verify detected emotion added with None ID
+        args = mock_session.add.call_args_list
+        # Found analysis (0), detected_emotion (1)
+        # We need to find the DetectedEmotion object
+        detected_emotion = None
+        for call in args:
+             obj = call[0][0]
+             if hasattr(obj, 'original_name') and obj.original_name == "Unknown":
+                 detected_emotion = obj
+                 break
+        
+        assert detected_emotion is not None
+        assert detected_emotion.emotion_id is None
+
+@pytest.mark.asyncio
+async def test_resolve_emotion(chat_service, mock_session):
+    # Mock AtlasMapper
+    with patch("app.services.chat_service.AtlasMapper") as MockMapper:
+        mapper_instance = AsyncMock()
+        MockMapper.return_value = mapper_instance
+        
+        # Found case
+        mock_result = MagicMock()
+        mock_result.atlas_id = str(uuid4())
+        mapper_instance.map_emotion.return_value = mock_result
+        
+        res = await chat_service._resolve_emotion("Joy")
+        assert res.atlas_id is not None
+        
+        # Not found case (map_emotion returns a result with None ID or handle None return if that's the contract)
+        # Based on AtlasMapper, it always returns a MappingResult, but atlas_id might be None
+        mock_result_none = MagicMock()
+        mock_result_none.atlas_id = None
+        mapper_instance.map_emotion.return_value = mock_result_none
+        
+        res_none = await chat_service._resolve_emotion("UnknownXYZ")
+        assert res_none.atlas_id is None
+
+@pytest.mark.asyncio
+async def test_save_multi_emotion_analysis(chat_service, mock_session):
+    message_id = uuid4()
+    session_id = uuid4()
+    
+    emotions = [{
+        "emotion_name": "Joy", 
+        "confidence": 0.9, 
+        "prominence": 0.6, 
+        "vac": {"valence": 0.8, "arousal": 0.5, "connection": 0.6}
+    }]
+    relationships = []
+    
+    mock_mapping = MagicMock()
+    mock_mapping.atlas_id = str(uuid4())
+    mock_mapping.original_name = "Joy"
+    mock_mapping.match_method = "exact"
+    mock_mapping.confidence = 1.0
+    
+    with patch.object(chat_service, '_resolve_emotion', return_value=mock_mapping):
+        analysis = await chat_service.save_multi_emotion_analysis(
+            message_id, session_id, emotions, relationships, 
+            [0.8, 0.5, 0.6], 0.5, 0.8, "concurrent"
+        )
+        
+        assert analysis.message_id == message_id
+        assert analysis.deep_feeling_enabled
+        
+        # Verify calls
+        assert mock_session.add.call_count >= 2
+        mock_session.commit.assert_awaited()
+
+# ... (delete_session, session_not_found_branches, get_session_messages, get_recent_messages, update_deep_feeling_mode remain unchanged)
+
+@pytest.mark.asyncio
+async def test_save_multi_emotion_analysis_full(chat_service, mock_session):
+    """Test saving analysis with 3-way data and relationships."""
+    message_id = uuid4()
+    session_id = uuid4()
+    
+    emotions = [
+        {"emotion_name": "Joy", "confidence": 0.9, "prominence": 0.6, "vac": {"valence": 0.8, "arousal": 0.5, "connection": 0.6}},
+        {"emotion_name": "Sadness", "confidence": 0.4, "prominence": 0.4, "vac": {"valence": -0.5, "arousal": -0.2, "connection": 0.0}}
+    ]
+    
+    relationships = [
+        {"emotion_a": "Joy", "emotion_b": "Sadness", "type": "bittersweet", "strength": 0.8}
+    ]
+    
+    three_way = {
+        "content_only": {"emotion": "Joy"},
+        "voice_only": {"emotion": "Sadness"},
+        "discrepancy": {"content_voice_distance": 0.5}
+    }
+    
+    mock_mapping_1 = MagicMock()
+    mock_mapping_1.atlas_id = str(uuid4())
+    mock_mapping_1.original_name = "Joy"
+    mock_mapping_1.match_method = "exact"
+    mock_mapping_1.confidence = 1.0
+
+    mock_mapping_2 = MagicMock()
+    mock_mapping_2.atlas_id = str(uuid4())
+    mock_mapping_2.original_name = "Sadness"
+    mock_mapping_2.match_method = "exact"
+    mock_mapping_2.confidence = 1.0
+    
+    # side_effect for multiple calls
+    with patch.object(chat_service, '_resolve_emotion', side_effect=[mock_mapping_1, mock_mapping_2, mock_mapping_1, mock_mapping_2]): 
+        # Note: Called for each emotion (2) + potentially relationships or other lookups?
+        # Relationships might look up IDs again if not passed.
+        # Let's assume the service looks up emotion IDs for the main list.
+        
+        analysis = await chat_service.save_multi_emotion_analysis(
+            message_id, session_id, emotions, relationships, 
+            [0.1, 0.1, 0.1], 0.5, 0.8, "concurrent",
+            three_way_data=three_way
+        )
+        
+        assert analysis.three_way_enabled
+        assert analysis.discrepancy_metrics["content_voice_distance"] == 0.5
+        
+        assert mock_session.add.call_count >= 4
 
 @pytest.mark.asyncio
 async def test_save_message_count_updates_missing_session(chat_service, mock_session):
@@ -409,7 +500,10 @@ async def test_save_message_count_updates_missing_session(chat_service, mock_ses
         assert msg.content == "test"
         
         # 2. save_analysis_message (need to mock emotion ID lookup)
-        with patch.object(chat_service, '_find_emotion_id', return_value=uuid4()):
+        mock_mapping = MagicMock()
+        mock_mapping.atlas_id = str(uuid4())
+        
+        with patch.object(chat_service, '_resolve_emotion', return_value=mock_mapping):
             msg2 = await chat_service.save_analysis_message(
                 session_id, "Joy", [0.1, 0.1, 0.1], 0.9, "content", "warm"
             )
@@ -429,7 +523,10 @@ async def test_save_analysis_message_branches(chat_service, mock_session):
     session = ChatSession(id=session_id, message_count=0)
     
     with patch.object(chat_service, 'get_session', return_value=session):
-        with patch.object(chat_service, '_find_emotion_id', return_value=uuid4()):
+        mock_mapping = MagicMock()
+        mock_mapping.atlas_id = str(uuid4())
+        
+        with patch.object(chat_service, '_resolve_emotion', return_value=mock_mapping):
             # Test WITH prosody
             prosody = {
                 "pitch_mean": 100.0,
@@ -455,7 +552,11 @@ async def test_save_multi_emotion_missing_relations(chat_service, mock_session):
     # Relationship references "Sadness" which is NOT in the emotions list
     relationships = [{"emotion_a": "Joy", "emotion_b": "Sadness", "type": "contrast"}]
     
-    with patch.object(chat_service, '_find_emotion_id', return_value=uuid4()):
+    mock_mapping = MagicMock()
+    mock_mapping.atlas_id = str(uuid4())
+    mock_mapping.original_name = "Joy"
+
+    with patch.object(chat_service, '_resolve_emotion', return_value=mock_mapping):
         # Should gracefully skip the invalid relationship
         await chat_service.save_multi_emotion_analysis(
             msg_id, session_id, emotions, relationships, [0.1,0.1,0.1], 0.5, 0.5, "concurrent"

@@ -170,18 +170,27 @@ async def test_get_current_user_ws_not_found(mock_db, mock_settings):
     assert exc.value.code == status.WS_1008_POLICY_VIOLATION
 
 @pytest.mark.asyncio
-async def test_get_current_user_ws_bypass_fail(mock_db):
-    """Test dev bypass falls through if user missing, then fails JWT decode."""
+async def test_get_current_user_ws_bypass_create(mock_db):
+    """Test dev bypass for WebSocket creates user if missing."""
     token = "dev-token-bypass"
     
     result = MagicMock()
-    result.scalars.return_value.first.return_value = None
+    result.scalars.return_value.first.return_value = None # No user found
     mock_db.execute.return_value = result
     
-    # It falls through to jwt.decode("dev-token-bypass") -> raises JWTError -> raises WebSocketException
-    with pytest.raises(WebSocketException) as exc:
-        await get_current_user_ws(token, mock_db)
-    assert exc.value.code == status.WS_1008_POLICY_VIOLATION
+    # Refresh mockup
+    async def side_effect_refresh(obj):
+        obj.id = "uuid"
+    mock_db.refresh.side_effect = side_effect_refresh
+    
+    with patch("app.core.security.get_password_hash") as mock_hash:
+        mock_hash.return_value = "hashed"
+        
+        res = await get_current_user_ws(token, mock_db)
+        
+        mock_db.add.assert_called_once()
+        mock_db.commit.assert_called_once()
+        assert res.email == "dev@admin.com"
 
 @pytest.mark.asyncio
 async def test_get_current_user_ws_missing_sub(mock_db, mock_settings):

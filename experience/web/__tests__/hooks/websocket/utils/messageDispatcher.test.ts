@@ -34,9 +34,20 @@ describe("messageDispatcher", () => {
       category: "High",
       vac: { valence: 0.8, arousal: 0.5, control: 0.7 },
       confidence: 0.9,
+      original_emotion: "Super Joy",
+      match_method: "fuzzy",
+      match_confidence: 0.85,
     };
     dispatchMessage(payload as any, mockHandlers);
-    expect(mockHandlers.onAnalysis).toHaveBeenCalledWith("Joy", "High", payload.vac, 0.9);
+    expect(mockHandlers.onAnalysis).toHaveBeenCalledWith(
+      "Joy",
+      "High",
+      payload.vac,
+      0.9,
+      "Super Joy",
+      "fuzzy",
+      0.85
+    );
   });
 
   it("should dispatch error message", () => {
@@ -53,6 +64,9 @@ describe("messageDispatcher", () => {
       vac: { valence: 0.9 },
       confidence: 0.85,
       prominence: "primary",
+      original_emotion: "Wow",
+      match_method: "exact",
+      match_confidence: 1.0,
     };
     dispatchMessage(payload as any, mockHandlers);
     expect(mockHandlers.onMultiEmotion).toHaveBeenCalledWith(
@@ -60,7 +74,10 @@ describe("messageDispatcher", () => {
       "Deep",
       payload.vac,
       0.85,
-      "primary"
+      "primary",
+      "Wow",
+      "exact",
+      1.0
     );
   });
 
@@ -176,7 +193,10 @@ describe("messageDispatcher", () => {
       "", // default category
       payload.vac,
       0, // default confidence
-      "primary"
+      "primary",
+      undefined,
+      undefined,
+      undefined
     );
   });
 
