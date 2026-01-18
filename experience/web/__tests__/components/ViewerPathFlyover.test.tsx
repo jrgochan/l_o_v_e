@@ -200,7 +200,7 @@ describe("ViewerPathFlyover", () => {
     act(() => {
       if (frameCallback) {
         frameCallback({ clock: { elapsedTime: 0 } } as any);
-        // Ensure we go well past duration (24s) to hit 1.0. 
+        // Ensure we go well past duration (24s) to hit 1.0.
         // 30s ensures eased progress is 1.0
         frameCallback({ clock: { elapsedTime: 30.0 } } as any);
       }

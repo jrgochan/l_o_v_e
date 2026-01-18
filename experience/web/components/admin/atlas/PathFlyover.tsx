@@ -171,7 +171,7 @@ export function PathFlyover() {
   }, [
     selectedPathId,
     computedPaths,
-    // allEmotions,
+    allEmotions,
     setTransitionPath,
     setFlyoverProgress,
     setIsFlying,

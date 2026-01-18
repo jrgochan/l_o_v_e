@@ -49,8 +49,6 @@ const mockExperienceState = {
   flyoverProgress: 0,
 };
 
-
-
 // Mock R3F
 const mockUseFrame = jest.fn();
 const mockDistanceTo = jest.fn((_v?: any) => 10);
@@ -106,9 +104,13 @@ describe("PathFlyover", () => {
       allEmotions: [],
     });
     // Wire up useAtlasAdminStore
-    (useAtlasAdminStore as unknown as jest.Mock).mockImplementation((selector: any) => selector(mockState));
+    (useAtlasAdminStore as unknown as jest.Mock).mockImplementation((selector: any) =>
+      selector(mockState)
+    );
     (useAtlasAdminStore.getState as jest.Mock).mockReturnValue(mockState);
-    (useAtlasAdminStore.setState as jest.Mock).mockImplementation((newState: any) => Object.assign(mockState, newState));
+    (useAtlasAdminStore.setState as jest.Mock).mockImplementation((newState: any) =>
+      Object.assign(mockState, newState)
+    );
 
     // Experience Store Mock Init
     Object.assign(mockExperienceState, {
@@ -121,11 +123,14 @@ describe("PathFlyover", () => {
     });
 
     // Wire up useExperienceStore
-    (useExperienceStore as unknown as jest.Mock).mockImplementation((selector: any) => selector(mockExperienceState));
+    (useExperienceStore as unknown as jest.Mock).mockImplementation((selector: any) =>
+      selector(mockExperienceState)
+    );
     (useExperienceStore.getState as jest.Mock).mockReturnValue(mockExperienceState);
-    (useExperienceStore.setState as jest.Mock).mockImplementation((newState: any) => Object.assign(mockExperienceState, newState));
+    (useExperienceStore.setState as jest.Mock).mockImplementation((newState: any) =>
+      Object.assign(mockExperienceState, newState)
+    );
   });
-
 
   it("should initialize flight when flying", () => {
     render(<PathFlyover />);

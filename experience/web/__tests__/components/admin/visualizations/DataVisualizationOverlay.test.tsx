@@ -13,7 +13,7 @@ jest.mock("@/components/admin/spheres/MiniSoulSphere", () => ({
     <div
       data-testid={`sphere-${emotion.id}`}
       onClick={onClick}
-      onMouseEnter={() => { }} // Not strictly using this handler in test, parent handles it
+      onMouseEnter={() => {}} // Not strictly using this handler in test, parent handles it
     >
       {emotion.name} {isHovered ? "(Hovered)" : ""}
     </div>
@@ -172,7 +172,7 @@ describe("DataVisualizationOverlay", () => {
 
     // Click "View all emotions" - wait, the new UI might not have a button with this exact text?
     // Checking DataVisualizationOverlay.tsx... it has "Clear Filter" logic but maybe not that text.
-    // The new Empty State has a "Clear Filter" button? 
+    // The new Empty State has a "Clear Filter" button?
     // Actually, looking at the DOM output in the failure message:
     // <div class="text-center"> <h3...>No Data</h3> <p>No emotions match this query.</p> </div>
     // It does NOT seem to have a "View all emotions" button in the DOM snippet provided in the failure.
