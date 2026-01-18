@@ -610,7 +610,7 @@ async def _extract_audio_features(
             logger.error(f"Feature extraction failed: {response.text}")
             raise RuntimeError(f"Feature extraction failed: {response.status_code}")
 
-        return response.json()
+        return dict(response.json())
 
 
 async def _analyze_audio_content(
@@ -646,7 +646,7 @@ async def _analyze_audio_content(
     if response.status_code != 200:
         raise RuntimeError(f"Analysis failed: {response.status_code}")
 
-    return response.json()
+    return dict(response.json())
 
 
 async def process_audio_message(
@@ -725,7 +725,7 @@ async def process_audio_message(
 
             final_result = await _analyze_audio_content(
                 client,
-                transcription,
+                transcription or "",
                 prosody_data,
                 user_identifier,
                 session_id,

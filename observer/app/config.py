@@ -6,8 +6,8 @@ Loads environment variables from .env file.
 import json
 from typing import List
 
-from pydantic import ConfigDict, Field
-from pydantic_settings import BaseSettings
+from pydantic import Field
+from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
 class Settings(BaseSettings):
@@ -107,7 +107,7 @@ class Settings(BaseSettings):
     APP_NAME: str = Field(default="L.O.V.E. Observer API")
     APP_DESCRIPTION: str = Field(default="Emotional state persistence and context retrieval")
 
-    model_config = ConfigDict(env_file=".env", case_sensitive=True)
+    model_config = SettingsConfigDict(env_file=".env", case_sensitive=True)
 
 
 # Global settings instance

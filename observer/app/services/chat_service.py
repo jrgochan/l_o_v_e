@@ -390,10 +390,11 @@ class ChatService:
         """
         # Find emotion ID from emotion name
         mapping = await self._resolve_emotion(emotion_name)
-        
+
         emotion_id = None
         if mapping.atlas_id:
             from uuid import UUID
+
             emotion_id = UUID(mapping.atlas_id)
         else:
             logger.warning(f"Emotion not found: {emotion_name}")
@@ -701,10 +702,11 @@ class ChatService:
             # Resolve emotion name to atlas ID (handles typos, variations)
             # Example: "joyful" → Joy, "anxious" → Anxiety
             mapping = await self._resolve_emotion(emotion_data["emotion_name"])
-            
+
             emotion_id = None
             if mapping.atlas_id:
                 from uuid import UUID
+
                 emotion_id = UUID(mapping.atlas_id)
 
             # Create detected emotion record

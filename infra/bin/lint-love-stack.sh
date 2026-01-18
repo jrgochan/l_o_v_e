@@ -164,6 +164,11 @@ if [ "$RUN_PYTHON" = true ]; then
     PYTHON_ARGS=()
     [ "$FIX_MODE" = true ] && PYTHON_ARGS+=("--fix")
     
+    # Pass module filter if specific python module is targeted
+    if [[ "$TARGET_MODULE" == "observer" || "$TARGET_MODULE" == "listener" || "$TARGET_MODULE" == "versor" ]]; then
+        PYTHON_ARGS+=("--module=$TARGET_MODULE")
+    fi
+    
     # Run from project root as it expects or from its dir? 
     # check-python-quality.sh expects to be run? It resolves its own dir. 
     # So we can call it by absolute path.

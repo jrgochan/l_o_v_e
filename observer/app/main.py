@@ -5,7 +5,7 @@ The memory and contextual core of the L.O.V.E. stack.
 
 import logging
 from contextlib import asynccontextmanager
-from typing import Any, Dict
+from typing import Any, AsyncGenerator, Dict
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
@@ -38,7 +38,7 @@ logger = logging.getLogger(__name__)
 
 
 @asynccontextmanager
-async def lifespan(app: FastAPI):
+async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
     """Application lifespan events.
 
     Handles startup and shutdown tasks:
