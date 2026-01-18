@@ -172,11 +172,21 @@ export function PathFlyover() {
     setIsFlying,
   ]);
 
-  // SFX Trigger on Fly Start (only when toggling from false to true)
+  // Sync isFlying state and handle restart logic (Ported from ViewerPathFlyover)
   useEffect(() => {
     if (isFlying) {
       playWhoosh(3.0);
-      // Ensure we force a "resume" calc by clearing active ref if it was stale, but actually we use null to signal "recalc start time"
+
+      // Check store for explicit reset (e.g. from Plane button in Overlay)
+      // or if we are at the end (Auto-Restart logic, though Overlay handles that too)
+      const storeProgress = useExperienceStore.getState().flyoverProgress;
+
+      // If store says 0 but we are at >1% locally, it means an external reset happened
+      if (storeProgress === 0 && progressRef.current > 0.01) {
+        progressRef.current = 0;
+      }
+
+      // Ensure we force a "resume" calc by clearing active ref
       startTimeRef.current = null;
     }
   }, [isFlying, playWhoosh]);

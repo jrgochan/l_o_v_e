@@ -46,6 +46,7 @@ import { VACAnimator } from "@/components/VACAnimator";
 import { DebugBroadcaster } from "@/components/DebugBroadcaster";
 import { PathDetailsOverlay } from "@/components/PathDetailsOverlay";
 import { useAdminTheme } from "@/hooks/admin/useAdminTheme";
+import { WaypointArrivalOverlay } from "@/components/WaypointArrivalOverlay";
 
 const AtlasAdminContent = () => {
   // Load emotions and set up path calculator
@@ -310,11 +311,10 @@ const AtlasAdminContent = () => {
                 toggleMute();
                 playClickSound();
               }}
-              className={`px-3 py-2 ${theme.layout.borderRadius} transition-all duration-300 flex items-center gap-2 text-sm border ${
-                isMuted
-                  ? `bg-red-900/50 border-red-800 text-red-200 hover:bg-red-800/50`
-                  : `${theme.colors.background} ${theme.colors.border} ${theme.colors.text.secondary} hover:${theme.colors.text.primary}`
-              }`}
+              className={`px-3 py-2 ${theme.layout.borderRadius} transition-all duration-300 flex items-center gap-2 text-sm border ${isMuted
+                ? `bg-red-900/50 border-red-800 text-red-200 hover:bg-red-800/50`
+                : `${theme.colors.background} ${theme.colors.border} ${theme.colors.text.secondary} hover:${theme.colors.text.primary}`
+                }`}
               title={isMuted ? "Unmute Audio" : "Mute Audio"}
             >
               {isMuted ? "🔇" : "🔊"}
@@ -444,9 +444,8 @@ const AtlasAdminContent = () => {
           <div
             data-testid="resize-handle"
             onMouseDown={handleMouseDown}
-            className={`w-2 flex-shrink-0 cursor-col-resize transition flex items-center justify-center hover:bg-cyan-500/50 ${
-              isResizing ? "bg-cyan-500" : "bg-transparent"
-            }`}
+            className={`w-2 flex-shrink-0 cursor-col-resize transition flex items-center justify-center hover:bg-cyan-500/50 ${isResizing ? "bg-cyan-500" : "bg-transparent"
+              }`}
             style={{ touchAction: "none" }}
           >
             <div className={`w-px h-8 ${theme.colors.border} bg-current opacity-50`} />
@@ -497,6 +496,7 @@ const AtlasAdminContent = () => {
 
       {/* Zen HUD (Visible in Zen or Cinema modes) - Replaced by Beautiful UX Overlay */}
       {viewMode !== "default" && layers.transitionPaths && <PathDetailsOverlay />}
+      <WaypointArrivalOverlay />
 
       {/* Debug Broadcaster */}
       {showDebug && <DebugBroadcaster />}

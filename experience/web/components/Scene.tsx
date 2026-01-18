@@ -125,7 +125,8 @@ export function Scene() {
       </Canvas>
 
       {/* Tooltip overlay */}
-      {hoveredWaypoint && hoveredWaypoint.data && (
+      {/* Tooltip overlay - Disabled as per user request */}
+      {/* {hoveredWaypoint && hoveredWaypoint.data && (
         <WaypointTooltip
           waypoint={hoveredWaypoint.data}
           position={hoveredWaypoint.screenPos}
@@ -139,7 +140,7 @@ export function Scene() {
               | "waypoint"
           }
         />
-      )}
+      )} */}
     </>
   );
 }

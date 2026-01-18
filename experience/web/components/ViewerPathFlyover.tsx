@@ -22,7 +22,7 @@ export function ViewerPathFlyover() {
   const lookAtRef = useRef(new THREE.Vector3());
   const splineRef = useRef<THREE.CatmullRomCurve3 | null>(null);
 
-  const BASE_DURATION = 12.0;
+  const BASE_DURATION = 24.0;
   const LOOK_AHEAD = 0.05;
 
   // Initialize spline when path changes
@@ -102,7 +102,8 @@ export function ViewerPathFlyover() {
     // Waypoint Index Tracking
     const totalPoints = transitionPath.waypoints.length + 2;
     const continuousIndex = easedProgress * (totalPoints - 1);
-    const currentIndex = Math.floor(continuousIndex + 0.1);
+    // Adjusted buffer to 0.35 gives a larger "approaching" window (triggering at 0.65 of previous segment)
+    const currentIndex = Math.floor(continuousIndex + 0.35);
 
     if (currentIndex !== flyoverCurrentWaypointIndexRef.current) {
       flyoverCurrentWaypointIndexRef.current = currentIndex;

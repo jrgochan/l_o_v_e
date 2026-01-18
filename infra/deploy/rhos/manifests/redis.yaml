@@ -1,0 +1,45 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: love-redis
+  labels:
+    app: love-stack
+    component: cache
+spec:
+  ports:
+    - port: 6379
+      targetPort: 6379
+  selector:
+    app: love-stack
+    component: cache
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: love-redis
+  labels:
+    app: love-stack
+    component: cache
+spec:
+  selector:
+    matchLabels:
+      app: love-stack
+      component: cache
+  template:
+    metadata:
+      labels:
+        app: love-stack
+        component: cache
+    spec:
+      containers:
+        - name: redis
+          image: redis:7
+          ports:
+            - containerPort: 6379
+          resources:
+            requests:
+              cpu: 50m
+              memory: 128Mi
+            limits:
+              cpu: 500m
+              memory: 512Mi

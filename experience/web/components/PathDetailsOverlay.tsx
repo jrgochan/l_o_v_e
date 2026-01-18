@@ -120,22 +120,22 @@ export function PathDetailsOverlay() {
       const wp = waypoints[currentIndex - 1];
       return wp
         ? {
-            id: `wp-${currentIndex}`,
-            label: `Step ${currentIndex + 1}`,
-            emotion: wp.emotion,
-            description: wp.reasoning || "Transitioning through this emotional state.",
-            index: currentIndex,
-            // Check if wp has vac, otherwise default to neutral logic or look it up (assuming it has vac per interface)
-            color: wp.vac ? getEmotionColor(wp.vac[0]) : "#fbbf24",
-            vac: wp.vac,
-          }
+          id: `wp-${currentIndex}`,
+          label: `Step ${currentIndex + 1}`,
+          emotion: wp.emotion,
+          description: wp.reasoning || "Transitioning through this emotional state.",
+          index: currentIndex,
+          // Check if wp has vac, otherwise default to neutral logic or look it up (assuming it has vac per interface)
+          color: wp.vac ? getEmotionColor(wp.vac[0]) : "#fbbf24",
+          vac: wp.vac,
+        }
         : null;
     }
   }, [currentIndex, totalPoints, waypoints, transitionPath]);
 
   // Main Card Animation
   const cardSpring = useSpring({
-    from: { opacity: 0, y: -50 },
+    from: { opacity: 0, y: 50 },
     to: { opacity: 1, y: 0 },
     config: config.gentle,
   });
@@ -212,7 +212,7 @@ export function PathDetailsOverlay() {
   return (
     <>
       <div
-        className={`fixed left-1/2 -translate-x-1/2 z-50 pointer-events-none transition-all duration-500 ${viewMode === "cinema" ? "top-28" : "top-8"}`}
+        className={`fixed left-1/2 -translate-x-1/2 z-50 pointer-events-none transition-all duration-500 ${viewMode === "cinema" ? "bottom-12" : "bottom-8"}`}
       >
         {/* Main Control Deck */}
         <animated.div
@@ -325,16 +325,16 @@ export function PathDetailsOverlay() {
             </div>
 
             {/* Text Details (Active Item - BELOW) */}
-            <div className="h-6 relative mt-0.5">
-              <div className="absolute top-0 left-0 w-full flex items-center gap-3 px-1">
+            <div className="h-6 relative mt-0.5 overflow-hidden">
+              <div className="absolute top-0 left-0 w-full h-full flex items-center gap-3 px-1">
                 {/* Current Active Item */}
                 {itemTransitions(
                   (style, item) =>
                     item && (
-                      <animated.div style={style} className="flex items-center gap-2">
+                      <animated.div style={style} className="flex items-center gap-2 w-full max-w-full">
                         {/* Colored Badge - REPURPOSED FOR CATEGORY NUMBER */}
                         <span
-                          className="w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-bold text-black shadow-sm"
+                          className="w-5 h-5 rounded-full flex-shrink-0 flex items-center justify-center text-[10px] font-bold text-black shadow-sm"
                           style={{ backgroundColor: item.color }}
                           title="Category Index"
                         >
@@ -342,31 +342,33 @@ export function PathDetailsOverlay() {
                             ? String(categoryInfo.index).padStart(2, "0")
                             : "--"}
                         </span>
-                        {/* Colored Label */}
-                        <div className="flex items-baseline gap-2">
+                        {/* Colored Label Container */}
+                        <div className="flex items-baseline gap-2 min-w-0 flex-1">
                           <span
-                            className="text-sm font-medium truncate max-w-[200px]"
+                            className="text-sm font-medium truncate"
                             style={{ color: item.color }}
                           >
                             {item.emotion}
                           </span>
                           {/* Step label moved here */}
-                          <span className="text-[10px] text-white/40 uppercase tracking-wider hidden sm:inline-block">
-                            {item.label}
-                          </span>
-                          {item.vac && (
-                            <span className="text-[9px] font-mono ml-0.5 tracking-tight flex gap-1">
-                              <span style={{ color: getVacComponentColor(item.vac[0], "V") }}>
-                                V:{item.vac[0].toFixed(2)}
-                              </span>
-                              <span style={{ color: getVacComponentColor(item.vac[1], "A") }}>
-                                A:{item.vac[1].toFixed(2)}
-                              </span>
-                              <span style={{ color: getVacComponentColor(item.vac[2], "C") }}>
-                                C:{item.vac[2].toFixed(2)}
-                              </span>
+                          <div className="hidden sm:flex items-baseline gap-2 min-w-0 flex-shrink">
+                            <span className="text-[10px] text-white/40 uppercase tracking-wider flex-shrink-0">
+                              {item.label}
                             </span>
-                          )}
+                            {item.vac && (
+                              <span className="text-[9px] font-mono ml-0.5 tracking-tight flex gap-1 flex-shrink-0">
+                                <span style={{ color: getVacComponentColor(item.vac[0], "V") }}>
+                                  V:{item.vac[0].toFixed(2)}
+                                </span>
+                                <span style={{ color: getVacComponentColor(item.vac[1], "A") }}>
+                                  A:{item.vac[1].toFixed(2)}
+                                </span>
+                                <span style={{ color: getVacComponentColor(item.vac[2], "C") }}>
+                                  C:{item.vac[2].toFixed(2)}
+                                </span>
+                              </span>
+                            )}
+                          </div>
 
                           {/* Relocated Info Button */}
                           <button
@@ -374,7 +376,7 @@ export function PathDetailsOverlay() {
                               e.stopPropagation();
                               handleOpenModal();
                             }}
-                            className="ml-2 w-5 h-5 rounded-full flex items-center justify-center bg-white/10 text-white/50 hover:bg-white/20 hover:text-white transition-all hover:scale-110 active:scale-95 group-hover:bg-white/20"
+                            className="ml-auto w-5 h-5 rounded-full flex-shrink-0 flex items-center justify-center bg-white/10 text-white/50 hover:bg-white/20 hover:text-white transition-all hover:scale-110 active:scale-95 group-hover:bg-white/20"
                             title="View Details"
                           >
                             <Info size={10} />
@@ -395,11 +397,10 @@ export function PathDetailsOverlay() {
                 onClick={() => setFlyoverSpeed(s)}
                 className={`
                                 w-7 h-7 rounded-full flex items-center justify-center text-[10px] font-bold transition-all
-                                ${
-                                  flyoverSpeed === s
-                                    ? "bg-white text-black shadow-sm"
-                                    : "text-white/30 hover:bg-white/10 hover:text-white"
-                                }
+                                ${flyoverSpeed === s
+                    ? "bg-white text-black shadow-sm"
+                    : "text-white/30 hover:bg-white/10 hover:text-white"
+                  }
                             `}
               >
                 {s}x
@@ -454,8 +455,8 @@ export function PathDetailsOverlay() {
             </div>
           </div>
 
-          {/* 5. Category Display (Absolute Bottom Center) */}
-          <div className="absolute -bottom-6 left-1/2 -translate-x-1/2 text-[9px] text-white/30 uppercase tracking-[0.2em] font-medium selection:bg-transparent">
+          {/* 5. Category Display (Absolute Top Center) */}
+          <div className="absolute -top-6 left-1/2 -translate-x-1/2 text-[9px] text-white/30 uppercase tracking-[0.2em] font-medium selection:bg-transparent">
             BROWSING: <span className="text-white/60">{categoryInfo.name}</span>
           </div>
         </animated.div>
