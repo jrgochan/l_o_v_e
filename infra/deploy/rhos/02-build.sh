@@ -53,6 +53,7 @@ build_service() {
     # versor/Containerfile says `COPY app/ app/`.
     # So the build context should be `versor/`.
     
+    # shellcheck disable=SC2086
     oc start-build "love-$svc_name" --from-dir="$ROOT_DIR/$dir" --follow $oc_build_args
 }
 
