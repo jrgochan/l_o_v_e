@@ -120,15 +120,15 @@ export function PathDetailsOverlay() {
       const wp = waypoints[currentIndex - 1];
       return wp
         ? {
-          id: `wp-${currentIndex}`,
-          label: `Step ${currentIndex + 1}`,
-          emotion: wp.emotion,
-          description: wp.reasoning || "Transitioning through this emotional state.",
-          index: currentIndex,
-          // Check if wp has vac, otherwise default to neutral logic or look it up (assuming it has vac per interface)
-          color: wp.vac ? getEmotionColor(wp.vac[0]) : "#fbbf24",
-          vac: wp.vac,
-        }
+            id: `wp-${currentIndex}`,
+            label: `Step ${currentIndex + 1}`,
+            emotion: wp.emotion,
+            description: wp.reasoning || "Transitioning through this emotional state.",
+            index: currentIndex,
+            // Check if wp has vac, otherwise default to neutral logic or look it up (assuming it has vac per interface)
+            color: wp.vac ? getEmotionColor(wp.vac[0]) : "#fbbf24",
+            vac: wp.vac,
+          }
         : null;
     }
   }, [currentIndex, totalPoints, waypoints, transitionPath]);
@@ -331,7 +331,10 @@ export function PathDetailsOverlay() {
                 {itemTransitions(
                   (style, item) =>
                     item && (
-                      <animated.div style={style} className="flex items-center gap-2 w-full max-w-full">
+                      <animated.div
+                        style={style}
+                        className="flex items-center gap-2 w-full max-w-full"
+                      >
                         {/* Colored Badge - REPURPOSED FOR CATEGORY NUMBER */}
                         <span
                           className="w-5 h-5 rounded-full flex-shrink-0 flex items-center justify-center text-[10px] font-bold text-black shadow-sm"
@@ -397,10 +400,11 @@ export function PathDetailsOverlay() {
                 onClick={() => setFlyoverSpeed(s)}
                 className={`
                                 w-7 h-7 rounded-full flex items-center justify-center text-[10px] font-bold transition-all
-                                ${flyoverSpeed === s
-                    ? "bg-white text-black shadow-sm"
-                    : "text-white/30 hover:bg-white/10 hover:text-white"
-                  }
+                                ${
+                                  flyoverSpeed === s
+                                    ? "bg-white text-black shadow-sm"
+                                    : "text-white/30 hover:bg-white/10 hover:text-white"
+                                }
                             `}
               >
                 {s}x

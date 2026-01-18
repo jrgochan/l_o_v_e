@@ -29,7 +29,7 @@ jest.mock("@react-spring/web", () => ({
       try {
         if (Array.isArray(items)) items.forEach((i) => config.keys(i));
         else config.keys(items);
-      } catch (e) {}
+      } catch (e) { }
     }
     return (fn: any) => (items ? fn({ opacity: 1 }, items) : null);
   },
@@ -429,6 +429,6 @@ describe("PathDetailsOverlay", () => {
     // The outermost div has the class
     // We can find it by verifying position class
     const wrapper = container.firstChild;
-    expect(wrapper).toHaveClass("top-28");
+    expect(wrapper).toHaveClass("bottom-12");
   });
 });

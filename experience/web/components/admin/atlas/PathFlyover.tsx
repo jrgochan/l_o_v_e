@@ -53,6 +53,7 @@ export function PathFlyover() {
   const startTimeRef = useRef<number | null>(null);
   const pathCurveRef = useRef<THREE.CatmullRomCurve3 | null>(null);
   const lookAtRef = useRef(new THREE.Vector3());
+  const lastPathIdRef = useRef<string | null>(null);
 
   // Waypoint tracking for labels
   const waypointsRef = useRef<Array<{ id: string; vec: THREE.Vector3 }>>([]);
@@ -68,7 +69,16 @@ export function PathFlyover() {
       startTimeRef.current = null;
       progressRef.current = 0;
       setFlyoverProgress(0);
+      lastPathIdRef.current = null;
       return;
+    }
+
+    // Only fully reset if ID changed
+    if (selectedPathId !== lastPathIdRef.current) {
+      progressRef.current = 0;
+      setFlyoverProgress(0);
+      startTimeRef.current = null;
+      lastPathIdRef.current = selectedPathId;
     }
 
     const path = computedPaths.get(selectedPathId);
@@ -152,11 +162,6 @@ export function PathFlyover() {
     // Create curve matches PathNetwork visual
     pathCurveRef.current = new THREE.CatmullRomCurve3(points, false, "catmullrom", 0.5);
 
-    // Reset progress on new path
-    progressRef.current = 0;
-    setFlyoverProgress(0);
-    startTimeRef.current = null; // Will calculate on next frame
-
     // Note: We do NOT playSFX here automatically anymore, unless we want to separate "Select" from "Play".
     // Director mode usually starts immediately?
     // If we want "Play Journey" button to start it, we shouldn't start automatically.
@@ -166,7 +171,7 @@ export function PathFlyover() {
   }, [
     selectedPathId,
     computedPaths,
-    allEmotions,
+    // allEmotions,
     setTransitionPath,
     setFlyoverProgress,
     setIsFlying,

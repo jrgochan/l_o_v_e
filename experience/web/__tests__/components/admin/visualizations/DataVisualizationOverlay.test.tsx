@@ -13,7 +13,7 @@ jest.mock("@/components/admin/spheres/MiniSoulSphere", () => ({
     <div
       data-testid={`sphere-${emotion.id}`}
       onClick={onClick}
-      onMouseEnter={() => {}} // Not strictly using this handler in test, parent handles it
+      onMouseEnter={() => { }} // Not strictly using this handler in test, parent handles it
     >
       {emotion.name} {isHovered ? "(Hovered)" : ""}
     </div>
@@ -77,10 +77,11 @@ describe("DataVisualizationOverlay", () => {
   it("renders header and emotion grid", () => {
     render(<DataVisualizationOverlay onClose={mockOnClose} />);
 
-    expect(screen.getByText("Data Visualization Mode")).toBeInTheDocument();
-    expect(screen.getByText("Joy")).toBeInTheDocument();
-    expect(screen.getByText("Sadness")).toBeInTheDocument();
-    expect(screen.getByText("Anger")).toBeInTheDocument();
+    expect(screen.getByText("Data Sense")).toBeInTheDocument();
+    // Joy appears in grid and potential insights, so we check for at least one
+    expect(screen.getAllByText("Joy").length).toBeGreaterThan(0);
+    expect(screen.getAllByText("Sadness").length).toBeGreaterThan(0);
+    expect(screen.getAllByText("Anger").length).toBeGreaterThan(0);
   });
 
   it("filters by category", () => {
@@ -89,13 +90,25 @@ describe("DataVisualizationOverlay", () => {
     // Click Category "Happy"
     fireEvent.click(screen.getByText("Happy"));
 
-    expect(screen.getByText("Joy")).toBeInTheDocument();
+    expect(screen.getAllByText("Joy").length).toBeGreaterThan(0);
     expect(screen.queryByText("Sadness")).not.toBeInTheDocument();
     expect(screen.queryByText("Anger")).not.toBeInTheDocument();
 
     // Clear filter
-    fireEvent.click(screen.getByText(/All \(\d+\)/));
-    expect(screen.getByText("Sadness")).toBeInTheDocument();
+    fireEvent.click(screen.getByText("Whole Atlas"));
+    expect(screen.getAllByText("Sadness").length).toBeGreaterThan(0);
+  });
+
+  it("toggles category selection off when clicked again", () => {
+    render(<DataVisualizationOverlay onClose={mockOnClose} />);
+
+    // Click Category "Happy" (Select)
+    fireEvent.click(screen.getByText("Happy"));
+    expect(screen.queryByText("Sadness")).not.toBeInTheDocument();
+
+    // Click Category "Happy" again (Deselect)
+    fireEvent.click(screen.getByText("Happy"));
+    expect(screen.getAllByText("Sadness").length).toBeGreaterThan(0);
   });
 
   it("handles sorting (alphabetical check)", () => {
@@ -120,7 +133,7 @@ describe("DataVisualizationOverlay", () => {
       fireEvent.mouseEnter(parent);
     }
 
-    expect(screen.getByText("A feeling of pleasure")).toBeInTheDocument();
+    expect(screen.getByText('"A feeling of pleasure"')).toBeInTheDocument();
     expect(screen.getByText("Joy (Hovered)")).toBeInTheDocument(); // Check prop passing
 
     if (parent) {
@@ -155,36 +168,56 @@ describe("DataVisualizationOverlay", () => {
     });
 
     render(<DataVisualizationOverlay onClose={mockOnClose} />);
-    expect(screen.getByText("No emotions in this category")).toBeInTheDocument();
+    expect(screen.getByText("No emotions match this query.")).toBeInTheDocument();
 
-    // Click "View all emotions"
-    fireEvent.click(screen.getByText("View all emotions"));
-
-    // Expect category to be cleared (setSelectedCategory(null))
-    // Since selectedCategory is internal state, we can't easily check it directly without inspecting the component internals or side effects.
-    // However, clicking it shouldn't crash.
-    // If we want to be sure, we can check if "No emotions" is gone or if `allEmotions` are shown?
-    // But in this specific mock setup, `allEmotions` is empty, so it will still look empty.
-    // The previous implementation plan just said "Verify state update (indirectly, or simply ensure no crash/handler execution)".
-    // So just clicking it covers the line.
+    // Click "View all emotions" - wait, the new UI might not have a button with this exact text?
+    // Checking DataVisualizationOverlay.tsx... it has "Clear Filter" logic but maybe not that text.
+    // The new Empty State has a "Clear Filter" button? 
+    // Actually, looking at the DOM output in the failure message:
+    // <div class="text-center"> <h3...>No Data</h3> <p>No emotions match this query.</p> </div>
+    // It does NOT seem to have a "View all emotions" button in the DOM snippet provided in the failure.
+    // So I should remove the click interaction or find the correct button.
+    // The previous implementation had a "Clear Filters" button in the empty state.
+    // If the new one doesn't, I should just verify the text.
+    // Actually, I'll update the component to include a clear button if it's missing, or just verify the text for now.
+    // Since I'm just fixing tests, I'll stick to verifying the text.
   });
 
-  it("renders correct descriptions for different color schemes", () => {
-    // Valence
-    setupMockState("valence");
-    const { unmount: unmount1 } = render(<DataVisualizationOverlay onClose={mockOnClose} />);
-    expect(screen.getByText("Red (negative) to Green (positive)")).toBeInTheDocument();
-    unmount1();
-
-    // Arousal
-    setupMockState("arousal");
-    const { unmount: unmount2 } = render(<DataVisualizationOverlay onClose={mockOnClose} />);
-    expect(screen.getByText("Blue (low) to Red (high)")).toBeInTheDocument();
-    unmount2();
-
-    // Connection
-    setupMockState("connection");
+  // Replaced obsolete color legend test with simple existence check of new stats
+  it("renders VAC stats", () => {
     render(<DataVisualizationOverlay onClose={mockOnClose} />);
-    expect(screen.getByText("Purple (withdrawal) to Yellow (openness)")).toBeInTheDocument();
+    expect(screen.getByText("AVG VALENCE")).toBeInTheDocument();
+    expect(screen.getByText("AVG AROUSAL")).toBeInTheDocument();
+    expect(screen.getByText("AVG CONNECTION")).toBeInTheDocument();
+  });
+
+  it("handles insight card clicks", () => {
+    render(<DataVisualizationOverlay onClose={mockOnClose} />);
+
+    // Helper to find and click insight card
+    const clickInsight = (label: string) => {
+      const labelEl = screen.getByText(label);
+      const card = labelEl.nextElementSibling;
+      if (card) {
+        fireEvent.click(card);
+      } else {
+        throw new Error(`Could not find insight card for ${label}`);
+      }
+    };
+
+    // 1. Most Connected (Joy id:1 in mock)
+    clickInsight("Most Connected");
+    expect(mockSelectEmotion).toHaveBeenCalledWith("1");
+    mockSelectEmotion.mockClear();
+
+    // 2. Highest Energy (Anger id:3 in mock)
+    clickInsight("Highest Energy");
+    expect(mockSelectEmotion).toHaveBeenCalledWith("3");
+    mockSelectEmotion.mockClear();
+
+    // 3. Most Negative (Sadness id:2 in mock)
+    clickInsight("Most Negative");
+    expect(mockSelectEmotion).toHaveBeenCalledWith("2");
+    mockSelectEmotion.mockClear();
   });
 });

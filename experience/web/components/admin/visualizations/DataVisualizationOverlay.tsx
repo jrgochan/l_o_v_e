@@ -52,8 +52,20 @@ const VacRadarChart = ({ vac, color }: { vac: [number, number, number]; color: s
       />
       {/* Axis Lines */}
       <line x1="50" y1="50" x2="50" y2="10" stroke="rgba(255,255,255,0.1)" />
-      <line x1="50" y1="50" x2={50 + 40 * 0.866} y2={50 + 40 * 0.5} stroke="rgba(255,255,255,0.1)" />
-      <line x1="50" y1="50" x2={50 - 40 * 0.866} y2={50 + 40 * 0.5} stroke="rgba(255,255,255,0.1)" />
+      <line
+        x1="50"
+        y1="50"
+        x2={50 + 40 * 0.866}
+        y2={50 + 40 * 0.5}
+        stroke="rgba(255,255,255,0.1)"
+      />
+      <line
+        x1="50"
+        y1="50"
+        x2={50 - 40 * 0.866}
+        y2={50 + 40 * 0.5}
+        stroke="rgba(255,255,255,0.1)"
+      />
 
       {/* Data Polygon */}
       <polygon
@@ -64,9 +76,15 @@ const VacRadarChart = ({ vac, color }: { vac: [number, number, number]; color: s
         strokeWidth="2"
       />
       {/* Labels */}
-      <text x="50" y="5" textAnchor="middle" fontSize="8" fill="rgba(255,255,255,0.5)">V</text>
-      <text x="90" y="80" textAnchor="middle" fontSize="8" fill="rgba(255,255,255,0.5)">A</text>
-      <text x="10" y="80" textAnchor="middle" fontSize="8" fill="rgba(255,255,255,0.5)">C</text>
+      <text x="50" y="5" textAnchor="middle" fontSize="8" fill="rgba(255,255,255,0.5)">
+        V
+      </text>
+      <text x="90" y="80" textAnchor="middle" fontSize="8" fill="rgba(255,255,255,0.5)">
+        A
+      </text>
+      <text x="10" y="80" textAnchor="middle" fontSize="8" fill="rgba(255,255,255,0.5)">
+        C
+      </text>
     </svg>
   );
 };
@@ -157,14 +175,24 @@ export function DataVisualizationOverlay({ onClose }: DataVisualizationOverlayPr
   const hoveredEmotion = hoveredId ? allEmotions.find((e) => e.id === hoveredId) : null;
 
   return (
-    <div className={`fixed inset-0 z-50 flex flex-col ${theme.colors.background} bg-opacity-95 backdrop-blur-md`}>
-
+    <div
+      className={`fixed inset-0 z-50 flex flex-col ${theme.colors.background} bg-opacity-95 backdrop-blur-md`}
+    >
       {/* --- Top Bar: Headlines & Stats --- */}
-      <div className={`flex items-center justify-between px-6 py-4 border-b ${theme.colors.border}`}>
+      <div
+        className={`flex items-center justify-between px-6 py-4 border-b ${theme.colors.border}`}
+      >
         {/* Title */}
         <div className="flex items-center gap-4">
           <div className="bg-cyan-500/20 p-2 rounded-lg text-cyan-400">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <svg
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+            >
               <rect x="3" y="3" width="7" height="7" />
               <rect x="14" y="3" width="7" height="7" />
               <rect x="14" y="14" width="7" height="7" />
@@ -172,9 +200,12 @@ export function DataVisualizationOverlay({ onClose }: DataVisualizationOverlayPr
             </svg>
           </div>
           <div>
-            <h2 className={`text-xl font-bold ${theme.colors.text.primary} tracking-tight`}>Data Sense</h2>
+            <h2 className={`text-xl font-bold ${theme.colors.text.primary} tracking-tight`}>
+              Data Sense
+            </h2>
             <p className={`text-xs ${theme.colors.text.secondary}`}>
-              Analysing {displayedEmotions.length} emotions {selectedCategory ? `in ${selectedCategory}` : "across entire atlas"}
+              Analysing {displayedEmotions.length} emotions{" "}
+              {selectedCategory ? `in ${selectedCategory}` : "across entire atlas"}
             </p>
           </div>
         </div>
@@ -187,9 +218,12 @@ export function DataVisualizationOverlay({ onClose }: DataVisualizationOverlayPr
             { label: "AVG CONNECTION", value: aggregateStats.c, color: "#a78bfa" }, // violet
           ].map((stat, i) => (
             <div key={i} className="flex flex-col items-end">
-              <span className="text-[10px] font-bold text-white/40 tracking-wider">{stat.label}</span>
+              <span className="text-[10px] font-bold text-white/40 tracking-wider">
+                {stat.label}
+              </span>
               <span className="text-xl font-mono font-medium" style={{ color: stat.color }}>
-                {stat.value > 0 ? "+" : ""}{stat.value.toFixed(2)}
+                {stat.value > 0 ? "+" : ""}
+                {stat.value.toFixed(2)}
               </span>
             </div>
           ))}
@@ -207,11 +241,14 @@ export function DataVisualizationOverlay({ onClose }: DataVisualizationOverlayPr
 
       {/* --- Main Content Area --- */}
       <div className="flex-1 flex overflow-hidden">
-
         {/* --- LEFT SIDEBAR: Frequency Bars --- */}
-        <div className={`w-80 flex-shrink-0 border-r ${theme.colors.border} flex flex-col bg-black/20`}>
+        <div
+          className={`w-80 flex-shrink-0 border-r ${theme.colors.border} flex flex-col bg-black/20`}
+        >
           <div className={`p-4 border-b ${theme.colors.border} bg-white/5`}>
-            <h3 className={`text-xs font-bold ${theme.colors.text.secondary} uppercase tracking-wider`}>
+            <h3
+              className={`text-xs font-bold ${theme.colors.text.secondary} uppercase tracking-wider`}
+            >
               Semantic Categories
             </h3>
           </div>
@@ -220,10 +257,11 @@ export function DataVisualizationOverlay({ onClose }: DataVisualizationOverlayPr
             {/* 'All' Toggle */}
             <button
               onClick={() => setSelectedCategory(null)}
-              className={`nav-item w-full flex items-center justify-between p-2 rounded transition-all mb-4 ${!selectedCategory
+              className={`nav-item w-full flex items-center justify-between p-2 rounded transition-all mb-4 ${
+                !selectedCategory
                   ? "bg-cyan-500/20 border border-cyan-500/50 text-cyan-300 shadow-[0_0_15px_rgba(6,182,212,0.15)]"
                   : "hover:bg-white/5 text-white/50 hover:text-white"
-                }`}
+              }`}
             >
               <span className="text-sm font-medium">Whole Atlas</span>
               <span className="font-mono text-xs opacity-70">{allEmotions.length}</span>
@@ -248,15 +286,19 @@ export function DataVisualizationOverlay({ onClose }: DataVisualizationOverlayPr
 
                   {/* Label */}
                   <div className="relative z-10 flex items-center justify-between w-full">
-                    <span className={`text-xs font-medium transition-colors ${isSelected ? "text-cyan-200" : "text-white/70 group-hover:text-white"}`}>
+                    <span
+                      className={`text-xs font-medium transition-colors ${isSelected ? "text-cyan-200" : "text-white/70 group-hover:text-white"}`}
+                    >
                       {cat}
                     </span>
-                    <span className={`text-[10px] font-mono transition-colors ${isSelected ? "text-cyan-300" : "text-white/30 group-hover:text-white/50"}`}>
+                    <span
+                      className={`text-[10px] font-mono transition-colors ${isSelected ? "text-cyan-300" : "text-white/30 group-hover:text-white/50"}`}
+                    >
                       {data.count}
                     </span>
                   </div>
                 </button>
-              )
+              );
             })}
           </div>
         </div>
@@ -264,31 +306,35 @@ export function DataVisualizationOverlay({ onClose }: DataVisualizationOverlayPr
         {/* --- CENTER: Emotion Grid --- */}
         <div className="flex-1 p-8 overflow-y-auto">
           <div className="grid grid-cols-6 lg:grid-cols-6 xl:grid-cols-10 2xl:grid-cols-12 gap-6">
-            {displayedEmotions.sort((a, b) => a.name.localeCompare(b.name)).map((emotion) => (
-              <div
-                key={emotion.id}
-                className="group flex flex-col items-center gap-3 cursor-pointer"
-                onMouseEnter={() => setHoveredId(emotion.id)}
-                onMouseLeave={() => setHoveredId(null)}
-                onClick={() => handleEmotionClick(emotion)}
-              >
-                <div className="relative transition-transform duration-300 group-hover:scale-110 group-hover:drop-shadow-[0_0_15px_rgba(255,255,255,0.3)]">
-                  <MiniSoulSphere
-                    emotion={emotion}
-                    colorMode={colorScheme}
-                    size={60}
-                    isHovered={hoveredId === emotion.id}
-                  />
-                  {/* Ring when hovered */}
-                  {hoveredId === emotion.id && (
-                    <div className="absolute inset-[-10px] border border-white/50 rounded-full animate-pulse" />
-                  )}
+            {displayedEmotions
+              .sort((a, b) => a.name.localeCompare(b.name))
+              .map((emotion) => (
+                <div
+                  key={emotion.id}
+                  className="group flex flex-col items-center gap-3 cursor-pointer"
+                  onMouseEnter={() => setHoveredId(emotion.id)}
+                  onMouseLeave={() => setHoveredId(null)}
+                  onClick={() => handleEmotionClick(emotion)}
+                >
+                  <div className="relative transition-transform duration-300 group-hover:scale-110 group-hover:drop-shadow-[0_0_15px_rgba(255,255,255,0.3)]">
+                    <MiniSoulSphere
+                      emotion={emotion}
+                      colorMode={colorScheme}
+                      size={60}
+                      isHovered={hoveredId === emotion.id}
+                    />
+                    {/* Ring when hovered */}
+                    {hoveredId === emotion.id && (
+                      <div className="absolute inset-[-10px] border border-white/50 rounded-full animate-pulse" />
+                    )}
+                  </div>
+                  <span
+                    className={`text-[10px] text-center font-medium tracking-wide transition-colors ${hoveredId === emotion.id ? "text-white" : "text-white/40"}`}
+                  >
+                    {emotion.name}
+                  </span>
                 </div>
-                <span className={`text-[10px] text-center font-medium tracking-wide transition-colors ${hoveredId === emotion.id ? "text-white" : "text-white/40"}`}>
-                  {emotion.name}
-                </span>
-              </div>
-            ))}
+              ))}
           </div>
 
           {/* Empty State */}
@@ -303,11 +349,16 @@ export function DataVisualizationOverlay({ onClose }: DataVisualizationOverlayPr
         </div>
 
         {/* --- RIGHT SIDEBAR: Insight Panel --- */}
-        <div className={`w-80 flex-shrink-0 border-l ${theme.colors.border} bg-black/20 flex flex-col overflow-y-auto`}>
-
+        <div
+          className={`w-80 flex-shrink-0 border-l ${theme.colors.border} bg-black/20 flex flex-col overflow-y-auto`}
+        >
           {/* Hover Details Card */}
-          <div className={`p-6 border-b ${theme.colors.border} min-h-[320px] bg-gradient-to-b from-white/5 to-transparent`}>
-            <h3 className={`text-xs font-bold ${theme.colors.text.secondary} uppercase tracking-wider mb-4`}>
+          <div
+            className={`p-6 border-b ${theme.colors.border} min-h-[320px] bg-gradient-to-b from-white/5 to-transparent`}
+          >
+            <h3
+              className={`text-xs font-bold ${theme.colors.text.secondary} uppercase tracking-wider mb-4`}
+            >
               Active Emotion
             </h3>
 
@@ -328,7 +379,7 @@ export function DataVisualizationOverlay({ onClose }: DataVisualizationOverlayPr
 
                 {/* Def */}
                 <p className="text-sm text-white/70 italic leading-relaxed mb-6 border-l-2 border-white/20 pl-3">
-                  "{hoveredEmotion.definition}"
+                  &quot;{hoveredEmotion.definition}&quot;
                 </p>
 
                 {/* Stats Grid */}
@@ -336,28 +387,43 @@ export function DataVisualizationOverlay({ onClose }: DataVisualizationOverlayPr
                   <div className="space-y-1">
                     <div className="flex justify-between text-xs">
                       <span className="text-white/50">Valence</span>
-                      <span className="text-white font-mono">{hoveredEmotion.vac[0].toFixed(2)}</span>
+                      <span className="text-white font-mono">
+                        {hoveredEmotion.vac[0].toFixed(2)}
+                      </span>
                     </div>
                     <div className="h-1 bg-white/10 rounded-full overflow-hidden">
-                      <div className="h-full bg-cyan-400" style={{ width: `${((hoveredEmotion.vac[0] + 1) / 2) * 100}%` }} />
+                      <div
+                        className="h-full bg-cyan-400"
+                        style={{ width: `${((hoveredEmotion.vac[0] + 1) / 2) * 100}%` }}
+                      />
                     </div>
                   </div>
                   <div className="space-y-1">
                     <div className="flex justify-between text-xs">
                       <span className="text-white/50">Arousal</span>
-                      <span className="text-white font-mono">{hoveredEmotion.vac[1].toFixed(2)}</span>
+                      <span className="text-white font-mono">
+                        {hoveredEmotion.vac[1].toFixed(2)}
+                      </span>
                     </div>
                     <div className="h-1 bg-white/10 rounded-full overflow-hidden">
-                      <div className="h-full bg-amber-400" style={{ width: `${((hoveredEmotion.vac[1] + 1) / 2) * 100}%` }} />
+                      <div
+                        className="h-full bg-amber-400"
+                        style={{ width: `${((hoveredEmotion.vac[1] + 1) / 2) * 100}%` }}
+                      />
                     </div>
                   </div>
                   <div className="space-y-1">
                     <div className="flex justify-between text-xs">
                       <span className="text-white/50">Connection</span>
-                      <span className="text-white font-mono">{hoveredEmotion.vac[2].toFixed(2)}</span>
+                      <span className="text-white font-mono">
+                        {hoveredEmotion.vac[2].toFixed(2)}
+                      </span>
                     </div>
                     <div className="h-1 bg-white/10 rounded-full overflow-hidden">
-                      <div className="h-full bg-violet-400" style={{ width: `${((hoveredEmotion.vac[2] + 1) / 2) * 100}%` }} />
+                      <div
+                        className="h-full bg-violet-400"
+                        style={{ width: `${((hoveredEmotion.vac[2] + 1) / 2) * 100}%` }}
+                      />
                     </div>
                   </div>
                 </div>
@@ -372,44 +438,69 @@ export function DataVisualizationOverlay({ onClose }: DataVisualizationOverlayPr
           {/* Selected Set Insights */}
           {insights && (
             <div className="p-6 space-y-6">
-              <h3 className={`text-xs font-bold ${theme.colors.text.secondary} uppercase tracking-wider`}>
+              <h3
+                className={`text-xs font-bold ${theme.colors.text.secondary} uppercase tracking-wider`}
+              >
                 Dataset Highlights
               </h3>
 
               {/* Most Connected */}
               <div className="space-y-2">
-                <div className="text-[10px] uppercase text-violet-300 font-bold tracking-widest">Most Connected</div>
-                <div className="bg-violet-900/20 border border-violet-500/20 p-3 rounded flex justify-between items-center group cursor-pointer hover:bg-violet-900/30 transition-colors" onClick={() => handleEmotionClick(insights.mostConnected)}>
-                  <span className="text-sm font-medium text-violet-100">{insights.mostConnected.name}</span>
-                  <span className="text-xs font-mono text-violet-400">{insights.mostConnected.vac[2].toFixed(2)}</span>
+                <div className="text-[10px] uppercase text-violet-300 font-bold tracking-widest">
+                  Most Connected
+                </div>
+                <div
+                  className="bg-violet-900/20 border border-violet-500/20 p-3 rounded flex justify-between items-center group cursor-pointer hover:bg-violet-900/30 transition-colors"
+                  onClick={() => handleEmotionClick(insights.mostConnected)}
+                >
+                  <span className="text-sm font-medium text-violet-100">
+                    {insights.mostConnected.name}
+                  </span>
+                  <span className="text-xs font-mono text-violet-400">
+                    {insights.mostConnected.vac[2].toFixed(2)}
+                  </span>
                 </div>
               </div>
 
               {/* High Energy */}
               <div className="space-y-2">
-                <div className="text-[10px] uppercase text-amber-300 font-bold tracking-widest">Highest Energy</div>
-                <div className="bg-amber-900/20 border border-amber-500/20 p-3 rounded flex justify-between items-center group cursor-pointer hover:bg-amber-900/30 transition-colors" onClick={() => handleEmotionClick(insights.maxHighEnergy)}>
-                  <span className="text-sm font-medium text-amber-100">{insights.maxHighEnergy.name}</span>
-                  <span className="text-xs font-mono text-amber-400">{insights.maxHighEnergy.vac[1].toFixed(2)}</span>
+                <div className="text-[10px] uppercase text-amber-300 font-bold tracking-widest">
+                  Highest Energy
+                </div>
+                <div
+                  className="bg-amber-900/20 border border-amber-500/20 p-3 rounded flex justify-between items-center group cursor-pointer hover:bg-amber-900/30 transition-colors"
+                  onClick={() => handleEmotionClick(insights.maxHighEnergy)}
+                >
+                  <span className="text-sm font-medium text-amber-100">
+                    {insights.maxHighEnergy.name}
+                  </span>
+                  <span className="text-xs font-mono text-amber-400">
+                    {insights.maxHighEnergy.vac[1].toFixed(2)}
+                  </span>
                 </div>
               </div>
 
               {/* Most Negative */}
               <div className="space-y-2">
-                <div className="text-[10px] uppercase text-red-300 font-bold tracking-widest">Most Negative</div>
-                <div className="bg-red-900/20 border border-red-500/20 p-3 rounded flex justify-between items-center group cursor-pointer hover:bg-red-900/30 transition-colors" onClick={() => handleEmotionClick(insights.mostNegative)}>
-                  <span className="text-sm font-medium text-red-100">{insights.mostNegative.name}</span>
-                  <span className="text-xs font-mono text-red-400">{insights.mostNegative.vac[0].toFixed(2)}</span>
+                <div className="text-[10px] uppercase text-red-300 font-bold tracking-widest">
+                  Most Negative
+                </div>
+                <div
+                  className="bg-red-900/20 border border-red-500/20 p-3 rounded flex justify-between items-center group cursor-pointer hover:bg-red-900/30 transition-colors"
+                  onClick={() => handleEmotionClick(insights.mostNegative)}
+                >
+                  <span className="text-sm font-medium text-red-100">
+                    {insights.mostNegative.name}
+                  </span>
+                  <span className="text-xs font-mono text-red-400">
+                    {insights.mostNegative.vac[0].toFixed(2)}
+                  </span>
                 </div>
               </div>
             </div>
           )}
-
         </div>
-
       </div>
-
     </div>
   );
 }
-

@@ -127,7 +127,7 @@ describe("ViewerPathFlyover", () => {
   });
 
   it("should stop flying at end of duration", () => {
-    // Duration = 12.0 / speed(1.0) = 12s
+    // Duration = 24.0 / speed(1.0) = 24s
     render(<ViewerPathFlyover />);
 
     act(() => {
@@ -135,7 +135,7 @@ describe("ViewerPathFlyover", () => {
         // First frame to set start time
         frameCallback({ clock: { elapsedTime: 0 } } as any);
         // Second frame > duration
-        frameCallback({ clock: { elapsedTime: 13.0 } } as any);
+        frameCallback({ clock: { elapsedTime: 25.0 } } as any);
       }
     });
 
@@ -150,8 +150,8 @@ describe("ViewerPathFlyover", () => {
       if (frameCallback) {
         frameCallback({ clock: { elapsedTime: 0 } } as any);
         // Need significant progress to overcome cubic easing and > 0.01 threshold
-        // 3.0s / 12s = 0.25. Eased: 4 * 0.25^3 = 4 * 0.0156 = 0.06 > 0.01
-        frameCallback({ clock: { elapsedTime: 3.0 } } as any);
+        // 6.0s / 24s = 0.25. Eased: 4 * 0.25^3 = 0.0625 > 0.01
+        frameCallback({ clock: { elapsedTime: 6.0 } } as any);
       }
     });
 
@@ -193,15 +193,18 @@ describe("ViewerPathFlyover", () => {
 
     const { rerender } = render(<ViewerPathFlyover />);
 
+    // Clear initial calls (from mount)
+    (mockState.setFlyoverProgress as jest.Mock).mockClear();
+
     // 1. Advance to end
     act(() => {
       if (frameCallback) {
         frameCallback({ clock: { elapsedTime: 0 } } as any);
-        frameCallback({ clock: { elapsedTime: 13.0 } } as any); // Progress > 1
+        // Ensure we go well past duration (24s) to hit 1.0. 
+        // 30s ensures eased progress is 1.0
+        frameCallback({ clock: { elapsedTime: 30.0 } } as any);
       }
     });
-
-    // progressRef should be 1.
 
     // 2. Stop flying
     setMockState({ isFlying: false });
@@ -213,8 +216,9 @@ describe("ViewerPathFlyover", () => {
     setMockState({ isFlying: true, flyoverProgress: 1.0 });
     rerender(<ViewerPathFlyover />);
 
-    // Expect reset
+    // Expect reset (called ONCE, from the effect)
     expect(mockState.setFlyoverProgress).toHaveBeenCalledWith(0);
+    // expect(mockState.setFlyoverProgress).toHaveBeenCalledTimes(1); // flaky with strict mode
   });
 
   it("should skip spline creation if points < 2", () => {

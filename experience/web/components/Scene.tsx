@@ -7,14 +7,14 @@
 
 "use client";
 
-import { useState } from "react";
+// import { useState } from "react";
 import { Canvas } from "@react-three/fiber";
 import { ViewerPathFlyover } from "@/components/ViewerPathFlyover";
 import { OrbitControls } from "./OrbitControls";
 import { SoulSphere } from "./SoulSphere";
 import { EmotionCloud } from "@/components/admin/atlas/EmotionCloud";
 import { TransitionPathRenderer } from "./TransitionPathRenderer";
-import { WaypointTooltip } from "./WaypointTooltip";
+// import { WaypointTooltip } from "./WaypointTooltip";
 import { Stars } from "@react-three/drei";
 import { VACAnimator } from "@/components/VACAnimator";
 import { VACAxisLabels3D } from "@/components/VACAxisLabels3D";
@@ -22,7 +22,7 @@ import { VACAxisLabels3D } from "@/components/VACAxisLabels3D";
 import { useExperienceStore } from "@/stores/useExperienceStore";
 import { useSettingsStore } from "@/stores/useSettingsStore";
 import { logger } from "@/utils/logger";
-import type { WaypointData } from "@/types/journeys";
+// import type { WaypointData } from "@/types/journeys";
 
 export function Scene() {
   const transitionPath = useExperienceStore((state) => state.transitionPath);
@@ -34,12 +34,12 @@ export function Scene() {
   const { layers } = useSettingsStore();
 
   // Tooltip state
-  const [hoveredWaypoint, setHoveredWaypoint] = useState<{
-    index: number;
-    screenPos: { x: number; y: number };
-    data: WaypointData;
-    state: string;
-  } | null>(null);
+  // const [hoveredWaypoint, setHoveredWaypoint] = useState<{
+  //   index: number;
+  //   screenPos: { x: number; y: number };
+  //   data: WaypointData;
+  //   state: string;
+  // } | null>(null);
 
   // Debug logging
   logger.debug("rendering", "Scene render", {
@@ -50,8 +50,9 @@ export function Scene() {
   });
 
   // Simple tooltip handler - shows in corner for now
-  const handleWaypointHover = (isHovering: boolean, waypointData: WaypointData | null) => {
-    if (isHovering && waypointData) {
+  const handleWaypointHover = () => {
+    // Disabled as per user request
+    /* if (isHovering && waypointData) {
       setHoveredWaypoint({
         index: waypointData.index,
         screenPos: { x: 100, y: 100 }, // Fixed position for simplicity
@@ -60,7 +61,7 @@ export function Scene() {
       });
     } else {
       setHoveredWaypoint(null);
-    }
+    } */
   };
 
   return (
@@ -103,7 +104,7 @@ export function Scene() {
             onWaypointClick={(index) =>
               logger.debug("user-interaction", "Clicked waypoint", { index })
             }
-            onWaypointHover={(index, data) => handleWaypointHover(index !== null, data)}
+            onWaypointHover={() => handleWaypointHover()}
           />
         )}
 

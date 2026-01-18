@@ -1,6 +1,8 @@
-import { render } from "@testing-library/react";
+import { render, act } from "@testing-library/react";
 import { PathFlyover } from "../../../../components/admin/atlas/PathFlyover";
 import * as THREE from "three";
+import { useAtlasAdminStore } from "@/stores/useAtlasAdminStore";
+import { useExperienceStore } from "@/stores/useExperienceStore";
 
 // Mock Three
 jest.mock("three", () => {
@@ -14,31 +16,40 @@ jest.mock("three", () => {
   };
 });
 
-// Mock Store
+// Mock Stores - implementation injected in beforeEach to avoid hoisting issues
+jest.mock("@/stores/useAtlasAdminStore", () => {
+  const mockfn: any = jest.fn();
+  mockfn.getState = jest.fn();
+  mockfn.setState = jest.fn();
+  return { useAtlasAdminStore: mockfn };
+});
+
+jest.mock("@/stores/useExperienceStore", () => {
+  const mockfn: any = jest.fn();
+  mockfn.getState = jest.fn();
+  mockfn.setState = jest.fn();
+  return { useExperienceStore: mockfn };
+});
+
 const mockState = {
   isFlying: false,
   selectedPathId: null,
   computedPaths: new Map(),
   setIsFlying: jest.fn(),
   setHoveredEmotion: jest.fn(),
+  setTransitionPath: jest.fn(),
   hoveredEmotionId: null,
   allEmotions: [],
 };
 
-const mockUseAtlasAdminStore = jest.fn((selector) => selector(mockState));
-const mockGetState = jest.fn(() => mockState);
+const mockExperienceState = {
+  isFlying: false,
+  setFlyoverProgress: jest.fn(),
+  setIsFlying: jest.fn(),
+  flyoverProgress: 0,
+};
 
-jest.mock("@/stores/useAtlasAdminStore", () => ({
-  useAtlasAdminStore: Object.assign((query: any) => mockUseAtlasAdminStore(query), {
-    getState: () => mockGetState(), // Deferred execution to pick up current mockState values? No, closures.
-    // Better: getState returns the object that mockSetHoveredEmotion belongs to.
-  }),
-}));
 
-// We need to update mockState in tests.
-// But we exported a const object.
-// Let's use a variable or mutable object.
-// Or just let mockUseAtlasAdminStore return what we want, and mockGetState return what we want.
 
 // Mock R3F
 const mockUseFrame = jest.fn();
@@ -90,12 +101,31 @@ describe("PathFlyover", () => {
       computedPaths: new Map([["p1", mockPath]]),
       setIsFlying: jest.fn(),
       setHoveredEmotion: jest.fn(),
+      setTransitionPath: jest.fn(),
       hoveredEmotionId: null,
       allEmotions: [],
     });
-    mockUseAtlasAdminStore.mockImplementation((selector) => selector(mockState));
-    mockGetState.mockReturnValue(mockState);
+    // Wire up useAtlasAdminStore
+    (useAtlasAdminStore as unknown as jest.Mock).mockImplementation((selector: any) => selector(mockState));
+    (useAtlasAdminStore.getState as jest.Mock).mockReturnValue(mockState);
+    (useAtlasAdminStore.setState as jest.Mock).mockImplementation((newState: any) => Object.assign(mockState, newState));
+
+    // Experience Store Mock Init
+    Object.assign(mockExperienceState, {
+      isFlying: false,
+      setFlyoverProgress: jest.fn(),
+      setIsFlying: jest.fn(),
+      setTransitionPath: jest.fn(),
+      flyoverSpeed: 1,
+      flyoverProgress: 0,
+    });
+
+    // Wire up useExperienceStore
+    (useExperienceStore as unknown as jest.Mock).mockImplementation((selector: any) => selector(mockExperienceState));
+    (useExperienceStore.getState as jest.Mock).mockReturnValue(mockExperienceState);
+    (useExperienceStore.setState as jest.Mock).mockImplementation((newState: any) => Object.assign(mockExperienceState, newState));
   });
+
 
   it("should initialize flight when flying", () => {
     render(<PathFlyover />);
@@ -275,8 +305,148 @@ describe("PathFlyover", () => {
     if (frameCallback) {
       frameCallback({ clock: { elapsedTime: 10 } });
       frameCallback({ clock: { elapsedTime: 23 } }); // > 12s
+      expect(mockState.setIsFlying).toHaveBeenCalledWith(false);
+      expect(mockState.setHoveredEmotion).toHaveBeenCalledWith(null);
     }
-    expect(mockState.setIsFlying).toHaveBeenCalledWith(false);
-    expect(mockState.setHoveredEmotion).toHaveBeenCalledWith(null);
+  });
+
+  it("handles external reset (progress > 0.01 but store 0)", () => {
+    // 1. Setup active path
+    const { rerender } = render(<PathFlyover />);
+
+    act(() => {
+      useAtlasAdminStore.setState({
+        selectedPathId: "path-1",
+        computedPaths: mockState.computedPaths,
+        allEmotions: mockState.allEmotions,
+      });
+    });
+
+    // 2. Simulate flying
+    act(() => {
+      useAtlasAdminStore.setState({ isFlying: true });
+    });
+    rerender(<PathFlyover />);
+
+    // 3. Get FRESH frame callback (captures isFlying=true)
+    const calls = (mockUseFrame as jest.Mock).mock.calls;
+    const frameCallback = calls[calls.length - 1][0];
+
+    if (frameCallback) {
+      // Advance to ~50% (6s)
+      frameCallback({ clock: { elapsedTime: 10 } });
+      frameCallback({ clock: { elapsedTime: 16 } });
+    }
+
+    // 4. Simulate external reset: set progress to 0 in store WHILE flying
+    act(() => {
+      useExperienceStore.setState({ flyoverProgress: 0 });
+    });
+
+    // Toggle isFlying to trigger effect check
+    act(() => {
+      useAtlasAdminStore.setState({ isFlying: false });
+    });
+    rerender(<PathFlyover />);
+
+    // Clear mock spy
+    (useExperienceStore.getState().setFlyoverProgress as jest.Mock).mockClear();
+
+    act(() => {
+      useAtlasAdminStore.setState({ isFlying: true });
+    });
+    rerender(<PathFlyover />);
+
+    // Check next frame
+    if (frameCallback) {
+      frameCallback({ clock: { elapsedTime: 12.1 } });
+    }
+
+    // Expect setFlyoverProgress to start from 0
+    const setProgressSpy = useExperienceStore.getState().setFlyoverProgress;
+    expect(setProgressSpy).toHaveBeenCalledWith(expect.closeTo(0, 0.1));
+  });
+
+  it("should reset progress when switching paths", () => {
+    // 1. Setup active path
+    const { rerender } = render(<PathFlyover />);
+
+    act(() => {
+      useAtlasAdminStore.setState({
+        selectedPathId: "path-1",
+        computedPaths: mockState.computedPaths,
+        allEmotions: mockState.allEmotions,
+      });
+    });
+
+    // 2. Simulate flying
+    act(() => {
+      useAtlasAdminStore.setState({ isFlying: true });
+    });
+    rerender(<PathFlyover />);
+
+    // 3. Advance progress on path-1
+    const calls = (mockUseFrame as jest.Mock).mock.calls;
+    const frameCallback = calls[calls.length - 1][0];
+
+    if (frameCallback) {
+      frameCallback({ clock: { elapsedTime: 10 } });
+      frameCallback({ clock: { elapsedTime: 16 } }); // ~50%
+    }
+
+    // Clear spy
+    (useExperienceStore.getState().setFlyoverProgress as jest.Mock).mockClear();
+
+    // 4. Switch to path-2
+    act(() => {
+      useAtlasAdminStore.setState({ selectedPathId: "path-2" });
+    });
+    rerender(<PathFlyover />);
+
+    // 5. Verify reset was called
+    const setProgressSpy = useExperienceStore.getState().setFlyoverProgress;
+    expect(setProgressSpy).toHaveBeenCalledWith(0);
+  });
+
+  it("should maintain progress when computedPaths update", () => {
+    // 1. Setup active path
+    const { rerender } = render(<PathFlyover />);
+
+    act(() => {
+      useAtlasAdminStore.setState({
+        selectedPathId: "path-1",
+        computedPaths: mockState.computedPaths,
+        allEmotions: mockState.allEmotions,
+      });
+    });
+
+    // 2. Simulate flying
+    act(() => {
+      useAtlasAdminStore.setState({ isFlying: true });
+    });
+    rerender(<PathFlyover />);
+
+    // 3. Advance progress
+    const calls = (mockUseFrame as jest.Mock).mock.calls;
+    const frameCallback = calls[calls.length - 1][0];
+
+    if (frameCallback) {
+      frameCallback({ clock: { elapsedTime: 10 } });
+      frameCallback({ clock: { elapsedTime: 16 } }); // ~50%
+    }
+
+    // Spy on reset
+    const setProgressSpy = useExperienceStore.getState().setFlyoverProgress;
+    (setProgressSpy as jest.Mock).mockClear();
+
+    // 4. Update computedPaths (new Map reference)
+    const newPaths = new Map(mockState.computedPaths);
+    act(() => {
+      useAtlasAdminStore.setState({ computedPaths: newPaths });
+    });
+    rerender(<PathFlyover />);
+
+    // 5. Verify reset was NOT called with 0
+    expect(setProgressSpy).not.toHaveBeenCalledWith(0);
   });
 });

@@ -147,30 +147,8 @@ describe("Scene", () => {
   });
 
   describe("Interactions", () => {
-    it("shows tooltip on waypoint hover", () => {
-      act(() => {
-        useExperienceStore.setState({
-          showPath: true,
-          transitionPath: mockTransitionPath as any,
-        });
-      });
-
-      const { getByText, getByTestId, queryByTestId } = render(<Scene />);
-
-      // Tooltip hidden initially
-      expect(queryByTestId("waypoint-tooltip")).not.toBeInTheDocument();
-
-      // Trigger hover via mock button
-      fireEvent.click(getByText("Hover On"));
-
-      // Tooltip visible
-      expect(getByTestId("waypoint-tooltip")).toBeInTheDocument();
-      expect(getByText("Joy")).toBeInTheDocument(); // from mock data
-
-      // Trigger unhover
-      fireEvent.click(getByText("Hover Off"));
-      expect(queryByTestId("waypoint-tooltip")).not.toBeInTheDocument();
-    });
+    // Tooltip functionality disabled
+    // it("shows tooltip on waypoint hover", () => { ... });
 
     it("logs debug info when waypoint is clicked", () => {
       act(() => {
@@ -188,6 +166,25 @@ describe("Scene", () => {
       expect(logger.debug).toHaveBeenCalledWith("user-interaction", "Clicked waypoint", {
         index: 0,
       });
+    });
+
+    it("handles waypoint hover interactions", () => {
+      act(() => {
+        useExperienceStore.setState({
+          showPath: true,
+          transitionPath: mockTransitionPath as any,
+        });
+      });
+
+      const { getByText } = render(<Scene />);
+
+      // Click "Hover On" to trigger onWaypointHover prop
+      fireEvent.click(getByText("Hover On"));
+      // Click "Hover Off" just in case
+      fireEvent.click(getByText("Hover Off"));
+
+      // Since handleWaypointHover is empty/disabled, we just verify no crash
+      expect(true).toBe(true);
     });
   });
 

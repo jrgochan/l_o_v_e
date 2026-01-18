@@ -130,6 +130,49 @@ describe("ChatDrawer", () => {
     expect(screen.getByText(/Detected: Joy/)).toBeInTheDocument();
   });
 
+  it("handles websocket events: Analysis with Mapping", async () => {
+    render(<ChatDrawer isOpen={true} onToggle={mockOnToggle} sessionId="sess1" />);
+    const callbacks = getSocketCallbacks();
+
+    await act(async () => {
+      callbacks.onAnalysis(
+        "Joy",
+        "Happy",
+        { valence: 0.8, arousal: 0.5, connection: 0.6 },
+        0.95,
+        "Ecstatic", // originalEmotion
+        "fuzzy", // matchMethod
+        0.88 // matchConfidence
+      );
+    });
+
+    // Check content string construction (Line 86)
+    expect(screen.getByText('Detected: Joy (mapped from "Ecstatic")')).toBeInTheDocument();
+
+    // Check mapping details (Lines 303-307)
+    expect(screen.getByText("Mapping:")).toBeInTheDocument();
+    expect(screen.getByText("fuzzy (88%)")).toBeInTheDocument();
+  });
+
+  it("handles websocket events: Analysis with Mapping (no confidence)", async () => {
+    render(<ChatDrawer isOpen={true} onToggle={mockOnToggle} sessionId="sess1" />);
+    const callbacks = getSocketCallbacks();
+
+    await act(async () => {
+      callbacks.onAnalysis(
+        "Joy",
+        "Happy",
+        { valence: 0.8, arousal: 0.5, connection: 0.6 },
+        0.95,
+        "Ecstatic", // originalEmotion
+        "fuzzy", // matchMethod
+        undefined // matchConfidence missing
+      );
+    });
+
+    expect(screen.getByText("fuzzy (0%)")).toBeInTheDocument();
+  });
+
   it("handles websocket events: Insight", async () => {
     render(<ChatDrawer isOpen={true} onToggle={mockOnToggle} sessionId="sess1" />);
     const callbacks = getSocketCallbacks();
