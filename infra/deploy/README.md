@@ -8,6 +8,18 @@ This directory will contain deployment configurations for various platforms and 
 
 ## Planned Subdirectories
 
+### aws/
+Pool for AWS-specific scripts.
+
+### kubernetes/
+Kubernetes manifests.
+
+### rhos/
+Red Hat OpenShift configuration and scripts.
+
+### gcp/
+Google Cloud Platform deployment guides.
+
 ### kubernetes/
 Kubernetes manifests for deploying L.O.V.E. stack to K8s clusters:
 - Deployments for each service
@@ -37,7 +49,9 @@ AWS-specific deployment guides and configs:
 - Terraform configurations
 
 ### gcp/
+### gcp/
 Google Cloud Platform deployment guides:
+- `deploy.sh`: Master deployment script
 - Cloud Run
 - GKE (Google Kubernetes Engine)
 - Deployment Manager templates
@@ -58,7 +72,7 @@ We provide a master script that orchestrates the entire deployment process, incl
 
 ```bash
 cd infra
-./deploy-to-gcp.sh
+./deploy/gcp/deploy.sh
 ```
 
 **What this script does:**

@@ -2,7 +2,7 @@
 # GCP Project Configuration
 # shellcheck disable=SC2034
 
-PROJECT_ID="love-stack-123" # Replace with your GCP Project ID
+PROJECT_ID="" # Leave empty to use 'gcloud config get-value project'
 APP_NAME="love-stack"
 
 # Region settings

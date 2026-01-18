@@ -73,7 +73,6 @@ deploy_service() {
         --set-env-vars "DB_HOST=$DB_IP,DB_PORT=5432,DB_NAME=$DB_NAME,DB_USER=$DB_USER" \
         --set-env-vars "REDIS_HOST=$REDIS_HOST,REDIS_PORT=$REDIS_PORT" \
         --set-env-vars "OLLAMA_BASE_URL=$OLLAMA_URL" \
-        --set-env-vars "OLLAMA_BASE_URL=$OLLAMA_URL" \
         --set-secrets "JWT_SECRET_KEY=${JWT_SECRET_REF}" \
         --set-secrets "DB_PASSWORD=${DB_SECRET_VERSION}" \
         --project "$PROJECT_ID" >/dev/null 2>&1
