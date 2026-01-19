@@ -90,9 +90,16 @@ Quaternion mathematics engine providing the geometric foundation for the 3D emot
 - [→ Full Documentation](versor/README.md)
 
 ### Experience
-React Native mobile application with 3D visualization of emotional states as animated spheres.
-- **Features:** Real-time 3D rendering (Three.js), GLSL shaders, Quaternion animations, Observer integration.
-- [→ Full Documentation](experience/README.md)
+Next.js web application with 3D visualization of emotional states as animated spheres.
+
+**Key Features:**
+- Real-time 3D rendering (React Three Fiber/Three.js)
+- Next.js Web Application (React 19)
+- Custom GLSL shaders for visual effects
+- Quaternion-based animations
+- Observer API integration
+
+[→ Full Documentation](experience/README.md)
 
 ## 🔧 Infrastructure & Tooling
 
