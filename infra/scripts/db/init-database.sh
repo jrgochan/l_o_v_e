@@ -486,7 +486,7 @@ seed_database() {
     echo ""
     
     # Run seed_all.py
-    if python scripts/seed_all.py "$seed_args"; then
+    if python scripts/seed_all.py $seed_args; then
         echo ""
         print_success "Database seeding completed"
         deactivate

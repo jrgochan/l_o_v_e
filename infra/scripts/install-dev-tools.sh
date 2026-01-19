@@ -6,8 +6,8 @@ set -e
 
 # Get script directory and source common functions
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
-# shellcheck source=lib/common.sh
-. "$SCRIPT_DIR/lib/common.sh"
+# shellcheck source=../lib/common.sh
+. "$SCRIPT_DIR/../lib/common.sh"
 
 # Change to project root
 PROJECT_ROOT="$(cd "$SCRIPT_DIR/../.." && pwd)"

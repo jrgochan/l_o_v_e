@@ -53,8 +53,10 @@ spec:
           env:
             - name: OLLAMA_HOST
               value: "0.0.0.0"
+            - name: HOME
+              value: "/data"
           volumeMounts:
-            - mountPath: /root/.ollama
+            - mountPath: /data
               name: ollama-data
           lifecycle:
              postStart:
