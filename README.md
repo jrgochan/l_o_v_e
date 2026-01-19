@@ -11,7 +11,7 @@ l_o_v_e/
 ├── listener/          # Audio transcription & semantic VAC analysis (Python 3.14/FastAPI)
 ├── observer/          # Data persistence & vector search (Python 3.14/FastAPI + PostgreSQL + pgvector)
 ├── versor/            # Quaternion mathematics engine (Python 3.14/FastAPI)
-├── experience/        # Mobile 3D visualization (React Native + Expo + Three.js)
+├── experience/        # Next.js visualization (React 19, React Three Fiber/Three.js)
 └── infra/             # Infrastructure orchestration, deployment & documentation
 ```
 
