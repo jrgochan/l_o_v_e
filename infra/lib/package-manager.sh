@@ -242,6 +242,22 @@ add_repository() {
     esac
 }
 
+# Install Homebrew
+# Usage: install_homebrew
+install_homebrew() {
+    if ! command -v brew >/dev/null 2>&1; then
+        echo "Installing Homebrew..."
+        /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+        
+        # Add to PATH for immediate use
+        if [ -d "/opt/homebrew/bin" ]; then
+            eval "$(/opt/homebrew/bin/brew shellenv)"
+        elif [ -d "/usr/local/bin" ]; then
+            eval "$(/usr/local/bin/brew shellenv)"
+        fi
+    fi
+}
+
 # Install development tools (compilers, etc.)
 # Usage: install_dev_tools
 install_dev_tools() {
@@ -250,21 +266,37 @@ install_dev_tools() {
     
     case "$os_family" in
         macos)
-            # Check for Xcode Command Line Tools
+            # 1. Install Homebrew if missing
+            install_homebrew
+            
+            # 2. Xcode Command Line Tools
             if ! xcode-select -p >/dev/null 2>&1; then
                 echo "Installing Xcode Command Line Tools..."
                 xcode-select --install
                 echo "Please complete the Xcode installation and re-run this script."
                 return 1
             fi
+            
+            # 3. Critical Build Dependencies
+            install_package gcc --no-confirm
+            install_package openblas --no-confirm
+            install_package pkg-config --no-confirm
+            install_package shellcheck --no-confirm
+            install_package git --no-confirm
             ;;
         debian)
             install_package build-essential --no-confirm
+            install_package pkg-config --no-confirm
+            install_package shellcheck --no-confirm
+            install_package git --no-confirm
             ;;
         redhat)
             install_package gcc --no-confirm
             install_package gcc-c++ --no-confirm
             install_package make --no-confirm
+            install_package pkgconfig --no-confirm
+            install_package shellcheck --no-confirm
+            install_package git --no-confirm
             ;;
         *)
             echo "Unknown OS family for dev tools installation"

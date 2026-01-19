@@ -716,12 +716,26 @@ main() {
         exit 1
     fi
     
+    # Install development tools (OS level)
+    print_header "🔨 Checking Development Tools"
+    if install_dev_tools; then
+        print_success "System development tools ready"
+    fi
+    
     # Configure build environment for macOS (OpenBLAS for scipy/numpy)
-    if [ "$(detect_os)" = "macos" ] && [ -d "/opt/homebrew/opt/openblas" ]; then
-        print_info "Configuring build environment for OpenBLAS (macOS)..."
-        export LDFLAGS="-L/opt/homebrew/opt/openblas/lib"
-        export CPPFLAGS="-I/opt/homebrew/opt/openblas/include"
-        export PKG_CONFIG_PATH="/opt/homebrew/opt/openblas/lib/pkgconfig"
+    if [ "$(detect_os)" = "macos" ]; then
+        # Check for OpenBLAS (installed by dev tools)
+        if [ -d "/opt/homebrew/opt/openblas" ]; then
+            print_info "Configuring build environment for OpenBLAS (macOS)..."
+            export LDFLAGS="-L/opt/homebrew/opt/openblas/lib"
+            export CPPFLAGS="-I/opt/homebrew/opt/openblas/include"
+            export PKG_CONFIG_PATH="/opt/homebrew/opt/openblas/lib/pkgconfig"
+        elif [ -d "/usr/local/opt/openblas" ]; then
+            print_info "Configuring build environment for OpenBLAS (macOS Intel)..."
+            export LDFLAGS="-L/usr/local/opt/openblas/lib"
+            export CPPFLAGS="-I/usr/local/opt/openblas/include"
+            export PKG_CONFIG_PATH="/usr/local/opt/openblas/lib/pkgconfig"
+        fi
         
         # Use GCC if available to avoid Clang OpenMP issues with Scipy
         if command -v gcc-15 >/dev/null; then
@@ -733,12 +747,6 @@ main() {
             export CC=gcc-14
             export CXX=g++-14
         fi
-    fi
-    
-    # Install development tools (OS level)
-    print_header "🔨 Checking Development Tools"
-    if install_dev_tools; then
-        print_success "System development tools ready"
     fi
 
     # Install Python Linting/DX Tools

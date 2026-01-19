@@ -468,25 +468,25 @@ seed_database() {
     fi
     
     # Build seed_all.py arguments
-    seed_args="--level=enhanced --verify"
+    seed_args=("--level=enhanced" "--verify")
     
     if [ "$WITH_DEMO" = true ]; then
-        seed_args="$seed_args --with-demo"
+        seed_args+=("--with-demo")
     fi
     
     if [ "$WITH_BOOTSTRAP" = true ]; then
-        seed_args="$seed_args --with-bootstrap"
+        seed_args+=("--with-bootstrap")
     fi
     
     if [ "$FORCE_RESEED" = true ]; then
-        seed_args="$seed_args --force-reseed"
+        seed_args+=("--force-reseed")
     fi
     
-    print_info "Running master seeding script with args: $seed_args"
+    print_info "Running master seeding script with args: ${seed_args[*]}"
     echo ""
     
     # Run seed_all.py
-    if python scripts/seed_all.py $seed_args; then
+    if python scripts/seed_all.py "${seed_args[@]}"; then
         echo ""
         print_success "Database seeding completed"
         deactivate
