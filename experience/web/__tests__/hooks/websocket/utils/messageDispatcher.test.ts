@@ -15,6 +15,7 @@ describe("messageDispatcher", () => {
     onAggregateState: jest.fn(),
     onThreeWayAnalysis: jest.fn(),
     onProgressUpdate: jest.fn(),
+    onMessageRelationship: jest.fn(),
     setError: jest.fn(),
   };
 
@@ -143,6 +144,29 @@ describe("messageDispatcher", () => {
       50,
       100
     );
+  });
+
+  it("should dispatch message_relationship message", () => {
+    const payload = {
+      type: "message_relationship",
+      relationship: {
+        id: "123",
+        source_message_id: "src",
+        target_message_id: "target",
+        relationship_type: "reply",
+        created_at: new Date().toISOString(),
+      },
+    };
+    dispatchMessage(payload as any, mockHandlers);
+    expect(mockHandlers.onMessageRelationship).toHaveBeenCalledWith(payload.relationship);
+  });
+
+  it("should ignore message_relationship with missing relationship field", () => {
+    const payload = {
+      type: "message_relationship",
+    };
+    dispatchMessage(payload as any, mockHandlers);
+    expect(mockHandlers.onMessageRelationship).not.toHaveBeenCalled();
   });
 
   it("should ignore malformed messages safely", () => {

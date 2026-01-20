@@ -222,16 +222,18 @@ References:
 import json
 import logging
 import time
-from typing import Any, Dict, Optional
+from typing import Any, Dict, List, Optional
 from uuid import UUID
 
 import httpx
 from fastapi import APIRouter, Depends, WebSocket, WebSocketDisconnect
+from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.api.deps import get_current_user_ws
+from app.api.deps import get_current_user, get_current_user_ws
+from app.api.schemas.chat import DisplayMessage
 from app.config import settings
 from app.core.security import create_access_token
-from app.database import AsyncSessionLocal
+from app.database import AsyncSessionLocal, get_db
 from app.models.user import User
 from app.services.chat_service import ChatService
 
@@ -1106,6 +1108,33 @@ async def handle_multi_emotion_result(
                 "reasoning": analysis_result.get("reasoning", ""),
             },
             tone_preference,
-            None,
-            websocket,
         )
+
+
+@router.get("/chat/messages/{message_id}/thread", response_model=List[DisplayMessage], tags=["Chat"])
+async def get_message_thread(
+    message_id: UUID,
+    limit: int = 10,
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+) -> List[DisplayMessage]:
+    """Retrieve the conversation thread ending at a specific message.
+
+    Uses recursive CTEs to efficiently fetch the chain of 'reply' or 'precipitated_by'
+    relationships leading up to the target message.
+
+    Args:
+        message_id: The target message UUID (leaf or mid-thread)
+        limit: Max depth/messages to retrieve
+        db: Database session
+        current_user: Authenticated user
+
+    Returns:
+        List[DisplayMessage]: Chronological thread of messages
+    """
+    service = ChatService(db)
+    messages = await service.get_message_thread(message_id, limit=limit)
+    
+    # Convert to Pydantic models
+    # We use model_validate to handle the SQLAlchemy -> Pydantic conversion
+    return [DisplayMessage.model_validate(msg) for msg in messages]

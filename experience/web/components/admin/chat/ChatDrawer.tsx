@@ -10,6 +10,8 @@ import { useState, useRef, useEffect } from "react";
 import { useWebSocketChat } from "@/hooks/useWebSocketChat";
 import type { ToneMode, DeepFeelingServerMessage, InsightData, VAC, DisplayMessage, MessageRelationship } from "@/types/chat";
 import { logger } from "@/utils/logger";
+import { ThreadView } from "./ThreadView";
+import { AutoLinkIndicator } from "./AutoLinkIndicator";
 
 interface ChatDrawerProps {
   isOpen: boolean;
@@ -24,6 +26,7 @@ export function ChatDrawer({ isOpen, onToggle, sessionId }: ChatDrawerProps) {
   const [inputText, setInputText] = useState("");
   const [messages, setMessages] = useState<DisplayMessage[]>([]);
   const [isProcessing, setIsProcessing] = useState(false);
+  const [activeThreadId, setActiveThreadId] = useState<string | null>(null);
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const startYRef = useRef(0);
@@ -305,6 +308,16 @@ export function ChatDrawer({ isOpen, onToggle, sessionId }: ChatDrawerProps) {
 
               {/* Timestamp */}
               <div className="text-xs opacity-70 mt-2">{msg.timestamp.toLocaleTimeString()}</div>
+
+              {/* Auto-Linking Indicator */}
+              {msg.relationships && msg.relationships.length > 0 && (
+                <div className="mt-2 pt-2 border-t border-cyan-500/20">
+                  <AutoLinkIndicator
+                    relationships={msg.relationships}
+                    onRelationshipClick={(rel) => setActiveThreadId(rel.target_message_id)}
+                  />
+                </div>
+              )}
             </div>
           </div>
         ))}
@@ -351,6 +364,15 @@ export function ChatDrawer({ isOpen, onToggle, sessionId }: ChatDrawerProps) {
           </button>
         </div>
       </div>
+      {/* Thread View Overlay */}
+      {activeThreadId && (
+        <ThreadView
+          rootMessageId={activeThreadId}
+          onClose={() => setActiveThreadId(null)}
+          toneMode={toneMode}
+          deepFeelingMode={true} // Always enable deep feeling visualization in threads
+        />
+      )}
     </div>
   );
 }

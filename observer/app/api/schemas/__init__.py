@@ -96,6 +96,10 @@ from app.api.schemas.state import (
     StateInput,
     StateResponse,
 )
+from app.api.schemas.chat import (
+    DisplayMessage,
+    MessageRelationship,
+)
 
 __all__ = [
     "VACVector",
@@ -104,4 +108,6 @@ __all__ = [
     "MetricsInfo",
     "StateInput",
     "StateResponse",
+    "DisplayMessage",
+    "MessageRelationship",
 ]

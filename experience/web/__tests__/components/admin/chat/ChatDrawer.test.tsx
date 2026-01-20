@@ -1,4 +1,4 @@
-import { render, screen, fireEvent, act } from "@testing-library/react";
+import { render, screen, fireEvent, act, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { ChatDrawer } from "@/components/admin/chat/ChatDrawer";
 import { logger } from "@/utils/logger";
@@ -19,6 +19,28 @@ jest.mock("@/utils/logger", () => ({
 
 // Mock scrollIntoView
 window.HTMLElement.prototype.scrollIntoView = jest.fn();
+
+// Mock child components to facilitate interaction testing
+jest.mock("@/components/admin/chat/AutoLinkIndicator", () => ({
+  AutoLinkIndicator: ({ onRelationshipClick }: any) => (
+    <button onClick={() => onRelationshipClick({ target_message_id: "thread-1" })}>
+      View Thread
+    </button>
+  ),
+}));
+
+jest.mock("@/components/admin/chat/StrategyCard", () => ({
+  StrategyCard: () => <div data-testid="mock-strategy">Strategy</div>,
+}));
+
+jest.mock("@/components/admin/chat/ThreadView", () => ({
+  ThreadView: ({ rootMessageId, onClose }: any) => (
+    <div data-testid="thread-view">
+      Thread: {rootMessageId}
+      <button onClick={onClose}>Close Thread</button>
+    </div>
+  ),
+}));
 
 describe("ChatDrawer", () => {
   const mockOnToggle = jest.fn();
@@ -295,5 +317,96 @@ describe("ChatDrawer", () => {
     // Force event to verify guard despite disabled UI
     fireEvent.keyPress(input, { key: "Enter", code: "Enter", charCode: 13 });
     expect(mockSendMessage).not.toHaveBeenCalled();
+  });
+
+  it("opens ThreadView when relationship is clicked", async () => {
+    (useWebSocketChat as jest.Mock).mockReturnValue({
+      ...defaultWebSocketState,
+      isConnected: true,
+    });
+    render(<ChatDrawer isOpen={true} onToggle={mockOnToggle} sessionId="sess1" />);
+
+    // Inject a message with relationship
+    const callbacks = getSocketCallbacks();
+
+    // Use fake timers to control ID generation
+    jest.useFakeTimers();
+    jest.setSystemTime(new Date('2023-01-01T00:00:00.000Z'));
+    const fixedTimestamp = new Date().getTime().toString();
+
+    await act(async () => {
+      callbacks.onAnalysis("Joy", "positive", { valence: 1, arousal: 1, connection: 1 }, 1);
+
+      // Now dispatch relationship for this ID
+      callbacks.onMessageRelationship({
+        id: "rel1",
+        source_message_id: fixedTimestamp,
+        target_message_id: "thread-1",
+        relationship_type: "reply",
+        created_at: new Date()
+      });
+    });
+
+    // Check for "View Thread" button from AutoLinkIndicator mock
+    await waitFor(() => {
+      expect(screen.queryByText(/View Thread/)).toBeInTheDocument();
+    });
+
+    const viewBtn = screen.getByText((content, element) => {
+      return element?.tagName.toLowerCase() === 'button' && content.includes("View Thread");
+    });
+
+    fireEvent.click(viewBtn);
+
+    expect(screen.getByText("Thread: thread-1")).toBeInTheDocument();
+
+    // Close
+    fireEvent.click(screen.getByText("Close Thread"));
+    expect(screen.queryByText("Thread: thread-1")).not.toBeInTheDocument();
+
+    jest.useRealTimers();
+  });
+
+  it("updates existing message with relationship but ignores non-matching messages", async () => {
+    (useWebSocketChat as jest.Mock).mockReturnValue({
+      ...defaultWebSocketState,
+      isConnected: true,
+    });
+    render(<ChatDrawer isOpen={true} onToggle={mockOnToggle} sessionId="sess1" />);
+    // Inject a message with ID "msg-1"
+    const callbacks = getSocketCallbacks();
+    jest.useFakeTimers();
+    jest.setSystemTime(new Date('2023-01-01T00:00:00.000Z'));
+    // We can't control the ID easily unless we mock Date for the first message too.
+    // The previous test did this.
+
+    await act(async () => {
+      // Message 1
+      callbacks.onAnalysis("Joy", "positive", { valence: 1, arousal: 1, connection: 1 }, 1);
+    });
+
+    // Now advance time to get a different ID if we added another message?
+    // But we just need to ensure the map function handles "false" case.
+    // If we have 1 message, and we send relationship for a DIFFERENT ID, it should NOT update the message.
+
+    await act(async () => {
+      // Relationship for non-existent message
+      callbacks.onMessageRelationship({
+        id: "rel2",
+        source_message_id: "non-existent-id",
+        target_message_id: "thread-2",
+        relationship_type: "reply",
+        created_at: new Date()
+      });
+    });
+
+    // Check that our message is still there and valid (render didn't crash)
+    // And ideally that it DOESN'T have the relationship. 
+    // But since it didn't have one before, we can't distinguish "didn't add" from "didn't have".
+    // Wait, if it updated, it would have "relationships" array.
+    // We can check that "View Thread" is NOT present.
+    expect(screen.queryByText(/View Thread/)).not.toBeInTheDocument();
+
+    jest.useRealTimers();
   });
 });

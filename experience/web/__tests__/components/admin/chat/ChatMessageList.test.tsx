@@ -1,6 +1,6 @@
 import { render, screen, fireEvent, within } from "@testing-library/react";
 import { ChatMessageList } from "@/components/admin/chat/ChatMessageList";
-import { DisplayMessage } from "@/hooks/chat/useChatMessages";
+import { DisplayMessage } from "@/types/chat";
 
 // Mock child components
 jest.mock("@/components/admin/shared/InsightCard", () => ({
@@ -23,6 +23,14 @@ jest.mock("@/components/admin/emotion-display/EmotionChipCluster", () => ({
 
 jest.mock("@/components/admin/shared/AnalysisProgressIndicator", () => ({
   AnalysisProgressIndicator: () => <div data-testid="mock-progress">Progress...</div>,
+}));
+
+jest.mock("@/components/admin/chat/AutoLinkIndicator", () => ({
+  AutoLinkIndicator: () => <div data-testid="mock-autolink">AutoLink</div>,
+}));
+
+jest.mock("@/components/admin/chat/StrategyCard", () => ({
+  StrategyCard: () => <div data-testid="mock-strategy-card">StrategyCard</div>,
 }));
 
 describe("ChatMessageList", () => {
@@ -252,5 +260,33 @@ describe("ChatMessageList", () => {
 
     // Should not throw
     fireEvent.click(screen.getByText("Select Joy"));
+  });
+
+  it("renders AutoLinkIndicator when relationships are present", () => {
+    const messages: DisplayMessage[] = [
+      {
+        id: "6",
+        type: "analysis",
+        content: "Linked message",
+        timestamp: new Date(),
+        relationships: [{ id: "r1", relationship_type: "reply", source_message_id: 'a', target_message_id: 'b', created_at: new Date() } as any],
+      },
+    ];
+    render(<ChatMessageList {...defaultProps} messages={messages} onRelationshipClick={jest.fn()} />);
+    expect(screen.getByTestId("mock-autolink")).toBeInTheDocument();
+  });
+
+  it("renders StrategyCard when strategies are present", () => {
+    const messages: DisplayMessage[] = [
+      {
+        id: "7",
+        type: "analysis",
+        content: "Strategic message",
+        timestamp: new Date(),
+        strategies: [{ strategy_id: "s1" } as any],
+      },
+    ];
+    render(<ChatMessageList {...defaultProps} messages={messages} />);
+    expect(screen.getByTestId("mock-strategy-card")).toBeInTheDocument();
   });
 });
