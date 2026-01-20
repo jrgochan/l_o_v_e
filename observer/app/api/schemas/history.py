@@ -64,7 +64,7 @@ References:
 """
 
 from datetime import datetime
-from typing import List, Optional
+from typing import Any, Dict, List, Optional
 
 from pydantic import BaseModel, ConfigDict, Field
 
@@ -76,7 +76,14 @@ class TrajectoryPoint(BaseModel):
     vac: List[float] = Field(description="VAC coordinates [v, a, c]")
     quaternion: List[float] = Field(description="Quaternion state [w, x, y, z]")
     emotion: str = Field(description="Dominant emotion name")
+    emotion: str = Field(description="Dominant emotion name")
     elasticity: float = Field(description="Speed of change (rad/s)")
+
+    # Linkage to Chat Message
+    message_id: Optional[str] = Field(None, description="Associated ChatMessage ID")
+    relationship_marker: Optional[Dict[str, Any]] = Field(
+        None, description="Relationship metadata if linked"
+    )
 
     model_config = ConfigDict(
         json_schema_extra={

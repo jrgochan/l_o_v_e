@@ -529,7 +529,40 @@ async def test_handle_multi_emotion_result_integration(mock_websocket, mock_mana
             session_id, {"type": "three_way_analysis", "data": {"data": "test"}}
         )
         
-        # Check recursive generation
         mock_recursive_gen.assert_awaited()
+
+
+@pytest.mark.asyncio
+async def test_handle_user_message_invalid_relationship_id(mock_websocket, mock_manager, mock_db_session_local, mock_httpx_client):
+    """Test handling of invalid UUID in related_message_id."""
+    session_id = "session1"
+    # Pass an invalid UUID string to trigger the exception block
+    data = {
+        "type": "user_message", 
+        "content": "Hello", 
+        "related_message_id": "invalid-uuid-string"
+    }
+    
+    with patch("app.api.routes.chat_websocket.ChatService") as MockChatService:
+        service_instance = AsyncMock()
+        MockChatService.return_value = service_instance
+        service_instance.create_session.return_value = MagicMock(id=uuid4())
+        service_instance.save_user_message.return_value = MagicMock(id=uuid4())
+        
+        # Mock listener response
+        mock_response = MagicMock()
+        mock_response.status_code = 200
+        mock_response.json.return_value = {"emotion": "Joy", "vac": {}, "confidence": 0.9}
+        mock_httpx_client.post.return_value = mock_response
+
+        with patch("app.api.routes.chat_websocket.generate_insights", new_callable=AsyncMock):
+            await chat_websocket.handle_user_message(session_id, data, mock_websocket)
+            
+            # Verify save_user_message calls
+            # args[0] is session_id, then kwargs
+            call_args = service_instance.save_user_message.call_args
+            # related_message_id should be None because exception handler caught it and set it to None
+            assert call_args.kwargs.get("related_message_id") is None
+
 
 

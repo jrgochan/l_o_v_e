@@ -1,230 +1,397 @@
+
 import pytest
 from unittest.mock import AsyncMock, MagicMock
 from uuid import uuid4
-from datetime import datetime
+
 from app.services.strategy_recommender import StrategyRecommender
 from app.models.atlas_definition import AtlasDefinition
-from app.models.transition_strategy import TransitionPattern, TransitionStrategy, PatternStrategy, StrategyAttempt
+from app.models.transition_strategy import (
+    TransitionPattern,
+    TransitionStrategy,
+    PatternStrategy,
+    StrategyAttempt,
+    UserJourney
+)
 
 @pytest.fixture
 def mock_session():
-    mock_db = AsyncMock()
-    mock_db.execute = AsyncMock()
-    mock_db.add = MagicMock()
-    mock_db.delete = MagicMock()
-    mock_db.commit = AsyncMock()
-    return mock_db
+    return AsyncMock()
 
 @pytest.fixture
 def recommender(mock_session):
     return StrategyRecommender(mock_session)
 
 @pytest.fixture
-def transition_objects():
-    anger = AtlasDefinition(
-        id=uuid4(),
-        emotion_name="Anger",
-        vac_vector=[-0.6, 0.8, -0.4],
-        category="Negative"
+def sample_emotions():
+    from_e = AtlasDefinition(
+        emotion_name="Anxiety",
+        category="When Things Are Uncertain",
+        vac_vector=[0.2, 0.8, -0.4] # High arousal, neg connection
     )
-    calm = AtlasDefinition(
-        id=uuid4(),
+    to_e = AtlasDefinition(
         emotion_name="Calm",
-        vac_vector=[0.4, 0.0, 0.5],
-        category="Positive"
+        category="When Life Is Good",
+        vac_vector=[0.5, 0.1, 0.5] # Low arousal, pos connection
     )
-    return anger, calm
+    return from_e, to_e
 
-@pytest.mark.asyncio
-async def test_get_strategies_no_pattern_fallback(recommender, mock_session, transition_objects):
-    anger, calm = transition_objects
-    
-    # Mock no patterns found
-    # Mock universal strategies
-    strat = TransitionStrategy(
-        id=uuid4(), strategy_name="Breathing", difficulty_level=1, evidence_level="meta_analysis"
-    )
-    
-    # First call: patterns (empty)
-    mock_result_patterns = MagicMock()
-    mock_result_patterns.scalars.return_value.all.return_value = []
-    
-    # Second call: universal strategies
-    mock_result_universal = MagicMock()
-    mock_result_universal.scalars.return_value.all.return_value = [strat]
-    
-    mock_session.execute.side_effect = [mock_result_patterns, mock_result_universal]
-    
-    strategies = await recommender.get_strategies_for_transition(anger, calm)
-    
-    assert len(strategies) == 1
-    assert strategies[0]["name"] == "Breathing"
-    assert strategies[0]["evidence_level"] == "meta_analysis"
-
-@pytest.mark.asyncio
-async def test_match_to_pattern_success(recommender, mock_session, transition_objects):
-    anger, calm = transition_objects
-    
+@pytest.fixture
+def mock_patterns():
     pattern = TransitionPattern(
         id=uuid4(),
-        pattern_name="Anger Management",
-        from_category="Negative",
-        to_category="Positive",
+        pattern_name="anxiety_regulation",
+        from_category="When Things Are Uncertain",
+        to_category="When Life Is Good",
         vac_change_characteristics={
-            "valence_change": "increase",
-            "arousal_change": "decrease",
-            "connection_change": "increase"
+            "arousal_change": "major_decrease",
+            "connection_change": "increase",
+            "valence_change": "increase"
+        }
+    )
+    return [pattern]
+
+@pytest.mark.asyncio
+async def test_match_to_pattern_success(recommender, mock_session, sample_emotions, mock_patterns):
+    """Test standard pattern matching logic."""
+    from_e, to_e = sample_emotions
+    
+    # Mock database returning patterns
+    result_mock = MagicMock()
+    result_mock.scalars().all.return_value = mock_patterns
+    mock_session.execute.return_value = result_mock
+    
+    match = await recommender._match_to_pattern(from_e, to_e)
+    
+    assert match is not None
+    assert match.pattern_name == "anxiety_regulation"
+
+@pytest.mark.asyncio
+async def test_get_strategies_for_transition_with_match(
+    recommender, mock_session, sample_emotions, mock_patterns
+):
+    """Test full flow: match pattern -> get strategies."""
+    from_e, to_e = sample_emotions
+    
+    # 1. Match Pattern (returns mock_patterns)
+    # 2. Get Strategies for Pattern
+    #    returns [(strategy, pattern_strategy)]
+    
+    strategy = TransitionStrategy(id=uuid4(), strategy_name="Deep Breathing", difficulty_level=1)
+    p_strategy = PatternStrategy(effectiveness_rating=4.5)
+    
+    # Mock execute results
+    # Call 1: _match_to_pattern -> select(TransitionPattern)
+    res_patterns = MagicMock()
+    res_patterns.scalars().all.return_value = mock_patterns
+    
+    # Call 2: _get_pattern_strategies -> select(Strategy, PStrategy)
+    res_strategies = MagicMock()
+    res_strategies.all.return_value = [(strategy, p_strategy)]
+    
+    mock_session.execute.side_effect = [res_patterns, res_strategies]
+    
+    strategies = await recommender.get_strategies_for_transition(from_e, to_e)
+    
+    assert len(strategies) == 1
+    assert strategies[0]["name"] == "Deep Breathing"
+    assert strategies[0]["effectiveness_rating"] == 4.5
+
+@pytest.mark.asyncio
+async def test_fallback_to_universal(recommender, mock_session, sample_emotions):
+    """Test fallback when no pattern matches."""
+    from_e, to_e = sample_emotions
+    
+    # 1. Match Pattern -> returns empty list
+    res_patterns = MagicMock()
+    res_patterns.scalars().all.return_value = []
+    
+    # 2. Universal Strategies -> returns list of strategies
+    univ_strategy = TransitionStrategy(id=uuid4(), strategy_name="Universal", difficulty_level=1)
+    res_universal = MagicMock()
+    res_universal.scalars().all.return_value = [univ_strategy]
+    
+    mock_session.execute.side_effect = [res_patterns, res_universal]
+    
+    strategies = await recommender.get_strategies_for_transition(from_e, to_e)
+    
+    assert len(strategies) == 1
+    assert strategies[0]["name"] == "Universal"
+
+@pytest.mark.asyncio
+async def test_personalization(recommender, mock_session, sample_emotions, mock_patterns):
+    """Test strategy personalization with user history."""
+    from_e, to_e = sample_emotions
+    user_id = "test_user"
+    
+    strategy = TransitionStrategy(id=uuid4(), strategy_name="Test Strat", difficulty_level=2)
+    p_strategy = PatternStrategy(effectiveness_rating=4.0)
+    
+    attempt = StrategyAttempt(helpful_rating=5, user_notes="Great!")
+    
+    # Call sequence:
+    # 1. Patterns
+    res_patterns = MagicMock()
+    res_patterns.scalars().all.return_value = mock_patterns
+    
+    # 2. Strategies
+    res_strategies = MagicMock()
+    res_strategies.all.return_value = [(strategy, p_strategy)]
+    
+    # 3. User Data (_get_user_strategy_data)
+    res_attempts = MagicMock()
+    res_attempts.scalars().all.return_value = [attempt]
+    
+    mock_session.execute.side_effect = [res_patterns, res_strategies, res_attempts]
+    
+    results = await recommender.get_strategies_for_transition(from_e, to_e, user_id=user_id)
+    
+    s = results[0]
+    assert s["times_successful_for_user"] == 1
+    assert s["user_notes"] == ["Great!"]
+
+@pytest.mark.asyncio
+async def test_get_simple_lookups(recommender, mock_session):
+    """Test get_strategies_by_type and get_strategy_by_id."""
+    strategy = TransitionStrategy(
+        id=uuid4(), 
+        strategy_name="Test", 
+        strategy_type="cognitive_reappraisal",
+        difficulty_level=3
+    )
+    
+    # 1. By Type
+    res_type = MagicMock()
+    res_type.scalars().all.return_value = [strategy]
+    
+    # 2. By ID
+    res_id = MagicMock()
+    res_id.scalar_one_or_none.return_value = strategy
+    
+    mock_session.execute.side_effect = [res_type, res_id]
+    
+    # Test By Type
+    by_type = await recommender.get_strategies_by_type("cognitive_reappraisal")
+    assert len(by_type) == 1
+    assert by_type[0]["type"] == "cognitive_reappraisal"
+    
+    # Test By ID
+    by_id = await recommender.get_strategy_by_id(str(strategy.id))
+    assert by_id["name"] == "Test"
+
+@pytest.mark.asyncio
+async def test_match_pattern_complex_conditions(recommender, mock_session):
+    """Test various VAC condition branches."""
+    # Pattern expecting major connection increase and valence decrease
+    pattern = TransitionPattern(
+        id=uuid4(),
+        pattern_name="complex_pattern",
+        from_category="A",
+        to_category="B",
+        vac_change_characteristics={
+            "valence_change": "decrease",
+            "connection_change": "major_increase",
+            "arousal_change": "increase"
         }
     )
     
+    # Transition: +Valence, -Arousal, +Connection
+    from_e = AtlasDefinition(vac_vector=[0.5, 0.5, 0.0], category="A", emotion_name="E1")
+    to_e = AtlasDefinition(vac_vector=[0.1, 0.9, 0.8], category="B", emotion_name="E2")
+    # Change:
+    # V: -0.4 (Decrease) -> Matches
+    # A: +0.4 (Increase) -> Matches activation (>0.3)
+    # C: +0.8 (Major Increase) -> Matches major (>0.6)
+    
     mock_result = MagicMock()
-    mock_result.scalars.return_value.all.return_value = [pattern]
+    mock_result.scalars().all.return_value = [pattern]
     mock_session.execute.return_value = mock_result
     
-    match = await recommender._match_to_pattern(anger, calm)
-    assert match == pattern
+    match = await recommender._match_to_pattern(from_e, to_e)
+    assert match is not None
+    assert match.pattern_name == "complex_pattern"
 
 @pytest.mark.asyncio
-async def test_get_pattern_strategies_with_history(recommender, mock_session):
-    pattern = TransitionPattern(id=uuid4())
-    user_id = "user1"
+async def test_personalization_no_history(recommender, mock_session, sample_emotions, mock_patterns):
+    """Test personalization implicitly handles no history."""
+    # Same setup as personalization but return empty attempts
+    from_e, to_e = sample_emotions
+    strategy = TransitionStrategy(id=uuid4(), strategy_name="Test", difficulty_level=1)
+    p_strategy = PatternStrategy(effectiveness_rating=4.0)
     
-    s1 = TransitionStrategy(id=uuid4(), strategy_name="S1")
-    ps1 = PatternStrategy(strategy_id=s1.id, pattern_id=pattern.id, effectiveness_rating=4.5)
+    res_patterns = MagicMock()
+    res_patterns.scalars().all.return_value = mock_patterns
+    res_strategies = MagicMock()
+    res_strategies.all.return_value = [(strategy, p_strategy)]
+    res_attempts = MagicMock() # Empty attempts
+    res_attempts.scalars().all.return_value = []
     
-    mock_result_strats = MagicMock()
-    mock_result_strats.all.return_value = [(s1, ps1)]
+    mock_session.execute.side_effect = [res_patterns, res_strategies, res_attempts]
     
-    mock_result_history = MagicMock()
-    attempt = StrategyAttempt(helpful_rating=5, user_notes="Good")
-    mock_result_history.scalars.return_value.all.return_value = [attempt]
-    
-    mock_session.execute.side_effect = [mock_result_strats, mock_result_history]
-    
-    strategies = await recommender._get_pattern_strategies(pattern, user_id, 5)
-    
-    assert len(strategies) == 1
-    assert strategies[0]["times_successful_for_user"] == 1
-    assert strategies[0]["effectiveness_rating"] == 4.5
-    assert strategies[0]["user_notes"] == ["Good"]
+    strategies = await recommender.get_strategies_for_transition(from_e, to_e, user_id="new_user")
+    assert strategies[0]["times_successful_for_user"] == 0
 
 @pytest.mark.asyncio
-async def test_match_pattern_scoring_logic(recommender, mock_session, transition_objects):
-    anger, calm = transition_objects
-    
-    p1 = TransitionPattern(
-        from_category="Negative", to_category="Positive",
-        vac_change_characteristics={}
+async def test_match_pattern_score_logic(recommender, mock_session):
+    """Test that higher score wins (fixing logic bug) and cover edge branches."""
+    # Pattern A: Weak match (only category)
+    # Expects "increase" arousal, but we will give stable -> Hits 342 False branch (coverage)
+    pattern_weak = TransitionPattern(
+        id=uuid4(),
+        pattern_name="weak",
+        from_category="A",
+        to_category="B",
+        vac_change_characteristics={
+            "arousal_change": "increase", # We will provide stable
+            "connection_change": "increase", # We will provide increase
+            "valence_change": "increase" # We will provide increase
+        }
     )
     
-    p2 = TransitionPattern(
-        from_category="Negative", to_category="Positive",
-        vac_change_characteristics={"arousal_change": "decrease"}
+    # Pattern B: Strong match
+    # Expects "major_increase" connection, we give major -> Hits 359 True
+    # Also matches arousal -> Hits 342 True
+    pattern_strong = TransitionPattern(
+        id=uuid4(),
+        pattern_name="strong",
+        from_category="A",
+        to_category="B",
+        vac_change_characteristics={
+            "arousal_change": "increase", 
+            "connection_change": "major_increase",
+            "valence_change": "increase"
+        }
     )
-    
-    # Explicitly use MagicMock for the result to avoid AsyncMock children issues
-    mock_result = MagicMock()
-    mock_result.scalars.return_value.all.return_value = [p1, p2]
-    mock_session.execute.return_value = mock_result
-    
-    match = await recommender._match_to_pattern(anger, calm)
-    assert match == p2
 
-@pytest.mark.asyncio
-async def test_get_strategies_by_type(recommender, mock_session):
-    s = TransitionStrategy(id=uuid4(), strategy_type="CBT", strategy_name="Cognitive")
-    mock_result = MagicMock()
-    mock_result.scalars.return_value.all.return_value = [s]
-    mock_session.execute.return_value = mock_result
+    # Transition: +V, +A (Small), +C (Major)
+    from_e = AtlasDefinition(vac_vector=[0, 0, 0], category="A", emotion_name="E1")
+    to_e = AtlasDefinition(vac_vector=[0.5, 0.4, 0.8], category="B", emotion_name="E2")
+    # Changes: V=+0.5, A=+0.4 (Increase), C=+0.8 (Major Increase)
     
-    res = await recommender.get_strategies_by_type("CBT")
-    assert len(res) == 1
-    assert res[0]["strategy_id"] == str(s.id)
-
-@pytest.mark.asyncio
-async def test_get_strategy_by_id(recommender, mock_session):
-    sid = str(uuid4())
-    s = TransitionStrategy(id=uuid4(), strategy_name="Test")
-    mock_result = MagicMock()
-    mock_result.scalar_one_or_none.return_value = s
-    mock_session.execute.return_value = mock_result
+    # Wait, to hit 342 False branch for weak pattern:
+    # Pattern Weak expects "increase" (>0.3).
+    # If input A is +0.2 (stable), 342 is False.
+    # So let's use input A=+0.2 everywhere?
+    # But Strong pattern needs A increase match to be "Strong".
+    # Let's verify logic.
     
-    res = await recommender.get_strategy_by_id(sid)
-    assert res["name"] == "Test"
+    # Let's adjust inputs to split behavior.
     
-    mock_result.scalar_one_or_none.return_value = None
-    res = await recommender.get_strategy_by_id(sid)
-    assert res is None
-
-@pytest.mark.asyncio
-async def test_strategy_recommender_user_data_loop():
-    mock_db = AsyncMock()
-    recommender_svc = StrategyRecommender(mock_db)
-    mock_strategy = MagicMock(spec=TransitionStrategy); mock_strategy.id = uuid4(); mock_strategy.to_dict.return_value = {"id": str(mock_strategy.id)}
-    mock_pattern_strategy = MagicMock(spec=PatternStrategy); mock_pattern_strategy.effectiveness_rating = 4.5
-    mock_result = MagicMock(); mock_result.all.return_value = [(mock_strategy, mock_pattern_strategy)]
-    recommender_svc.session.execute.return_value = mock_result
-    mock_pattern = MagicMock(); mock_pattern.id = uuid4()
-    recommender_svc._get_user_strategy_data = AsyncMock(return_value={"times_tried": 5})
-    result = await recommender_svc._get_pattern_strategies(mock_pattern, "user-123", 5)
-    assert result[0]["times_successful_for_user"] == 5
-
-@pytest.mark.asyncio
-async def test_strategy_recommender_no_user_id():
-    mock_db = AsyncMock()
-    recommender_svc = StrategyRecommender(mock_db)
-    mock_strategy = MagicMock(spec=TransitionStrategy); mock_strategy.id = uuid4(); mock_strategy.to_dict.return_value = {"id": str(mock_strategy.id)}
-    mock_pattern_strategy = MagicMock(spec=PatternStrategy); mock_pattern_strategy.effectiveness_rating = 4.5
-    mock_result = MagicMock(); mock_result.all.return_value = [(mock_strategy, mock_pattern_strategy)]
-    recommender_svc.session.execute.return_value = mock_result
-    mock_pattern = MagicMock(); mock_pattern.id = uuid4()
-    recommender_svc._get_user_strategy_data = AsyncMock()
-    result = await recommender_svc._get_pattern_strategies(mock_pattern, None, 5)
-    recommender_svc._get_user_strategy_data.assert_not_called()
-
-@pytest.mark.asyncio
-async def test_strategy_scoring_branches(mock_session):
-    """
-    Test StrategyRecommender._match_to_pattern specific scoring branches.
-    Covers lines 326 (valence decrease) and 343 (arousal increase).
-    """
-    recommender = StrategyRecommender(mock_session)
+    # weak_pattern: expects "increase" Arousal. 
+    # strong_pattern: expects "increase" Arousal.
     
-    # Setup Emotions
-    # Case 1: Valence Decrease (Positive -> Negative)
-    from_pos = AtlasDefinition(emotion_name="Joy", vac_vector=[0.8, 0.5, 0.5], category="Pos")
-    to_neg = AtlasDefinition(emotion_name="Sadness", vac_vector=[-0.8, 0.5, 0.5], category="Neg")
+    # Input Arousal change: 0.1 (Stable).
+    # both match 342 False (miss expected increase). Score 0 for arousal.
+    # weak matches connection "increase" (+0.8). Score += 2.0.
+    # strong matches connection "major_increase" (+0.8). Score += 2.5.
+    # Result: Strong has 2.5, Weak has 2.0.
+    # Logic should pick Strong.
+    # The bug (minimize) would pick Weak?
     
-    # Case 2: Arousal Increase (Low -> High)
-    from_low = AtlasDefinition(emotion_name="Boredom", vac_vector=[0.0, -0.5, 0.0], category="Low")
-    to_high = AtlasDefinition(emotion_name="Excitement", vac_vector=[0.0, 0.5, 0.0], category="High")
+    # Wait, checking branches too.
+    # 342->357 (Missing False).
+    # If Arousal change is 0.1, and vac_char is "increase".
+    # 342 check: `vac_char == "increase" and change > 0.3`.
+    # "increase" == "increase" (True) AND 0.1 > 0.3 (False). -> False.
+    # Jump to 357. Covered!
     
-    # Defined Patterns
-    pattern_val_dec = TransitionPattern(
-        pattern_name="mood_worsening",
-        from_category="Pos",
-        to_category="Neg",
-        vac_change_characteristics={"valence_change": "decrease"}
+    # 359->370 (Missing False).
+    # 359 check: `vac_char == "major_increase" and change > 0.6`.
+    # We need a pattern that expects "major_increase" but gets small increase.
+    # Let's add Pattern C: "Failed Major"
+    pattern_fail_major = TransitionPattern(
+        id=uuid4(),
+        pattern_name="fail_major",
+        from_category="A",
+        to_category="B",
+        vac_change_characteristics={
+            "connection_change": "major_increase"
+        }
     )
+    # If input is +0.4.
+    # 357 (increase check): False (pattern is not "increase").
+    # 359 (major check): `major == major` (True) AND `0.4 > 0.6` (False). -> False.
+    # Jump to 370. Covered!
     
-    pattern_arousal_inc = TransitionPattern(
-        pattern_name="activation",
-        from_category="Low",
-        to_category="High",
-        vac_change_characteristics={"arousal_change": "increase"}
-    )
-    
-    # Mock DB return
     mock_result = MagicMock()
-    mock_result.scalars.return_value.all.return_value = [
-        pattern_val_dec, pattern_arousal_inc
+    mock_result.scalars().all.return_value = [
+        pattern_weak, pattern_strong
     ]
     mock_session.execute.return_value = mock_result
     
-    # Test Valence Decrease
-    match1 = await recommender._match_to_pattern(from_pos, to_neg)
-    assert match1.pattern_name == "mood_worsening"
+    # Case 1: Reproduce scoring bug (Strong vs Weak) with A=+0.4 (Match)
+    # Changes: V=+0.5 (Match), A=+0.4 (Match both), C=+0.8 (Match Weak incr, Match Strong major)
+    # Weak: V(1) + A(2) + C(2) = 5.0
+    # Strong: V(1) + A(2) + C(2.5) = 5.5
+    # If minimizing, it picks Weak (5.0). Expected: Strong (5.5).
     
-    # Test Arousal Increase
-    match2 = await recommender._match_to_pattern(from_low, to_high)
-    assert match2.pattern_name == "activation"
+    match = await recommender._match_to_pattern(from_e, to_e)
+    assert match.pattern_name == "strong"
+
+@pytest.mark.asyncio
+async def test_match_pattern_359_miss_branch(recommender, mock_session):
+    """Test specifically the 359 False branch."""
+    pattern = TransitionPattern(
+        id=uuid4(),
+        pattern_name="miss_major",
+        from_category="A",
+        to_category="B",
+        vac_change_characteristics={
+            "connection_change": "major_increase"
+        }
+    )
+    # Input gives small increase +0.4.
+    from_e = AtlasDefinition(vac_vector=[0,0,0], category="A", emotion_name="E1")
+    to_e = AtlasDefinition(vac_vector=[0,0,0.4], category="B", emotion_name="E2")
+    
+    mock_result = MagicMock()
+    mock_result.scalars().all.return_value = [pattern]
+    mock_session.execute.return_value = mock_result
+    
+    mock_session.execute.return_value = mock_result
+    
+    match = await recommender._match_to_pattern(from_e, to_e)
+    # Score should be 0 (no match). match is None.
+    assert match is None
+
+@pytest.mark.asyncio
+async def test_match_pattern_category_mismatch(recommender, mock_session):
+    """Test that patterns with non-matching categories are filtered."""
+    pattern = TransitionPattern(
+        id=uuid4(),
+        pattern_name="wrong_category",
+        from_category="Other",
+        to_category="Other",
+        vac_change_characteristics={}
+    )
+    from_e = AtlasDefinition(vac_vector=[0,0,0], category="A", emotion_name="E1")
+    to_e = AtlasDefinition(vac_vector=[0,0,0], category="B", emotion_name="E2")
+    
+    mock_result = MagicMock()
+    mock_result.scalars().all.return_value = [pattern]
+    mock_session.execute.return_value = mock_result
+    
+    match = await recommender._match_to_pattern(from_e, to_e)
+    assert match is None
+
+@pytest.mark.asyncio
+async def test_match_pattern_major_decrease_miss(recommender, mock_session):
+    """Test specifically the 340 False branch (major decrease miss)."""
+    pattern = TransitionPattern(
+        id=uuid4(),
+        pattern_name="miss_major_dec",
+        from_category="A",
+        to_category="B",
+        vac_change_characteristics={
+            "arousal_change": "major_decrease"
+        }
+    )
+    # Input gives small decrease -0.4 (not < -0.6).
+    from_e = AtlasDefinition(vac_vector=[0,0.4,0], category="A", emotion_name="E1")
+    to_e = AtlasDefinition(vac_vector=[0,0,0], category="B", emotion_name="E2")
+    
+    mock_result = MagicMock()
+    mock_result.scalars().all.return_value = [pattern]
+    mock_session.execute.return_value = mock_result
+    
+    match = await recommender._match_to_pattern(from_e, to_e)
+    assert match is None

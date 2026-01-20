@@ -251,10 +251,13 @@ from uuid import UUID
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import selectinload
 
 from app.api.schemas.history import HistoryResponse, TrajectoryPoint
 from app.database import get_db
 from app.models.atlas_definition import AtlasDefinition
+from app.models.chat_message import ChatMessage
+from app.models.chat_session import ChatSession
 from app.models.user_trajectory import UserTrajectory
 
 logger = logging.getLogger(__name__)
@@ -315,6 +318,45 @@ async def get_history(
 
         # Transform to trajectory points
         trajectory_points = []
+
+        # Pre-fetch messages in this time range to link relationships
+        # We perform a separate query to avoid complex joins and potential Cartesian products
+        # This assumes trajectory points and messages are roughly synchronized
+        message_map = {}
+
+        min_ts = states[0].timestamp
+        max_ts = states[-1].timestamp
+
+        # Buffer window for timestamp matching (e.g. +/- 1 second)
+        # Messages might be slightly offset from trajectory points
+
+        msg_stmt = (
+            select(ChatMessage)
+            .join(ChatSession)
+            .where(
+                ChatSession.user_id == user_id,
+                ChatMessage.timestamp >= min_ts,
+                ChatMessage.timestamp <= max_ts,
+            )
+            .options(selectinload(ChatMessage.outgoing_relationships))
+        )
+
+        msg_result = await db.execute(msg_stmt)
+        messages = msg_result.scalars().all()
+
+        # Index messages by timestamp (simplified matching for now)
+        # In a real scenario, we might use a dedicated correlation ID if available
+        for msg in messages:
+            # Only care if there are relationships or strict requirements
+            if msg.outgoing_relationships:
+                # We store by session_id + timestamp or just fuzzy timestamp?
+                # Let's simple check: msg timestamp -> msg
+                # We might have duplicates, so we store list
+                ts_key = msg.timestamp.replace(microsecond=0)  # Round to second for matching
+                if ts_key not in message_map:
+                    message_map[ts_key] = []
+                message_map[ts_key].append(msg)
+
         for state in states:
             # Get emotion name (fetch if needed)
             emotion_name = "Unknown"
@@ -327,12 +369,34 @@ async def get_history(
                 if emotion:
                     emotion_name = emotion.emotion_name
 
+            # Check for linked message
+            # Fuzzy match timestamp
+            linked_msg_id = None
+            relationship_data = None
+
+            ts_key = state.timestamp.replace(microsecond=0)
+            if ts_key in message_map:
+                # Take the first matching message for now
+                # Ideally we want exact correlation, but without a shared ID, time is our best proxy
+                linked_msg = message_map[ts_key][0]
+                linked_msg_id = str(linked_msg.id)
+
+                # Just take the first relationship for the marker
+                rel = linked_msg.outgoing_relationships[0]
+                relationship_data = {
+                    "type": rel.relationship_type,
+                    "target_id": str(rel.target_message_id),
+                    "count": len(linked_msg.outgoing_relationships),
+                }
+
             point = TrajectoryPoint(
                 timestamp=state.timestamp,
                 vac=list(state.vac_values),
                 quaternion=list(state.quaternion_state),
                 emotion=emotion_name,
                 elasticity=state.elasticity_metric,
+                message_id=linked_msg_id,
+                relationship_marker=relationship_data,
             )
             trajectory_points.append(point)
 

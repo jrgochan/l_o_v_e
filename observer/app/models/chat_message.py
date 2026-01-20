@@ -451,10 +451,13 @@ from sqlalchemy.dialects.postgresql import ARRAY, JSONB
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.database import Base
+from pgvector.sqlalchemy import Vector
 
 if TYPE_CHECKING:
     from app.models.atlas_definition import AtlasDefinition
     from app.models.chat_session import ChatSession
+    from app.models.message_relationship import MessageRelationship
+    from app.models.multi_emotion_analysis import MultiEmotionAnalysis
 
 
 class ChatMessage(Base):
@@ -500,6 +503,11 @@ class ChatMessage(Base):
         JSONB
     )  # Additional features: jitter, shimmer, HNR, etc.
 
+    # Semantic Vector
+    semantic_embedding: Mapped[Optional[List[float]]] = mapped_column(
+        Vector(384)
+    )  # Embedding for similarity search
+
     # Insights and reasoning
     insights: Mapped[Optional[Dict[str, Any]]] = mapped_column(JSONB)  # AI-generated insights
     tone_mode: Mapped[Optional[str]] = mapped_column(String(20))  # 'clinical' or 'warm'
@@ -509,6 +517,23 @@ class ChatMessage(Base):
     # Relationships
     session: Mapped["ChatSession"] = relationship(back_populates="messages")
     emotion: Mapped[Optional["AtlasDefinition"]] = relationship(foreign_keys=[emotion_id])
+
+    # Relationships for timelines/threading
+    outgoing_relationships: Mapped[List["MessageRelationship"]] = relationship(
+        foreign_keys="MessageRelationship.source_message_id",
+        back_populates="source_message",
+        cascade="all, delete-orphan",
+    )
+    incoming_relationships: Mapped[List["MessageRelationship"]] = relationship(
+        foreign_keys="MessageRelationship.target_message_id",
+        back_populates="target_message",
+        cascade="all, delete-orphan",
+    )
+    multi_emotion_analysis: Mapped[Optional["MultiEmotionAnalysis"]] = relationship(
+        back_populates="message",
+        uselist=False,
+        cascade="all, delete-orphan",
+    )
 
     def __repr__(self) -> str:
         """Represent the object as a string."""
@@ -571,6 +596,19 @@ class ChatMessage(Base):
                 ),
             }
             data["emotion"] = emotion_dict  # type: ignore[assignment]
+
+            data["emotion"] = emotion_dict  # type: ignore[assignment]
+
+        # Add relationships if loaded/available
+        # Check if relationship is loaded to avoid implicit I/O in sync method if possible,
+        # but usually to_dict is called after eager loading.
+        # We use a safe check to see if the collection is populated.
+        if hasattr(self, "outgoing_relationships") and self.outgoing_relationships:
+            data["outgoing_relationships"] = [rel.to_dict() for rel in self.outgoing_relationships]
+
+        # Add deep feeling analysis if available
+        if hasattr(self, "multi_emotion_analysis") and self.multi_emotion_analysis:
+            data["multi_emotion_analysis"] = self.multi_emotion_analysis.to_dict()
 
         return data
 

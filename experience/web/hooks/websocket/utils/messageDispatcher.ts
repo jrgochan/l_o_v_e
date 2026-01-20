@@ -8,6 +8,7 @@ import type {
   ProsodyData,
   ThreeWayAnalysis,
   AggregateState,
+  MessageRelationship,
 } from "@/types/chat";
 
 export interface MessageHandlers {
@@ -41,6 +42,7 @@ export interface MessageHandlers {
     strength: number,
     description: string
   ) => void;
+  onMessageRelationship?: (relationship: MessageRelationship) => void;
   onAggregateState?: (state: AggregateState) => void;
   onThreeWayAnalysis?: (data: ThreeWayAnalysis) => void;
   onProgressUpdate?: (
@@ -132,6 +134,13 @@ export const dispatchMessage = (
           message.strength || 0,
           message.description || ""
         );
+      }
+      break;
+
+    case "message_relationship":
+      if ("relationship" in message) {
+        logger.info("websocket", "Message Relationship detected", message.relationship);
+        handlers.onMessageRelationship?.(message.relationship);
       }
       break;
 

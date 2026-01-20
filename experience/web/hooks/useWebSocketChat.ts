@@ -17,6 +17,7 @@ import type {
   RelationshipType,
   ProsodyData,
   ThreeWayAnalysis,
+  MessageRelationship,
 } from "@/types/chat";
 import { useWebSocketMessageHandler } from "./websocket/useWebSocketMessageHandler";
 import { useWebSocketConnection } from "./websocket/useWebSocketConnection";
@@ -60,6 +61,7 @@ export interface UseWebSocketChatOptions {
   ) => void;
   onAggregateState?: (state: AggregateState) => void;
   onThreeWayAnalysis?: (data: ThreeWayAnalysis) => void;
+  onMessageRelationship?: (relationship: MessageRelationship) => void;
   // New: Progress tracking callback
   onProgressUpdate?: (
     stage: string,

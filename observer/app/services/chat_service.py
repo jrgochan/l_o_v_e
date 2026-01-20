@@ -214,11 +214,13 @@ from datetime import datetime
 from typing import Any, Dict, List, Optional
 from uuid import UUID
 
-from sqlalchemy import desc, func, select
+from sqlalchemy import desc, func, literal, select
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import aliased, selectinload
 
 from app.models.chat_message import ChatMessage
 from app.models.chat_session import ChatSession
+from app.models.message_relationship import MessageRelationship
 from app.models.multi_emotion_analysis import (
     DetectedEmotion,
     EmotionRelationship,
@@ -329,6 +331,9 @@ class ChatService:
         audio_url: Optional[str] = None,
         transcription: Optional[str] = None,
         message_type: str = "user_text",
+        related_message_id: Optional[UUID] = None,
+        relationship_type: Optional[str] = None,
+        relationship_metadata: Optional[Dict[str, Any]] = None,
     ) -> ChatMessage:
         """Save a user message (text or audio).
 
@@ -338,6 +343,9 @@ class ChatService:
             audio_url: URL to audio file
             transcription: Transcribed text from audio
             message_type: 'user_text' or 'user_audio'
+            related_message_id: Optional linked message ID
+            relationship_type: Optional type of link (e.g. 'reply')
+            relationship_metadata: Optional link metadata
 
         Returns:
             New ChatMessage instance
@@ -362,7 +370,160 @@ class ChatService:
         await self.db.refresh(message)
 
         logger.info(f"Saved user message {message.id} to session {session_id}")
+
+        # Create relationship if requested
+        if related_message_id:
+            await self.create_message_relationship(
+                source_id=message.id,
+                target_id=related_message_id,
+                relationship_type=relationship_type or "reply",
+                relationship_metadata=relationship_metadata,
+            )
+
+        # Trigger Semantic Auto-Linking
+        try:
+            from app.services.association_engine import get_association_engine
+            
+            engine = get_association_engine()
+            # We await here for simplicity in this version. 
+            # In a high-scale env, this should be a BackgroundTask.
+            await engine.auto_link(message.id, self.db)
+        except Exception as e:
+            logger.error(f"Auto-linking failed for message {message.id}: {e}")
+
         return message
+
+    async def create_message_relationship(
+        self,
+        source_id: UUID,
+        target_id: UUID,
+        relationship_type: str,
+        relationship_metadata: Optional[Dict[str, Any]] = None,
+    ) -> MessageRelationship:
+        """Create a relationship between two messages.
+
+        Args:
+            source_id: The current message ID (child/later)
+            target_id: The past message ID (parent/earlier)
+            relationship_type: Type of link (e.g. 'reply', 'reference')
+            relationship_metadata: Optional details
+
+        Returns:
+            New MessageRelationship instance
+        """
+        relationship = MessageRelationship(
+            source_message_id=source_id,
+            target_message_id=target_id,
+            relationship_type=relationship_type,
+            relationship_metadata=relationship_metadata,
+            created_at=datetime.utcnow(),
+        )
+
+        self.db.add(relationship)
+        await self.db.commit()
+        await self.db.refresh(relationship)
+
+        logger.info(
+            f"Created relationship {relationship.id}: {source_id} -> {target_id} ({relationship_type})"
+        )
+        return relationship
+
+    async def get_message_thread(self, root_id: UUID, max_depth: int = 10) -> List[ChatMessage]:
+        """Fetch full conversation thread (descendants) using recursive CTE.
+        
+        Retrieves all messages that reply to the root message (directly or indirectly).
+        Direction: Finds messages that have 'target_id' pointing to the current lineage.
+        (Since Reply = Source -> Target, we traverse "backwards" from Target to Source).
+        
+        Args:
+            root_id: The starting message ID (ancestor)
+            max_depth: limit recursion depth
+            
+        Returns:
+            List of ChatMessage objects in the thread
+        """
+        # We need the class for the CTE
+        # Avoid circular imports if any, but models are usually safe here 
+        # (ChatMessage already imported)
+        
+        # CTE Definition
+        # Anchor: Relationships where target_id == root_id
+        hierarchy = (
+            select(
+                MessageRelationship.source_message_id, 
+                MessageRelationship.target_message_id,
+                literal(1).label("depth")
+            )
+            .where(MessageRelationship.target_message_id == root_id)
+            .cte(name="hierarchy", recursive=True)
+        )
+        
+        # Recursive Member: Relationships targeting the sources found in previous step
+        # hierarchy.c.source_message_id is the ID of the child message found.
+        # We want relationships where target_id == child_id
+        
+        parent = aliased(hierarchy, name="parent")
+        child = aliased(MessageRelationship, name="child")
+        
+        hierarchy = hierarchy.union_all(
+            select(
+                child.source_message_id, 
+                child.target_message_id,
+                (parent.c.depth + 1).label("depth")
+            )
+            .where(child.target_message_id == parent.c.source_message_id)
+            .where(parent.c.depth < max_depth)
+        )
+        
+        # Final selection: Get Messages that matches the source_ids in the CTE
+        # Plus the root message itself? The method implies "Thread", often includes root.
+        # Let's fetch descendants + root.
+        
+        # Helper stub for root (depth 0)
+        # We can just fetch root separately or union ID list.
+        # Let's fetch root + matched IDs.
+        
+        stmt = (
+            select(ChatMessage)
+            .join(hierarchy, ChatMessage.id == hierarchy.c.source_message_id)
+            .order_by(hierarchy.c.depth, ChatMessage.timestamp)
+        )
+        
+        # Fetch descendants
+        result = await self.db.execute(stmt)
+        descendants = result.scalars().all()
+        
+        # Fetch root
+        root = await self.get_message(root_id)
+        
+        if root:
+            # Return Root + Descendants
+            return [root] + list(descendants)
+        return list(descendants)
+
+    async def get_message_relationships(
+        self, message_id: UUID, direction: str = "outgoing"
+    ) -> List[MessageRelationship]:
+        """Get relationships for a message.
+        
+        Args:
+            message_id: The message ID
+            direction: 'outgoing' (links FROM this msg) or 'incoming' (links TO this msg)
+        
+        Returns:
+            List of relationships
+        """
+        if direction == "outgoing":
+            stmt = select(MessageRelationship).where(
+                MessageRelationship.source_message_id == message_id
+            )
+        else:
+            stmt = select(MessageRelationship).where(
+                MessageRelationship.target_message_id == message_id
+            )
+
+        result = await self.db.execute(stmt)
+        return list(result.scalars().all())
 
     async def save_analysis_message(
         self,
@@ -434,6 +595,19 @@ class ChatService:
         logger.info(f"Saved analysis message {message.id} to session {session_id}")
         return message
 
+    async def get_message(self, message_id: UUID) -> Optional[ChatMessage]:
+        """Fetch a single message by ID.
+        
+        Args:
+            message_id: Message ID
+            
+        Returns:
+            ChatMessage or None
+        """
+        stmt = select(ChatMessage).where(ChatMessage.id == message_id)
+        result = await self.db.execute(stmt)
+        return result.scalar_one_or_none()
+
     async def save_insight_message(
         self, session_id: UUID, content: str, insights: Dict[str, Any], tone_mode: str
     ) -> ChatMessage:
@@ -492,6 +666,10 @@ class ChatService:
             select(ChatMessage)
             .where(ChatMessage.session_id == session_id)
             .order_by(ChatMessage.timestamp)
+            .options(
+                selectinload(ChatMessage.outgoing_relationships),  # Eager load relationships
+                selectinload(ChatMessage.multi_emotion_analysis),  # Eager load deep feeling data
+            )
             .offset(offset)
         )
 

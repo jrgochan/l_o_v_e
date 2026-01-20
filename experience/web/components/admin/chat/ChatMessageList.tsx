@@ -10,10 +10,13 @@
 import { InsightCard } from "../shared/InsightCard";
 import { EmotionChipCluster } from "../emotion-display/EmotionChipCluster";
 import { AnalysisProgressIndicator } from "../shared/AnalysisProgressIndicator";
-import type { DisplayMessage } from "@/hooks/chat/useChatMessages";
-import type { ToneMode, ProgressStage, DetectedEmotion } from "@/types/chat";
+// import type { DisplayMessage } from "@/hooks/chat/useChatMessages"; // Replaced by direct import above
+import type { ToneMode, ProgressStage, DetectedEmotion, MessageRelationship } from "@/types/chat";
 import { logger } from "@/utils/logger";
 import { useAdminTheme } from "@/hooks/admin/useAdminTheme";
+import { AutoLinkIndicator } from "./AutoLinkIndicator";
+import { StrategyCard } from "./StrategyCard";
+import type { DisplayMessage } from "@/types/chat";
 
 interface ChatMessageListProps {
   messages: DisplayMessage[];
@@ -28,6 +31,7 @@ interface ChatMessageListProps {
   deepFeelingMode: boolean;
   messagesEndRef: React.RefObject<HTMLDivElement | null>;
   onEmotionClick?: (emotion: string) => void;
+  onRelationshipClick?: (relationship: MessageRelationship) => void;
 }
 
 export function ChatMessageList({
@@ -38,6 +42,7 @@ export function ChatMessageList({
   deepFeelingMode,
   messagesEndRef,
   onEmotionClick,
+  onRelationshipClick,
 }: ChatMessageListProps) {
   const theme = useAdminTheme();
   return (
@@ -67,13 +72,12 @@ export function ChatMessageList({
             </div>
           ) : (
             <div
-              className={`max-w-[70%] rounded-lg px-4 py-3 ${
-                msg.type === "user"
-                  ? "bg-cyan-600 text-white"
-                  : msg.type === "analysis" || msg.type === "multi_emotion"
-                    ? `bg-purple-900/50 border border-purple-500/30 text-white`
-                    : `bg-white/5 ${theme.colors.text.secondary} border ${theme.colors.border}`
-              }`}
+              className={`max-w-[70%] rounded-lg px-4 py-3 ${msg.type === "user"
+                ? "bg-cyan-600 text-white"
+                : msg.type === "analysis" || msg.type === "multi_emotion"
+                  ? `bg-purple-900/50 border border-purple-500/30 text-white`
+                  : `bg-white/5 ${theme.colors.text.secondary} border ${theme.colors.border}`
+                }`}
             >
               {/* Message Content */}
               <div className="text-sm whitespace-pre-wrap">{msg.content}</div>
@@ -116,6 +120,23 @@ export function ChatMessageList({
                       <span className="font-mono">{(msg.confidence * 100).toFixed(0)}%</span>
                     </div>
                   )}
+                </div>
+              )}
+
+              {/* Auto-Linking Indicator */}
+              {msg.relationships && msg.relationships.length > 0 && onRelationshipClick && (
+                <div className="mt-2 pt-2 border-t border-cyan-500/20">
+                  <AutoLinkIndicator
+                    relationships={msg.relationships}
+                    onRelationshipClick={onRelationshipClick}
+                  />
+                </div>
+              )}
+
+              {/* Strategy Recommendations */}
+              {msg.strategies && msg.strategies.length > 0 && (
+                <div className="mt-2 pt-2 border-t border-amber-500/20">
+                  <StrategyCard strategies={msg.strategies} />
                 </div>
               )}
 

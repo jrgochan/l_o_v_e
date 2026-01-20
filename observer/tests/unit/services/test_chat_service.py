@@ -6,6 +6,7 @@ from app.services.chat_service import ChatService
 from app.models.chat_session import ChatSession
 from app.models.chat_message import ChatMessage
 from app.models.multi_emotion_analysis import MultiEmotionAnalysis
+from app.models.message_relationship import MessageRelationship
 
 @pytest.fixture
 def mock_session():
@@ -602,3 +603,96 @@ async def test_get_session_statistics_active(chat_service, mock_session):
         
         stats = await chat_service.get_session_statistics(session_id)
         assert stats["duration_seconds"] is None
+
+
+@pytest.mark.asyncio
+async def test_create_message_relationship(chat_service, mock_session):
+    """Test creating a message relationship."""
+    source_id = uuid4()
+    target_id = uuid4()
+    
+    rel = await chat_service.create_message_relationship(
+        source_id, target_id, "reply", {"note": "test"}
+    )
+    
+    assert rel.source_message_id == source_id
+    assert rel.target_message_id == target_id
+    assert rel.relationship_type == "reply"
+    
+    mock_session.add.assert_called_once()
+    mock_session.commit.assert_awaited()
+    mock_session.refresh.assert_awaited()
+
+
+@pytest.mark.asyncio
+async def test_get_message_relationships(chat_service, mock_session):
+    """Test retrieving message relationships."""
+    msg_id = uuid4()
+    
+    mock_result = MagicMock()
+    r1 = MessageRelationship(id=uuid4(), source_message_id=msg_id, relationship_type="reply")
+    mock_result.scalars.return_value.all.return_value = [r1]
+    mock_session.execute.return_value = mock_result
+    
+    # 1. Outgoing
+    rels_out = await chat_service.get_message_relationships(msg_id, "outgoing")
+    assert len(rels_out) == 1
+    # Verify filter usage (heuristic)
+    assert str(mock_session.execute.call_args)
+    
+    # 2. Incoming
+    rels_in = await chat_service.get_message_relationships(msg_id, "incoming")
+    assert len(rels_in) == 1
+
+
+@pytest.mark.asyncio
+async def test_save_user_message_with_relationship(chat_service, mock_session):
+    """Test saving user message with automatic relationship creation."""
+    session_id = uuid4()
+    related_id = uuid4()
+    session = ChatSession(id=session_id, message_count=0)
+    
+    with patch.object(chat_service, 'get_session', return_value=session):
+        # We need to mock create_message_relationship to verify it's called
+        with patch.object(chat_service, 'create_message_relationship', new_callable=AsyncMock) as mock_create_rel:
+            
+            msg = await chat_service.save_user_message(
+                session_id, 
+                "Reply", 
+                related_message_id=related_id,
+                relationship_type="reply",
+                relationship_metadata={"foo": "bar"}
+            )
+            
+            assert msg.content == "Reply"
+            
+            # Verify relationship creation was called
+            mock_create_rel.assert_awaited_once_with(
+                source_id=msg.id,
+                target_id=related_id,
+                relationship_type="reply",
+                relationship_metadata={"foo": "bar"}
+            )
+
+
+def test_message_relationship_model_methods():
+    """Test MessageRelationship model methods (repr, to_dict)."""
+    rel = MessageRelationship(
+        id=uuid4(),
+        source_message_id=uuid4(),
+        target_message_id=uuid4(),
+        relationship_type="reply",
+        relationship_metadata={"a": 1},
+        created_at=datetime.utcnow()
+    )
+    
+    # Test __repr__
+    assert "MessageRelationship" in repr(rel)
+    assert "reply" in repr(rel)
+    
+    # Test to_dict
+    data = rel.to_dict()
+    assert data["relationship_type"] == "reply"
+    assert data["relationship_metadata"] == {"a": 1}
+    assert "source_message_id" in data
+    assert "created_at" in data

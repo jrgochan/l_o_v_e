@@ -289,8 +289,9 @@ class StrategyRecommender:
         # Scoring system rewards patterns that match:
         #   - Category alignment (required)
         #   - VAC change characteristics (weighted by importance)
+        #   - VAC change characteristics (weighted by importance)
         best_match = None
-        best_score = float("inf")  # Lower score = better match
+        best_score = -1.0  # Higher score = better match
 
         for pattern in patterns:
             # ───────────────────────────────────────────────────────────────────
@@ -367,7 +368,7 @@ class StrategyRecommender:
                 # ───────────────────────────────────────────────────────────────
                 # Highest scoring pattern wins
                 # Must have score > 0 (at least one VAC dimension matched)
-                if score > 0 and score < best_score:
+                if score > 0 and score > best_score:
                     best_score = score
                     best_match = pattern
 

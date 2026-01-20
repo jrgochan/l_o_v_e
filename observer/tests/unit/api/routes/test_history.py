@@ -61,11 +61,16 @@ async def test_get_history_full_success(mock_db, mock_states):
     mock_result_emotion = MagicMock()
     mock_result_emotion.scalar_one_or_none.return_value = mock_emotion
     
+    # Mock DB query for messages (empty for now)
+    mock_result_msgs = MagicMock()
+    mock_result_msgs.scalars().all.return_value = []
+
     # Configure execute side effects
     # First call: Select UserTrajectory
-    # Second call: Select AtlasDefinition (for s1)
+    # Second call: Select ChatMessage (new)
+    # Third call: Select AtlasDefinition (for s1)
     # Note: s2 has no ID, so no lookup
-    mock_db.execute.side_effect = [mock_result_states, mock_result_emotion]
+    mock_db.execute.side_effect = [mock_result_states, mock_result_msgs, mock_result_emotion]
     
     resp = await history.get_history(user_id, db=mock_db)
     
@@ -88,6 +93,8 @@ async def test_get_history_empty(mock_db):
     # Mock empty result
     mock_result = MagicMock()
     mock_result.scalars().all.return_value = []
+    # Queries: Trajectory (empty), [Messages skipped if states empty? Check logic]
+    # Logic: if not states: return empty. So only 1 query.
     mock_db.execute.return_value = mock_result
     
     user_id = uuid4()
@@ -132,11 +139,15 @@ async def test_get_history_lookup_fail_for_valid_id(mock_db):
     mock_result_states = MagicMock()
     mock_result_states.scalars().all.return_value = [s1]
     
+    # Mock messages (empty)
+    mock_result_msgs = MagicMock()
+    mock_result_msgs.scalars().all.return_value = []
+    
     # Lookup returns None
     mock_result_lookup = MagicMock()
     mock_result_lookup.scalar_one_or_none.return_value = None
     
-    mock_db.execute.side_effect = [mock_result_states, mock_result_lookup]
+    mock_db.execute.side_effect = [mock_result_states, mock_result_msgs, mock_result_lookup]
     
     resp = await history.get_history(user_id, db=mock_db)
     
@@ -152,3 +163,108 @@ async def test_get_history_exception(mock_db):
     
     assert exc.value.status_code == 500
     assert "Failed to retrieve history" in exc.value.detail
+
+@pytest.mark.asyncio
+async def test_get_history_with_linked_messages(mock_db, mock_states):
+    """Test retrieving history where states are linked to messages with relationships."""
+    user_id = mock_states[0].user_id
+    states = [mock_states[0]] # Just use one state
+    
+    # Timestamp for synchronization
+    ts = states[0].timestamp
+    
+    # Mock DB query for states
+    mock_result_states = MagicMock()
+    mock_result_states.scalars().all.return_value = states
+    
+    # Mock Linked Message
+    # Needs to match timestamp: state.timestamp.replace(microsecond=0)
+    # We set message timestamp to be exactly that
+    mock_msg = MagicMock()
+    mock_msg.id = uuid4()
+    mock_msg.timestamp = ts # Exact match
+    
+    # Mock Relationship
+    mock_rel = MagicMock()
+    mock_rel.relationship_type = "elaboration"
+    mock_rel.target_message_id = uuid4()
+    
+    mock_msg.outgoing_relationships = [mock_rel]
+    
+    # Mock DB query for messages
+    mock_result_msgs = MagicMock()
+    mock_result_msgs.scalars().all.return_value = [mock_msg]
+    
+    # Mock DB query for emotion (for state)
+    mock_result_emotion = MagicMock()
+    mock_result_emotion.scalar_one_or_none.return_value = None # Skip name lookup for simplicity
+    
+    # Side effects: States -> Messages -> Emotion
+    mock_db.execute.side_effect = [mock_result_states, mock_result_msgs, mock_result_emotion]
+    
+    resp = await history.get_history(user_id, db=mock_db)
+    
+    assert len(resp.trajectory) == 1
+    t1 = resp.trajectory[0]
+    
+    # Verify Message Link
+    assert t1.message_id == str(mock_msg.id)
+    
+    # Verify Relationship Marker
+    assert t1.relationship_marker is not None
+    assert t1.relationship_marker["target_id"] == str(mock_rel.target_message_id)
+    assert t1.relationship_marker["count"] == 1
+
+@pytest.mark.asyncio
+async def test_get_history_diverse_messages(mock_db, mock_states):
+    """Test history with diverse message scenarios (no relationships, duplicates)."""
+    user_id = mock_states[0].user_id
+    states = [mock_states[0]]
+    ts = states[0].timestamp
+    
+    # 1. Message with NO relationships (should be skipped in map)
+    msg_no_rel = MagicMock()
+    msg_no_rel.id = uuid4()
+    msg_no_rel.timestamp = ts
+    msg_no_rel.outgoing_relationships = [] # Empty
+    
+    # 2. Message WITH relationships (should be indexed)
+    msg_with_rel = MagicMock()
+    msg_with_rel.id = uuid4()
+    msg_with_rel.timestamp = ts
+    
+    rel = MagicMock()
+    rel.relationship_type = "reply"
+    rel.target_message_id = uuid4()
+    msg_with_rel.outgoing_relationships = [rel]
+    
+    # 3. Duplicate timestamp message with relationships (should be grouped)
+    msg_dup = MagicMock()
+    msg_dup.id = uuid4()
+    msg_dup.timestamp = ts
+    rel2 = MagicMock()
+    rel2.relationship_type = "link"
+    msg_dup.outgoing_relationships = [rel2]
+    
+    # DB Setup
+    mock_result_states = MagicMock()
+    mock_result_states.scalars().all.return_value = states
+    
+    mock_result_msgs = MagicMock()
+    # Order matters for "first matching message" logic in history.py
+    mock_result_msgs.scalars().all.return_value = [msg_no_rel, msg_with_rel, msg_dup]
+    
+    mock_result_emotion = MagicMock()
+    mock_result_emotion.scalar_one_or_none.return_value = None
+    
+    mock_db.execute.side_effect = [mock_result_states, mock_result_msgs, mock_result_emotion]
+    
+    resp = await history.get_history(user_id, db=mock_db)
+    
+    assert len(resp.trajectory) == 1
+    t = resp.trajectory[0]
+    
+    # Verify it picked up the message WITH relationships (msg_with_rel)
+    # Because msg_no_rel should not be in the map at all.
+    assert t.message_id == str(msg_with_rel.id)
+    assert t.relationship_marker["type"] == "reply"

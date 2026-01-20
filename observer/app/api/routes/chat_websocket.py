@@ -370,6 +370,17 @@ async def handle_user_message(
         "deep_feeling_enabled", False
     )  # NEW: Check for deep feeling mode
 
+    # Relationship linking
+    related_message_id = data.get("related_message_id")
+    relationship_type = data.get("relationship_type")
+    relationship_metadata = data.get("relationship_metadata")
+    if related_message_id:
+        try:
+            related_message_id = UUID(related_message_id)
+        except (ValueError, TypeError):
+            logger.warning(f"Invalid related_message_id format: {related_message_id}")
+            related_message_id = None
+
     # Send acknowledgment
     await manager.send_message(session_id, {"type": "message_received", "timestamp": "now"})
 
@@ -388,6 +399,9 @@ async def handle_user_message(
                 websocket,
                 user_identifier,
                 auth_user_id,
+                related_message_id=related_message_id,
+                relationship_type=relationship_type,
+                relationship_metadata=relationship_metadata,
             )
         else:
             # Process text message
@@ -399,6 +413,9 @@ async def handle_user_message(
                 websocket,
                 user_identifier,
                 auth_user_id,
+                related_message_id=related_message_id,
+                relationship_type=relationship_type,
+                relationship_metadata=relationship_metadata,
             )
 
     except Exception as e:
@@ -416,6 +433,9 @@ async def process_text_message(
     websocket: WebSocket,
     user_identifier: str = "guest",
     auth_user_id: Optional[UUID] = None,
+    related_message_id: Optional[UUID] = None,
+    relationship_type: Optional[str] = None,
+    relationship_metadata: Optional[Dict[str, Any]] = None,
 ) -> None:
     """Process a text-only message."""
     logger.info(
@@ -447,7 +467,12 @@ async def process_text_message(
 
         # Save user message
         user_msg = await chat_service.save_user_message(
-            session_id=db_session_id, content=content, message_type="user_text"
+            session_id=db_session_id,
+            content=content,
+            message_type="user_text",
+            related_message_id=related_message_id,
+            relationship_type=relationship_type,
+            relationship_metadata=relationship_metadata,
         )
 
         # Send confirmation
@@ -568,6 +593,9 @@ async def _save_audio_message_transaction(
     user_identifier: str,
     tone_preference: str,
     auth_user_id: Optional[UUID],
+    related_message_id: Optional[UUID] = None,
+    relationship_type: Optional[str] = None,
+    relationship_metadata: Optional[Dict[str, Any]] = None,
 ) -> "tuple[UUID, Any]":
     """Helper to save audio message and ensure session exists."""
     from app.database import AsyncSessionLocal
@@ -585,7 +613,12 @@ async def _save_audio_message_transaction(
             manager.set_db_session(session_id, db_session_id)
 
         user_msg = await chat_service.save_user_message(
-            session_id=db_session_id, content="🎤 Voice message", message_type="user_audio"
+            session_id=db_session_id,
+            content="🎤 Voice message",
+            message_type="user_audio",
+            related_message_id=related_message_id,
+            relationship_type=relationship_type,
+            relationship_metadata=relationship_metadata,
         )
         return db_session_id, user_msg
 
@@ -658,6 +691,9 @@ async def process_audio_message(
     websocket: WebSocket,
     user_identifier: str = "guest",
     auth_user_id: Optional[UUID] = None,
+    related_message_id: Optional[UUID] = None,
+    relationship_type: Optional[str] = None,
+    relationship_metadata: Optional[Dict[str, Any]] = None,
 ) -> None:
     """Process an audio message with transcription and prosody analysis."""
     logger.info(
@@ -686,7 +722,13 @@ async def process_audio_message(
 
         # Create or get DB session and save user message
         db_session_id, user_msg = await _save_audio_message_transaction(
-            session_id, user_identifier, tone_preference, auth_user_id
+            session_id,
+            user_identifier,
+            tone_preference,
+            auth_user_id,
+            related_message_id=related_message_id,
+            relationship_type=relationship_type,
+            relationship_metadata=relationship_metadata,
         )
 
         # Generate internal service token (propagating user identity)

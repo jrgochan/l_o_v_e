@@ -471,7 +471,9 @@ class MultiEmotionAnalysis(Base):
         cascade="all, delete-orphan",
         lazy="selectin",
     )
-    message: Mapped[Optional["ChatMessage"]] = relationship(foreign_keys=[message_id])
+    message: Mapped[Optional["ChatMessage"]] = relationship(
+        foreign_keys=[message_id], back_populates="multi_emotion_analysis"
+    )
     session: Mapped[Optional["ChatSession"]] = relationship(foreign_keys=[session_id])
 
     def __repr__(self) -> str:

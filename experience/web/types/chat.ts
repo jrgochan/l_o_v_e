@@ -226,6 +226,7 @@ export interface InsightData {
   };
   voice_content_correlation?: VoiceContentCorrelation;
   recommendations: Recommendation[];
+  strategies?: StrategyRecommendation[];
   guidance: string;
   // NEW: Backend-generated clinical alerts
   clinical_alerts?: Array<{
@@ -234,11 +235,11 @@ export interface InsightData {
     timestamp: string;
     level: "critical" | "warning" | "attention" | "stable";
     type:
-      | "high_arousal"
-      | "voice_mismatch"
-      | "low_confidence"
-      | "pattern_concern"
-      | "voice_quality";
+    | "high_arousal"
+    | "voice_mismatch"
+    | "low_confidence"
+    | "pattern_concern"
+    | "voice_quality";
     message: string;
     suggestion?: string;
     triggered_by: AlertTriggerData;
@@ -304,68 +305,68 @@ export interface ChatSession {
 // WebSocket message types (client -> server)
 export type ClientMessage =
   | {
-      type: "user_message";
-      content: string;
-      tone_preference: ToneMode;
-    }
+    type: "user_message";
+    content: string;
+    tone_preference: ToneMode;
+  }
   | {
-      type: "user_message";
-      audio_data: string;
-      tone_preference: ToneMode;
-    }
+    type: "user_message";
+    audio_data: string;
+    tone_preference: ToneMode;
+  }
   | {
-      type: "ping";
-    }
+    type: "ping";
+  }
   | {
-      type: "update_tone";
-      tone_preference: ToneMode;
-    };
+    type: "update_tone";
+    tone_preference: ToneMode;
+  };
 
 // WebSocket message types (server -> client)
 export type ServerMessage =
   | {
-      type: "message_received";
-      timestamp: string;
-    }
+    type: "message_received";
+    timestamp: string;
+  }
   | {
-      type: "user_message_saved";
-      message_id: string;
-      content: string;
-    }
+    type: "user_message_saved";
+    message_id: string;
+    content: string;
+  }
   | {
-      type: "transcription";
-      text: string;
-    }
+    type: "transcription";
+    text: string;
+  }
   | {
-      type: "analysis";
-      emotion: string;
-      category: string;
-      vac: VAC;
-      confidence: number;
-      reasoning?: string;
-      original_emotion?: string;
-      match_method?: string;
-      match_confidence?: number;
-    }
+    type: "analysis";
+    emotion: string;
+    category: string;
+    vac: VAC;
+    confidence: number;
+    reasoning?: string;
+    original_emotion?: string;
+    match_method?: string;
+    match_confidence?: number;
+  }
   | {
-      type: "prosody";
-      data: ProsodyData;
-    }
+    type: "prosody";
+    data: ProsodyData;
+  }
   | {
-      type: "insight";
-      insights: InsightData;
-    }
+    type: "insight";
+    insights: InsightData;
+  }
   | {
-      type: "tone_updated";
-      tone_preference: ToneMode;
-    }
+    type: "tone_updated";
+    tone_preference: ToneMode;
+  }
   | {
-      type: "error";
-      message: string;
-    }
+    type: "error";
+    message: string;
+  }
   | {
-      type: "pong";
-    };
+    type: "pong";
+  };
 
 // Recording state
 export interface RecordingState {
@@ -428,11 +429,35 @@ export interface ClinicalAlert {
 export type EmotionProminence = "primary" | "secondary" | "underlying";
 
 export type RelationshipType =
-  | "complementary"
-  | "contradictory"
+  | "reply"
+  | "precipitated_by"
+  | "resolves"
+  | "reoccurs_in"
+  | "semantic_similarity"
+  | "contradicts"
+  | "references"
+  | "complementary" // Keeping legacy types if needed for emotional math
   | "masking"
   | "amplifying"
   | "sequential";
+
+export interface MessageRelationship {
+  id: string;
+  source_message_id: string;
+  target_message_id: string;
+  relationship_type: RelationshipType;
+  metadata?: Record<string, any>;
+  created_at?: string;
+}
+
+export interface StrategyRecommendation {
+  strategy_id: string;
+  name: string;
+  description: string;
+  difficulty_level: number;
+  rationale: string;
+  evidence_level?: string;
+}
 
 export type TemporalPattern = "concurrent" | "sequential" | "emerging";
 
@@ -548,67 +573,71 @@ export interface ProgressState {
 export type DeepFeelingServerMessage =
   | ServerMessage
   | {
-      type: "multi_emotion";
-      emotion: string;
-      category: string;
-      vac: VAC;
-      confidence: number;
-      prominence: EmotionProminence;
-      original_emotion?: string;
-      match_method?: string;
-      match_confidence?: number;
-    }
+    type: "multi_emotion";
+    emotion: string;
+    category: string;
+    vac: VAC;
+    confidence: number;
+    prominence: EmotionProminence;
+    original_emotion?: string;
+    match_method?: string;
+    match_confidence?: number;
+  }
   | {
-      type: "emotion_relationship";
-      emotion_a: string;
-      emotion_b: string;
-      relationship_type: RelationshipType;
-      strength: number;
-      description: string;
-    }
+    type: "emotion_relationship";
+    emotion_a: string;
+    emotion_b: string;
+    relationship_type: RelationshipType;
+    strength: number;
+    description: string;
+  }
   | {
-      type: "aggregate_state";
-      aggregate_vac: VAC;
-      complexity_score: number;
-      emotional_clarity: number;
-      temporal_pattern: TemporalPattern;
-    }
+    type: "message_relationship";
+    relationship: MessageRelationship;
+  }
   | {
-      type: "deep_feeling_updated";
-      deep_feeling_enabled: boolean;
-    }
+    type: "aggregate_state";
+    aggregate_vac: VAC;
+    complexity_score: number;
+    emotional_clarity: number;
+    temporal_pattern: TemporalPattern;
+  }
   | {
-      type: "three_way_analysis";
-      data: ThreeWayAnalysis;
-    }
+    type: "deep_feeling_updated";
+    deep_feeling_enabled: boolean;
+  }
   | {
-      type: "progress_update";
-      stage: string;
-      status: "started" | "in_progress" | "complete";
-      message: string;
-      percentage: number;
-      elapsed_ms?: number;
-    };
+    type: "three_way_analysis";
+    data: ThreeWayAnalysis;
+  }
+  | {
+    type: "progress_update";
+    stage: string;
+    status: "started" | "in_progress" | "complete";
+    message: string;
+    percentage: number;
+    elapsed_ms?: number;
+  };
 
 // Extended Client Message types for Deep Feeling mode
 export type DeepFeelingClientMessage =
   | ClientMessage
   | {
-      type: "user_message";
-      content: string;
-      tone_preference: ToneMode;
-      deep_feeling_enabled: boolean;
-    }
+    type: "user_message";
+    content: string;
+    tone_preference: ToneMode;
+    deep_feeling_enabled: boolean;
+  }
   | {
-      type: "user_message";
-      audio_data: string;
-      tone_preference: ToneMode;
-      deep_feeling_enabled: boolean;
-    }
+    type: "user_message";
+    audio_data: string;
+    tone_preference: ToneMode;
+    deep_feeling_enabled: boolean;
+  }
   | {
-      type: "update_deep_feeling";
-      deep_feeling_enabled: boolean;
-    };
+    type: "update_deep_feeling";
+    deep_feeling_enabled: boolean;
+  };
 
 export interface CurrentAnalysis {
   transcription: string | null;
@@ -630,6 +659,11 @@ export interface DisplayMessage {
   category?: string;
   vac?: VAC;
   confidence?: number;
+  originalEmotion?: string;
+  matchMethod?: string;
+  matchConfidence?: number;
   insights?: InsightData;
   multiEmotionData?: MultiEmotionAnalysis;
+  relationships?: MessageRelationship[];
+  strategies?: StrategyRecommendation[];
 }

@@ -21,20 +21,7 @@
  */
 
 import { useState, useRef, useEffect } from "react";
-import type { InsightData, VAC, MultiEmotionAnalysis } from "@/types/chat";
-
-export interface DisplayMessage {
-  id: string;
-  type: "user" | "analysis" | "insight" | "transcription" | "multi_emotion";
-  content: string;
-  timestamp: Date;
-  emotion?: string;
-  category?: string;
-  vac?: VAC;
-  confidence?: number;
-  insights?: InsightData;
-  multiEmotionData?: MultiEmotionAnalysis;
-}
+import type { InsightData, VAC, MultiEmotionAnalysis, DisplayMessage } from "@/types/chat";
 
 export function useChatMessages(isExpanded: boolean) {
   const [messages, setMessages] = useState<DisplayMessage[]>([]);
