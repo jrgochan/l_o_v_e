@@ -30,7 +30,7 @@ class InsightData(BaseModel):
 class DisplayMessage(BaseModel):
     id: UUID
     session_id: UUID
-    type: str  # user, analysis, insight, transcription
+    type: str = Field(..., validation_alias="message_type")  # user, analysis, insight, transcription
     content: str
     timestamp: datetime
     

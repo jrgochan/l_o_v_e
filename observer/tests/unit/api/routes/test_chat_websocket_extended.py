@@ -321,3 +321,21 @@ async def test_generate_insights(mock_websocket, mock_auth_session_local, mock_c
         assert call_args[1]["type"] == "insight"
         # Verify saving
         mock_chat_service.save_insight_message.assert_called_once()
+
+@pytest.mark.asyncio
+async def test_handle_user_message_invalid_related_id(mock_websocket):
+    """Test handling of invalid related_message_id format."""
+    from app.api.routes.chat_websocket import handle_user_message
+    
+    data = {
+        "content": "Test", 
+        "related_message_id": "not-a-uuid"
+    }
+    
+    with patch("app.api.routes.chat_websocket.process_text_message", new_callable=AsyncMock) as mock_text, \
+         patch("app.api.routes.chat_websocket.manager.send_message", new_callable=AsyncMock):
+        
+        await handle_user_message("sess_invalid", data, mock_websocket)
+        
+        # It should still process the message but log warning and continue with None related_id
+        mock_text.assert_called_once()
