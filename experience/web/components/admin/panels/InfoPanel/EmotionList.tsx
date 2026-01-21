@@ -79,6 +79,12 @@ export function EmotionList({ emotions, animationMode, onRemove }: EmotionListPr
                 >
                   {emotion.category}
                 </div>
+
+                {emotion.definition && (
+                  <div className="text-xs text-gray-300 italic mb-3 leading-relaxed">
+                    "{emotion.definition}"
+                  </div>
+                )}
                 <div className="text-xs text-gray-400 space-y-0.5">
                   <div className="flex justify-between">
                     <span>Valence:</span>
@@ -104,6 +110,6 @@ export function EmotionList({ emotions, animationMode, onRemove }: EmotionListPr
           </div>
         ))}
       </div>
-    </section>
+    </section >
   );
 }
