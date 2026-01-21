@@ -181,3 +181,115 @@ async def test_resolve_emotion_none(resolver, mock_session, mock_emotions):
     
     assert res.match_method == "none"
     assert res.emotion_name is None
+
+@pytest.mark.asyncio
+async def test_ensure_loaded_collection_not_found(resolver, mock_session):
+    """Test ensure_loaded when collection lookup fails."""
+    # Mock collection query returning None
+    mock_res = MagicMock()
+    mock_res.scalar_one_or_none.return_value = None
+    mock_session.execute.return_value = mock_res
+    
+    await resolver.ensure_loaded()
+    
+    assert resolver._loaded is True # Should mark as loaded empty
+    assert len(resolver.emotions_cache) == 0
+
+@pytest.mark.asyncio
+async def test_ensure_loaded_with_explicit_collection_id(mock_session):
+    """Test ensure_loaded with explicitly provided collection ID."""
+    cid = str(uuid4())
+    resolver = EmotionResolver(mock_session, collection_id=cid)
+    
+    # Mock emotions query directly (skips collection name lookup)
+    mock_res = MagicMock()
+    mock_res.scalars.return_value.all.return_value = []
+    mock_session.execute.return_value = mock_res
+    
+    await resolver.ensure_loaded()
+    
+    assert resolver._collection_uuid == cid
+    # Should only have executed one query (emotions), not two (collection + emotions)
+    assert mock_session.execute.call_count == 1
+
+@pytest.mark.asyncio
+async def test_vac_match_missing_collection_id(resolver):
+    """Test _vac_match returns None if collection ID missing."""
+    # Don't call ensure_loaded, so _collection_uuid is None
+    res = await resolver._vac_match({"valence": 0, "arousal": 0, "connection": 0})
+    assert res is None
+
+@pytest.mark.asyncio
+async def test_vac_match_exception_handling(resolver):
+    """Test _vac_match handles DB exceptions gracefull."""
+    resolver._collection_uuid = uuid4()
+    resolver.db.execute.side_effect = Exception("DB Error")
+    
+    # Should catch error and log it, returning None
+    res = await resolver._vac_match({"valence": 0, "arousal": 0, "connection": 0})
+    assert res is None
+
+@pytest.mark.asyncio
+async def test_fuzzy_match_cache_miss_edge_case(resolver):
+    """Test branch where fuzzy match works but cache lookup fails (defensive coding)."""
+    # Manually setup partial state
+    resolver.emotion_names = ["Ghost"]
+    resolver.emotions_cache = {} # Empty cache
+    
+    # "Ghost" is in names, so close match finds it
+    # But cache lookup returns None
+    match = resolver._fuzzy_match("Ghost")
+    assert match is None
+
+@pytest.mark.asyncio
+async def test_ensure_loaded_none_vac_vector(resolver, mock_session):
+    """Test loading an emotion that has no VAC vector (None)."""
+    e_none = MagicMock()
+    e_none.emotion_name = "NullVAC"
+    e_none.vac_vector = None
+    e_none.id = uuid4()
+    e_none.category = "Void"
+    e_none.semantic_embedding = None
+    
+    mock_res = MagicMock()
+    mock_res.scalars.return_value.all.return_value = [e_none]
+    mock_session.execute.return_value = mock_res
+    
+    await resolver.ensure_loaded()
+    
+    cached = resolver.emotions_cache["nullvac"]
+    assert cached["vac"] is None
+
+@pytest.mark.asyncio
+async def test_vac_match_distance_too_high(resolver, mock_session):
+    """Test _vac_match finds a candidate but distance exceeds threshold."""
+    resolver._collection_uuid = uuid4()
+    
+    # Threshold is 0.3. Mock distance 0.5
+    row = (uuid4(), "FarAway", "Cat", [0,0,0], 0.5)
+    
+    mock_res = MagicMock()
+    mock_res.first.return_value = row
+    mock_session.execute.return_value = mock_res
+    
+    res = await resolver._vac_match({"valence": 0, "arousal": 0, "connection": 0})
+    assert res is None
+
+@pytest.mark.asyncio
+async def test_vac_match_none_vac_vector_in_result(resolver, mock_session):
+    """Test _vac_match when returned row has None vac_vector (defensive check)."""
+    resolver._collection_uuid = uuid4()
+    
+    # Row with None VAC vector
+    row = (uuid4(), "Ghost", "Cat", None, 0.1)
+    
+    mock_res = MagicMock()
+    mock_res.first.return_value = row
+    mock_session.execute.return_value = mock_res
+    
+    res = await resolver._vac_match({"valence": 0, "arousal": 0, "connection": 0})
+    
+    # Should return match object but with vac=None
+    assert res is not None
+    assert res["name"] == "Ghost"
+    assert res["vac"] is None

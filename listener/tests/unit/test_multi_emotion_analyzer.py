@@ -47,7 +47,10 @@ class TestMultiEmotionAnalyzer:
             mock_get_fetcher.return_value = mock_fetcher
             
             mock_loop_instance = MagicMock()
-            mock_loop_instance.run_until_complete.return_value = "dynamic_model"
+            def mock_run_until_complete(coro):
+                coro.close()
+                return "dynamic_model"
+            mock_loop_instance.run_until_complete.side_effect = mock_run_until_complete
             mock_loop.return_value = mock_loop_instance
             
             analyzer = MultiEmotionAnalyzer(fetch_dynamic_model=True)
@@ -319,9 +322,9 @@ class TestMultiEmotionAnalyzer:
         voice_vac = VACVector(valence=-0.8, arousal=0.5, connection=0.5)
         
         # Setup mocks
-        with patch.object(analyzer, "_analyze_content_only") as mock_content, \
-             patch.object(analyzer, "_analyze_voice_only") as mock_voice, \
-             patch.object(analyzer, "analyze") as mock_analyze:
+        with patch.object(analyzer, "_analyze_content_only", new_callable=AsyncMock) as mock_content, \
+             patch.object(analyzer, "_analyze_voice_only", new_callable=AsyncMock) as mock_voice, \
+             patch.object(analyzer, "analyze", new_callable=AsyncMock) as mock_analyze:
              
              mock_content.return_value.aggregate_vac = content_vac
              mock_voice.return_value.aggregate_vac = voice_vac
