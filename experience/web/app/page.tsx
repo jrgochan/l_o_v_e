@@ -162,7 +162,7 @@ export default function ZenExperience() {
       {settings.layers.vacDisplay && <LiveVACDisplay />}
 
       {/* Header UI (Settings only) */}
-      <Header showAuth={false} />
+      <Header showAuth={true} />
 
       {/* Debug Overlay - Sync Diagnosis (Toggle with 'D') */}
       {showDebug && (

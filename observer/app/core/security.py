@@ -11,6 +11,16 @@ from passlib.context import CryptContext
 
 from app.config import settings
 
+# Monkeypatch bcrypt to work with passlib 1.7.4
+import bcrypt
+if not hasattr(bcrypt, "__about__"):
+    try:
+        class About:
+            __version__ = bcrypt.__version__
+        bcrypt.__about__ = About()
+    except Exception:
+        pass
+
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 

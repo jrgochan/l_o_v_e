@@ -35,13 +35,13 @@ async def seed_users():
     users_to_seed = [
         {
             "email": "admin@admin.com",
-            "password": "love",
+            "password": "lovelove",
             "full_name": "System Admin",
             "role": UserRole.ADMIN
         },
         {
             "email": "user@user.com",
-            "password": "love",
+            "password": "lovelove",
             "full_name": "Demo User",
             "role": UserRole.USER
         }
@@ -58,7 +58,9 @@ async def seed_users():
                 existing_user = result.scalars().first()
 
                 if existing_user:
-                    logger.info(f"User {user_data['email']} already exists - skipping")
+                    logger.info(f"User {user_data['email']} exists - updating password")
+                    existing_user.password_hash = get_password_hash(user_data["password"])
+                    seeded_count += 1
                     continue
 
                 # Create user

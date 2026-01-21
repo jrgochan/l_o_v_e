@@ -7,6 +7,16 @@ import logging
 from contextlib import asynccontextmanager
 from typing import Any, AsyncGenerator, Dict
 
+# Monkeypatch bcrypt to work with passlib 1.7.4 (Must be before passlib imports)
+import bcrypt
+if not hasattr(bcrypt, "__about__"):
+    try:
+        class About:
+            __version__ = bcrypt.__version__
+        bcrypt.__about__ = About()
+    except Exception:
+        pass
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 

@@ -486,6 +486,12 @@ describe("Additional Actions & Helpers", () => {
     expect(result).toBeNull();
   });
 
+  it("should handle setFocusedEmotionId alias", () => {
+    const { setFocusedEmotionId } = useAtlasAdminStore.getState();
+    act(() => setFocusedEmotionId("123"));
+    expect(useAtlasAdminStore.getState().focusedEmotionId).toBe("123");
+  });
+
   it("should clear selection", () => {
     const { selectEmotion, clearSelection } = useAtlasAdminStore.getState();
     act(() => {

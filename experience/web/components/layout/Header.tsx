@@ -60,15 +60,7 @@ export function Header({ showAuth = true }: HeaderProps) {
                 <p className={`text-sm truncate ${theme.colors.text.primary}`}>{user.email}</p>
               </div>
 
-              {user.role === UserRole.ADMIN && (
-                <Link
-                  href="/admin/atlas"
-                  className={`block px-4 py-2 text-sm hover:bg-white/10 ${theme.colors.primary}`}
-                  onClick={() => setIsProfileOpen(false)}
-                >
-                  ⚡ Admin Dashboard
-                </Link>
-              )}
+
 
               <Link
                 href="/users/profile"
@@ -98,6 +90,16 @@ export function Header({ showAuth = true }: HeaderProps) {
           Sign In
         </button>
       ) : null}
+
+      {user?.role === UserRole.ADMIN && (
+        <Link
+          href="/admin/atlas"
+          className={`hidden md:flex items-center gap-2 px-4 h-10 border rounded-full backdrop-blur-sm transition-colors ${theme.colors.background} ${theme.colors.border} hover:bg-white/10`}
+        >
+          <span className="text-lg">⚡</span>
+          <span className={`text-sm font-medium ${theme.colors.text.primary}`}>Admin Panel</span>
+        </Link>
+      )}
 
       {/* Settings Component (existing) - styled as icon button */}
       <div
