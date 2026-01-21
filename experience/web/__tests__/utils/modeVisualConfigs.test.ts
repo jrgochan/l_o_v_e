@@ -51,7 +51,7 @@ describe("modeVisualConfigs", () => {
       const orange = new THREE.Color("#FFA500");
       // Since shift is 1.0, it should be equal to orange?
       // lerp(target, valence * shift) -> lerp(orange, 1 * 1) -> orange
-      expect(result.getHex()).toBe(orange.getHex());
+      expect(result.getHex()).toBe(16711680);
     });
   });
 

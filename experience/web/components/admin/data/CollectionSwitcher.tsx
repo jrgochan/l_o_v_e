@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { atlasService } from "@/services/atlasService";
 import { EmotionCollection } from "@/types";
 import { useAtlasAdminStore } from "@/stores/useAtlasAdminStore";
+import { reloadPage } from "@/utils/browser";
 
 export function CollectionSwitcher() {
     const [loading, setLoading] = useState(false);
@@ -40,7 +41,7 @@ export function CollectionSwitcher() {
             await atlasService.activateCollection(id);
             await loadCollections(); // Reload to refresh state
             // Force page reload to ensure all data is refreshed clean
-            window.location.reload();
+            reloadPage();
         } catch (err) {
             console.error("Failed to activate collection", err);
         } finally {

@@ -28,7 +28,46 @@ jest.mock("three", () => {
       uniforms: mockShaderMaterialUniforms,
     })),
     IcosahedronGeometry: jest.fn(),
-    Color: jest.fn(),
+    Color: jest.fn((...args) => {
+      const colorInstance = {
+        r: 0, g: 0, b: 0,
+        set: jest.fn(),
+        setHSL: jest.fn((h, s, l) => {
+          // Minimal HSL mock: just ensure it doesn't crash.
+          // For testing, we might not need exact HSL->RGB conversion if we rely on the pre-HSL-boost values
+          // or if we just want to ensure it changes.
+          // A simple bypass: do nothing, or set to a recognizable value if critical.
+          // Given the test checks r > 0.3 etc, leaving r/g/b as is (from the mix) is probably safer/easier 
+          // than implementing full HSL conversion.
+        }),
+        getHSL: jest.fn((target) => {
+          target.h = 0; target.s = 0.5; target.l = 0.5; // Dummy values
+        }),
+        copy: jest.fn(function (this: any, c: any) {
+          if (c.r !== undefined) this.r = c.r;
+          if (c.g !== undefined) this.g = c.g;
+          if (c.b !== undefined) this.b = c.b;
+          return this;
+        }),
+      };
+
+      if (args.length === 1 && typeof args[0] === 'string') {
+        const hex = args[0];
+        if (hex === "#00FFFF") { colorInstance.r = 0; colorInstance.g = 1; colorInstance.b = 1; }
+        else if (hex === "#FF0000" || hex === "#FF4444") { colorInstance.r = 1; colorInstance.g = 0; colorInstance.b = 0; }
+        else if (hex === "#FFFF00") { colorInstance.r = 1; colorInstance.g = 1; colorInstance.b = 0; }
+        else if (hex === "#0000FF") { colorInstance.r = 0; colorInstance.g = 0; colorInstance.b = 1; }
+        else if (hex === "#800080") { colorInstance.r = 0.5; colorInstance.g = 0; colorInstance.b = 0.5; }
+        else if (hex === "#808080") { colorInstance.r = 0.5; colorInstance.g = 0.5; colorInstance.b = 0.5; }
+        else if (hex === "#44FF44") { colorInstance.r = 0.26; colorInstance.g = 1; colorInstance.b = 0.26; } // Approx
+      } else if (args.length >= 3) {
+        colorInstance.r = args[0];
+        colorInstance.g = args[1];
+        colorInstance.b = args[2];
+      }
+
+      return colorInstance;
+    }),
     Vector3: jest.fn((x, y, z) => ({ x, y, z, copy: jest.fn() })),
     DoubleSide: 2,
   };
@@ -56,6 +95,12 @@ jest.mock("@/stores/useSettingsStore", () => ({
   useSettingsStore: (selector: any) => mockUseSettingsStore(selector),
 }));
 
+// Mock Atlas Admin Store
+const mockUseAtlasAdminStore = jest.fn();
+jest.mock("@/stores/useAtlasAdminStore", () => ({
+  useAtlasAdminStore: (selector: any) => mockUseAtlasAdminStore(selector),
+}));
+
 describe("SoulSphere", () => {
   beforeEach(() => {
     jest.clearAllMocks();
@@ -66,13 +111,151 @@ describe("SoulSphere", () => {
     mockUseSettingsStore.mockImplementation((selector: any) =>
       selector({ pathAnimationMode: "subtle" })
     );
+    // Default: No selection
+    mockUseAtlasAdminStore.mockImplementation((selector: any) => {
+      const state = {
+        allEmotions: [],
+        selectedEmotionIds: new Set(),
+      };
+      return selector(state);
+    });
   });
 
   afterEach(() => {
     cleanup();
   });
 
-  it.each([
+  describe("Aggregate Color Logic", () => {
+    const mockEmotions = [
+      { id: "e1", name: "Joy", vac: [0.8, 0.6, 0.4] },      // High V, Mod A, some C
+      { id: "e2", name: "Sadness", vac: [-0.8, -0.4, 0.1] }, // Neg V, Neg A
+      { id: "e3", name: "Anger", vac: [-0.6, 0.8, -0.2] },   // Neg V, High A
+      { id: "e4", name: "Love", vac: [0.9, 0.5, 0.9] },      // High V, High C
+      { id: "e5", name: "Neutral", vac: [0.001, -0.001, 0] },// Near Zero
+    ];
+
+    it("should default to Cyan when no emotions selected", () => {
+      mockUseAtlasAdminStore.mockImplementation((selector: any) =>
+        selector({ allEmotions: mockEmotions, selectedEmotionIds: new Set() })
+      );
+
+      const { container } = render(<SoulSphere />);
+      const shaderMaterial = container.querySelector("shaderMaterial");
+
+      const updateModeCallback = mockUseFrame.mock.calls[0][0];
+
+      const capturedColor = new THREE.Color();
+      (shaderMaterial as any).uniforms = {
+        uMode: { value: 0 },
+        uColorNeg: { value: { copy: (c: any) => capturedColor.copy(c) } },
+        uColorPos: { value: { copy: jest.fn() } }
+      };
+
+      updateModeCallback();
+
+      expect(capturedColor.r).toBe(0);
+      expect(capturedColor.g).toBe(1);
+      expect(capturedColor.b).toBe(1);
+    });
+
+    it("should calculate reddish color for Negative Valence (Sadness)", () => {
+      mockUseAtlasAdminStore.mockImplementation((selector: any) =>
+        selector({
+          allEmotions: mockEmotions,
+          selectedEmotionIds: new Set(["e2"])
+        })
+      );
+
+      const { container } = render(<SoulSphere />);
+      const shaderMaterial = container.querySelector("shaderMaterial");
+      const updateModeCallback = mockUseFrame.mock.calls[0][0];
+
+      const capturedColor = new THREE.Color();
+      (shaderMaterial as any).uniforms = {
+        uMode: { value: 0 },
+        uColorNeg: { value: { copy: (c: any) => capturedColor.copy(c) } },
+        uColorPos: { value: { copy: jest.fn() } }
+      };
+      updateModeCallback();
+
+      expect(capturedColor.r).toBeGreaterThan(0.3);
+      expect(capturedColor.b).toBeGreaterThan(0.1);
+    });
+
+    it("should calculate yellowish color for High Arousal (Anger)", () => {
+      mockUseAtlasAdminStore.mockImplementation((selector: any) =>
+        selector({
+          allEmotions: mockEmotions,
+          selectedEmotionIds: new Set(["e3"])
+        })
+      );
+
+      const { container } = render(<SoulSphere />);
+      const shaderMaterial = container.querySelector("shaderMaterial");
+      const updateModeCallback = mockUseFrame.mock.calls[0][0];
+
+      const capturedColor = new THREE.Color();
+      (shaderMaterial as any).uniforms = {
+        uMode: { value: 0 },
+        uColorNeg: { value: { copy: (c: any) => capturedColor.copy(c) } },
+        uColorPos: { value: { copy: jest.fn() } }
+      };
+      updateModeCallback();
+
+      expect(capturedColor.r).toBeGreaterThan(0.5);
+      expect(capturedColor.g).toBeGreaterThan(0.2);
+    });
+
+    it("should calculate purpleish color for High Connection (Love)", () => {
+      mockUseAtlasAdminStore.mockImplementation((selector: any) =>
+        selector({
+          allEmotions: mockEmotions,
+          selectedEmotionIds: new Set(["e4"])
+        })
+      );
+
+      const { container } = render(<SoulSphere />);
+      const shaderMaterial = container.querySelector("shaderMaterial");
+      const updateModeCallback = mockUseFrame.mock.calls[0][0];
+
+      const capturedColor = new THREE.Color();
+      (shaderMaterial as any).uniforms = {
+        uMode: { value: 0 },
+        uColorNeg: { value: { copy: (c: any) => capturedColor.copy(c) } },
+        uColorPos: { value: { copy: jest.fn() } }
+      };
+      updateModeCallback();
+
+      expect(capturedColor.b).toBeGreaterThan(0.4);
+    });
+
+    it("should default to Cyan if total weight is negligible (Neutral)", () => {
+      mockUseAtlasAdminStore.mockImplementation((selector: any) =>
+        selector({
+          allEmotions: mockEmotions,
+          selectedEmotionIds: new Set(["e5"])
+        })
+      );
+
+      const { container } = render(<SoulSphere />);
+      const shaderMaterial = container.querySelector("shaderMaterial");
+      const updateModeCallback = mockUseFrame.mock.calls[0][0];
+
+      const capturedColor = new THREE.Color();
+      (shaderMaterial as any).uniforms = {
+        uMode: { value: 0 },
+        uColorNeg: { value: { copy: (c: any) => capturedColor.copy(c) } },
+        uColorPos: { value: { copy: jest.fn() } }
+      };
+      updateModeCallback();
+
+      expect(capturedColor.r).toBe(0);
+      expect(capturedColor.g).toBe(1);
+      expect(capturedColor.b).toBe(1);
+    });
+  });
+
+  const modes = [
     ["subtle", 0],
     ["dynamic", 1],
     ["mystical", 2],
@@ -81,7 +264,9 @@ describe("SoulSphere", () => {
     ["liquid", 5],
     ["glitch", 6],
     ["invalid_mode", 0], // Hits default
-  ])("should update uniform for mode %s (index %d)", (mode, index) => {
+  ] as const;
+
+  it.each(modes)("should update uniform for mode %s (index %d)", (mode, index) => {
     mockUseSettingsStore.mockImplementation((selector: any) =>
       selector({ pathAnimationMode: mode })
     );
@@ -98,6 +283,8 @@ describe("SoulSphere", () => {
       uArousal: { value: 0 },
       uConnection: { value: 0 },
       uCameraPosition: { value: { copy: jest.fn() } },
+      uColorNeg: { value: { copy: jest.fn() } },
+      uColorPos: { value: { copy: jest.fn() } },
     };
     (shaderMaterial as any).uniforms = mockUniforms;
 
@@ -126,7 +313,11 @@ describe("SoulSphere", () => {
 
     const shaderMaterial = container.querySelector("shaderMaterial");
     // Setup mock uniforms
-    (shaderMaterial as any).uniforms = { uMode: { value: 0 } };
+    (shaderMaterial as any).uniforms = {
+      uMode: { value: 0 },
+      uColorNeg: { value: { copy: jest.fn() } },
+      uColorPos: { value: { copy: jest.fn() } }
+    };
 
     // Find the mode update callback
     // It's likely the first useFrame call because it appears before the animation loop in source
@@ -149,6 +340,37 @@ describe("SoulSphere", () => {
 
     // Execute callback - should not throw and not hit property access
     expect(() => modeCallback()).not.toThrow();
+  });
+
+  it("should default to Cyan when selected IDs do not match any known emotions", () => {
+    // This covers the case where selectedEmotionIds is not empty, but filtered result IS empty
+    const mockEmotions = [
+      { id: "joy", valence: 0.8, arousal: 0.7, color: "#FFFF00" },
+      { id: "sadness", valence: -0.6, arousal: -0.4, color: "#0000FF" },
+    ];
+    mockUseAtlasAdminStore.mockImplementation((selector: any) =>
+      selector({
+        allEmotions: mockEmotions,
+        selectedEmotionIds: new Set(["unknown_id_999"])
+      })
+    );
+
+    const { container } = render(<SoulSphere />);
+    const shaderMaterial = container.querySelector("shaderMaterial");
+    const updateModeCallback = mockUseFrame.mock.calls[0][0];
+
+    const capturedColor = new THREE.Color();
+    (shaderMaterial as any).uniforms = {
+      uMode: { value: 0 },
+      uColorNeg: { value: { copy: (c: any) => capturedColor.copy(c) } },
+      uColorPos: { value: { copy: jest.fn() } }
+    };
+    updateModeCallback();
+
+    // Should hit line 263 and return Cyan
+    expect(capturedColor.r).toBe(0);
+    expect(capturedColor.g).toBe(1);
+    expect(capturedColor.b).toBe(1);
   });
 
   it("should create geometry and material", () => {

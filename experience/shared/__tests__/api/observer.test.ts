@@ -14,7 +14,7 @@ describe("Observer API", () => {
   const mockFetch = jest.fn();
   global.fetch = mockFetch;
 
-  const mockConsoleError = jest.spyOn(console, "error").mockImplementation(() => {});
+  const mockConsoleError = jest.spyOn(console, "error").mockImplementation(() => { });
 
   beforeEach(() => {
     jest.useRealTimers();
@@ -145,6 +145,52 @@ describe("Observer API", () => {
       );
     });
 
+    it("should get collections successfully", async () => {
+      const mockCollections = { collections: [{ id: "c1", name: "Coll 1" }] };
+      mockFetch.mockResolvedValueOnce({
+        ok: true,
+        json: async () => mockCollections,
+      });
+
+      const client = new ObserverApiClient();
+      const result = await client.getCollections();
+      expect(result).toEqual(mockCollections);
+    });
+
+    it("should handle error when getting collections", async () => {
+      mockFetch.mockResolvedValueOnce({
+        ok: false,
+        status: 500,
+        statusText: "Server Error"
+      });
+
+      const client = new ObserverApiClient();
+      await expect(client.getCollections()).rejects.toThrow("Observer API error: 500 Server Error");
+    });
+
+    it("should get collection details successfully", async () => {
+      const mockCollection = { id: "c1", name: "Coll 1" };
+      mockFetch.mockResolvedValueOnce({
+        ok: true,
+        json: async () => mockCollection,
+      });
+
+      const client = new ObserverApiClient();
+      const result = await client.getCollectionDetails("c1");
+      expect(result).toEqual(mockCollection);
+    });
+
+    it("should handle error when getting collection details", async () => {
+      mockFetch.mockResolvedValueOnce({
+        ok: false,
+        status: 404,
+        statusText: "Not Found"
+      });
+
+      const client = new ObserverApiClient();
+      await expect(client.getCollectionDetails("bad-id")).rejects.toThrow("Observer API error: 404 Not Found");
+    });
+
     const methodsToTest = [
       ["getHistory", ["u1"]],
       ["loadEmotionAtlas", []], // Test without category arg
@@ -215,6 +261,25 @@ describe("Observer API", () => {
       const client = new ObserverApiClient();
       client.updateConfig({ retryAttempts: 99 });
     });
+    it("should load emotions with query params", async () => {
+      const mockEmotionsResponse = { emotions: [] };
+      mockFetch.mockResolvedValueOnce({
+        ok: true,
+        json: async () => mockEmotionsResponse,
+      });
+
+      const client = new ObserverApiClient();
+      await client.loadEmotions("col1", "joy");
+
+      expect(mockFetch).toHaveBeenCalledWith(
+        expect.stringContaining("collection_id=col1"),
+        expect.any(Object)
+      );
+      expect(mockFetch).toHaveBeenCalledWith(
+        expect.stringContaining("category=joy"),
+        expect.any(Object)
+      );
+    });
   });
 
   describe("ObserverPollingManager", () => {
@@ -254,7 +319,7 @@ describe("Observer API", () => {
       mockFetch.mockRejectedValue(new Error("Poll fail"));
 
       const onError = jest.fn();
-      manager.start("u1", () => {}, onError, 100);
+      manager.start("u1", () => { }, onError, 100);
 
       await jest.runOnlyPendingTimersAsync();
       await Promise.resolve();
@@ -269,7 +334,7 @@ describe("Observer API", () => {
       mockFetch.mockRejectedValue(new Error("Poll fail"));
 
       // Start without onError
-      manager.start("u1", () => {}); // No onError provided
+      manager.start("u1", () => { }); // No onError provided
 
       // Advance timers to trigger poll and failure
       await jest.runOnlyPendingTimersAsync();
@@ -282,8 +347,8 @@ describe("Observer API", () => {
 
     it("should prevent double start (coverage)", () => {
       const manager = createPollingManager();
-      manager.start("u1", () => {});
-      manager.start("u1", () => {});
+      manager.start("u1", () => { });
+      manager.start("u1", () => { });
       expect(manager.isActive()).toBe(true);
       manager.stop();
     });
@@ -313,7 +378,7 @@ describe("Observer API", () => {
       jest.spyOn(client, "getCurrentState").mockImplementation(() => statePromise as any);
 
       // Mock cancel to do nothing (so promise doesn't reject)
-      jest.spyOn(client, "cancel").mockImplementation(() => {});
+      jest.spyOn(client, "cancel").mockImplementation(() => { });
 
       const onUpdate = jest.fn();
       manager.start("u1", onUpdate); // This triggers the immediate poll
@@ -371,14 +436,14 @@ describe("Observer API", () => {
     });
 
     it("should trigger timeout callback in healthCheck", async () => {
-      mockFetch.mockImplementation(() => new Promise(() => {}));
+      mockFetch.mockImplementation(() => new Promise(() => { }));
       const client = new ObserverApiClient();
       client.healthCheck();
       jest.advanceTimersByTime(5000);
     });
 
     it("should trigger timeout callback in fetchWithRetry", async () => {
-      mockFetch.mockImplementation(() => new Promise(() => {}));
+      mockFetch.mockImplementation(() => new Promise(() => { }));
       const client = new ObserverApiClient();
       // @ts-ignore
       client.fetchWithRetry("http://foo", 1);

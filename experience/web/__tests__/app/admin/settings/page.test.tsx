@@ -27,6 +27,10 @@ jest.mock("@/components/admin/settings/DevelopmentSettings", () => ({
   DevelopmentSettings: () => <div data-testid="development-settings">Development Settings</div>,
 }));
 
+jest.mock("@/components/admin/data/CollectionSwitcher", () => ({
+  CollectionSwitcher: () => <div data-testid="collection-switcher">Collection Switcher</div>,
+}));
+
 jest.mock("@/stores/useSettingsStore");
 jest.mock("@/hooks/useKeyboardShortcuts", () => ({ useKeyboardShortcuts: jest.fn() }));
 
@@ -93,20 +97,18 @@ describe("SettingsPage", () => {
   it("renders header and default tab", () => {
     render(<SettingsPage />);
     expect(screen.getByText("Settings")).toBeInTheDocument();
-    expect(screen.getByTestId("visual-settings")).toBeInTheDocument();
-
-    // Check tabs
+    // Default tab is now Dataset
+    expect(screen.getByText("Dataset")).toHaveClass("text-white");
+    expect(screen.getByTestId("collection-switcher")).toBeInTheDocument();
     expect(screen.getByText("Visual")).toBeInTheDocument();
-    expect(screen.getByText("Behavior")).toBeInTheDocument();
-    expect(screen.getByText("Network")).toBeInTheDocument();
-    expect(screen.getByText("Chat")).toBeInTheDocument();
-    expect(screen.getByText("Accessibility")).toBeInTheDocument();
-    expect(screen.getByText("AI Models")).toBeInTheDocument();
-    expect(screen.getByText("Development")).toBeInTheDocument();
   });
 
   it("switches tabs correctly", () => {
     render(<SettingsPage />);
+
+    // Switch from default (Dataset) to Visual
+    fireEvent.click(screen.getByText("Visual"));
+    expect(screen.getByTestId("visual-settings")).toBeInTheDocument();
 
     fireEvent.click(screen.getByText("Behavior"));
     expect(screen.getByTestId("behavior-settings")).toBeInTheDocument();

@@ -1,11 +1,25 @@
 import { render, screen, fireEvent } from "@testing-library/react";
 import { HelpModal } from "@/components/admin/modals/HelpModal";
 
+// Mock store
+jest.mock("@/stores/useAtlasAdminStore", () => ({
+  useAtlasAdminStore: jest.fn(() => ({
+    allEmotions: Array(10).fill({}),
+    getBridgeEmotions: jest.fn(() => [
+      { id: "1", name: "Vulnerability", vac: [0, 0, 0], definition: "Def" },
+      { id: "2", name: "Awe", vac: [0, 0, 0], definition: "Def" },
+      { id: "3", name: "Compassion", vac: [0, 0, 0], definition: "Def" },
+      { id: "4", name: "Curiosity", vac: [0, 0, 0], definition: "Def" },
+      { id: "5", name: "Acceptance", vac: [0, 0, 0], definition: "Def" },
+      { id: "6", name: "Gratitude", vac: [0, 0, 0], definition: "Def" }
+    ]),
+  })),
+}));
+
 describe("HelpModal", () => {
   const onClose = jest.fn();
 
   beforeEach(() => {
-    jest.clearAllMocks();
   });
 
   it("renders modal content", () => {

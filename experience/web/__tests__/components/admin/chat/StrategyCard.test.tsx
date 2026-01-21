@@ -33,7 +33,7 @@ describe("StrategyCard", () => {
         render(<StrategyCard strategies={mockStrategies} />);
 
         expect(screen.getByText("Iv. 1")).toBeInTheDocument();
-        expect(screen.getByText("Take slow deep breaths")).toBeInTheDocument();
+        expect(screen.getByText(/Take slow deep breaths/)).toBeInTheDocument();
         expect(screen.getByText('"High arousal detected"')).toBeInTheDocument();
     });
 

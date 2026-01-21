@@ -38,6 +38,10 @@ describe("useLocalQuickActions", () => {
         { id: "v1", name: "Vulnerability" },
         { id: "a1", name: "Awe" },
       ],
+      getBridgeEmotions: () => [
+        { id: "v1", name: "Vulnerability" },
+        { id: "a1", name: "Awe" },
+      ],
     });
 
     (useExperienceStore.getState as jest.Mock).mockReturnValue({

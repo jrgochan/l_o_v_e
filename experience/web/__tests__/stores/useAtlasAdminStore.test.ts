@@ -15,7 +15,7 @@ jest.mock("zustand/middleware", () => ({
     if (options && options.partialize) {
       try {
         options.partialize(get());
-      } catch (e) {}
+      } catch (e) { }
     }
     return config(set, get, api);
   },
@@ -427,13 +427,29 @@ describe("Additional Actions & Helpers", () => {
   it("should get bridge emotions", () => {
     const { setAllEmotions, getBridgeEmotions } = useAtlasAdminStore.getState();
     // 'Joy' is NOT a bridge emotion in default list. "Awe" is.
-    const aweEmotion = { ...mockEmotions[0], name: "Awe" };
+    const aweEmotion = { ...mockEmotions[0], name: "Awe", is_bridge: true };
 
     act(() => setAllEmotions([aweEmotion]));
 
     const bridges = getBridgeEmotions();
     const awe = bridges.find((e) => e.name === "Awe");
     expect(awe).toBeDefined();
+  });
+
+  it("should manage collections state", () => {
+    const { setCollections, setActiveCollection } = useAtlasAdminStore.getState();
+    const mockCollections = [
+      { id: "c1", name: "Collection 1", description: "desc", is_system: false, is_default: false },
+    ];
+
+    act(() => {
+      setCollections(mockCollections);
+      setActiveCollection("c1");
+    });
+
+    const state = useAtlasAdminStore.getState();
+    expect(state.collections).toEqual(mockCollections);
+    expect(state.activeCollectionId).toBe("c1");
   });
 
   it("should handle simple setters", () => {

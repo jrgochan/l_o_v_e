@@ -28,7 +28,7 @@ describe("atlasService", () => {
       const result = await atlasService.getCachedPaths();
       expect(result).toEqual(mockResponse);
       expect(global.fetch).toHaveBeenCalledWith(
-        `${API_BASE_URL}/observer/atlas/paths/all?limit=10000`
+        `${API_BASE_URL}/observer/paths/all?limit=10000`
       );
     });
 
@@ -41,7 +41,7 @@ describe("atlasService", () => {
 
       const result = await atlasService.getCachedPaths(50);
       expect(global.fetch).toHaveBeenCalledWith(
-        `${API_BASE_URL}/observer/atlas/paths/all?limit=50`
+        `${API_BASE_URL}/observer/paths/all?limit=50`
       );
     });
 
@@ -73,7 +73,7 @@ describe("atlasService", () => {
       const result = await atlasService.computeAllPaths();
       expect(result).toEqual(mockResponse);
       expect(global.fetch).toHaveBeenCalledWith(
-        `${API_BASE_URL}/observer/atlas/compute-all-paths`,
+        `${API_BASE_URL}/observer/compute-all-paths`,
         { method: "POST" }
       );
     });
