@@ -27,7 +27,8 @@
           0.6
         ]
       },
-      "emotion_count": 9
+      "emotion_count": 9,
+      "motion_type": "reaching"
     },
     {
       "id": 2,
@@ -49,7 +50,8 @@
           0.9
         ]
       },
-      "emotion_count": 7
+      "emotion_count": 7,
+      "motion_type": "recoil"
     },
     {
       "id": 3,
@@ -71,7 +73,8 @@
           0.0
         ]
       },
-      "emotion_count": 6
+      "emotion_count": 6,
+      "motion_type": "reaching"
     },
     {
       "id": 4,
@@ -93,7 +96,8 @@
           0.8
         ]
       },
-      "emotion_count": 6
+      "emotion_count": 6,
+      "motion_type": "stable"
     },
     {
       "id": 5,
@@ -115,7 +119,8 @@
           0.5
         ]
       },
-      "emotion_count": 6
+      "emotion_count": 6,
+      "motion_type": "reaching"
     },
     {
       "id": 6,
@@ -137,7 +142,8 @@
           0.5
         ]
       },
-      "emotion_count": 7
+      "emotion_count": 7,
+      "motion_type": "reaching"
     },
     {
       "id": 7,
@@ -159,7 +165,8 @@
           0.9
         ]
       },
-      "emotion_count": 6
+      "emotion_count": 6,
+      "motion_type": "orbital"
     },
     {
       "id": 8,
@@ -181,7 +188,8 @@
           0.9
         ]
       },
-      "emotion_count": 6
+      "emotion_count": 6,
+      "motion_type": "recoil"
     },
     {
       "id": 9,
@@ -203,7 +211,8 @@
           1.0
         ]
       },
-      "emotion_count": 6
+      "emotion_count": 6,
+      "motion_type": "orbital"
     },
     {
       "id": 10,
@@ -225,7 +234,8 @@
           1.0
         ]
       },
-      "emotion_count": 11
+      "emotion_count": 11,
+      "motion_type": "orbital"
     },
     {
       "id": 11,
@@ -247,7 +257,8 @@
           0.9
         ]
       },
-      "emotion_count": 8
+      "emotion_count": 8,
+      "motion_type": "stable"
     },
     {
       "id": 12,
@@ -269,7 +280,8 @@
           -0.2
         ]
       },
-      "emotion_count": 6
+      "emotion_count": 6,
+      "motion_type": "reaching"
     },
     {
       "id": 13,
@@ -291,7 +303,8 @@
           0.8
         ]
       },
-      "emotion_count": 3
+      "emotion_count": 3,
+      "motion_type": "recoil"
     }
   ]
 }

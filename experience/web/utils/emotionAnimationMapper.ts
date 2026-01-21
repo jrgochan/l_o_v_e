@@ -87,8 +87,15 @@ export function getEmotionAnimationParams(
   // Fast arousal = fast pulse, slow arousal = slow pulse
   const glowPulseSpeed = mapRange(Math.abs(arousal), 0, 1, 5.0, 1.5);
 
-  // 6. SECONDARY MOTION from CATEGORY
-  const secondaryMotion = getCategoryMotionType(category);
+  // 6. SECONDARY MOTION from CATEGORY (or explicit data)
+  const validMotions = ["stable", "orbital", "recoil", "reaching"];
+  let secondaryMotion: "stable" | "orbital" | "recoil" | "reaching" = "reaching";
+
+  if (emotion.movement_pattern && validMotions.includes(emotion.movement_pattern)) {
+    secondaryMotion = emotion.movement_pattern as any;
+  } else {
+    secondaryMotion = getCategoryMotionType(category);
+  }
 
   // 7. SECONDARY AMPLITUDE from CONNECTION
   const secondaryAmplitude = Math.abs(connection) * 0.3;

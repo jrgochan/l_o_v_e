@@ -69,6 +69,7 @@ class EmotionDefinition(Base):
     emotion_name: Mapped[str] = mapped_column(String(100), index=True)
     category: Mapped[str] = mapped_column(String(100), index=True)
     definition: Mapped[str] = mapped_column(Text)
+    movement_pattern: Mapped[Optional[str]] = mapped_column(String(50), nullable=True)
 
     # Computational Vectors
     # VAC: 3-dimensional [Valence, Arousal, Connection]
@@ -103,6 +104,7 @@ class EmotionDefinition(Base):
             "emotion_name": self.emotion_name,
             "category": self.category,
             "definition": self.definition,
+            "movement_pattern": self.movement_pattern,
             "vac_vector": list(self.vac_vector) if self.vac_vector else None,
             "q_constant": list(self.q_constant) if self.q_constant else None,
             "haptic_pattern_id": self.haptic_pattern_id,

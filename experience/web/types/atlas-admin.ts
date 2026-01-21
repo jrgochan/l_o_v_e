@@ -16,7 +16,8 @@ export interface AtlasEmotion {
   name: string;
   category: string;
   definition: string;
-  vac: VACVector;
+  movement_pattern?: string | null;
+  vac: [number, number, number]; // [Valence, Arousal, Connection];
   quaternion: Quaternion;
   color_hint?: string;
   is_bridge?: boolean;

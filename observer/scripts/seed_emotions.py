@@ -76,6 +76,31 @@ def load_emotions_data(file_path: str) -> list:
     return data['emotions']
 
 
+def load_category_motion_map(file_path: str) -> dict:
+    """Load category motion types from sibling categories.json file."""
+    emotions_path = Path(file_path)
+    categories_path = emotions_path.parent / "categories.json"
+    
+    if not categories_path.exists():
+        logger.warning(f"No categories.json found at {categories_path}, using defaults")
+        return {}
+        
+    try:
+        with open(categories_path, 'r') as f:
+            data = json.load(f)
+            
+        mapping = {}
+        for cat in data.get('categories', []):
+            if 'motion_type' in cat:
+                mapping[cat['name']] = cat['motion_type']
+                
+        logger.info(f"✓ Loaded {len(mapping)} category motion mappings")
+        return mapping
+    except Exception as e:
+        logger.warning(f"Failed to load categories.json: {e}")
+        return {}
+
+
 async def get_or_create_collection(session, name: str, create_if_missing: bool = False) -> Optional[EmotionCollection]:
     """Get emotion collection by name or create if requested."""
     stmt = select(EmotionCollection).where(EmotionCollection.name == name)
@@ -116,6 +141,9 @@ async def seed_emotions(
     except Exception as e:
         logger.error(f"Failed to load data: {e}")
         return False
+
+    # Load category mapping
+    category_map = load_category_motion_map(file_path)
 
     # Initialize services
     try:
@@ -209,7 +237,8 @@ async def seed_emotions(
                         q_constant=quaternion,
                         semantic_embedding=embedding,
                         haptic_pattern_id=emotion.get('haptic_pattern_id'),
-                        color_hint=emotion.get('color_hint')
+                        color_hint=emotion.get('color_hint'),
+                        movement_pattern=category_map.get(emotion['category'])
                     )
                     
                     session.add(emotion_entry)
