@@ -74,6 +74,7 @@ interface AtlasAdminState {
   setHoveredEmotion: (id: string | null) => void;
   setHoveredPath: (id: string | null) => void;
   setFocusedEmotion: (id: string | null) => void;
+  setFocusedEmotionId: (id: string | null) => void;
   cycleViewMode: () => void;
   cycleSelectedPath: (direction: "next" | "prev" | "up" | "down") => void;
   setIsFlying: (isFlying: boolean) => void;
@@ -308,6 +309,9 @@ export const useAtlasAdminStore = create<AtlasAdminState>()(
       },
 
       setFocusedEmotion: (id) => {
+        set({ focusedEmotionId: id });
+      },
+      setFocusedEmotionId: (id) => {
         set({ focusedEmotionId: id });
       },
 

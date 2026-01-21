@@ -49,6 +49,8 @@ export function useInfoPanelState() {
   const isComputingPaths = useAtlasAdminStore((state) => state.isComputingPaths);
   const pathAnimationMode = useAtlasAdminStore((state) => state.settings.pathAnimationMode);
   const deselectEmotion = useAtlasAdminStore((state) => state.deselectEmotion);
+  const setFocusedEmotionId = useAtlasAdminStore((state) => state.setFocusedEmotionId);
+  const focusedEmotionId = useAtlasAdminStore((state) => state.focusedEmotionId);
 
   // Compute selected emotions (memoized to avoid infinite loops)
   const selectedEmotions = useMemo(() => {
@@ -108,10 +110,12 @@ export function useInfoPanelState() {
 
     // Store actions
     deselectEmotion,
+    setFocusedEmotionId,
 
     // Store values
     allEmotions,
     isComputingPaths,
     pathAnimationMode,
+    focusedEmotionId,
   };
 }

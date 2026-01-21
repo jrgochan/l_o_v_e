@@ -20,9 +20,11 @@ interface EmotionListProps {
   emotions: AtlasEmotion[];
   animationMode: PathAnimationMode;
   onRemove?: (id: string) => void;
+  onFocus?: (id: string | null) => void;
+  focusedEmotionId?: string | null;
 }
 
-export function EmotionList({ emotions, animationMode, onRemove }: EmotionListProps) {
+export function EmotionList({ emotions, animationMode, onRemove, onFocus, focusedEmotionId }: EmotionListProps) {
   if (emotions.length === 0) {
     return (
       <section>
@@ -50,7 +52,11 @@ export function EmotionList({ emotions, animationMode, onRemove }: EmotionListPr
         {emotions.map((emotion) => (
           <div
             key={emotion.id}
-            className="bg-gray-800/50 border border-gray-700/50 rounded-lg p-3 hover:bg-gray-800 hover:border-gray-600 transition-all"
+            onClick={() => onFocus?.(focusedEmotionId === emotion.id ? null : emotion.id)}
+            className={`bg-gray-800/50 border rounded-lg p-3 transition-all cursor-pointer group ${focusedEmotionId === emotion.id
+              ? "border-cyan-500/50 bg-gray-800 ring-1 ring-cyan-500/30"
+              : "border-gray-700/50 hover:bg-gray-800 hover:border-gray-600"
+              }`}
           >
             <div className="flex gap-3 items-start">
               {/* Animated Character Sphere */}
