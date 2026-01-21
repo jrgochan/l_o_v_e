@@ -4,7 +4,7 @@ from uuid import uuid4
 from sqlalchemy.ext.asyncio import AsyncSession
 from app.services.path_planner import PathPlanner, TransitionPath
 from app.models.user_trajectory import UserTrajectory
-from app.models.atlas_definition import AtlasDefinition
+from app.models.emotion_definition import EmotionDefinition
 from app.models.transition_strategy import CategoryTransition
 
 @pytest.fixture
@@ -24,7 +24,7 @@ def planner(mock_session):
 def mock_emotions():
     # Helper to create emotions with specific VAC
     def create(name, category, vac):
-        return AtlasDefinition(
+        return EmotionDefinition(
             id=uuid4(),
             emotion_name=name,
             category=category,
@@ -131,7 +131,7 @@ async def test_astar_search_success(planner, mock_session, mock_emotions):
     # Mock _get_valid_neighbors to return Mid for Start, Goal for Mid
     # We need to patch the method on the instance or use side_effect
     
-    async def get_neighbors_side_effect(current, g):
+    async def get_neighbors_side_effect(current, goal_node, collection_id=None):
         if current.id == start.id:
             return [mid]
         if current.id == mid.id:
@@ -239,12 +239,12 @@ async def test_find_arousal_bridge_logic(planner, mock_session, mock_emotions):
 
 @pytest.mark.asyncio
 async def test_fallback_path(planner):
-    start = AtlasDefinition(id=uuid4(), emotion_name="Start", category="CatA", vac_vector=[0,0,0])
-    goal = AtlasDefinition(id=uuid4(), emotion_name="Goal", category="CatB", vac_vector=[1,0,0])
-    n1 = AtlasDefinition(id=uuid4(), emotion_name="N1", category="CatA", vac_vector=[0.1,0,0])
+    start = EmotionDefinition(id=uuid4(), emotion_name="Start", category="CatA", vac_vector=[0,0,0])
+    goal = EmotionDefinition(id=uuid4(), emotion_name="Goal", category="CatB", vac_vector=[1,0,0])
+    n1 = EmotionDefinition(id=uuid4(), emotion_name="N1", category="CatA", vac_vector=[0.1,0,0])
     
     # Mock neighbors sequence: Start -> [N1], N1 -> [Goal]
-    async def get_neighbors_se(current, g):
+    async def get_neighbors_se(current, goal_node, collection_id=None):
         if current.emotion_name == "Start": return [n1]
         if current.emotion_name == "N1": return [goal]
         return []
@@ -272,9 +272,9 @@ async def test_get_user_history(planner, mock_session):
 
 @pytest.mark.asyncio
 async def test_build_transition_path(planner):
-    e1 = AtlasDefinition(id=uuid4(), emotion_name="E1", vac_vector=[0,0,0])
-    e2 = AtlasDefinition(id=uuid4(), emotion_name="E2", vac_vector=[0.5,0,0])
-    e3 = AtlasDefinition(id=uuid4(), emotion_name="E3", vac_vector=[1.5,0,0])
+    e1 = EmotionDefinition(id=uuid4(), emotion_name="E1", vac_vector=[0,0,0])
+    e2 = EmotionDefinition(id=uuid4(), emotion_name="E2", vac_vector=[0.5,0,0])
+    e3 = EmotionDefinition(id=uuid4(), emotion_name="E3", vac_vector=[1.5,0,0])
     
     # Path length 3 (1 waypoint)
     path = [e1, e2, e3]
@@ -289,8 +289,8 @@ async def test_build_transition_path(planner):
 
 @pytest.mark.asyncio
 async def test_create_direct_path(planner):
-    start = AtlasDefinition(id=uuid4(), vac_vector=[0,0,0])
-    goal = AtlasDefinition(id=uuid4(), vac_vector=[0.5,0,0])
+    start = EmotionDefinition(id=uuid4(), vac_vector=[0,0,0])
+    goal = EmotionDefinition(id=uuid4(), vac_vector=[0.5,0,0])
     
     tp = await planner._create_direct_path(start, goal)
     assert len(tp.waypoints) == 0
@@ -331,7 +331,7 @@ async def test_find_transition_path_branches(planner, mock_session, mock_emotion
     res = await planner.find_transition_path(start_vac, goal_vac, user_id="user1")
     assert res == "FullPath"
     planner._get_user_history.assert_awaited_with("user1")
-    planner._astar_search.assert_awaited_with(start, goal, 3, {"history": "data"})
+    planner._astar_search.assert_awaited_with(start, goal, 3, {"history": "data"}, None)
 
 @pytest.mark.asyncio
 async def test_path_planner_cached_transitions_skip():
@@ -362,8 +362,8 @@ async def test_load_category_transitions_trigger():
 
     mock_em = MagicMock()
     mock_em.find_nearest_by_vac_only = AsyncMock()
-    start_emotion = MagicMock(spec=AtlasDefinition, id=uuid4(), category="CatA", vac_vector=[0.0, 0.0, 0.0], emotion_name="Start")
-    goal_emotion = MagicMock(spec=AtlasDefinition, id=uuid4(), category="CatB", vac_vector=[0.5, 0.5, 0.5], emotion_name="Goal")
+    start_emotion = MagicMock(spec=EmotionDefinition, id=uuid4(), category="CatA", vac_vector=[0.0, 0.0, 0.0], emotion_name="Start")
+    goal_emotion = MagicMock(spec=EmotionDefinition, id=uuid4(), category="CatB", vac_vector=[0.5, 0.5, 0.5], emotion_name="Goal")
     mock_em.find_nearest_by_vac_only.side_effect = [start_emotion, goal_emotion]
     planner.emotion_mapper = mock_em
     
@@ -395,7 +395,7 @@ async def test_find_arousal_bridge_filtering():
     mock_session = AsyncMock()
     planner = PathPlanner(mock_session)
     
-    current = MagicMock(spec=AtlasDefinition, id=uuid4(), vac_vector=[0.0, 0.8, 0.0])
+    current = MagicMock(spec=EmotionDefinition, id=uuid4(), vac_vector=[0.0, 0.8, 0.0])
     target_arousal = 0.5
     
     c1 = MagicMock(id=current.id, vac_vector=[0.0, 0.8, 0.0]) 
@@ -451,8 +451,8 @@ async def test_fallback_path_break():
     planner = PathPlanner(mock_session)
     planner._get_valid_neighbors = AsyncMock(return_value=[])
     
-    start = MagicMock(spec=AtlasDefinition, id=uuid4(), category="A", vac_vector=[0,0,0])
-    goal = MagicMock(spec=AtlasDefinition, id=uuid4(), category="B", vac_vector=[1,1,1])
+    start = MagicMock(spec=EmotionDefinition, id=uuid4(), category="A", vac_vector=[0,0,0])
+    goal = MagicMock(spec=EmotionDefinition, id=uuid4(), category="B", vac_vector=[1,1,1])
     
     path = await planner._fallback_path(start, goal)
     assert len(path) == 1
@@ -464,11 +464,11 @@ async def test_fallback_path_success():
     mock_session = AsyncMock()
     planner = PathPlanner(mock_session)
     
-    start = MagicMock(spec=AtlasDefinition, id=uuid4(), category="A", vac_vector=[0,0,0])
-    goal = MagicMock(spec=AtlasDefinition, id=uuid4(), category="C", vac_vector=[2,2,2])
+    start = MagicMock(spec=EmotionDefinition, id=uuid4(), category="A", vac_vector=[0,0,0])
+    goal = MagicMock(spec=EmotionDefinition, id=uuid4(), category="C", vac_vector=[2,2,2])
     
-    mid = MagicMock(spec=AtlasDefinition, id=uuid4(), category="B", vac_vector=[1,1,1])
-    end = MagicMock(spec=AtlasDefinition, id=goal.id, category="C", vac_vector=[2,2,2])
+    mid = MagicMock(spec=EmotionDefinition, id=uuid4(), category="B", vac_vector=[1,1,1])
+    end = MagicMock(spec=EmotionDefinition, id=goal.id, category="C", vac_vector=[2,2,2])
     
     planner._get_valid_neighbors = AsyncMock(side_effect=[[mid], [end]])
     
@@ -484,12 +484,12 @@ async def test_fallback_path_max_depth():
     mock_session = AsyncMock()
     planner = PathPlanner(mock_session)
     
-    start = MagicMock(spec=AtlasDefinition, id=uuid4(), category="A", vac_vector=[0,0,0])
-    goal = MagicMock(spec=AtlasDefinition, id=uuid4(), category="Z", vac_vector=[3,3,3])
+    start = MagicMock(spec=EmotionDefinition, id=uuid4(), category="A", vac_vector=[0,0,0])
+    goal = MagicMock(spec=EmotionDefinition, id=uuid4(), category="Z", vac_vector=[3,3,3])
     
-    n1 = MagicMock(spec=AtlasDefinition, id=uuid4(), category="B", vac_vector=[1,1,1])
-    n2 = MagicMock(spec=AtlasDefinition, id=uuid4(), category="C", vac_vector=[2,2,2])
-    n3 = MagicMock(spec=AtlasDefinition, id=uuid4(), category="D", vac_vector=[2.5,2.5,2.5])
+    n1 = MagicMock(spec=EmotionDefinition, id=uuid4(), category="B", vac_vector=[1,1,1])
+    n2 = MagicMock(spec=EmotionDefinition, id=uuid4(), category="C", vac_vector=[2,2,2])
+    n3 = MagicMock(spec=EmotionDefinition, id=uuid4(), category="D", vac_vector=[2.5,2.5,2.5])
     
     planner._get_valid_neighbors = AsyncMock(side_effect=[[n1], [n2], [n3]])
     
@@ -556,7 +556,7 @@ async def test_astar_goal_same_category_refinement(planner, mock_emotions):
     # Neighbor in CatB (Same category as goal!)
     neighbor = mock_emotions("N1", "CatB", [0.9,0,0])
     
-    async def get_neighbors(curr, goal_node):
+    async def get_neighbors(curr, goal_node, collection_id=None):
         if curr.id == start.id: return [neighbor]
         return []
 
@@ -619,8 +619,8 @@ async def test_path_planner_cached_transitions_skip():
 @pytest.mark.asyncio
 async def test_fallback_path_dead_end(planner):
     """Test fallback path generation when greedy search hits a dead end."""
-    start = AtlasDefinition(id=uuid4(), emotion_name="Start", category="CatA", vac_vector=[0.1, 0.1, 0.1])
-    goal = AtlasDefinition(id=uuid4(), emotion_name="Goal", category="CatB", vac_vector=[0.9, 0.9, 0.9])
+    start = EmotionDefinition(id=uuid4(), emotion_name="Start", category="CatA", vac_vector=[0.1, 0.1, 0.1])
+    goal = EmotionDefinition(id=uuid4(), emotion_name="Goal", category="CatB", vac_vector=[0.9, 0.9, 0.9])
     
     # Mock get_valid_neighbors to return empty list immediately
     with patch.object(planner, '_get_valid_neighbors', new_callable=AsyncMock) as mock_neighbors:
@@ -634,14 +634,14 @@ async def test_fallback_path_dead_end(planner):
 @pytest.mark.asyncio
 async def test_fallback_path_success_same_category(planner):
     """Test fallback path finding loops until goal category is reached."""
-    start = AtlasDefinition(id=uuid4(), emotion_name="Start", category="CatA", vac_vector=[0,0,0])
-    mid = AtlasDefinition(id=uuid4(), emotion_name="Mid", category="CatB", vac_vector=[0.5, 0.5, 0.5]) # Goal category
-    goal = AtlasDefinition(id=uuid4(), emotion_name="Goal", category="CatB", vac_vector=[0.9, 0.9, 0.9])
+    start = EmotionDefinition(id=uuid4(), emotion_name="Start", category="CatA", vac_vector=[0,0,0])
+    mid = EmotionDefinition(id=uuid4(), emotion_name="Mid", category="CatB", vac_vector=[0.5, 0.5, 0.5]) # Goal category
+    goal = EmotionDefinition(id=uuid4(), emotion_name="Goal", category="CatB", vac_vector=[0.9, 0.9, 0.9])
     
     # Setup greedy neighbors
     # First iteration returns mid (CatB), loop checks category matches goal -> breaks
     
-    async def get_neighbors_se(current, g):
+    async def get_neighbors_se(current, goal_node, collection_id=None):
         if current.emotion_name == "Start": return [mid]
         if current.emotion_name == "Mid": return [goal]
         return []
@@ -660,7 +660,7 @@ async def test_fallback_path_success_same_category(planner):
 @pytest.mark.asyncio
 async def test_build_transition_path_metrics_comprehensive(planner):
     """Cover all branches of estimated_time and difficulty calculation."""
-    start = AtlasDefinition(id=uuid4(), emotion_name="S", vac_vector=[0.0, 0.0, 0.0])
+    start = EmotionDefinition(id=uuid4(), emotion_name="S", vac_vector=[0.0, 0.0, 0.0])
     
     # 0 waypoints (len 2)
     path_short = [start, start]
@@ -875,7 +875,7 @@ async def test_astar_path_length_pruning(planner, mock_emotions):
     goal = mock_emotions("G", "CatB", [1,0,0])
     n1 = mock_emotions("N1", "CatA", [0.1,0,0])
     
-    async def get_neighbors(curr, g):
+    async def get_neighbors(curr, g, collection_id=None):
         if curr == start: return [n1]
         return []
         

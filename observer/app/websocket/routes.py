@@ -176,7 +176,7 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.database import get_db
-from app.models.atlas_definition import AtlasDefinition
+from app.models.emotion_definition import EmotionDefinition
 from app.models.user_trajectory import UserTrajectory
 
 from .connection_manager import manager
@@ -210,8 +210,8 @@ async def websocket_endpoint(
     try:
         # Send initial state if one exists
         stmt = (
-            select(UserTrajectory, AtlasDefinition)
-            .join(AtlasDefinition, UserTrajectory.dominant_emotion_id == AtlasDefinition.id)
+            select(UserTrajectory, EmotionDefinition)
+            .join(EmotionDefinition, UserTrajectory.dominant_emotion_id == EmotionDefinition.id)
             .where(UserTrajectory.user_id == user_id)
             .order_by(UserTrajectory.timestamp.desc())
             .limit(1)

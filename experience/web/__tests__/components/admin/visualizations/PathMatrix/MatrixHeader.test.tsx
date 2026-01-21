@@ -20,7 +20,7 @@ describe("MatrixHeader", () => {
     render(<MatrixHeader {...defaultProps} />);
     expect(screen.getByText("Emotion Transition Matrix")).toBeInTheDocument();
     expect(
-      screen.getByText("87×87 grid showing all possible emotional transitions")
+      screen.getByText("Grid showing all possible emotional transitions")
     ).toBeInTheDocument();
     expect(screen.getByText(/Computed:/)).toBeInTheDocument();
     expect(screen.getByText("50")).toBeInTheDocument();

@@ -226,7 +226,7 @@ Database Schema Highlights:
         - CASCADE DELETE (remove with session)
         - Indexed for fast session queries
 
-        emotion_id → atlas_definitions.id
+        emotion_id → emotion_definitions.id
         - Nullable (system messages have no emotion)
         - Indexed for emotion-based queries
 
@@ -454,7 +454,7 @@ from app.database import Base
 from pgvector.sqlalchemy import Vector
 
 if TYPE_CHECKING:
-    from app.models.atlas_definition import AtlasDefinition
+    from app.models.emotion_definition import EmotionDefinition
     from app.models.chat_session import ChatSession
     from app.models.message_relationship import MessageRelationship
     from app.models.multi_emotion_analysis import MultiEmotionAnalysis
@@ -482,7 +482,7 @@ class ChatMessage(Base):
 
     # Analysis data
     emotion_id: Mapped[Optional[UUID]] = mapped_column(
-        ForeignKey("atlas_definitions.id"), index=True
+        ForeignKey("emotion_definitions.id"), index=True
     )
     vac_coordinates: Mapped[Optional[List[float]]] = mapped_column(
         ARRAY(Float)
@@ -516,7 +516,7 @@ class ChatMessage(Base):
 
     # Relationships
     session: Mapped["ChatSession"] = relationship(back_populates="messages")
-    emotion: Mapped[Optional["AtlasDefinition"]] = relationship(foreign_keys=[emotion_id])
+    emotion: Mapped[Optional["EmotionDefinition"]] = relationship(foreign_keys=[emotion_id])
 
     # Relationships for timelines/threading
     outgoing_relationships: Mapped[List["MessageRelationship"]] = relationship(

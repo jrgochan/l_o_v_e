@@ -446,7 +446,7 @@ export interface MessageRelationship {
   source_message_id: string;
   target_message_id: string;
   relationship_type: RelationshipType;
-  metadata?: Record<string, any>;
+  metadata?: Record<string, unknown>;
   created_at?: string;
 }
 

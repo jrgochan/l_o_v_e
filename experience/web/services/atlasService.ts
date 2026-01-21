@@ -1,7 +1,8 @@
 import { logger } from "@/utils/logger";
 import { API_BASE_URL } from "@/utils/api";
+import { EmotionCollection } from "@/types";
 
-const SERVICE_URL = `${API_BASE_URL}/observer/atlas`;
+const SERVICE_URL = `${API_BASE_URL}/observer`;
 
 interface PathResponse {
   paths: Array<{
@@ -56,6 +57,40 @@ export const atlasService = {
       return await response.json();
     } catch (err) {
       logger.error("api", "Error starting batch computation", err);
+      throw err;
+    }
+  },
+
+  /**
+   * Get all emotion collections
+   */
+  getCollections: async (): Promise<{ collections: EmotionCollection[]; total_count: number }> => {
+    try {
+      const response = await fetch(`${SERVICE_URL}/collections`);
+      if (!response.ok) {
+        throw new Error(`Failed to fetch collections: ${response.statusText}`);
+      }
+      return await response.json();
+    } catch (err) {
+      logger.error("api", "Error fetching collections", err);
+      throw err;
+    }
+  },
+
+  /**
+   * Set active collection
+   */
+  activateCollection: async (id: string): Promise<{ success: boolean; active_collection: { id: string; name: string } }> => {
+    try {
+      const response = await fetch(`${SERVICE_URL}/collections/${id}/activate`, {
+        method: "POST",
+      });
+      if (!response.ok) {
+        throw new Error(`Failed to activate collection: ${response.statusText}`);
+      }
+      return await response.json();
+    } catch (err) {
+      logger.error("api", "Error activating collection", err);
       throw err;
     }
   },

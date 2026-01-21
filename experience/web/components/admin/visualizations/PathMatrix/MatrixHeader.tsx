@@ -52,8 +52,8 @@ export function MatrixHeader({
           <h2 className="text-xl font-bold text-white">Emotion Transition Matrix</h2>
           <p className="text-sm text-gray-400">
             {viewMode === "emotions"
-              ? "87×87 grid showing all possible emotional transitions"
-              : "13×13 grid showing category-level transitions"}
+              ? "Grid showing all possible emotional transitions"
+              : "Grid showing category-level transitions"}
           </p>
         </div>
 
@@ -61,24 +61,22 @@ export function MatrixHeader({
         <div className="flex bg-gray-800 rounded-lg p-1 border border-gray-700">
           <button
             onClick={() => onViewModeChange("emotions")}
-            className={`px-4 py-2 text-sm rounded transition-all ${
-              viewMode === "emotions"
+            className={`px-4 py-2 text-sm rounded transition-all ${viewMode === "emotions"
                 ? "bg-cyan-600 text-white shadow-lg"
                 : "text-gray-400 hover:text-gray-200 hover:bg-gray-700"
-            }`}
+              }`}
           >
             <span className="flex items-center gap-2">
               <span>🎭</span>
-              <span>Emotions (87×87)</span>
+              <span>Emotions</span>
             </span>
           </button>
           <button
             onClick={() => onViewModeChange("categories")}
-            className={`px-4 py-2 text-sm rounded transition-all ${
-              viewMode === "categories"
+            className={`px-4 py-2 text-sm rounded transition-all ${viewMode === "categories"
                 ? "bg-cyan-600 text-white shadow-lg"
                 : "text-gray-400 hover:text-gray-200 hover:bg-gray-700"
-            }`}
+              }`}
           >
             <span className="flex items-center gap-2">
               <span>📂</span>

@@ -25,7 +25,7 @@
 import { BaseEmotionChip } from "./BaseEmotionChip";
 import { PreviewSphere } from "../spheres/PreviewSphere";
 import type { AtlasEmotion } from "@/types/atlas-admin";
-import { CATEGORY_COLORS } from "@/types/atlas-admin";
+import { resolveEmotionColor } from "@/utils/emotion-colors";
 
 interface EmotionCardProps {
   emotion: AtlasEmotion;
@@ -49,7 +49,7 @@ export function EmotionCard({
   onClick,
   className = "",
 }: EmotionCardProps) {
-  const categoryColor = CATEGORY_COLORS[emotion.category] || "#888888";
+  const categoryColor = resolveEmotionColor(emotion);
   const isBridge = [
     "Vulnerability",
     "Awe",

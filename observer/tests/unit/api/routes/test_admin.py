@@ -6,13 +6,13 @@ from datetime import datetime
 from fastapi import HTTPException
 from app.api.routes import admin
 from app.models.user import User, UserRole
-from app.models.atlas_definition import AtlasDefinition
+from app.models.emotion_definition import EmotionDefinition
 from app.models.transition_strategy import TransitionStrategy
 from app.models.model_assignment import ModelAssignment
 from app.models.clinical_alert import ClinicalAlert
 from app.models.bootstrap_data import BootstrapData
 from app.schemas.ai_models import ModelAssignmentUpdate
-from app.schemas.atlas import AtlasEmotionUpdate
+from app.schemas.emotions import EmotionUpdate
 from app.schemas.strategies import StrategyUpdate
 from app.schemas.user import UserUpdate
 from app.schemas.bootstrap import BootstrapDataCreate, BootstrapDataUpdate
@@ -233,7 +233,7 @@ async def test_admin_update_user_password(mock_db, mock_admin_user):
 @pytest.mark.asyncio
 async def test_admin_update_atlas_emotion_exceptions(mock_db, mock_admin_user):
     """Test exception handling in atlas updates."""
-    from app.schemas.atlas import AtlasEmotionUpdate
+    from app.schemas.emotions import EmotionUpdate
     emotion = MagicMock()
     emotion.id = uuid.uuid4()
     emotion.emotion_name = "Joy"
@@ -244,14 +244,14 @@ async def test_admin_update_atlas_emotion_exceptions(mock_db, mock_admin_user):
     
     with patch("app.services.get_quaternion_builder") as mock_get_qb:
         mock_get_qb.return_value.from_vac.side_effect = Exception("Math Error")
-        update = AtlasEmotionUpdate(vac_vector=[1.0, 1.0, 1.0])
+        update = EmotionUpdate(vac_vector=[1.0, 1.0, 1.0])
         with pytest.raises(HTTPException) as exc:
             await admin.update_atlas_emotion(emotion.id, update, mock_db, mock_admin_user)
         assert exc.value.status_code == 400
         
     with patch("app.services.get_embedding_service") as mock_get_es:
         mock_get_es.return_value.generate_embedding.side_effect = Exception("API Error")
-        update = AtlasEmotionUpdate(definition="New Definition")
+        update = EmotionUpdate(definition="New Definition")
         with pytest.raises(HTTPException) as exc:
             await admin.update_atlas_emotion(emotion.id, update, mock_db, mock_admin_user)
         assert exc.value.status_code == 400
@@ -310,7 +310,7 @@ async def test_admin_prompt_render_endpoints(mock_db, mock_admin_user):
 @pytest.mark.asyncio
 async def test_admin_update_atlas_emotion_other_fields(mock_db, mock_admin_user):
     """Test updating fields other than VAC/Definition."""
-    from app.schemas.atlas import AtlasEmotionUpdate
+    from app.schemas.emotions import EmotionUpdate
     emotion = MagicMock()
     emotion.id = uuid.uuid4()
     
@@ -318,7 +318,7 @@ async def test_admin_update_atlas_emotion_other_fields(mock_db, mock_admin_user)
     mock_res.scalars.return_value.first.return_value = emotion
     mock_db.execute.return_value = mock_res
     
-    update = AtlasEmotionUpdate(category="New Category")
+    update = EmotionUpdate(category="New Category")
     await admin.update_atlas_emotion(emotion.id, update, mock_db, mock_admin_user)
     assert emotion.category == "New Category"
 
@@ -555,7 +555,7 @@ async def test_test_prompt_render():
 
 @pytest.mark.asyncio
 async def test_update_atlas_emotion(mock_db, mock_admin_user):
-    e = AtlasDefinition(id=uuid.uuid4(), emotion_name="Joy", vac_vector=[0.5, 0.5, 0.5], definition="Old Def")
+    e = EmotionDefinition(id=uuid.uuid4(), emotion_name="Joy", vac_vector=[0.5, 0.5, 0.5], definition="Old Def")
     mock_res = MagicMock()
     mock_res.scalars.return_value.first.return_value = e
     mock_db.execute.return_value = mock_res
@@ -570,7 +570,7 @@ async def test_update_atlas_emotion(mock_db, mock_admin_user):
         mock_es.generate_embedding.return_value = [0.1, 0.1]
         mock_get_es.return_value = mock_es
         
-        up = AtlasEmotionUpdate(definition="New Def")
+        up = EmotionUpdate(definition="New Def")
         await admin.update_atlas_emotion(e.id, up, mock_db, mock_admin_user)
         
         assert e.definition == "New Def"
@@ -583,7 +583,7 @@ async def test_update_atlas_emotion(mock_db, mock_admin_user):
         mock_qb.from_vac.return_value = [0, 0, 0, 1]
         mock_get_qb.return_value = mock_qb
         
-        up_vac = AtlasEmotionUpdate(vac_vector=[0.1, 0.2, 0.3])
+        up_vac = EmotionUpdate(vac_vector=[0.1, 0.2, 0.3])
         await admin.update_atlas_emotion(e.id, up_vac, mock_db, mock_admin_user)
         
         assert e.vac_vector == [0.1, 0.2, 0.3]
@@ -603,7 +603,7 @@ async def test_import_atlas_data(mock_db, mock_admin_user):
     }
     
     # Mock existing emotion found
-    e = AtlasDefinition(id=uuid.uuid4(), emotion_name="Joy", vac_vector=[0, 0, 0], definition="Old")
+    e = EmotionDefinition(id=uuid.uuid4(), emotion_name="Joy", vac_vector=[0, 0, 0], definition="Old")
     mock_res = MagicMock()
     mock_res.scalars.return_value.first.return_value = e
     mock_db.execute.return_value = mock_res
@@ -728,7 +728,7 @@ async def test_update_atlas_emotion_quat_fail(mock_db, mock_admin_user):
         with pytest.raises(HTTPException) as exc:
             await admin.update_atlas_emotion(
                 uuid.uuid4(),
-                AtlasEmotionUpdate(vac_vector=[0.5, 0.5, 0.5]),
+                EmotionUpdate(vac_vector=[0.5, 0.5, 0.5]),
                 mock_db, 
                 mock_admin_user
             )

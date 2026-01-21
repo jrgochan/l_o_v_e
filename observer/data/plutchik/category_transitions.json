@@ -1,0 +1,22 @@
+{
+  "version": "1.0",
+  "source": "Generated Centroid Distance Matrix",
+  "metadata": {
+    "total_categories": 1,
+    "matrix_size": "1x1",
+    "created": "2026-01-20"
+  },
+  "category_names": [
+    "Plutchik Primary"
+  ],
+  "difficulty_matrix": [
+    [
+      0.0
+    ]
+  ],
+  "difficulty_interpretation": {
+    "0.0-0.3": "Easy (Similar VAC)",
+    "0.3-0.7": "Moderate",
+    "0.7-1.0": "Difficult (Opposite VAC)"
+  }
+}

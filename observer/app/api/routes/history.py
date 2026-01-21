@@ -255,7 +255,7 @@ from sqlalchemy.orm import selectinload
 
 from app.api.schemas.history import HistoryResponse, TrajectoryPoint
 from app.database import get_db
-from app.models.atlas_definition import AtlasDefinition
+from app.models.emotion_definition import EmotionDefinition
 from app.models.chat_message import ChatMessage
 from app.models.chat_session import ChatSession
 from app.models.user_trajectory import UserTrajectory
@@ -361,8 +361,8 @@ async def get_history(
             # Get emotion name (fetch if needed)
             emotion_name = "Unknown"
             if state.dominant_emotion_id:
-                emotion_stmt = select(AtlasDefinition).where(
-                    AtlasDefinition.id == state.dominant_emotion_id
+                emotion_stmt = select(EmotionDefinition).where(
+                    EmotionDefinition.id == state.dominant_emotion_id
                 )
                 emotion_result = await db.execute(emotion_stmt)
                 emotion = emotion_result.scalar_one_or_none()

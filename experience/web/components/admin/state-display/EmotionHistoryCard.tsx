@@ -9,7 +9,8 @@
 
 import { useState } from "react";
 import type { EmotionHistoryEntry } from "@/stores/useEmotionHistoryStore";
-import { CATEGORY_COLORS } from "@/types/atlas-admin";
+import { useAtlasAdminStore } from "@/stores/useAtlasAdminStore";
+import { resolveEmotionColor } from "@/utils/emotion-colors";
 
 interface EmotionHistoryCardProps {
   entry: EmotionHistoryEntry;
@@ -23,9 +24,11 @@ export function EmotionHistoryCard({
   onRemove,
 }: EmotionHistoryCardProps) {
   const [isExpanded, setIsExpanded] = useState(false);
+  const allEmotions = useAtlasAdminStore((state) => state.allEmotions);
 
   // Get category color
-  const categoryColor = CATEGORY_COLORS[entry.category] || "#888888";
+  const emotion = allEmotions.find((e) => e.name === entry.emotion);
+  const categoryColor = resolveEmotionColor(emotion);
 
   // Format time
   const timeStr = entry.timestamp.toLocaleTimeString([], {
@@ -43,11 +46,10 @@ export function EmotionHistoryCard({
 
   return (
     <div
-      className={`bg-gray-800/50 border rounded-lg transition-all ${
-        entry.isVisibleInSphere
-          ? "border-cyan-400 bg-cyan-900/20"
-          : "border-gray-700 hover:border-gray-600"
-      }`}
+      className={`bg-gray-800/50 border rounded-lg transition-all ${entry.isVisibleInSphere
+        ? "border-cyan-400 bg-cyan-900/20"
+        : "border-gray-700 hover:border-gray-600"
+        }`}
     >
       {/* Main Card Content */}
       <div className="p-3">

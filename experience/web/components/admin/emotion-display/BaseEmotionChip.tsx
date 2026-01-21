@@ -20,7 +20,7 @@
 
 "use client";
 
-import { CATEGORY_COLORS } from "@/types/atlas-admin";
+import { resolveEmotionColor } from "@/utils/emotion-colors";
 
 export type ChipSize = "sm" | "md" | "lg";
 
@@ -28,6 +28,8 @@ export interface BaseEmotionChipProps {
   emotion: string;
   category?: string;
   color?: string;
+  // Optional full emotion object for better color resolution
+  emotionObject?: { color_hint?: string; category: string };
   size?: ChipSize;
   showCategory?: boolean;
   showBridge?: boolean;
@@ -49,6 +51,7 @@ export function BaseEmotionChip({
   emotion,
   category,
   color,
+  emotionObject,
   size = "md",
   showCategory = false,
   showBridge = false,
@@ -56,8 +59,10 @@ export function BaseEmotionChip({
   onClick,
   className = "",
 }: BaseEmotionChipProps) {
-  // Get category color if not provided
-  const chipColor = color || (category ? CATEGORY_COLORS[category] : "#888888");
+  // Get color: Explicit prop > Object hint > Category map > Default
+  const chipColor = color || resolveEmotionColor(
+    emotionObject || { category: category || "", color_hint: undefined }
+  );
 
   const isBridge = [
     "Vulnerability",

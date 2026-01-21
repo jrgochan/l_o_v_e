@@ -1,6 +1,6 @@
 """SQLAlchemy ORM models."""
 
-from app.models.atlas_definition import AtlasDefinition
+from app.models.emotion_definition import EmotionCollection, EmotionDefinition
 from app.models.bootstrap_data import BootstrapData
 from app.models.chat_message import ChatMessage
 from app.models.chat_session import ChatSession
@@ -28,7 +28,8 @@ from app.models.user import User
 from app.models.user_trajectory import UserTrajectory
 
 __all__ = [
-    "AtlasDefinition",
+    "EmotionCollection",
+    "EmotionDefinition",
     "BootstrapData",
     "CategoryTransition",
     "ChatMessage",

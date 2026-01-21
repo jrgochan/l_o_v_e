@@ -4,7 +4,7 @@ from unittest.mock import AsyncMock, MagicMock
 from uuid import uuid4
 
 from app.services.waypoint_explainer import WaypointExplainer
-from app.models.atlas_definition import AtlasDefinition
+from app.models.emotion_definition import EmotionDefinition
 
 @pytest.fixture
 def mock_session():
@@ -16,17 +16,17 @@ def explainer(mock_session):
 
 @pytest.fixture
 def sample_emotions():
-    prev_e = AtlasDefinition(
+    prev_e = EmotionDefinition(
         id=uuid4(),
         emotion_name="Anger",
         vac_vector=[0.2, 0.8, -0.4] 
     )
-    waypoint_e = AtlasDefinition(
+    waypoint_e = EmotionDefinition(
         id=uuid4(),
         emotion_name="Frustration", 
         vac_vector=[0.3, 0.1, -0.2] # +V, Low A (0.1), +C
     )
-    next_e = AtlasDefinition(
+    next_e = EmotionDefinition(
         id=uuid4(),
         emotion_name="Calm",
         vac_vector=[0.5, 0.2, 0.5]
@@ -121,13 +121,13 @@ async def test_vac_analysis_logic(explainer):
 async def test_generate_purpose_branches(explainer):
     """Test generating purpose from different VAC states."""
     # 1. Connection Building (C > 0.5)
-    w_conn = AtlasDefinition(vac_vector=[0, 0.4, 0.6], emotion_name="Love")
+    w_conn = EmotionDefinition(vac_vector=[0, 0.4, 0.6], emotion_name="Love")
     mock_analysis = {"valence_shift": {"delta": 0}}
     purpose = explainer._generate_purpose_from_vac(w_conn, mock_analysis)
     assert "building positive connection" in purpose
 
     # 2. Valence Improvement (Delta > 0.3)
-    w_joy = AtlasDefinition(vac_vector=[0, 0.4, 0], emotion_name="Joy")
+    w_joy = EmotionDefinition(vac_vector=[0, 0.4, 0], emotion_name="Joy")
     mock_analysis = {"valence_shift": {"delta": 0.4}}
     purpose = explainer._generate_purpose_from_vac(w_joy, mock_analysis)
     assert "creating positive emotional momentum" in purpose
@@ -136,17 +136,17 @@ async def test_generate_purpose_branches(explainer):
 async def test_readiness_signs_branches(explainer):
     """Test generation of readiness signs."""
     # 1. Low Arousal (< 0)
-    w1 = AtlasDefinition(vac_vector=[0, -0.1, 0], emotion_name="Calm")
+    w1 = EmotionDefinition(vac_vector=[0, -0.1, 0], emotion_name="Calm")
     signs = explainer._generate_readiness_signs(w1, None)
     assert any("arousal level has decreased" in s for s in signs)
     
     # 2. High Connection (> 0.5)
-    w2 = AtlasDefinition(vac_vector=[0, 0, 0.6], emotion_name="Connected")
+    w2 = EmotionDefinition(vac_vector=[0, 0, 0.6], emotion_name="Connected")
     signs = explainer._generate_readiness_signs(w2, None)
     assert any("more connected" in s for s in signs)
     
     # 3. Pos Valence (> 0.3)
-    w3 = AtlasDefinition(vac_vector=[0.4, 0, 0], emotion_name="Happy")
+    w3 = EmotionDefinition(vac_vector=[0.4, 0, 0], emotion_name="Happy")
     signs = explainer._generate_readiness_signs(w3, None)
     assert any("positive emotions emerging" in s for s in signs)
 
@@ -206,13 +206,13 @@ async def test_extract_first_citation_invalid_type(explainer):
 async def test_warning_signs_generation(explainer, mock_session):
     """Test generation of warning signs based on thresholds."""
     # High arousal (>0.7), Negative Connection (<-0.5), Negative Valence (<-0.7)
-    waypoint_e = AtlasDefinition(
+    waypoint_e = EmotionDefinition(
         id=uuid4(),
         emotion_name="Panic",
         vac_vector=[-0.8, 0.9, -0.6]
     )
-    prev_e = AtlasDefinition(vac_vector=[0,0,0], emotion_name="Neutral")
-    next_e = AtlasDefinition(vac_vector=[0,0,0], emotion_name="Neutral")
+    prev_e = EmotionDefinition(vac_vector=[0,0,0], emotion_name="Neutral")
+    next_e = EmotionDefinition(vac_vector=[0,0,0], emotion_name="Neutral")
     
     mock_result = MagicMock()
     mock_result.fetchone.return_value = None # Fallback

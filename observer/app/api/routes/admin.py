@@ -15,7 +15,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.api.deps import get_current_admin
 from app.database import get_db
-from app.models.atlas_definition import AtlasDefinition
+from app.models.emotion_definition import EmotionDefinition
 from app.models.chat_session import ChatSession
 from app.models.clinical_alert import ClinicalAlert
 from app.models.model_assignment import ModelAssignment
@@ -23,7 +23,7 @@ from app.models.transition_strategy import TransitionStrategy
 from app.models.user import User
 from app.models.user_trajectory import UserTrajectory
 from app.schemas.ai_models import ModelAssignmentResponse, ModelAssignmentUpdate
-from app.schemas.atlas import AtlasEmotionResponse, AtlasEmotionUpdate
+from app.schemas.emotions import EmotionResponse, EmotionUpdate
 from app.schemas.bootstrap import (
     BootstrapDataCreate,
     BootstrapDataResponse,
@@ -239,22 +239,22 @@ async def get_session_details(
 # -----------------------------------------------------------------------------
 
 
-@router.get("/atlas/emotions", response_model=List[AtlasEmotionResponse])
+@router.get("/atlas/emotions", response_model=List[EmotionResponse])
 async def list_atlas_emotions(
     db: Annotated[AsyncSession, Depends(get_db)],
     current_admin: Annotated[User, Depends(get_current_admin)],
 ) -> Any:
     """List all 87 atlas emotions."""
     # Simply list all - no pagination needed for 87 items
-    stmt = select(AtlasDefinition).order_by(AtlasDefinition.emotion_name)
+    stmt = select(EmotionDefinition).order_by(EmotionDefinition.emotion_name)
     result = await db.execute(stmt)
     return result.scalars().all()
 
 
-@router.put("/atlas/emotions/{emotion_id}", response_model=AtlasEmotionResponse)
+@router.put("/atlas/emotions/{emotion_id}", response_model=EmotionResponse)
 async def update_atlas_emotion(
     emotion_id: UUID,
-    emotion_in: AtlasEmotionUpdate,
+    emotion_in: EmotionUpdate,
     db: Annotated[AsyncSession, Depends(get_db)],
     current_admin: Annotated[User, Depends(get_current_admin)],
 ) -> Any:
@@ -264,7 +264,7 @@ async def update_atlas_emotion(
     - If VAC changes -> Recalculate Quaternion
     - If Definition/Name changes -> Recalculate Semantic Embedding
     """
-    stmt = select(AtlasDefinition).where(AtlasDefinition.id == emotion_id)
+    stmt = select(EmotionDefinition).where(EmotionDefinition.id == emotion_id)
     result = await db.execute(stmt)
     emotion = result.scalars().first()
 
@@ -321,7 +321,7 @@ async def export_atlas_data(
     current_admin: Annotated[User, Depends(get_current_admin)],
 ) -> Any:
     """Export current state as JSON matching the canonical emotions.json format."""
-    stmt = select(AtlasDefinition).order_by(AtlasDefinition.id)
+    stmt = select(EmotionDefinition).order_by(EmotionDefinition.id)
     result = await db.execute(stmt)
     emotions = result.scalars().all()
 
@@ -376,7 +376,7 @@ async def import_atlas_data(
             continue
 
         # Find existing
-        stmt = select(AtlasDefinition).where(AtlasDefinition.emotion_name == name)
+        stmt = select(EmotionDefinition).where(EmotionDefinition.emotion_name == name)
         result = await db.execute(stmt)
         emotion = result.scalars().first()
 

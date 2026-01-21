@@ -36,7 +36,7 @@ describe("HelpModal", () => {
 
     // Switch to Concepts tab
     fireEvent.click(screen.getByText("🌟 Key Concepts"));
-    expect(screen.getByText("The 87 Emotions")).toBeInTheDocument();
+    expect(screen.getByText(/The \d+ Emotions/)).toBeInTheDocument();
 
     // Switch back to Model tab
     fireEvent.click(screen.getByText("🧠 VAC Model & Soul Sphere"));

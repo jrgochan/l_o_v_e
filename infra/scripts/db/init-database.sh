@@ -28,6 +28,7 @@ WITH_DEMO=false
 WITH_BOOTSTRAP=false
 FORCE_RESEED=false
 PRECOMPUTE_PATHS=false
+DATASET="atlas"
 
 echo -e "${BLUE}${ROCKET} L.O.V.E. Stack - Database Initialization${NC}"
 echo "=================================================="
@@ -56,9 +57,13 @@ while [[ $# -gt 0 ]]; do
             PRECOMPUTE_PATHS=true
             shift
             ;;
+        --dataset)
+            DATASET="$2"
+            shift 2
+            ;;
         *)
             echo "Unknown option: $1"
-            echo "Usage: $0 [--skip-seed] [--with-demo] [--with-bootstrap] [--force-reseed] [--precompute-paths]"
+            echo "Usage: $0 [--skip-seed] [--with-demo] [--with-bootstrap] [--force-reseed] [--precompute-paths] [--dataset <name>]"
             exit 1
             ;;
     esac
@@ -294,7 +299,8 @@ verify_tables() {
     # List of required tables (complete as of 2026-01-03)
     # Core tables
     required_tables=(
-        "atlas_definitions"
+        "emotion_collections"
+        "emotion_definitions"
         "user_trajectory"
     )
     
@@ -450,7 +456,7 @@ seed_database() {
     if [ "$FORCE_RESEED" = false ]; then
         print_info "Checking if database already has data..."
         
-        atlas_count=$(PGPASSWORD="$DB_PASSWORD" psql -h "$DB_HOST" -p "$DB_PORT" -U "$DB_USER" -d "$DB_NAME" -t -c "SELECT COUNT(*) FROM atlas_definitions;" 2>/dev/null | xargs)
+        atlas_count=$(PGPASSWORD="$DB_PASSWORD" psql -h "$DB_HOST" -p "$DB_PORT" -U "$DB_USER" -d "$DB_NAME" -t -c "SELECT COUNT(*) FROM emotion_definitions;" 2>/dev/null | xargs)
         
         if [ "$atlas_count" -gt 0 ]; then
             print_warning "Database already contains $atlas_count emotions"
@@ -482,6 +488,9 @@ seed_database() {
         seed_args+=("--force-reseed")
     fi
     
+    # Add dataset
+    seed_args+=("--dataset=$DATASET")
+    
     print_info "Running master seeding script with args: ${seed_args[*]}"
     echo ""
     
@@ -501,6 +510,7 @@ seed_database() {
 }
 
 # Compute path matrix cache
+# Compute path matrix cache
 compute_path_matrix() {
     print_header "🔄 Computing Path Matrix Cache"
     
@@ -519,19 +529,49 @@ compute_path_matrix() {
     
     . venv/bin/activate
     
-    print_info "Pre-computing all 87×87 = 7,569 transition paths..."
-    print_warning "This will take 30-60 minutes"
+    print_info "Pre-computing transition paths..."
+    print_warning "This will take significantly longer for multiple datasets"
     echo ""
     
-    if python scripts/compute_path_matrix.py; then
-        print_success "Path matrix computed and cached"
-        deactivate
-        cd - > /dev/null
+    # Determine which collections to process
+    collections_to_process=()
+    
+    if [ "$DATASET" == "all" ]; then
+        collections_to_process=("Atlas of the Heart" "Plutchik Wheel" "GoEmotions")
+    else
+        case "$DATASET" in
+            "plutchik")
+                collections_to_process=("Plutchik Wheel")
+                ;;
+            "goemotions")
+                collections_to_process=("GoEmotions")
+                ;;
+            *)
+                collections_to_process=("Atlas of the Heart")
+                ;;
+        esac
+    fi
+    
+    # Process each collection
+    overall_success=true
+    
+    for collection in "${collections_to_process[@]}"; do
+        print_info "Processing collection: $collection"
+        if python scripts/compute_path_matrix.py --collection "$collection"; then
+            print_success "Path matrix computed for $collection"
+        else
+            print_error "Path matrix computation failed for $collection"
+            overall_success=false
+        fi
+        echo ""
+    done
+    
+    deactivate
+    cd - > /dev/null
+    
+    if [ "$overall_success" = true ]; then
         return 0
     else
-        print_error "Path matrix computation failed"
-        deactivate
-        cd - > /dev/null
         return 1
     fi
 }
@@ -548,12 +588,12 @@ verify_data() {
     print_info "Checking data counts..."
     
     # Count atlas_definitions
-    atlas_count=$(PGPASSWORD="$DB_PASSWORD" psql -h "$DB_HOST" -p "$DB_PORT" -U "$DB_USER" -d "$DB_NAME" -t -c "SELECT COUNT(*) FROM atlas_definitions;" 2>/dev/null | xargs)
+    atlas_count=$(PGPASSWORD="$DB_PASSWORD" psql -h "$DB_HOST" -p "$DB_PORT" -U "$DB_USER" -d "$DB_NAME" -t -c "SELECT COUNT(*) FROM emotion_definitions;" 2>/dev/null | xargs)
     
-    if [ "$atlas_count" -ge 87 ]; then
-        print_success "Atlas emotions: $atlas_count (expected 87)"
+    if [ "$atlas_count" -ge 10 ]; then
+        print_success "Emotions seeded: $atlas_count"
     else
-        print_warning "Atlas emotions: $atlas_count (expected 87)"
+        print_warning "Emotions seeded: $atlas_count (This seems low, expected > 10)"
     fi
     
     # Count transition_strategies (if table exists)
@@ -577,6 +617,7 @@ main() {
     echo "  Database: $DB_NAME"
     echo "  Host: $DB_HOST:$DB_PORT"
     echo "  User: $DB_USER"
+    echo "  Dataset: $DATASET"
     echo "  Skip Seed: $SKIP_SEED"
     echo "  With Demo: $WITH_DEMO"
     echo "  With Bootstrap: $WITH_BOOTSTRAP"

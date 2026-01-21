@@ -25,7 +25,7 @@ export interface JourneyTemplate {
  *
  * These are the most common and well-researched emotional transitions
  */
-export const JOURNEY_TEMPLATES: JourneyTemplate[] = [
+const BASE_JOURNEY_TEMPLATES: JourneyTemplate[] = [
   {
     id: "anxiety-calm",
     name: "Anxiety → Calm",
@@ -181,7 +181,7 @@ export const JOURNEY_TEMPLATES: JourneyTemplate[] = [
  * Get template by ID
  */
 export function getTemplateById(id: string): JourneyTemplate | undefined {
-  return JOURNEY_TEMPLATES.find((t) => t.id === id);
+  return BASE_JOURNEY_TEMPLATES.find((t) => t.id === id);
 }
 
 /**
@@ -190,7 +190,7 @@ export function getTemplateById(id: string): JourneyTemplate | undefined {
 export function getTemplatesByDifficulty(
   difficulty: "easy" | "moderate" | "hard"
 ): JourneyTemplate[] {
-  return JOURNEY_TEMPLATES.filter((t) => t.difficulty === difficulty);
+  return BASE_JOURNEY_TEMPLATES.filter((t) => t.difficulty === difficulty);
 }
 
 /**
@@ -198,7 +198,7 @@ export function getTemplatesByDifficulty(
  */
 export function getTemplatesWithEmotion(emotionName: string): JourneyTemplate[] {
   const name = emotionName.toLowerCase();
-  return JOURNEY_TEMPLATES.filter(
+  return BASE_JOURNEY_TEMPLATES.filter(
     (t) =>
       t.from_emotion.toLowerCase() === name ||
       t.to_emotion.toLowerCase() === name ||
@@ -211,7 +211,7 @@ export function getTemplatesWithEmotion(emotionName: string): JourneyTemplate[] 
  */
 export function searchTemplates(query: string): JourneyTemplate[] {
   const q = query.toLowerCase();
-  return JOURNEY_TEMPLATES.filter(
+  return BASE_JOURNEY_TEMPLATES.filter(
     (t) =>
       t.name.toLowerCase().includes(q) ||
       t.description.toLowerCase().includes(q) ||
@@ -219,3 +219,26 @@ export function searchTemplates(query: string): JourneyTemplate[] {
       t.to_emotion.toLowerCase().includes(q)
   );
 }
+
+/**
+ * Get templates valid for the current set of emotions
+ */
+export function getValidTemplates(
+  availableEmotions: { name: string }[]
+): JourneyTemplate[] {
+  const availableNames = new Set(availableEmotions.map((e) => e.name.toLowerCase()));
+
+  return BASE_JOURNEY_TEMPLATES.filter((template) => {
+    // Check if start and end emotions exist
+    if (!availableNames.has(template.from_emotion.toLowerCase())) return false;
+    if (!availableNames.has(template.to_emotion.toLowerCase())) return false;
+
+    // Check if all waypoints exist
+    if (!template.waypoints.every((w) => availableNames.has(w.toLowerCase()))) return false;
+
+    return true;
+  });
+}
+
+// Re-export for backward compatibility
+export const JOURNEY_TEMPLATES = BASE_JOURNEY_TEMPLATES;

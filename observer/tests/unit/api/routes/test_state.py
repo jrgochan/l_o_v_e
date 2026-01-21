@@ -9,7 +9,7 @@ from app.api.routes import state
 from app.api.schemas.state import StateInput
 from app.api.schemas.common import VACVector
 from app.models.user_trajectory import UserTrajectory
-from app.models.atlas_definition import AtlasDefinition
+from app.models.emotion_definition import EmotionDefinition
 
 @pytest.fixture
 def mock_db():
@@ -60,7 +60,7 @@ def mock_deps():
         
         # 2. Mapper
         mock_em = MagicMock()
-        mock_em.find_nearest = AsyncMock(return_value=AtlasDefinition(
+        mock_em.find_nearest = AsyncMock(return_value=EmotionDefinition(
             id=uuid4(), emotion_name="Anxiety", category="Fear", vac_vector=[-0.5, 0.7, -0.3]
         ))
         MockMapper.return_value = mock_em

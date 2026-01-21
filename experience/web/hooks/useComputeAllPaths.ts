@@ -1,7 +1,7 @@
 /**
  * useComputeAllPaths Hook
  *
- * Computes paths for all 87×86 = 7,482 possible emotion pairs.
+ * Computes paths for all emotion pairs.
  * Uses new backend batch API for massive performance improvement.
  * Refactored to compose useBatchJob logic and atlasService.
  */
@@ -70,11 +70,13 @@ export function useComputeAllPaths() {
       return;
     }
 
-    const totalPaths = 87 * 86;
+    // Use allEmotions from hook scope
+    const totalCount = allEmotions.length;
+    const totalPaths = totalCount * (totalCount - 1);
     const confirmed = confirm(
       `This will compute all ${totalPaths} paths using the backend batch API.\n\n` +
-        `This will take ~8-10 minutes running in the background.\n\n` +
-        `Continue?`
+      `This will take ~8-10 minutes running in the background.\n\n` +
+      `Continue?`
     );
 
     if (!confirmed) return;

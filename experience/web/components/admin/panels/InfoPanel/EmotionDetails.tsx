@@ -15,7 +15,8 @@
 
 import { CharacterSphere } from "@/components/admin/spheres/CharacterSphere";
 import { PreviewSphere } from "@/components/admin/spheres/PreviewSphere";
-import { BRIDGE_EMOTIONS, CATEGORY_COLORS } from "@/types/atlas-admin";
+import { BRIDGE_EMOTIONS } from "@/types/atlas-admin";
+import { resolveEmotionColor } from "@/utils/emotion-colors";
 import type { AtlasEmotion, PathAnimationMode } from "@/types/atlas-admin";
 
 interface EmotionDetailsProps {
@@ -37,11 +38,10 @@ export function EmotionDetails({ emotion, isHovered = false, animationMode }: Em
       </div>
 
       <div
-        className={`rounded-lg p-4 space-y-4 transition-all ${
-          isHovered
-            ? "bg-cyan-900/30 border border-cyan-700/50 shadow-[0_0_20px_rgba(34,211,238,0.15)]"
-            : "bg-gray-800/50 border border-gray-700/50"
-        }`}
+        className={`rounded-lg p-4 space-y-4 transition-all ${isHovered
+          ? "bg-cyan-900/30 border border-cyan-700/50 shadow-[0_0_20px_rgba(34,211,238,0.15)]"
+          : "bg-gray-800/50 border border-gray-700/50"
+          }`}
       >
         {/* Dual sphere view: Character + VAC Position */}
         <div className="flex gap-3 justify-center items-start">
@@ -69,7 +69,7 @@ export function EmotionDetails({ emotion, isHovered = false, animationMode }: Em
           </h3>
           <p
             className="text-xs font-semibold mt-1.5 uppercase tracking-wide"
-            style={{ color: CATEGORY_COLORS[emotion.category] || "#888888" }}
+            style={{ color: resolveEmotionColor(emotion) }}
           >
             {emotion.category}
           </p>

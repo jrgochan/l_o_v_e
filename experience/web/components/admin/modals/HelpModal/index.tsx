@@ -8,6 +8,7 @@
 "use client";
 
 import { useState } from "react";
+import { useAtlasAdminStore } from "@/stores/useAtlasAdminStore";
 
 type TabType = "model" | "usage" | "shortcuts" | "concepts";
 
@@ -39,41 +40,37 @@ export function HelpModal({ onClose }: HelpModalProps) {
         <div className="flex border-b border-gray-700">
           <button
             onClick={() => setActiveTab("model")}
-            className={`flex-1 px-6 py-3 text-sm font-medium transition ${
-              activeTab === "model"
-                ? "text-white bg-gray-800 border-b-2 border-cyan-500"
-                : "text-gray-400 hover:text-gray-300 hover:bg-gray-800/50"
-            }`}
+            className={`flex-1 px-6 py-3 text-sm font-medium transition ${activeTab === "model"
+              ? "text-white bg-gray-800 border-b-2 border-cyan-500"
+              : "text-gray-400 hover:text-gray-300 hover:bg-gray-800/50"
+              }`}
           >
             🧠 VAC Model & Soul Sphere
           </button>
           <button
             onClick={() => setActiveTab("usage")}
-            className={`flex-1 px-6 py-3 text-sm font-medium transition ${
-              activeTab === "usage"
-                ? "text-white bg-gray-800 border-b-2 border-cyan-500"
-                : "text-gray-400 hover:text-gray-300 hover:bg-gray-800/50"
-            }`}
+            className={`flex-1 px-6 py-3 text-sm font-medium transition ${activeTab === "usage"
+              ? "text-white bg-gray-800 border-b-2 border-cyan-500"
+              : "text-gray-400 hover:text-gray-300 hover:bg-gray-800/50"
+              }`}
           >
             🎯 How to Use
           </button>
           <button
             onClick={() => setActiveTab("shortcuts")}
-            className={`flex-1 px-6 py-3 text-sm font-medium transition ${
-              activeTab === "shortcuts"
-                ? "text-white bg-gray-800 border-b-2 border-cyan-500"
-                : "text-gray-400 hover:text-gray-300 hover:bg-gray-800/50"
-            }`}
+            className={`flex-1 px-6 py-3 text-sm font-medium transition ${activeTab === "shortcuts"
+              ? "text-white bg-gray-800 border-b-2 border-cyan-500"
+              : "text-gray-400 hover:text-gray-300 hover:bg-gray-800/50"
+              }`}
           >
             ⌨️ Shortcuts
           </button>
           <button
             onClick={() => setActiveTab("concepts")}
-            className={`flex-1 px-6 py-3 text-sm font-medium transition ${
-              activeTab === "concepts"
-                ? "text-white bg-gray-800 border-b-2 border-cyan-500"
-                : "text-gray-400 hover:text-gray-300 hover:bg-gray-800/50"
-            }`}
+            className={`flex-1 px-6 py-3 text-sm font-medium transition ${activeTab === "concepts"
+              ? "text-white bg-gray-800 border-b-2 border-cyan-500"
+              : "text-gray-400 hover:text-gray-300 hover:bg-gray-800/50"
+              }`}
           >
             🌟 Key Concepts
           </button>
@@ -206,7 +203,7 @@ function ModelTab() {
         <h3 className="text-xl font-bold text-white mb-3">Research Foundation</h3>
         <div className="bg-gray-800 rounded-lg p-4 text-gray-300 space-y-2 text-sm">
           <p>
-            <strong className="text-white">Brené Brown</strong> - Atlas of the Heart (87 emotions,
+            <strong className="text-white">Brené Brown&apos;s</strong> - Atlas of the Heart (
             relational dynamics)
           </p>
           <p>
@@ -336,7 +333,7 @@ function UsageTab() {
         <div className="bg-gray-800 rounded-lg p-4 space-y-2 text-gray-300">
           <p>
             Click <strong className="text-purple-400">&quot;📊 Show Path Matrix&quot;</strong> to
-            view all 87×87 possible emotion transitions at once.
+            view all possible emotion transitions at once.
           </p>
           <ul className="list-disc list-inside space-y-1 text-sm ml-4">
             <li>Color-coded cells: Green (easy), Yellow (moderate), Red (difficult)</li>
@@ -538,17 +535,19 @@ function ShortcutsTab() {
 }
 
 function ConceptsTab() {
+  const { allEmotions, getBridgeEmotions } = useAtlasAdminStore();
+  const bridgeEmotions = getBridgeEmotions();
+
   return (
     <div className="prose prose-invert max-w-none space-y-6">
       <section>
-        <h3 className="text-xl font-bold text-white mb-3">The 87 Emotions</h3>
+        <h3 className="text-xl font-bold text-white mb-3">The {allEmotions.length} Emotions</h3>
         <div className="bg-gray-800 rounded-lg p-4 text-gray-300">
           <p className="mb-2">
-            Based on <strong className="text-white">Brené Brown&apos;s</strong> groundbreaking
-            research, we map 87 distinct emotions to VAC space.
+            The system maps <strong className="text-white">{allEmotions.length} distinct emotions</strong> to VAC space.
           </p>
           <p>
-            These emotions are organized into <strong>13 categories</strong> representing different
+            These emotions are organized into categories representing different
             &quot;places we go&quot; emotionally. Each emotion has a unique position in 3D VAC
             space.
           </p>
@@ -556,53 +555,28 @@ function ConceptsTab() {
       </section>
 
       <section>
-        <h3 className="text-xl font-bold text-white mb-3">Bridge Emotions (6 Gateway States)</h3>
+        <h3 className="text-xl font-bold text-white mb-3">Bridge Emotions ({bridgeEmotions.length} Gateway States)</h3>
         <div className="space-y-2">
-          {[
-            {
-              name: "Vulnerability",
-              vac: "[0.0, 0.3, 0.6]",
-              desc: "Required for shame → connection healing. The zero-crossing where isolation shifts to connection.",
-            },
-            {
-              name: "Awe",
-              vac: "[0.7, 0.5, 0.8]",
-              desc: "Universal bridge accessible from almost any state. Provides perspective shift.",
-            },
-            {
-              name: "Compassion",
-              vac: "[0.5, 0.2, 0.9]",
-              desc: "Repairs shame, builds connection. Feeling WITH not FOR others.",
-            },
-            {
-              name: "Curiosity",
-              vac: "[0.5, 0.6, 0.3]",
-              desc: "Interrupts rumination loops, enables exploration mode.",
-            },
-            {
-              name: "Acceptance",
-              vac: "[0.3, -0.2, 0.4]",
-              desc: "Releases resistance, prerequisite for peace and letting go.",
-            },
-            {
-              name: "Gratitude",
-              vac: "[0.8, 0.3, 0.9]",
-              desc: "Amplifies positive emotions, counteracts foreboding joy.",
-            },
-          ].map((bridge, i) => (
-            <div key={i} className="bg-gray-800 rounded-lg p-3">
-              <div className="flex items-start gap-2">
-                <span className="text-yellow-400 text-lg">★</span>
-                <div className="flex-1">
-                  <h4 className="font-semibold text-white">
-                    {bridge.name}{" "}
-                    <span className="text-xs text-gray-400 font-mono">{bridge.vac}</span>
-                  </h4>
-                  <p className="text-sm text-gray-300 mt-1">{bridge.desc}</p>
+          {bridgeEmotions.length > 0 ? (
+            bridgeEmotions.map((bridge) => (
+              <div key={bridge.id} className="bg-gray-800 rounded-lg p-3">
+                <div className="flex items-start gap-2">
+                  <span className="text-yellow-400 text-lg">★</span>
+                  <div className="flex-1">
+                    <h4 className="font-semibold text-white">
+                      {bridge.name}{" "}
+                      <span className="text-xs text-gray-400 font-mono">
+                        [{bridge.vac[0].toFixed(1)}, {bridge.vac[1].toFixed(1)}, {bridge.vac[2].toFixed(1)}]
+                      </span>
+                    </h4>
+                    <p className="text-sm text-gray-300 mt-1">{bridge.definition}</p>
+                  </div>
                 </div>
               </div>
-            </div>
-          ))}
+            ))
+          ) : (
+            <p className="text-gray-400 italic">No bridge emotions defined for this collection.</p>
+          )}
         </div>
       </section>
 

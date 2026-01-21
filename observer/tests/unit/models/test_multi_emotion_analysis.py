@@ -6,7 +6,7 @@ from datetime import datetime
 from app.models.multi_emotion_analysis import (
     MultiEmotionAnalysis, DetectedEmotion, EmotionRelationship, EmotionGoal
 )
-from app.models.atlas_definition import AtlasDefinition
+from app.models.emotion_definition import EmotionDefinition
 
 # --- DetectedEmotion Tests ---
 
@@ -31,7 +31,7 @@ def test_detected_emotion_initialization_and_properties():
 
     # Test repr
     assert "Unknown" in repr(de)
-    de.emotion = AtlasDefinition(emotion_name="Joy")
+    de.emotion = EmotionDefinition(emotion_name="Joy")
     assert "Joy" in repr(de)
 
 def test_detected_emotion_to_dict_full():
@@ -216,7 +216,7 @@ def test_emotion_goal_model():
     """Test EmotionGoal methods."""
     goal = EmotionGoal(
         status="active",
-        goal_emotion=AtlasDefinition(emotion_name="Hope")
+        goal_emotion=EmotionDefinition(emotion_name="Hope")
     )
     
     assert "Hope" in repr(goal)
@@ -250,7 +250,7 @@ def test_missing_coverage_branches():
     # Case: include_emotion_details=False
     # (Need a goal WITH emotion to ensure it's hidden)
     goal_with_emotion = EmotionGoal(user_id="u2")
-    goal_with_emotion.goal_emotion = AtlasDefinition(emotion_name="Hope")
+    goal_with_emotion.goal_emotion = EmotionDefinition(emotion_name="Hope")
     
 
 def test_emotion_goal_properties():

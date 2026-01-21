@@ -1,0 +1,385 @@
+{
+  "version": "1.0",
+  "source": "Generated from ual emotions",
+  "metadata": {
+    "total_categories": 17,
+    "total_emotions": 53,
+    "created": "2026-01-20"
+  },
+  "categories": [
+    {
+      "id": 1,
+      "name": "Anger",
+      "short_name": "Anger",
+      "description": "Emotions related to Anger",
+      "color_hex": "#FF4444",
+      "typical_vac_range": {
+        "valence": [
+          -0.875,
+          -0.375
+        ],
+        "arousal": [
+          -0.125,
+          1.0
+        ],
+        "connection": [
+          -0.9,
+          -0.7
+        ]
+      },
+      "emotion_count": 8
+    },
+    {
+      "id": 2,
+      "name": "Appreciation",
+      "short_name": "Appreciation",
+      "description": "Emotions related to Appreciation",
+      "color_hex": "#FF44CC",
+      "typical_vac_range": {
+        "valence": [
+          0.625,
+          0.75
+        ],
+        "arousal": [
+          0.125,
+          0.25
+        ],
+        "connection": [
+          0.9,
+          0.9
+        ]
+      },
+      "emotion_count": 2
+    },
+    {
+      "id": 3,
+      "name": "Bittersweet",
+      "short_name": "Bittersweet",
+      "description": "Emotions related to Bittersweet",
+      "color_hex": "#4488FF",
+      "typical_vac_range": {
+        "valence": [
+          -0.125,
+          0.375
+        ],
+        "arousal": [
+          -0.25,
+          -0.125
+        ],
+        "connection": [
+          -0.6,
+          -0.2
+        ]
+      },
+      "emotion_count": 2
+    },
+    {
+      "id": 4,
+      "name": "Dependency",
+      "short_name": "Dependency",
+      "description": "Emotions related to Dependency",
+      "color_hex": "#FFCC44",
+      "typical_vac_range": {
+        "valence": [
+          0.5,
+          0.5
+        ],
+        "arousal": [
+          -0.5,
+          -0.5
+        ],
+        "connection": [
+          0.6,
+          0.6
+        ]
+      },
+      "emotion_count": 1
+    },
+    {
+      "id": 5,
+      "name": "Epiphany",
+      "short_name": "Epiphany",
+      "description": "Emotions related to Epiphany",
+      "color_hex": "#FFCC44",
+      "typical_vac_range": {
+        "valence": [
+          0.5,
+          0.5
+        ],
+        "arousal": [
+          0.125,
+          0.125
+        ],
+        "connection": [
+          0.6,
+          0.6
+        ]
+      },
+      "emotion_count": 1
+    },
+    {
+      "id": 6,
+      "name": "Existential",
+      "short_name": "Existential",
+      "description": "Emotions related to Existential",
+      "color_hex": "#FFCC44",
+      "typical_vac_range": {
+        "valence": [
+          -0.625,
+          -0.625
+        ],
+        "arousal": [
+          0.25,
+          0.25
+        ],
+        "connection": [
+          -0.2,
+          -0.2
+        ]
+      },
+      "emotion_count": 1
+    },
+    {
+      "id": 7,
+      "name": "Fear",
+      "short_name": "Fear",
+      "description": "Emotions related to Fear",
+      "color_hex": "#FF4444",
+      "typical_vac_range": {
+        "valence": [
+          -0.875,
+          -0.25
+        ],
+        "arousal": [
+          0.0,
+          0.95
+        ],
+        "connection": [
+          -0.7,
+          0.2
+        ]
+      },
+      "emotion_count": 8
+    },
+    {
+      "id": 8,
+      "name": "Joy",
+      "short_name": "Joy",
+      "description": "Emotions related to Joy",
+      "color_hex": "#FF44CC",
+      "typical_vac_range": {
+        "valence": [
+          0.75,
+          0.875
+        ],
+        "arousal": [
+          -0.75,
+          0.875
+        ],
+        "connection": [
+          0.9,
+          0.9
+        ]
+      },
+      "emotion_count": 3
+    },
+    {
+      "id": 9,
+      "name": "Knowledge",
+      "short_name": "Knowledge",
+      "description": "Emotions related to Knowledge",
+      "color_hex": "#FF8844",
+      "typical_vac_range": {
+        "valence": [
+          -0.25,
+          0.75
+        ],
+        "arousal": [
+          0.0,
+          0.375
+        ],
+        "connection": [
+          0.4,
+          0.4
+        ]
+      },
+      "emotion_count": 5
+    },
+    {
+      "id": 10,
+      "name": "Love",
+      "short_name": "Love",
+      "description": "Emotions related to Love",
+      "color_hex": "#FF44CC",
+      "typical_vac_range": {
+        "valence": [
+          0.625,
+          0.95
+        ],
+        "arousal": [
+          0.0,
+          0.375
+        ],
+        "connection": [
+          0.9,
+          0.9
+        ]
+      },
+      "emotion_count": 2
+    },
+    {
+      "id": 11,
+      "name": "Nostalgia",
+      "short_name": "Nostalgia",
+      "description": "Emotions related to Nostalgia",
+      "color_hex": "#FFCC44",
+      "typical_vac_range": {
+        "valence": [
+          -0.5,
+          -0.5
+        ],
+        "arousal": [
+          -0.125,
+          -0.125
+        ],
+        "connection": [
+          -0.2,
+          -0.2
+        ]
+      },
+      "emotion_count": 1
+    },
+    {
+      "id": 12,
+      "name": "Relief",
+      "short_name": "Relief",
+      "description": "Emotions related to Relief",
+      "color_hex": "#FF44CC",
+      "typical_vac_range": {
+        "valence": [
+          0.625,
+          0.625
+        ],
+        "arousal": [
+          -0.25,
+          -0.25
+        ],
+        "connection": [
+          0.9,
+          0.9
+        ]
+      },
+      "emotion_count": 1
+    },
+    {
+      "id": 13,
+      "name": "Resilience",
+      "short_name": "Resilience",
+      "description": "Emotions related to Resilience",
+      "color_hex": "#FFCC44",
+      "typical_vac_range": {
+        "valence": [
+          0.25,
+          0.25
+        ],
+        "arousal": [
+          0.625,
+          0.625
+        ],
+        "connection": [
+          0.6,
+          0.6
+        ]
+      },
+      "emotion_count": 1
+    },
+    {
+      "id": 14,
+      "name": "Sadness",
+      "short_name": "Sadness",
+      "description": "Emotions related to Sadness",
+      "color_hex": "#4488FF",
+      "typical_vac_range": {
+        "valence": [
+          -0.875,
+          -0.375
+        ],
+        "arousal": [
+          -0.625,
+          0.5
+        ],
+        "connection": [
+          -0.6,
+          -0.6
+        ]
+      },
+      "emotion_count": 7
+    },
+    {
+      "id": 15,
+      "name": "Shame",
+      "short_name": "Shame",
+      "description": "Emotions related to Shame",
+      "color_hex": "#FFCC44",
+      "typical_vac_range": {
+        "valence": [
+          -0.75,
+          -0.75
+        ],
+        "arousal": [
+          0.5,
+          0.5
+        ],
+        "connection": [
+          -0.2,
+          -0.2
+        ]
+      },
+      "emotion_count": 1
+    },
+    {
+      "id": 16,
+      "name": "Social",
+      "short_name": "Social",
+      "description": "Emotions related to Social",
+      "color_hex": "#44CCFF",
+      "typical_vac_range": {
+        "valence": [
+          -0.625,
+          0.75
+        ],
+        "arousal": [
+          -0.75,
+          0.25
+        ],
+        "connection": [
+          -0.5,
+          0.7
+        ]
+      },
+      "emotion_count": 8
+    },
+    {
+      "id": 17,
+      "name": "Surprise",
+      "short_name": "Surprise",
+      "description": "Emotions related to Surprise",
+      "color_hex": "#FF8844",
+      "typical_vac_range": {
+        "valence": [
+          0.0,
+          0.0
+        ],
+        "arousal": [
+          0.75,
+          0.75
+        ],
+        "connection": [
+          0.4,
+          0.4
+        ]
+      },
+      "emotion_count": 1
+    }
+  ]
+}

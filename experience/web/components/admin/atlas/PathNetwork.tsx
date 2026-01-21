@@ -12,7 +12,8 @@ import { ThreeEvent } from "@react-three/fiber";
 import * as THREE from "three";
 import { useAtlasAdminStore } from "@/stores/useAtlasAdminStore";
 import { useExperienceStore } from "@/stores/useExperienceStore";
-import { DIFFICULTY_COLORS, CATEGORY_COLORS } from "@/types/atlas-admin";
+import { DIFFICULTY_COLORS } from "@/types/atlas-admin";
+import { resolveEmotionColor } from "@/utils/emotion-colors";
 import type { EmotionPath } from "@/types/atlas-admin";
 import { PathParticles } from "../visualizations/PathParticles";
 import { PathCurveAnimated } from "../paths/PathCurveAnimated";
@@ -133,10 +134,7 @@ function PathCurve({ path, opacity, showWaypoints, activePathDetails }: PathCurv
   // Helper function to get category color for a waypoint emotion
   const getWaypointCategoryColor = (emotionName: string): string => {
     const emotion = allEmotions.find((e) => e.name === emotionName);
-    if (emotion && emotion.category && CATEGORY_COLORS[emotion.category]) {
-      return CATEGORY_COLORS[emotion.category];
-    }
-    return "#888888"; // Fallback gray if not found
+    return resolveEmotionColor(emotion);
   };
 
   // Hover handlers

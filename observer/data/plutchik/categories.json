@@ -1,0 +1,33 @@
+{
+  "version": "1.0",
+  "source": "Generated from plutchik emotions",
+  "metadata": {
+    "total_categories": 1,
+    "total_emotions": 8,
+    "created": "2026-01-20"
+  },
+  "categories": [
+    {
+      "id": 1,
+      "name": "Plutchik Primary",
+      "short_name": "Plutchik Primar",
+      "description": "Emotions related to Plutchik Primary",
+      "color_hex": "#FFFF44",
+      "typical_vac_range": {
+        "valence": [
+          -0.7,
+          0.8
+        ],
+        "arousal": [
+          -0.4,
+          0.9
+        ],
+        "connection": [
+          -0.6,
+          0.8
+        ]
+      },
+      "emotion_count": 8
+    }
+  ]
+}

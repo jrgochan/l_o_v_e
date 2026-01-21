@@ -35,22 +35,42 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 
-async def compute_matrix():
+async def compute_matrix(collection_name: str = None):
     """
-    Compute all paths in the 87×87 matrix.
+    Compute all paths in the matrix for the specified collection.
     
     Note: Parallelization is built into PathMatrixService.
     """
     logger.info("=" * 70)
     logger.info("PATH MATRIX PRE-COMPUTATION")
     logger.info("=" * 70)
-    logger.info(f"Computing all 87×87 = 7,569 emotion transition paths")
+    logger.info(f"Collection: {collection_name}")
+    logger.info(f"Computing emotion transition paths")
     logger.info(f"Estimated time: 15-30 minutes")
     logger.info("")
     
     start_time = datetime.now()
     
     async with AsyncSessionLocal() as session:
+        # Get collection ID first
+        if collection_name:
+            from sqlalchemy import select
+            from app.models.emotion_definition import EmotionCollection
+            
+            stmt = select(EmotionCollection).where(EmotionCollection.name == collection_name)
+            result = await session.execute(stmt)
+            collection = result.scalar_one_or_none()
+            
+            if not collection:
+                logger.error(f"Collection '{collection_name}' not found!")
+                return False
+                
+            collection_id = str(collection.id)
+            logger.info(f"Resolved collection ID: {collection_id}")
+        else:
+            collection_id = None
+            logger.warning("No collection specified - computing for ALL emotions (mixed collections!)")
+
         service = PathMatrixService(session)
         
         try:
@@ -63,7 +83,8 @@ async def compute_matrix():
             
             # Start batch computation
             result = await service.compute_all_paths_batch(
-                job_id=job_id
+                job_id=job_id,
+                collection_id=collection_id
             )
             
             # Report results
@@ -96,8 +117,15 @@ async def compute_matrix():
 
 
 if __name__ == "__main__":
+    import argparse
+    
+    parser = argparse.ArgumentParser(description="Pre-compute path matrix")
+    parser.add_argument('--collection', type=str, help='Name of collection to compute paths for')
+    
+    args = parser.parse_args()
+
     try:
-        success = asyncio.run(compute_matrix())
+        success = asyncio.run(compute_matrix(args.collection))
         sys.exit(0 if success else 1)
     except KeyboardInterrupt:
         logger.warning("\n⚠️  Interrupted by user")

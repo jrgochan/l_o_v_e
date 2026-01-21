@@ -11,7 +11,7 @@ from sqlalchemy.pool import NullPool
 import uuid
 
 from app.database import Base
-from app.models.atlas_definition import AtlasDefinition
+from app.models.emotion_definition import EmotionDefinition, EmotionCollection
 from app.models.user_trajectory import UserTrajectory
 from app.models.user_trajectory import UserTrajectory
 from app.models.user import User
@@ -67,7 +67,7 @@ async def test_db(test_engine) -> AsyncGenerator[AsyncSession, None]:
 
 
 @pytest.fixture
-async def seeded_test_atlas(test_db: AsyncSession) -> List[AtlasDefinition]:
+async def seeded_test_atlas(test_db: AsyncSession) -> List[EmotionDefinition]:
     """
     Seed test database with essential emotions.
     Uses get-or-create pattern to avoid unique constraint violations.
@@ -75,9 +75,26 @@ async def seeded_test_atlas(test_db: AsyncSession) -> List[AtlasDefinition]:
     test_emotions = []
     from sqlalchemy import select
     
+    # Ensure a collection exists
+    stmt = select(EmotionCollection).where(EmotionCollection.name == "Test Collection")
+    col_res = await test_db.execute(stmt)
+    collection = col_res.scalar_one_or_none()
+    
+    if not collection:
+        collection = EmotionCollection(
+            id=uuid.uuid4(),
+            name="Test Collection",
+            is_default=True
+        )
+        test_db.add(collection)
+        await test_db.flush()
+    
     for emotion_name, emotion_data in TEST_EMOTIONS.items():
-        # Check if already exists
-        stmt = select(AtlasDefinition).where(AtlasDefinition.emotion_name == emotion_name)
+        # Check if already exists in this collection
+        stmt = select(EmotionDefinition).where(
+            EmotionDefinition.emotion_name == emotion_name,
+            EmotionDefinition.collection_id == collection.id
+        )
         result = await test_db.execute(stmt)
         existing = result.scalar_one_or_none()
         
@@ -85,8 +102,9 @@ async def seeded_test_atlas(test_db: AsyncSession) -> List[AtlasDefinition]:
             test_emotions.append(existing)
             continue
             
-        atlas_entry = AtlasDefinition(
+        atlas_entry = EmotionDefinition(
             id=uuid.uuid4(),
+            collection_id=collection.id,
             emotion_name=emotion_name,
             category=emotion_data["category"],
             definition=emotion_data["definition"],
@@ -219,6 +237,11 @@ async def cleanup_test_data(test_db: AsyncSession):
         # Delete in correct order to avoid FK violations
         from sqlalchemy import text
         # Child tables first
+        await test_db.execute(text("DELETE FROM emotion_relationships"))
+        await test_db.execute(text("DELETE FROM detected_emotions"))
+        await test_db.execute(text("DELETE FROM multi_emotion_analyses"))
+        await test_db.execute(text("DELETE FROM emotion_goals"))
+        
         await test_db.execute(text("DELETE FROM strategy_attempts"))
         await test_db.execute(text("DELETE FROM journey_waypoints"))
         await test_db.execute(text("DELETE FROM user_journeys"))
@@ -228,11 +251,13 @@ async def cleanup_test_data(test_db: AsyncSession):
         await test_db.execute(text("DELETE FROM path_matrix_cache"))
         
         # Chat tables
+        await test_db.execute(text("DELETE FROM session_analytics"))
         await test_db.execute(text("DELETE FROM chat_messages"))
         await test_db.execute(text("DELETE FROM chat_sessions"))
         
         # Parent tables last
-        await test_db.execute(text("DELETE FROM atlas_definitions"))
+        await test_db.execute(text("DELETE FROM emotion_definitions"))
+        await test_db.execute(text("DELETE FROM emotion_collections"))
         await test_db.execute(text("DELETE FROM users"))
         await test_db.commit()
 

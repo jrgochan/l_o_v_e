@@ -3,7 +3,7 @@
  *
  * Main 3D scene that combines all visual elements:
  * - Soul Sphere (optional background)
- * - Emotion Cloud (87 emotion points)
+ * - Emotion Cloud (Dynamic emotion points)
  * - Path Network (transition paths)
  */
 

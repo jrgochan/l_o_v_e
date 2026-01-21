@@ -4,7 +4,7 @@ from unittest.mock import MagicMock, AsyncMock, patch
 from uuid import uuid4
 from sqlalchemy.ext.asyncio import AsyncSession
 from app.services.path_planner import PathPlanner
-from app.models.atlas_definition import AtlasDefinition
+from app.models.emotion_definition import EmotionDefinition
 
 @pytest.fixture
 def mock_session():
@@ -17,7 +17,7 @@ def planner(mock_session):
 @pytest.fixture
 def mock_emotions():
     def create(name, category, vac):
-        return AtlasDefinition(
+        return EmotionDefinition(
             id=uuid4(),
             emotion_name=name,
             category=category,
@@ -35,7 +35,7 @@ async def test_astar_loop_prevention(planner, mock_emotions):
     goal = mock_emotions("Goal", "CatC", [1,0,0])
     
     # Graph: Start <-> Loop (Cycle), Loop -> Goal
-    async def get_neighbors(curr, g):
+    async def get_neighbors(curr, g, collection_id=None):
         if curr.id == start.id: return [loop_node]
         if curr.id == loop_node.id: return [start, goal] # Cycle back to start
         return []
@@ -59,7 +59,7 @@ async def test_astar_pruning_limit(planner, mock_emotions):
     goal = mock_emotions("Goal", "OtherCat", [1,0,0]) # Diff cat to force search
     
     # Path: Start -> N1 -> N2 -> N3 -> Goal (Length 5 nodes, 4 steps)
-    async def get_neighbors(curr, g):
+    async def get_neighbors(curr, g, collection_id=None):
         if curr.id == start.id: return [n1]
         if curr.id == n1.id: return [n2]
         if curr.id == n2.id: return [n3]
@@ -158,7 +158,7 @@ async def test_astar_queue_duplicates(planner, mock_emotions):
     goal = mock_emotions("Goal", "OtherCat", [1,0,0])
     
     # Return N1 twice to cause duplicates in queue
-    async def get_neighbors(curr, g):
+    async def get_neighbors(curr, g, collection_id=None):
         if curr.id == start.id: return [n1, n1]
         if curr.id == n1.id: return [goal]
         return []

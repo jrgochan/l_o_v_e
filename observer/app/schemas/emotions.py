@@ -1,4 +1,4 @@
-"""Atlas Emotion Schemas."""
+"""Emotion Schemas."""
 
 from datetime import datetime
 from typing import List, Optional
@@ -7,8 +7,8 @@ from uuid import UUID
 from pydantic import BaseModel, ConfigDict, Field
 
 
-class AtlasEmotionBase(BaseModel):
-    """Base schema for atlas emotion."""
+class EmotionBase(BaseModel):
+    """Base schema for an emotion."""
 
     emotion_name: str
     category: str
@@ -18,8 +18,8 @@ class AtlasEmotionBase(BaseModel):
     color_hint: Optional[str] = None
 
 
-class AtlasEmotionUpdate(BaseModel):
-    """Schema for updating atlas emotion."""
+class EmotionUpdate(BaseModel):
+    """Schema for updating an emotion."""
 
     category: Optional[str] = None
     definition: Optional[str] = None
@@ -28,8 +28,8 @@ class AtlasEmotionUpdate(BaseModel):
     color_hint: Optional[str] = None
 
 
-class AtlasEmotionResponse(AtlasEmotionBase):
-    """Schema for atlas emotion response."""
+class EmotionResponse(EmotionBase):
+    """Schema for emotion response."""
 
     id: UUID
     q_constant: List[float]

@@ -2,7 +2,7 @@
  * useCommandPalette Hook
  *
  * Manages the CMD+K command palette state and actions.
- * Provides keyboard-driven access to all 87 emotions with modifier key actions.
+ * Provides keyboard-driven access to all emotions with modifier key actions.
  *
  * Refactored to use sub-hooks for better maintainability.
  */

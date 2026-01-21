@@ -2,7 +2,8 @@
 
 import { useMemo } from "react";
 import { useExperienceStore } from "@/stores/useExperienceStore";
-import { CATEGORY_COLORS } from "@/types";
+import { useAtlasAdminStore } from "@/stores/useAtlasAdminStore";
+import { resolveEmotionColor } from "@/utils/emotion-colors";
 
 export function WaypointArrivalOverlay() {
   const isFlying = useExperienceStore((state) => state.isFlying);
@@ -10,6 +11,15 @@ export function WaypointArrivalOverlay() {
     (state) => state.flyoverCurrentWaypointIndex
   );
   const transitionPath = useExperienceStore((state) => state.transitionPath);
+
+  // Access full emotion data for color resolution
+  const allEmotions = useAtlasAdminStore((state) => state.allEmotions);
+
+  // Helper to resolve color by name
+  const getColorByName = (name: string) => {
+    const emotion = allEmotions.find((e) => e.name === name);
+    return resolveEmotionColor(emotion);
+  };
 
   // Calculate data derived from state (pure function of render)
   // Replaces useState/useEffect sync pattern
@@ -28,7 +38,7 @@ export function WaypointArrivalOverlay() {
         title: startInfo.emotion,
         subtitle: "Starting Point",
         description: `Leaving ${startInfo.category}...`,
-        color: CATEGORY_COLORS[startInfo.category] || "#ffffff",
+        color: getColorByName(startInfo.emotion),
         strategies: undefined as Array<{ name: string; time_required?: string }> | undefined,
       };
     } else if (flyoverCurrentWaypointIndex === totalPoints - 1) {
@@ -38,7 +48,7 @@ export function WaypointArrivalOverlay() {
         title: goalInfo.emotion,
         subtitle: "Destination Reached",
         description: `Welcome to ${goalInfo.category}`,
-        color: CATEGORY_COLORS[goalInfo.category] || "#ffffff",
+        color: getColorByName(goalInfo.emotion),
         strategies: undefined,
       };
     } else {
@@ -50,13 +60,13 @@ export function WaypointArrivalOverlay() {
           title: waypoint.emotion,
           subtitle: `Waypoint ${flyoverCurrentWaypointIndex} / ${waypoints.length}`,
           description: waypoint.reasoning,
-          color: CATEGORY_COLORS[waypoint.category] || "#ffffff",
+          color: getColorByName(waypoint.emotion),
           strategies: waypoint.strategies,
         };
       }
     }
     return null;
-  }, [isFlying, transitionPath, flyoverCurrentWaypointIndex]);
+  }, [isFlying, transitionPath, flyoverCurrentWaypointIndex, allEmotions]);
 
   if (!currentData) return null;
 

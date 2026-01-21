@@ -22,6 +22,7 @@ export interface ObserverEmotionResponse {
   total_count: number;
   emotions: Array<{
     id: string;
+    collection_id?: string;
     name: string;
     category: string;
     definition: string;

@@ -95,6 +95,7 @@ export type {
   UserContext,
   ContextualRecommendation,
   ChallengePattern,
+  EmotionCollection,
 } from "./api/observer";
 
 // Listener API

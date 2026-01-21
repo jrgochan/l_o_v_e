@@ -3,7 +3,7 @@ import pytest
 from uuid import uuid4
 from datetime import datetime
 from app.models.chat_message import ChatMessage
-from app.models.atlas_definition import AtlasDefinition
+from app.models.emotion_definition import EmotionDefinition
 
 def test_chat_message_properties():
     """Test ChatMessage convenience properties."""
@@ -59,7 +59,7 @@ def test_chat_message_to_dict():
     assert "emotion" not in d
     
     # With Emotion (mock relationship)
-    emotion = AtlasDefinition(
+    emotion = EmotionDefinition(
         id=e_id,
         emotion_name="Joy",
         category="Happiness",
@@ -85,7 +85,7 @@ def test_chat_message_to_dict():
 
 def test_chat_message_to_dict_full():
     """Test ChatMessage serialization full coverage."""
-    emotion = AtlasDefinition(
+    emotion = EmotionDefinition(
         id=uuid4(),
         emotion_name="Joy",
         category="Happiness",

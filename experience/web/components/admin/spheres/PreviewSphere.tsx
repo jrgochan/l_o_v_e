@@ -13,7 +13,7 @@
 import { Canvas } from "@react-three/fiber";
 import { BaseSphere, StandardLighting, getColorFromCategory } from "./BaseSphere";
 import type { AtlasEmotion } from "@/types/atlas-admin";
-import { CATEGORY_COLORS } from "@/types/atlas-admin";
+import { resolveEmotionColor } from "@/utils/emotion-colors";
 
 interface PreviewSphereProps {
   emotion: AtlasEmotion;
@@ -25,7 +25,7 @@ interface PreviewSphereProps {
  * Preview Sphere - Optimized for static display
  */
 export function PreviewSphere({ emotion, size = 120, showLabels = true }: PreviewSphereProps) {
-  const color = getColorFromCategory(emotion.category, CATEGORY_COLORS);
+  const color = resolveEmotionColor(emotion);
 
   // Position based on VAC (scaled for compact view)
   const position = [emotion.vac[0] * 0.8, emotion.vac[1] * 0.8, emotion.vac[2] * 0.8] as [

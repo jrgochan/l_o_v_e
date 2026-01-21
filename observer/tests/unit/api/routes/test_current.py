@@ -5,7 +5,7 @@ from uuid import uuid4
 from datetime import datetime
 from app.api.routes import current
 from app.models.user_trajectory import UserTrajectory
-from app.models.atlas_definition import AtlasDefinition
+from app.models.emotion_definition import EmotionDefinition
 
 @pytest.fixture
 def mock_db():
@@ -31,7 +31,7 @@ def mock_state():
 
 @pytest.fixture
 def mock_emotion():
-    em = MagicMock(spec=AtlasDefinition)
+    em = MagicMock(spec=EmotionDefinition)
     em.id = uuid4()
     em.emotion_name = "Joy"
     em.category = "Happiness"

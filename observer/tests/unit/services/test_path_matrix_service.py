@@ -7,7 +7,7 @@ from datetime import datetime, timezone
 from sqlalchemy.exc import SQLAlchemyError
 
 from app.services.path_matrix_service import PathMatrixService
-from app.models.atlas_definition import AtlasDefinition
+from app.models.emotion_definition import EmotionDefinition
 
 @pytest.fixture
 def mock_session():
@@ -38,8 +38,8 @@ def service(mock_session, mock_planner):
 async def test_compute_all_paths_batch_success(service, mock_session):
     """Test full batch computation success."""
     # Mock emotions
-    e1 = AtlasDefinition(id=uuid.uuid4(), emotion_name="E1", category="C1", vac_vector=[0.1, 0.2, 0.3])
-    e2 = AtlasDefinition(id=uuid.uuid4(), emotion_name="E2", category="C2", vac_vector=[0.4, 0.5, 0.6])
+    e1 = EmotionDefinition(id=uuid.uuid4(), emotion_name="E1", category="C1", vac_vector=[0.1, 0.2, 0.3])
+    e2 = EmotionDefinition(id=uuid.uuid4(), emotion_name="E2", category="C2", vac_vector=[0.4, 0.5, 0.6])
     
     # Mock Result for emotions query
     emotion_result = MagicMock()
@@ -69,8 +69,8 @@ async def test_compute_all_paths_batch_success(service, mock_session):
 @pytest.mark.asyncio
 async def test_compute_all_paths_batch_cached(service, mock_session):
     """Test skip cached paths."""
-    e1 = AtlasDefinition(id=uuid.uuid4(), emotion_name="E1", category="C1", vac_vector=[0.1, 0.2, 0.3])
-    e2 = AtlasDefinition(id=uuid.uuid4(), emotion_name="E2", category="C2", vac_vector=[0.4, 0.5, 0.6])
+    e1 = EmotionDefinition(id=uuid.uuid4(), emotion_name="E1", category="C1", vac_vector=[0.1, 0.2, 0.3])
+    e2 = EmotionDefinition(id=uuid.uuid4(), emotion_name="E2", category="C2", vac_vector=[0.4, 0.5, 0.6])
     
     emotion_result = MagicMock()
     emotion_result.scalars.return_value.all.return_value = [e1, e2]
@@ -97,8 +97,8 @@ async def test_compute_all_paths_batch_error(service, mock_session):
 @pytest.mark.asyncio
 async def test_compute_single_path(service):
     """Test single path data construction."""
-    e1 = AtlasDefinition(id=uuid.uuid4(), emotion_name="E1", category="C1", vac_vector=[0.1, 0.2, 0.3])
-    e2 = AtlasDefinition(id=uuid.uuid4(), emotion_name="E2", category="C2", vac_vector=[0.4, 0.5, 0.6])
+    e1 = EmotionDefinition(id=uuid.uuid4(), emotion_name="E1", category="C1", vac_vector=[0.1, 0.2, 0.3])
+    e2 = EmotionDefinition(id=uuid.uuid4(), emotion_name="E2", category="C2", vac_vector=[0.4, 0.5, 0.6])
     
     wp = MagicMock()
     wp.emotion_name = "Bridge"
@@ -121,8 +121,8 @@ async def test_compute_single_path(service):
 @pytest.mark.asyncio
 async def test_cache_path(service, mock_session):
     """Test SQL execution for caching."""
-    e1 = AtlasDefinition(id=uuid.uuid4(), emotion_name="E1", category="C1", vac_vector=[0.1, 0.2, 0.3])
-    e2 = AtlasDefinition(id=uuid.uuid4(), emotion_name="E2", category="C2", vac_vector=[0.4, 0.5, 0.6])
+    e1 = EmotionDefinition(id=uuid.uuid4(), emotion_name="E1", category="C1", vac_vector=[0.1, 0.2, 0.3])
+    e2 = EmotionDefinition(id=uuid.uuid4(), emotion_name="E2", category="C2", vac_vector=[0.4, 0.5, 0.6])
     path_data = {
         "distance": 1.0, "difficulty": "easy", "waypoint_count": 0,
         "requires_bridge": False, "estimated_time": "5m"
@@ -177,8 +177,8 @@ def test_calculate_vac_hash(service):
 @pytest.mark.asyncio
 async def test_compute_single_path_bridge_logic(service):
     """Test bridge detection logic."""
-    e1 = AtlasDefinition(id=uuid.uuid4(), emotion_name="A", vac_vector=[0,0,0], category="C")
-    e2 = AtlasDefinition(id=uuid.uuid4(), emotion_name="B", vac_vector=[0,0,0], category="C")
+    e1 = EmotionDefinition(id=uuid.uuid4(), emotion_name="A", vac_vector=[0,0,0], category="C")
+    e2 = EmotionDefinition(id=uuid.uuid4(), emotion_name="B", vac_vector=[0,0,0], category="C")
     
     # Case 1: No bridge
     wp1 = MagicMock()
@@ -299,9 +299,9 @@ async def test_get_all_cached_paths_filters(service, mock_session):
 @pytest.mark.asyncio
 async def test_compute_all_paths_batch_partial_failure(service, mock_session):
     """Test batch continuing after single failure."""
-    e1 = AtlasDefinition(id=uuid.uuid4(), emotion_name="E1", vac_vector=[0,0,0], category="C")
-    e2 = AtlasDefinition(id=uuid.uuid4(), emotion_name="E2", vac_vector=[0,0,0], category="C")
-    e3 = AtlasDefinition(id=uuid.uuid4(), emotion_name="E3", vac_vector=[0,0,0], category="C")
+    e1 = EmotionDefinition(id=uuid.uuid4(), emotion_name="E1", vac_vector=[0,0,0], category="C")
+    e2 = EmotionDefinition(id=uuid.uuid4(), emotion_name="E2", vac_vector=[0,0,0], category="C")
+    e3 = EmotionDefinition(id=uuid.uuid4(), emotion_name="E3", vac_vector=[0,0,0], category="C")
     
     emotion_result = MagicMock()
     emotion_result.scalars.return_value.all.return_value = [e1, e2, e3]
@@ -312,7 +312,7 @@ async def test_compute_all_paths_batch_partial_failure(service, mock_session):
         mock_cached.return_value = False
         
         # Setup _compute_single_path to fail for E2->E1 but succeed for others
-        async def side_effect(from_e, to_e, uid):
+        async def side_effect(from_e, to_e, uid, collection_id=None):
             if from_e.emotion_name == "E1" and to_e.emotion_name == "E2":
                 raise ValueError("Fail path")
             return {
@@ -395,7 +395,7 @@ async def test_compute_batch_progress(service, mock_session):
     # Need 4 emotions => 4*3 = 12 paths (> 10)
     emotions = []
     for i in range(4):
-        emotions.append(AtlasDefinition(
+        emotions.append(EmotionDefinition(
             id=uuid.uuid4(), 
             emotion_name=f"E{i}", 
             vac_vector=[0,0,0], 

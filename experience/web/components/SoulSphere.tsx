@@ -12,6 +12,7 @@ import { useFrame } from "@react-three/fiber";
 import * as THREE from "three";
 import { useExperienceStore } from "@/stores/useExperienceStore";
 import { useSettingsStore } from "@/stores/useSettingsStore";
+import { useAtlasAdminStore } from "@/stores/useAtlasAdminStore";
 
 // Inline vertex shader
 const vertexShader = `
@@ -220,6 +221,7 @@ void main() {
 }
 `;
 
+
 export function SoulSphere() {
   const meshRef = useRef<THREE.Mesh>(null);
   const materialRef = useRef<THREE.ShaderMaterial>(null);
@@ -249,6 +251,64 @@ export function SoulSphere() {
     }
   }, [pathAnimationMode]);
 
+  const allEmotions = useAtlasAdminStore((state) => state.allEmotions);
+  const selectedEmotionIds = useAtlasAdminStore((state) => state.selectedEmotionIds);
+
+  // Compute aggregate VAC and Color
+  const aggregateColor = useMemo(() => {
+    // Default Cyan if no selection
+    if (selectedEmotionIds.size === 0) return new THREE.Color("#00FFFF"); // Cyan
+
+    const selected = allEmotions.filter((e) => selectedEmotionIds.has(e.id));
+    if (selected.length === 0) return new THREE.Color("#00FFFF");
+
+    // Calculate average VAC
+    const agg = selected.reduce(
+      (acc, e) => {
+        acc[0] += e.vac[0];
+        acc[1] += e.vac[1];
+        acc[2] += e.vac[2];
+        return acc;
+      },
+      [0, 0, 0] as [number, number, number]
+    );
+
+    const count = selected.length;
+    const v = agg[0] / count;
+    const a = agg[1] / count;
+    const c = agg[2] / count;
+
+    // Axis colors (matching VACAxisLabels3D)
+    // Valence: Cyan (+) / Red (-)
+    const cV = v >= 0 ? new THREE.Color("#00FFFF") : new THREE.Color("#FF0000");
+    // Arousal: Yellow (+) / Blue (-)
+    const cA = a >= 0 ? new THREE.Color("#FFFF00") : new THREE.Color("#0000FF");
+    // Connection: Purple (+) / Gray (-)
+    const cC = c >= 0 ? new THREE.Color("#800080") : new THREE.Color("#808080");
+
+    // Weight by magnitude of deviation from center
+    const wV = Math.abs(v);
+    const wA = Math.abs(a);
+    const wC = Math.abs(c);
+    const totalW = wV + wA + wC;
+
+    // If perfectly neutral, default to Cyan or White? Defaulting to Cyan as per "default" request
+    if (totalW < 0.01) return new THREE.Color("#00FFFF");
+
+    // Weighted blend
+    const mixed = new THREE.Color(0, 0, 0);
+    mixed.r = (cV.r * wV + cA.r * wA + cC.r * wC) / totalW;
+    mixed.g = (cV.g * wV + cA.g * wA + cC.g * wC) / totalW;
+    mixed.b = (cV.b * wV + cA.b * wA + cC.b * wC) / totalW;
+
+    // Boost saturation slightly as averaging can wash out colors
+    const hsl = { h: 0, s: 0, l: 0 };
+    mixed.getHSL(hsl);
+    mixed.setHSL(hsl.h, Math.min(hsl.s * 1.2, 1.0), hsl.l);
+
+    return mixed;
+  }, [selectedEmotionIds, allEmotions]);
+
   // Create geometry and material
   const geometry = useMemo(() => {
     return new THREE.IcosahedronGeometry(1.0, 20); // High detail sphere
@@ -266,8 +326,8 @@ export function SoulSphere() {
         uArousal: { value: 0 },
         uConnection: { value: 0 },
         uMode: { value: 0 }, // Initial mode
-        uColorNeg: { value: new THREE.Color(0.545, 0.0, 0.0) }, // Crimson
-        uColorPos: { value: new THREE.Color(0.0, 1.0, 1.0) }, // Cyan
+        uColorNeg: { value: new THREE.Color("#FF4444") }, // Will be overridden
+        uColorPos: { value: new THREE.Color("#44FF44") }, // Will be overridden
         uCameraPosition: { value: new THREE.Vector3(0, 0, 5) },
       },
     });
@@ -277,6 +337,10 @@ export function SoulSphere() {
   useFrame(() => {
     if (materialRef.current) {
       materialRef.current.uniforms.uMode.value = modeInt;
+      // Override standard valence mixing with our computed aggregate color
+      // By setting both Neg and Pos to the same color, mix() returns that color
+      materialRef.current.uniforms.uColorNeg.value.copy(aggregateColor);
+      materialRef.current.uniforms.uColorPos.value.copy(aggregateColor);
     }
   });
 
@@ -289,7 +353,7 @@ export function SoulSphere() {
 
     materialRef.current.uniforms.uTime.value += delta;
 
-    // Update uniforms from store
+    // Update uniforms from store for ANIMATION (noise, pulse), not color
     materialRef.current.uniforms.uValence.value = currentVAC[0];
     materialRef.current.uniforms.uArousal.value = currentVAC[1];
     materialRef.current.uniforms.uConnection.value = currentVAC[2];

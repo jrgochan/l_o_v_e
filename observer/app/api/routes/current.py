@@ -212,7 +212,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.api.schemas.common import EmotionInfo, MetricsInfo, QuaternionModel
 from app.api.schemas.state import StateResponse
 from app.database import get_db
-from app.models.atlas_definition import AtlasDefinition
+from app.models.emotion_definition import EmotionDefinition
 from app.models.user_trajectory import UserTrajectory
 
 logger = logging.getLogger(__name__)
@@ -262,8 +262,8 @@ async def get_current_state(user_id: UUID, db: AsyncSession = Depends(get_db)) -
         previous_state = prev_result.scalar_one_or_none()
 
         # Get emotion info
-        emotion_stmt = select(AtlasDefinition).where(
-            AtlasDefinition.id == current_state.dominant_emotion_id
+        emotion_stmt = select(EmotionDefinition).where(
+            EmotionDefinition.id == current_state.dominant_emotion_id
         )
         emotion_result = await db.execute(emotion_stmt)
         emotion = emotion_result.scalar_one_or_none()

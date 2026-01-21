@@ -141,7 +141,8 @@ def main(
     with_bootstrap: bool = False,
     verify: bool = False,
     dry_run: bool = False,
-    force_reseed: bool = False
+    force_reseed: bool = False,
+    dataset: str = "atlas"
 ):
     """Main orchestration function."""
     start_time = datetime.now()
@@ -149,6 +150,7 @@ def main(
     print_header("LOVE STACK - MASTER SEEDING ORCHESTRATOR")
     
     print(f"Configuration:")
+    print(f"  Dataset: {dataset}")
     print(f"  Level: {level}")
     print(f"  Include demo data: {with_demo}")
     print(f"  Include bootstrap data: {with_bootstrap}")
@@ -162,9 +164,34 @@ def main(
     # Add force-reseed flag if specified
     reseed_args = ["--force-reseed"] if force_reseed else []
     
-    # PHASE 1: Foundation (CRITICAL - Atlas emotions are the foundation)
-    # This MUST be first and MUST succeed
-    steps.append(("Atlas Emotions (87)", "seed_atlas.py", reseed_args.copy()))
+    # PHASE 1: Foundation (CRITICAL)
+    # Configure dataset args
+    seed_emotions_args = reseed_args.copy()
+    seed_emotions_args.append("--create-collection")
+    
+    datasets_to_seed = []
+    
+    if dataset.lower() == 'all':
+        datasets_to_seed = [
+            ("Atlas Emotions (87)", "data/atlas/emotions.json", "Atlas of the Heart"),
+            ("Plutchik Emotions (8)", "data/plutchik/emotions.json", "Plutchik Wheel"),
+            ("GoEmotions (28)", "data/goemotions/emotions.json", "GoEmotions"),
+            ("UAL (Unified Affective Lexicon)", "data/ual/emotions.json", "Unified Affective Lexicon")
+        ]
+    elif dataset.lower() == "plutchik":
+        datasets_to_seed = [("Plutchik Emotions (8)", "data/plutchik/emotions.json", "Plutchik Wheel")]
+    elif dataset.lower() == "goemotions":
+        datasets_to_seed = [("GoEmotions (28)", "data/goemotions/emotions.json", "GoEmotions")]
+    elif dataset.lower() == "ual":
+        datasets_to_seed = [("UAL (Unified Affective Lexicon)", "data/ual/emotions.json", "Unified Affective Lexicon")]
+    else:
+        datasets_to_seed = [("Atlas Emotions (87)", "data/atlas/emotions.json", "Atlas of the Heart")]
+        
+    for name, file_path, coll_name in datasets_to_seed:
+        args_list = reseed_args.copy()
+        args_list.append("--create-collection")
+        args_list.extend(["--file", file_path, "--collection", coll_name])
+        steps.append((name, "seed_emotions.py", args_list))
     
     # PHASE 1.5: Initial Users (Admin/Demo)
     steps.append(("Initial Users", "seed_users.py", []))
@@ -214,7 +241,7 @@ def main(
             failed_steps.append((step_name, output))
             
             # For critical steps, stop execution
-            if step_name in ["Atlas Emotions (87)", "Transition System Data"]:
+            if step_name in ["Atlas Emotions (87)", "Plutchik Emotions (8)", "GoEmotions (28)", "Transition System Data"]:
                 print_error("Critical seeding step failed, stopping execution")
                 break
     
@@ -331,6 +358,12 @@ if __name__ == "__main__":
         action='store_true',
         help='Force re-seed (clear existing data without prompts)'
     )
+    parser.add_argument(
+        '--dataset',
+        choices=['atlas', 'plutchik', 'goemotions', 'ual', 'all'],
+        default='atlas',
+        help='Dataset to seed (default: atlas)'
+    )
     
     args = parser.parse_args()
     
@@ -341,7 +374,8 @@ if __name__ == "__main__":
             with_bootstrap=args.with_bootstrap,
             verify=args.verify,
             dry_run=args.dry_run,
-            force_reseed=args.force_reseed
+            force_reseed=args.force_reseed,
+            dataset=args.dataset
         )
     except KeyboardInterrupt:
         print(f"\n\n{Colors.WARNING}⚠️  Interrupted by user{Colors.ENDC}")

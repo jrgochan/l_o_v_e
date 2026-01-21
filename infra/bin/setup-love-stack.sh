@@ -7,7 +7,7 @@
 #   - Dependency verification and installation
 #   - Python virtual environment creation for each module
 #   - Database initialization with migrations
-#   - Data seeding (87 emotions, strategies, patterns)
+#   - Data seeding (emotions, strategies, patterns)
 #   - Service configuration
 #
 # Requirements:
@@ -53,6 +53,7 @@ QUIET=false
 UPDATE_MODE=false
 MINIMAL_MODE=false
 CLEAN_MODE=false
+DATASET=""
 
 show_help() {
     # Check if terminal supports colors
@@ -89,6 +90,7 @@ show_help() {
         echo "    --clean                 Clean mode: drop DB, remove venvs, fresh install"
         echo "    --force-reseed          Force re-seed DB from JSON (no prompts)"
         echo "    --precompute-paths      Pre-compute all 7,569 transition paths (30-60 min)"
+        echo "    --dataset NAME          Select dataset (atlas/plutchik) [default: atlas]"
         echo ""
         echo -e "${BOLD}EXAMPLES${NC}"
         echo "    Interactive setup:        ./setup-love-stack.sh"
@@ -174,6 +176,10 @@ while [[ $# -gt 0 ]]; do
         --precompute-paths)
             PRECOMPUTE_PATHS=true
             shift
+            ;;
+        --dataset)
+            DATASET="$2"
+            shift 2
             ;;
         *)
             echo "Unknown option: $1"
@@ -786,7 +792,7 @@ if [ "$SKIP_DATABASE" = false ]; then
     echo ""
     print_info "The database needs to be initialized with tables and seed data."
     echo "This includes:"
-    echo "  • 87 emotions from Atlas of the Heart"
+    echo "  • Emotions from default collection"
     echo "  • 107 evidence-based strategies"
     echo "  • 18 transition patterns"
     echo "  • Category mappings and transitions"
@@ -798,6 +804,17 @@ if [ "$SKIP_DATABASE" = false ]; then
         if [ "$FORCE_RESEED" = true ]; then
             DB_INIT_ARGS+=("--force-reseed")
         fi
+        
+        # Prompt for dataset if not specified
+        if [ -z "$DATASET" ] && [ "$AUTO_YES" = false ]; then
+             echo ""
+             print_info "Available datasets: atlas, plutchik, goemotions, all"
+             read -r -p "Select emotion dataset (default: atlas): " input_dataset
+             DATASET="${input_dataset:-atlas}"
+        fi
+        DATASET="${DATASET:-atlas}"
+        
+        DB_INIT_ARGS+=("--dataset" "$DATASET")
         if [ "$PRECOMPUTE_PATHS" = true ]; then
             DB_INIT_ARGS+=("--precompute-paths")
         fi

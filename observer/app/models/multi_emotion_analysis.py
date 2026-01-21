@@ -412,7 +412,7 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 from app.database import Base
 
 if TYPE_CHECKING:
-    from app.models.atlas_definition import AtlasDefinition
+    from app.models.emotion_definition import EmotionDefinition
     from app.models.chat_message import ChatMessage
     from app.models.chat_session import ChatSession
 
@@ -569,7 +569,7 @@ class DetectedEmotion(Base):
         index=True,
     )
     emotion_id: Mapped[Optional[UUID]] = mapped_column(
-        ForeignKey("atlas_definitions.id"), index=True
+        ForeignKey("emotion_definitions.id"), index=True
     )
 
     # Detection data
@@ -594,7 +594,7 @@ class DetectedEmotion(Base):
 
     # Relationships
     analysis: Mapped["MultiEmotionAnalysis"] = relationship(back_populates="detected_emotions")
-    emotion: Mapped[Optional["AtlasDefinition"]] = relationship(foreign_keys=[emotion_id])
+    emotion: Mapped[Optional["EmotionDefinition"]] = relationship(foreign_keys=[emotion_id])
 
     # Relationships where this emotion is emotion_a or emotion_b
     relationships_as_a: Mapped[List["EmotionRelationship"]] = relationship(
@@ -788,7 +788,7 @@ class EmotionGoal(Base):
     user_id: Mapped[str] = mapped_column(String(255), index=True)
 
     # Goal definition
-    goal_emotion_id: Mapped[Optional[UUID]] = mapped_column(ForeignKey("atlas_definitions.id"))
+    goal_emotion_id: Mapped[Optional[UUID]] = mapped_column(ForeignKey("emotion_definitions.id"))
     priority: Mapped[int] = mapped_column(Integer, default=1)  # For multiple goals
     target_date: Mapped[Optional[datetime]] = mapped_column()
 
@@ -802,7 +802,7 @@ class EmotionGoal(Base):
 
     # Relationships
     session: Mapped[Optional["ChatSession"]] = relationship(foreign_keys=[session_id])
-    goal_emotion: Mapped[Optional["AtlasDefinition"]] = relationship(foreign_keys=[goal_emotion_id])
+    goal_emotion: Mapped[Optional["EmotionDefinition"]] = relationship(foreign_keys=[goal_emotion_id])
 
     def __repr__(self) -> str:
         """Represent the object as a string."""

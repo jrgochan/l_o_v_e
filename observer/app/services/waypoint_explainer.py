@@ -192,7 +192,7 @@ Integration Points:
     Calls::
 
         - Database: waypoint_explanation_templates
-        - AtlasDefinition: For VAC coordinates
+        - EmotionDefinition: For VAC coordinates
         - Pure algorithms: VAC delta calculations
 
 References:
@@ -209,7 +209,7 @@ from uuid import UUID
 from sqlalchemy import text
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.models.atlas_definition import AtlasDefinition
+from app.models.emotion_definition import EmotionDefinition
 
 logger = logging.getLogger(__name__)
 
@@ -227,9 +227,9 @@ class WaypointExplainer:
 
     async def explain_waypoint(
         self,
-        waypoint_emotion: AtlasDefinition,
-        previous_emotion: AtlasDefinition,
-        next_emotion: AtlasDefinition,
+        waypoint_emotion: EmotionDefinition,
+        previous_emotion: EmotionDefinition,
+        next_emotion: EmotionDefinition,
         path_context: Optional[Dict[str, Any]] = None,
     ) -> Dict[str, Any]:
         """Generate comprehensive explanation for a waypoint.
@@ -319,9 +319,9 @@ class WaypointExplainer:
     async def _format_template_explanation(
         self,
         template: Dict[str, Any],
-        waypoint: AtlasDefinition,
-        previous: AtlasDefinition,
-        next_emotion: AtlasDefinition,
+        waypoint: EmotionDefinition,
+        previous: EmotionDefinition,
+        next_emotion: EmotionDefinition,
     ) -> Dict[str, Any]:
         """Format template data with computed VAC analysis."""
         # Calculate VAC analysis (always computed, even with templates)
@@ -348,7 +348,7 @@ class WaypointExplainer:
         }
 
     async def _generate_fallback_explanation(
-        self, waypoint: AtlasDefinition, previous: AtlasDefinition, next_emotion: AtlasDefinition
+        self, waypoint: EmotionDefinition, previous: EmotionDefinition, next_emotion: EmotionDefinition
     ) -> Dict[str, Any]:
         """Generate explanation algorithmically when no template exists.
 
@@ -502,7 +502,7 @@ class WaypointExplainer:
         return "Appropriate relational stance for this transition stage"
 
     def _generate_purpose_from_vac(
-        self, waypoint: AtlasDefinition, vac_analysis: Dict[str, Any]
+        self, waypoint: EmotionDefinition, vac_analysis: Dict[str, Any]
     ) -> str:
         """Generate psychological purpose from VAC analysis."""
         purposes = []
@@ -540,7 +540,7 @@ class WaypointExplainer:
         return changes or ["Emotional state shifted"]
 
     def _generate_readiness_signs(
-        self, waypoint: AtlasDefinition, _vac_analysis: Dict[str, Any]
+        self, waypoint: EmotionDefinition, _vac_analysis: Dict[str, Any]
     ) -> List[str]:
         """Generate readiness signs based on waypoint characteristics."""
         signs = [
@@ -561,7 +561,7 @@ class WaypointExplainer:
         return signs
 
     def _generate_warning_signs(
-        self, waypoint: AtlasDefinition, _vac_analysis: Dict[str, Any]
+        self, waypoint: EmotionDefinition, _vac_analysis: Dict[str, Any]
     ) -> List[str]:
         """Generate warning signs based on waypoint characteristics."""
         warnings = []

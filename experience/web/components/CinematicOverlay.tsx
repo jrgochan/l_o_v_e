@@ -10,6 +10,7 @@
 import { useEffect, useState } from "react";
 import type { AtlasEmotion } from "@/types";
 import { CATEGORY_COLORS } from "@/types";
+import { resolveEmotionColor } from "@/utils/emotion-colors";
 
 interface Props {
   activeEmotions: AtlasEmotion[];
@@ -78,11 +79,10 @@ export function CinematicOverlay({
       {/* Mode 1: Large Cinematic Text (Few Emotions) or Waiting State */}
       {(isWaiting || !isGridMode) && (
         <div
-          className={`text-center transition-all duration-1000 transform ${
-            fadeState === "in"
-              ? "opacity-100 translate-y-0 scale-100"
-              : "opacity-0 translate-y-4 scale-95"
-          }`}
+          className={`text-center transition-all duration-1000 transform ${fadeState === "in"
+            ? "opacity-100 translate-y-0 scale-100"
+            : "opacity-0 translate-y-4 scale-95"
+            }`}
         >
           <h1 className="text-4xl md:text-6xl lg:text-7xl font-thin text-white tracking-[0.2em] uppercase drop-shadow-[0_0_15px_rgba(255,255,255,0.3)] max-w-4xl leading-tight">
             {displayText}
@@ -103,7 +103,7 @@ export function CinematicOverlay({
         <div className="w-full max-w-7xl max-h-[80vh] overflow-y-auto custom-scrollbar px-8 py-12 pointer-events-auto flex flex-col items-center">
           <div className="flex flex-wrap justify-center gap-3 shrink-0">
             {activeEmotions.map((emotion) => {
-              const color = CATEGORY_COLORS[emotion.category] || "#888888";
+              const color = resolveEmotionColor(emotion);
               return (
                 <div
                   key={emotion.id}

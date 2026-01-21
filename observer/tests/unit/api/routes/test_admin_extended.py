@@ -5,10 +5,10 @@ from uuid import uuid4
 from fastapi import HTTPException
 from app.api.routes import admin
 from app.models.user import User
-from app.models.atlas_definition import AtlasDefinition
+from app.models.emotion_definition import EmotionDefinition
 from app.models.transition_strategy import TransitionStrategy
 from app.schemas.user import UserUpdate
-from app.schemas.atlas import AtlasEmotionUpdate
+from app.schemas.emotions import EmotionUpdate
 from app.schemas.strategies import StrategyUpdate
 from app.schemas.bootstrap import BootstrapDataUpdate
 
@@ -85,7 +85,7 @@ async def test_import_atlas_data_service_failure(mock_db, mock_admin):
     }
     
     # Mock existing emotion to trigger update logic
-    existing_emotion = AtlasDefinition(
+    existing_emotion = EmotionDefinition(
         id=uuid4(), 
         emotion_name="TestJoy", 
         definition="Old def",
@@ -136,7 +136,7 @@ async def test_update_atlas_emotion_not_found(mock_db, mock_admin):
     mock_db.execute.return_value = result
     
     with pytest.raises(HTTPException) as exc:
-        await admin.update_atlas_emotion(emotion_id, AtlasEmotionUpdate(category="Joy"), mock_db, mock_admin)
+        await admin.update_atlas_emotion(emotion_id, EmotionUpdate(category="Joy"), mock_db, mock_admin)
         
     assert exc.value.status_code == 404
 
@@ -144,14 +144,14 @@ async def test_update_atlas_emotion_not_found(mock_db, mock_admin):
 async def test_update_atlas_emotion_service_failure(mock_db, mock_admin):
     """Test 400 when calculation service fails during update."""
     emotion_id = uuid4()
-    emotion = AtlasDefinition(id=emotion_id, emotion_name="Joy")
+    emotion = EmotionDefinition(id=emotion_id, emotion_name="Joy")
     
     result = MagicMock()
     result.scalars.return_value.first.return_value = emotion
     mock_db.execute.return_value = result
     
     # Update that triggers VAC recalc
-    update = AtlasEmotionUpdate(vac_vector=[1.0, 0.5, 0.5])
+    update = EmotionUpdate(vac_vector=[1.0, 0.5, 0.5])
     
     # Patch app.services because local import
     with patch("app.services.get_quaternion_builder") as mock_get_qb:

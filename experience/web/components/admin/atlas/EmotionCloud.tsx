@@ -13,7 +13,8 @@ import { Html } from "@react-three/drei";
 import * as THREE from "three";
 import { useAtlasAdminStore } from "@/stores/useAtlasAdminStore";
 import { useSettingsStore } from "@/stores/useSettingsStore";
-import { CATEGORY_COLORS, BRIDGE_EMOTIONS } from "@/types/atlas-admin";
+import { BRIDGE_EMOTIONS } from "@/types/atlas-admin";
+import { resolveEmotionColor } from "@/utils/emotion-colors";
 import type { AtlasEmotion, PathAnimationMode } from "@/types/atlas-admin";
 //
 import { AnimatedEmotionNode } from "../emotions/AnimatedEmotionNode";
@@ -89,7 +90,7 @@ export function EmotionCloud({ enableFloatingLabels = false }: EmotionCloudProps
           // Only add lights for selected/hovered emotions to avoid performance hit
           if (!isSelected && !isHovered) return null;
 
-          const categoryColor = CATEGORY_COLORS[emotion.category] || "#888888";
+          const categoryColor = resolveEmotionColor(emotion);
           const lightColor = new THREE.Color(categoryColor);
 
           // Warm or cool based on valence
@@ -167,9 +168,9 @@ function EmotionSphere({
 
   // Color based on category
   const color = useMemo(() => {
-    const categoryColor = CATEGORY_COLORS[emotion.category] || "#888888";
+    const categoryColor = resolveEmotionColor(emotion);
     return new THREE.Color(categoryColor);
-  }, [emotion.category]);
+  }, [emotion]);
 
   // Size calculation
   const baseSize = 0.06 * settings.emotionSize;
@@ -391,7 +392,7 @@ function FloatingEmotionLabel({
   isHovered: boolean;
   isBridge: boolean;
 }) {
-  const categoryColor = CATEGORY_COLORS[emotion.category] || "#888888";
+  const categoryColor = resolveEmotionColor(emotion);
   const labelStyle = getLabelStyle(mode, isSelected, isHovered, categoryColor);
 
   return (

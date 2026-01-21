@@ -183,7 +183,7 @@ from typing import Any, Dict, List, Optional
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.models.atlas_definition import AtlasDefinition
+from app.models.emotion_definition import EmotionDefinition
 from app.models.transition_strategy import (
     PatternStrategy,
     StrategyAttempt,
@@ -208,8 +208,8 @@ class StrategyRecommender:
 
     async def get_strategies_for_transition(
         self,
-        from_emotion: AtlasDefinition,
-        to_emotion: AtlasDefinition,
+        from_emotion: EmotionDefinition,
+        to_emotion: EmotionDefinition,
         user_id: Optional[str] = None,
         limit: int = 5,
     ) -> List[Dict[str, Any]]:
@@ -243,7 +243,7 @@ class StrategyRecommender:
         return strategies
 
     async def _match_to_pattern(
-        self, from_emotion: AtlasDefinition, to_emotion: AtlasDefinition
+        self, from_emotion: EmotionDefinition, to_emotion: EmotionDefinition
     ) -> Optional[TransitionPattern]:
         """Match an emotion transition to a predefined pattern.
 

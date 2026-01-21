@@ -4,7 +4,7 @@ from unittest.mock import AsyncMock, MagicMock
 from typing import List
 from uuid import uuid4
 from app.services.emotion_mapper import EmotionMapper
-from app.models.atlas_definition import AtlasDefinition
+from app.models.emotion_definition import EmotionDefinition
 
 # ============================================================================
 # FIXTURES
@@ -17,7 +17,7 @@ def mock_session():
     
     # Create sample emotions
     # 1. Joy: High Valence, High Arousal
-    joy = AtlasDefinition(
+    joy = EmotionDefinition(
         id=uuid4(),
         emotion_name="Joy",
         vac_vector=[0.8, 0.8, 0.5],
@@ -25,7 +25,7 @@ def mock_session():
     )
     
     # 2. Sadness: Low Valence, Low Arousal
-    sadness = AtlasDefinition(
+    sadness = EmotionDefinition(
         id=uuid4(),
         emotion_name="Sadness",
         vac_vector=[-0.8, -0.6, -0.5],
@@ -33,7 +33,7 @@ def mock_session():
     )
     
     # 3. Neutral: Zero
-    neutral = AtlasDefinition(
+    neutral = EmotionDefinition(
         id=uuid4(),
         emotion_name="Neutral",
         vac_vector=[0.0, 0.0, 0.0],
@@ -52,8 +52,8 @@ def mock_session():
     # 3. query specific id -> .scalar_one()
     
     # We need to handle sequential calls.
-    # First call: select(AtlasDefinition) -> returns list
-    # Second call: select(AtlasDefinition).where(...) -> returns single
+    # First call: select(EmotionDefinition) -> returns list
+    # Second call: select(EmotionDefinition).where(...) -> returns single
     
     session.execute.return_value = mock_result
     
@@ -266,7 +266,7 @@ async def test_get_top_k_nearest_malformed_embedding(emotion_mapper, mock_sessio
 @pytest.mark.asyncio
 async def test_get_top_k_nearest_combinations(emotion_mapper, mock_session):
     """Test get_top_k_nearest with various input combinations for branch coverage."""
-    emotion = MagicMock(spec=AtlasDefinition)
+    emotion = MagicMock(spec=EmotionDefinition)
     emotion.id = uuid4()
     emotion.vac_vector = [0.8, 0.8, 0.8]
     emotion.semantic_embedding = [0.1] * 3
@@ -343,3 +343,95 @@ async def test_find_nearest_vac_only_method(emotion_mapper, mock_session):
     
     # Verify result
     assert result.emotion_name == "Joy"
+
+@pytest.mark.asyncio
+async def test_find_nearest_with_collection(emotion_mapper, mock_session):
+    """Test finding nearest emotion with collection ID filtering."""
+    collection_id = str(uuid4())
+    
+    # Setup mocks - ensure emotions are returned
+    mock_res = MagicMock()
+    emotions = mock_session._dataset
+    mock_res.scalars.return_value.all.return_value = emotions
+    
+    def side_effect(stmt):
+        return mock_res
+        
+    mock_session.execute.side_effect = side_effect
+    
+    # Call with collection_id
+    await emotion_mapper.find_nearest(
+        vac_values=[0.8, 0.8, 0.5], 
+        collection_id=collection_id
+    )
+    
+    # verify execution arguments check for collection_id UUID conversion
+    # We can inspect the calls to execute
+    calls = mock_session.execute.call_args_list
+    assert len(calls) > 0
+    first_call_stmt = str(calls[0][0][0])
+    
+    # Check that WHERE clause was added for collection_id
+    # SQLAlchemy string representation usually includes the WHERE clause
+    assert "WHERE" in first_call_stmt or "where" in first_call_stmt
+
+@pytest.mark.asyncio
+async def test_get_top_k_nearest_with_collection(emotion_mapper, mock_session):
+    """Test top K ranking with collection ID filtering."""
+    collection_id = str(uuid4())
+    
+    mock_res = MagicMock()
+    emotions = mock_session._dataset
+    mock_res.scalars.return_value.all.return_value = emotions
+    
+    # Reset side effect from fixture to plain return
+    mock_session.execute.side_effect = None
+    mock_session.execute.return_value = mock_res
+    
+    await emotion_mapper.get_top_k_nearest(
+        vac_values=[0.0, 0.0, 0.0], 
+        k=3,
+        collection_id=collection_id
+    )
+    
+    # Verify execute called
+    assert mock_session.execute.called
+    calls = mock_session.execute.call_args_list
+    first_call_stmt = str(calls[0][0][0])
+    assert "WHERE" in first_call_stmt or "where" in first_call_stmt
+
+@pytest.mark.asyncio
+async def test_find_nearest_malformed_embedding(emotion_mapper, mock_session):
+    """Test handling of malformed embeddings in find_nearest."""
+    # Mock emotion with invalid embedding
+    class BadEmotion:
+        id = uuid4()
+        vac_vector = [0.1, 0.2, 0.3]
+        category = "Test"
+        emotion_name = "BadData"
+        
+        @property
+        def semantic_embedding(self):
+            raise TypeError("Bad vector")
+            
+    bad_emotion = BadEmotion()
+    
+    mock_res = MagicMock()
+    # First call returns list
+    mock_res.scalars.return_value.all.return_value = [bad_emotion]
+    # Second call (scalar_one) returns the item
+    mock_res.scalar_one.return_value = bad_emotion
+    
+    def side_effect(stmt):
+        return mock_res
+        
+    mock_session.execute.side_effect = side_effect
+    
+    # Should not raise error, just treat semantic dist as 0
+    # Provide text_embedding to ensure we try to access emotion_embedding
+    result = await emotion_mapper.find_nearest(
+        vac_values=[0.1, 0.2, 0.3], 
+        text_embedding=[0.1]*384
+    )
+    
+    assert result.emotion_name == "BadData"

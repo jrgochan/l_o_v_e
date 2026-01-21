@@ -150,7 +150,7 @@ export function EmotionsTab() {
         <div>
           <h2 className="text-xl font-semibold text-white mb-1">Emotion Definitions</h2>
           <p className="text-gray-400 text-sm">
-            Manage the 87 canonical emotions. Changes affect the entire platform.
+            Manage the canonical emotions. Changes affect the entire platform.
           </p>
         </div>
         <div className="flex items-center gap-3">

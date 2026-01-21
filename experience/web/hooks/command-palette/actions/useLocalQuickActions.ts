@@ -29,16 +29,9 @@ export function useLocalQuickActions({
           return true;
         case "/bridge":
           {
-            const bridgeNames = [
-              "Vulnerability",
-              "Awe",
-              "Compassion",
-              "Curiosity",
-              "Acceptance",
-              "Gratitude",
-            ];
-            const all = useAtlasAdminStore.getState().allEmotions;
-            const ids = all.filter((e) => bridgeNames.includes(e.name)).map((e) => e.id);
+            const { getBridgeEmotions } = useAtlasAdminStore.getState();
+            const bridgeEmotions = getBridgeEmotions();
+            const ids = bridgeEmotions.map((e) => e.id);
             selectMultiple(ids);
             close();
           }

@@ -4,7 +4,7 @@ import { useRef, useMemo } from "react";
 import { useFrame } from "@react-three/fiber";
 import * as THREE from "three";
 import type { AtlasEmotion, PathAnimationMode } from "@/types/atlas-admin";
-import { CATEGORY_COLORS } from "@/types/atlas-admin";
+import { resolveEmotionColor } from "@/utils/emotion-colors";
 import { getEmotionAnimationParams } from "@/utils/emotionAnimationMapper";
 
 type MotionType = "stable" | "orbital" | "recoil" | "reaching";
@@ -27,10 +27,11 @@ export function InnerCharacterSphere({
   // Get emotion-specific animation parameters
   const animParams = useMemo(() => getEmotionAnimationParams(emotion, mode), [emotion, mode]);
 
-  // Color from category
+  // Color from category or hint
   const color = useMemo(() => {
-    return new THREE.Color(CATEGORY_COLORS[emotion.category] || "#888888");
-  }, [emotion.category]);
+    const colorHex = resolveEmotionColor(emotion);
+    return new THREE.Color(colorHex);
+  }, [emotion]);
 
   // Characteristic animation
   useFrame((state) => {

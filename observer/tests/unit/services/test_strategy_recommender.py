@@ -4,7 +4,7 @@ from unittest.mock import AsyncMock, MagicMock
 from uuid import uuid4
 
 from app.services.strategy_recommender import StrategyRecommender
-from app.models.atlas_definition import AtlasDefinition
+from app.models.emotion_definition import EmotionDefinition
 from app.models.transition_strategy import (
     TransitionPattern,
     TransitionStrategy,
@@ -23,12 +23,12 @@ def recommender(mock_session):
 
 @pytest.fixture
 def sample_emotions():
-    from_e = AtlasDefinition(
+    from_e = EmotionDefinition(
         emotion_name="Anxiety",
         category="When Things Are Uncertain",
         vac_vector=[0.2, 0.8, -0.4] # High arousal, neg connection
     )
-    to_e = AtlasDefinition(
+    to_e = EmotionDefinition(
         emotion_name="Calm",
         category="When Life Is Good",
         vac_vector=[0.5, 0.1, 0.5] # Low arousal, pos connection
@@ -195,8 +195,8 @@ async def test_match_pattern_complex_conditions(recommender, mock_session):
     )
     
     # Transition: +Valence, -Arousal, +Connection
-    from_e = AtlasDefinition(vac_vector=[0.5, 0.5, 0.0], category="A", emotion_name="E1")
-    to_e = AtlasDefinition(vac_vector=[0.1, 0.9, 0.8], category="B", emotion_name="E2")
+    from_e = EmotionDefinition(vac_vector=[0.5, 0.5, 0.0], category="A", emotion_name="E1")
+    to_e = EmotionDefinition(vac_vector=[0.1, 0.9, 0.8], category="B", emotion_name="E2")
     # Change:
     # V: -0.4 (Decrease) -> Matches
     # A: +0.4 (Increase) -> Matches activation (>0.3)
@@ -263,8 +263,8 @@ async def test_match_pattern_score_logic(recommender, mock_session):
     )
 
     # Transition: +V, +A (Small), +C (Major)
-    from_e = AtlasDefinition(vac_vector=[0, 0, 0], category="A", emotion_name="E1")
-    to_e = AtlasDefinition(vac_vector=[0.5, 0.4, 0.8], category="B", emotion_name="E2")
+    from_e = EmotionDefinition(vac_vector=[0, 0, 0], category="A", emotion_name="E1")
+    to_e = EmotionDefinition(vac_vector=[0.5, 0.4, 0.8], category="B", emotion_name="E2")
     # Changes: V=+0.5, A=+0.4 (Increase), C=+0.8 (Major Increase)
     
     # Wait, to hit 342 False branch for weak pattern:
@@ -340,8 +340,8 @@ async def test_match_pattern_359_miss_branch(recommender, mock_session):
         }
     )
     # Input gives small increase +0.4.
-    from_e = AtlasDefinition(vac_vector=[0,0,0], category="A", emotion_name="E1")
-    to_e = AtlasDefinition(vac_vector=[0,0,0.4], category="B", emotion_name="E2")
+    from_e = EmotionDefinition(vac_vector=[0,0,0], category="A", emotion_name="E1")
+    to_e = EmotionDefinition(vac_vector=[0,0,0.4], category="B", emotion_name="E2")
     
     mock_result = MagicMock()
     mock_result.scalars().all.return_value = [pattern]
@@ -363,8 +363,8 @@ async def test_match_pattern_category_mismatch(recommender, mock_session):
         to_category="Other",
         vac_change_characteristics={}
     )
-    from_e = AtlasDefinition(vac_vector=[0,0,0], category="A", emotion_name="E1")
-    to_e = AtlasDefinition(vac_vector=[0,0,0], category="B", emotion_name="E2")
+    from_e = EmotionDefinition(vac_vector=[0,0,0], category="A", emotion_name="E1")
+    to_e = EmotionDefinition(vac_vector=[0,0,0], category="B", emotion_name="E2")
     
     mock_result = MagicMock()
     mock_result.scalars().all.return_value = [pattern]
@@ -386,8 +386,8 @@ async def test_match_pattern_major_decrease_miss(recommender, mock_session):
         }
     )
     # Input gives small decrease -0.4 (not < -0.6).
-    from_e = AtlasDefinition(vac_vector=[0,0.4,0], category="A", emotion_name="E1")
-    to_e = AtlasDefinition(vac_vector=[0,0,0], category="B", emotion_name="E2")
+    from_e = EmotionDefinition(vac_vector=[0,0.4,0], category="A", emotion_name="E1")
+    to_e = EmotionDefinition(vac_vector=[0,0,0], category="B", emotion_name="E2")
     
     mock_result = MagicMock()
     mock_result.scalars().all.return_value = [pattern]

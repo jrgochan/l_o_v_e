@@ -2,11 +2,11 @@
 import pytest
 import uuid
 from datetime import datetime
-from app.models.atlas_definition import AtlasDefinition
+from app.models.emotion_definition import EmotionDefinition
 
 def test_atlas_definition_to_dict():
     """Test AtlasDefinition serialization."""
-    emotion = AtlasDefinition(
+    emotion = EmotionDefinition(
         id=uuid.uuid4(),
         emotion_name="Test Joy",
         category="Happiness",

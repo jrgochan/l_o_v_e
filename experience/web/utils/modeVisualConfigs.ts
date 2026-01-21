@@ -420,8 +420,8 @@ export const LUMINOUS_MODE_CONFIG: ModeVisualConfig = {
   materials: {
     metalness: 0.1,
     roughness: 0.9,
-    emissiveIntensityBase: 3.0,
-    emissiveIntensityRange: [2.0, 5.0],
+    emissiveIntensityBase: 2.0,
+    emissiveIntensityRange: [1.5, 3.0], // Reduced top end to avoid white blowout
     transparent: true,
     opacityBase: 0.4,
     fresnelStrength: 0.5,
@@ -429,7 +429,7 @@ export const LUMINOUS_MODE_CONFIG: ModeVisualConfig = {
 
   colors: {
     saturationMultiplier: 1.5,
-    luminosityMultiplier: 2.0, // Very bright
+    luminosityMultiplier: 1.1, // Reduced from 2.0 to prevent washout to white
     useGradients: true,
     valenceTempShift: 0.5,
     arousalBrightnessRange: [1.0, 2.0],
@@ -570,7 +570,7 @@ export const GLITCH_MODE_CONFIG: ModeVisualConfig = {
     metalness: 0.5,
     roughness: 0.5,
     emissiveIntensityBase: 1.0,
-    emissiveIntensityRange: [0.0, 5.0], // Massive flicker range
+    emissiveIntensityRange: [0.5, 5.0], // Increased min from 0.0 to ensure visibility
     transparent: false,
     opacityBase: 1.0,
     fresnelStrength: 0.0,
@@ -585,7 +585,7 @@ export const GLITCH_MODE_CONFIG: ModeVisualConfig = {
   },
 
   lighting: {
-    ambientIntensity: 0.1,
+    ambientIntensity: 0.3, // Increased from 0.1 to prevent total darkness
     keyLightIntensity: 2.0,
     keyLightPosition: [0, 0, 10], // Direct flash
     fillLightIntensity: 0.1,
@@ -680,14 +680,11 @@ export function applyColorConfig(
 
   color.setHSL(hsl.h, Math.min(hsl.s, 1), Math.min(hsl.l, 1));
 
-  // Apply temperature shift based on valence
+  // Valence temperature shift removed to preserve dataset color identity
+  // Previous logic mixed in Orange/Cyan which muddied specific emotion colors
   if (colorConfig.valenceTempShift > 0) {
-    const tempColor =
-      valence > 0
-        ? new THREE.Color("#FFA500") // Warm orange
-        : new THREE.Color("#00CED1"); // Cool cyan
-
-    color.lerp(tempColor, Math.abs(valence) * colorConfig.valenceTempShift);
+    // Optional: We could just boost saturation here instead of shifting hue
+    // For now, we leave the hue alone.
   }
 
   // Apply undertone if specified

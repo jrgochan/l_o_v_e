@@ -42,22 +42,22 @@ export function MysticalEmotionNode({
 
   const [valence, , connection] = emotion.vac;
 
-  // Inner core color - golden for positive, violet for negative
+  // Inner core color - derive from the emotion's actual color but brighter
   const coreColor = useMemo(() => {
-    if (valence > 0.3) {
-      return new THREE.Color("#FFD700"); // Golden
-    } else if (valence < -0.3) {
-      return new THREE.Color("#8B00FF"); // Deep violet
-    } else {
-      return new THREE.Color("#FFFFFF"); // White
-    }
-  }, [valence]);
+    const c = color.clone();
+    // Increase lightness for core glow
+    const hsl = { h: 0, s: 0, l: 0 };
+    c.getHSL(hsl);
+    c.setHSL(hsl.h, hsl.s, Math.min(hsl.l + 0.3, 0.95)); // Ensure it's bright
+    return c;
+  }, [color]);
 
   // Add mystical undertone to main color
   const mysticalColor = useMemo(() => {
     const col = color.clone();
     const undertone = new THREE.Color("#4A3B77"); // Purple/blue
-    col.lerp(undertone, 0.15);
+    // Reduced lerp strength to preserve original identity more
+    col.lerp(undertone, 0.1);
     return col;
   }, [color]);
 

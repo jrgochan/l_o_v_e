@@ -4,7 +4,7 @@ from unittest.mock import MagicMock, AsyncMock, patch
 from uuid import uuid4
 from sqlalchemy.ext.asyncio import AsyncSession
 from app.services.insight_generator import InsightGenerator
-from app.models.atlas_definition import AtlasDefinition
+from app.models.emotion_definition import EmotionDefinition
 
 @pytest.fixture
 def mock_db():

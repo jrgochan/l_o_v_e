@@ -70,8 +70,8 @@ Example:
 Performance:
     - Typical path computation: 100-200ms
     - Cached paths (path matrix): < 5ms
-    - Scales with graph size: O(E log V) where E=edges, V=87 vertices
-    - Pre-computation of all 7,482 paths: ~8-10 minutes
+    - Scales with graph size: O(E log V)
+    - Pre-computation of all paths: ~8-10 minutes
 
 Validation:
     - 50 therapists reviewed paths: 94% therapeutic validity
@@ -94,7 +94,7 @@ import numpy as np
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.models.atlas_definition import AtlasDefinition
+from app.models.emotion_definition import EmotionDefinition
 from app.models.transition_strategy import CategoryTransition, UserJourney
 from app.services.emotion_mapper import EmotionMapper
 
@@ -106,9 +106,9 @@ class TransitionPath:
 
     def __init__(
         self,
-        current_emotion: AtlasDefinition,
-        goal_emotion: AtlasDefinition,
-        waypoints: List[AtlasDefinition],
+        current_emotion: EmotionDefinition,
+        goal_emotion: EmotionDefinition,
+        waypoints: List[EmotionDefinition],
         total_distance: float,
         estimated_time: str,
         difficulty: str,
@@ -153,6 +153,7 @@ class PathPlanner:
         goal_vac: List[float],
         max_waypoints: int = 3,
         user_id: Optional[str] = None,
+        collection_id: Optional[str] = None,
     ) -> TransitionPath:
         """Find optimal path from current to goal emotional state.
 
@@ -161,6 +162,7 @@ class PathPlanner:
             goal_vac: Goal VAC coordinates [v, a, c]
             max_waypoints: Maximum intermediate waypoints
             user_id: User ID for personalization (optional)
+            collection_id: Optional collection ID to constrain search
 
         Returns:
             TransitionPath with waypoints and metrics
@@ -172,8 +174,13 @@ class PathPlanner:
             await self._load_category_transitions()
 
         # 2. Identify current and goal emotions
-        current_emotion = await self.emotion_mapper.find_nearest_by_vac_only(current_vac)
-        goal_emotion = await self.emotion_mapper.find_nearest_by_vac_only(goal_vac)
+        # Use collection_id if provided to ensure we map to the correct collection
+        current_emotion = await self.emotion_mapper.find_nearest_by_vac_only(
+            current_vac, collection_id=collection_id
+        )
+        goal_emotion = await self.emotion_mapper.find_nearest_by_vac_only(
+            goal_vac, collection_id=collection_id
+        )
 
         logger.info(f"Mapped to: {current_emotion.emotion_name} → {goal_emotion.emotion_name}")
 
@@ -189,7 +196,7 @@ class PathPlanner:
 
         # 5. Run A* search
         path_emotions = await self._astar_search(
-            current_emotion, goal_emotion, max_waypoints, user_history
+            current_emotion, goal_emotion, max_waypoints, user_history, collection_id
         )
 
         # 6. Validate psychological requirements
@@ -220,11 +227,12 @@ class PathPlanner:
 
     async def _astar_search(
         self,
-        start: AtlasDefinition,
-        goal: AtlasDefinition,
+        start: EmotionDefinition,
+        goal: EmotionDefinition,
         max_waypoints: int,
         user_history: Optional[Dict[str, Any]],
-    ) -> List[AtlasDefinition]:
+        collection_id: Optional[str] = None,
+    ) -> List[EmotionDefinition]:
         """A* pathfinding with psychological constraints.
 
         Returns list of emotions forming the path.
@@ -235,12 +243,12 @@ class PathPlanner:
         # Priority queue structure: (f_cost, counter, emotion, path)
         #   - f_cost: Total estimated cost = g(n) + h(n), determines priority
         #   - counter: Unique sequence number prevents tuple comparison errors
-        #             (Python can't compare AtlasDefinition objects directly)
-        #   - emotion: Current AtlasDefinition being evaluated
+        #             (Python can't compare EmotionDefinition objects directly)
+        #   - emotion: Current EmotionDefinition being evaluated
         #   - path: List[Any] of emotions from start to current
         #
         # PriorityQueue.get() always returns lowest f_cost first (optimal A*)
-        open_set: PriorityQueue[Tuple[float, int, AtlasDefinition, List[AtlasDefinition]]] = (
+        open_set: PriorityQueue[Tuple[float, int, EmotionDefinition, List[EmotionDefinition]]] = (
             PriorityQueue()
         )
         counter = 0
@@ -253,7 +261,7 @@ class PathPlanner:
 
         # Store up to 3 complete paths for comparison
         # Sometimes the "shortest" isn't the "best" therapeutically
-        best_paths: List[List[AtlasDefinition]] = []
+        best_paths: List[List[EmotionDefinition]] = []
 
         # ═══════════════════════════════════════════════════════════════════════
         # A* MAIN LOOP
@@ -297,7 +305,7 @@ class PathPlanner:
             # ───────────────────────────────────────────────────────────────────
             # EXPANSION: Explore valid neighboring emotions
             # ───────────────────────────────────────────────────────────────────
-            neighbors = await self._get_valid_neighbors(current, goal)
+            neighbors = await self._get_valid_neighbors(current, goal, collection_id)
 
             for neighbor in neighbors:
                 if neighbor.id not in visited:
@@ -332,8 +340,8 @@ class PathPlanner:
 
     def _calculate_g_cost(
         self,
-        path: List[AtlasDefinition],
-        next_emotion: AtlasDefinition,
+        path: List[EmotionDefinition],
+        next_emotion: EmotionDefinition,
         user_history: Optional[Dict[str, Any]],
     ) -> float:
         """Calculate cost from start to this emotion.
@@ -446,7 +454,7 @@ class PathPlanner:
         # This is the "g(n)" in f(n) = g(n) + h(n)
         return vac_distance + category_penalty + history_bonus + arousal_penalty + length_penalty
 
-    def _heuristic_cost(self, current: AtlasDefinition, goal: AtlasDefinition) -> float:
+    def _heuristic_cost(self, current: EmotionDefinition, goal: EmotionDefinition) -> float:
         """Admissible heuristic: Euclidean distance in VAC space.
 
         This is the "h(n)" in f(n) = g(n) + h(n).
@@ -510,8 +518,11 @@ class PathPlanner:
         )
 
     async def _get_valid_neighbors(
-        self, current: AtlasDefinition, goal: AtlasDefinition
-    ) -> List[AtlasDefinition]:
+        self, 
+        current: EmotionDefinition, 
+        goal: EmotionDefinition,
+        collection_id: Optional[str] = None
+    ) -> List[EmotionDefinition]:
         """Get emotions that are valid next steps.
 
         Filters by:
@@ -519,10 +530,14 @@ class PathPlanner:
         - Not too far in VAC space
         - Generally moving toward goal OR opens bridge category
         """
-        # Query all 87 emotions from atlas
+        # Query all emotions from collection (or all if not specified)
         # In production, this could be cached for performance
         # Current implementation: ~5ms query time (acceptable)
-        stmt = select(AtlasDefinition)
+        stmt = select(EmotionDefinition)
+        if collection_id:
+            from uuid import UUID
+            stmt = stmt.where(EmotionDefinition.collection_id == UUID(collection_id))
+            
         result = await self.session.execute(stmt)
         all_emotions = result.scalars().all()
 
@@ -620,7 +635,7 @@ class PathPlanner:
         ]
         return category in bridge_categories
 
-    def _is_direct_transition_valid(self, current: AtlasDefinition, goal: AtlasDefinition) -> bool:
+    def _is_direct_transition_valid(self, current: EmotionDefinition, goal: EmotionDefinition) -> bool:
         """Check if we can go directly from current to goal."""
         # Case 1: Same emotion (no transition needed)
         if current.id == goal.id:
@@ -643,8 +658,8 @@ class PathPlanner:
         return difficulty < 0.3  # Only very easy cross-category transitions
 
     async def _validate_and_enhance_path(
-        self, path: List[AtlasDefinition], start: AtlasDefinition, goal: AtlasDefinition
-    ) -> List[AtlasDefinition]:
+        self, path: List[EmotionDefinition], start: EmotionDefinition, goal: EmotionDefinition
+    ) -> List[EmotionDefinition]:
         """Validate path meets psychological requirements.
 
         Adds bridge emotions if needed (e.g., Vulnerability for shame healing).
@@ -660,7 +675,7 @@ class PathPlanner:
         return path
 
     def _needs_vulnerability_bridge(
-        self, start: AtlasDefinition, goal: AtlasDefinition, path: List[AtlasDefinition]
+        self, start: EmotionDefinition, goal: EmotionDefinition, path: List[EmotionDefinition]
     ) -> bool:
         """Check if path requires Vulnerability as bridge.
 
@@ -685,11 +700,11 @@ class PathPlanner:
         return False
 
     async def _add_vulnerability_waypoint(
-        self, path: List[AtlasDefinition]
-    ) -> List[AtlasDefinition]:
+        self, path: List[EmotionDefinition]
+    ) -> List[EmotionDefinition]:
         """Add Vulnerability emotion as waypoint in path."""
         # Find Vulnerability emotion
-        stmt = select(AtlasDefinition).where(AtlasDefinition.emotion_name == "Vulnerability")
+        stmt = select(EmotionDefinition).where(EmotionDefinition.emotion_name == "Vulnerability")
         result = await self.session.execute(stmt)
         vulnerability = result.scalar_one_or_none()
 
@@ -700,8 +715,8 @@ class PathPlanner:
         return path
 
     async def _ensure_arousal_regulation(
-        self, path: List[AtlasDefinition]
-    ) -> List[AtlasDefinition]:
+        self, path: List[EmotionDefinition]
+    ) -> List[EmotionDefinition]:
         """Ensure high arousal is reduced before complex cognitive work.
 
         If path jumps from high arousal to low without intermediate,
@@ -739,15 +754,15 @@ class PathPlanner:
         return refined_path
 
     async def _find_arousal_bridge(
-        self, current: AtlasDefinition, target_arousal: float
-    ) -> Optional[AtlasDefinition]:
+        self, current: EmotionDefinition, target_arousal: float
+    ) -> Optional[EmotionDefinition]:
         """Find an emotion to bridge a high-arousal gap."""
         # Query for emotions with:
         # 1. Arousal close to target (+/- 0.15)
         # 2. Valence similar to current or slightly better (don't make it worse)
         # 3. Connection non-negative (don't increase isolation)
 
-        stmt = select(AtlasDefinition)
+        stmt = select(EmotionDefinition)
         result = await self.session.execute(stmt)
         candidates = result.scalars().all()
 
@@ -789,7 +804,7 @@ class PathPlanner:
         return best_bridge
 
     async def _create_direct_path(
-        self, current: AtlasDefinition, goal: AtlasDefinition
+        self, current: EmotionDefinition, goal: EmotionDefinition
     ) -> TransitionPath:
         """Create a simple direct path (no waypoints needed)."""
         distance = self._vac_distance(list(current.vac_vector), list(goal.vac_vector))
@@ -804,8 +819,8 @@ class PathPlanner:
         )
 
     async def _fallback_path(
-        self, start: AtlasDefinition, goal: AtlasDefinition
-    ) -> List[AtlasDefinition]:
+        self, start: "EmotionDefinition", goal: "EmotionDefinition"
+    ) -> List["EmotionDefinition"]:
         """Fallback if A* fails - use simple greedy approach."""
         logger.warning("Using fallback greedy path")
         path = [start]
@@ -835,7 +850,7 @@ class PathPlanner:
         return path
 
     async def _build_transition_path(
-        self, path_emotions: List[AtlasDefinition], user_history: Optional[Dict[str, Any]]
+        self, path_emotions: List["EmotionDefinition"], user_history: Optional[Dict[str, Any]]
     ) -> TransitionPath:
         """Build complete TransitionPath object with metrics."""
         # Calculate total distance

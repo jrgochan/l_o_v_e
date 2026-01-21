@@ -1,12 +1,12 @@
 /**
  * useEmotionAtlas Hook
  *
- * Fetches all 87 emotions from the Observer API and loads them into the admin store.
+ * Fetches all emotions from the Observer API and loads them into the admin store.
  */
 
 import { useEffect, useCallback } from "react";
 import { useAtlasAdminStore } from "@/stores/useAtlasAdminStore";
-import type { AtlasEmotion } from "@/types/atlas-admin";
+import type { AtlasEmotion, EmotionCollection } from "@/types/atlas-admin";
 import type { ObserverEmotionResponse } from "@/types/api-responses";
 import { logger } from "@/utils/logger";
 import { getCanonicalEmotion } from "@love/experience-shared";
@@ -14,16 +14,58 @@ import { getCanonicalEmotion } from "@love/experience-shared";
 const OBSERVER_API_URL = process.env.NEXT_PUBLIC_OBSERVER_API_URL || "http://localhost:8000";
 
 export function useEmotionAtlas() {
-  const { allEmotions, isLoadingEmotions, error, setAllEmotions, setLoadingEmotions, setError } =
-    useAtlasAdminStore();
+  const {
+    allEmotions,
+    collections,
+    activeCollectionId,
+    isLoadingEmotions,
+    isLoadingCollections,
+    error,
+    setAllEmotions,
+    setCollections,
+    setActiveCollection,
+    setLoadingEmotions,
+    setError,
+  } = useAtlasAdminStore();
 
+  // 1. Fetch Collections
+  const fetchCollections = useCallback(async () => {
+    if (collections.length > 0) return; // Already loaded
+
+    try {
+      logger.info("api", "Fetching emotion collections...");
+      const response = await fetch(`${OBSERVER_API_URL}/observer/collections`);
+      if (!response.ok) throw new Error("Failed to fetch collections");
+
+      const data: { collections: EmotionCollection[] } = await response.json();
+      const loadedCollections = data.collections || [];
+      setCollections(loadedCollections);
+
+      // Set default active if none selected
+      if (!activeCollectionId && loadedCollections.length > 0) {
+        const defaultCollection = loadedCollections.find((c) => c.is_default) || loadedCollections[0];
+        setActiveCollection(defaultCollection.id);
+        logger.info("api", `Set active collection to ${defaultCollection.name}`);
+      }
+    } catch (err) {
+      logger.error("api", "Error fetching collections", err);
+      // Don't block, just log. Fallback to emotions fetch might still work if default handles it.
+    }
+  }, [collections.length, activeCollectionId, setCollections, setActiveCollection]);
+
+  // 2. Fetch Emotions for Active Collection
   const fetchEmotions = useCallback(async () => {
+    // Wait for collection to be active (or default)
+    // If no collections loaded yet, we might want to wait or just fetch default
+
     setLoadingEmotions(true);
     setError(null);
 
     try {
-      logger.info("api", "Fetching emotions from Observer API...");
-      const response = await fetch(`${OBSERVER_API_URL}/observer/atlas/emotions`);
+      const collectionParam = activeCollectionId ? `?collection_id=${activeCollectionId}` : "";
+      logger.info("api", `Fetching emotions for collection ${activeCollectionId || "default"}...`);
+
+      const response = await fetch(`${OBSERVER_API_URL}/observer/emotions${collectionParam}`);
 
       if (!response.ok) {
         throw new Error(`Failed to fetch emotions: ${response.statusText}`);
@@ -31,28 +73,37 @@ export function useEmotionAtlas() {
 
       const data: ObserverEmotionResponse = await response.json();
 
-      // Transform API response to our internal format
-      // Patch with Canonical VACs if valid to ensure 3D visualization works even if backend sends valid 0,0,0 or mocks
+      // Transform API response
       const emotions: AtlasEmotion[] = data.emotions.map((emotion) => {
         const canonical = getCanonicalEmotion(emotion.name);
-        // Use canonical VAC if available and backend sends [0,0,0] (suspiciously neutral), or just prefer canonical for visuals
-        // For now, we prefer backend, but fallback if backend is suspicious 0,0,0 for a non-neutral emotion
+        // Fix for potentially missing VACs in backend (fallback to canonical if available)
         const isSuspiciouslyNeutral =
-          emotion.vac[0] === 0 &&
-          emotion.vac[1] === 0 &&
-          emotion.vac[2] === 0 &&
-          emotion.name.toLowerCase() !== "neutral";
+          !emotion.vac || (emotion.vac[0] === 0 && emotion.vac[1] === 0 && emotion.vac[2] === 0 && emotion.name.toLowerCase() !== "neutral");
 
         const vac = isSuspiciouslyNeutral && canonical ? canonical.vac : emotion.vac;
 
+        // Bridge detection (fallback to hardcoded list if backend doesn't provide it)
+        // Hardcoded list from atlas-admin.ts types
+        const BRIDGE_NAMES = [
+          "Vulnerability",
+          "Awe",
+          "Compassion",
+          "Curiosity",
+          "Acceptance",
+          "Gratitude",
+        ];
+        const isBridge = BRIDGE_NAMES.includes(emotion.name);
+
         return {
           id: emotion.id,
+          collection_id: emotion.collection_id,
           name: emotion.name,
           category: emotion.category,
           definition: emotion.definition,
-          vac,
+          vac: vac || [0, 0, 0],
           quaternion: emotion.quaternion,
           color_hint: emotion.color_hint,
+          is_bridge: isBridge,
         };
       });
 
@@ -64,14 +115,23 @@ export function useEmotionAtlas() {
       setError(errorMessage);
       setLoadingEmotions(false);
     }
-  }, [setLoadingEmotions, setError, setAllEmotions]);
+  }, [activeCollectionId, setLoadingEmotions, setError, setAllEmotions]);
 
+  // Initial load effect
   useEffect(() => {
-    // Only fetch if we don't have emotions yet
-    if (allEmotions.length === 0 && !isLoadingEmotions) {
+    const init = async () => {
+      await fetchCollections();
+    };
+    init();
+  }, [fetchCollections]);
+
+  // Fetch emotions when active collection changes
+  useEffect(() => {
+    if (activeCollectionId || (!isLoadingCollections && collections.length === 0)) {
+      // Fetch if we have an ID, OR if we failed to load collections (default fallback)
       fetchEmotions();
     }
-  }, [allEmotions.length, isLoadingEmotions, fetchEmotions]);
+  }, [activeCollectionId, fetchEmotions, isLoadingCollections, collections.length]);
 
   const refetchEmotions = () => {
     fetchEmotions();
@@ -79,7 +139,9 @@ export function useEmotionAtlas() {
 
   return {
     emotions: allEmotions,
-    isLoading: isLoadingEmotions,
+    collections,
+    activeCollectionId,
+    isLoading: isLoadingEmotions || isLoadingCollections,
     error,
     refetch: refetchEmotions,
   };

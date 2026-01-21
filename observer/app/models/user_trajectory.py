@@ -445,7 +445,7 @@ class UserTrajectory(Base):
 
     # Dominant Emotion (nearest Atlas emotion)
     dominant_emotion_id: Mapped[Optional[UUID]] = mapped_column(
-        ForeignKey("atlas_definitions.id"), index=True
+        ForeignKey("emotion_definitions.id"), index=True
     )
 
     # Temporal Metrics

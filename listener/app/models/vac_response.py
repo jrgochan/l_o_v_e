@@ -120,8 +120,8 @@ class EmotionalClassification(BaseModel):
     This is the primary output model for the Listener module's semantic analysis.
 
     Attributes:
-        primary_emotion (str): One of 87 Atlas of the Heart emotions
-        category (str): One of 13 Atlas categories
+        primary_emotion (str): Name of the detected emotion
+        category (str): Category of the emotion
         vac (VACVector): 3D emotional coordinates
         confidence (float): LLM's confidence (0.0 to 1.0)
         reasoning (str): Step-by-step analysis explaining VAC values
@@ -151,8 +151,8 @@ class EmotionalClassification(BaseModel):
         - API Response: Used in all /listener/analyze* endpoints
     """
 
-    primary_emotion: str = Field(description="One of the 87 Atlas of the Heart emotions")
-    category: str = Field(description="One of the 13 Atlas categories")
+    primary_emotion: str = Field(description="Name of the detected emotion")
+    category: str = Field(description="Category of the emotion")
     vac: VACVector = Field(description="3-dimensional VAC coordinates")
     confidence: float = Field(ge=0.0, le=1.0, description="Confidence in classification (0-1)")
     reasoning: str = Field(description="Step-by-step psychometric analysis")

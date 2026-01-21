@@ -2,7 +2,7 @@
  * Command Palette Component
  *
  * Beautiful keyboard-driven command palette for emotion navigation.
- * Opens with CMD+K and provides instant access to all 87 emotions.
+ * Opens with CMD+K and provides instant access to all emotions.
  */
 
 "use client";

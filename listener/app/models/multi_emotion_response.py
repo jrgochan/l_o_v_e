@@ -67,7 +67,7 @@ class DetectedEmotionResponse(BaseModel):
     """
 
     emotion_name: str = Field(
-        ..., description="Name of the detected emotion (will be mapped to Atlas by Observer)"
+        ..., description="Name of the detected emotion"
     )
     original_name: Optional[str] = Field(
         None, description="Original AI name if mapped (populated by Observer)"
@@ -78,7 +78,7 @@ class DetectedEmotionResponse(BaseModel):
     match_confidence: Optional[float] = Field(
         None, ge=0.0, le=1.0, description="Mapping confidence 0-1 (populated by Observer)"
     )
-    category: str = Field(..., description="Atlas category (one of 13)")
+    category: str = Field(..., description="Category of the emotion")
     vac: VACVector = Field(..., description="VAC coordinates for this emotion")
     confidence: float = Field(..., ge=0.0, le=1.0, description="Detection confidence (0-1)")
     prominence: str = Field(..., description="'primary', 'secondary', or 'underlying'")

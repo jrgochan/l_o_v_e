@@ -29,7 +29,7 @@ describe("PathDetails", () => {
     estimated_time: "10m",
     difficulty: "Moderate",
     requires_bridge: true,
-    bridge_emotions: ["Vulnerability"],
+    bridge_emotions: ["Vulnerability"], // Mock data for testing
   };
 
   const mockAllEmotions = [

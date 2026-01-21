@@ -3,8 +3,8 @@ import logging
 import sys
 import os
 
-# Add observer directory to path so we can import app modules
-sys.path.append(os.path.join(os.getcwd(), "observer"))
+from pathlib import Path
+sys.path.insert(0, str(Path(__file__).parent.parent))
 
 from app.database import AsyncSessionLocal
 from app.services.chat_service import ChatService

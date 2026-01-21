@@ -1,7 +1,7 @@
 """Path Matrix Service.
 
-Pre-computes and caches all 7,482 possible emotion-to-emotion transition paths in Observer's
-87-emotion atlas, eliminating real-time pathfinding latency and enabling instant journey
+Pre-computes and caches all possible emotion-to-emotion transition paths in Observer's
+active emotion collection, eliminating real-time pathfinding latency and enabling instant journey
 recommendations. Implements job tracking, progress monitoring, and intelligent cache management.
 
 The Performance Challenge:
@@ -23,7 +23,7 @@ The Performance Challenge:
     Pre-computation solution::
 
         Batch compute all paths once:
-        87 emotions × 86 destinations = 7,482 paths
+        N emotions × (N-1) destinations = Total paths
         Total time: ~30-45 minutes (one-time cost)
 
         Cached lookup: <10ms
@@ -33,8 +33,8 @@ The Complete Path Matrix:
 
     Comprehensive emotion transition network::
 
-        Matrix dimensions: 87 × 87
-        Total possible paths: 87 × 86 = 7,482
+        Matrix dimensions: N × N
+        Total possible paths: N × (N-1)
         (Excluding self-transitions: Anxiety → Anxiety)
 
         Coverage:
@@ -437,7 +437,7 @@ from uuid import UUID, uuid4
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.models.atlas_definition import AtlasDefinition
+from app.models.emotion_definition import EmotionDefinition
 from app.services.path_planner import PathPlanner
 from app.services.quaternion_builder import QuaternionBuilder
 
@@ -454,9 +454,9 @@ class PathMatrixService:
         self.quat_builder = QuaternionBuilder()
 
     async def compute_all_paths_batch(
-        self, job_id: UUID, user_id: Optional[str] = None
+        self, job_id: UUID, user_id: Optional[str] = None, collection_id: Optional[str] = None
     ) -> Dict[str, Any]:
-        """Compute all 87×86 = 7,482 possible emotion transitions.
+        """Compute all possible emotion transitions for the specified collection.
 
         Stores results in path_matrix_cache table.
         Updates job status in path_computation_jobs table.
@@ -464,14 +464,19 @@ class PathMatrixService:
         Args:
             job_id: UUID for tracking this computation job
             user_id: Optional user ID for personalized paths
+            collection_id: Optional collection ID to compute paths for
 
         Returns:
             Summary of computation results
         """
         logger.info(f"Starting batch path computation for job {job_id}")
 
-        # Get all emotions
-        stmt = select(AtlasDefinition).order_by(AtlasDefinition.emotion_name)
+        # Get all emotions (filtered by collection if provided)
+        stmt = select(EmotionDefinition).order_by(EmotionDefinition.emotion_name)
+        if collection_id:
+            from uuid import UUID
+            stmt = stmt.where(EmotionDefinition.collection_id == UUID(collection_id))
+            
         result = await self.session.execute(stmt)
         all_emotions = result.scalars().all()
 
@@ -508,7 +513,7 @@ class PathMatrixService:
 
                         # Compute path
                         path_data = await self._compute_single_path(
-                            from_emotion, to_emotion, user_id
+                            from_emotion, to_emotion, user_id, collection_id
                         )
 
                         # Cache result
@@ -564,7 +569,11 @@ class PathMatrixService:
             raise
 
     async def _compute_single_path(
-        self, from_emotion: AtlasDefinition, to_emotion: AtlasDefinition, user_id: Optional[str]
+        self, 
+        from_emotion: EmotionDefinition, 
+        to_emotion: EmotionDefinition, 
+        user_id: Optional[str],
+        collection_id: Optional[str] = None
     ) -> Dict[str, Any]:
         """Compute a single path using PathPlanner.
 
@@ -576,6 +585,7 @@ class PathMatrixService:
             goal_vac=list(to_emotion.vac_vector),
             max_waypoints=3,
             user_id=user_id,
+            collection_id=collection_id,
         )
 
         # Build complete path data (convert numpy float32 to Python float for JSON serialization)
@@ -612,7 +622,7 @@ class PathMatrixService:
         }
 
     async def _cache_path(
-        self, from_emotion: AtlasDefinition, to_emotion: AtlasDefinition, path_data: Dict[str, Any]
+        self, from_emotion: EmotionDefinition, to_emotion: EmotionDefinition, path_data: Dict[str, Any]
     ) -> None:
         """Store computed path in cache table."""
         vac_hash = self._calculate_vac_hash(

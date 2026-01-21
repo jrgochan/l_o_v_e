@@ -261,11 +261,11 @@ if [ "$RUN_INFRA" = true ] && [ "$SKIP_INFRA_CHECKS" = false ]; then
     if command_exists psql; then
         if PGPASSWORD="$DB_PASSWORD" psql -h "$DB_HOST" -p "$DB_PORT" -U "$DB_USER" -lqt 2>/dev/null | grep -qw "$DB_NAME"; then
             # Check for data presence
-            atlas_count=$(PGPASSWORD="$DB_PASSWORD" psql -h "$DB_HOST" -p "$DB_PORT" -U "$DB_USER" -d "$DB_NAME" -t -c "SELECT COUNT(*) FROM atlas_definitions;" 2>/dev/null | xargs)
-            if [ -n "$atlas_count" ] && [ "$atlas_count" -ge 87 ]; then
+            atlas_count=$(PGPASSWORD="$DB_PASSWORD" psql -h "$DB_HOST" -p "$DB_PORT" -U "$DB_USER" -d "$DB_NAME" -t -c "SELECT COUNT(*) FROM emotion_definitions;" 2>/dev/null | xargs)
+            if [ -n "$atlas_count" ] && [ "$atlas_count" -ge 10 ]; then
                 print_success "Database ready: $atlas_count emotions loaded"
             else
-                print_warning "Database low count: ${atlas_count:-0} (expected 87+). Run ./init-database.sh"
+                print_warning "Database low count: ${atlas_count:-0} (expected > 10). Run ./init-database.sh"
             fi
         else
             print_warning "Database '$DB_NAME' not found or not accessible."

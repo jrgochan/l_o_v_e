@@ -19,8 +19,10 @@ import { DevelopmentSettings } from "@/components/admin/settings/DevelopmentSett
 import { useSettingsStore } from "@/stores/useSettingsStore";
 import { SETTINGS_PRESETS } from "@/utils/settingsPresets";
 import { useKeyboardShortcuts } from "@/hooks/useKeyboardShortcuts";
+import { CollectionSwitcher } from "@/components/admin/data/CollectionSwitcher";
 
 type SettingsTab =
+  | "dataset"
   | "visual"
   | "behavior"
   | "network"
@@ -30,7 +32,7 @@ type SettingsTab =
   | "development";
 
 export default function SettingsPage() {
-  const [activeTab, setActiveTab] = useState<SettingsTab>("visual");
+  const [activeTab, setActiveTab] = useState<SettingsTab>("dataset");
   const [showResetConfirm, setShowResetConfirm] = useState(false);
   const [showPresets, setShowPresets] = useState(false);
   const [notification, setNotification] = useState<{
@@ -122,6 +124,7 @@ export default function SettingsPage() {
   };
 
   const tabs: Array<{ id: SettingsTab; label: string; icon: string }> = [
+    { id: "dataset", label: "Dataset", icon: "📚" },
     { id: "visual", label: "Visual", icon: "🎨" },
     { id: "behavior", label: "Behavior", icon: "⚙️" },
     { id: "network", label: "Network", icon: "🌐" },
@@ -198,11 +201,10 @@ export default function SettingsPage() {
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
-              className={`px-6 py-3 text-sm font-medium transition border-b-2 ${
-                activeTab === tab.id
+              className={`px-6 py-3 text-sm font-medium transition border-b-2 ${activeTab === tab.id
                   ? "text-white border-cyan-500 bg-gray-900/50"
                   : "text-gray-400 border-transparent hover:text-gray-300 hover:bg-gray-900/30"
-              }`}
+                }`}
             >
               <span className="mr-2">{tab.icon}</span>
               {tab.label}
@@ -212,6 +214,7 @@ export default function SettingsPage() {
 
         {/* Tab Content */}
         <div className="bg-gray-900 rounded-lg p-6">
+          {activeTab === "dataset" && <CollectionSwitcher />}
           {activeTab === "visual" && <VisualSettings />}
           {activeTab === "behavior" && <BehaviorSettings />}
           {activeTab === "network" && <NetworkSettings />}
@@ -311,11 +314,10 @@ export default function SettingsPage() {
       {notification && (
         <div className="fixed bottom-6 right-6 z-50">
           <div
-            className={`px-6 py-3 rounded-lg border shadow-lg ${
-              notification.type === "success"
+            className={`px-6 py-3 rounded-lg border shadow-lg ${notification.type === "success"
                 ? "bg-green-900/90 border-green-500 text-green-100"
                 : "bg-red-900/90 border-red-500 text-red-100"
-            }`}
+              }`}
           >
             <div className="flex items-center gap-2">
               <span>{notification.type === "success" ? "✅" : "❌"}</span>

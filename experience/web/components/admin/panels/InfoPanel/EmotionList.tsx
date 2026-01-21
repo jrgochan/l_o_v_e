@@ -13,7 +13,7 @@
 "use client";
 
 import { CharacterSphere } from "@/components/admin/spheres/CharacterSphere";
-import { CATEGORY_COLORS } from "@/types/atlas-admin";
+import { resolveEmotionColor } from "@/utils/emotion-colors";
 import type { AtlasEmotion, PathAnimationMode } from "@/types/atlas-admin";
 
 interface EmotionListProps {
@@ -75,7 +75,7 @@ export function EmotionList({ emotions, animationMode, onRemove }: EmotionListPr
                 </div>
                 <div
                   className="text-xs font-semibold mb-2 uppercase tracking-wide"
-                  style={{ color: CATEGORY_COLORS[emotion.category] || "#888888" }}
+                  style={{ color: resolveEmotionColor(emotion) }}
                 >
                   {emotion.category}
                 </div>

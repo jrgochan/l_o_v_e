@@ -4,7 +4,7 @@ from unittest.mock import MagicMock, AsyncMock, patch
 from uuid import uuid4
 from sqlalchemy.ext.asyncio import AsyncSession
 from app.services.strategy_recommender import StrategyRecommender
-from app.models.atlas_definition import AtlasDefinition
+from app.models.emotion_definition import EmotionDefinition
 from app.models.transition_strategy import TransitionPattern, TransitionStrategy, PatternStrategy, StrategyAttempt
 
 @pytest.fixture
@@ -17,11 +17,11 @@ def recommender(mock_session):
 
 @pytest.fixture
 def emotions():
-    from_e = MagicMock(spec=AtlasDefinition)
+    from_e = MagicMock(spec=EmotionDefinition)
     from_e.category = "Anxiety"
     from_e.vac_vector = [0, 0.8, -0.4]
     
-    to_e = MagicMock(spec=AtlasDefinition)
+    to_e = MagicMock(spec=EmotionDefinition)
     to_e.category = "Calm"
     to_e.vac_vector = [0.4, 0.0, 0.5]
     

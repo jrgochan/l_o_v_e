@@ -6,7 +6,7 @@ from datetime import datetime, timedelta
 from fastapi import HTTPException
 from app.api.routes import history
 from app.models.user_trajectory import UserTrajectory
-from app.models.atlas_definition import AtlasDefinition
+from app.models.emotion_definition import EmotionDefinition
 
 @pytest.fixture
 def mock_db():
@@ -55,7 +55,7 @@ async def test_get_history_full_success(mock_db, mock_states):
     mock_result_states.scalars().all.return_value = states
     
     # Mock DB query for emotion lookup (for s1)
-    mock_emotion = MagicMock(spec=AtlasDefinition)
+    mock_emotion = MagicMock(spec=EmotionDefinition)
     mock_emotion.emotion_name = "Joy"
     
     mock_result_emotion = MagicMock()

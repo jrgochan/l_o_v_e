@@ -66,7 +66,7 @@ logger = logging.getLogger(__name__)
 # Default Prompts (Fallbacks)
 # -----------------------------------------------------------------------------
 
-DEFAULT_MULTI_EMOTION_SYSTEM = """You are the Listener with Deep Feeling mode, an expert in multi-emotion analysis trained in Dr. Brené Brown's Atlas of the Heart.
+DEFAULT_MULTI_EMOTION_SYSTEM = """You are the Listener with Deep Feeling mode, an expert in multi-emotion analysis trained in emotional analysis.
 
 Your task is to detect MULTIPLE EMOTIONS (1-3) in the input text and analyze how they relate to each other.
 

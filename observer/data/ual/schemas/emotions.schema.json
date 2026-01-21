@@ -1,0 +1,74 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Generic Emotions Schema",
+  "description": "Validation schema for Emotion datasets",
+  "type": "object",
+  "required": [
+    "version",
+    "source",
+    "metadata",
+    "emotions"
+  ],
+  "properties": {
+    "version": {
+      "type": "string"
+    },
+    "source": {
+      "type": "string"
+    },
+    "metadata": {
+      "type": "object",
+      "required": [
+        "total_emotions",
+        "categories"
+      ],
+      "properties": {
+        "total_emotions": {
+          "type": "integer"
+        },
+        "categories": {
+          "type": "integer"
+        },
+        "coordinate_system": {
+          "type": "string"
+        }
+      }
+    },
+    "emotions": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "emotion_name",
+          "category",
+          "definition",
+          "vac"
+        ],
+        "properties": {
+          "emotion_name": {
+            "type": "string"
+          },
+          "category": {
+            "type": "string"
+          },
+          "definition": {
+            "type": "string"
+          },
+          "vac": {
+            "type": "array",
+            "minItems": 3,
+            "maxItems": 3,
+            "items": {
+              "type": "number",
+              "minimum": -1.0,
+              "maximum": 1.0
+            }
+          },
+          "color_hint": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  }
+}

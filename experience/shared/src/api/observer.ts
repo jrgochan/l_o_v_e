@@ -44,10 +44,23 @@ export interface ObserverHistoryResponse {
 }
 
 /**
- * Atlas API Response Types
+ * Emotion Collection Definition
+ */
+export interface EmotionCollection {
+  id: string;
+  name: string;
+  description: string;
+  is_default: boolean;
+  category_count?: number;
+  emotion_count?: number;
+}
+
+/**
+ * Emotion API Response Types
  */
 export interface AtlasEmotion {
   id: string;
+  collection_id?: string;
   name: string;
   category: string;
   definition: string;
@@ -232,13 +245,54 @@ export class ObserverApiClient {
     }
   }
 
+
+
   /**
-   * Load the complete emotion atlas (87 emotions)
+   * Get all available emotion collections
    */
-  async loadEmotionAtlas(category?: string): Promise<AtlasEmotionsResponse> {
-    let url = `${this.config.baseUrl}/observer/atlas/emotions`;
-    if (category) {
-      url += `?category=${encodeURIComponent(category)}`;
+  async getCollections(): Promise<{ collections: EmotionCollection[] }> {
+    const url = `${this.config.baseUrl}/observer/collections`;
+    try {
+      const response = await this.fetchWithRetry(url);
+      if (!response.ok) {
+        throw new Error(`Observer API error: ${response.status} ${response.statusText}`);
+      }
+      return await response.json();
+    } catch (error) {
+      console.error("Failed to fetch collections:", error);
+      throw error;
+    }
+  }
+
+  /**
+   * Get details for a specific collection
+   */
+  async getCollectionDetails(id: string): Promise<EmotionCollection> {
+    const url = `${this.config.baseUrl}/observer/collections/${id}`;
+    try {
+      const response = await this.fetchWithRetry(url);
+      if (!response.ok) {
+        throw new Error(`Observer API error: ${response.status} ${response.statusText}`);
+      }
+      return await response.json();
+    } catch (error) {
+      console.error(`Failed to fetch collection details for ${id}:`, error);
+      throw error;
+    }
+  }
+
+  /**
+   * Load emotions for a specific collection
+   */
+  async loadEmotions(collectionId?: string, category?: string): Promise<AtlasEmotionsResponse> {
+    let url = `${this.config.baseUrl}/observer/emotions`;
+    const params = new URLSearchParams();
+
+    if (collectionId) params.append("collection_id", collectionId);
+    if (category) params.append("category", category);
+
+    if (params.toString()) {
+      url += `?${params.toString()}`;
     }
 
     try {
@@ -251,9 +305,16 @@ export class ObserverApiClient {
       const data = (await response.json()) as AtlasEmotionsResponse;
       return data;
     } catch (error) {
-      console.error("Failed to load emotion atlas:", error);
+      console.error("Failed to load emotions:", error);
       throw error;
     }
+  }
+
+  /**
+   * Load the complete emotion atlas (legacy alias for loadEmotions)
+   */
+  async loadEmotionAtlas(category?: string): Promise<AtlasEmotionsResponse> {
+    return this.loadEmotions(undefined, category);
   }
 
   /**

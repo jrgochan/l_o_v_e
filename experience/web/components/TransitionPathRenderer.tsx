@@ -98,7 +98,7 @@ export function TransitionPathRenderer({
 
   // Calculate base color
   const baseColor = useMemo(() => {
-    return valence < 0 ? new THREE.Color(0.0, 1.0, 1.0) : new THREE.Color(1.0, 0.2, 1.0);
+    return valence < 0 ? new THREE.Color(1.0, 0.2, 0.2) : new THREE.Color(0.2, 1.0, 0.2);
   }, [valence]);
 
   return (

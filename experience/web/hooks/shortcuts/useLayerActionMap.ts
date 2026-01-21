@@ -68,7 +68,7 @@ export function useLayerActionMap() {
         const newVal = !state.dataVisualizationMode;
         state.updateVisualSetting("dataVisualizationMode", newVal);
         const status = newVal
-          ? "ON - Showing all 87 emotions with VAC coordinates"
+          ? "ON - Showing all emotions with VAC coordinates"
           : "OFF - Normal view";
         logger.info("user-interaction", `Data Visualization Mode: ${status}`);
       },

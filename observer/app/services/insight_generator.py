@@ -166,7 +166,7 @@ Integration Points:
         - RecommendationEngine: Get similar emotions, journeys
         - ClinicalAlertService: Evaluate and store alerts
         - SessionAnalyticsService: Update session metrics
-        - AtlasMapper: Map emotion names to atlas
+        - EmotionResolver: Map emotion names to atlas
 
 References:
     - Motivational Interviewing: Miller & Rollnick (2012)
@@ -181,8 +181,8 @@ from typing import Any, Dict, List, Optional, cast
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.models.atlas_definition import AtlasDefinition
-from app.services.atlas_mapper import AtlasMapper
+from app.models.emotion_definition import EmotionDefinition
+from app.services.emotion_resolver import EmotionResolver
 from app.services.clinical_alert_service import ClinicalAlertService
 from app.services.recommendation_engine import RecommendationEngine
 from app.services.session_analytics_service import SessionAnalyticsService
@@ -1040,8 +1040,8 @@ class InsightGenerator:
         """
         if not use_atlas_mapping:
             # Simple exact match only
-            stmt = select(AtlasDefinition).where(
-                AtlasDefinition.emotion_name.ilike(f"%{emotion_name}%")
+            stmt = select(EmotionDefinition).where(
+                EmotionDefinition.emotion_name.ilike(f"%{emotion_name}%")
             )
             result = await self.db.execute(stmt)
             emotion = result.scalar_one_or_none()
@@ -1070,17 +1070,17 @@ class InsightGenerator:
                 }
             return None
 
-        # Use AtlasMapper for comprehensive matching
-        atlas_mapper = AtlasMapper(self.db)
-        mapping = await atlas_mapper.map_emotion(emotion_name, vac=vac_coords)
+        # Use EmotionResolver for comprehensive matching
+        resolver = EmotionResolver(self.db)
+        mapping = await resolver.resolve_emotion(emotion_name, vac=vac_coords)
 
-        if mapping.atlas_name:
+        if mapping.emotion_name:
             # Fetch full emotion details
             from uuid import UUID
 
             try:
-                emotion_id = UUID(mapping.atlas_id)
-                stmt = select(AtlasDefinition).where(AtlasDefinition.id == emotion_id)
+                emotion_id = UUID(mapping.emotion_id)
+                stmt = select(EmotionDefinition).where(EmotionDefinition.id == emotion_id)
                 result = await self.db.execute(stmt)
                 emotion = result.scalar_one_or_none()
 

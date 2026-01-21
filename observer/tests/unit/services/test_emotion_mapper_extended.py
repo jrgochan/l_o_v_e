@@ -4,7 +4,7 @@ from unittest.mock import MagicMock, AsyncMock, patch
 from uuid import uuid4
 from sqlalchemy.ext.asyncio import AsyncSession
 from app.services.emotion_mapper import EmotionMapper
-from app.models.atlas_definition import AtlasDefinition
+from app.models.emotion_definition import EmotionDefinition
 
 @pytest.fixture
 def mock_session():
@@ -16,7 +16,7 @@ def mapper(mock_session):
 
 @pytest.fixture
 def mock_emotion():
-    e = MagicMock(spec=AtlasDefinition)
+    e = MagicMock(spec=EmotionDefinition)
     e.id = uuid4()
     e.emotion_name = "Test"
     e.vac_vector = [0,0,0]

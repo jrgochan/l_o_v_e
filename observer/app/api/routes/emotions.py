@@ -274,7 +274,7 @@ from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.database import get_db
-from app.models.atlas_definition import AtlasDefinition
+from app.models.emotion_definition import EmotionDefinition, EmotionCollection
 from app.services.path_matrix_service import PathMatrixService
 from app.services.recommendation_engine import RecommendationEngine
 
@@ -283,23 +283,37 @@ logger = logging.getLogger(__name__)
 router = APIRouter()
 
 
-@router.get("/atlas/emotions", tags=["Atlas"])
+@router.get("/emotions", tags=["Emotions"])
 async def get_all_emotions(
     category: Optional[str] = Query(None, description="Filter by category"),
+    collection_id: Optional[UUID] = Query(None, description="Filter by collection ID"),
     db: AsyncSession = Depends(get_db),
 ) -> Dict[str, Any]:
     """Get all emotions from the atlas.
 
-    Returns the complete 87-emotion atlas with VAC coordinates,
+    Returns the complete emotion set (defaulting to Atlas of the Heart),
     optionally filtered by category.
     """
     try:
-        stmt = select(AtlasDefinition)
+        # Determine collection
+        target_collection_id = collection_id
+        if not target_collection_id:
+            # Get default collection
+            default_coll = await db.scalar(
+                select(EmotionCollection).where(EmotionCollection.is_default == True)
+            )
+            if default_coll:
+                target_collection_id = default_coll.id
+
+        stmt = select(EmotionDefinition)
+        
+        if target_collection_id:
+            stmt = stmt.where(EmotionDefinition.collection_id == target_collection_id)
 
         if category:
-            stmt = stmt.where(AtlasDefinition.category == category)
+            stmt = stmt.where(EmotionDefinition.category == category)
 
-        stmt = stmt.order_by(AtlasDefinition.category, AtlasDefinition.emotion_name)
+        stmt = stmt.order_by(EmotionDefinition.category, EmotionDefinition.emotion_name)
 
         result = await db.execute(stmt)
         emotions = result.scalars().all()
@@ -327,6 +341,7 @@ async def get_all_emotions(
                         if emotion.q_constant is not None
                         else [1.0, 0.0, 0.0, 0.0]
                     ),
+                    "color_hint": emotion.color_hint,
                 }
                 for emotion in emotions
             ],
@@ -337,7 +352,7 @@ async def get_all_emotions(
         raise HTTPException(status_code=500, detail=str(e))
 
 
-@router.get("/atlas/categories", tags=["Atlas"])
+@router.get("/categories", tags=["Emotions"])
 async def get_categories(db: AsyncSession = Depends(get_db)) -> Dict[str, Any]:
     """Get all emotion categories (the 13 'places' from Brené Brown's Atlas of the Heart).
 
@@ -346,12 +361,12 @@ async def get_categories(db: AsyncSession = Depends(get_db)) -> Dict[str, Any]:
     try:
         stmt = (
             select(
-                AtlasDefinition.category,
+                EmotionDefinition.category,
                 # pylint: disable=not-callable
-                func.count(AtlasDefinition.id).label("emotion_count"),
+                func.count(EmotionDefinition.id).label("emotion_count"),
             )
-            .group_by(AtlasDefinition.category)
-            .order_by(AtlasDefinition.category)
+            .group_by(EmotionDefinition.category)
+            .order_by(EmotionDefinition.category)
         )
 
         result = await db.execute(stmt)
@@ -367,14 +382,14 @@ async def get_categories(db: AsyncSession = Depends(get_db)) -> Dict[str, Any]:
         raise HTTPException(status_code=500, detail=str(e))
 
 
-@router.get("/atlas/emotions/{emotion_id}", tags=["Atlas"])
+@router.get("/emotions/{emotion_id}", tags=["Emotions"])
 async def get_emotion_by_id(emotion_id: str, db: AsyncSession = Depends(get_db)) -> Dict[str, Any]:
     """Get a specific emotion by ID.
 
     Returns complete emotion details including VAC coordinates and definition.
     """
     try:
-        stmt = select(AtlasDefinition).where(AtlasDefinition.id == emotion_id)
+        stmt = select(EmotionDefinition).where(EmotionDefinition.id == emotion_id)
         result = await db.execute(stmt)
         emotion = result.scalar_one_or_none()
 
@@ -411,7 +426,7 @@ async def get_emotion_by_id(emotion_id: str, db: AsyncSession = Depends(get_db))
         raise HTTPException(status_code=500, detail=str(e))
 
 
-@router.get("/atlas/search", tags=["Atlas"])
+@router.get("/search", tags=["Emotions"])
 async def search_emotions(
     query: str = Query(..., description="Search term for emotion name or definition"),
     db: AsyncSession = Depends(get_db),
@@ -422,12 +437,12 @@ async def search_emotions(
     """
     try:
         stmt = (
-            select(AtlasDefinition)
+            select(EmotionDefinition)
             .where(
-                (AtlasDefinition.emotion_name.ilike(f"%{query}%"))
-                | (AtlasDefinition.definition.ilike(f"%{query}%"))
+                (EmotionDefinition.emotion_name.ilike(f"%{query}%"))
+                | (EmotionDefinition.definition.ilike(f"%{query}%"))
             )
-            .order_by(AtlasDefinition.emotion_name)
+            .order_by(EmotionDefinition.emotion_name)
         )
 
         result = await db.execute(stmt)
@@ -447,6 +462,7 @@ async def search_emotions(
                         float(emotion.vac_vector[1]),
                         float(emotion.vac_vector[2]),
                     ],
+                    "color_hint": emotion.color_hint,
                 }
                 for emotion in emotions
             ],
@@ -457,7 +473,7 @@ async def search_emotions(
         raise HTTPException(status_code=500, detail=str(e))
 
 
-@router.post("/atlas/compute-all-paths", tags=["Atlas", "Path Matrix"])
+@router.post("/compute-all-paths", tags=["Emotions", "Path Matrix"])
 async def compute_all_paths_batch(
     background_tasks: BackgroundTasks,
     user_id: Optional[str] = Query(None, description="User ID for personalized paths"),
@@ -497,7 +513,7 @@ async def compute_all_paths_batch(
         raise HTTPException(status_code=500, detail=str(e))
 
 
-@router.get("/atlas/computation-status/{job_id}", tags=["Atlas", "Path Matrix"])
+@router.get("/computation-status/{job_id}", tags=["Emotions", "Path Matrix"])
 async def get_computation_status(
     job_id: UUID, db: AsyncSession = Depends(get_db)
 ) -> Dict[str, Any]:
@@ -521,7 +537,7 @@ async def get_computation_status(
         raise HTTPException(status_code=500, detail=str(e))
 
 
-@router.get("/atlas/paths/all", tags=["Atlas", "Path Matrix"])
+@router.get("/paths/all", tags=["Emotions", "Path Matrix"])
 async def get_all_cached_paths(
     difficulty: Optional[str] = Query(
         None, description="Filter by difficulty: easy, moderate, difficult"
@@ -561,7 +577,7 @@ async def get_all_cached_paths(
         raise HTTPException(status_code=500, detail=str(e))
 
 
-@router.get("/atlas/statistics", tags=["Atlas", "Path Matrix"])
+@router.get("/statistics", tags=["Emotions", "Path Matrix"])
 async def get_atlas_statistics(db: AsyncSession = Depends(get_db)) -> Dict[str, Any]:
     """Get comprehensive statistics about the path matrix.
 
@@ -579,7 +595,7 @@ async def get_atlas_statistics(db: AsyncSession = Depends(get_db)) -> Dict[str, 
         raise HTTPException(status_code=500, detail=str(e))
 
 
-@router.delete("/atlas/paths/cache", tags=["Atlas", "Path Matrix"])
+@router.delete("/paths/cache", tags=["Emotions", "Path Matrix"])
 async def clear_path_cache(db: AsyncSession = Depends(get_db)) -> Dict[str, Any]:
     """Clear all cached paths from the path matrix.
 
@@ -602,7 +618,7 @@ async def clear_path_cache(db: AsyncSession = Depends(get_db)) -> Dict[str, Any]
         raise HTTPException(status_code=500, detail=str(e))
 
 
-@router.get("/atlas/recommendations", tags=["Atlas", "Smart Recommendations"])
+@router.get("/recommendations", tags=["Emotions", "Smart Recommendations"])
 async def get_smart_recommendations(
     context: str = Query("exploration", description="Context: exploration, healing, or growth"),
     emotion_id: Optional[str] = Query(None, description="Current emotion for similarity search"),

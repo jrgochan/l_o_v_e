@@ -13,7 +13,8 @@ from fastapi.middleware.cors import CORSMiddleware
 from app.api.routes import (
     admin,
     ai_settings,
-    atlas,
+    collections,
+    emotions,
     auth,
     bootstrap,
     chat_websocket,
@@ -100,7 +101,8 @@ app.include_router(health.router, tags=["Health"])
 app.include_router(state.router, tags=["State"])
 app.include_router(history.router, tags=["History"])
 app.include_router(current.router, tags=["Current"])
-app.include_router(atlas.router, prefix="/observer", tags=["Atlas"])
+app.include_router(collections.router, prefix="/observer", tags=["Collections"])
+app.include_router(emotions.router, prefix="/observer", tags=["Emotions"])
 app.include_router(transitions.router, prefix="/observer", tags=["Transitions"])
 app.include_router(bootstrap.router, prefix="/observer/bootstrap", tags=["Bootstrap"])
 app.include_router(websocket_router, tags=["WebSocket"])

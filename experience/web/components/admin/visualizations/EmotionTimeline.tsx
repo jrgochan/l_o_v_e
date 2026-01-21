@@ -8,7 +8,8 @@
 "use client";
 
 import type { EmotionHistoryEntry } from "@/stores/useEmotionHistoryStore";
-import { CATEGORY_COLORS } from "@/types/atlas-admin";
+import { useAtlasAdminStore } from "@/stores/useAtlasAdminStore";
+import { resolveEmotionColor } from "@/utils/emotion-colors";
 import { useAdminTheme } from "@/hooks/admin/useAdminTheme";
 
 interface EmotionTimelineProps {
@@ -18,6 +19,7 @@ interface EmotionTimelineProps {
 
 export function EmotionTimeline({ entries, onToggleVisibility }: EmotionTimelineProps) {
   const theme = useAdminTheme();
+  const allEmotions = useAtlasAdminStore((state) => state.allEmotions);
 
   if (entries.length === 0) return null;
 
@@ -25,7 +27,8 @@ export function EmotionTimeline({ entries, onToggleVisibility }: EmotionTimeline
     <div className="space-y-3">
       {/* Timeline nodes */}
       {entries.map((entry, index) => {
-        const categoryColor = CATEGORY_COLORS[entry.category] || "#888888";
+        const emotion = allEmotions.find((e) => e.name === entry.emotion);
+        const categoryColor = resolveEmotionColor(emotion);
         const timeStr = entry.timestamp.toLocaleTimeString([], {
           hour: "2-digit",
           minute: "2-digit",
@@ -48,11 +51,10 @@ export function EmotionTimeline({ entries, onToggleVisibility }: EmotionTimeline
               <div className="relative flex-shrink-0">
                 <button
                   onClick={() => onToggleVisibility(entry.id)}
-                  className={`w-7 h-7 rounded-full border-2 flex items-center justify-center transition ${
-                    entry.isVisibleInSphere
-                      ? "border-cyan-400 bg-cyan-500"
-                      : `${theme.colors.border} ${theme.colors.background} hover:brightness-125`
-                  }`}
+                  className={`w-7 h-7 rounded-full border-2 flex items-center justify-center transition ${entry.isVisibleInSphere
+                    ? "border-cyan-400 bg-cyan-500"
+                    : `${theme.colors.border} ${theme.colors.background} hover:brightness-125`
+                    }`}
                   style={{
                     backgroundColor: entry.isVisibleInSphere ? categoryColor : undefined,
                   }}
@@ -89,9 +91,8 @@ export function EmotionTimeline({ entries, onToggleVisibility }: EmotionTimeline
                     <div className={`text-xs ${theme.colors.text.muted} mb-0.5`}>V</div>
                     <div className="h-1.5 bg-gray-700/50 rounded overflow-hidden">
                       <div
-                        className={`h-full transition-all ${
-                          entry.vac.valence >= 0 ? "bg-cyan-400" : "bg-red-400"
-                        }`}
+                        className={`h-full transition-all ${entry.vac.valence >= 0 ? "bg-cyan-400" : "bg-red-400"
+                          }`}
                         style={{
                           width: `${Math.abs(entry.vac.valence) * 100}%`,
                         }}
@@ -113,9 +114,8 @@ export function EmotionTimeline({ entries, onToggleVisibility }: EmotionTimeline
                     <div className={`text-xs ${theme.colors.text.muted} mb-0.5`}>C</div>
                     <div className="h-1.5 bg-gray-700/50 rounded overflow-hidden">
                       <div
-                        className={`h-full transition-all ${
-                          entry.vac.connection >= 0 ? "bg-purple-400" : "bg-pink-400"
-                        }`}
+                        className={`h-full transition-all ${entry.vac.connection >= 0 ? "bg-purple-400" : "bg-pink-400"
+                          }`}
                         style={{
                           width: `${Math.abs(entry.vac.connection) * 100}%`,
                         }}

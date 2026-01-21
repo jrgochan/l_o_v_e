@@ -17,9 +17,11 @@ import type {
   LayerVisibility,
   CacheStatus,
   PathAnimationMode,
+  EmotionCollection,
 } from "@/types";
-import { DEFAULT_SETTINGS, DEFAULT_LAYERS, CATEGORY_COLORS, BRIDGE_EMOTIONS } from "@/types";
+import { DEFAULT_SETTINGS, DEFAULT_LAYERS, CATEGORY_COLORS } from "@/types";
 import { logger } from "@/utils/logger";
+import { resolveEmotionColor } from "@/utils/emotion-colors";
 
 interface AtlasAdminState {
   // State
@@ -40,11 +42,16 @@ interface AtlasAdminState {
   settings: AtlasAdminSettings;
   layers: LayerVisibility;
 
+  collections: EmotionCollection[];
+  activeCollectionId: string | null;
+  isLoadingCollections: boolean;
   isLoadingEmotions: boolean;
   isComputingPaths: boolean;
   error: string | null;
 
   // Actions
+  setCollections: (collections: EmotionCollection[]) => void;
+  setActiveCollection: (id: string) => void;
   setAllEmotions: (emotions: AtlasEmotion[]) => void;
   addComputedPath: (path: EmotionPath) => void;
 
@@ -131,6 +138,10 @@ export const reviver = (_key: string, value: unknown) => {
 };
 
 export const getInitialAdminState = () => ({
+  collections: [] as EmotionCollection[],
+  activeCollectionId: null as string | null,
+  isLoadingCollections: false,
+
   allEmotions: [] as AtlasEmotion[],
   selectedEmotionIds: new Set<string>(),
   computedPaths: new Map<string, EmotionPath>(),
@@ -164,6 +175,9 @@ export const useAtlasAdminStore = create<AtlasAdminState>()(
       // Initial state
       ...getInitialAdminState(),
 
+      setCollections: (collections) => set({ collections }),
+      setActiveCollection: (id) => set({ activeCollectionId: id }),
+
       // Data actions
       setAllEmotions: (emotions) => {
         // Build category filters from emotions
@@ -173,7 +187,7 @@ export const useAtlasAdminStore = create<AtlasAdminState>()(
             categoryMap.set(emotion.category, {
               name: emotion.category,
               enabled: true,
-              color: CATEGORY_COLORS[emotion.category] || "#888888",
+              color: resolveEmotionColor(emotion),
               emotionCount: 0,
             });
           }
@@ -411,9 +425,7 @@ export const useAtlasAdminStore = create<AtlasAdminState>()(
 
       getBridgeEmotions: () => {
         const state = get();
-        return state.allEmotions.filter((emotion) =>
-          (BRIDGE_EMOTIONS as readonly string[]).includes(emotion.name)
-        );
+        return state.allEmotions.filter((emotion) => emotion.is_bridge);
       },
 
       getPathForPair: (fromId, toId) => {

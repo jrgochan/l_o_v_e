@@ -199,7 +199,7 @@ Integration Points:
 
     Calls::
 
-        - AtlasMapper: Resolve emotion names to IDs
+        - EmotionResolver: Resolve emotion names to IDs
         - MultiEmotionAnalysis model: Deep Feeling Mode storage
         - Database: All CRUD operations
 
@@ -226,7 +226,7 @@ from app.models.multi_emotion_analysis import (
     EmotionRelationship,
     MultiEmotionAnalysis,
 )
-from app.services.atlas_mapper import AtlasMapper, MappingResult
+from app.services.emotion_resolver import EmotionResolver, MappingResult
 
 logger = logging.getLogger(__name__)
 
@@ -553,10 +553,10 @@ class ChatService:
         mapping = await self._resolve_emotion(emotion_name)
 
         emotion_id = None
-        if mapping.atlas_id:
+        if mapping.emotion_id:
             from uuid import UUID
 
-            emotion_id = UUID(mapping.atlas_id)
+            emotion_id = UUID(mapping.emotion_id)
         else:
             logger.warning(f"Emotion not found: {emotion_name}")
 
@@ -743,13 +743,13 @@ class ChatService:
         }
 
     async def _resolve_emotion(self, emotion_name: str) -> MappingResult:
-        """Resolve emotion name to Atlas emotion using AtlasMapper.
+        """Resolve emotion name to EmotionResolver.
 
         Returns full mapping result including method and confidence.
         """
-        # Use AtlasMapper for comprehensive matching
-        atlas_mapper = AtlasMapper(self.db)
-        return await atlas_mapper.map_emotion(emotion_name)
+        # Use EmotionResolver for comprehensive matching
+        resolver = EmotionResolver(self.db)
+        return await resolver.resolve_emotion(emotion_name)
 
     async def delete_session(self, session_id: UUID) -> bool:
         """Delete a session and all its messages (cascade).
@@ -882,10 +882,10 @@ class ChatService:
             mapping = await self._resolve_emotion(emotion_data["emotion_name"])
 
             emotion_id = None
-            if mapping.atlas_id:
+            if mapping.emotion_id:
                 from uuid import UUID
 
-                emotion_id = UUID(mapping.atlas_id)
+                emotion_id = UUID(mapping.emotion_id)
 
             # Create detected emotion record
             # prominence: Relative strength (all emotions sum to 1.0)

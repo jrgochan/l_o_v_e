@@ -3,7 +3,7 @@
  *
  * CSS-based sphere for Data Visualization Mode (no WebGL).
  * Displays emotion with gradient colors based on VAC coordinates.
- * Designed for performance when showing all 87 emotions simultaneously.
+ * Designed for performance when showing all emotions simultaneously.
  */
 
 "use client";
@@ -11,7 +11,7 @@
 import { useMemo } from "react";
 import * as THREE from "three";
 import type { AtlasEmotion } from "@/types/atlas-admin";
-import { CATEGORY_COLORS } from "@/types/atlas-admin";
+import { resolveEmotionColor } from "@/utils/emotion-colors";
 
 interface MiniSoulSphereProps {
   emotion: AtlasEmotion;
@@ -35,7 +35,7 @@ export function MiniSoulSphere({
   const colorHex = useMemo(() => {
     switch (colorMode) {
       case "category":
-        return CATEGORY_COLORS[emotion.category] || "#888888";
+        return resolveEmotionColor(emotion);
 
       case "valence": {
         // Red (negative) to Green (positive)

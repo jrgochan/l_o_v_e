@@ -4,7 +4,7 @@ import json
 from unittest.mock import AsyncMock, MagicMock, patch
 from uuid import uuid4
 from app.services.insight_generator import InsightGenerator
-from app.models.atlas_definition import AtlasDefinition
+from app.models.emotion_definition import EmotionDefinition
 
 @pytest.fixture
 def mock_db():
@@ -50,15 +50,15 @@ class MockAsyncDb:
 @pytest.mark.asyncio
 async def test_get_emotion_details_no_vac_vector(insight_generator):
     """Test when emotion found but has no VAC vector."""
-    with patch("app.services.insight_generator.AtlasMapper") as MockMapper:
+    with patch("app.services.insight_generator.EmotionResolver") as MockMapper:
         mapping_result = MagicMock(
-            atlas_name="Joy", 
-            atlas_id=str(uuid4()), 
+            emotion_name="Joy", 
+            emotion_id=str(uuid4()), 
             vac=[0.8, 0.5, 0.2], 
             match_method="exact", 
             match_confidence=0.9
         )
-        MockMapper.return_value.map_emotion = AsyncMock(return_value=mapping_result)
+        MockMapper.return_value.resolve_emotion = AsyncMock(return_value=mapping_result)
         
         mock_emotion = MagicMock(
             id=uuid4(),
@@ -79,9 +79,9 @@ async def test_get_emotion_details_no_vac_vector(insight_generator):
 @pytest.mark.asyncio
 async def test_get_emotion_details_db_exception(insight_generator):
     """Test DB exception handling in emotion details."""
-    with patch("app.services.insight_generator.AtlasMapper") as MockMapper:
-        MockMapper.return_value.map_emotion = AsyncMock(
-            return_value=MagicMock(atlas_name="Joy", atlas_id=str(uuid4()))
+    with patch("app.services.insight_generator.EmotionResolver") as MockMapper:
+        MockMapper.return_value.resolve_emotion = AsyncMock(
+            return_value=MagicMock(emotion_name="Joy", emotion_id=str(uuid4()))
         )
         
         insight_generator.db = MockAsyncDb(exception=Exception("DB Fail"))
@@ -92,9 +92,9 @@ async def test_get_emotion_details_db_exception(insight_generator):
 @pytest.mark.asyncio
 async def test_get_emotion_details_not_found_after_map(insight_generator):
     """Test mapping returns ID but DB returns None."""
-    with patch("app.services.insight_generator.AtlasMapper") as MockMapper:
-        MockMapper.return_value.map_emotion = AsyncMock(
-            return_value=MagicMock(atlas_name="Joy", atlas_id=str(uuid4()))
+    with patch("app.services.insight_generator.EmotionResolver") as MockMapper:
+        MockMapper.return_value.resolve_emotion = AsyncMock(
+            return_value=MagicMock(emotion_name="Joy", emotion_id=str(uuid4()))
         )
         
         mock_db_result = MagicMock()
@@ -175,7 +175,7 @@ async def test_get_emotion_details_no_vac_vector_direct():
     mock_session = AsyncMock()
     generator = InsightGenerator(mock_session)
     
-    emotion = MagicMock(spec=AtlasDefinition, id=1, emotion_name="Joy", vac_vector=None)
+    emotion = MagicMock(spec=EmotionDefinition, id=1, emotion_name="Joy", vac_vector=None)
     mock_res = MagicMock()
     mock_res.scalar_one_or_none.return_value = emotion
     mock_session.execute.return_value = mock_res
@@ -312,13 +312,13 @@ async def test_get_emotion_details_logic(insight_generator_service, mock_db):
     res3 = await insight_generator_service._get_emotion_details("Unknown", use_atlas_mapping=False)
     assert res3 is None
     
-    with patch("app.services.insight_generator.AtlasMapper") as MockMapper:
+    with patch("app.services.insight_generator.EmotionResolver") as MockMapper:
         mock_map_res = MagicMock()
-        mock_map_res.atlas_name = "MappedJoy"
-        mock_map_res.atlas_id = str(uuid4())
+        mock_map_res.emotion_name = "MappedJoy"
+        mock_map_res.emotion_id = str(uuid4())
         mock_map_res.vac = [0.9, 0.9, 0.9]
         mock_map_res.match_method = "fuzzy"
-        MockMapper.return_value.map_emotion = AsyncMock(return_value=mock_map_res)
+        MockMapper.return_value.resolve_emotion = AsyncMock(return_value=mock_map_res)
         
         mock_res.scalar_one_or_none.return_value = mock_emotion
         res4 = await insight_generator_service._get_emotion_details("Joyful", use_atlas_mapping=True)
@@ -512,16 +512,16 @@ async def test_assess_risk_indicators(insight_generator_service):
 
 @pytest.mark.asyncio
 async def test_generate_insights_warm_flow(insight_generator_service, mock_db):
-    # Mock AtlasMapper
-    with patch("app.services.insight_generator.AtlasMapper") as MockMapper:
+    # Mock EmotionResolver
+    with patch("app.services.insight_generator.EmotionResolver") as MockMapper:
         mapper = AsyncMock()
         MockMapper.return_value = mapper
         
-        mock_def = AtlasDefinition(id=uuid4(), emotion_name="Joy", definition="Happiness")
+        mock_def = EmotionDefinition(id=uuid4(), emotion_name="Joy", definition="Happiness")
         mapping = MagicMock()
-        mapping.atlas_id = str(mock_def.id)
-        mapping.atlas_name = "Joy"
-        mapper.map_emotion.return_value = mapping
+        mapping.emotion_id = str(mock_def.id)
+        mapping.emotion_name = "Joy"
+        mapper.resolve_emotion.return_value = mapping
         
         # Mock DB execute for _get_emotion_details
         result_mock = MagicMock()
@@ -544,16 +544,16 @@ async def test_generate_insights_warm_flow(insight_generator_service, mock_db):
 
 @pytest.mark.asyncio
 async def test_generate_insights_clinical_flow(insight_generator_service, mock_db):
-    # Mock AtlasMapper
-    with patch("app.services.insight_generator.AtlasMapper") as MockMapper:
+    # Mock EmotionResolver
+    with patch("app.services.insight_generator.EmotionResolver") as MockMapper:
         mapper = AsyncMock()
         MockMapper.return_value = mapper
         
-        mock_def = AtlasDefinition(id=uuid4(), emotion_name="Anxiety", definition="Worry", category="Fear")
+        mock_def = EmotionDefinition(id=uuid4(), emotion_name="Anxiety", definition="Worry", category="Fear")
         mapping = MagicMock()
-        mapping.atlas_id = str(mock_def.id)
-        mapping.atlas_name = "Anxiety"
-        mapper.map_emotion.return_value = mapping
+        mapping.emotion_id = str(mock_def.id)
+        mapping.emotion_name = "Anxiety"
+        mapper.resolve_emotion.return_value = mapping
         
         # Mock DB execute for _get_emotion_details
         result_mock = MagicMock()
@@ -594,15 +594,15 @@ async def test_generate_insights_clinical_flow(insight_generator_service, mock_d
 
 @pytest.mark.asyncio
 async def test_generate_insights_no_mapping(insight_generator_service, mock_db):
-    # Test fallback when AtlasMapper returns no ID
-    with patch("app.services.insight_generator.AtlasMapper") as MockMapper:
+    # Test fallback when EmotionResolver returns no ID
+    with patch("app.services.insight_generator.EmotionResolver") as MockMapper:
         mapper = MagicMock()
-        mapper.map_emotion = AsyncMock()
+        mapper.resolve_emotion = AsyncMock()
         MockMapper.return_value = mapper
         mapping = MagicMock()
-        mapping.atlas_name = None  # Explicitly None to trigger fallback
-        mapping.atlas_id = None
-        mapper.map_emotion.return_value = mapping
+        mapping.emotion_name = None  # Explicitly None to trigger fallback
+        mapping.emotion_id = None
+        mapper.resolve_emotion.return_value = mapping
         
         insights = await insight_generator_service.generate_insights(
             emotion_name="UnknownEmotion",

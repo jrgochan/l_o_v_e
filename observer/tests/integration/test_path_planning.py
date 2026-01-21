@@ -1,5 +1,5 @@
 import pytest
-from app.models.atlas_definition import AtlasDefinition
+from app.models.emotion_definition import EmotionDefinition
 from app.services.path_planner import PathPlanner
 from app.models.transition_strategy import CategoryTransition
 from sqlalchemy import select
@@ -12,7 +12,7 @@ async def test_find_transition_path_simple(test_db, seeded_test_atlas):
     planner = PathPlanner(test_db)
     
     # Mock finding emotions
-    stmt = select(AtlasDefinition).where(AtlasDefinition.emotion_name.in_(["Anger", "Frustration"]))
+    stmt = select(EmotionDefinition).where(EmotionDefinition.emotion_name.in_(["Anger", "Frustration"]))
     result = await test_db.execute(stmt)
     emotions = {e.emotion_name: e for e in result.scalars().all()}
     
@@ -37,7 +37,7 @@ async def test_arousal_regulation_trigger(test_db, seeded_test_atlas):
     
     # 1. Panic: High arousal (~0.8)
     # 2. Calm: Low arousal (~-0.3)
-    stmt = select(AtlasDefinition).where(AtlasDefinition.emotion_name.in_(["Panic", "Calm"]))
+    stmt = select(EmotionDefinition).where(EmotionDefinition.emotion_name.in_(["Panic", "Calm"]))
     result = await test_db.execute(stmt)
     emotions = {e.emotion_name: e for e in result.scalars().all()}
     
@@ -82,7 +82,7 @@ async def test_shame_joy_impossible_direct(test_db, seeded_test_atlas):
     """Test that Shame -> Joy is not direct and requires bridge."""
     planner = PathPlanner(test_db)
     
-    stmt = select(AtlasDefinition).where(AtlasDefinition.emotion_name.in_(["Shame", "Joy"]))
+    stmt = select(EmotionDefinition).where(EmotionDefinition.emotion_name.in_(["Shame", "Joy"]))
     result = await test_db.execute(stmt)
     emotions = {e.emotion_name: e for e in result.scalars().all()}
     

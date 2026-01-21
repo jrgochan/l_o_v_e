@@ -55,13 +55,13 @@ import numpy as np
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.models.atlas_definition import AtlasDefinition
+from app.models.emotion_definition import EmotionDefinition
 
 logger = logging.getLogger(__name__)
 
 
 class EmotionMapper:
-    """Maps VAC coordinates and text to the nearest Atlas emotion.
+    """Maps VAC coordinates and text to the nearest EmotionDefinition.
 
     Uses weighted fusion of:
     1. VAC distance (Euclidean distance in 3D space)
@@ -85,7 +85,8 @@ class EmotionMapper:
         vac_values: List[float],
         text_embedding: Optional[List[float]] = None,
         word_count: Optional[int] = None,
-    ) -> AtlasDefinition:
+        collection_id: Optional[str] = None,
+    ) -> EmotionDefinition:
         """Find the nearest emotion from the Atlas.
 
         Args:
@@ -94,13 +95,17 @@ class EmotionMapper:
             word_count: Number of words in input text (for weighting)
 
         Returns:
-            AtlasDefinition of the nearest emotion
+            EmotionDefinition of the nearest emotion
 
         Raises:
             ValueError: If no emotions found in database
         """
-        # Fetch all Atlas emotions
-        stmt = select(AtlasDefinition)
+        # Fetch all emotions (filtered by collection if provided)
+        stmt = select(EmotionDefinition)
+        if collection_id:
+            from uuid import UUID
+            stmt = stmt.where(EmotionDefinition.collection_id == UUID(collection_id))
+            
         result = await self.session.execute(stmt)
         emotions = result.scalars().all()
 
@@ -142,7 +147,7 @@ class EmotionMapper:
         nearest_id = min(distances, key=lambda k: distances[k])
 
         # Fetch the nearest emotion
-        stmt = select(AtlasDefinition).where(AtlasDefinition.id == nearest_id)
+        stmt = select(EmotionDefinition).where(EmotionDefinition.id == nearest_id)
         result = await self.session.execute(stmt)
         nearest_emotion = result.scalar_one()
 
@@ -349,7 +354,11 @@ class EmotionMapper:
 
         return combined
 
-    async def find_nearest_by_vac_only(self, vac_values: List[float]) -> AtlasDefinition:
+    async def find_nearest_by_vac_only(
+        self, 
+        vac_values: List[float],
+        collection_id: Optional[str] = None
+    ) -> EmotionDefinition:
         """Find nearest emotion using only VAC distance.
 
         Useful when no text input is available.
@@ -358,9 +367,9 @@ class EmotionMapper:
             vac_values: [valence, arousal, connection]
 
         Returns:
-            AtlasDefinition of the nearest emotion
+            EmotionDefinition of the nearest emotion
         """
-        return await self.find_nearest(vac_values, text_embedding=None)
+        return await self.find_nearest(vac_values, text_embedding=None, collection_id=collection_id)
 
     async def get_top_k_nearest(
         self,
@@ -368,7 +377,8 @@ class EmotionMapper:
         text_embedding: Optional[List[float]] = None,
         word_count: Optional[int] = None,
         k: int = 5,
-    ) -> List[Tuple[AtlasDefinition, float]]:
+        collection_id: Optional[str] = None,
+    ) -> List[Tuple[EmotionDefinition, float]]:
         """Find the top K nearest emotions.
 
         Args:
@@ -380,8 +390,12 @@ class EmotionMapper:
         Returns:
             List of (emotion, distance) tuples, sorted by distance
         """
-        # Fetch all Atlas emotions
-        stmt = select(AtlasDefinition)
+        # Fetch all emotions
+        stmt = select(EmotionDefinition)
+        if collection_id:
+            from uuid import UUID
+            stmt = stmt.where(EmotionDefinition.collection_id == UUID(collection_id))
+
         result = await self.session.execute(stmt)
         emotions = result.scalars().all()
 

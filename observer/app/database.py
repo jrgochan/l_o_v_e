@@ -85,7 +85,7 @@ async def init_db() -> None:
         async with engine.begin() as conn:
             # Import all models to register them with Base
             from app.models import (  # noqa: F401 # pylint: disable=unused-import
-                atlas_definition,
+                emotion_definition,
                 chat_message,
                 chat_session,
                 clinical_alert,

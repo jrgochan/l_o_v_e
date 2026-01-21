@@ -4,19 +4,22 @@
  * Comprehensive types for the Soul Sphere admin visualization tool.
  */
 
-import type { VACVector, Quaternion } from "@love/experience-shared";
+import type { VACVector, Quaternion, EmotionCollection } from "@love/experience-shared";
+export type { EmotionCollection };
 
 /**
  * Complete emotion definition from Observer API
  */
 export interface AtlasEmotion {
   id: string;
+  collection_id?: string;
   name: string;
   category: string;
   definition: string;
   vac: VACVector;
   quaternion: Quaternion;
   color_hint?: string;
+  is_bridge?: boolean;
 }
 
 /**

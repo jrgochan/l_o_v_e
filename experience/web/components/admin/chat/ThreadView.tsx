@@ -32,9 +32,11 @@ export function ThreadView({
             try {
                 setLoading(true);
                 // Use centralized API client which handles auth and base URL
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
                 const data = await api.get<any[]>(`observer/chat/messages/${rootMessageId}/thread?limit=20`);
 
                 // Transform dates
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
                 const parsedMessages = data.map((msg: any) => ({
                     ...msg,
                     timestamp: new Date(msg.timestamp)

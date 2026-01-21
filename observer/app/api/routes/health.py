@@ -235,7 +235,7 @@ from sqlalchemy import func, select, text
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.database import get_db
-from app.models.atlas_definition import AtlasDefinition
+from app.models.emotion_definition import EmotionDefinition
 
 logger = logging.getLogger(__name__)
 
@@ -293,7 +293,7 @@ async def health_check(db: AsyncSession = Depends(get_db)) -> HealthResponse:
 
         # Count Atlas emotions
         # pylint: disable=not-callable
-        result = await db.execute(select(func.count(AtlasDefinition.id)))
+        result = await db.execute(select(func.count(EmotionDefinition.id)))
         emotion_count = result.scalar() or 0
 
         # Determine overall status
