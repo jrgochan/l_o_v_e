@@ -29,6 +29,7 @@ export interface ObserverEmotionResponse {
     vac: [number, number, number];
     quaternion: [number, number, number, number];
     color_hint?: string;
+    movement_pattern?: string;
   }>;
 }
 

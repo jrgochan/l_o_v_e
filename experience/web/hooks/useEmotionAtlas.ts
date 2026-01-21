@@ -103,6 +103,7 @@ export function useEmotionAtlas() {
           vac: vac || [0, 0, 0],
           quaternion: emotion.quaternion,
           color_hint: emotion.color_hint,
+          movement_pattern: emotion.movement_pattern,
           is_bridge: isBridge,
         };
       });

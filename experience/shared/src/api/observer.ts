@@ -66,6 +66,7 @@ export interface AtlasEmotion {
   definition: string;
   vac: [number, number, number];
   quaternion: [number, number, number, number];
+  movement_pattern?: string;
 }
 
 export interface AtlasEmotionsResponse {
