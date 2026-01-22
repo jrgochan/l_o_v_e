@@ -106,7 +106,7 @@ describe("ThreadView", () => {
         });
     });
 
-    it("calls onClose when close button is clicked", () => {
+    it("calls onClose when close button is clicked", async () => {
         render(
             <ThreadView
                 rootMessageId="root-1"
@@ -115,6 +115,11 @@ describe("ThreadView", () => {
                 deepFeelingMode={true}
             />
         );
+
+        // Wait for fetch to complete to avoid act warning
+        await waitFor(() => {
+            expect(screen.getByTestId("chat-message-list")).toBeInTheDocument();
+        });
 
         fireEvent.click(screen.getByText("✕"));
         expect(mockOnClose).toHaveBeenCalled();

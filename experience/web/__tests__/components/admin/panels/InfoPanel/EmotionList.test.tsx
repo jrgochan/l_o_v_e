@@ -71,4 +71,37 @@ describe("EmotionList", () => {
 
     expect(onRemove).toHaveBeenCalledWith(mockEmotions[0].id);
   });
+
+  it("calls onFocus when emotion card is clicked", () => {
+    const onFocus = jest.fn();
+    render(
+      <EmotionList
+        emotions={[mockEmotions[0]] as any}
+        animationMode="dynamic"
+        onFocus={onFocus}
+      />
+    );
+
+    // Click anywhere on the card
+    const card = screen.getByText("Joy").closest("div");
+    // We can just click the text to propagate up
+    screen.getByText("Joy").click();
+
+    expect(onFocus).toHaveBeenCalledWith("joy");
+  });
+
+  it("toggles focus off when clicking already focused emotion", () => {
+    const onFocus = jest.fn();
+    render(
+      <EmotionList
+        emotions={[mockEmotions[0]] as any}
+        animationMode="dynamic"
+        onFocus={onFocus}
+        focusedEmotionId="joy"
+      />
+    );
+
+    screen.getByText("Joy").click();
+    expect(onFocus).toHaveBeenCalledWith(null);
+  });
 });

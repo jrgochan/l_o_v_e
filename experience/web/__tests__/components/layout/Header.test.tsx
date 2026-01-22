@@ -102,7 +102,7 @@ describe("Header", () => {
     expect(screen.getByText("🚪 Sign out")).toBeInTheDocument();
 
     // Admin link should NOT be there for regular user
-    expect(screen.queryByText("⚡ Admin Dashboard")).not.toBeInTheDocument();
+    expect(screen.queryByText("Admin Panel")).not.toBeInTheDocument();
 
     // Close logic (click outside) - hard to mock exact document click in JSDOM sometimes without setup,
     // but we can test the toggle logic by clicking the button again
@@ -128,7 +128,7 @@ describe("Header", () => {
 
     // Open dropdown
     fireEvent.click(screen.getByText("admin").closest("button")!);
-    const adminLink = screen.getByText("⚡ Admin Dashboard");
+    const adminLink = screen.getByText("Admin Panel");
     expect(adminLink).toBeInTheDocument();
 
     // Click the link to cover the onClick handler

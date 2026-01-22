@@ -2,6 +2,12 @@ import { render, screen, fireEvent } from "@testing-library/react";
 import { EmotionHistoryCard } from "@/components/admin/state-display/EmotionHistoryCard";
 import type { EmotionHistoryEntry } from "@/stores/useEmotionHistoryStore";
 
+// Mock the store
+jest.mock("@/stores/useAtlasAdminStore", () => ({
+  useAtlasAdminStore: jest.fn(),
+}));
+import { useAtlasAdminStore } from "@/stores/useAtlasAdminStore";
+
 describe("EmotionHistoryCard", () => {
   const mockEntry: EmotionHistoryEntry = {
     id: "1",
@@ -20,6 +26,15 @@ describe("EmotionHistoryCard", () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
+    (useAtlasAdminStore as unknown as jest.Mock).mockImplementation((selector) => {
+      const state = {
+        allEmotions: [
+          { name: "Joy", category: "joy", vac: [0.8, 0.5, 0.7] },
+          { name: "Sadness", category: "sadness", vac: [-0.6, -0.4, -0.2] },
+        ],
+      };
+      return selector(state);
+    });
   });
 
   it("renders basic info", () => {

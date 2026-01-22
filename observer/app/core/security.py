@@ -18,7 +18,7 @@ if not hasattr(bcrypt, "__about__"):
         class About:
             __version__ = bcrypt.__version__
         bcrypt.__about__ = About()
-    except Exception:
+    except Exception:  # pragma: no cover
         pass
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")

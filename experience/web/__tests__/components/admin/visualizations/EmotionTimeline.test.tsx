@@ -4,6 +4,10 @@ import { EmotionHistoryEntry } from "@/stores/useEmotionHistoryStore";
 import { useAdminTheme } from "@/hooks/admin/useAdminTheme";
 
 jest.mock("@/hooks/admin/useAdminTheme");
+jest.mock("@/stores/useAtlasAdminStore", () => ({
+  useAtlasAdminStore: jest.fn(),
+}));
+import { useAtlasAdminStore } from "@/stores/useAtlasAdminStore";
 
 const mockEntries: EmotionHistoryEntry[] = [
   {
@@ -36,6 +40,17 @@ describe("EmotionTimeline", () => {
         background: "bg-black",
         text: { primary: "text-white", secondary: "text-gray", muted: "text-gray-500" },
       },
+    });
+
+    (useAtlasAdminStore as unknown as jest.Mock).mockImplementation((selector) => {
+      const state = {
+        allEmotions: [
+          { name: "Joy", category: "Happy", vac: [0.8, 0.5, 0.6] },
+          { name: "Sadness", category: "Sad", vac: [-0.5, 0.2, 0.3] },
+          { name: "Hostility", category: "Anger", vac: [-0.8, 0.9, -0.7] },
+        ],
+      };
+      return selector(state);
     });
   });
 

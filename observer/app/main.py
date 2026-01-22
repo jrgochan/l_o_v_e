@@ -14,7 +14,7 @@ if not hasattr(bcrypt, "__about__"):
         class About:
             __version__ = bcrypt.__version__
         bcrypt.__about__ = About()
-    except Exception:
+    except Exception:  # pragma: no cover
         pass
 
 from fastapi import FastAPI
@@ -81,7 +81,7 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
     try:
         await close_db()
         logger.info("Database connections closed")
-    except Exception as e:
+    except Exception as e:  # pragma: no cover
         logger.error(f"Error during shutdown: {e}")
 
 

@@ -13,6 +13,11 @@ jest.mock("@/stores/useExperienceStore", () => ({
   useExperienceStore: jest.fn(),
 }));
 
+jest.mock("@/stores/useAtlasAdminStore", () => ({
+  useAtlasAdminStore: jest.fn(),
+}));
+import { useAtlasAdminStore } from "@/stores/useAtlasAdminStore";
+
 const setMockState = (updates: any) => {
   Object.assign(mockState, updates);
 };
@@ -29,6 +34,17 @@ describe("WaypointArrivalOverlay", () => {
     (useExperienceStore as unknown as jest.Mock).mockImplementation((selector: any) =>
       selector ? selector(mockState) : mockState
     );
+
+    (useAtlasAdminStore as unknown as jest.Mock).mockImplementation((selector: any) => {
+      const state = {
+        allEmotions: [
+          { name: "Joy", category: "Happy", vac: [0.8, 0.5, 0.6] },
+          { name: "Peace", category: "Calm", vac: [0.5, 0.1, 0.5] },
+          { name: "Hope", category: "Happy", vac: [0.6, 0.4, 0.5] },
+        ],
+      };
+      return selector(state);
+    });
   });
 
   it("renders nothing when not flying", () => {

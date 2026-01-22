@@ -8,6 +8,12 @@ fetchMock.enableMocks();
 
 jest.mock("@/stores/useAtlasAdminStore");
 jest.mock("@/utils/logger");
+jest.mock("@love/experience-shared", () => ({
+  getCanonicalEmotion: jest.fn((name) => {
+    if (name === "Joy") return { vac: [0.8, 0.5, 0.7] };
+    return null;
+  }),
+}));
 
 describe("useEmotionAtlas", () => {
   const mockSetAllEmotions = jest.fn();
