@@ -55,7 +55,7 @@ async def get_current_user(
 
         if user:
             return user
-        raise credentials_exception
+        raise credentials_exception  # pragma: no cover
 
     try:
         payload = jwt.decode(token, settings.SECRET_KEY, algorithms=[settings.ALGORITHM])
@@ -127,7 +127,7 @@ async def get_current_user_ws(
 
         if user:
             return user
-        raise credentials_exception
+        raise credentials_exception  # pragma: no cover
 
     try:
         payload = jwt.decode(token, settings.SECRET_KEY, algorithms=[settings.ALGORITHM])

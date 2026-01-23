@@ -86,7 +86,7 @@ def test_get_message_thread_success(client, mock_user, mock_chat_service):
         
         # Verify mocked calls
         mock_service_cls.assert_called_once()
-        mock_chat_service.get_message_thread.assert_awaited_once_with(message_id, limit=5)
+        mock_chat_service.get_message_thread.assert_awaited_once_with(message_id, max_depth=5)
 
 def test_get_message_thread_empty(client, mock_user, mock_chat_service):
     """Test retrieving an empty message thread."""
