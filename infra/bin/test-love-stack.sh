@@ -226,20 +226,20 @@ check_environments() {
     for module in versor observer listener; do
         if [[ "$TARGET_MODULE" != "all" && "$TARGET_MODULE" != "$module" ]]; then continue; fi
         
-        if [ -d "$module/venv" ]; then
+        if [ -d "$module/.venv" ]; then
             # We assume python check is fast, just check directory existence + bin
-            if [ -x "$module/venv/bin/python" ]; then
-                print_success "$module: venv ready"
+            if [ -x "$module/.venv/bin/python" ]; then
+                print_success "$module: .venv ready"
             else
-                print_error "$module: venv broken (python binary missing)"
+                print_error "$module: .venv broken (python binary missing)"
                 has_err=true
             fi
         else
             if [[ "$CI_MODE" == "true" ]]; then
-                print_error "$module: venv missing"
+                print_error "$module: .venv missing"
                 has_err=true
             else
-                print_warning "$module: venv missing (run setup-love-stack.sh)"
+                print_warning "$module: .venv missing (run setup-love-stack.sh)"
                 has_err=true
             fi
         fi
@@ -321,8 +321,8 @@ run_pytest() {
 
     if (
         cd "$module"
-        if [ ! -d "venv" ]; then
-            print_warning "Skipping $name (no venv)"
+        if [ ! -d ".venv" ]; then
+            print_warning "Skipping $name (no .venv)"
             exit 1
         fi
         
@@ -335,7 +335,7 @@ run_pytest() {
             args+=("-q")
         fi
         
-        if ./venv/bin/pytest "${args[@]}"; then
+        if ./.venv/bin/pytest "${args[@]}"; then
             exit 0
         else
             exit 1
@@ -405,8 +405,8 @@ check_critical() {
     local critical_failed=false
     (
         cd listener
-        if [ -x "venv/bin/pytest" ]; then
-             if ./venv/bin/pytest tests/semantic/test_connection_axis.py::TestConnectionAxis::test_pity_vs_compassion -v -s --no-cov >/dev/null 2>&1; then
+        if [ -x ".venv/bin/pytest" ]; then
+             if ./.venv/bin/pytest tests/semantic/test_connection_axis.py::TestConnectionAxis::test_pity_vs_compassion -v -s --no-cov >/dev/null 2>&1; then
                  echo -e "${GREEN}✓${NC} Connection Axis: Validated"
              else
                  echo -e "${RED}✗${NC} Connection Axis: FAILED"

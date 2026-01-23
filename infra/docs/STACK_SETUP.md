@@ -1,6 +1,6 @@
 # L.O.V.E. Stack - Complete Setup Guide
 
-This guide helps you set up the entire L.O.V.E. stack (Listener-Observer-Versor-Experience) with consistent Python 3.14 environments across all modules.
+This guide helps you set up the entire L.O.V.E. stack (Listener-Observer-Versor-Experience) with consistent Python 3.12 environments across all modules.
 
 ## 🚀 Quick Start
 
@@ -11,7 +11,7 @@ This guide helps you set up the entire L.O.V.E. stack (Listener-Observer-Versor-
 ```
 
 This script will:
-- ✅ Check for Python 3.14+ (install if needed)
+- ✅ Check for Python 3.12+ (install if needed)
 - ✅ Verify system dependencies (PostgreSQL, Redis, Ollama, ffmpeg)
 - ✅ Create virtual environments for all Python modules
 - ✅ Install all dependencies
@@ -39,7 +39,7 @@ This script will:
 
 1. **macOS** (or Linux with adjustments)
 2. **Homebrew** package manager
-3. **Python 3.14+** (script can install)
+3. **Python 3.12+** (script can install)
 4. **Node.js 18+** (for Experience module)
 
 ### System Dependencies
@@ -55,11 +55,11 @@ The setup script will check and optionally install:
 
 ## 🔧 Manual Setup (If Needed)
 
-### Install Python 3.14
+### Install Python 3.12
 
 **Option 1: Homebrew**
 ```bash
-brew install python@3.14
+brew install python@3.12
 ```
 
 **Option 2: pyenv (for version management)**
@@ -106,8 +106,8 @@ ollama pull llama3.1:8b-instruct-q4_0
 
 ```bash
 cd versor
-python3.11 -m venv venv
-source venv/bin/activate
+python3.12 -m venv .venv
+source .venv/bin/activate
 pip install -r requirements.txt
 ```
 
@@ -120,8 +120,8 @@ pytest tests/unit/ -v
 
 ```bash
 cd observer
-python3.11 -m venv venv
-source venv/bin/activate
+python3.12 -m venv .venv
+source .venv/bin/activate
 pip install -r requirements.txt
 
 # Run database migrations
@@ -140,8 +140,8 @@ pytest tests/ -v
 
 ```bash
 cd listener
-python3.11 -m venv venv
-source venv/bin/activate
+python3.12 -m venv .venv
+source .venv/bin/activate
 pip install -r requirements.txt
 python -m spacy download en_core_web_sm
 ```
@@ -222,7 +222,7 @@ curl http://localhost:8002/health
 
 ```bash
 cd versor
-source venv/bin/activate
+source .venv/bin/activate
 uvicorn app.main:app --reload --port 8001
 ```
 
@@ -232,7 +232,7 @@ Visit: http://localhost:8001/docs
 
 ```bash
 cd observer
-source venv/bin/activate
+source .venv/bin/activate
 uvicorn app.main:app --reload --port 8000
 ```
 
@@ -242,7 +242,7 @@ Visit: http://localhost:8000/docs
 
 ```bash
 cd listener
-source venv/bin/activate
+source .venv/bin/activate
 uvicorn app.main:app --reload --port 8002
 ```
 
@@ -278,7 +278,7 @@ cd listener && source venv/bin/activate && pytest tests/unit/ -v -m "not slow"
 
 ```bash
 cd listener
-source venv/bin/activate
+source .venv/bin/activate
 pytest tests/semantic/test_connection_axis.py::TestConnectionAxis::test_pity_vs_compassion -v -s
 ```
 
@@ -308,9 +308,9 @@ export PATH="/opt/homebrew/bin:$PATH"
 
 ```bash
 # Remove and recreate
-rm -rf venv
-python3.11 -m venv venv
-source venv/bin/activate
+rm -rf .venv
+python3.11 -m venv .venv
+source .venv/bin/activate
 pip install -r requirements.txt
 ```
 
@@ -359,8 +359,8 @@ ollama pull llama3.1:8b-instruct-q4_0
 ### Import Errors
 
 ```bash
-# Make sure venv is activated
-source venv/bin/activate
+# Make sure .venv is activated
+source .venv/bin/activate
 
 # Check Python version
 python --version  # Should be 3.11.x or 3.12.x
@@ -379,14 +379,14 @@ pip install -r requirements.txt --force-reinstall
 for module in versor observer listener; do
     echo "=== $module ==="
     cd $module
-    source venv/bin/activate
+    source .venv/bin/activate
     python --version
     deactivate
     cd ..
 done
 ```
 
-Should output Python 3.14.x for all three.
+Should output Python 3.12.x for all three.
 
 ### Test End-to-End Pipeline
 
@@ -397,7 +397,7 @@ Should output Python 3.14.x for all three.
 ```bash
 # In listener directory
 cd listener
-source venv/bin/activate
+source .venv/bin/activate
 python -c "
 from app.services.semantic_analyzer import SemanticAnalyzer
 analyzer = SemanticAnalyzer()
@@ -468,7 +468,7 @@ pytest tests/semantic/test_connection_axis.py -v
 You'll know setup is complete when:
 
 ✅ `./test-love-stack.sh` shows 🟢 HEALTHY  
-✅ All three modules use Python 3.14+  
+✅ All three modules use Python 3.12+  
 ✅ PostgreSQL, Redis, and Ollama are running  
 ✅ All fast tests pass  
 ✅ Critical semantic test validates Connection axis  

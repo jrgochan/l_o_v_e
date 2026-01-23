@@ -1,7 +1,7 @@
 """EmotionDefinition Model - Canonical Reference for Emotional States.
 
 The foundational data model storing Observer's emotional definitions.
-Supports multiple emotion datasets (collections), with "Atlas of the Heart" as the default.
+Supports multiple emotion datasets (collections), with "brene_brown" as the default.
 
 Each emotion is represented in three complementary vector spaces:
 1. VAC Vector (3D) - Geometric Space

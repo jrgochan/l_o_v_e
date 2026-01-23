@@ -3,6 +3,7 @@
 # shellcheck disable=SC2034
 
 PROJECT_ID="" # Leave empty to use 'gcloud config get-value project'
+CLOUD_MODE="false" # Set to "true" via --cloud flag
 APP_NAME="love-stack"
 
 # Region settings

@@ -1,6 +1,6 @@
 #!/bin/bash
 # L.O.V.E. Stack - Complete Setup Script
-# Cross-platform setup for Python modules with Python 3.14+
+# Cross-platform setup for Python modules with Python 3.12+
 #
 # This script sets up the complete L.O.V.E. (Listener-Observer-Versor-Experience) Stack
 # development environment from a fresh clone. It handles:
@@ -11,7 +11,7 @@
 #   - Service configuration
 #
 # Requirements:
-#   - Python 3.14+
+#   - Python 3.12+
 #   - PostgreSQL 14+ (auto-detects version)
 #   - Redis
 #   - Ollama
@@ -41,12 +41,13 @@ PROJECT_ROOT="$(cd "$SCRIPT_DIR/../.." && pwd)"
 # shellcheck disable=SC2034
 REQUIRED_PYTHON_MAJOR=3
 # shellcheck disable=SC2034
-REQUIRED_PYTHON_MINOR=14
+REQUIRED_PYTHON_MINOR=12
 
 # Parse command line arguments
 SKIP_DATABASE=false
 SKIP_DEPENDENCIES=false
 SKIP_OLLAMA=false
+LOCAL_MODE=false
 AUTO_YES=false
 VERBOSE=false
 QUIET=false
@@ -54,6 +55,12 @@ UPDATE_MODE=false
 MINIMAL_MODE=false
 CLEAN_MODE=false
 DATASET=""
+CLOUD_PROVIDER=""
+GCP_PROJECT_ID=""
+GCP_LOCATION=""
+CLOUD_PROVIDER=""
+GCP_PROJECT_ID=""
+GCP_LOCATION=""
 
 show_help() {
     # Check if terminal supports colors
@@ -90,7 +97,11 @@ show_help() {
         echo "    --clean                 Clean mode: drop DB, remove venvs, fresh install"
         echo "    --force-reseed          Force re-seed DB from JSON (no prompts)"
         echo "    --precompute-paths      Pre-compute all 7,569 transition paths (30-60 min)"
-        echo "    --dataset NAME          Select dataset (atlas/plutchik) [default: atlas]"
+        echo "    --dataset NAME          Select dataset (atlas/plutchik) [default: goemotions]"
+        echo "    --cloud PROVIDER        Use cloud AI provider (supported: gcp)"
+        echo "    --local                 Revert to Local Mode (Ollama)"
+        echo "    --gcp-project ID        Google Cloud Project ID (for --cloud gcp)"
+        echo "    --gcp-location LOC      Google Cloud Location (e.g., us-central1)"
         echo ""
         echo -e "${BOLD}EXAMPLES${NC}"
         echo "    Interactive setup:        ./setup-love-stack.sh"
@@ -180,6 +191,28 @@ while [[ $# -gt 0 ]]; do
         --dataset)
             DATASET="$2"
             shift 2
+            ;;
+        --cloud)
+            CLOUD_PROVIDER="$2"
+            # Validate provider
+            if [ "$CLOUD_PROVIDER" != "gcp" ]; then
+                echo "Error: Only 'gcp' is currently supported for --cloud"
+                exit 1
+            fi
+            shift 2
+            ;;
+        --gcp-project)
+            GCP_PROJECT_ID="$2"
+            shift 2
+            ;;
+        --gcp-location)
+            GCP_LOCATION="$2"
+            shift 2
+            ;;
+        --local)
+            LOCAL_MODE=true
+            CLOUD_PROVIDER=""
+            shift
             ;;
         *)
             echo "Unknown option: $1"
@@ -298,12 +331,12 @@ print_info "Package Manager: $(detect_package_manager)"
 print_info "Init System: $(detect_init_system)"
 echo ""
 
-# Check Python 3.14 availability
+# Check Python 3.12 availability
 check_python() {
-    print_header "📋 Checking Python 3.14+"
+    print_header "📋 Checking Python 3.12+"
     
-    # Try to find Python 3.14+
-    PYTHON_CMD=$(find_python_314)
+    # Try to find Python 3.12+
+    PYTHON_CMD=$(find_python_312)
     
     if [ -n "$PYTHON_CMD" ]; then
         VERSION=$($PYTHON_CMD --version 2>&1 | grep -oE '[0-9]+\.[0-9]+' | head -1)
@@ -312,22 +345,22 @@ check_python() {
         return 0
     fi
     
-    print_error "Python 3.14+ not found"
+    print_error "Python 3.12+ not found"
     echo ""
-    echo "Python 3.14+ is required for the L.O.V.E. stack."
+    echo "Python 3.12+ is required for the L.O.V.E. stack."
     echo ""
     
-    if prompt_yes_no "Would you like to install Python 3.14 now?"; then
-        print_info "Installing Python 3.14..."
-        if install_python_314; then
-            PYTHON_CMD=$(find_python_314)
+    if prompt_yes_no "Would you like to install Python 3.12 now?"; then
+        print_info "Installing Python 3.12..."
+        if install_python_312; then
+            PYTHON_CMD=$(find_python_312)
             if [ -n "$PYTHON_CMD" ]; then
-                print_success "Python 3.14 installed"
+                print_success "Python 3.12 installed"
                 echo "$PYTHON_CMD" > "$SCRIPT_DIR/.python_cmd"
                 return 0
             fi
         fi
-        print_error "Failed to install Python 3.14"
+        print_error "Failed to install Python 3.12"
         return 1
     else
         print_warning "Skipping Python installation. Please install manually."
@@ -549,32 +582,32 @@ setup_python_module() {
     if [ -f "$SCRIPT_DIR/.python_cmd" ]; then
         PYTHON_CMD=$(cat "$SCRIPT_DIR/.python_cmd")
     else
-        PYTHON_CMD=$(find_python_314)
+        PYTHON_CMD=$(find_python_312)
     fi
     
     if [ -z "$PYTHON_CMD" ]; then
-        print_error "Python 3.14+ not found"
+        print_error "Python 3.12+ not found"
         cd - > /dev/null
         return 1
     fi
     
     # Handle venv creation based on UPDATE_MODE
-    if [ "$UPDATE_MODE" = true ] && [ -d "venv" ]; then
+    if [ "$UPDATE_MODE" = true ] && [ -d ".venv" ]; then
         print_info "Update mode: Using existing virtual environment"
-        . venv/bin/activate
+        . .venv/bin/activate
     else
         # Remove old venv if exists
-        if [ -d "venv" ]; then
+        if [ -d ".venv" ]; then
             print_info "Removing old virtual environment..."
-            rm -rf venv
+            rm -rf .venv
         fi
         
         # Create virtual environment
         print_info "Creating virtual environment..."
-        $PYTHON_CMD -m venv venv
+        $PYTHON_CMD -m venv .venv
         
         # Activate venv
-        . venv/bin/activate
+        . .venv/bin/activate
         
         # Upgrade pip
         print_info "Upgrading pip..."
@@ -600,6 +633,61 @@ setup_python_module() {
     cd - > /dev/null
 }
 
+# Validate GCP Environment
+validate_gcp_environment() {
+    print_info "Validating Google Cloud Environment..."
+
+    if ! command -v gcloud &> /dev/null; then
+        print_error "gcloud CLI not found. Please install Google Cloud SDK."
+        exit 1
+    fi
+
+    if ! gcloud auth print-access-token &> /dev/null; then
+        print_warning "Not authenticated with gcloud."
+        echo -n "Run 'gcloud auth login' now? [Y/n] "
+        read -r response
+        if [[ "$response" =~ ^([yY][eE][sS]|[yY])+$ ]]; then
+            gcloud auth login
+        else
+            print_error "Authentication required for Cloud Setup."
+            exit 1
+        fi
+    fi
+
+    if [ -z "$GCP_PROJECT_ID" ]; then
+        echo -n "Enter Google Cloud Project ID: "
+        read -r GCP_PROJECT_ID
+    fi
+
+    print_info "Checking Project access..."
+    if ! gcloud projects describe "$GCP_PROJECT_ID" &> /dev/null; then
+        print_error "Project '$GCP_PROJECT_ID' not found or not accessible."
+        exit 1
+    fi
+    
+    if [ -z "$GCP_LOCATION" ]; then
+        echo -n "Enter Google Cloud Location [us-central1]: "
+        read -r GCP_LOCATION
+        GCP_LOCATION=${GCP_LOCATION:-us-central1}
+    fi
+
+    print_info "Checking Vertex AI API (aiplatform.googleapis.com)..."
+    if ! gcloud services list --project "$GCP_PROJECT_ID" --enabled --filter="name:aiplatform.googleapis.com" | grep -q "aiplatform.googleapis.com"; then
+        print_warning "Vertex AI API not enabled."
+        echo -n "Enable 'aiplatform.googleapis.com' now? [Y/n] "
+        read -r response
+        if [[ "$response" =~ ^([yY][eE][sS]|[yY])+$ ]]; then
+             gcloud services enable aiplatform.googleapis.com --project "$GCP_PROJECT_ID"
+             print_success "Vertex AI API enabled."
+        else
+             print_error "Vertex AI API required."
+             exit 1
+        fi
+    else
+        print_success "Vertex AI API is enabled."
+    fi
+}
+
 # Setup configuration files
 setup_configs() {
     print_header "⚙️  Setting up Configuration Files"
@@ -610,15 +698,65 @@ setup_configs() {
             print_success "$module: .env created from .env.example"
         fi
     done
+
+    # Cloud Configuration (Listener)
+    if [ "$CLOUD_PROVIDER" = "gcp" ]; then
+        validate_gcp_environment
+        
+        print_info "Configuring Listener for Google Cloud Vertex AI..."
+        
+        ENV_FILE="$PROJECT_ROOT/listener/.env"
+        
+        # Update AI_PROVIDER
+        if grep -q "AI_PROVIDER=" "$ENV_FILE"; then
+            perl -pi -e "s|AI_PROVIDER=.*|AI_PROVIDER=google_vertex|" "$ENV_FILE"
+        else
+            echo "AI_PROVIDER=google_vertex" >> "$ENV_FILE"
+        fi
+        
+        # Update GOOGLE_CLOUD_PROJECT
+        if grep -q "GOOGLE_CLOUD_PROJECT=" "$ENV_FILE"; then
+            perl -pi -e "s|GOOGLE_CLOUD_PROJECT=.*|GOOGLE_CLOUD_PROJECT=$GCP_PROJECT_ID|" "$ENV_FILE"
+        else
+            echo "GOOGLE_CLOUD_PROJECT=$GCP_PROJECT_ID" >> "$ENV_FILE"
+        fi
+        
+        # Update GOOGLE_CLOUD_LOCATION
+        if grep -q "GOOGLE_CLOUD_LOCATION=" "$ENV_FILE"; then
+            perl -pi -e "s|GOOGLE_CLOUD_LOCATION=.*|GOOGLE_CLOUD_LOCATION=$GCP_LOCATION|" "$ENV_FILE"
+        else
+            echo "GOOGLE_CLOUD_LOCATION=$GCP_LOCATION" >> "$ENV_FILE"
+        fi
+        
+        print_success "Listener configured for Vertex AI ($GCP_PROJECT_ID in $GCP_LOCATION)"
+    
+    elif [ "$LOCAL_MODE" = true ]; then
+        print_info "Reverting Listener to Local Mode (Ollama)..."
+        ENV_FILE="$PROJECT_ROOT/listener/.env"
+
+        if grep -q "AI_PROVIDER=" "$ENV_FILE"; then
+            perl -pi -e "s|AI_PROVIDER=.*|AI_PROVIDER=ollama|" "$ENV_FILE"
+        fi
+        
+        # Comment out Cloud vars
+        perl -pi -e "s|^(GOOGLE_CLOUD_PROJECT=.*)|# \1|" "$ENV_FILE"
+        perl -pi -e "s|^(GOOGLE_CLOUD_LOCATION=.*)|# \1|" "$ENV_FILE"
+
+        print_success "Listener reverted to Local Mode"
+    fi
 }
 
 # Pull Ollama model
 setup_ollama() {
     print_header "🤖 Setting up Ollama LLM Model"
     
-    if [ "$SKIP_OLLAMA" = true ]; then
-        print_warning "Ollama setup skipped (--skip-ollama flag)"
-        print_info "Download manually: ollama pull llama3.1:8b-instruct-q4_0"
+    if [ "$SKIP_OLLAMA" = true ] || [ "$CLOUD_PROVIDER" = "gcp" ]; then
+        if [ -n "$CLOUD_PROVIDER" ]; then
+             print_info "Skipping Ollama setup (Cloud provider $CLOUD_PROVIDER selected)"
+        else
+             print_warning "Ollama setup skipped (--skip-ollama flag)"
+             print_info "Download manually: ollama pull llama3.1:8b-instruct-q4_0"
+        fi
         return 0
     fi
     
@@ -651,9 +789,9 @@ setup_ai_models() {
     print_header "🧠 Setting up AI Models"
     
     # 1. Listener Models (BERT for PII)
-    if [ -d "$PROJECT_ROOT/listener/venv" ]; then
+    if [ -d "$PROJECT_ROOT/listener/.venv" ]; then
         print_info "Downloading Listener models (BERT for PII)..."
-        . "$PROJECT_ROOT/listener/venv/bin/activate"
+        . "$PROJECT_ROOT/listener/.venv/bin/activate"
         
         # Use robust curl-based script
         if python "$PROJECT_ROOT/infra/scripts/download_models.py" listener --project-root "$PROJECT_ROOT"; then
@@ -718,7 +856,7 @@ main() {
     
     # Check Python
     if ! check_python; then
-        print_error "Setup cannot continue without Python 3.14+"
+        print_error "Setup cannot continue without Python 3.12+"
         exit 1
     fi
     
@@ -837,7 +975,7 @@ fi
 # Summary
 print_header "📊 Setup Complete!"
 echo ""
-print_success "All Python modules configured with Python 3.14+"
+print_success "All Python modules configured with Python 3.12+"
 print_success "Experience module configured with Node.js dependencies"
 print_success "Virtual environments created for all modules"
 print_success "Dependencies installed"

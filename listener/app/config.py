@@ -113,6 +113,12 @@ class Settings(BaseSettings):
     OLLAMA_MODEL: str = "llama3.1:8b-instruct-q4_0"
     LLM_TEMPERATURE: float = 0.0
 
+    # Cloud AI Configuration
+    AI_PROVIDER: Literal["ollama", "google_vertex"] = "ollama"
+    GOOGLE_CLOUD_PROJECT: Optional[str] = None
+    GOOGLE_CLOUD_LOCATION: str = "us-central1"
+    VERTEX_MODEL_NAME: str = "gemini-1.5-flash-001"
+
     # Redis Configuration
     REDIS_HOST: str = "localhost"
     REDIS_PORT: int = 6379

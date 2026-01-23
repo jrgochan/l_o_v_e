@@ -181,16 +181,29 @@ def main(
     elif dataset.lower() == "plutchik":
         datasets_to_seed = [("Plutchik Emotions (8)", "data/plutchik/emotions.json", "Plutchik Wheel")]
     elif dataset.lower() == "goemotions":
-        datasets_to_seed = [("GoEmotions (28)", "data/goemotions/emotions.json", "GoEmotions")]
+        datasets_to_seed = [
+            ("GoEmotions (28)", "data/goemotions/emotions.json", "GoEmotions", "--default"),
+            # Seed Brene Brown as inactive so it's available but disabled
+            ("Brene Brown Emotions (87)", "data/brene_brown/emotions.json", "brene_brown", "--inactive")
+        ]
     elif dataset.lower() == "ual":
         datasets_to_seed = [("UAL (Unified Affective Lexicon)", "data/ual/emotions.json", "Unified Affective Lexicon")]
     else:
-        datasets_to_seed = [("Brene Brown Emotions (87)", "data/brene_brown/emotions.json", "Atlas of the Heart")]
+        datasets_to_seed = [("Brene Brown Emotions (87)", "data/brene_brown/emotions.json", "brene_brown")]
         
-    for name, file_path, coll_name in datasets_to_seed:
+    for item in datasets_to_seed:
+        # Handle 3-tuple (standard) or 4-tuple (with extra args)
+        if len(item) == 4:
+            name, file_path, coll_name, extra_arg = item
+            extra_args = [extra_arg]
+        else:
+            name, file_path, coll_name = item
+            extra_args = []
+            
         args_list = reseed_args.copy()
         args_list.append("--create-collection")
         args_list.extend(["--file", file_path, "--collection", coll_name])
+        args_list.extend(extra_args)
         steps.append((name, "seed_emotions.py", args_list))
     
     # PHASE 1.5: Initial Users (Admin/Demo)

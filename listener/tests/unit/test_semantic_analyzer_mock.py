@@ -7,7 +7,7 @@ import sys
 
 @pytest.fixture
 def mock_ollama():
-    with patch('app.services.semantic_analyzer.Ollama') as mock:
+    with patch('app.services.semantic_analyzer.get_llm') as mock:
         llm_instance = MagicMock()
         llm_instance.ainvoke = AsyncMock()
         mock.return_value = llm_instance

@@ -18,11 +18,11 @@ print_header "L.O.V.E. Development Tools Installation"
 # === Step 1: Check Python ===
 print_header "Step 1: Python Check"
 
-PYTHON_CMD=$(find_python_314)
+PYTHON_CMD=$(find_python_312)
 
 if [ -z "$PYTHON_CMD" ]; then
-    print_error "Python 3.14+ not found"
-    print_info "Please install Python 3.14 to proceed."
+    print_error "Python 3.12+ not found"
+    print_info "Please install Python 3.12 to proceed."
     exit 1
 else
     VERSION=$($PYTHON_CMD --version 2>&1 | grep -oE '[0-9]+\.[0-9]+' | head -1)

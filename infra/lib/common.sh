@@ -351,11 +351,11 @@ check_python_version() {
 # Find Python 3.14+ command
 # Usage: find_python_314
 # Returns: python command via echo, or empty if not found
-find_python_314() {
+find_python_312() {
     local python_cmd
     
-    for cmd in python3.14 python3 python; do
-        if check_python_version "$cmd" 3 14; then
+    for cmd in python3.12 python3 python; do
+        if check_python_version "$cmd" 3 12; then
             echo "$cmd"
             return 0
         fi

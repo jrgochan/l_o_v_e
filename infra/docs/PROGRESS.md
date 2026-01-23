@@ -24,8 +24,8 @@
 
 ### Tasks Pending (User Action Required)
 
-- [ ] Create Python virtual environment: `python3.11 -m venv venv`
-- [ ] Activate venv: `source venv/bin/activate`
+- [ ] Create Python virtual environment: `python3.11 -m venv .venv`
+- [ ] Activate venv: `source .venv/bin/activate`
 - [ ] Install dependencies: `pip install -r requirements.txt`
 - [ ] Run tests: `pytest tests/unit/test_quaternion.py -v`
 
@@ -116,8 +116,8 @@ None - Ready for Day 2!
 To validate our work:
 ```bash
 cd versor
-python3.11 -m venv venv
-source venv/bin/activate
+python3.11 -m venv .venv
+source .venv/bin/activate
 pip install -r requirements.txt
 pytest tests/unit/ -v
 ```

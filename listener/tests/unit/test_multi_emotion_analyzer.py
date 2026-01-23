@@ -22,9 +22,9 @@ class TestMultiEmotionAnalyzer:
     @pytest.fixture
     def analyzer(self):
         """Create analyzer instance with mocks."""
-        with patch("app.services.multi_emotion_analyzer.Ollama") as mock_ollama_cls:
+        with patch("app.services.multi_emotion_analyzer.get_llm") as mock_get_llm:
             mock_llm = AsyncMock()
-            mock_ollama_cls.return_value = mock_llm
+            mock_get_llm.return_value = mock_llm
             
             # Prevent dynamic fetch during init
             analyzer = MultiEmotionAnalyzer(fetch_dynamic_model=False)
@@ -115,7 +115,7 @@ class TestMultiEmotionAnalyzer:
              patch("asyncio.new_event_loop") as mock_new_loop, \
              patch("asyncio.set_event_loop") as mock_set_loop, \
              patch("app.services.multi_emotion_analyzer.get_model_fetcher") as mock_fetcher, \
-             patch("app.services.multi_emotion_analyzer.Ollama"):
+             patch("app.services.multi_emotion_analyzer.get_llm"):
              
              mock_fetcher.return_value.get_model_for_function = AsyncMock(return_value="model")
              

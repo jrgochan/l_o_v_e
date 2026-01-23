@@ -142,22 +142,22 @@ start_api() {
     
     # Install/update dependencies first
     cd "$dir"
-    if [ -f "requirements.txt" ] && [ -d "venv" ]; then
+    if [ -f "requirements.txt" ] && [ -d ".venv" ]; then
         # Check if we should update deps? For now, we assume setup script ran.
         # But let's run a quick pip install to be safe if env exists.
         # Using bash -c to ensure venv activation works
-        bash -c ". venv/bin/activate && pip install -q -r requirements.txt" > /dev/null 2>&1 || {
+        bash -c ". .venv/bin/activate && pip install -q -r requirements.txt" > /dev/null 2>&1 || {
             print_warning "Dependency check failed (non-fatal)"
         }
     fi
     
-    if [ ! -d "venv" ]; then
-        print_error "$name: Virtual environment not found. Run setup-love-stack.sh first"
+    if [ ! -d ".venv" ]; then
+        print_error "$name: Virtual environment not found in .venv. Run setup-love-stack.sh first"
         cd - > /dev/null
         return 1
     fi
     
-    bash -c ". venv/bin/activate && uvicorn app.main:app --host 0.0.0.0 --port $port --reload" > "$log_file" 2>&1 &
+    bash -c ". .venv/bin/activate && uvicorn app.main:app --host 0.0.0.0 --port $port --reload" > "$log_file" 2>&1 &
     local pid=$!
     echo "$pid $name" >> "$PID_FILE"
     
@@ -183,9 +183,9 @@ start_worker() {
     
     if [ ! -d "$dir" ]; then return 1; fi
     cd "$dir"
-    if [ ! -d "venv" ]; then return 1; fi
+    if [ ! -d ".venv" ]; then return 1; fi
     
-    bash -c ". venv/bin/activate && arq $worker_class" > "$log_file" 2>&1 &
+    bash -c ". .venv/bin/activate && arq $worker_class" > "$log_file" 2>&1 &
     local pid=$!
     echo "$pid ${name}-Worker" >> "$PID_FILE"
     print_success "$name Worker started"
@@ -295,14 +295,23 @@ if [ "$RUN_INFRA" = true ] && [ "$SKIP_INFRA_CHECKS" = false ]; then
         fi
     fi
 
-    # Ollama
-    if check_service_running ollama; then
-        print_success "Ollama running"
+    # Ollama (Skip if using Cloud AI)
+    AI_PROVIDER=""
+    if [ -f "$PROJECT_ROOT/listener/.env" ]; then
+        AI_PROVIDER=$(grep "^AI_PROVIDER=" "$PROJECT_ROOT/listener/.env" | cut -d '=' -f2)
+    fi
+
+    if [ "$AI_PROVIDER" = "google_vertex" ]; then
+        print_info "Ollama skipped (Cloud Mode: Vertex AI Active)"
     else
-        if start_ollama; then
-            print_success "Ollama started"
+        if check_service_running ollama; then
+            print_success "Ollama running"
         else
-            print_warning "Failed to start Ollama"
+            if start_ollama; then
+                print_success "Ollama started"
+            else
+                print_warning "Failed to start Ollama"
+            fi
         fi
     fi
     echo ""

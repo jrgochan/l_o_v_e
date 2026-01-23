@@ -7,20 +7,7 @@ import logging
 from contextlib import asynccontextmanager
 from typing import Any, AsyncGenerator, Dict
 
-# Monkeypatch bcrypt to work with passlib 1.7.4 (Must be before passlib imports)
-import bcrypt
-
-if not hasattr(bcrypt, "__about__"):
-    try:
-
-        class About:
-            """Monkeypatched About class for bcrypt compatibility."""
-
-            __version__ = bcrypt.__version__  # type: ignore[attr-defined]
-
-        bcrypt.__about__ = About()  # type: ignore[attr-defined]
-    except Exception:  # pragma: no cover
-        pass
+# Monkeypatch removed: using pwdlib instead of passlib
 
 from fastapi import FastAPI  # pylint: disable=wrong-import-position
 from fastapi.middleware.cors import CORSMiddleware  # pylint: disable=wrong-import-position

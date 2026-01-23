@@ -101,7 +101,13 @@ def load_category_motion_map(file_path: str) -> dict:
         return {}
 
 
-async def get_or_create_collection(session, name: str, create_if_missing: bool = False) -> Optional[EmotionCollection]:
+async def get_or_create_collection(
+    session, 
+    name: str, 
+    create_if_missing: bool = False,
+    is_active: bool = True,
+    is_default: bool = False
+) -> Optional[EmotionCollection]:
     """Get emotion collection by name or create if requested."""
     stmt = select(EmotionCollection).where(EmotionCollection.name == name)
     result = await session.execute(stmt)
@@ -109,16 +115,28 @@ async def get_or_create_collection(session, name: str, create_if_missing: bool =
     
     if collection:
         logger.info(f"Found existing collection: '{name}' (ID: {collection.id})")
+        # Update active status if needed
+        if collection.is_active != is_active:
+            collection.is_active = is_active
+            await session.commit()
+            logger.info(f"Updated collection status to is_active={is_active}")
         return collection
         
     if create_if_missing:
-        logger.info(f"Creating new collection: '{name}'")
-        collection = EmotionCollection(name=name, is_active=True, is_default=False)
+        logger.info(f"Creating new collection: '{name}' (Active: {is_active}, Default: {is_default})")
+        collection = EmotionCollection(name=name, is_active=is_active, is_default=is_default)
         session.add(collection)
         await session.commit()
         await session.refresh(collection)
         return collection
         
+    if collection and is_default:
+        # If updating existing to be default
+        if not collection.is_default:
+            collection.is_default = True
+            await session.commit()
+            logger.info("Updated collection to be default")
+
     return None
 
 
@@ -126,7 +144,9 @@ async def seed_emotions(
     file_path: str, 
     collection_name: str, 
     create_collection: bool = False,
-    force_reseed: bool = False
+    force_reseed: bool = False,
+    is_active: bool = True,
+    is_default: bool = False
 ):
     """Main seeding function."""
     logger.info("=" * 60)
@@ -159,7 +179,13 @@ async def seed_emotions(
     async with AsyncSessionLocal() as session:
         try:
             # 1. Get/Create Collection
-            collection = await get_or_create_collection(session, collection_name, create_collection)
+            collection = await get_or_create_collection(
+                session, 
+                collection_name, 
+                create_collection, 
+                is_active=is_active,
+                is_default=is_default
+            )
             
             if not collection:
                 logger.error(f"Collection '{collection_name}' not found. Use --create-collection to create it.")
@@ -268,12 +294,17 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Seed emotions into a collection")
     parser.add_argument('--file', type=str, default='data/brene_brown/emotions.json',
                        help='Path to JSON data file')
-    parser.add_argument('--collection', type=str, default='Atlas of the Heart',
+    parser.add_argument('--collection', type=str, default='brene_brown',
                        help='Name of the collection')
     parser.add_argument('--create-collection', action='store_true',
                        help='Create collection if it does not exist')
     parser.add_argument('--force-reseed', action='store_true',
                        help='Clear existing data without prompting')
+    
+    parser.add_argument('--inactive', action='store_true',
+                       help='Seed collection as inactive (not enabled by default)')
+    parser.add_argument('--default', action='store_true',
+                       help='Set as default collection')
     
     args = parser.parse_args()
     
@@ -281,6 +312,8 @@ if __name__ == "__main__":
         file_path=args.file,
         collection_name=args.collection,
         create_collection=args.create_collection,
-        force_reseed=args.force_reseed
+        force_reseed=args.force_reseed,
+        is_active=not args.inactive,
+        is_default=args.default
     ))
     sys.exit(0 if success else 1)

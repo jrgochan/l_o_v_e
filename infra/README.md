@@ -15,7 +15,7 @@ This directory contains all orchestration scripts, configuration, and documentat
   - Intelligent pre-flight checks and error handling
 
 - **`setup-love-stack.sh`** - Initial environment setup
-  - Verifies Python 3.14+ installation
+  - Verifies Python 3.12+ installation
   - Checks system dependencies (PostgreSQL, Redis, Ollama, ffmpeg)
   - Creates virtual environments for all modules
   - Installs Python dependencies
@@ -226,7 +226,7 @@ podman-compose down
 
 # Critical semantic test only
 cd ../listener
-source venv/bin/activate
+source .venv/bin/activate
 pytest tests/semantic/test_connection_axis.py::TestConnectionAxis::test_pity_vs_compassion -v -s
 ```
 
@@ -314,8 +314,8 @@ Copy from `.env.example` files if needed.
 
 ### Python Version
 
-The stack requires Python 3.14+. The setup script will:
-1. Try to find Python 3.14
+The stack requires Python 3.12+. The setup script will:
+1. Try to find Python 3.12
 2. Save the command to `.python_cmd`
 3. Use this version for all modules
 
@@ -372,9 +372,9 @@ brew services restart redis
 
 ```bash
 # Remove and recreate environments
-cd ../listener && rm -rf venv
-cd ../observer && rm -rf venv
-cd ../versor && rm -rf venv
+cd ../listener && rm -rf .venv
+cd ../observer && rm -rf .venv
+cd ../versor && rm -rf .venv
 
 # Re-run setup
 cd ../infra

@@ -28,7 +28,7 @@ WITH_DEMO=false
 WITH_BOOTSTRAP=false
 FORCE_RESEED=false
 PRECOMPUTE_PATHS=false
-DATASET="atlas"
+DATASET="goemotions"
 
 echo -e "${BLUE}${ROCKET} L.O.V.E. Stack - Database Initialization${NC}"
 echo "=================================================="
@@ -264,14 +264,14 @@ run_migrations() {
     cd "$OBSERVER_DIR"
     
     # Check for virtual environment
-    if [ ! -d "venv" ]; then
-        print_error "Virtual environment not found. Run setup-love-stack.sh first"
+    if [ ! -d ".venv" ]; then
+        print_error "Virtual environment not found in .venv. Run setup-love-stack.sh first"
         cd - > /dev/null
         return 1
     fi
     
     # Activate venv
-    . venv/bin/activate
+    . .venv/bin/activate
     
     print_info "Running Alembic migrations..."
     
@@ -366,13 +366,13 @@ validate_json_data() {
     
     cd "$OBSERVER_DIR"
     
-    if [ ! -d "venv" ]; then
-        print_error "Virtual environment not found"
+    if [ ! -d ".venv" ]; then
+        print_error "Virtual environment not found in .venv"
         cd - > /dev/null
         return 1
     fi
     
-    . venv/bin/activate
+    . .venv/bin/activate
     
     print_info "Validating canonical data files..."
     
@@ -404,8 +404,8 @@ seed_database() {
     print_info "Checking Versor availability..."
     VERSOR_DIR="$PROJECT_ROOT/versor"
     
-    if [ ! -d "$VERSOR_DIR/venv" ]; then
-        print_error "Versor virtual environment not found"
+    if [ ! -d "$VERSOR_DIR/.venv" ]; then
+        print_error "Versor virtual environment not found in .venv"
         print_info "Run setup-love-stack.sh first to set up Versor"
         return 1
     fi
@@ -414,7 +414,7 @@ seed_database() {
     if ! curl -s http://localhost:8080/health > /dev/null 2>&1; then
         print_info "Starting Versor API (required for Atlas seeding)..."
         cd "$VERSOR_DIR"
-        . venv/bin/activate
+        . .venv/bin/activate
         nohup uvicorn app.main:app --host 0.0.0.0 --port 8080 > /tmp/versor.log 2>&1 &
         VERSOR_PID=$!
         
@@ -444,13 +444,13 @@ seed_database() {
     
     cd "$OBSERVER_DIR"
     
-    if [ ! -d "venv" ]; then
-        print_error "Virtual environment not found"
+    if [ ! -d ".venv" ]; then
+        print_error "Virtual environment not found in .venv"
         cd - > /dev/null
         return 1
     fi
     
-    . venv/bin/activate
+    . .venv/bin/activate
     
     # Check if already seeded
     if [ "$FORCE_RESEED" = false ]; then
@@ -521,13 +521,13 @@ compute_path_matrix() {
     
     cd "$OBSERVER_DIR"
     
-    if [ ! -d "venv" ]; then
-        print_error "Virtual environment not found"
+    if [ ! -d ".venv" ]; then
+        print_error "Virtual environment not found in .venv"
         cd - > /dev/null
         return 1
     fi
     
-    . venv/bin/activate
+    . .venv/bin/activate
     
     print_info "Pre-computing transition paths..."
     print_warning "This will take significantly longer for multiple datasets"
@@ -537,7 +537,7 @@ compute_path_matrix() {
     collections_to_process=()
     
     if [ "$DATASET" == "all" ]; then
-        collections_to_process=("Atlas of the Heart" "Plutchik Wheel" "GoEmotions")
+        collections_to_process=("brene_brown" "Plutchik Wheel" "GoEmotions")
     else
         case "$DATASET" in
             "plutchik")
@@ -547,7 +547,7 @@ compute_path_matrix() {
                 collections_to_process=("GoEmotions")
                 ;;
             *)
-                collections_to_process=("Atlas of the Heart")
+                collections_to_process=("brene_brown")
                 ;;
         esac
     fi

@@ -51,6 +51,7 @@ export interface EmotionCollection {
   name: string;
   description: string;
   is_default: boolean;
+  is_active: boolean;
   category_count?: number;
   emotion_count?: number;
 }

@@ -8,7 +8,7 @@ Deploy the L.O.V.E. stack to Red Hat OpenShift (or Podman Desktop / CodeReady Co
 - Logged into an OpenShift cluster (`oc login ...`).
     - For CRC: Run `crc console --credentials` to get the `kubeadmin` password and login command.
     - **Important:** Ensure CRC is running (`crc status`) before attempting to login.
-- Python 3.14 compatible container environment (OpenShift usually handles this if building from source with Docker strategy).
+- Python 3.12 compatible container environment (OpenShift usually handles this if building from source with Docker strategy).
 
 ## Usage
 

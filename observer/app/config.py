@@ -72,7 +72,7 @@ class Settings(BaseSettings):
     SECRET_KEY: str = Field(default="dev-secret-key-change-in-production")
     ALGORITHM: str = Field(default="HS256")
     ACCESS_TOKEN_EXPIRE_MINUTES: int = Field(default=30)
-    ALLOWED_ORIGINS: str = Field(default='["http://localhost:3000", "http://localhost:19006"]')
+    ALLOWED_ORIGINS: str = Field(default='["http://localhost:3000", "http://127.0.0.1:3000", "http://localhost:19006"]')
 
     @property
     def ALLOWED_ORIGINS_LIST(self) -> List[str]:
@@ -106,7 +106,7 @@ class Settings(BaseSettings):
     API_VERSION: str = Field(default="v1")
     APP_NAME: str = Field(default="L.O.V.E. Observer API")
     APP_DESCRIPTION: str = Field(default="Emotional state persistence and context retrieval")
-    DEFAULT_EMOTION_COLLECTION: str = Field(default="Atlas of the Heart")
+    DEFAULT_EMOTION_COLLECTION: str = Field(default="goemotions")
 
     model_config = SettingsConfigDict(env_file=".env", case_sensitive=True)
 

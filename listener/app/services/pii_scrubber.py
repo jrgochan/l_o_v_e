@@ -15,7 +15,7 @@ Integration Points:
     - Used by: API routes (ingest.py), workers (audio_processor.py)
 
 Performance:
-    - Latency: ~100ms per text (slower than Spacy but Python 3.14 compatible)
+    - Latency: ~100ms per text (slower than Spacy but Python 3.12 compatible)
     - Accuracy: ~95% PII detection rate (BERT based)
     - Model loading: ~2s first time, then cached
 
@@ -46,8 +46,7 @@ import logging
 import os
 from typing import Any, List, Optional, Tuple
 
-# Replace spacy with transformers
-# import spacy
+import spacy
 from transformers import pipeline
 
 logger = logging.getLogger(__name__)
@@ -61,7 +60,8 @@ class PIIScrubber:
 
     Attributes:
         model_name (str): HF model name (default: "dslim/bert-base-NER")
-        _nlp: Loaded pipeline instance (lazy loaded)
+        _nlp_bert: Loaded BERT pipeline instance (lazy loaded)
+        _nlp_spacy: Loaded Spacy pipeline instance (lazy loaded)
         PII_ENTITIES (dict): Mapping of entity types to placeholders
     """
 
@@ -101,7 +101,8 @@ class PIIScrubber:
             model_name = env_model
 
         self.model_name = model_name
-        self._nlp: Optional[Any] = None
+        self._nlp_bert: Optional[Any] = None
+        self._nlp_spacy: Optional[Any] = None
 
         # Pre-compile regexes
         import re
@@ -110,15 +111,16 @@ class PIIScrubber:
         for label, patterns in self.REGEX_PATTERNS.items():
             self._compiled_patterns[label] = [re.compile(p, re.IGNORECASE) for p in patterns]
 
-        logger.info(f"PIIScrubber initialized with model: {model_name}")
+            self._compiled_patterns[label] = [re.compile(p, re.IGNORECASE) for p in patterns]
 
-    def _load_model(self) -> Any:
-        """Load HF NER pipeline into memory with lazy initialization."""
-        if self._nlp is None:
+        logger.info(f"PIIScrubber initialized with BERT model: {model_name}")
+
+    def _load_models(self) -> Tuple[Any, Any]:
+        """Load both Spacy and BERT models with lazy initialization."""
+        # Load BERT
+        if self._nlp_bert is None:
             try:
-                # Load pipeline
-                # aggregation_strategy="simple" merges sub-tokens (e.g. "San" "Francisco" -> "San Francisco")
-                self._nlp = pipeline(
+                self._nlp_bert = pipeline(
                     "token-classification",
                     model=self.model_name,
                     tokenizer=self.model_name,
@@ -129,7 +131,17 @@ class PIIScrubber:
                 logger.error(f"Failed to load Transformers model: {e}")
                 raise RuntimeError(f"Failed to load Transformers model '{self.model_name}': {e}")
 
-        return self._nlp
+        # Load Spacy
+        if self._nlp_spacy is None:
+            try:
+                self._nlp_spacy = spacy.load("en_core_web_sm")
+                logger.info("Spacy model loaded: en_core_web_sm")
+            except Exception as e:
+                logger.error(f"Failed to load Spacy model: {e}")
+                # Fallback to just BERT if Spacy fails (though strictly we want both per user request)
+                logger.warning("Continuing without Spacy (BERT only)")
+
+        return self._nlp_bert, self._nlp_spacy
 
     def _detect_regex_entities(self, text: str) -> List[Tuple[int, int, str, str]]:
         """Detect entities using regex patterns."""
@@ -154,23 +166,41 @@ class PIIScrubber:
         if not text or len(text.strip()) == 0:
             return text
 
-        # 1. BERT Detection
-        nlp = self._load_model()
-        bert_entities = nlp(text)
+        # 1. Hybrid Detection (BERT + Spacy)
+        nlp_bert, nlp_spacy = self._load_models()
 
-        # Collect entities to scrub
-        # Format: (start, end, replacement, original_text)
+        # Collect entities to scrub: (start, end, replacement, original_text)
         entities_to_scrub = []
+        covered_ranges = set()
 
-        # Add BERT entities
+        # Helper to add entity if no overlap
+        def add_entity(start, end, label, word, source="BERT"):
+            # Simple overlap check: if any index in range is already covered
+            is_new = True
+            for i in range(start, end):
+                if i in covered_ranges:
+                    is_new = False
+                    break
+
+            if is_new:
+                if label in self.PII_ENTITIES:
+                    replacement = self.PII_ENTITIES.get(label, "[REDACTED]")
+                    entities_to_scrub.append((start, end, replacement, word))
+                    for i in range(start, end):
+                        covered_ranges.add(i)
+
+        # Run BERT
+        bert_entities = nlp_bert(text)
         for ent in bert_entities:
-            # HF 'simple' aggregation uses 'entity_group'
             label = ent.get("entity_group", ent.get("entity"))
-            if label in self.PII_ENTITIES:
-                replacement = self.PII_ENTITIES.get(label, "[REDACTED]")
-                entities_to_scrub.append(
-                    (ent["start"], ent["end"], replacement, ent.get("word", ""))
-                )
+            add_entity(ent["start"], ent["end"], label, ent.get("word", ""), "BERT")
+
+        # Run Spacy (if loaded)
+        if nlp_spacy:
+            doc = nlp_spacy(text)
+            for ent in doc.ents:
+                # Spacy labels: PERSON, ORG, GPE, etc.
+                add_entity(ent.start_char, ent.end_char, ent.label_, ent.text, "Spacy")
 
         # 2. Regex Detection (Fallback for Dates, Emails, etc.)
         regex_matches = self._detect_regex_entities(text)
@@ -204,25 +234,47 @@ class PIIScrubber:
         if not text or len(text.strip()) == 0:
             return []
 
-        # 1. BERT
-        nlp = self._load_model()
-        bert_entities = nlp(text)
+        # 1. Hybrid Detection
+        nlp_bert, nlp_spacy = self._load_models()
 
         pii_found = []
-        covered_ranges = []
+        covered_ranges = set()
 
+        def add_finding(word, label, start, end, source):
+            # Check overlap
+            is_new = True
+            for i in range(start, end):
+                if i in covered_ranges:
+                    is_new = False
+                    break
+
+            if is_new:
+                if label in self.PII_ENTITIES:
+                    pii_found.append((word, label, start, end))
+                    for i in range(start, end):
+                        covered_ranges.add(i)
+
+        # BERT
+        bert_entities = nlp_bert(text)
         for ent in bert_entities:
             label = ent.get("entity_group", ent.get("entity"))
-            if label in self.PII_ENTITIES:
-                # (text, type, start, end)
-                pii_found.append((ent.get("word", ""), label, ent["start"], ent["end"]))
-                covered_ranges.append((ent["start"], ent["end"]))
+            add_finding(ent.get("word", ""), label, ent["start"], ent["end"], "BERT")
+
+        # Spacy
+        if nlp_spacy:
+            doc = nlp_spacy(text)
+            for ent in doc.ents:
+                add_finding(ent.text, ent.label_, ent.start_char, ent.end_char, "Spacy")
 
         # 2. Regex
         regex_matches = self._detect_regex_entities(text)
         for start, end, label, word in regex_matches:
-            # Check overlap
-            is_overlap = any((start < c_end and end > c_start) for c_start, c_end in covered_ranges)
+            # Check overlap logic compatible with set
+            is_overlap = False
+            for i in range(start, end):
+                if i in covered_ranges:
+                    is_overlap = True
+                    break
             if not is_overlap:
                 # Strip brackets for consistent type string if needed, or keep as is
                 # label is like '[DATE]', BERT is like 'PER'.

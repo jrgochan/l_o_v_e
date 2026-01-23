@@ -3,7 +3,7 @@
 # Update this file and run: infra/scripts/sync-versions.sh
 
 # === Python Toolchain ===
-PYTHON_MIN_VERSION=3.14
+PYTHON_MIN_VERSION=3.12
 
 # === Python Quality Tools ===
 BLACK_VERSION=23.12.1

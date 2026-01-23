@@ -39,12 +39,12 @@ import logging
 import time
 from typing import Optional
 
-from langchain_community.llms import Ollama
 from langchain_core.output_parsers import PydanticOutputParser
 from langchain_core.prompts import ChatPromptTemplate
 
 from app.config import settings
 from app.models.vac_response import EmotionalClassification
+from app.services.llm_factory import get_llm
 from app.services.model_fetcher import get_model_fetcher
 
 # Default Prompt (Fallback)
@@ -154,7 +154,7 @@ class SemanticAnalyzer:
         model (str): Ollama model name (e.g., "llama3.1:8b-instruct-q4_0")
         temperature (float): LLM temperature (0.0 for deterministic output)
         base_url (str): Ollama API base URL
-        llm (Ollama): LangChain Ollama LLM instance
+        llm (UnifiedLLM): Unified LLM instance (Ollama or Vertex AI)
         parser (PydanticOutputParser): Parses LLM JSON into EmotionalClassification
         prompt (ChatPromptTemplate): Few-shot prompt template
 
@@ -260,12 +260,10 @@ class SemanticAnalyzer:
         self.temperature = temperature if temperature is not None else settings.LLM_TEMPERATURE
         self.base_url = base_url or settings.OLLAMA_BASE_URL
 
-        # Initialize LLM
-        self.llm = Ollama(
+        # Initialize LLM via Factory
+        self.llm = get_llm(
             model=self.model,
             temperature=self.temperature,
-            base_url=self.base_url,
-            format="json",  # Request JSON output
         )
 
         # Initialize parser

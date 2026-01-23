@@ -18,11 +18,11 @@ map_package_name() {
     
     case "$pkg" in
 
-        python3.14)
+        python3.12)
             case "$pkg_mgr" in
-                brew) echo "python@3.14" ;;
-                apt) echo "python3.14 python3.14-venv python3.14-dev" ;;
-                dnf|yum) echo "python3.14 python3.14-devel" ;;
+                brew) echo "python@3.12" ;;
+                apt) echo "python3.12 python3.12-venv python3.12-dev" ;;
+                dnf|yum) echo "python3.12 python3.12-devel" ;;
                 *) echo "$pkg" ;;
             esac
             ;;
@@ -283,6 +283,7 @@ install_dev_tools() {
             install_package pkg-config --no-confirm
             install_package shellcheck --no-confirm
             install_package git --no-confirm
+            install_package apache-arrow --no-confirm
             ;;
         debian)
             install_package build-essential --no-confirm
@@ -305,9 +306,9 @@ install_dev_tools() {
     esac
 }
 
-# Install Python 3.14 (handles special cases like PPA on Ubuntu)
-# Usage: install_python_314
-install_python_314() {
+# Install Python 3.12 (handles special cases like PPA on Ubuntu)
+# Usage: install_python_312
+install_python_312() {
     local pkg_mgr
     pkg_mgr=$(detect_package_manager)
     
@@ -317,7 +318,7 @@ install_python_314() {
     fi
     
     # Install Python 3.14
-    install_package python3.14 --no-confirm
+    install_package python3.12 --no-confirm
 }
 
 # Install PostgreSQL 18 (handles special cases like official repo)

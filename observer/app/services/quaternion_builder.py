@@ -92,9 +92,11 @@ References:
 """
 
 import logging
+from datetime import datetime, timedelta, timezone
 from typing import Any, List, Optional
 
 import httpx
+from jose import jwt
 
 from app.config import settings
 
@@ -134,6 +136,19 @@ class QuaternionBuilder:
                 raise ImportError(
                     "Versor package not found. Either install Versor or use HTTP mode."
                 )
+
+    def _create_service_token(self) -> str:
+        """Create a service-to-service JWT token for Versor authentication."""
+        # Use simple short-lived token
+        now = datetime.now(timezone.utc)
+        expire = now + timedelta(minutes=5)
+        to_encode = {
+            "sub": "observer-service@love.stack",  # Recognized as valid user (any non-null sub works)
+            "exp": expire,
+            "iat": now,
+            "type": "service",
+        }
+        return jwt.encode(to_encode, settings.SECRET_KEY, algorithm=settings.ALGORITHM)
 
     async def from_vac(self, vac: List[float], validate: bool = True) -> List[float]:
         """Convert VAC coordinates to quaternion.
@@ -179,6 +194,11 @@ class QuaternionBuilder:
             #   - Single source of truth for VAC model
             #   - Versor team maintains the psychologically-validated mapping
             #   - Observer focuses on clinical application, not math implementation
+
+            # Generate service token for auth
+            token = self._create_service_token()
+            headers = {"Authorization": f"Bearer {token}"}
+
             async with httpx.AsyncClient(timeout=5.0) as client:
                 # POST to Versor's calculate endpoint
                 # Includes time_delta for SLERP context (though we use current_state here)
@@ -192,6 +212,7 @@ class QuaternionBuilder:
                         },
                         "time_delta_seconds": 1.0,  # Not used for current_state, but required by API
                     },
+                    headers=headers,
                 )
                 response.raise_for_status()
 

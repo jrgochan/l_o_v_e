@@ -117,8 +117,8 @@ podman exec -it observer_postgres psql -U love_user -d love_db
 ```bash
 cd /Users/jrgochan/code/gitlab.com/l_o_v_e/versor
 
-# Activate Versor's venv
-source venv/bin/activate
+# Activate Versor's .venv
+source .venv/bin/activate
 
 # Start Versor API on port 8001
 uvicorn app.main:app --port 8001
@@ -220,8 +220,8 @@ Open in your browser:
 python3 --version
 
 # If 3.11+, use python3 instead
-python3 -m venv venv
-source venv/bin/activate
+python3 -m venv .venv
+source .venv/bin/activate
 ```
 
 ### Issue: `command not found: pip`

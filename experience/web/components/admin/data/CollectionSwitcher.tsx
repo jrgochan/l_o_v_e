@@ -64,60 +64,60 @@ export function CollectionSwitcher() {
       </div>
 
       <div className="grid grid-cols-1 gap-4">
-        {collections.map((collection) => (
-          <div
-            key={collection.id}
-            className={`
+        {collections
+          .filter((collection) => collection.is_active)
+          .map((collection) => (
+            <div
+              key={collection.id}
+              className={`
               relative flex items-center p-4 rounded-lg border transition-all
-              ${
-                collection.is_default
+              ${collection.is_default
                   ? "bg-purple-900/20 border-purple-500 shadow-lg shadow-purple-900/20"
                   : "bg-gray-800 border-gray-700 hover:border-gray-600"
-              }
+                }
             `}
-          >
-            <div className="flex-1">
-              <div className="flex items-center gap-3 mb-1">
-                <h4 className="text-base font-semibold text-white">{collection.name}</h4>
-                {collection.is_default && (
-                  <span className="px-2 py-0.5 text-xs font-medium bg-purple-500/20 text-purple-300 rounded-full border border-purple-500/30">
-                    Active
-                  </span>
-                )}
+            >
+              <div className="flex-1">
+                <div className="flex items-center gap-3 mb-1">
+                  <h4 className="text-base font-semibold text-white">{collection.name}</h4>
+                  {collection.is_default && (
+                    <span className="px-2 py-0.5 text-xs font-medium bg-purple-500/20 text-purple-300 rounded-full border border-purple-500/30">
+                      Active
+                    </span>
+                  )}
+                </div>
+                <p className="text-sm text-gray-400">
+                  {collection.description || "No description provided."}
+                </p>
+                <div className="mt-2 text-xs text-gray-500 font-mono">ID: {collection.id}</div>
               </div>
-              <p className="text-sm text-gray-400">
-                {collection.description || "No description provided."}
-              </p>
-              <div className="mt-2 text-xs text-gray-500 font-mono">ID: {collection.id}</div>
-            </div>
 
-            <div className="ml-4">
-              {collection.is_default ? (
-                <button
-                  disabled
-                  className="px-4 py-2 bg-gray-700 text-gray-400 text-sm font-medium rounded cursor-not-allowed opacity-50"
-                >
-                  Selected
-                </button>
-              ) : (
-                <button
-                  onClick={() => handleActivate(collection.id)}
-                  disabled={!!activating}
-                  className={`
+              <div className="ml-4">
+                {collection.is_default ? (
+                  <button
+                    disabled
+                    className="px-4 py-2 bg-gray-700 text-gray-400 text-sm font-medium rounded cursor-not-allowed opacity-50"
+                  >
+                    Selected
+                  </button>
+                ) : (
+                  <button
+                    onClick={() => handleActivate(collection.id)}
+                    disabled={!!activating}
+                    className={`
                     px-4 py-2 text-sm font-medium rounded text-white transition-all
-                    ${
-                      activating === collection.id
+                    ${activating === collection.id
                         ? "bg-gray-600 cursor-wait"
                         : "bg-purple-600 hover:bg-purple-500 shadow hover:shadow-purple-500/25"
-                    }
+                      }
                   `}
-                >
-                  {activating === collection.id ? "Activating..." : "Select"}
-                </button>
-              )}
+                  >
+                    {activating === collection.id ? "Activating..." : "Select"}
+                  </button>
+                )}
+              </div>
             </div>
-          </div>
-        ))}
+          ))}
       </div>
 
       <div className="mt-4 p-4 bg-blue-900/20 border border-blue-500/30 rounded-lg">

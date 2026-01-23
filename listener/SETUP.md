@@ -84,8 +84,8 @@ ffmpeg -version
 
 ```bash
 cd listener
-python3.11 -m venv venv
-source venv/bin/activate  # On Windows: venv\Scripts\activate
+python3.12 -m venv .venv
+source .venv/bin/activate  # On Windows: .venv\Scripts\activate
 ```
 
 ### Step 2: Install Python Dependencies
@@ -153,7 +153,7 @@ redis-server
 
 ```bash
 cd listener
-source venv/bin/activate
+source .venv/bin/activate
 uvicorn app.main:app --reload --host 0.0.0.0 --port 8002
 ```
 
@@ -163,7 +163,7 @@ API will be available at: `http://localhost:8002`
 
 ```bash
 cd listener
-source venv/bin/activate
+source .venv/bin/activate
 arq app.workers.audio_processor.WorkerSettings
 ```
 
@@ -244,8 +244,8 @@ export HF_ENDPOINT=https://huggingface.co
 ### Import errors
 
 ```bash
-# Make sure venv is activated
-source venv/bin/activate
+# Make sure .venv is activated
+source .venv/bin/activate
 
 # Reinstall dependencies
 pip install -r requirements.txt --force-reinstall

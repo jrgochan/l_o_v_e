@@ -31,6 +31,7 @@ gcloud services enable \
     vpcaccess.googleapis.com \
     secretmanager.googleapis.com \
     servicenetworking.googleapis.com \
+    aiplatform.googleapis.com \
     --project "$PROJECT_ID"
 
 # Create Artifact Registry
@@ -42,8 +43,18 @@ if ! gcloud artifacts repositories describe "$REPO_NAME" --location="$REGION" --
         --location="$REGION" \
         --description="L.O.V.E. Stack Images" \
         --project="$PROJECT_ID"
-else
     echo "Repository $REPO_NAME already exists."
 fi
+
+# IAM Permissions
+# Grant Secret Accessor to Default Compute Service Account (used by Cloud Run)
+echo "Configuring IAM permissions..."
+PROJECT_NUMBER=$(gcloud projects describe "$PROJECT_ID" --format='value(projectNumber)')
+COMPUTE_SA="${PROJECT_NUMBER}-compute@developer.gserviceaccount.com"
+
+echo "Granting Secret Accessor to $COMPUTE_SA..."
+gcloud projects add-iam-policy-binding "$PROJECT_ID" \
+    --member="serviceAccount:${COMPUTE_SA}" \
+    --role="roles/secretmanager.secretAccessor" >/dev/null
 
 echo "Phase 1 Complete."

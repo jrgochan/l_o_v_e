@@ -95,8 +95,12 @@ else
 fi
 
 # 6. Ollama VM
-echo "Checking Ollama VM..."
-if ! gcloud compute instances describe "$OLLAMA_INSTANCE_NAME" --zone="$ZONE" --project="$PROJECT_ID" >/dev/null 2>&1; then
+if [ "$CLOUD_MODE" == "true" ]; then
+    echo "Cloud Mode enabled: Skipping Ollama VM provisioning."
+else
+    echo "Checking Ollama VM..."
+    if ! gcloud compute instances describe "$OLLAMA_INSTANCE_NAME" --zone="$ZONE" --project="$PROJECT_ID" >/dev/null 2>&1; then
+
     echo "Creating Ollama VM..."
     
     # Startup script to install Ollama
@@ -131,8 +135,9 @@ EOF
         --project="$PROJECT_ID" 2>/dev/null || true
         
     rm startup-ollama.sh
-else
-    echo "Ollama VM exists."
+    else
+        echo "Ollama VM exists."
+    fi
 fi
 
 echo "Phase 3 Complete."

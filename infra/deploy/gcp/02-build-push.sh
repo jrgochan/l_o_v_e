@@ -40,19 +40,29 @@ build_and_push() {
     local dir=$2
     local image_name="${REGISTRY}/${service}:latest"
     local build_args_str=$3 # Optional build arguments
-    
+    local use_root_context=$4 # Optional: "true" to use root context
+
     echo "Building $service using $CONTAINER_CMD..."
     
-    # Check context
-    if [ ! -d "$ROOT_DIR/$dir" ]; then
-        echo "Error: Directory $dir not found"
-        return 1
+    local build_context="."
+    local dockerfile="Containerfile"
+
+    if [ "$use_root_context" == "true" ]; then
+        cd "$ROOT_DIR"
+        build_context="."
+        dockerfile="$dir/Containerfile"
+        echo "  Using Root Context"
+    else 
+        # Check context
+        if [ ! -d "$ROOT_DIR/$dir" ]; then
+            echo "Error: Directory $dir not found"
+            return 1
+        fi
+        cd "$ROOT_DIR/$dir"
     fi
     
-    cd "$ROOT_DIR/$dir"
-    
     # Construct build command
-    local cmd="$CONTAINER_CMD build $BUILD_FLAGS --platform linux/amd64 -t $image_name -f Containerfile"
+    local cmd="$CONTAINER_CMD build $BUILD_FLAGS --platform linux/amd64 -t $image_name -f $dockerfile"
     
     # Add any build arguments
     if [ -n "$build_args_str" ]; then
@@ -60,13 +70,14 @@ build_and_push() {
     fi
     
     # Execute build
-    echo "Executing: $cmd ."
-    $cmd .
+    echo "Executing: $cmd $build_context"
+    $cmd $build_context
     
     echo "Pushing $service..."
     $CONTAINER_CMD push "$image_name"
     
-    cd - >/dev/null
+    # Return to script dir (approximate, since we cd'd around)
+    cd "$DIR" >/dev/null
 }
 
 # Parse command line arguments
@@ -108,14 +119,16 @@ case "$TARGET" in
     "frontend")
         echo "Building Frontend (Experience)..."
         # EXTRA_ARGS should contain --build-arg flags
-        build_and_push "experience" "experience" "$EXTRA_ARGS"
+        # Use root context for experience module
+        build_and_push "experience" "experience" "$EXTRA_ARGS" "true"
         ;;
     *)
         echo "Building All Services (Default)..."
         build_and_push "versor" "versor"
         build_and_push "observer" "observer"
         build_and_push "listener" "listener"
-        build_and_push "experience" "experience"
+        # Use root context for experience module
+        build_and_push "experience" "experience" "" "true"
         ;;
 esac
 

@@ -19,7 +19,7 @@ l_o_v_e/
 
 ### Prerequisites
 
-- **Python 3.14+** (Required for all backend services)
+- **Python 3.12+** (Required for all backend services)
 - **Node.js 18+** (for Experience module)
 - **PostgreSQL 14+** (PostgreSQL 18 recommended) with `pgvector` extension
 - **Redis** (for task queuing)

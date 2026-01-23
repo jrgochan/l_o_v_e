@@ -6,36 +6,23 @@ Handles password hashing and JWT token generation.
 from datetime import datetime, timedelta
 from typing import Any, Dict, Optional
 
-# Monkeypatch bcrypt to work with passlib 1.7.4
-import bcrypt
 from jose import jwt
-from passlib.context import CryptContext
+from pwdlib import PasswordHash
+from pwdlib.hashers.argon2 import Argon2Hasher
 
 from app.config import settings
 
-if not hasattr(bcrypt, "__about__"):
-    try:
-
-        class About:
-            """Monkeypatched About class for bcrypt compatibility."""
-
-            __version__ = bcrypt.__version__  # type: ignore[attr-defined]
-
-        bcrypt.__about__ = About()  # type: ignore[attr-defined]
-    except Exception:  # pragma: no cover
-        pass
-
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+password_hash = PasswordHash((Argon2Hasher(),))
 
 
 def verify_password(plain_password: str, hashed_password: str) -> bool:
     """Verify a password against its hash."""
-    return bool(pwd_context.verify(plain_password, hashed_password))
+    return password_hash.verify(plain_password, hashed_password)
 
 
 def get_password_hash(password: str) -> str:
     """Hash a password for storage."""
-    return str(pwd_context.hash(password))
+    return password_hash.hash(password)
 
 
 def create_access_token(data: Dict[str, Any], expires_delta: Optional[timedelta] = None) -> str:

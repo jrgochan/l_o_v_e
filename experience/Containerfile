@@ -21,6 +21,12 @@ COPY . .
 # Disable telemetry during build
 ENV NEXT_TELEMETRY_DISABLED 1
 
+# Build Arguments
+ARG NEXT_PUBLIC_API_URL
+ARG NEXT_PUBLIC_OBSERVER_URL
+ARG NEXT_PUBLIC_LISTENER_URL
+ARG NEXT_PUBLIC_VERSOR_URL
+
 # Build web workspace (and its dependencies)
 RUN npm run build:web
 

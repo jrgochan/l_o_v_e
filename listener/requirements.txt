@@ -1,5 +1,5 @@
 # Listener Module - Dependencies
-# Python 3.14+
+# Python 3.12+
 
 # FastAPI & Server
 fastapi[all]==0.115.6
@@ -12,7 +12,7 @@ ffmpeg-python==0.2.0
 
 # Prosody Analysis
 librosa==0.10.2.post1
-numba>=0.63.0
+numba>=0.59.0
 soundfile==0.13.0
 praat-parselmouth==0.4.7
 
@@ -20,11 +20,13 @@ praat-parselmouth==0.4.7
 langchain>=0.3.14
 langchain-community>=0.3.14
 ollama==0.6.1
+spacy>=3.7.2
 transformers>=4.48.0
+langchain-google-vertexai>=2.0.0
 
-# Core AI - Explicit version pinning for Python 3.14 compatibility
-torch==2.9.1
-numpy==2.3.1
+# Core AI - Explicit version pinning for Python 3.12 compatibility
+torch==2.3.0
+numpy==1.26.4
 
 # Task Queue
 arq==0.26.1

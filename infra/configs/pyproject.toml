@@ -32,7 +32,7 @@ ensure_newline_before_comments = true
 skip_glob = ["*/migrations/*", "*/__pycache__/*", "*/venv/*"]
 
 [tool.mypy]
-python_version = "3.14"
+python_version = "3.12"
 strict = true
 warn_return_any = true
 warn_unused_configs = true

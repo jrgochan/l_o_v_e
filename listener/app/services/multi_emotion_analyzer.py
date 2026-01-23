@@ -50,7 +50,6 @@ import time
 from typing import Any, Dict, List, Optional, Tuple
 
 import numpy as np
-from langchain_community.llms import Ollama
 from langchain_core.output_parsers import PydanticOutputParser
 from langchain_core.prompts import ChatPromptTemplate
 
@@ -58,6 +57,7 @@ from app.config import settings
 from app.models.multi_emotion_response import (
     MultiEmotionAnalysisResponse,
 )
+from app.services.llm_factory import get_llm
 from app.services.model_fetcher import get_model_fetcher
 
 logger = logging.getLogger(__name__)
@@ -358,9 +358,10 @@ class MultiEmotionAnalyzer:
         self.base_url = base_url or settings.OLLAMA_BASE_URL
         self.min_confidence = min_confidence
 
-        # Initialize LLM
-        self.llm = Ollama(
-            model=self.model, temperature=self.temperature, base_url=self.base_url, format="json"
+        # Initialize LLM via Factory
+        self.llm = get_llm(
+            model=self.model,
+            temperature=self.temperature,
         )
 
         # Initialize parser

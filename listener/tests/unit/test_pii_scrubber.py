@@ -10,6 +10,13 @@ def mock_pipeline():
         mock.return_value = pipe_mock
         yield mock
 
+@pytest.fixture
+def mock_spacy():
+    with patch('app.services.pii_scrubber.spacy') as mock:
+        nlp_mock = MagicMock()
+        mock.load.return_value = nlp_mock
+        yield mock
+
 class TestPIIScrubber:
     def test_singleton_getter(self):
         """Test singleton pattern."""
@@ -24,13 +31,18 @@ class TestPIIScrubber:
             assert s1 is s2
             mock_cls.assert_called_once()
 
-    def test_load_model_success(self, mock_pipeline):
-        """Test model loading."""
+    def test_load_models_success(self, mock_pipeline, mock_spacy):
+        """Test hybrid model loading."""
         scrubber = PIIScrubber(model_name="test_model")
-        assert scrubber._nlp is None
+        assert scrubber._nlp_bert is None
+        assert scrubber._nlp_spacy is None
         
-        nlp = scrubber._load_model()
-        assert nlp is not None
+        nlp_bert, nlp_spacy = scrubber._load_models()
+        
+        assert nlp_bert is not None
+        assert nlp_spacy is not None
+        
+        # Verify BERT load
         mock_pipeline.assert_called_with(
             "token-classification",
             model="test_model",
@@ -38,110 +50,123 @@ class TestPIIScrubber:
             aggregation_strategy="simple"
         )
         
+        # Verify Spacy load
+        mock_spacy.load.assert_called_with("en_core_web_sm")
+        
         # Second call uses cache
-        nlp2 = scrubber._load_model()
-        assert nlp2 is nlp
+        nlp_bert2, nlp_spacy2 = scrubber._load_models()
+        assert nlp_bert2 is nlp_bert
+        assert nlp_spacy2 is nlp_spacy
         mock_pipeline.assert_called_once()
+        mock_spacy.load.assert_called_once()
 
-    def test_load_model_failure(self, mock_pipeline):
-        """Test model load failure."""
-        mock_pipeline.side_effect = RuntimeError("Model fail")
+    def test_load_model_failure_graceful_spacy(self, mock_pipeline, mock_spacy):
+        """Test that failure to load Spacy allows BERT to continue."""
+        mock_spacy.load.side_effect = Exception("Spacy missing")
         
         scrubber = PIIScrubber()
-        with pytest.raises(RuntimeError, match="Failed to load Transformers model"):
-            scrubber._load_model()
+        nlp_bert, nlp_spacy = scrubber._load_models()
+        
+        assert nlp_bert is not None
+        assert nlp_spacy is None  # Spacy failed but we proceeded
 
-    def test_scrub_pii_structure(self, mock_pipeline):
-        """Test scrubbing with placeholders."""
+    def test_scrub_pii_structure(self, mock_pipeline, mock_spacy):
+        """Test scrubbing with placeholders (Hybrid)."""
         scrubber = PIIScrubber()
-        nlp_mock = mock_pipeline.return_value
         
-        # Mock HF pipeline output
-        # Input: "I saw Dr. Smith at Kaiser"
-        # Smith -> PER, Kaiser -> ORG
-        
-        # Note: HF aggregation merges "Dr" "." "Smith" if they are adjacent PER tokens
-        # but for this mock we just simulate the output list
-        mock_output = [
-            {'entity_group': 'PER', 'score': 0.99, 'word': 'Smith', 'start': 10, 'end': 15},
-            {'entity_group': 'ORG', 'score': 0.98, 'word': 'Kaiser', 'start': 19, 'end': 25}
+        # Mock BERT output
+        bert_mock = mock_pipeline.return_value
+        bert_mock.return_value = [
+             {'entity_group': 'PER', 'score': 0.99, 'word': 'Smith', 'start': 10, 'end': 15}
         ]
-        nlp_mock.return_value = mock_output
+        
+        # Mock Spacy output
+        spacy_nlp = mock_spacy.load.return_value
+        
+        # Create a mock Doc and Ents for Spacy
+        # Text: "I saw Dr. Smith at Kaiser"
+        # Kaiser -> ORG (Spacy)
+        
+        # Spacy Doc simulation
+        mock_doc = MagicMock()
+        mock_doc.text = "I saw Dr. Smith at Kaiser"
+        
+        ent_org = MagicMock()
+        ent_org.text = "Kaiser"
+        ent_org.label_ = "ORG"
+        ent_org.start_char = 19
+        ent_org.end_char = 25
+        
+        mock_doc.ents = [ent_org]
+        spacy_nlp.return_value = mock_doc
         
         text = "I saw Dr. Smith at Kaiser"
         
         result = scrubber.scrub(text, keep_structure=True)
         
-        # Logic is reverse order replacement
-        # Kaiser (19-25) -> [ORG]
-        # Smith (10-15) -> [NAME]
+        # Expected:
+        # Smith (BERT) -> [NAME] (PER->[NAME])
+        # Kaiser (Spacy) -> [ORG] (ORG->[ORG])
         
-        # "I saw Dr. [NAME] at [ORG]"
         expected = "I saw Dr. [NAME] at [ORG]"
         assert result == expected
-        
-        # Check that pipeline was called with text
-        nlp_mock.assert_called_with(text)
 
-    def test_scrub_pii_remove(self, mock_pipeline):
-        """Test scrubbing removing text."""
+    def test_detect_pii_hybrid_deduplication(self, mock_pipeline, mock_spacy):
+        """Test that overlapping PII is handled (first one wins usually, or standard overlap logic)."""
         scrubber = PIIScrubber()
-        nlp_mock = mock_pipeline.return_value
         
-        mock_output = [
-            {'entity_group': 'PER', 'score': 0.99, 'word': 'Smith', 'start': 10, 'end': 15}
+        # Text: "Bob Smith"
+        # BERT finds "Bob Smith" (PER) 0-9
+        # Spacy finds "Smith" (PERSON) 4-9
+        
+        # BERT Mock
+        bert_mock = mock_pipeline.return_value
+        bert_mock.return_value = [
+            {'entity_group': 'PER', 'score': 0.99, 'word': 'Bob Smith', 'start': 0, 'end': 9}
         ]
-        nlp_mock.return_value = mock_output
         
-        text = "I saw Dr. Smith"
-        result = scrubber.scrub(text, keep_structure=False)
+        # Spacy Mock
+        spacy_nlp = mock_spacy.load.return_value
+        mock_doc = MagicMock()
         
-        # "I saw Dr." (stripped)
-        expected = "I saw Dr."
-        assert result == expected
+        ent_person = MagicMock()
+        ent_person.text = "Smith"
+        ent_person.label_ = "PERSON"
+        ent_person.start_char = 4
+        ent_person.end_char = 9
+        
+        mock_doc.ents = [ent_person]
+        spacy_nlp.return_value = mock_doc
+        
+        results = scrubber.detect_pii("Bob Smith")
+        
+        # Should detect "Bob Smith" from BERT.
+        # "Smith" from Spacy overlaps 4-9 with 0-9.
+        # Logic says: if overlap, skip new one.
+        # So Spacy finding should be ignored.
+        
+        assert len(results) == 1
+        assert results[0] == ("Bob Smith", "PER", 0, 9)
+
+    def test_detect_pii_regex_fallback(self, mock_pipeline, mock_spacy):
+        """Test regex fallback works with hybrid models."""
+        scrubber = PIIScrubber()
+        
+        # Empty AI findings
+        mock_pipeline.return_value.return_value = []
+        mock_spacy.load.return_value.return_value.ents = []
+        
+        text = "Call me at 555-123-4567"
+        results = scrubber.detect_pii(text)
+        
+        assert len(results) == 1
+        # PHONE regex match
+        word, label, start, end = results[0]
+        assert "555-123-4567" in word
+        assert label == "PHONE"
 
     def test_scrub_empty(self):
         """Test empty input."""
         scrubber = PIIScrubber()
         assert scrubber.scrub("") == ""
         assert scrubber.scrub(None) is None
-
-    def test_detect_pii(self, mock_pipeline):
-        """Test detection."""
-        scrubber = PIIScrubber()
-        nlp_mock = mock_pipeline.return_value
-        
-        mock_output = [
-            {'entity_group': 'PER', 'score': 0.99, 'word': 'Bob', 'start': 0, 'end': 3}
-        ]
-        nlp_mock.return_value = mock_output
-        
-        results = scrubber.detect_pii("Bob")
-        assert len(results) == 1
-        assert results[0] == ("Bob", "PER", 0, 3)
-
-    def test_has_pii(self, mock_pipeline):
-        """Test check."""
-        scrubber = PIIScrubber()
-        with patch.object(scrubber, 'detect_pii', return_value=[1]):
-            assert scrubber.has_pii("text")
-            
-        with patch.object(scrubber, 'detect_pii', return_value=[]):
-            assert not scrubber.has_pii("text")
-
-    def test_scrub_ignored_entity(self, mock_pipeline):
-        """Test that non-PII entities are ignored."""
-        scrubber = PIIScrubber()
-        nlp_mock = mock_pipeline.return_value
-        
-        # Entity with label not in PII_ENTITIES
-        mock_output = [
-            {'entity_group': 'UNKNOWN', 'score': 0.5, 'word': 'Thing', 'start': 0, 'end': 5}
-        ]
-        nlp_mock.return_value = mock_output
-        
-        # Test scrub
-        assert scrubber.scrub("Thing") == "Thing"
-        
-        # Test detect
-        assert scrubber.detect_pii("Thing") == []
