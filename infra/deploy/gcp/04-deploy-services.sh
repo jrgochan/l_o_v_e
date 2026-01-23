@@ -82,6 +82,9 @@ deploy_service() {
     elif [ "$service" == "listener" ]; then
         svc_cpu=$LISTENER_CPU
         svc_mem=$LISTENER_MEMORY
+    elif [ "$service" == "observer" ]; then
+        svc_cpu=$OBSERVER_CPU
+        svc_mem=$OBSERVER_MEMORY
     fi
     
     echo "Deploying $service..."
@@ -101,7 +104,7 @@ deploy_service() {
         --memory "$svc_mem" \
         --set-env-vars "POSTGRES_HOST=$DB_IP,POSTGRES_PORT=5432,POSTGRES_DB=$DB_NAME,POSTGRES_USER=$DB_USER" \
         --set-env-vars "REDIS_HOST=$REDIS_HOST,REDIS_PORT=$REDIS_PORT" \
-        --set-env-vars "OBSERVER_URL=$OBSERVER_URL,LISTENER_URL=$LISTENER_URL,VERSOR_URL=$VERSOR_URL" \
+        --set-env-vars "OBSERVER_URL=$OBSERVER_URL,LISTENER_URL=$LISTENER_URL,VERSOR_URL=$VERSOR_URL,DATASET=$DATASET" \
         --set-secrets "JWT_SECRET_KEY=${JWT_SECRET_REF}" \
         --set-secrets "POSTGRES_PASSWORD=${DB_SECRET_VERSION}" \
         --project "$PROJECT_ID")

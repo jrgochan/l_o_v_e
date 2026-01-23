@@ -111,11 +111,11 @@ show_help() {
         echo -e "    ${GREEN}Update deps only:${NC}         ./setup-love-stack.sh --update --skip-ollama --skip-db"
         echo "    Production minimal:       ./setup-love-stack.sh --yes --skip-ollama --skip-db"
         echo ""
-        echo -e "For complete documentation, run: ${BOLD}cat $SCRIPT_DIR/.setup-help.txt${NC}"
+        echo -e "For complete documentation, run: ${BOLD}cat $SCRIPT_DIR/../.setup-help.txt${NC}"
         echo -e "${BLUE}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
     else
         # Terminal doesn't support colors - use plain text
-        cat "$SCRIPT_DIR/.setup-help.txt"
+        cat "$SCRIPT_DIR/../.setup-help.txt"
     fi
     exit 0
 }
@@ -947,10 +947,10 @@ if [ "$SKIP_DATABASE" = false ]; then
         if [ -z "$DATASET" ] && [ "$AUTO_YES" = false ]; then
              echo ""
              print_info "Available datasets: atlas, plutchik, goemotions, all"
-             read -r -p "Select emotion dataset (default: atlas): " input_dataset
-             DATASET="${input_dataset:-atlas}"
+             read -r -p "Select emotion dataset (default: goemotions): " input_dataset
+             DATASET="${input_dataset:-goemotions}"
         fi
-        DATASET="${DATASET:-atlas}"
+        DATASET="${DATASET:-goemotions}"
         
         DB_INIT_ARGS+=("--dataset" "$DATASET")
         if [ "$PRECOMPUTE_PATHS" = true ]; then

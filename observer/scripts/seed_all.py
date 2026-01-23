@@ -181,11 +181,7 @@ def main(
     elif dataset.lower() == "plutchik":
         datasets_to_seed = [("Plutchik Emotions (8)", "data/plutchik/emotions.json", "Plutchik Wheel")]
     elif dataset.lower() == "goemotions":
-        datasets_to_seed = [
-            ("GoEmotions (28)", "data/goemotions/emotions.json", "GoEmotions", "--default"),
-            # Seed Brene Brown as inactive so it's available but disabled
-            ("Brene Brown Emotions (87)", "data/brene_brown/emotions.json", "brene_brown", "--inactive")
-        ]
+        datasets_to_seed = [("GoEmotions (28)", "data/goemotions/emotions.json", "GoEmotions", "--default")]
     elif dataset.lower() == "ual":
         datasets_to_seed = [("UAL (Unified Affective Lexicon)", "data/ual/emotions.json", "Unified Affective Lexicon")]
     else:
@@ -210,7 +206,9 @@ def main(
     steps.append(("Initial Users", "seed_users.py", []))
 
     # PHASE 2: Base Transition System (seeds strategies, patterns, transitions together)
-    steps.append(("Transition System Data", "seed_transition_data.py", reseed_args.copy()))
+    trans_args = reseed_args.copy()
+    trans_args.append(f"--dataset={dataset}")
+    steps.append(("Transition System Data", "seed_transition_data.py", trans_args))
     
     # PHASE 3: Enhanced Data (additional strategies and patterns)
     if level == "enhanced":

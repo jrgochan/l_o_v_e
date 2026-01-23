@@ -23,6 +23,7 @@ OPTIONS
     --skip-ollama           Skip Ollama model download (saves 4.7GB)
     --update                Update mode: keep venvs, just update dependencies (fast!)
     --minimal               Minimal mode: --skip-db --skip-ollama --update (fastest)
+    --dataset NAME          Select emotion dataset (atlas/plutchik/goemotions) [default: goemotions]
 
 WHAT IT DOES
     1. Checks Python 3.11+
@@ -60,8 +61,7 @@ WHAT IT DOES
        - Creates PostgreSQL database
        - Installs extensions (vector, uuid-ossp, pg_trgm)
        - Runs Alembic migrations
-       - Seeds all data:
-         • 87 emotions from Atlas of the Heart
+       - Seeds data from selected dataset (default: GoEmotions):
          • 69 transition strategies
          • 18 transition patterns
          • 169 category transition mappings

@@ -16,11 +16,17 @@ PROJECT_ARG=""
 while [[ $# -gt 0 ]]; do
     case $1 in
         --cloud)
+            # Check if next argument is "gcp" (optional value)
             if [ "$2" == "gcp" ]; then
                 CLOUD_MODE="true"
                 export CLOUD_MODE
+                shift 2
+            else
+                # Treat as boolean flag
+                CLOUD_MODE="true"
+                export CLOUD_MODE
+                shift 1
             fi
-            shift 2
             ;;
         --project)
             PROJECT_ARG="$2"

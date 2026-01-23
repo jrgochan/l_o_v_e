@@ -5,6 +5,7 @@
 PROJECT_ID="" # Leave empty to use 'gcloud config get-value project'
 CLOUD_MODE="false" # Set to "true" via --cloud flag
 APP_NAME="love-stack"
+DATASET="goemotions" # Default dataset (can be overridden)
 
 # Region settings
 REGION="us-central1"
@@ -65,6 +66,9 @@ EXP_MEMORY="1Gi"
 
 LISTENER_CPU="2"
 LISTENER_MEMORY="2Gi"
+
+OBSERVER_CPU="1"
+OBSERVER_MEMORY="1Gi"
 
 # Resource Naming (Derived)
 OLLAMA_INSTANCE_NAME="${APP_NAME}-ollama"
