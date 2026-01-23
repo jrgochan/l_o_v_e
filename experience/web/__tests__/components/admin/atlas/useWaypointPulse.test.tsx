@@ -1,4 +1,4 @@
-import { useWaypointPulse } from "../../../../components/admin/atlas/useWaypointPulse";
+import { useWaypointPulse } from "../../../../components/admin/visualization/useWaypointPulse";
 import { render } from "@testing-library/react";
 import React from "react";
 import * as THREE from "three";

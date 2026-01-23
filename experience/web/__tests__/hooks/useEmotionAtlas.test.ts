@@ -1,12 +1,12 @@
 import { renderHook, waitFor } from "@testing-library/react";
 import { useEmotionAtlas } from "@/hooks/useEmotionAtlas";
-import { useAtlasAdminStore } from "@/stores/useAtlasAdminStore";
+import { useVisualizationStore } from "@/stores/useVisualizationStore";
 import { logger } from "@/utils/logger";
 import fetchMock from "jest-fetch-mock";
 
 fetchMock.enableMocks();
 
-jest.mock("@/stores/useAtlasAdminStore");
+jest.mock("@/stores/useVisualizationStore");
 jest.mock("@/utils/logger");
 jest.mock("@love/experience-shared", () => ({
   getCanonicalEmotion: jest.fn((name) => {
@@ -23,7 +23,7 @@ describe("useEmotionAtlas", () => {
   beforeEach(() => {
     jest.clearAllMocks();
     fetchMock.resetMocks();
-    (useAtlasAdminStore as unknown as jest.Mock).mockReturnValue({
+    (useVisualizationStore as unknown as jest.Mock).mockReturnValue({
       allEmotions: [],
       collections: [],
       activeCollectionId: null,
@@ -86,7 +86,7 @@ describe("useEmotionAtlas", () => {
     fetchMock.mockResponseOnce(JSON.stringify({ emotions: [] }));
 
     const mockSetActiveCollection = jest.fn();
-    (useAtlasAdminStore as unknown as jest.Mock).mockReturnValue({
+    (useVisualizationStore as unknown as jest.Mock).mockReturnValue({
       allEmotions: [],
       collections: [],
       activeCollectionId: null, // No active collection
@@ -129,7 +129,7 @@ describe("useEmotionAtlas", () => {
   });
 
   it("should not fetch if emotions already loaded", async () => {
-    (useAtlasAdminStore as unknown as jest.Mock).mockReturnValue({
+    (useVisualizationStore as unknown as jest.Mock).mockReturnValue({
       allEmotions: [{ id: "e1" }], // Store has data
       collections: [{ id: "c1", selected: true }], // Collections loaded
       activeCollectionId: "c1", // Active collection set
@@ -154,7 +154,7 @@ describe("useEmotionAtlas", () => {
 
   it("should handle error", async () => {
     // Skip collections fetch
-    (useAtlasAdminStore as unknown as jest.Mock).mockReturnValue({
+    (useVisualizationStore as unknown as jest.Mock).mockReturnValue({
       allEmotions: [],
       collections: [{ id: "c1" }],
       activeCollectionId: "c1",
@@ -179,7 +179,7 @@ describe("useEmotionAtlas", () => {
   });
 
   it("handles unknown error objects", async () => {
-    (useAtlasAdminStore as unknown as jest.Mock).mockReturnValue({
+    (useVisualizationStore as unknown as jest.Mock).mockReturnValue({
       allEmotions: [],
       collections: [{ id: "c1" }],
       activeCollectionId: "c1",
@@ -243,7 +243,7 @@ describe("useEmotionAtlas", () => {
   });
 
   it("should handle non-ok API response", async () => {
-    (useAtlasAdminStore as unknown as jest.Mock).mockReturnValue({
+    (useVisualizationStore as unknown as jest.Mock).mockReturnValue({
       allEmotions: [],
       collections: [{ id: "c1" }],
       activeCollectionId: "c1",
@@ -271,7 +271,7 @@ describe("useEmotionAtlas", () => {
 
   it("should allow refetching", async () => {
     // Initial load prevented by store having data? NO, hook always fetches on mount/active.
-    (useAtlasAdminStore as unknown as jest.Mock).mockReturnValue({
+    (useVisualizationStore as unknown as jest.Mock).mockReturnValue({
       allEmotions: [{ id: "e1" }], // Store has data
       collections: [{ id: "c1" }],
       activeCollectionId: "c1",
@@ -300,7 +300,7 @@ describe("useEmotionAtlas", () => {
   });
   it("should handle non-ok response when fetching collections", async () => {
     fetchMock.resetMocks();
-    (useAtlasAdminStore as unknown as jest.Mock).mockReturnValue({
+    (useVisualizationStore as unknown as jest.Mock).mockReturnValue({
       allEmotions: [],
       collections: [],
       activeCollectionId: null,
@@ -339,7 +339,7 @@ describe("useEmotionAtlas", () => {
     fetchMock.mockResponseOnce(JSON.stringify({ emotions: [] }));
 
     const mockSetActiveCollection = jest.fn();
-    (useAtlasAdminStore as unknown as jest.Mock).mockReturnValue({
+    (useVisualizationStore as unknown as jest.Mock).mockReturnValue({
       allEmotions: [],
       collections: [],
       activeCollectionId: null,
@@ -396,7 +396,7 @@ describe("useEmotionAtlas", () => {
     // This targets line 130 logic: if (activeCollectionId || (!isLoadingCollections && collections.length === 0))
     // we want the failsafe case: !activeCollectionId AND collections.length > 0 -> Should NOT fetch
     fetchMock.resetMocks();
-    (useAtlasAdminStore as unknown as jest.Mock).mockReturnValue({
+    (useVisualizationStore as unknown as jest.Mock).mockReturnValue({
       allEmotions: [],
       collections: [{ id: "c1", name: "Existing" }], // Collections exist
       activeCollectionId: null, // But none active
@@ -441,7 +441,7 @@ describe("useEmotionAtlas", () => {
     fetchMock.mockResponseOnce(JSON.stringify({ someOtherProp: [] }));
 
     const mockSetCollections = jest.fn();
-    (useAtlasAdminStore as unknown as jest.Mock).mockReturnValue({
+    (useVisualizationStore as unknown as jest.Mock).mockReturnValue({
       allEmotions: [],
       collections: [],
       activeCollectionId: null,

@@ -1,9 +1,9 @@
 import { renderHook, waitFor } from "@testing-library/react";
 import { useLoadCachedPaths } from "@/hooks/useLoadCachedPaths";
-import { useAtlasAdminStore } from "@/stores/useAtlasAdminStore";
+import { useVisualizationStore } from "@/stores/useVisualizationStore";
 import { logger } from "@/utils/logger";
 
-jest.mock("@/stores/useAtlasAdminStore");
+jest.mock("@/stores/useVisualizationStore");
 jest.mock("@/utils/logger");
 
 describe("useLoadCachedPaths", () => {
@@ -18,7 +18,7 @@ describe("useLoadCachedPaths", () => {
     // Manual global fetch mock
     global.fetch = jest.fn();
 
-    (useAtlasAdminStore as unknown as jest.Mock).mockImplementation((selector) => {
+    (useVisualizationStore as unknown as jest.Mock).mockImplementation((selector) => {
       const state = {
         allEmotions: [{ id: "e1" }, { id: "e2" }],
         addComputedPath: mockAddComputedPath,
@@ -26,7 +26,7 @@ describe("useLoadCachedPaths", () => {
       return selector(state);
     });
 
-    (useAtlasAdminStore.getState as jest.Mock).mockReturnValue({
+    (useVisualizationStore.getState as jest.Mock).mockReturnValue({
       updateCacheStatus: mockUpdateCacheStatus,
     });
   });
@@ -70,7 +70,7 @@ describe("useLoadCachedPaths", () => {
   });
 
   it("should skip if no emotions loaded", async () => {
-    (useAtlasAdminStore as unknown as jest.Mock).mockImplementation((selector) => {
+    (useVisualizationStore as unknown as jest.Mock).mockImplementation((selector) => {
       const state = {
         allEmotions: [], // Empty
         addComputedPath: mockAddComputedPath,

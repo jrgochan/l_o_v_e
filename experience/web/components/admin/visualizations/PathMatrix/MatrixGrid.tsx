@@ -10,25 +10,25 @@
 
 "use client";
 
-import type { AtlasEmotion, EmotionPath } from "@/types/atlas-admin";
+import type { Emotion, EmotionPath } from "@/types/visualization";
 // import type { TransitionPathResponse } from '@love/experience-shared';
 
 interface MatrixGridProps {
   viewMode: "emotions" | "categories";
-  sortedEmotions: AtlasEmotion[];
+  sortedEmotions: Emotion[];
   categories: string[];
-  getCellColor: (from: AtlasEmotion, to: AtlasEmotion) => string;
+  getCellColor: (from: Emotion, to: Emotion) => string;
   getCategoryCellColor: (fromCat: string, toCat: string) => string;
   getCategoryAverageDifficulty: (
     fromCat: string,
     toCat: string
   ) => { avgDistance: number; difficulty: string; pathCount: number } | null;
-  getPathForPair: (from: AtlasEmotion, to: AtlasEmotion) => EmotionPath | undefined | null;
+  getPathForPair: (from: Emotion, to: Emotion) => EmotionPath | undefined | null;
   hoveredCell: { from: string; to: string } | null;
   onHoverCell: (from: string, to: string) => void;
   onLeaveCell: () => void;
-  onCellClick: (from: AtlasEmotion, to: AtlasEmotion) => void;
-  allEmotions: AtlasEmotion[];
+  onCellClick: (from: Emotion, to: Emotion) => void;
+  allEmotions: Emotion[];
 }
 
 /**

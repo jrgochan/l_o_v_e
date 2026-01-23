@@ -7,7 +7,7 @@ import * as THREE from "three";
 import React from "react";
 
 // Mock types
-import type { EmotionPath } from "@/types/atlas-admin";
+import type { EmotionPath } from "@/types/visualization";
 
 const mockEmotionPath: EmotionPath = {
   id: "p1",

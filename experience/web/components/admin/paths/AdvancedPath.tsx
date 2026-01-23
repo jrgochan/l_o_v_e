@@ -13,7 +13,7 @@
 import { useRef, useEffect } from "react";
 import { useFrame } from "@react-three/fiber";
 import * as THREE from "three";
-import type { PathAnimationMode } from "@/types/atlas-admin";
+import type { PathAnimationMode } from "@/types/visualization";
 
 interface AdvancedPathProps {
   mode: PathAnimationMode;

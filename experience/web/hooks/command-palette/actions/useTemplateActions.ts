@@ -1,5 +1,5 @@
 import { useCallback } from "react";
-import { useAtlasAdminStore } from "@/stores/useAtlasAdminStore";
+import { useVisualizationStore } from "@/stores/useVisualizationStore";
 import { logger } from "@/utils/logger";
 import { JOURNEY_TEMPLATES, getTemplateById } from "@/data/journey-templates";
 
@@ -27,7 +27,7 @@ export function useTemplateActions({ close, selectMultiple }: UseTemplateActions
         const template = getTemplateById(templateId);
         if (!template) return;
 
-        const allEmotions = useAtlasAdminStore.getState().allEmotions;
+        const allEmotions = useVisualizationStore.getState().allEmotions;
         const fromEmotion = allEmotions.find((e) => e.name === template.from_emotion);
         const toEmotion = allEmotions.find((e) => e.name === template.to_emotion);
 

@@ -8,7 +8,7 @@
 
 import { Toggle } from "@/components/ui/Toggle";
 import { useSettingsStore } from "@/stores/useSettingsStore";
-import type { PathAnimationMode } from "@/types/atlas-admin";
+import type { PathAnimationMode } from "@/types/visualization";
 
 type ColorScheme = "category" | "valence" | "arousal" | "connection";
 

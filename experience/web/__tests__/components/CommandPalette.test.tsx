@@ -2,7 +2,7 @@ import { render, screen, fireEvent, act } from "@testing-library/react";
 import { CommandPalette } from "@/components/CommandPalette";
 import { useCommandPalette } from "@/hooks/useCommandPalette";
 import { useCommandPaletteFilter } from "@/hooks/command-palette/useCommandPaletteFilter";
-import { useAtlasAdminStore } from "@/stores/useAtlasAdminStore";
+import { useVisualizationStore } from "@/stores/useVisualizationStore";
 import { useExperienceStore } from "@/stores/useExperienceStore";
 
 // Robust Mock cmdk
@@ -25,7 +25,7 @@ jest.mock("cmdk", () => {
 
 jest.mock("@/hooks/useCommandPalette");
 jest.mock("@/hooks/command-palette/useCommandPaletteFilter");
-jest.mock("@/stores/useAtlasAdminStore");
+jest.mock("@/stores/useVisualizationStore");
 jest.mock("@/stores/useExperienceStore");
 jest.mock("@/components/command-palette/ActiveJourneyStatus", () => ({
   ActiveJourneyStatus: () => <div data-testid="active-journey-status" />,
@@ -114,7 +114,7 @@ describe("CommandPalette", () => {
     // Default mocks
     (useCommandPalette as jest.Mock).mockReturnValue(createMockPalette());
     (useCommandPaletteFilter as jest.Mock).mockReturnValue(mockFilter);
-    (useAtlasAdminStore as unknown as jest.Mock).mockImplementation((selector) =>
+    (useVisualizationStore as unknown as jest.Mock).mockImplementation((selector) =>
       selector({
         selectedEmotionIds: new Set(),
         setSelectedPath: jest.fn(),

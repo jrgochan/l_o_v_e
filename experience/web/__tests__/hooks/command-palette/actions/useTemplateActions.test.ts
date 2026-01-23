@@ -1,9 +1,9 @@
 import { renderHook } from "@testing-library/react";
 import { useTemplateActions } from "@/hooks/command-palette/actions/useTemplateActions";
-import { useAtlasAdminStore } from "@/stores/useAtlasAdminStore";
+import { useVisualizationStore } from "@/stores/useVisualizationStore";
 import { logger } from "@/utils/logger";
 
-jest.mock("@/stores/useAtlasAdminStore");
+jest.mock("@/stores/useVisualizationStore");
 jest.mock("@/utils/logger");
 jest.mock("@/data/journey-templates", () => ({
   JOURNEY_TEMPLATES: [{ id: "t1", name: "T1", from_emotion: "Anxiety", to_emotion: "Calmness" }],
@@ -20,7 +20,7 @@ describe("useTemplateActions", () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
-    (useAtlasAdminStore.getState as jest.Mock).mockReturnValue({
+    (useVisualizationStore.getState as jest.Mock).mockReturnValue({
       allEmotions: [
         { id: "e1", name: "Anxiety" },
         { id: "e2", name: "Calmness" },
@@ -67,7 +67,7 @@ describe("useTemplateActions", () => {
   });
 
   it("should not select if emotions missing", async () => {
-    (useAtlasAdminStore.getState as jest.Mock).mockReturnValue({
+    (useVisualizationStore.getState as jest.Mock).mockReturnValue({
       allEmotions: [], // Empty emotions
     });
     const { result } = getHook();

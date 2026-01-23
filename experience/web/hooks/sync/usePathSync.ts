@@ -1,14 +1,14 @@
 "use client";
 
 import { useEffect } from "react";
-import { useAtlasAdminStore } from "@/stores/useAtlasAdminStore";
+import { useVisualizationStore } from "@/stores/useVisualizationStore";
 import { useExperienceStore } from "@/stores/useExperienceStore";
 import { type TransitionPathResponse } from "@love/experience-shared";
 
 export function usePathSync() {
-  const selectedPathId = useAtlasAdminStore((state) => state.selectedPathId);
-  const computedPaths = useAtlasAdminStore((state) => state.computedPaths);
-  const allEmotions = useAtlasAdminStore((state) => state.allEmotions);
+  const selectedPathId = useVisualizationStore((state) => state.selectedPathId);
+  const computedPaths = useVisualizationStore((state) => state.computedPaths);
+  const allEmotions = useVisualizationStore((state) => state.allEmotions);
 
   const setTransitionPath = useExperienceStore((state) => state.setTransitionPath);
   const setShowPath = useExperienceStore((state) => state.setShowPath);

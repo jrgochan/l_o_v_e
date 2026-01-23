@@ -1,9 +1,9 @@
 import { render, act, screen } from "@testing-library/react";
-import { IntroSequence } from "@/components/admin/atlas/IntroSequence";
+import { IntroSequence } from "@/components/admin/visualization/IntroSequence";
 // Interact with R3F state
 import { useThree, useFrame } from "@react-three/fiber";
 import * as THREE from "three";
-import { useAtlasAdminStore } from "@/stores/useAtlasAdminStore";
+import { useVisualizationStore } from "@/stores/useVisualizationStore";
 
 // Mock Hooks
 jest.mock("@react-three/fiber", () => ({
@@ -11,8 +11,8 @@ jest.mock("@react-three/fiber", () => ({
   useFrame: jest.fn(),
 }));
 
-jest.mock("@/stores/useAtlasAdminStore", () => ({
-  useAtlasAdminStore: jest.fn(),
+jest.mock("@/stores/useVisualizationStore", () => ({
+  useVisualizationStore: jest.fn(),
 }));
 
 jest.mock("@/hooks/useAmbientAudio", () => ({
@@ -36,7 +36,7 @@ describe("IntroSequence", () => {
   beforeEach(() => {
     jest.useFakeTimers();
     jest.clearAllMocks();
-    (useAtlasAdminStore as unknown as jest.Mock).mockImplementation((selector) =>
+    (useVisualizationStore as unknown as jest.Mock).mockImplementation((selector) =>
       selector({ setIntroActive })
     );
     (useThree as jest.Mock).mockReturnValue({ camera: mockCamera });

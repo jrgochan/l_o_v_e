@@ -9,9 +9,9 @@
 
 import { useState, useMemo } from "react";
 import { MiniSoulSphere } from "../spheres/MiniSoulSphere";
-import { useAtlasAdminStore } from "@/stores/useAtlasAdminStore";
+import { useVisualizationStore } from "@/stores/useVisualizationStore";
 import { useAdminTheme } from "@/hooks/admin/useAdminTheme";
-import type { AtlasEmotion } from "@/types/atlas-admin";
+import type { Emotion } from "@/types/visualization";
 
 interface DataVisualizationOverlayProps {
   onClose: () => void;
@@ -91,10 +91,10 @@ const VacRadarChart = ({ vac, color }: { vac: [number, number, number]; color: s
 
 export function DataVisualizationOverlay({ onClose }: DataVisualizationOverlayProps) {
   const theme = useAdminTheme();
-  const allEmotions = useAtlasAdminStore((state) => state.allEmotions);
-  const colorScheme = useAtlasAdminStore((state) => state.settings.colorScheme);
-  const selectEmotion = useAtlasAdminStore((state) => state.selectEmotion);
-  const setFocusedEmotion = useAtlasAdminStore((state) => state.setFocusedEmotion);
+  const allEmotions = useVisualizationStore((state) => state.allEmotions);
+  const colorScheme = useVisualizationStore((state) => state.settings.colorScheme);
+  const selectEmotion = useVisualizationStore((state) => state.selectEmotion);
+  const setFocusedEmotion = useVisualizationStore((state) => state.setFocusedEmotion);
 
   const [hoveredId, setHoveredId] = useState<string | null>(null);
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
@@ -103,7 +103,7 @@ export function DataVisualizationOverlay({ onClose }: DataVisualizationOverlayPr
 
   // 1. Group by Category & Counts
   const categoryStats = useMemo(() => {
-    const stats = new Map<string, { count: number; emotions: AtlasEmotion[] }>();
+    const stats = new Map<string, { count: number; emotions: Emotion[] }>();
     let maxCount = 0;
 
     allEmotions.forEach((e) => {
@@ -166,7 +166,7 @@ export function DataVisualizationOverlay({ onClose }: DataVisualizationOverlayPr
     };
   }, [displayedEmotions]);
 
-  const handleEmotionClick = (emotion: AtlasEmotion) => {
+  const handleEmotionClick = (emotion: Emotion) => {
     selectEmotion(emotion.id);
     setFocusedEmotion(emotion.id);
     onClose();

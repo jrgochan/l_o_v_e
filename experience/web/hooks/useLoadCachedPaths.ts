@@ -6,8 +6,8 @@
  */
 
 import { useEffect, useState } from "react";
-import { useAtlasAdminStore } from "@/stores/useAtlasAdminStore";
-import type { EmotionPath } from "@/types/atlas-admin";
+import { useVisualizationStore } from "@/stores/useVisualizationStore";
+import type { EmotionPath } from "@/types/visualization";
 import type { CachedPathData } from "@/types/api-responses";
 import { logger } from "@/utils/logger";
 
@@ -19,8 +19,8 @@ export function useLoadCachedPaths() {
   const [loadTime, setLoadTime] = useState<number>(0);
   const [error, setError] = useState<string | null>(null);
 
-  const allEmotions = useAtlasAdminStore((state) => state.allEmotions);
-  const addComputedPath = useAtlasAdminStore((state) => state.addComputedPath);
+  const allEmotions = useVisualizationStore((state) => state.allEmotions);
+  const addComputedPath = useVisualizationStore((state) => state.addComputedPath);
 
   useEffect(() => {
     // Only load once emotions are available
@@ -84,7 +84,7 @@ export function useLoadCachedPaths() {
         setLoadTime(duration);
 
         // Update cache status in store
-        useAtlasAdminStore.getState().updateCacheStatus({
+        useVisualizationStore.getState().updateCacheStatus({
           loaded: true,
           count: loaded,
           lastLoadTime: Date.now(),

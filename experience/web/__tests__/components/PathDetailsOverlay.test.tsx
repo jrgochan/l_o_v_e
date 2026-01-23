@@ -1,11 +1,11 @@
 import { render, screen, fireEvent, act } from "@testing-library/react";
 import { PathDetailsOverlay } from "../../components/PathDetailsOverlay";
 import { useExperienceStore } from "@/stores/useExperienceStore";
-import { useAtlasAdminStore } from "@/stores/useAtlasAdminStore";
+import { useVisualizationStore } from "@/stores/useVisualizationStore";
 
 // Mock Stores
 jest.mock("@/stores/useExperienceStore");
-jest.mock("@/stores/useAtlasAdminStore");
+jest.mock("@/stores/useVisualizationStore");
 
 // Mock WaypointDetailModal
 jest.mock("@/components/admin/shared/WaypointDetailModal", () => ({
@@ -66,7 +66,7 @@ describe("PathDetailsOverlay", () => {
       })
     );
 
-    (useAtlasAdminStore as unknown as jest.Mock).mockImplementation((selector: any) =>
+    (useVisualizationStore as unknown as jest.Mock).mockImplementation((selector: any) =>
       selector({
         allEmotions: [
           { name: "Joy", category: "positive" },
@@ -404,7 +404,7 @@ describe("PathDetailsOverlay", () => {
   });
 
   it("should position lower in cinema mode", () => {
-    (useAtlasAdminStore as unknown as jest.Mock).mockImplementation((selector: any) =>
+    (useVisualizationStore as unknown as jest.Mock).mockImplementation((selector: any) =>
       selector({
         allEmotions: [],
         viewMode: "cinema",

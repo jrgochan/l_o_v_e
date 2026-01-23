@@ -7,7 +7,7 @@
 
 import { create } from "zustand";
 import { persist, createJSONStorage } from "zustand/middleware";
-import type { PathAnimationMode, PathComputeMode } from "@/types/atlas-admin";
+import type { PathAnimationMode, PathComputeMode } from "@/types/visualization";
 import type { LogLevel, LogCategory } from "@/utils/logger";
 import { logger } from "@/utils/logger";
 

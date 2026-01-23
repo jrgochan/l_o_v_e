@@ -1,9 +1,9 @@
 import { useEffect, Dispatch, SetStateAction } from "react";
-import type { AtlasEmotion } from "@/types";
+import type { Emotion } from "@/types";
 import type { TransitionPathResponse } from "@love/experience-shared";
 import { useExperienceStore } from "@/stores/useExperienceStore";
 import { useSettingsStore } from "@/stores/useSettingsStore";
-import type { PathAnimationMode } from "@/types/atlas-admin";
+import type { PathAnimationMode } from "@/types/visualization";
 
 interface UseZenKeyboardShortcutsProps {
   initAudio: () => void;
@@ -11,7 +11,7 @@ interface UseZenKeyboardShortcutsProps {
   toggleMute: () => void;
   setHasAudioEnabled: (enabled: boolean) => void;
   setShowDebug: Dispatch<SetStateAction<boolean>>;
-  emotions: AtlasEmotion[];
+  emotions: Emotion[];
 }
 
 export function useZenKeyboardShortcuts({

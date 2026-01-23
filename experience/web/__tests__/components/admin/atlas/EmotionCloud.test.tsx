@@ -1,5 +1,5 @@
 import { render, fireEvent } from "@testing-library/react";
-import { EmotionCloud } from "../../../../components/admin/atlas/EmotionCloud";
+import { EmotionCloud } from "../../../../components/admin/visualization/EmotionCloud";
 import * as THREE from "three";
 
 // Mock child components
@@ -32,8 +32,8 @@ jest.mock("../../../../components/admin/particles/EmotionParticles", () => ({
 
 // Mock Stores
 const mockUseAtlasAdminStore = jest.fn();
-jest.mock("@/stores/useAtlasAdminStore", () => ({
-  useAtlasAdminStore: (selector: any) => mockUseAtlasAdminStore(selector),
+jest.mock("@/stores/useVisualizationStore", () => ({
+  useVisualizationStore: (selector: any) => mockUseAtlasAdminStore(selector),
 }));
 
 const mockUseSettingsStore = jest.fn();
@@ -47,7 +47,7 @@ jest.mock("@react-three/drei", () => ({
 }));
 
 // Mock getLabelStyle
-jest.mock("../../../../components/admin/atlas/EmotionLabelOverlay", () => ({
+jest.mock("../../../../components/admin/visualization/EmotionLabelOverlay", () => ({
   getLabelStyle: () => ({
     containerClass: "mock-container",
     textClass: "mock-text",
@@ -165,8 +165,8 @@ describe("EmotionCloud", () => {
     });
 
     // Mock BRIDGE_EMOTIONS to include "Awe" if not already
-    jest.mock("@/types/atlas-admin", () => ({
-      ...jest.requireActual("@/types/atlas-admin"),
+    jest.mock("@/types/visualization", () => ({
+      ...jest.requireActual("@/types/visualization"),
       BRIDGE_EMOTIONS: ["Awe"],
     }));
 

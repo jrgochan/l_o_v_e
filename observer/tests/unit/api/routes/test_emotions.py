@@ -10,7 +10,7 @@ from app.api.routes.emotions import (
     compute_all_paths_batch,
     get_computation_status,
     get_all_cached_paths,
-    get_atlas_statistics,
+    get_path_statistics,
     clear_path_cache,
     get_smart_recommendations
 )
@@ -41,7 +41,7 @@ def mock_emotion():
     )
 
 # -----------------------------------------------------------------------------
-# GET /atlas/emotions
+# GET /emotions
 # -----------------------------------------------------------------------------
 
 @pytest.mark.asyncio
@@ -119,7 +119,7 @@ async def test_get_all_emotions_exception(mock_db):
     assert exc.value.status_code == 500
 
 # -----------------------------------------------------------------------------
-# GET /atlas/categories
+# GET /categories
 # -----------------------------------------------------------------------------
 
 @pytest.mark.asyncio
@@ -142,7 +142,7 @@ async def test_get_categories_exception(mock_db):
     assert exc.value.status_code == 500
 
 # -----------------------------------------------------------------------------
-# GET /atlas/emotions/{id}
+# GET /emotions/{id}
 # -----------------------------------------------------------------------------
 
 @pytest.mark.asyncio
@@ -172,7 +172,7 @@ async def test_get_emotion_by_id_exception(mock_db):
     assert exc.value.status_code == 500
 
 # -----------------------------------------------------------------------------
-# GET /atlas/search
+# GET /search
 # -----------------------------------------------------------------------------
 
 @pytest.mark.asyncio
@@ -193,7 +193,7 @@ async def test_search_emotions_exception(mock_db):
     assert exc.value.status_code == 500
 
 # -----------------------------------------------------------------------------
-# POST /atlas/compute-all-paths
+# POST /compute-all-paths
 # -----------------------------------------------------------------------------
 
 @pytest.mark.asyncio
@@ -227,7 +227,7 @@ async def test_compute_all_paths_batch_exception(mock_db):
         assert exc.value.status_code == 500
 
 # -----------------------------------------------------------------------------
-# GET /atlas/computation-status/{job_id}
+# GET /computation-status/{job_id}
 # -----------------------------------------------------------------------------
 
 @pytest.mark.asyncio
@@ -263,7 +263,7 @@ async def test_get_computation_status_exception(mock_db):
         assert exc.value.status_code == 500
 
 # -----------------------------------------------------------------------------
-# GET /atlas/paths/all
+# GET /paths/all
 # -----------------------------------------------------------------------------
 
 @pytest.mark.asyncio
@@ -288,26 +288,26 @@ async def test_get_all_cached_paths_exception(mock_db):
         assert exc.value.status_code == 500
 
 # -----------------------------------------------------------------------------
-# GET /atlas/statistics
+# GET /statistics
 # -----------------------------------------------------------------------------
 
 @pytest.mark.asyncio
-async def test_get_atlas_statistics_success(mock_db):
+async def test_get_path_statistics_success(mock_db):
     with patch("app.api.routes.emotions.PathMatrixService") as MockService:
         service_instance = MockService.return_value
         service_instance.get_cache_statistics = AsyncMock(return_value={"stat": "val"})
         
-        response = await get_atlas_statistics(db=mock_db)
+        response = await get_path_statistics(db=mock_db)
         assert response["stat"] == "val"
 
 @pytest.mark.asyncio
-async def test_get_atlas_statistics_exception(mock_db):
+async def test_get_path_statistics_exception(mock_db):
     with patch("app.api.routes.emotions.PathMatrixService") as MockService:
         service_instance = MockService.return_value
         service_instance.get_cache_statistics.side_effect = Exception("Service Error")
         
         with pytest.raises(HTTPException) as exc:
-            await get_atlas_statistics(db=mock_db)
+            await get_path_statistics(db=mock_db)
         assert exc.value.status_code == 500
 
 # -----------------------------------------------------------------------------

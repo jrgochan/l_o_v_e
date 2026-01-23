@@ -8,7 +8,7 @@
 // Re-export core types
 export type { VACVector, Quaternion, HapticMode, CanonicalEmotion } from "../core/vac";
 
-export type { ObserverEmotionResponse, ObserverHistoryResponse } from "../api/observer";
+export type { ObserverEmotionResponse, ObserverHistoryResponse, Emotion, EmotionsResponse } from "../api/observer";
 
 /**
  * Store interface types (for platform-specific implementations)

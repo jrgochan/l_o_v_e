@@ -1,8 +1,8 @@
 import { renderHook, act } from "@testing-library/react";
 import { useInfoPanelState } from "@/hooks/admin/useInfoPanelState";
-import { useAtlasAdminStore } from "@/stores/useAtlasAdminStore";
+import { useVisualizationStore } from "@/stores/useVisualizationStore";
 
-jest.mock("@/stores/useAtlasAdminStore");
+jest.mock("@/stores/useVisualizationStore");
 
 describe("useInfoPanelState", () => {
   const mockAllEmotions = [
@@ -16,7 +16,7 @@ describe("useInfoPanelState", () => {
   beforeEach(() => {
     jest.clearAllMocks();
     // Setup default store mock
-    (useAtlasAdminStore as unknown as jest.Mock).mockImplementation((selector) => {
+    (useVisualizationStore as unknown as jest.Mock).mockImplementation((selector) => {
       const state = {
         allEmotions: mockAllEmotions,
         selectedEmotionIds: new Set(),
@@ -49,7 +49,7 @@ describe("useInfoPanelState", () => {
 
   it("should prioritize selected path over hovered path", () => {
     // Redefine mock for this test
-    (useAtlasAdminStore as unknown as jest.Mock).mockImplementation((selector) => {
+    (useVisualizationStore as unknown as jest.Mock).mockImplementation((selector) => {
       const state = {
         allEmotions: mockAllEmotions,
         selectedEmotionIds: new Set(),
@@ -80,7 +80,7 @@ describe("useInfoPanelState", () => {
   });
 
   it("should display passed emotion if no path selected", () => {
-    (useAtlasAdminStore as unknown as jest.Mock).mockImplementation((selector) => {
+    (useVisualizationStore as unknown as jest.Mock).mockImplementation((selector) => {
       const state = {
         allEmotions: mockAllEmotions,
         selectedEmotionIds: new Set(["e1"]), // 1 selected
@@ -98,7 +98,7 @@ describe("useInfoPanelState", () => {
   });
 
   it("should filter selected paths", () => {
-    (useAtlasAdminStore as unknown as jest.Mock).mockImplementation((selector) => {
+    (useVisualizationStore as unknown as jest.Mock).mockImplementation((selector) => {
       const state = {
         allEmotions: mockAllEmotions,
         selectedEmotionIds: new Set(["e1", "e2"]),
@@ -117,7 +117,7 @@ describe("useInfoPanelState", () => {
   });
 
   it("should return null for displayPath when path missing from map", () => {
-    (useAtlasAdminStore as unknown as jest.Mock).mockImplementation((selector) => {
+    (useVisualizationStore as unknown as jest.Mock).mockImplementation((selector) => {
       const state = {
         allEmotions: mockAllEmotions,
         selectedEmotionIds: new Set(),
@@ -135,7 +135,7 @@ describe("useInfoPanelState", () => {
   });
 
   it("should return null for displayPath when selected path missing from map", () => {
-    (useAtlasAdminStore as unknown as jest.Mock).mockImplementation((selector) => {
+    (useVisualizationStore as unknown as jest.Mock).mockImplementation((selector) => {
       const state = {
         allEmotions: mockAllEmotions,
         selectedEmotionIds: new Set(),
@@ -153,7 +153,7 @@ describe("useInfoPanelState", () => {
   });
 
   it("should return null for displayEmotion when emotion missing from list", () => {
-    (useAtlasAdminStore as unknown as jest.Mock).mockImplementation((selector) => {
+    (useVisualizationStore as unknown as jest.Mock).mockImplementation((selector) => {
       const state = {
         allEmotions: mockAllEmotions,
         selectedEmotionIds: new Set(),

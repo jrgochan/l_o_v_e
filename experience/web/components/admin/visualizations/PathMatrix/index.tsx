@@ -13,7 +13,7 @@
 "use client";
 
 import { useState } from "react";
-import { useAtlasAdminStore } from "@/stores/useAtlasAdminStore";
+import { useVisualizationStore } from "@/stores/useVisualizationStore";
 import { useComputeAllPaths } from "@/hooks/useComputeAllPaths";
 import { useMatrixData } from "@/hooks/visualization/useMatrixData";
 import { logger } from "@/utils/logger";
@@ -21,7 +21,7 @@ import { MatrixHeader } from "./MatrixHeader";
 import { MatrixLegend } from "./MatrixLegend";
 import { MatrixGrid } from "./MatrixGrid";
 import { MatrixTooltip } from "./MatrixTooltip";
-import type { AtlasEmotion, EmotionPath } from "@/types/atlas-admin";
+import type { Emotion, EmotionPath } from "@/types/visualization";
 import type { CachedPathData } from "@/types/api-responses";
 
 interface PathMatrixGridProps {
@@ -36,10 +36,10 @@ export function PathMatrixGrid({ onClose }: PathMatrixGridProps) {
   const [isLoadingCache, setIsLoadingCache] = useState(false);
 
   // Store state
-  const allEmotions = useAtlasAdminStore((state) => state.allEmotions);
-  const computedPaths = useAtlasAdminStore((state) => state.computedPaths);
-  const addComputedPath = useAtlasAdminStore((state) => state.addComputedPath);
-  const selectMultiple = useAtlasAdminStore((state) => state.selectMultiple);
+  const allEmotions = useVisualizationStore((state) => state.allEmotions);
+  const computedPaths = useVisualizationStore((state) => state.computedPaths);
+  const addComputedPath = useVisualizationStore((state) => state.addComputedPath);
+  const selectMultiple = useVisualizationStore((state) => state.selectMultiple);
 
   // Hooks
   const { computeAllPaths, isComputing, progress, estimatedTimeRemaining } = useComputeAllPaths();
@@ -162,24 +162,24 @@ export function PathMatrixGrid({ onClose }: PathMatrixGridProps) {
   };
 
   // Handle cell click - select ONLY those two emotions
-  const handleCellClick = (fromEmotion: AtlasEmotion, toEmotion: AtlasEmotion) => {
+  const handleCellClick = (fromEmotion: Emotion, toEmotion: Emotion) => {
     // Temporarily set to manual to prevent auto-computation
-    const currentSetting = useAtlasAdminStore.getState().settings.computeMode;
-    useAtlasAdminStore.getState().updateSetting("computeMode", "manual");
+    const currentSetting = useVisualizationStore.getState().settings.computeMode;
+    useVisualizationStore.getState().updateSetting("computeMode", "manual");
 
     // Clear all selections first
-    useAtlasAdminStore.getState().clearSelection();
+    useVisualizationStore.getState().clearSelection();
 
     // Select only these two emotions
     selectMultiple([fromEmotion.id, toEmotion.id]);
 
     // Set the path as selected in InfoPanel
     const pathId = `${fromEmotion.id}-${toEmotion.id}`;
-    useAtlasAdminStore.getState().setSelectedPath(pathId);
+    useVisualizationStore.getState().setSelectedPath(pathId);
 
     // Restore compute mode after a brief delay
     setTimeout(() => {
-      useAtlasAdminStore.getState().updateSetting("computeMode", currentSetting);
+      useVisualizationStore.getState().updateSetting("computeMode", currentSetting);
     }, 100);
 
     onClose(); // Close matrix to see the path in 3D

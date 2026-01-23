@@ -1,9 +1,9 @@
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import { ExportControls } from "@/components/admin/shared/ExportControls";
-import { useAtlasAdminStore } from "@/stores/useAtlasAdminStore";
+import { useVisualizationStore } from "@/stores/useVisualizationStore";
 
 // Mock the store
-jest.mock("@/stores/useAtlasAdminStore");
+jest.mock("@/stores/useVisualizationStore");
 
 describe("ExportControls", () => {
   const mockAllEmotions = [
@@ -61,14 +61,14 @@ describe("ExportControls", () => {
     jest.clearAllMocks();
 
     // Default store mock
-    (useAtlasAdminStore as unknown as jest.Mock).mockReturnValue({
+    (useVisualizationStore as unknown as jest.Mock).mockReturnValue({
       allEmotions: mockAllEmotions,
       selectedEmotionIds: mockSelectedIds,
       computedPaths: mockComputedPaths,
     });
 
     // Mock store behavior for selector
-    (useAtlasAdminStore as unknown as jest.Mock).mockImplementation((selector) => {
+    (useVisualizationStore as unknown as jest.Mock).mockImplementation((selector) => {
       const state = {
         allEmotions: mockAllEmotions,
         selectedEmotionIds: mockSelectedIds,
@@ -148,7 +148,7 @@ describe("ExportControls", () => {
   });
 
   it("shows alert if exporting CSV with no paths", () => {
-    (useAtlasAdminStore as unknown as jest.Mock).mockImplementation((selector) => {
+    (useVisualizationStore as unknown as jest.Mock).mockImplementation((selector) => {
       return selector({
         allEmotions: mockAllEmotions,
         selectedEmotionIds: mockSelectedIds,
@@ -200,7 +200,7 @@ describe("ExportControls", () => {
   });
 
   it("disables buttons when no selection", () => {
-    (useAtlasAdminStore as unknown as jest.Mock).mockImplementation((selector) => {
+    (useVisualizationStore as unknown as jest.Mock).mockImplementation((selector) => {
       return selector({
         allEmotions: mockAllEmotions,
         selectedEmotionIds: new Set(), // No selection

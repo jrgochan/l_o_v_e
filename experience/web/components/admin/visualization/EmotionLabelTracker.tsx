@@ -9,11 +9,11 @@
 
 import { useThree, useFrame } from "@react-three/fiber";
 import * as THREE from "three";
-import { useAtlasAdminStore } from "@/stores/useAtlasAdminStore";
-import type { AtlasEmotion } from "@/types/atlas-admin";
+import { useVisualizationStore } from "@/stores/useVisualizationStore";
+import type { Emotion } from "@/types/visualization";
 
 export interface LabelPosition {
-  emotion: AtlasEmotion;
+  emotion: Emotion;
   x: number;
   y: number;
   visible: boolean;
@@ -26,10 +26,10 @@ interface EmotionLabelTrackerProps {
 export function EmotionLabelTracker({ onUpdate }: EmotionLabelTrackerProps) {
   const { camera, size } = useThree();
 
-  const allEmotions = useAtlasAdminStore((state) => state.allEmotions);
-  const selectedIds = useAtlasAdminStore((state) => state.selectedEmotionIds);
-  const hoveredId = useAtlasAdminStore((state) => state.hoveredEmotionId);
-  const layers = useAtlasAdminStore((state) => state.layers);
+  const allEmotions = useVisualizationStore((state) => state.allEmotions);
+  const selectedIds = useVisualizationStore((state) => state.selectedEmotionIds);
+  const hoveredId = useVisualizationStore((state) => state.hoveredEmotionId);
+  const layers = useVisualizationStore((state) => state.layers);
 
   // Update label positions every frame
   useFrame(() => {

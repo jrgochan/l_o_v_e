@@ -149,18 +149,18 @@ describe("Admin API Helpers", () => {
   });
 
   it("fetches atlas emotions", async () => {
-    await adminApi.getAtlasEmotions();
+    await adminApi.getEmotions();
     expect(mockFetch).toHaveBeenCalledWith(
-      expect.stringContaining("/admin/atlas/emotions"),
+      expect.stringContaining("/admin/visualization/emotions"),
       expect.anything()
     );
   });
 
   // Smoke tests for other methods to ensure URL construction
-  it("updateAtlasEmotion", async () => {
-    await adminApi.updateAtlasEmotion("1", {} as any);
+  it("updateEmotion", async () => {
+    await adminApi.updateEmotion("1", {} as any);
     expect(mockFetch).toHaveBeenCalledWith(
-      expect.stringContaining("/admin/atlas/emotions/1"),
+      expect.stringContaining("/admin/visualization/emotions/1"),
       expect.objectContaining({ method: "PUT" })
     );
   });
@@ -307,7 +307,7 @@ describe("Admin API Helpers", () => {
   it("exportAtlasData", async () => {
     await adminApi.exportAtlasData();
     expect(mockFetch).toHaveBeenCalledWith(
-      expect.stringContaining("/admin/atlas/export"),
+      expect.stringContaining("/admin/visualization/export"),
       expect.anything()
     );
   });
@@ -315,7 +315,7 @@ describe("Admin API Helpers", () => {
   it("importAtlasData", async () => {
     await adminApi.importAtlasData({ emotions: [] });
     expect(mockFetch).toHaveBeenCalledWith(
-      expect.stringContaining("/admin/atlas/import"),
+      expect.stringContaining("/admin/visualization/import"),
       expect.anything()
     );
   });

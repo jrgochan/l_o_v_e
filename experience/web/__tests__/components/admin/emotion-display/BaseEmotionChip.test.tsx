@@ -1,6 +1,6 @@
 import { render, screen, fireEvent } from "@testing-library/react";
 import { BaseEmotionChip } from "@/components/admin/emotion-display/BaseEmotionChip";
-import { CATEGORY_COLORS } from "@/types/atlas-admin";
+import { CATEGORY_COLORS } from "@/types/visualization";
 
 describe("BaseEmotionChip", () => {
   const defaultProps = {

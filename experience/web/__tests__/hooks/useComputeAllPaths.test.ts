@@ -1,10 +1,10 @@
 import { renderHook, waitFor } from "@testing-library/react";
 import { useComputeAllPaths } from "@/hooks/useComputeAllPaths";
-import { useAtlasAdminStore } from "@/stores/useAtlasAdminStore";
+import { useVisualizationStore } from "@/stores/useVisualizationStore";
 import { atlasService } from "@/services/atlasService";
 import { useBatchJob } from "@/hooks/pathfinding/useBatchJob";
 
-jest.mock("@/stores/useAtlasAdminStore");
+jest.mock("@/stores/useVisualizationStore");
 jest.mock("@/services/atlasService");
 jest.mock("@/hooks/pathfinding/useBatchJob");
 
@@ -18,13 +18,13 @@ describe("useComputeAllPaths", () => {
     window.confirm = jest.fn();
     window.alert = jest.fn();
 
-    (useAtlasAdminStore as unknown as jest.Mock).mockReturnValue([{ id: "e1" }, { id: "e2" }]); // selector
-    (useAtlasAdminStore.getState as jest.Mock).mockReturnValue({
+    (useVisualizationStore as unknown as jest.Mock).mockReturnValue([{ id: "e1" }, { id: "e2" }]); // selector
+    (useVisualizationStore.getState as jest.Mock).mockReturnValue({
       allEmotions: [{ id: "e1" }, { id: "e2" }],
     });
 
     // mock selector behavior in component
-    (useAtlasAdminStore as unknown as jest.Mock).mockImplementation((selector) => {
+    (useVisualizationStore as unknown as jest.Mock).mockImplementation((selector) => {
       // If selector is picking allEmotions
       const state = {
         allEmotions: [{ id: "e1" }, { id: "e2" }],
@@ -117,7 +117,7 @@ describe("useComputeAllPaths", () => {
   });
 
   it("should alert if no emotions loaded", async () => {
-    (useAtlasAdminStore as unknown as jest.Mock).mockImplementation((selector) => {
+    (useVisualizationStore as unknown as jest.Mock).mockImplementation((selector) => {
       const state = { allEmotions: [], addComputedPath: mockAddComputedPath };
       return selector(state);
     });

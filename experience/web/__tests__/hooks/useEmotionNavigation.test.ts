@@ -2,11 +2,11 @@ import { renderHook } from "@testing-library/react";
 import { useEmotionNavigation } from "@/hooks/useEmotionNavigation";
 import { useNavigationActions } from "@/hooks/navigation/useNavigationActions";
 import { useEmotionResolution } from "@/hooks/navigation/useEmotionResolution";
-import { useAtlasAdminStore } from "@/stores/useAtlasAdminStore";
+import { useVisualizationStore } from "@/stores/useVisualizationStore";
 
 jest.mock("@/hooks/navigation/useNavigationActions");
 jest.mock("@/hooks/navigation/useEmotionResolution");
-jest.mock("@/stores/useAtlasAdminStore");
+jest.mock("@/stores/useVisualizationStore");
 
 describe("useEmotionNavigation", () => {
   const mockFocus = jest.fn();
@@ -23,7 +23,7 @@ describe("useEmotionNavigation", () => {
       viewMultipleInSphere: jest.fn(),
       autoFocusEmotion: jest.fn(),
     });
-    (useAtlasAdminStore as unknown as jest.Mock).mockImplementation((selector) => {
+    (useVisualizationStore as unknown as jest.Mock).mockImplementation((selector) => {
       // Support function selectors
       const state = {
         getSelectedEmotions: jest.fn(() => []),

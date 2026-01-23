@@ -32,7 +32,7 @@ async def test_health_check_healthy(mock_db):
     assert response.status == "healthy"
     assert response.database == "connected"
     assert response.pgvector_version == "0.6.0"
-    assert response.atlas_emotions_count == 87
+    assert response.emotion_count == 87
 
 @pytest.mark.asyncio
 async def test_health_check_degraded(mock_db):
@@ -111,6 +111,6 @@ async def test_health_check_initializing_zero_emotions():
     mock_db.execute.side_effect = execute_side_effect
     response = await health_check(db=mock_db)
     assert response.status == "initializing"
-    assert response.atlas_emotions_count == 0
+    assert response.emotion_count == 0
 
 

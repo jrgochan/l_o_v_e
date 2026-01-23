@@ -2,16 +2,16 @@
 
 import { useEffect, useState, useRef } from "react";
 import { adminApi } from "@/utils/api";
-import { AtlasEmotion, AtlasEmotionUpdate } from "@/types/admin";
+import { Emotion, EmotionUpdate } from "@/types/admin";
 import { Loader2, Download, Upload, Save, AlertTriangle } from "lucide-react";
 
 export function EmotionsTab() {
-  const [emotions, setEmotions] = useState<AtlasEmotion[]>([]);
+  const [emotions, setEmotions] = useState<Emotion[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const [editingId, setEditingId] = useState<string | null>(null);
-  const [editForm, setEditForm] = useState<AtlasEmotionUpdate>({});
+  const [editForm, setEditForm] = useState<EmotionUpdate>({});
   const [isSaving, setIsSaving] = useState(false);
 
   // File input ref for import
@@ -24,7 +24,7 @@ export function EmotionsTab() {
   const fetchEmotions = async () => {
     try {
       setLoading(true);
-      const data = await adminApi.getAtlasEmotions();
+      const data = await adminApi.getEmotions();
       setEmotions(Array.isArray(data) ? data : []);
       setError(null);
     } catch (err) {
@@ -35,7 +35,7 @@ export function EmotionsTab() {
     }
   };
 
-  const handleEdit = (emotion: AtlasEmotion) => {
+  const handleEdit = (emotion: Emotion) => {
     setEditingId(emotion.id);
     setEditForm({
       category: emotion.category,
@@ -54,7 +54,7 @@ export function EmotionsTab() {
   const handleSave = async (id: string) => {
     try {
       setIsSaving(true);
-      const updated = await adminApi.updateAtlasEmotion(id, editForm);
+      const updated = await adminApi.updateEmotion(id, editForm);
 
       // Update local state
       setEmotions((prev) => prev.map((e) => (e.id === id ? updated : e)));

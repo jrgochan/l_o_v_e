@@ -7,15 +7,15 @@
  */
 
 import { useCallback } from "react";
-import { useAtlasAdminStore } from "@/stores/useAtlasAdminStore";
-import type { EmotionPath } from "@/types/atlas-admin";
+import { useVisualizationStore } from "@/stores/useVisualizationStore";
+import type { EmotionPath } from "@/types/visualization";
 import { logger } from "@/utils/logger";
 import { useBatchJob } from "./pathfinding/useBatchJob";
 import { atlasService } from "@/services/atlasService";
 
 export function useComputeAllPaths() {
-  const allEmotions = useAtlasAdminStore((state) => state.allEmotions);
-  const addComputedPath = useAtlasAdminStore((state) => state.addComputedPath);
+  const allEmotions = useVisualizationStore((state) => state.allEmotions);
+  const addComputedPath = useVisualizationStore((state) => state.addComputedPath);
 
   const loadCachedPaths = useCallback(async () => {
     try {

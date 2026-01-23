@@ -14,10 +14,10 @@
 
 import { CharacterSphere } from "@/components/admin/spheres/CharacterSphere";
 import { resolveEmotionColor } from "@/utils/emotion-colors";
-import type { AtlasEmotion, PathAnimationMode } from "@/types/atlas-admin";
+import type { Emotion, PathAnimationMode } from "@/types/visualization";
 
 interface EmotionListProps {
-  emotions: AtlasEmotion[];
+  emotions: Emotion[];
   animationMode: PathAnimationMode;
   onRemove?: (id: string) => void;
   onFocus?: (id: string | null) => void;

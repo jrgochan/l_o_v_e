@@ -11,7 +11,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useAtlasAdminStore } from "@/stores/useAtlasAdminStore";
+import { useVisualizationStore } from "@/stores/useVisualizationStore";
 import { logger } from "@/utils/logger";
 import type { RecommendationsResponse } from "@/types/api-responses";
 
@@ -27,14 +27,14 @@ export function SmartRecommendations() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const selectedIds = useAtlasAdminStore((state) => state.selectedEmotionIds);
-  const selectMultiple = useAtlasAdminStore((state) => state.selectMultiple);
-  const clearSelection = useAtlasAdminStore((state) => state.clearSelection);
-  const updateSetting = useAtlasAdminStore((state) => state.updateSetting);
+  const selectedIds = useVisualizationStore((state) => state.selectedEmotionIds);
+  const selectMultiple = useVisualizationStore((state) => state.selectMultiple);
+  const clearSelection = useVisualizationStore((state) => state.clearSelection);
+  const updateSetting = useVisualizationStore((state) => state.updateSetting);
 
   const applyJourney = (emotionIds: string[]) => {
     // Temporarily set to always mode if in manual
-    const currentSetting = useAtlasAdminStore.getState().settings.computeMode;
+    const currentSetting = useVisualizationStore.getState().settings.computeMode;
     if (currentSetting === "manual") {
       updateSetting("computeMode", "cache-first");
     }

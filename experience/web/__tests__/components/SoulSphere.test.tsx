@@ -97,8 +97,8 @@ jest.mock("@/stores/useSettingsStore", () => ({
 
 // Mock Atlas Admin Store
 const mockUseAtlasAdminStore = jest.fn();
-jest.mock("@/stores/useAtlasAdminStore", () => ({
-  useAtlasAdminStore: (selector: any) => mockUseAtlasAdminStore(selector),
+jest.mock("@/stores/useVisualizationStore", () => ({
+  useVisualizationStore: (selector: any) => mockUseAtlasAdminStore(selector),
 }));
 
 describe("SoulSphere", () => {

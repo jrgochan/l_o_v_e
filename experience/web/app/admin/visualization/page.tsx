@@ -20,18 +20,18 @@ import { useLoadCachedPaths } from "@/hooks/useLoadCachedPaths";
 import { useAdminSphereSync } from "@/hooks/useAdminSphereSync";
 import { useSettingsSync } from "@/hooks/useSettingsSync";
 import { useSphereSync } from "@/hooks/useSphereSync";
-import { useAtlasAdminStore } from "@/stores/useAtlasAdminStore";
+import { useVisualizationStore } from "@/stores/useVisualizationStore";
 import { useExperienceStore } from "@/stores/useExperienceStore";
-import { AtlasScene } from "@/components/admin/atlas/AtlasScene";
+import { VisualizationScene } from "@/components/admin/visualization/VisualizationScene";
 import { VACAxisLabels3D } from "@/components/VACAxisLabels3D";
 import { ControlPanel } from "@/components/admin/panels/ControlPanel";
 import { InfoPanel } from "@/components/admin/panels/InfoPanel";
-import { LegendOverlay } from "@/components/admin/atlas/LegendOverlay";
-import { EmotionLabelOverlay } from "@/components/admin/atlas/EmotionLabelOverlay";
+import { LegendOverlay } from "@/components/admin/visualization/LegendOverlay";
+import { EmotionLabelOverlay } from "@/components/admin/visualization/EmotionLabelOverlay";
 import {
   EmotionLabelTracker,
   type LabelPosition,
-} from "@/components/admin/atlas/EmotionLabelTracker";
+} from "@/components/admin/visualization/EmotionLabelTracker";
 
 import { PathMatrixGrid } from "@/components/admin/visualizations/PathMatrix";
 import { HelpModal } from "@/components/admin/modals/HelpModal";
@@ -40,8 +40,8 @@ import { AggregateVACHeaderDisplay } from "@/components/admin/state-display/Aggr
 import { DataVisualizationOverlay } from "@/components/admin/visualizations/DataVisualizationOverlay";
 import { CommandPalette } from "@/components/CommandPalette";
 import { useCommandPalette } from "@/hooks/useCommandPalette";
-import { PathFlyover } from "@/components/admin/atlas/PathFlyover";
-import { IntroSequence } from "@/components/admin/atlas/IntroSequence";
+import { PathFlyover } from "@/components/admin/visualization/PathFlyover";
+import { IntroSequence } from "@/components/admin/visualization/IntroSequence";
 import { useAmbientAudio } from "@/hooks/useAmbientAudio";
 import { VACAnimator } from "@/components/VACAnimator";
 import { DebugBroadcaster } from "@/components/DebugBroadcaster";
@@ -110,15 +110,15 @@ const AtlasAdminContent = () => {
   const [isInfoPanelExpanded, setIsInfoPanelExpanded] = useState(false);
   const [labelPositions, setLabelPositions] = useState<LabelPosition[]>([]);
 
-  const layers = useAtlasAdminStore((state) => state.layers);
-  const dataVisualizationMode = useAtlasAdminStore((state) => state.settings.dataVisualizationMode);
-  const updateSetting = useAtlasAdminStore((state) => state.updateSetting);
+  const layers = useVisualizationStore((state) => state.layers);
+  const dataVisualizationMode = useVisualizationStore((state) => state.settings.dataVisualizationMode);
+  const updateSetting = useVisualizationStore((state) => state.updateSetting);
 
   // Broadcast sphere state changes to Zen viewer
-  const selectedEmotionIds = useAtlasAdminStore((state) => state.selectedEmotionIds);
-  const viewMode = useAtlasAdminStore((state) => state.viewMode); // "default" | "zen" | "cinema"
-  const isFlying = useAtlasAdminStore((state) => state.isFlying);
-  const isIntroActive = useAtlasAdminStore((state) => state.isIntroActive);
+  const selectedEmotionIds = useVisualizationStore((state) => state.selectedEmotionIds);
+  const viewMode = useVisualizationStore((state) => state.viewMode); // "default" | "zen" | "cinema"
+  const isFlying = useVisualizationStore((state) => state.isFlying);
+  const isIntroActive = useVisualizationStore((state) => state.isIntroActive);
   const targetVAC = useExperienceStore((state) => state.targetVAC);
   const transitionPath = useExperienceStore((state) => state.transitionPath);
 
@@ -195,18 +195,18 @@ const AtlasAdminContent = () => {
         if (transitionPath) {
           // Auto-enable paths layer if hidden
           if (!layers.transitionPaths) {
-            useAtlasAdminStore.getState().updateLayer("transitionPaths", true);
+            useVisualizationStore.getState().updateLayer("transitionPaths", true);
           }
           // Toggle flying state
           // Note: We need to update the AtlasAdminStore which syncs to ExperienceStore
-          useAtlasAdminStore.getState().setIsFlying(!isFlying);
+          useVisualizationStore.getState().setIsFlying(!isFlying);
         }
       }
 
       // Next Path (ArrowRight)
       if (key === "arrowright" && !e.ctrlKey && !e.metaKey) {
         e.preventDefault();
-        const state = useAtlasAdminStore.getState();
+        const state = useVisualizationStore.getState();
         // If we have selected emotions >= 2, cycle through their paths
         if (state.selectedEmotionIds.size >= 2) {
           state.cycleSelectedPath("next");
@@ -229,7 +229,7 @@ const AtlasAdminContent = () => {
       // Prev Path (ArrowLeft)
       if (key === "arrowleft" && !e.ctrlKey && !e.metaKey) {
         e.preventDefault();
-        const state = useAtlasAdminStore.getState();
+        const state = useVisualizationStore.getState();
         if (state.selectedEmotionIds.size >= 2) {
           state.cycleSelectedPath("prev");
           state.setIsFlying(false);
@@ -241,7 +241,7 @@ const AtlasAdminContent = () => {
       // Up/Down (Variations)
       if ((key === "arrowup" || key === "arrowdown") && !e.ctrlKey && !e.metaKey) {
         e.preventDefault();
-        const state = useAtlasAdminStore.getState();
+        const state = useVisualizationStore.getState();
         if (state.selectedEmotionIds.size >= 2) {
           state.cycleSelectedPath(key === "arrowup" ? "up" : "down");
           state.setIsFlying(false);
@@ -405,7 +405,7 @@ const AtlasAdminContent = () => {
                 />
 
                 {/* Main Content */}
-                <AtlasScene />
+                <VisualizationScene />
 
                 {/* Visual Helpers */}
                 <VACAxisLabels3D />

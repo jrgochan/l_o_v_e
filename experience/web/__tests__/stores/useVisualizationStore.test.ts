@@ -1,12 +1,13 @@
+
 import { act } from "@testing-library/react";
 import {
-  useAtlasAdminStore,
-  adminPartialize,
+  useVisualizationStore,
+  visualizationPartialize,
   replacer,
   reviver,
   getInitialAdminState,
-} from "../../stores/useAtlasAdminStore";
-import { AtlasEmotion, EmotionPath } from "../../types";
+} from "../../stores/useVisualizationStore";
+import { Emotion, EmotionPath } from "../../types";
 
 jest.mock("zustand/middleware", () => ({
   ...jest.requireActual("zustand/middleware"),
@@ -22,7 +23,7 @@ jest.mock("zustand/middleware", () => ({
 }));
 
 // Mock data
-const mockEmotions: AtlasEmotion[] = [
+const mockEmotions: Emotion[] = [
   {
     id: "1",
     name: "Joy",
@@ -77,12 +78,12 @@ const mockPath: EmotionPath = {
   difficulty: "moderate",
 };
 
-describe("useAtlasAdminStore", () => {
+describe("useVisualizationStore", () => {
   beforeEach(() => {
     // Reset store before each test
     localStorage.clear();
     const initialState = getInitialAdminState();
-    useAtlasAdminStore.setState({ ...useAtlasAdminStore.getState(), ...initialState }, true);
+    useVisualizationStore.setState({ ...useVisualizationStore.getState(), ...initialState }, true);
   });
   // ...
   describe("Path Cycling", () => {
@@ -91,14 +92,14 @@ describe("useAtlasAdminStore", () => {
 
   describe("Persistence Logic", () => {
     it("should handle Map/Set serialization roughly", () => {
-      const { selectEmotion, addComputedPath } = useAtlasAdminStore.getState();
+      const { selectEmotion, addComputedPath } = useVisualizationStore.getState();
 
       act(() => {
         selectEmotion("1");
         addComputedPath(mockPath);
       });
 
-      const state = useAtlasAdminStore.getState();
+      const state = useVisualizationStore.getState();
       expect(state.selectedEmotionIds.has("1")).toBe(true);
       expect(state.computedPaths.has("1-2")).toBe(true);
     });
@@ -139,29 +140,29 @@ describe("useAtlasAdminStore", () => {
     });
 
     it("should use setComputedPaths", () => {
-      const { setComputedPaths } = useAtlasAdminStore.getState();
+      const { setComputedPaths } = useVisualizationStore.getState();
       const map = new Map();
       map.set("1-2", mockPath);
       act(() => setComputedPaths(map));
-      expect(useAtlasAdminStore.getState().computedPaths.get("1-2")).toEqual(mockPath);
+      expect(useVisualizationStore.getState().computedPaths.get("1-2")).toEqual(mockPath);
     });
 
     it("should persist viewMode (admin check)", () => {
-      const { cycleViewMode } = useAtlasAdminStore.getState();
+      const { cycleViewMode } = useVisualizationStore.getState();
       act(() => cycleViewMode());
-      expect(useAtlasAdminStore.getState().viewMode).toBe("zen");
+      expect(useVisualizationStore.getState().viewMode).toBe("zen");
     });
   });
 
   describe("Emotions & Categories", () => {
     it("should set all emotions and initialize category filters", () => {
-      const { setAllEmotions } = useAtlasAdminStore.getState();
+      const { setAllEmotions } = useVisualizationStore.getState();
 
       act(() => {
         setAllEmotions(mockEmotions);
       });
 
-      const state = useAtlasAdminStore.getState();
+      const state = useVisualizationStore.getState();
       expect(state.allEmotions).toHaveLength(3);
       expect(state.categoryFilters.size).toBe(2); // Positive, Negative
       expect(state.categoryFilters.get("Positive")?.emotionCount).toBe(1);
@@ -169,88 +170,88 @@ describe("useAtlasAdminStore", () => {
     });
 
     it("should toggle category filters", () => {
-      const { setAllEmotions, toggleCategoryFilter } = useAtlasAdminStore.getState();
+      const { setAllEmotions, toggleCategoryFilter } = useVisualizationStore.getState();
 
       act(() => {
         setAllEmotions(mockEmotions);
         toggleCategoryFilter("Positive");
       });
 
-      const state = useAtlasAdminStore.getState();
+      const state = useVisualizationStore.getState();
       expect(state.categoryFilters.get("Positive")?.enabled).toBe(false);
       expect(state.categoryFilters.get("Negative")?.enabled).toBe(true);
     });
 
     it("should enable/disable all categories", () => {
       const { setAllEmotions, disableAllCategories, enableAllCategories } =
-        useAtlasAdminStore.getState();
+        useVisualizationStore.getState();
 
       act(() => {
         setAllEmotions(mockEmotions);
         disableAllCategories();
       });
 
-      let state = useAtlasAdminStore.getState();
+      let state = useVisualizationStore.getState();
       expect(Array.from(state.categoryFilters.values()).every((f) => !f.enabled)).toBe(true);
 
       act(() => {
         enableAllCategories();
       });
 
-      state = useAtlasAdminStore.getState();
+      state = useVisualizationStore.getState();
       expect(Array.from(state.categoryFilters.values()).every((f) => f.enabled)).toBe(true);
     });
   });
 
   describe("Selection Logic", () => {
     it("should select single emotion", () => {
-      const { selectEmotion } = useAtlasAdminStore.getState();
+      const { selectEmotion } = useVisualizationStore.getState();
 
       act(() => {
         selectEmotion("1");
       });
 
-      const state = useAtlasAdminStore.getState();
+      const state = useVisualizationStore.getState();
       expect(state.selectedEmotionIds.has("1")).toBe(true);
       expect(state.selectedEmotionIds.size).toBe(1);
     });
 
     it("should select multiple emotions", () => {
-      const { selectMultiple } = useAtlasAdminStore.getState();
+      const { selectMultiple } = useVisualizationStore.getState();
 
       act(() => {
         selectMultiple(["1", "2"]);
       });
 
-      const state = useAtlasAdminStore.getState();
+      const state = useVisualizationStore.getState();
       expect(state.selectedEmotionIds.has("1")).toBe(true);
       expect(state.selectedEmotionIds.has("2")).toBe(true);
       expect(state.selectedEmotionIds.size).toBe(2);
     });
 
     it("should toggle emotion selection", () => {
-      const { toggleEmotion } = useAtlasAdminStore.getState();
+      const { toggleEmotion } = useVisualizationStore.getState();
 
       act(() => {
         toggleEmotion("1");
       });
-      expect(useAtlasAdminStore.getState().selectedEmotionIds.has("1")).toBe(true);
+      expect(useVisualizationStore.getState().selectedEmotionIds.has("1")).toBe(true);
 
       act(() => {
         toggleEmotion("1");
       });
-      expect(useAtlasAdminStore.getState().selectedEmotionIds.has("1")).toBe(false);
+      expect(useVisualizationStore.getState().selectedEmotionIds.has("1")).toBe(false);
     });
 
     it("should select/deselect by category", () => {
-      const { setAllEmotions, selectCategory, deselectCategory } = useAtlasAdminStore.getState();
+      const { setAllEmotions, selectCategory, deselectCategory } = useVisualizationStore.getState();
 
       act(() => {
         setAllEmotions(mockEmotions);
         selectCategory("Negative");
       });
 
-      let state = useAtlasAdminStore.getState();
+      let state = useVisualizationStore.getState();
       expect(state.selectedEmotionIds.has("2")).toBe(true);
       expect(state.selectedEmotionIds.has("3")).toBe(true);
       expect(state.selectedEmotionIds.has("1")).toBe(false);
@@ -259,63 +260,63 @@ describe("useAtlasAdminStore", () => {
         deselectCategory("Negative");
       });
 
-      state = useAtlasAdminStore.getState();
+      state = useVisualizationStore.getState();
       expect(state.selectedEmotionIds.size).toBe(0);
     });
   });
 
   describe("Path Management", () => {
     it("should add and retrieve computed paths", () => {
-      const { addComputedPath, getPathForPair } = useAtlasAdminStore.getState();
+      const { addComputedPath, getPathForPair } = useVisualizationStore.getState();
 
       act(() => {
         addComputedPath(mockPath);
       });
 
-      const state = useAtlasAdminStore.getState();
+      const state = useVisualizationStore.getState();
       expect(state.computedPaths.has("1-2")).toBe(true);
       expect(getPathForPair("1", "2")).toEqual(mockPath);
       expect(getPathForPair("2", "1")).toEqual(mockPath); // Should handle reverse key
     });
 
     it("should clear computed paths", () => {
-      const { addComputedPath, clearComputedPaths } = useAtlasAdminStore.getState();
+      const { addComputedPath, clearComputedPaths } = useVisualizationStore.getState();
 
       act(() => {
         addComputedPath(mockPath);
         clearComputedPaths();
       });
 
-      const state = useAtlasAdminStore.getState();
+      const state = useVisualizationStore.getState();
       expect(state.computedPaths.size).toBe(0);
     });
   });
 
   describe("View & Settings", () => {
     it("should cycle view modes", () => {
-      const { cycleViewMode } = useAtlasAdminStore.getState();
+      const { cycleViewMode } = useVisualizationStore.getState();
 
-      expect(useAtlasAdminStore.getState().viewMode).toBe("default");
-
-      act(() => cycleViewMode());
-      expect(useAtlasAdminStore.getState().viewMode).toBe("zen");
+      expect(useVisualizationStore.getState().viewMode).toBe("default");
 
       act(() => cycleViewMode());
-      expect(useAtlasAdminStore.getState().viewMode).toBe("cinema");
+      expect(useVisualizationStore.getState().viewMode).toBe("zen");
 
       act(() => cycleViewMode());
-      expect(useAtlasAdminStore.getState().viewMode).toBe("default");
+      expect(useVisualizationStore.getState().viewMode).toBe("cinema");
+
+      act(() => cycleViewMode());
+      expect(useVisualizationStore.getState().viewMode).toBe("default");
     });
 
     it("should update settings", () => {
-      const { updateVisualSetting, updateLayer } = useAtlasAdminStore.getState();
+      const { updateVisualSetting, updateLayer } = useVisualizationStore.getState();
 
       act(() => {
         updateVisualSetting("showAllPaths", false);
         updateLayer("transitionPaths", false);
       });
 
-      const state = useAtlasAdminStore.getState();
+      const state = useVisualizationStore.getState();
       expect(state.settings.showAllPaths).toBe(false);
       expect(state.layers.transitionPaths).toBe(false);
     });
@@ -323,7 +324,7 @@ describe("useAtlasAdminStore", () => {
 
   describe("Derived State Helpers", () => {
     it("should get selected emotions", () => {
-      const { setAllEmotions, selectEmotion, getSelectedEmotions } = useAtlasAdminStore.getState();
+      const { setAllEmotions, selectEmotion, getSelectedEmotions } = useVisualizationStore.getState();
 
       act(() => {
         setAllEmotions(mockEmotions);
@@ -337,7 +338,7 @@ describe("useAtlasAdminStore", () => {
 
     it("should get visible emotions respecting filters", () => {
       const { setAllEmotions, toggleCategoryFilter, getVisibleEmotions } =
-        useAtlasAdminStore.getState();
+        useVisualizationStore.getState();
 
       act(() => {
         setAllEmotions(mockEmotions);
@@ -350,7 +351,7 @@ describe("useAtlasAdminStore", () => {
     });
 
     it("should use default undefined category enabled state", () => {
-      const { setAllEmotions, getVisibleEmotions } = useAtlasAdminStore.getState();
+      const { setAllEmotions, getVisibleEmotions } = useVisualizationStore.getState();
 
       const weirdEmotion = { ...mockEmotions[0], id: "99", category: "Unlisted" };
       act(() => setAllEmotions([weirdEmotion]));
@@ -360,7 +361,7 @@ describe("useAtlasAdminStore", () => {
       // Actually setAllEmotions initializes filters.
       // If we modify categoryFilters to delete "Unlisted"
       act(() => {
-        useAtlasAdminStore.setState((prev) => {
+        useVisualizationStore.setState((prev) => {
           const newFilters = new Map(prev.categoryFilters);
           newFilters.delete("Unlisted");
           return { categoryFilters: newFilters };
@@ -375,37 +376,37 @@ describe("useAtlasAdminStore", () => {
 
 describe("Additional Actions & Helpers", () => {
   it("should update cache status", () => {
-    const { updateCacheStatus } = useAtlasAdminStore.getState();
+    const { updateCacheStatus } = useVisualizationStore.getState();
     act(() => updateCacheStatus({ count: 50, loaded: true }));
-    const state = useAtlasAdminStore.getState();
+    const state = useVisualizationStore.getState();
     expect(state.cacheStatus.count).toBe(50);
     expect(state.cacheStatus.loaded).toBe(true);
   });
 
   it("should deselect emotion", () => {
-    const { selectEmotion, deselectEmotion } = useAtlasAdminStore.getState();
+    const { selectEmotion, deselectEmotion } = useVisualizationStore.getState();
     act(() => {
       selectEmotion("1");
       deselectEmotion("1");
     });
-    expect(useAtlasAdminStore.getState().selectedEmotionIds.has("1")).toBe(false);
+    expect(useVisualizationStore.getState().selectedEmotionIds.has("1")).toBe(false);
   });
 
   it("should toggle layer", () => {
-    const { toggleLayer } = useAtlasAdminStore.getState();
-    const initial = useAtlasAdminStore.getState().layers;
+    const { toggleLayer } = useVisualizationStore.getState();
+    const initial = useVisualizationStore.getState().layers;
     act(() => toggleLayer("transitionPaths"));
-    expect(useAtlasAdminStore.getState().layers.transitionPaths).toBe(!initial.transitionPaths);
+    expect(useVisualizationStore.getState().layers.transitionPaths).toBe(!initial.transitionPaths);
   });
 
   it("should update behavior setting", () => {
-    const { updateBehaviorSetting } = useAtlasAdminStore.getState();
+    const { updateBehaviorSetting } = useVisualizationStore.getState();
     act(() => updateBehaviorSetting("focusMode", true));
-    expect(useAtlasAdminStore.getState().settings.focusMode).toBe(true);
+    expect(useVisualizationStore.getState().settings.focusMode).toBe(true);
   });
 
   it("should toggle category selection logic (all selected vs partial)", () => {
-    const { setAllEmotions, selectEmotion, toggleCategory } = useAtlasAdminStore.getState();
+    const { setAllEmotions, selectEmotion, toggleCategory } = useVisualizationStore.getState();
     act(() => {
       setAllEmotions(mockEmotions);
       // Select only one in Negative category
@@ -413,19 +414,19 @@ describe("Additional Actions & Helpers", () => {
       toggleCategory("Negative");
     });
     // Should select ALL in Negative now because it wasn't fully selected
-    const state = useAtlasAdminStore.getState();
+    const state = useVisualizationStore.getState();
     expect(state.selectedEmotionIds.has("2")).toBe(true);
     expect(state.selectedEmotionIds.has("3")).toBe(true); // The other negative one
 
     // Now toggle again -> should deselect all
     act(() => toggleCategory("Negative"));
-    const state2 = useAtlasAdminStore.getState();
+    const state2 = useVisualizationStore.getState();
     expect(state2.selectedEmotionIds.has("2")).toBe(false);
     expect(state2.selectedEmotionIds.has("3")).toBe(false);
   });
 
   it("should get bridge emotions", () => {
-    const { setAllEmotions, getBridgeEmotions } = useAtlasAdminStore.getState();
+    const { setAllEmotions, getBridgeEmotions } = useVisualizationStore.getState();
     // 'Joy' is NOT a bridge emotion in default list. "Awe" is.
     const aweEmotion = { ...mockEmotions[0], name: "Awe", is_bridge: true };
 
@@ -437,7 +438,7 @@ describe("Additional Actions & Helpers", () => {
   });
 
   it("should manage collections state", () => {
-    const { setCollections, setActiveCollection } = useAtlasAdminStore.getState();
+    const { setCollections, setActiveCollection } = useVisualizationStore.getState();
     const mockCollections = [
       { id: "c1", name: "Collection 1", description: "desc", is_system: false, is_default: false },
     ];
@@ -447,13 +448,13 @@ describe("Additional Actions & Helpers", () => {
       setActiveCollection("c1");
     });
 
-    const state = useAtlasAdminStore.getState();
+    const state = useVisualizationStore.getState();
     expect(state.collections).toEqual(mockCollections);
     expect(state.activeCollectionId).toBe("c1");
   });
 
   it("should handle simple setters", () => {
-    const store = useAtlasAdminStore.getState();
+    const store = useVisualizationStore.getState();
     act(() => {
       store.setHoveredEmotion("1");
       store.setHoveredPath("path-1");
@@ -467,7 +468,7 @@ describe("Additional Actions & Helpers", () => {
       store.setPathAnimationMode("dynamic");
     });
 
-    const state = useAtlasAdminStore.getState();
+    const state = useVisualizationStore.getState();
     expect(state.hoveredEmotionId).toBe("1");
     expect(state.hoveredPathId).toBe("path-1");
     expect(state.selectedPathId).toBe("path-1");
@@ -481,38 +482,38 @@ describe("Additional Actions & Helpers", () => {
   });
 
   it("should handle placeholder fetchPathFromBackend", async () => {
-    const { fetchPathFromBackend } = useAtlasAdminStore.getState();
+    const { fetchPathFromBackend } = useVisualizationStore.getState();
     const result = await fetchPathFromBackend("1", "2");
     expect(result).toBeNull();
   });
 
   it("should handle setFocusedEmotionId alias", () => {
-    const { setFocusedEmotionId } = useAtlasAdminStore.getState();
+    const { setFocusedEmotionId } = useVisualizationStore.getState();
     act(() => setFocusedEmotionId("123"));
-    expect(useAtlasAdminStore.getState().focusedEmotionId).toBe("123");
+    expect(useVisualizationStore.getState().focusedEmotionId).toBe("123");
   });
 
   it("should clear selection", () => {
-    const { selectEmotion, clearSelection } = useAtlasAdminStore.getState();
+    const { selectEmotion, clearSelection } = useVisualizationStore.getState();
     act(() => {
       selectEmotion("1");
       clearSelection();
     });
-    expect(useAtlasAdminStore.getState().selectedEmotionIds.size).toBe(0);
+    expect(useVisualizationStore.getState().selectedEmotionIds.size).toBe(0);
   });
 
   it("should support legacy updateSetting alias", () => {
-    const { updateSetting } = useAtlasAdminStore.getState();
+    const { updateSetting } = useVisualizationStore.getState();
     act(() => {
       updateSetting("showAllPaths", true);
     });
-    expect(useAtlasAdminStore.getState().settings.showAllPaths).toBe(true);
+    expect(useVisualizationStore.getState().settings.showAllPaths).toBe(true);
   });
 
   describe("Path Cycling", () => {
     it("should cycle through filtered paths", () => {
       const { setAllEmotions, addComputedPath, selectMultiple, cycleSelectedPath } =
-        useAtlasAdminStore.getState();
+        useVisualizationStore.getState();
 
       // Setup: 2 paths between 3 emotions. All emotions selected.
       // Path 1: 1-2
@@ -528,19 +529,19 @@ describe("Additional Actions & Helpers", () => {
 
       // Initial: No path selected. Cycle next -> should select first (1-2)
       act(() => cycleSelectedPath("next"));
-      expect(useAtlasAdminStore.getState().selectedPathId).toBe("1-2");
+      expect(useVisualizationStore.getState().selectedPathId).toBe("1-2");
 
       // Cycle next -> should select second (2-3)
       act(() => cycleSelectedPath("next"));
-      expect(useAtlasAdminStore.getState().selectedPathId).toBe("2-3");
+      expect(useVisualizationStore.getState().selectedPathId).toBe("2-3");
 
       // Cycle next -> loop back to first
       act(() => cycleSelectedPath("next"));
-      expect(useAtlasAdminStore.getState().selectedPathId).toBe("1-2");
+      expect(useVisualizationStore.getState().selectedPathId).toBe("1-2");
 
       // Cycle prev -> loop back to last
       act(() => cycleSelectedPath("prev"));
-      expect(useAtlasAdminStore.getState().selectedPathId).toBe("2-3");
+      expect(useVisualizationStore.getState().selectedPathId).toBe("2-3");
     });
 
     it("should not cycle if no valid paths for selection", () => {
@@ -551,7 +552,7 @@ describe("Additional Actions & Helpers", () => {
         cycleSelectedPath,
         clearComputedPaths,
         setSelectedPath,
-      } = useAtlasAdminStore.getState();
+      } = useVisualizationStore.getState();
       act(() => {
         clearComputedPaths(); // Force clear paths
         setSelectedPath(null); // Force clear selection residue
@@ -561,7 +562,7 @@ describe("Additional Actions & Helpers", () => {
       });
 
       act(() => cycleSelectedPath("next"));
-      expect(useAtlasAdminStore.getState().selectedPathId).toBeNull();
+      expect(useVisualizationStore.getState().selectedPathId).toBeNull();
     });
 
     it("should handle cycling when selected path is not in filtered list", () => {
@@ -571,7 +572,7 @@ describe("Additional Actions & Helpers", () => {
         selectMultiple,
         cycleSelectedPath,
         setSelectedPath,
-      } = useAtlasAdminStore.getState();
+      } = useVisualizationStore.getState();
       // Setup
       act(() => {
         setAllEmotions(mockEmotions);
@@ -582,7 +583,7 @@ describe("Additional Actions & Helpers", () => {
 
       // Cycle next -> should reset to first available
       act(() => cycleSelectedPath("next"));
-      expect(useAtlasAdminStore.getState().selectedPathId).toBe("1-2");
+      expect(useVisualizationStore.getState().selectedPathId).toBe("1-2");
     });
 
     it("should cycle correctly from null selection when paths exist", () => {
@@ -592,7 +593,7 @@ describe("Additional Actions & Helpers", () => {
         selectMultiple,
         cycleSelectedPath,
         setSelectedPath,
-      } = useAtlasAdminStore.getState();
+      } = useVisualizationStore.getState();
       act(() => {
         setAllEmotions(mockEmotions);
         addComputedPath(mockPath);
@@ -604,7 +605,7 @@ describe("Additional Actions & Helpers", () => {
       // currentIndex should be -1.
       // nextIndex should be 0.
       act(() => cycleSelectedPath("next"));
-      expect(useAtlasAdminStore.getState().selectedPathId).toBe("1-2");
+      expect(useVisualizationStore.getState().selectedPathId).toBe("1-2");
     });
   });
 
@@ -645,19 +646,19 @@ describe("Additional Actions & Helpers", () => {
 
     it("should handle cycleViewMode safety fallback", () => {
       act(() => {
-        useAtlasAdminStore.setState({ viewMode: "invalid" as any });
-        useAtlasAdminStore.getState().cycleViewMode();
+        useVisualizationStore.setState({ viewMode: "invalid" as any });
+        useVisualizationStore.getState().cycleViewMode();
       });
       // Should reset to default (index 0 implies next is index 1 => zen? No, logic: if -1, set to 0. Next is (0+1)%3 = 1 -> zen )
-      // Wait: `if (currentIdx === -1) currentIdx = 0;` Next is 1 ("zen").
-      expect(useAtlasAdminStore.getState().viewMode).toBe("zen");
+      // Wait: `if (currentIdx === -1) currentIdx = 0; ` Next is 1 ("zen").
+      expect(useVisualizationStore.getState().viewMode).toBe("zen");
     });
 
     it("should safely handle toggleCategoryFilter for unknown category", () => {
-      const { toggleCategoryFilter } = useAtlasAdminStore.getState();
+      const { toggleCategoryFilter } = useVisualizationStore.getState();
       // Should not crash
       act(() => toggleCategoryFilter("Unknown Category"));
-      const state = useAtlasAdminStore.getState();
+      const state = useVisualizationStore.getState();
       // Nothing happens, just validation
       expect(state.categoryFilters.get("Unknown Category")).toBeUndefined();
     });
@@ -665,10 +666,10 @@ describe("Additional Actions & Helpers", () => {
     it("should persist viewMode (admin check)", () => {
       // Mock window location to assume admin
       const originalPath = window.location.pathname;
-      window.history.pushState({}, "Admin", "/admin/atlas");
+      window.history.pushState({}, "Admin", "/admin/visualization");
 
-      const mockState = useAtlasAdminStore.getState();
-      const persisted = adminPartialize(mockState) as any;
+      const mockState = useVisualizationStore.getState();
+      const persisted = visualizationPartialize(mockState) as any;
 
       // Should contain viewMode (Admin persistence)
       expect(persisted.viewMode).toBeDefined();
@@ -683,8 +684,8 @@ describe("Additional Actions & Helpers", () => {
       const originalPath = window.location.pathname;
       window.history.pushState({}, "Client", "/");
 
-      const mockState = useAtlasAdminStore.getState();
-      const persisted = adminPartialize(mockState) as any;
+      const mockState = useVisualizationStore.getState();
+      const persisted = visualizationPartialize(mockState) as any;
 
       // Should ONLY contain selectedEmotionIds
       expect(persisted.viewMode).toBeUndefined();
@@ -702,8 +703,8 @@ describe("Additional Actions & Helpers", () => {
       const consoleSpy = jest.spyOn(console, "log").mockImplementation();
 
       // Trigger persistence logic
-      const state = useAtlasAdminStore.getState();
-      adminPartialize(state); // Manual call to trigger log
+      const state = useVisualizationStore.getState();
+      visualizationPartialize(state); // Manual call to trigger log
 
       expect(consoleSpy).toHaveBeenCalledWith("DEBUG: partialize", expect.anything());
 

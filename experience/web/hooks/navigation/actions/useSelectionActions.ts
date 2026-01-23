@@ -1,17 +1,17 @@
 import { useCallback } from "react";
-import { useAtlasAdminStore } from "@/stores/useAtlasAdminStore";
+import { useVisualizationStore } from "@/stores/useVisualizationStore";
 import { logger } from "@/utils/logger";
-import type { AtlasEmotion } from "@/types/atlas-admin";
+import type { Emotion } from "@/types/visualization";
 
 interface UseSelectionActionsOptions {
-  findEmotionByName: (name: string) => AtlasEmotion | null;
+  findEmotionByName: (name: string) => Emotion | null;
   onNavigate?: () => void;
 }
 
 export function useSelectionActions({ findEmotionByName, onNavigate }: UseSelectionActionsOptions) {
-  const selectEmotion = useAtlasAdminStore((state) => state.selectEmotion);
-  const setFocusedEmotion = useAtlasAdminStore((state) => state.setFocusedEmotion);
-  const selectMultiple = useAtlasAdminStore((state) => state.selectMultiple);
+  const selectEmotion = useVisualizationStore((state) => state.selectEmotion);
+  const setFocusedEmotion = useVisualizationStore((state) => state.setFocusedEmotion);
+  const selectMultiple = useVisualizationStore((state) => state.selectMultiple);
 
   const selectEmotionByName = useCallback(
     (emotionName: string, navigate: boolean = false) => {

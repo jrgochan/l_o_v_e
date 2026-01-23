@@ -3,8 +3,8 @@ import { useSinglePath } from "../../../hooks/pathfinding/useSinglePath";
 
 // Mock store
 const mockAddComputedPath = jest.fn();
-jest.mock("@/stores/useAtlasAdminStore", () => ({
-  useAtlasAdminStore: () => ({
+jest.mock("@/stores/useVisualizationStore", () => ({
+  useVisualizationStore: () => ({
     addComputedPath: mockAddComputedPath,
   }),
 }));

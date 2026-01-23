@@ -7,12 +7,12 @@
 
 "use client";
 
-import { useAtlasAdminStore } from "@/stores/useAtlasAdminStore";
+import { useVisualizationStore } from "@/stores/useVisualizationStore";
 import { useExperienceStore } from "@/stores/useExperienceStore";
 
 export function AggregateVACHeaderDisplay() {
-  const selectedIds = useAtlasAdminStore((state) => state.selectedEmotionIds);
-  const allEmotions = useAtlasAdminStore((state) => state.allEmotions);
+  const selectedIds = useVisualizationStore((state) => state.selectedEmotionIds);
+  const allEmotions = useVisualizationStore((state) => state.allEmotions);
   const targetVAC = useExperienceStore((state) => state.targetVAC);
 
   // Get selected emotions

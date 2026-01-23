@@ -8,20 +8,20 @@
  * - Category-level aggregations
  */
 
-import type { AtlasEmotion, EmotionPath, MatrixStats, CategoryStats } from "@/types/atlas-admin";
+import type { Emotion, EmotionPath, MatrixStats, CategoryStats } from "@/types/visualization";
 import { useMatrixProcessing } from "./matrix/useMatrixProcessing";
 import { useMatrixStats } from "./matrix/useMatrixStats";
 
 interface UseMatrixDataOptions {
-  allEmotions: AtlasEmotion[];
+  allEmotions: Emotion[];
   computedPaths: Map<string, EmotionPath>;
 }
 
 interface UseMatrixDataReturn {
-  sortedEmotions: AtlasEmotion[];
+  sortedEmotions: Emotion[];
   categories: string[];
-  getPathForPair: (from: AtlasEmotion, to: AtlasEmotion) => EmotionPath | undefined;
-  getCellColor: (from: AtlasEmotion, to: AtlasEmotion) => string;
+  getPathForPair: (from: Emotion, to: Emotion) => EmotionPath | undefined;
+  getCellColor: (from: Emotion, to: Emotion) => string;
   getCategoryAverageDifficulty: (fromCat: string, toCat: string) => CategoryStats | null;
   getCategoryCellColor: (fromCat: string, toCat: string) => string;
   stats: MatrixStats;

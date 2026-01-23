@@ -1,15 +1,15 @@
 import { useCallback } from "react";
-import { useAtlasAdminStore } from "@/stores/useAtlasAdminStore";
+import { useVisualizationStore } from "@/stores/useVisualizationStore";
 import { logger } from "@/utils/logger";
-import { AtlasEmotion } from "@/types/atlas-admin";
+import { Emotion } from "@/types/visualization";
 
 interface UseBatchPathsOptions {
-  computePath: (from: AtlasEmotion, to: AtlasEmotion) => Promise<void>;
+  computePath: (from: Emotion, to: Emotion) => Promise<void>;
 }
 
 export function useBatchPaths({ computePath }: UseBatchPathsOptions) {
   const computeAllPaths = useCallback(async () => {
-    const store = useAtlasAdminStore.getState();
+    const store = useVisualizationStore.getState();
     const {
       selectedEmotionIds,
       allEmotions,
@@ -73,7 +73,7 @@ export function useBatchPaths({ computePath }: UseBatchPathsOptions) {
             }
 
             // 2. Try backend API
-            const backendPath = await useAtlasAdminStore
+            const backendPath = await useVisualizationStore
               .getState()
               .fetchPathFromBackend(from.id, to.id);
             if (backendPath) {

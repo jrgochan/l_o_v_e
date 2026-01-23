@@ -11,12 +11,12 @@
 
 "use client";
 
-import type { AtlasEmotion, EmotionPath } from "@/types/atlas-admin";
-import { DIFFICULTY_COLORS } from "@/types/atlas-admin";
+import type { Emotion, EmotionPath } from "@/types/visualization";
+import { DIFFICULTY_COLORS } from "@/types/visualization";
 
 interface MatrixTooltipProps {
-  fromEmotion: AtlasEmotion;
-  toEmotion: AtlasEmotion;
+  fromEmotion: Emotion;
+  toEmotion: Emotion;
   path: EmotionPath | undefined;
 }
 

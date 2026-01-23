@@ -10,22 +10,22 @@
 import { create } from "zustand";
 import { persist, createJSONStorage } from "zustand/middleware";
 import type {
-  AtlasEmotion,
+  Emotion,
   EmotionPath,
   CategoryFilter,
-  AtlasAdminSettings,
+  VisualizationSettings,
   LayerVisibility,
   CacheStatus,
   PathAnimationMode,
   EmotionCollection,
 } from "@/types";
-import { DEFAULT_SETTINGS, DEFAULT_LAYERS, CATEGORY_COLORS } from "@/types";
+import { DEFAULT_SETTINGS, DEFAULT_LAYERS } from "@/types";
 import { logger } from "@/utils/logger";
 import { resolveEmotionColor } from "@/utils/emotion-colors";
 
-interface AtlasAdminState {
+interface VisualizationState {
   // State
-  allEmotions: AtlasEmotion[];
+  allEmotions: Emotion[];
   selectedEmotionIds: Set<string>;
   computedPaths: Map<string, EmotionPath>;
   categoryFilters: Map<string, CategoryFilter>;
@@ -39,7 +39,7 @@ interface AtlasAdminState {
   isFlying: boolean;
   isIntroActive: boolean;
 
-  settings: AtlasAdminSettings;
+  settings: VisualizationSettings;
   layers: LayerVisibility;
 
   collections: EmotionCollection[];
@@ -52,7 +52,7 @@ interface AtlasAdminState {
   // Actions
   setCollections: (collections: EmotionCollection[]) => void;
   setActiveCollection: (id: string) => void;
-  setAllEmotions: (emotions: AtlasEmotion[]) => void;
+  setAllEmotions: (emotions: Emotion[]) => void;
   addComputedPath: (path: EmotionPath) => void;
 
   // Selection
@@ -81,15 +81,15 @@ interface AtlasAdminState {
   setIntroActive: (active: boolean) => void;
 
   // Settings & Layers
-  updateVisualSetting: <K extends keyof AtlasAdminSettings>(
+  updateVisualSetting: <K extends keyof VisualizationSettings>(
     key: K,
-    value: AtlasAdminSettings[K]
+    value: VisualizationSettings[K]
   ) => void;
-  updateSetting: <K extends keyof AtlasAdminSettings>(key: K, value: AtlasAdminSettings[K]) => void;
+  updateSetting: <K extends keyof VisualizationSettings>(key: K, value: VisualizationSettings[K]) => void;
   updateLayer: <K extends keyof LayerVisibility>(key: K, value: boolean) => void;
-  updateBehaviorSetting: <K extends keyof AtlasAdminSettings>(
+  updateBehaviorSetting: <K extends keyof VisualizationSettings>(
     key: K,
-    value: AtlasAdminSettings[K]
+    value: VisualizationSettings[K]
   ) => void;
 
   // Path Computation Support
@@ -107,9 +107,9 @@ interface AtlasAdminState {
   setLoadingEmotions: (loading: boolean) => void;
 
   // Helpers
-  getSelectedEmotions: () => AtlasEmotion[];
-  getVisibleEmotions: () => AtlasEmotion[];
-  getBridgeEmotions: () => AtlasEmotion[];
+  getSelectedEmotions: () => Emotion[];
+  getVisibleEmotions: () => Emotion[];
+  getBridgeEmotions: () => Emotion[];
   getPathForPair: (fromId: string, toId: string) => EmotionPath | undefined;
 }
 
@@ -143,7 +143,7 @@ export const getInitialAdminState = () => ({
   activeCollectionId: null as string | null,
   isLoadingCollections: false,
 
-  allEmotions: [] as AtlasEmotion[],
+  allEmotions: [] as Emotion[],
   selectedEmotionIds: new Set<string>(),
   computedPaths: new Map<string, EmotionPath>(),
   categoryFilters: new Map<string, CategoryFilter>(),
@@ -170,7 +170,7 @@ export const getInitialAdminState = () => ({
   error: null as string | null,
 });
 
-export const useAtlasAdminStore = create<AtlasAdminState>()(
+export const useVisualizationStore = create<VisualizationState>()(
   persist(
     (set, get) => ({
       // Initial state
@@ -496,14 +496,14 @@ export const useAtlasAdminStore = create<AtlasAdminState>()(
       },
     }),
     {
-      name: "love-atlas-admin", // unique name
+      name: "love-visualization-store", // unique name
       storage: createJSONStorage(() => localStorage, { replacer, reviver }), // Use properly configured storage support
-      partialize: (state) => adminPartialize(state),
+      partialize: (state) => visualizationPartialize(state),
     }
   )
 );
 
-export const adminPartialize = (state: AtlasAdminState) => {
+export const visualizationPartialize = (state: VisualizationState) => {
   // Safe check for window existence
   const isClientViewer =
     typeof window !== "undefined" && !window.location.pathname.startsWith("/admin");
@@ -517,7 +517,7 @@ export const adminPartialize = (state: AtlasAdminState) => {
     // This prevents overwriting Admin-computed paths with empty maps
     return {
       selectedEmotionIds: state.selectedEmotionIds,
-    } as unknown as Partial<AtlasAdminState>;
+    } as unknown as Partial<VisualizationState>;
   }
 
   // Admin persists full relevant state

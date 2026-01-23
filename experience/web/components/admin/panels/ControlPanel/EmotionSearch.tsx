@@ -8,13 +8,13 @@
 "use client";
 
 // import { useToast } from "@/hooks/useToast";
-import { BRIDGE_EMOTIONS } from "@/types/atlas-admin";
-import type { AtlasEmotion } from "@/types/atlas-admin";
+import { BRIDGE_EMOTIONS } from "@/types/visualization";
+import type { Emotion } from "@/types/visualization";
 
 interface EmotionSearchProps {
   searchQuery: string;
   onSearchChange: (query: string) => void;
-  filteredEmotions: AtlasEmotion[];
+  filteredEmotions: Emotion[];
   selectedIds: Set<string>;
   onToggleEmotion: (id: string) => void;
 }
@@ -36,7 +36,7 @@ export function EmotionSearch({
 
   // const toast = useToast();
 
-  const handleToggle = (emotion: AtlasEmotion) => {
+  const handleToggle = (emotion: Emotion) => {
     const isSelected = selectedIds.has(emotion.id);
     onToggleEmotion(emotion.id);
 

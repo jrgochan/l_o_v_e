@@ -13,10 +13,10 @@ jest.mock("@/stores/useExperienceStore", () => ({
   useExperienceStore: jest.fn(),
 }));
 
-jest.mock("@/stores/useAtlasAdminStore", () => ({
-  useAtlasAdminStore: jest.fn(),
+jest.mock("@/stores/useVisualizationStore", () => ({
+  useVisualizationStore: jest.fn(),
 }));
-import { useAtlasAdminStore } from "@/stores/useAtlasAdminStore";
+import { useVisualizationStore } from "@/stores/useVisualizationStore";
 
 const setMockState = (updates: any) => {
   Object.assign(mockState, updates);
@@ -35,7 +35,7 @@ describe("WaypointArrivalOverlay", () => {
       selector ? selector(mockState) : mockState
     );
 
-    (useAtlasAdminStore as unknown as jest.Mock).mockImplementation((selector: any) => {
+    (useVisualizationStore as unknown as jest.Mock).mockImplementation((selector: any) => {
       const state = {
         allEmotions: [
           { name: "Joy", category: "Happy", vac: [0.8, 0.5, 0.6] },

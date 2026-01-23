@@ -1,10 +1,10 @@
 import { renderHook } from "@testing-library/react";
 import { useSettingsSync } from "@/hooks/useSettingsSync";
 import { useSettingsStore } from "@/stores/useSettingsStore";
-import { useAtlasAdminStore } from "@/stores/useAtlasAdminStore";
+import { useVisualizationStore } from "@/stores/useVisualizationStore";
 
 jest.mock("@/stores/useSettingsStore");
-jest.mock("@/stores/useAtlasAdminStore");
+jest.mock("@/stores/useVisualizationStore");
 
 describe("useSettingsSync", () => {
   const mockSetState = jest.fn();
@@ -16,7 +16,7 @@ describe("useSettingsSync", () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
-    useAtlasAdminStore.setState = mockSetState;
+    useVisualizationStore.setState = mockSetState;
 
     // Mock zustand store methods directly on the import
     (useSettingsStore as unknown as any).getState = mockGetState;

@@ -1,8 +1,8 @@
 import { render, screen, act } from "@testing-library/react";
 import { CinematicOverlay } from "../../components/CinematicOverlay";
-import type { AtlasEmotion } from "@/types";
+import type { Emotion } from "@/types";
 
-const mockEmotion = (name: string): AtlasEmotion => ({
+const mockEmotion = (name: string): Emotion => ({
   id: name.toLowerCase(),
   name,
   category: "Places We Go With Others",

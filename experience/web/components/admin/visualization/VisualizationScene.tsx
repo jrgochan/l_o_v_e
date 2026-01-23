@@ -14,7 +14,7 @@ import { EmotionCloud } from "./EmotionCloud";
 import { PathNetwork } from "./PathNetwork";
 import { useSettingsStore } from "@/stores/useSettingsStore";
 
-export function AtlasScene() {
+export function VisualizationScene() {
   const { layers, showAxisLabels } = useSettingsStore();
 
   return (

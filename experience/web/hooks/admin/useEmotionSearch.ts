@@ -8,16 +8,16 @@
  */
 
 import { useState, useMemo } from "react";
-import type { AtlasEmotion } from "@/types/atlas-admin";
+import type { Emotion } from "@/types/visualization";
 
 interface UseEmotionSearchOptions {
-  allEmotions: AtlasEmotion[];
+  allEmotions: Emotion[];
 }
 
 interface UseEmotionSearchReturn {
   searchQuery: string;
   setSearchQuery: (query: string) => void;
-  filteredEmotions: AtlasEmotion[];
+  filteredEmotions: Emotion[];
   hasActiveSearch: boolean;
   resultCount: number;
 }

@@ -135,7 +135,7 @@ async def test_get_all_cached_paths_failure(mock_db):
         assert "Cache Read Error" in exc.value.detail
 
 @pytest.mark.asyncio
-async def test_get_atlas_statistics_failure(mock_db):
+async def test_get_path_statistics_failure(mock_db):
     """Test 500 when retrieving statistics fails."""
     with patch("app.api.routes.emotions.PathMatrixService") as MockService:
         service_instance = AsyncMock()
@@ -143,7 +143,7 @@ async def test_get_atlas_statistics_failure(mock_db):
         service_instance.get_cache_statistics.side_effect = Exception("Stats Error")
         
         with pytest.raises(HTTPException) as exc:
-            await emotions.get_atlas_statistics(db=mock_db)
+            await emotions.get_path_statistics(db=mock_db)
             
         assert exc.value.status_code == 500
         assert "Stats Error" in exc.value.detail

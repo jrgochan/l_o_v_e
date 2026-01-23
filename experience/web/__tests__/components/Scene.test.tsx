@@ -69,7 +69,7 @@ jest.mock("@/components/VACAnimator", () => ({
   VACAnimator: () => <div data-testid="vac-animator" />,
 }));
 
-jest.mock("@/components/admin/atlas/EmotionCloud", () => ({
+jest.mock("@/components/admin/visualization/EmotionCloud", () => ({
   EmotionCloud: () => <div data-testid="emotion-cloud" />,
 }));
 

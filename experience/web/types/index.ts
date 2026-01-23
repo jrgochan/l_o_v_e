@@ -8,11 +8,11 @@
  * ```typescript
  * // Instead of:
  * import type { VAC } from '@/types/chat';
- * import type { AtlasEmotion } from '@/types/atlas-admin';
+ * import type { Emotion } from '@/types/visualization';
  * import type { WaypointData } from '@/types/journeys';
  *
  * // Simply:
- * import type { VAC, AtlasEmotion, WaypointData } from '@/types';
+ * import type { VAC, Emotion, WaypointData } from '@/types';
  * ```
  */
 
@@ -24,7 +24,7 @@
 export * from "./chat";
 
 // Atlas Admin & Emotion Visualization
-export * from "./atlas-admin";
+export * from "./visualization";
 
 // Extended Insights System
 export * from "./insights";
@@ -59,4 +59,4 @@ export * from "./ui-events";
 // ============================================================================
 
 // Example usage:
-// import type { VAC, AtlasEmotion, WaypointData, CachedPathData } from '@/types';
+// import type { VAC, Emotion, WaypointData, CachedPathData } from '@/types';

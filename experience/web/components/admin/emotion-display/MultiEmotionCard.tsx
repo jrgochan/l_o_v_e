@@ -18,7 +18,7 @@ import { AggregateStateCard } from "../state-display/AggregateStateCard";
 import { EmotionRelationshipGraph } from "../visualizations/EmotionRelationshipGraph";
 import { AggregateSphere } from "../spheres/AggregateSphere";
 import { EmotionMappingBadge } from "./EmotionMappingBadge";
-import { useAtlasAdminStore } from "@/stores/useAtlasAdminStore";
+import { useVisualizationStore } from "@/stores/useVisualizationStore";
 import type { DetectedEmotion, EmotionRelationship, AggregateState } from "@/types/chat";
 
 interface MultiEmotionCardProps {
@@ -41,7 +41,7 @@ export function MultiEmotionCard({
   const [showSphere, setShowSphere] = useState(false);
 
   // Get animation mode from store (for aggregate sphere)
-  const pathAnimationMode = useAtlasAdminStore((state) => state.settings.pathAnimationMode);
+  const pathAnimationMode = useVisualizationStore((state) => state.settings.pathAnimationMode);
 
   if (!emotions || emotions.length === 0) {
     return null;

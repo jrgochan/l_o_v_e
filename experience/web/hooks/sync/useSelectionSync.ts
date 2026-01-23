@@ -1,14 +1,14 @@
 "use client";
 
 import { useEffect } from "react";
-import { useAtlasAdminStore } from "@/stores/useAtlasAdminStore";
+import { useVisualizationStore } from "@/stores/useVisualizationStore";
 import { useExperienceStore } from "@/stores/useExperienceStore";
 import { type VACVector, getCanonicalEmotion } from "@love/experience-shared";
 import { logger } from "@/utils/logger";
 
 export function useSelectionSync() {
-  const selectedIds = useAtlasAdminStore((state) => state.selectedEmotionIds);
-  const allEmotions = useAtlasAdminStore((state) => state.allEmotions);
+  const selectedIds = useVisualizationStore((state) => state.selectedEmotionIds);
+  const allEmotions = useVisualizationStore((state) => state.allEmotions);
   const setTarget = useExperienceStore((state) => state.setTarget);
 
   useEffect(() => {

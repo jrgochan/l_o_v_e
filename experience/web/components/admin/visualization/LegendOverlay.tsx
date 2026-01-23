@@ -7,12 +7,12 @@
 "use client";
 
 import { useState } from "react";
-import { useAtlasAdminStore } from "@/stores/useAtlasAdminStore";
-import { DIFFICULTY_COLORS } from "@/types/atlas-admin";
+import { useVisualizationStore } from "@/stores/useVisualizationStore";
+import { DIFFICULTY_COLORS } from "@/types/visualization";
 
 export function LegendOverlay() {
   const [isExpanded, setIsExpanded] = useState(false);
-  const categoryFilters = useAtlasAdminStore((state) => state.categoryFilters);
+  const categoryFilters = useVisualizationStore((state) => state.categoryFilters);
 
   const enabledCategories = Array.from(categoryFilters.values()).filter((cat) => cat.enabled);
 

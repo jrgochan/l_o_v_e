@@ -85,8 +85,8 @@ export {
 export type {
   ObserverEmotionResponse,
   ObserverHistoryResponse,
-  AtlasEmotion,
-  AtlasEmotionsResponse,
+  Emotion,
+  EmotionsResponse,
   StrategyInfo,
   WaypointInfo,
   TransitionPathResponse,

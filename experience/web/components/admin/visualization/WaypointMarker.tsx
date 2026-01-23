@@ -3,9 +3,9 @@
 import { useRef, useMemo } from "react";
 import { ThreeEvent } from "@react-three/fiber";
 import * as THREE from "three";
-import { useAtlasAdminStore } from "@/stores/useAtlasAdminStore";
+import { useVisualizationStore } from "@/stores/useVisualizationStore";
 import { useWaypointPulse } from "./useWaypointPulse";
-import type { PathAnimationMode } from "@/types/atlas-admin";
+import type { PathAnimationMode } from "@/types/visualization";
 
 interface WaypointMarkerProps {
   position: [number, number, number];
@@ -25,8 +25,8 @@ export function WaypointMarker({
   opacity,
 }: WaypointMarkerProps) {
   const meshRef = useRef<THREE.Mesh>(null);
-  const allEmotions = useAtlasAdminStore((state) => state.allEmotions);
-  const setHoveredEmotion = useAtlasAdminStore((state) => state.setHoveredEmotion);
+  const allEmotions = useVisualizationStore((state) => state.allEmotions);
+  const setHoveredEmotion = useVisualizationStore((state) => state.setHoveredEmotion);
 
   const color = useMemo(() => {
     return new THREE.Color(categoryColor);

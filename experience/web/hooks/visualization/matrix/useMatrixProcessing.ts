@@ -1,9 +1,9 @@
 import { useMemo, useCallback } from "react";
-import type { AtlasEmotion, EmotionPath } from "@/types/atlas-admin";
-import { DIFFICULTY_COLORS, type CategoryStats } from "@/types/atlas-admin";
+import type { Emotion, EmotionPath } from "@/types/visualization";
+import { DIFFICULTY_COLORS, type CategoryStats } from "@/types/visualization";
 
 interface UseMatrixProcessingOptions {
-  allEmotions: AtlasEmotion[];
+  allEmotions: Emotion[];
   computedPaths: Map<string, EmotionPath>;
 }
 
@@ -24,7 +24,7 @@ export function useMatrixProcessing({ allEmotions, computedPaths }: UseMatrixPro
 
   // Get path for a specific pair (checks both directions)
   const getPathForPair = useCallback(
-    (fromEmotion: AtlasEmotion, toEmotion: AtlasEmotion) => {
+    (fromEmotion: Emotion, toEmotion: Emotion) => {
       const key1 = `${fromEmotion.id}-${toEmotion.id}`;
       const key2 = `${toEmotion.id}-${fromEmotion.id}`;
       return computedPaths.get(key1) || computedPaths.get(key2);
@@ -34,7 +34,7 @@ export function useMatrixProcessing({ allEmotions, computedPaths }: UseMatrixPro
 
   // Get cell color based on path difficulty
   const getCellColor = useCallback(
-    (fromEmotion: AtlasEmotion, toEmotion: AtlasEmotion): string => {
+    (fromEmotion: Emotion, toEmotion: Emotion): string => {
       // Same emotion = no transition needed
       if (fromEmotion.id === toEmotion.id) {
         return "#1a1a1a"; // Dark gray

@@ -1,8 +1,8 @@
 import { render, screen, fireEvent } from "@testing-library/react";
 import { MatrixGrid } from "@/components/admin/visualizations/PathMatrix/MatrixGrid";
-import type { AtlasEmotion, EmotionPath } from "@/types/atlas-admin";
+import type { Emotion, EmotionPath } from "@/types/visualization";
 
-const MOCK_EMOTIONS: AtlasEmotion[] = [
+const MOCK_EMOTIONS: Emotion[] = [
   {
     id: "1",
     name: "Joy",

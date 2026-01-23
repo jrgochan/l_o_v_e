@@ -1,10 +1,10 @@
 import { render, screen } from "@testing-library/react";
 import { AggregateVACHeaderDisplay } from "../../../../components/admin/state-display/AggregateVACHeaderDisplay";
-import { useAtlasAdminStore } from "@/stores/useAtlasAdminStore";
+import { useVisualizationStore } from "@/stores/useVisualizationStore";
 import { useExperienceStore } from "@/stores/useExperienceStore";
 
 // Mock stores
-jest.mock("@/stores/useAtlasAdminStore");
+jest.mock("@/stores/useVisualizationStore");
 jest.mock("@/stores/useExperienceStore");
 
 describe("AggregateVACHeaderDisplay", () => {
@@ -16,7 +16,7 @@ describe("AggregateVACHeaderDisplay", () => {
   beforeEach(() => {
     jest.clearAllMocks();
     // Default mocks
-    (useAtlasAdminStore as unknown as jest.Mock).mockImplementation((selector) =>
+    (useVisualizationStore as unknown as jest.Mock).mockImplementation((selector) =>
       selector({
         selectedEmotionIds: new Set(),
         allEmotions: mockAllEmotions,
@@ -36,7 +36,7 @@ describe("AggregateVACHeaderDisplay", () => {
   });
 
   it("renders single emotion label", () => {
-    (useAtlasAdminStore as unknown as jest.Mock).mockImplementation((selector) =>
+    (useVisualizationStore as unknown as jest.Mock).mockImplementation((selector) =>
       selector({
         selectedEmotionIds: new Set(["joy"]),
         allEmotions: mockAllEmotions,
@@ -47,7 +47,7 @@ describe("AggregateVACHeaderDisplay", () => {
   });
 
   it("renders aggregate label and count for multiple emotions", () => {
-    (useAtlasAdminStore as unknown as jest.Mock).mockImplementation((selector) =>
+    (useVisualizationStore as unknown as jest.Mock).mockImplementation((selector) =>
       selector({
         selectedEmotionIds: new Set(["joy", "sadness"]),
         allEmotions: mockAllEmotions,
@@ -60,7 +60,7 @@ describe("AggregateVACHeaderDisplay", () => {
 
   describe("VAC Formatting", () => {
     const testRender = (vac: [number, number, number]) => {
-      (useAtlasAdminStore as unknown as jest.Mock).mockImplementation((selector) =>
+      (useVisualizationStore as unknown as jest.Mock).mockImplementation((selector) =>
         selector({
           selectedEmotionIds: new Set(["joy"]),
           allEmotions: mockAllEmotions,

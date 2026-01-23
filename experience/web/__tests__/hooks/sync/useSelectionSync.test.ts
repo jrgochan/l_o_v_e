@@ -1,10 +1,10 @@
 import { renderHook } from "@testing-library/react";
 import { useSelectionSync } from "@/hooks/sync/useSelectionSync";
-import { useAtlasAdminStore } from "@/stores/useAtlasAdminStore";
+import { useVisualizationStore } from "@/stores/useVisualizationStore";
 import { useExperienceStore } from "@/stores/useExperienceStore";
 import { logger } from "@/utils/logger";
 
-jest.mock("@/stores/useAtlasAdminStore");
+jest.mock("@/stores/useVisualizationStore");
 jest.mock("@/stores/useExperienceStore");
 jest.mock("@/utils/logger");
 
@@ -32,7 +32,7 @@ describe("useSelectionSync", () => {
   });
 
   it("should calculate average VAC for selected emotions", () => {
-    (useAtlasAdminStore as unknown as jest.Mock).mockImplementation((selector) => {
+    (useVisualizationStore as unknown as jest.Mock).mockImplementation((selector) => {
       return selector({
         selectedEmotionIds: new Set(["e1", "e2"]),
         allEmotions: mockEmotions,
@@ -47,7 +47,7 @@ describe("useSelectionSync", () => {
   });
 
   it("should handle single selection", () => {
-    (useAtlasAdminStore as unknown as jest.Mock).mockImplementation((selector) => {
+    (useVisualizationStore as unknown as jest.Mock).mockImplementation((selector) => {
       return selector({
         selectedEmotionIds: new Set(["e1"]),
         allEmotions: mockEmotions,
@@ -61,7 +61,7 @@ describe("useSelectionSync", () => {
 
   it("should use fallback for missing emotions", () => {
     // ID "Fallback" is not in allEmotions, but is in getCanonicalEmotion mock
-    (useAtlasAdminStore as unknown as jest.Mock).mockImplementation((selector) => {
+    (useVisualizationStore as unknown as jest.Mock).mockImplementation((selector) => {
       return selector({
         selectedEmotionIds: new Set(["Fallback"]),
         allEmotions: mockEmotions,
@@ -79,7 +79,7 @@ describe("useSelectionSync", () => {
   });
 
   it("should reset to neutral if no selection", () => {
-    (useAtlasAdminStore as unknown as jest.Mock).mockImplementation((selector) => {
+    (useVisualizationStore as unknown as jest.Mock).mockImplementation((selector) => {
       return selector({
         selectedEmotionIds: new Set(),
         allEmotions: mockEmotions,
@@ -93,7 +93,7 @@ describe("useSelectionSync", () => {
 
   it("should robust match by name if ID fails", () => {
     // select by name "Joy" instead of id "e1"
-    (useAtlasAdminStore as unknown as jest.Mock).mockImplementation((selector) => {
+    (useVisualizationStore as unknown as jest.Mock).mockImplementation((selector) => {
       return selector({
         selectedEmotionIds: new Set(["Joy"]),
         allEmotions: mockEmotions,
@@ -106,7 +106,7 @@ describe("useSelectionSync", () => {
   });
 
   it("should match by case-insensitive ID", () => {
-    (useAtlasAdminStore as unknown as jest.Mock).mockImplementation((selector) => {
+    (useVisualizationStore as unknown as jest.Mock).mockImplementation((selector) => {
       return selector({
         selectedEmotionIds: new Set(["E1"]), // Uppercase ID
         allEmotions: mockEmotions,
@@ -119,7 +119,7 @@ describe("useSelectionSync", () => {
   });
 
   it("should match by case-insensitive Name", () => {
-    (useAtlasAdminStore as unknown as jest.Mock).mockImplementation((selector) => {
+    (useVisualizationStore as unknown as jest.Mock).mockImplementation((selector) => {
       return selector({
         selectedEmotionIds: new Set(["joy"]), // Lowercase Name
         allEmotions: mockEmotions,
@@ -132,7 +132,7 @@ describe("useSelectionSync", () => {
   });
 
   it("should handle totally invalid ID (no internal, no canonical)", () => {
-    (useAtlasAdminStore as unknown as jest.Mock).mockImplementation((selector) => {
+    (useVisualizationStore as unknown as jest.Mock).mockImplementation((selector) => {
       return selector({
         selectedEmotionIds: new Set(["InvalidID"]),
         allEmotions: mockEmotions,

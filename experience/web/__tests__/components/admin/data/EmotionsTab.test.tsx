@@ -5,8 +5,8 @@ import userEvent from "@testing-library/user-event";
 
 jest.mock("@/utils/api", () => ({
   adminApi: {
-    getAtlasEmotions: jest.fn(),
-    updateAtlasEmotion: jest.fn(),
+    getEmotions: jest.fn(),
+    updateEmotion: jest.fn(),
     exportAtlasData: jest.fn(),
     importAtlasData: jest.fn(),
   },
@@ -55,14 +55,14 @@ describe("EmotionsTab", () => {
   });
 
   it("renders loading state", async () => {
-    (adminApi.getAtlasEmotions as jest.Mock).mockReturnValue(new Promise(() => {}));
+    (adminApi.getEmotions as jest.Mock).mockReturnValue(new Promise(() => {}));
     const { container } = render(<EmotionsTab />);
     // Check for loader by class or role
     expect(container.querySelector(".animate-spin")).toBeInTheDocument();
   });
 
   it("renders emotions table on success", async () => {
-    (adminApi.getAtlasEmotions as jest.Mock).mockResolvedValue(mockEmotions);
+    (adminApi.getEmotions as jest.Mock).mockResolvedValue(mockEmotions);
 
     render(<EmotionsTab />);
 
@@ -76,7 +76,7 @@ describe("EmotionsTab", () => {
   });
 
   it("handles fetch error", async () => {
-    (adminApi.getAtlasEmotions as jest.Mock).mockRejectedValue(new Error("Fetch failed"));
+    (adminApi.getEmotions as jest.Mock).mockRejectedValue(new Error("Fetch failed"));
 
     render(<EmotionsTab />);
 
@@ -86,8 +86,8 @@ describe("EmotionsTab", () => {
   });
 
   it("handles editing an emotion", async () => {
-    (adminApi.getAtlasEmotions as jest.Mock).mockResolvedValue(mockEmotions);
-    (adminApi.updateAtlasEmotion as jest.Mock).mockResolvedValue({
+    (adminApi.getEmotions as jest.Mock).mockResolvedValue(mockEmotions);
+    (adminApi.updateEmotion as jest.Mock).mockResolvedValue({
       ...mockEmotions[0],
       category: "Very Positive",
       definition: "Updated definition",
@@ -133,7 +133,7 @@ describe("EmotionsTab", () => {
     // (using lucide loader which is usually svg with animate-spin class)
 
     await waitFor(() => {
-      expect(adminApi.updateAtlasEmotion).toHaveBeenCalledWith(
+      expect(adminApi.updateEmotion).toHaveBeenCalledWith(
         "e1",
         expect.objectContaining({
           category: "Very Positive",
@@ -152,7 +152,7 @@ describe("EmotionsTab", () => {
   });
 
   it("handles cancel edit", async () => {
-    (adminApi.getAtlasEmotions as jest.Mock).mockResolvedValue(mockEmotions);
+    (adminApi.getEmotions as jest.Mock).mockResolvedValue(mockEmotions);
     render(<EmotionsTab />);
     await waitFor(() => expect(screen.getByText("Joy")).toBeInTheDocument());
 
@@ -171,8 +171,8 @@ describe("EmotionsTab", () => {
   });
 
   it("handles save error", async () => {
-    (adminApi.getAtlasEmotions as jest.Mock).mockResolvedValue(mockEmotions);
-    (adminApi.updateAtlasEmotion as jest.Mock).mockRejectedValue(new Error("Update failed"));
+    (adminApi.getEmotions as jest.Mock).mockResolvedValue(mockEmotions);
+    (adminApi.updateEmotion as jest.Mock).mockRejectedValue(new Error("Update failed"));
 
     render(<EmotionsTab />);
     await waitFor(() => expect(screen.getByText("Joy")).toBeInTheDocument());
@@ -188,7 +188,7 @@ describe("EmotionsTab", () => {
 
   it("handles export", async () => {
     jest.useFakeTimers();
-    (adminApi.getAtlasEmotions as jest.Mock).mockResolvedValue(mockEmotions);
+    (adminApi.getEmotions as jest.Mock).mockResolvedValue(mockEmotions);
     (adminApi.exportAtlasData as jest.Mock).mockResolvedValue({ emotions: mockEmotions });
 
     render(<EmotionsTab />);
@@ -214,7 +214,7 @@ describe("EmotionsTab", () => {
   });
 
   it("handles export error", async () => {
-    (adminApi.getAtlasEmotions as jest.Mock).mockResolvedValue(mockEmotions);
+    (adminApi.getEmotions as jest.Mock).mockResolvedValue(mockEmotions);
     (adminApi.exportAtlasData as jest.Mock).mockRejectedValue(new Error("Export failed"));
 
     render(<EmotionsTab />);
@@ -228,7 +228,7 @@ describe("EmotionsTab", () => {
   });
 
   it("triggers file input on import click", async () => {
-    (adminApi.getAtlasEmotions as jest.Mock).mockResolvedValue(mockEmotions);
+    (adminApi.getEmotions as jest.Mock).mockResolvedValue(mockEmotions);
     const { container } = render(<EmotionsTab />);
     await waitFor(() => expect(screen.getByText("Joy")).toBeInTheDocument());
 
@@ -242,7 +242,7 @@ describe("EmotionsTab", () => {
   });
 
   it("handles import success", async () => {
-    (adminApi.getAtlasEmotions as jest.Mock).mockResolvedValue(mockEmotions);
+    (adminApi.getEmotions as jest.Mock).mockResolvedValue(mockEmotions);
     (adminApi.importAtlasData as jest.Mock).mockResolvedValue({ updated: 5, errors: [] });
 
     const { container } = render(<EmotionsTab />);
@@ -276,7 +276,7 @@ describe("EmotionsTab", () => {
       id: "e_inc",
       vac_vector: [0.5, 0.5] as any, // Force 2 elements
     };
-    (adminApi.getAtlasEmotions as jest.Mock).mockResolvedValue([incompleteEmotion]);
+    (adminApi.getEmotions as jest.Mock).mockResolvedValue([incompleteEmotion]);
 
     render(<EmotionsTab />);
     await waitFor(() => expect(screen.getByText("Joy")).toBeInTheDocument());
@@ -295,7 +295,7 @@ describe("EmotionsTab", () => {
   });
 
   it("handles import partial errors", async () => {
-    (adminApi.getAtlasEmotions as jest.Mock).mockResolvedValue(mockEmotions);
+    (adminApi.getEmotions as jest.Mock).mockResolvedValue(mockEmotions);
     (adminApi.importAtlasData as jest.Mock).mockResolvedValue({
       updated: 2,
       errors: ["Err1", "Err2"],
@@ -319,7 +319,7 @@ describe("EmotionsTab", () => {
   });
 
   it("handles import exception", async () => {
-    (adminApi.getAtlasEmotions as jest.Mock).mockResolvedValue(mockEmotions);
+    (adminApi.getEmotions as jest.Mock).mockResolvedValue(mockEmotions);
     const error = new Error("Import crashed");
 
     (adminApi.importAtlasData as jest.Mock).mockRejectedValue(error);
@@ -346,7 +346,7 @@ describe("EmotionsTab", () => {
   });
 
   it("handles empty file selection", async () => {
-    (adminApi.getAtlasEmotions as jest.Mock).mockResolvedValue(mockEmotions);
+    (adminApi.getEmotions as jest.Mock).mockResolvedValue(mockEmotions);
     const { container } = render(<EmotionsTab />);
     await waitFor(() => expect(screen.getByText("Joy")).toBeInTheDocument());
 
@@ -360,7 +360,7 @@ describe("EmotionsTab", () => {
   });
 
   it("handles non-Error objects in fetch", async () => {
-    (adminApi.getAtlasEmotions as jest.Mock).mockRejectedValue("String Error");
+    (adminApi.getEmotions as jest.Mock).mockRejectedValue("String Error");
     render(<EmotionsTab />);
     await waitFor(() => {
       expect(screen.getByText("Failed to load atlas data")).toBeInTheDocument();
@@ -368,9 +368,9 @@ describe("EmotionsTab", () => {
   });
 
   it("handles non-Error objects in save", async () => {
-    (adminApi.getAtlasEmotions as jest.Mock).mockResolvedValue(mockEmotions);
+    (adminApi.getEmotions as jest.Mock).mockResolvedValue(mockEmotions);
     // Mock save to reject with non-Error
-    (adminApi.updateAtlasEmotion as jest.Mock).mockRejectedValue({ some: "obj" });
+    (adminApi.updateEmotion as jest.Mock).mockRejectedValue({ some: "obj" });
 
     render(<EmotionsTab />);
     await waitFor(() => expect(screen.getByText("Joy")).toBeInTheDocument());
@@ -385,7 +385,7 @@ describe("EmotionsTab", () => {
   });
 
   it("handles non-Error objects in export", async () => {
-    (adminApi.getAtlasEmotions as jest.Mock).mockResolvedValue(mockEmotions);
+    (adminApi.getEmotions as jest.Mock).mockResolvedValue(mockEmotions);
     (adminApi.exportAtlasData as jest.Mock).mockRejectedValue(123);
 
     render(<EmotionsTab />);
@@ -398,7 +398,7 @@ describe("EmotionsTab", () => {
   });
 
   it("handles non-Error objects in import", async () => {
-    (adminApi.getAtlasEmotions as jest.Mock).mockResolvedValue(mockEmotions);
+    (adminApi.getEmotions as jest.Mock).mockResolvedValue(mockEmotions);
     (adminApi.importAtlasData as jest.Mock).mockRejectedValue(null);
 
     const { container } = render(<EmotionsTab />);
@@ -418,7 +418,7 @@ describe("EmotionsTab", () => {
   });
 
   it("handles VAC changes with valid and invalid inputs", async () => {
-    (adminApi.getAtlasEmotions as jest.Mock).mockResolvedValue(mockEmotions);
+    (adminApi.getEmotions as jest.Mock).mockResolvedValue(mockEmotions);
     render(<EmotionsTab />);
     await waitFor(() => expect(screen.getByText("Joy")).toBeInTheDocument());
 
@@ -451,11 +451,11 @@ describe("EmotionsTab", () => {
     // Let's just assume if we save, it uses 0.5
 
     // Save and check call
-    (adminApi.updateAtlasEmotion as jest.Mock).mockResolvedValue(mockEmotions[0]);
+    (adminApi.updateEmotion as jest.Mock).mockResolvedValue(mockEmotions[0]);
     fireEvent.click(within(row).getByTitle("Save"));
 
     await waitFor(() => {
-      expect(adminApi.updateAtlasEmotion).toHaveBeenCalledWith(
+      expect(adminApi.updateEmotion).toHaveBeenCalledWith(
         "e1",
         expect.objectContaining({
           vac_vector: [0.5, 0.5, 0.2], // First value should stay 0.5, not become NaN
@@ -465,7 +465,7 @@ describe("EmotionsTab", () => {
   });
 
   it("handles definition change", async () => {
-    (adminApi.getAtlasEmotions as jest.Mock).mockResolvedValue(mockEmotions);
+    (adminApi.getEmotions as jest.Mock).mockResolvedValue(mockEmotions);
     render(<EmotionsTab />);
     await waitFor(() => expect(screen.getByText("Joy")).toBeInTheDocument());
 
@@ -485,7 +485,7 @@ describe("EmotionsTab", () => {
       id: "e3",
       vac_vector: undefined as unknown as number[],
     };
-    (adminApi.getAtlasEmotions as jest.Mock).mockResolvedValue([brokenEmotion]);
+    (adminApi.getEmotions as jest.Mock).mockResolvedValue([brokenEmotion]);
 
     render(<EmotionsTab />);
     await waitFor(() => expect(screen.getByText("Joy")).toBeInTheDocument());
@@ -508,7 +508,7 @@ describe("EmotionsTab", () => {
       haptic_pattern_id: undefined,
       // vac_vector checked separately
     };
-    (adminApi.getAtlasEmotions as jest.Mock).mockResolvedValue([emptyEmotion]);
+    (adminApi.getEmotions as jest.Mock).mockResolvedValue([emptyEmotion]);
 
     render(<EmotionsTab />);
     await waitFor(() => expect(screen.getByText("Joy")).toBeInTheDocument());
@@ -525,7 +525,7 @@ describe("EmotionsTab", () => {
   });
 
   it("handles null files in import", async () => {
-    (adminApi.getAtlasEmotions as jest.Mock).mockResolvedValue(mockEmotions);
+    (adminApi.getEmotions as jest.Mock).mockResolvedValue(mockEmotions);
     const { container } = render(<EmotionsTab />);
     await waitFor(() => expect(screen.getByText("Joy")).toBeInTheDocument());
 
@@ -538,7 +538,7 @@ describe("EmotionsTab", () => {
   });
 
   it("handles fetch success with invalid data format (non-array)", async () => {
-    (adminApi.getAtlasEmotions as jest.Mock).mockResolvedValue({ not: "an array" });
+    (adminApi.getEmotions as jest.Mock).mockResolvedValue({ not: "an array" });
     const { container } = render(<EmotionsTab />);
 
     await waitFor(() => {
@@ -548,7 +548,7 @@ describe("EmotionsTab", () => {
     });
   });
   it("handles unmount during import to cover finally block ref check", async () => {
-    (adminApi.getAtlasEmotions as jest.Mock).mockResolvedValue(mockEmotions);
+    (adminApi.getEmotions as jest.Mock).mockResolvedValue(mockEmotions);
     // Mock import to pending forever (or long enough) but we won't wait for it
     let resolveImport: (val: any) => void = () => {};
     (adminApi.importAtlasData as jest.Mock).mockImplementation(() => {

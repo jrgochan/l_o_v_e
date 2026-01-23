@@ -10,11 +10,11 @@
 import { useRef, useEffect, useState } from "react";
 import { useFrame } from "@react-three/fiber";
 import * as THREE from "three";
-import type { AtlasEmotion } from "@/types/atlas-admin";
+import type { Emotion } from "@/types/visualization";
 import type { ParticleConfig } from "@/utils/modeVisualConfigs";
 
 interface EmotionParticlesProps {
-  emotion: AtlasEmotion;
+  emotion: Emotion;
   color: THREE.Color;
   config: ParticleConfig;
   isSelected: boolean;

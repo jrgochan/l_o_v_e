@@ -10,8 +10,8 @@
 "use client";
 
 import { useState, useMemo, useEffect } from "react";
-import { useAtlasAdminStore } from "@/stores/useAtlasAdminStore";
-import type { PathWaypoint, EmotionPath } from "@/types/atlas-admin";
+import { useVisualizationStore } from "@/stores/useVisualizationStore";
+import type { PathWaypoint, EmotionPath } from "@/types/visualization";
 
 interface JourneyStep {
   type: "start" | "end" | "waypoint";
@@ -75,8 +75,8 @@ export function WaypointDetailModal({
   onNavigate,
 }: Omit<WaypointDetailModalProps, "waypoint"> & { waypoint?: PathWaypoint }) {
   const [activeTab, setActiveTab] = useState<TabType>("why");
-  const allEmotions = useAtlasAdminStore((state) => state.allEmotions);
-  const setFocusedEmotion = useAtlasAdminStore((state) => state.setFocusedEmotion);
+  const allEmotions = useVisualizationStore((state) => state.allEmotions);
+  const setFocusedEmotion = useVisualizationStore((state) => state.setFocusedEmotion);
 
   // Construct unified steps array [Start, ...Waypoints, End]
   const allSteps = useMemo(() => {

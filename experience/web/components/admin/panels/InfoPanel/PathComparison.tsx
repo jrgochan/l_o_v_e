@@ -13,7 +13,7 @@
 "use client";
 
 import { usePathComparison } from "@/hooks/admin/usePathComparison";
-import type { EmotionPath } from "@/types/atlas-admin";
+import type { EmotionPath } from "@/types/visualization";
 
 interface PathComparisonProps {
   paths: EmotionPath[];

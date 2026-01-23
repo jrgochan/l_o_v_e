@@ -1,6 +1,6 @@
 import { render, fireEvent } from "@testing-library/react";
 import { EmotionSearch } from "../../../../../components/admin/panels/ControlPanel/EmotionSearch";
-import { AtlasEmotion } from "@/types/atlas-admin";
+import { Emotion } from "@/types/visualization";
 
 const mockUseAdminTheme = jest.fn();
 jest.mock("@/hooks/admin/useAdminTheme", () => ({
@@ -8,7 +8,7 @@ jest.mock("@/hooks/admin/useAdminTheme", () => ({
 }));
 
 describe("EmotionSearch", () => {
-  const mockEmotions: AtlasEmotion[] = [
+  const mockEmotions: Emotion[] = [
     {
       id: "e1",
       name: "Joy",

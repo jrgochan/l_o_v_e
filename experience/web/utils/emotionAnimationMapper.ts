@@ -5,8 +5,8 @@
  * Each emotion expresses its unique character through motion.
  */
 
-import type { AtlasEmotion, PathAnimationMode } from "@/types/atlas-admin";
-import { BRIDGE_EMOTIONS } from "@/types/atlas-admin";
+import type { Emotion, PathAnimationMode } from "@/types/visualization";
+import { BRIDGE_EMOTIONS } from "@/types/visualization";
 
 export interface EmotionAnimationParams {
   // Breathing
@@ -32,7 +32,7 @@ export interface EmotionAnimationParams {
  * Calculate animation parameters for an emotion based on its VAC and category
  */
 export function getEmotionAnimationParams(
-  emotion: AtlasEmotion,
+  emotion: Emotion,
   mode: PathAnimationMode
 ): EmotionAnimationParams {
   const { vac, category, name } = emotion;
@@ -164,7 +164,7 @@ function mapRange(
 /**
  * Get descriptive name for emotion's animation character
  */
-export function getEmotionAnimationCharacter(emotion: AtlasEmotion): string {
+export function getEmotionAnimationCharacter(emotion: Emotion): string {
   const [valence, arousal, connection] = emotion.vac;
 
   // High arousal + negative

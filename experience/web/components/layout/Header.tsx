@@ -93,7 +93,7 @@ export function Header({ showAuth = true }: HeaderProps) {
 
       {user?.role === UserRole.ADMIN && (
         <Link
-          href="/admin/atlas"
+          href="/admin/visualization"
           className={`hidden md:flex items-center gap-2 px-4 h-10 border rounded-full backdrop-blur-sm transition-colors ${theme.colors.background} ${theme.colors.border} hover:bg-white/10`}
         >
           <span className="text-lg">⚡</span>

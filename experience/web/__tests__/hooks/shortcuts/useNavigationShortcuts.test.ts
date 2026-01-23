@@ -1,11 +1,11 @@
 import { renderHook, act, fireEvent } from "@testing-library/react";
 import { useNavigationShortcuts } from "../../../hooks/shortcuts/useNavigationShortcuts";
-import { useAtlasAdminStore } from "@/stores/useAtlasAdminStore";
+import { useVisualizationStore } from "@/stores/useVisualizationStore";
 
 // Mock store
 const mockSetSelectedPath = jest.fn();
-jest.mock("@/stores/useAtlasAdminStore", () => ({
-  useAtlasAdminStore: jest.fn(),
+jest.mock("@/stores/useVisualizationStore", () => ({
+  useVisualizationStore: jest.fn(),
 }));
 
 // Mock utils
@@ -21,7 +21,7 @@ describe("useNavigationShortcuts", () => {
     jest.clearAllMocks();
     mockShouldExecuteShortcut.mockReturnValue(true);
     // Setup store mock behavior
-    (useAtlasAdminStore as unknown as jest.Mock).mockImplementation((selector) => {
+    (useVisualizationStore as unknown as jest.Mock).mockImplementation((selector) => {
       const state = {
         computedPaths: new Map([
           [
@@ -90,7 +90,7 @@ describe("useNavigationShortcuts", () => {
       setSelectedPath: mockSetSelectedPath,
     };
 
-    (useAtlasAdminStore as unknown as jest.Mock).mockImplementation((selector) => {
+    (useVisualizationStore as unknown as jest.Mock).mockImplementation((selector) => {
       return selector(currentState);
     });
 
@@ -123,7 +123,7 @@ describe("useNavigationShortcuts", () => {
   });
 
   it("should not navigate if paths are empty", () => {
-    (useAtlasAdminStore as unknown as jest.Mock).mockImplementation((selector) => {
+    (useVisualizationStore as unknown as jest.Mock).mockImplementation((selector) => {
       return selector({
         computedPaths: new Map(),
         selectedPathId: null,
@@ -143,7 +143,7 @@ describe("useNavigationShortcuts", () => {
   });
 
   it("should not navigate if selection is insufficient", () => {
-    (useAtlasAdminStore as unknown as jest.Mock).mockImplementation((selector) => {
+    (useVisualizationStore as unknown as jest.Mock).mockImplementation((selector) => {
       return selector({
         computedPaths: new Map([["p1", { id: "p1", from: { id: "e1" }, to: { id: "e2" } }]]),
         selectedPathId: null,
@@ -163,7 +163,7 @@ describe("useNavigationShortcuts", () => {
   });
 
   it("should not jump if invalid number key", () => {
-    (useAtlasAdminStore as unknown as jest.Mock).mockImplementation((selector) => {
+    (useVisualizationStore as unknown as jest.Mock).mockImplementation((selector) => {
       return selector({
         computedPaths: new Map([["p1", { id: "p1", from: { id: "e1" }, to: { id: "e2" } }]]),
         selectedPathId: null,
@@ -184,7 +184,7 @@ describe("useNavigationShortcuts", () => {
   });
 
   it("should navigate via ArrowUp (Previous)", () => {
-    (useAtlasAdminStore as unknown as jest.Mock).mockImplementation((selector) => {
+    (useVisualizationStore as unknown as jest.Mock).mockImplementation((selector) => {
       return selector({
         computedPaths: new Map([
           ["p1", { id: "p1", from: { id: "e1" }, to: { id: "e2" } }],
@@ -212,7 +212,7 @@ describe("useNavigationShortcuts", () => {
     mockShouldExecuteShortcut.mockReturnValue(false);
 
     // Setup valid state so it WOULD navigate if not guarded
-    (useAtlasAdminStore as unknown as jest.Mock).mockImplementation((selector) => {
+    (useVisualizationStore as unknown as jest.Mock).mockImplementation((selector) => {
       return selector({
         computedPaths: new Map([["p1", { id: "p1", from: { id: "e1" }, to: { id: "e2" } }]]),
         selectedPathId: null,
@@ -243,7 +243,7 @@ describe("useNavigationShortcuts", () => {
       setSelectedPath: mockSetSelectedPath,
     };
 
-    (useAtlasAdminStore as unknown as jest.Mock).mockImplementation((selector) => {
+    (useVisualizationStore as unknown as jest.Mock).mockImplementation((selector) => {
       return selector(currentState);
     });
 
@@ -307,7 +307,7 @@ describe("useNavigationShortcuts", () => {
   });
 
   it("should not navigate if paths exist but filtering returns empty (empty computedPaths after filter)", () => {
-    (useAtlasAdminStore as unknown as jest.Mock).mockImplementation((selector) => {
+    (useVisualizationStore as unknown as jest.Mock).mockImplementation((selector) => {
       return selector({
         // Paths exist but emotions don't match ends
         computedPaths: new Map([["p1", { id: "p1", from: { id: "e1" }, to: { id: "e2" } }]]),
@@ -328,7 +328,7 @@ describe("useNavigationShortcuts", () => {
   });
 
   it("should not jump if path index out of bounds (but positive)", () => {
-    (useAtlasAdminStore as unknown as jest.Mock).mockImplementation((selector) => {
+    (useVisualizationStore as unknown as jest.Mock).mockImplementation((selector) => {
       return selector({
         computedPaths: new Map([["p1", { id: "p1", from: { id: "e1" }, to: { id: "e2" } }]]),
         selectedPathId: null,

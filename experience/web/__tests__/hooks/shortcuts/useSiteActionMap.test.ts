@@ -1,7 +1,7 @@
 import { renderHook, act } from "@testing-library/react";
 import { useSiteActionMap } from "@/hooks/shortcuts/useSiteActionMap";
 import { useRouter } from "next/navigation";
-import { useAtlasAdminStore } from "@/stores/useAtlasAdminStore";
+import { useVisualizationStore } from "@/stores/useVisualizationStore";
 import { useExperienceStore } from "@/stores/useExperienceStore";
 import { logger } from "@/utils/logger";
 import { useShortcutGuards } from "@/hooks/shortcuts/useShortcutUtils";
@@ -10,7 +10,7 @@ jest.mock("next/navigation", () => ({
   useRouter: jest.fn(),
 }));
 
-jest.mock("@/stores/useAtlasAdminStore");
+jest.mock("@/stores/useVisualizationStore");
 jest.mock("@/stores/useExperienceStore");
 jest.mock("@/utils/logger");
 
@@ -39,7 +39,7 @@ describe("useSiteActionMap", () => {
   beforeEach(() => {
     jest.clearAllMocks();
     (useRouter as jest.Mock).mockReturnValue(mockRouter);
-    (useAtlasAdminStore as unknown as jest.Mock).mockImplementation((selector) =>
+    (useVisualizationStore as unknown as jest.Mock).mockImplementation((selector) =>
       selector(mockStore)
     );
     (useExperienceStore as unknown as jest.Mock).mockImplementation((selector) =>

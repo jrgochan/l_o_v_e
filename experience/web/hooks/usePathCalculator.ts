@@ -6,7 +6,7 @@
  */
 
 import { useEffect, useCallback } from "react";
-import { useAtlasAdminStore } from "@/stores/useAtlasAdminStore";
+import { useVisualizationStore } from "@/stores/useVisualizationStore";
 import { useSinglePath } from "./pathfinding/useSinglePath";
 import { useBatchPaths } from "./pathfinding/useBatchPaths";
 
@@ -18,7 +18,7 @@ export function usePathCalculator() {
     allEmotions,
     settings,
     clearComputedPaths,
-  } = useAtlasAdminStore();
+  } = useVisualizationStore();
 
   // 1. Single Path Logic
   const { computePath } = useSinglePath();

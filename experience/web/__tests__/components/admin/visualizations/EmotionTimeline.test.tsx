@@ -4,10 +4,10 @@ import { EmotionHistoryEntry } from "@/stores/useEmotionHistoryStore";
 import { useAdminTheme } from "@/hooks/admin/useAdminTheme";
 
 jest.mock("@/hooks/admin/useAdminTheme");
-jest.mock("@/stores/useAtlasAdminStore", () => ({
-  useAtlasAdminStore: jest.fn(),
+jest.mock("@/stores/useVisualizationStore", () => ({
+  useVisualizationStore: jest.fn(),
 }));
-import { useAtlasAdminStore } from "@/stores/useAtlasAdminStore";
+import { useVisualizationStore } from "@/stores/useVisualizationStore";
 
 const mockEntries: EmotionHistoryEntry[] = [
   {
@@ -42,7 +42,7 @@ describe("EmotionTimeline", () => {
       },
     });
 
-    (useAtlasAdminStore as unknown as jest.Mock).mockImplementation((selector) => {
+    (useVisualizationStore as unknown as jest.Mock).mockImplementation((selector) => {
       const state = {
         allEmotions: [
           { name: "Joy", category: "Happy", vac: [0.8, 0.5, 0.6] },

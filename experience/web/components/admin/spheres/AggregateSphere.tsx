@@ -15,7 +15,7 @@ import { useEffect, useRef } from "react";
 import * as THREE from "three";
 import { blendColors, getColorFromValence } from "./BaseSphere";
 import type { DetectedEmotion, AggregateState } from "@/types/chat";
-import type { PathAnimationMode } from "@/types/atlas-admin";
+import type { PathAnimationMode } from "@/types/visualization";
 
 interface AggregateSphereProps {
   emotions: DetectedEmotion[];

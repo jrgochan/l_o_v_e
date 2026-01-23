@@ -26,7 +26,7 @@ function AdminLayoutContent({ children }: { children: React.ReactNode }) {
   const navItems = [
     { label: "Users", href: "/admin/users", icon: "👥" },
     { label: "Sessions", href: "/admin/sessions", icon: "💬" },
-    { label: "Atlas Visualization", href: "/admin/atlas", icon: "🌌" },
+    { label: "Atlas Visualization", href: "/admin/visualization", icon: "🌌" },
     { label: "Data Management", href: "/admin/data", icon: "💾" },
   ];
 

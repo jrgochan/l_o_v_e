@@ -1,9 +1,9 @@
 import { renderHook } from "@testing-library/react";
 import { usePathSync } from "@/hooks/sync/usePathSync";
-import { useAtlasAdminStore } from "@/stores/useAtlasAdminStore";
+import { useVisualizationStore } from "@/stores/useVisualizationStore";
 import { useExperienceStore } from "@/stores/useExperienceStore";
 
-jest.mock("@/stores/useAtlasAdminStore");
+jest.mock("@/stores/useVisualizationStore");
 jest.mock("@/stores/useExperienceStore");
 
 describe("usePathSync", () => {
@@ -46,7 +46,7 @@ describe("usePathSync", () => {
 
   it("should sync selected path to experience store", () => {
     // Mock Atlas Store with selected path
-    (useAtlasAdminStore as unknown as jest.Mock).mockImplementation((selector) => {
+    (useVisualizationStore as unknown as jest.Mock).mockImplementation((selector) => {
       const state = {
         selectedPathId: "e1-e2",
         computedPaths: { get: (id: string) => (id === "e1-e2" ? mockPath : undefined) },
@@ -71,7 +71,7 @@ describe("usePathSync", () => {
   });
 
   it("should clear path if no selection", () => {
-    (useAtlasAdminStore as unknown as jest.Mock).mockImplementation((selector) => {
+    (useVisualizationStore as unknown as jest.Mock).mockImplementation((selector) => {
       const state = {
         selectedPathId: null, // No selection
         computedPaths: { get: jest.fn() },
@@ -87,7 +87,7 @@ describe("usePathSync", () => {
   });
 
   it("should clear path if selection invalid", () => {
-    (useAtlasAdminStore as unknown as jest.Mock).mockImplementation((selector) => {
+    (useVisualizationStore as unknown as jest.Mock).mockImplementation((selector) => {
       const state = {
         selectedPathId: "invalid",
         computedPaths: { get: () => undefined },
@@ -110,7 +110,7 @@ describe("usePathSync", () => {
       ],
     };
 
-    (useAtlasAdminStore as unknown as jest.Mock).mockImplementation((selector) => {
+    (useVisualizationStore as unknown as jest.Mock).mockImplementation((selector) => {
       return selector({
         selectedPathId: "e1-e2",
         computedPaths: { get: () => multiPointPath },
@@ -136,7 +136,7 @@ describe("usePathSync", () => {
       waypoints: [{ emotion: "Mystery", vac: [0, 0, 0], reasoning: "Unknown" }],
     };
 
-    (useAtlasAdminStore as unknown as jest.Mock).mockImplementation((selector) => {
+    (useVisualizationStore as unknown as jest.Mock).mockImplementation((selector) => {
       return selector({
         selectedPathId: "e1-e2",
         computedPaths: { get: () => unknownPath },

@@ -1,10 +1,10 @@
 import { render, screen } from "@testing-library/react";
 import { AggregateVACDisplay } from "@/components/admin/state-display/AggregateVACDisplay";
-import { useAtlasAdminStore } from "@/stores/useAtlasAdminStore";
+import { useVisualizationStore } from "@/stores/useVisualizationStore";
 import { useExperienceStore } from "@/stores/useExperienceStore";
 
 // Mock Stores
-jest.mock("@/stores/useAtlasAdminStore");
+jest.mock("@/stores/useVisualizationStore");
 jest.mock("@/stores/useExperienceStore");
 
 describe("AggregateVACDisplay", () => {
@@ -15,7 +15,7 @@ describe("AggregateVACDisplay", () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
-    (useAtlasAdminStore as unknown as jest.Mock).mockImplementation((selector) =>
+    (useVisualizationStore as unknown as jest.Mock).mockImplementation((selector) =>
       selector({
         allEmotions: mockAllEmotions,
         selectedEmotionIds: new Set(),
@@ -35,7 +35,7 @@ describe("AggregateVACDisplay", () => {
   });
 
   it("renders single emotion state", () => {
-    (useAtlasAdminStore as unknown as jest.Mock).mockImplementation((selector) =>
+    (useVisualizationStore as unknown as jest.Mock).mockImplementation((selector) =>
       selector({
         allEmotions: mockAllEmotions,
         selectedEmotionIds: new Set(["1"]),
@@ -57,7 +57,7 @@ describe("AggregateVACDisplay", () => {
   });
 
   it("renders aggregate state for multiple emotions", () => {
-    (useAtlasAdminStore as unknown as jest.Mock).mockImplementation((selector) =>
+    (useVisualizationStore as unknown as jest.Mock).mockImplementation((selector) =>
       selector({
         allEmotions: mockAllEmotions,
         selectedEmotionIds: new Set(["1", "2"]),
@@ -77,7 +77,7 @@ describe("AggregateVACDisplay", () => {
   });
 
   it("displays correct descriptions based on values", () => {
-    (useAtlasAdminStore as unknown as jest.Mock).mockImplementation((selector) =>
+    (useVisualizationStore as unknown as jest.Mock).mockImplementation((selector) =>
       selector({
         allEmotions: mockAllEmotions,
         selectedEmotionIds: new Set(["1"]),

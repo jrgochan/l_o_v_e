@@ -15,12 +15,12 @@
 
 import { CharacterSphere } from "@/components/admin/spheres/CharacterSphere";
 import { PreviewSphere } from "@/components/admin/spheres/PreviewSphere";
-import { BRIDGE_EMOTIONS } from "@/types/atlas-admin";
+import { BRIDGE_EMOTIONS } from "@/types/visualization";
 import { resolveEmotionColor } from "@/utils/emotion-colors";
-import type { AtlasEmotion, PathAnimationMode } from "@/types/atlas-admin";
+import type { Emotion, PathAnimationMode } from "@/types/visualization";
 
 interface EmotionDetailsProps {
-  emotion: AtlasEmotion;
+  emotion: Emotion;
   isHovered?: boolean;
   animationMode: PathAnimationMode;
 }

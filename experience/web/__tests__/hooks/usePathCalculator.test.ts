@@ -1,10 +1,10 @@
 import { renderHook, act } from "@testing-library/react";
 import { usePathCalculator } from "@/hooks/usePathCalculator";
-import { useAtlasAdminStore } from "@/stores/useAtlasAdminStore";
+import { useVisualizationStore } from "@/stores/useVisualizationStore";
 import { useSinglePath } from "@/hooks/pathfinding/useSinglePath";
 import { useBatchPaths } from "@/hooks/pathfinding/useBatchPaths";
 
-jest.mock("@/stores/useAtlasAdminStore");
+jest.mock("@/stores/useVisualizationStore");
 jest.mock("@/hooks/pathfinding/useSinglePath");
 jest.mock("@/hooks/pathfinding/useBatchPaths");
 
@@ -19,7 +19,7 @@ describe("usePathCalculator", () => {
     (useSinglePath as jest.Mock).mockReturnValue({ computePath: mockComputePath });
     (useBatchPaths as jest.Mock).mockReturnValue({ computeAllPaths: mockComputeAllPaths });
 
-    (useAtlasAdminStore as unknown as jest.Mock).mockImplementation((selector) => {
+    (useVisualizationStore as unknown as jest.Mock).mockImplementation((selector) => {
       const state = {
         selectedEmotionIds: new Set(),
         computedPaths: new Map(),
@@ -33,7 +33,7 @@ describe("usePathCalculator", () => {
   });
 
   it("should auto-compute paths when 2+ emotions selected", () => {
-    (useAtlasAdminStore as unknown as jest.Mock).mockImplementation((selector) => {
+    (useVisualizationStore as unknown as jest.Mock).mockImplementation((selector) => {
       const state = {
         selectedEmotionIds: new Set(["e1", "e2"]),
         computedPaths: new Map(),
@@ -50,7 +50,7 @@ describe("usePathCalculator", () => {
   });
 
   it("should clear paths when selection drops below 2", () => {
-    (useAtlasAdminStore as unknown as jest.Mock).mockImplementation((selector) => {
+    (useVisualizationStore as unknown as jest.Mock).mockImplementation((selector) => {
       const state = {
         selectedEmotionIds: new Set(["e1"]), // Only 1
         computedPaths: new Map([["p1", {} as any]]), // Has existing
@@ -67,7 +67,7 @@ describe("usePathCalculator", () => {
   });
 
   it("should skip auto-compute in manual mode", () => {
-    (useAtlasAdminStore as unknown as jest.Mock).mockImplementation((selector) => {
+    (useVisualizationStore as unknown as jest.Mock).mockImplementation((selector) => {
       const state = {
         selectedEmotionIds: new Set(["e1", "e2"]),
         computedPaths: new Map(),

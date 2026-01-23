@@ -5,14 +5,14 @@
  * as controlled from the admin/atlas page. This is the "Zen Experience" -
  * a beautiful, uncluttered emotional visualization with no controls.
  *
- * This page listens to BroadcastChannel messages from /admin/atlas
+ * This page listens to BroadcastChannel messages from /admin/visualization
  * and updates the sphere accordingly, creating a clean viewer experience
  * perfect for therapeutic sessions, presentations, or pure contemplation.
  */
 
 "use client";
 
-import type { AtlasEmotion } from "@/types";
+import type { Emotion } from "@/types";
 import { useRef, useState, useEffect, useCallback } from "react";
 import dynamic from "next/dynamic";
 import { useExperienceStore } from "@/stores/useExperienceStore";
@@ -28,7 +28,7 @@ import { Header } from "@/components/layout/Header";
 import { useSettingsStore } from "@/stores/useSettingsStore";
 import { useSphereSync } from "@/hooks/useSphereSync";
 import { useEmotionAtlas } from "@/hooks/useEmotionAtlas";
-import { useAtlasAdminStore } from "@/stores/useAtlasAdminStore";
+import { useVisualizationStore } from "@/stores/useVisualizationStore";
 import { useAmbientAudio } from "@/hooks/useAmbientAudio";
 import { PathDetailsOverlay } from "@/components/PathDetailsOverlay";
 import { SphereDebugOverlay } from "@/components/admin/debug/SphereDebugOverlay";
@@ -54,8 +54,8 @@ export default function ZenExperience() {
   useEmotionAtlas();
 
   // Sync store for emotion lookups
-  const emotions = useAtlasAdminStore((state) => state.allEmotions);
-  const selectMultiple = useAtlasAdminStore((state) => state.selectMultiple);
+  const emotions = useVisualizationStore((state) => state.allEmotions);
+  const selectMultiple = useVisualizationStore((state) => state.selectMultiple);
 
   // Audio Engine
   const { initAudio, isMuted, toggleMute } = useAmbientAudio();
@@ -65,7 +65,7 @@ export default function ZenExperience() {
   const settings = useSettingsStore();
 
   const [isWaiting, setIsWaiting] = useState(false);
-  const [activeEmotions, setActiveEmotions] = useState<AtlasEmotion[]>([]);
+  const [activeEmotions, setActiveEmotions] = useState<Emotion[]>([]);
 
   const targetVAC = useExperienceStore((state) => state.targetVAC);
   const lastSyncRef = useRef(0);
@@ -88,8 +88,8 @@ export default function ZenExperience() {
       if (message.selectedEmotionIds && emotions.length > 0) {
         // Find full emotion objects
         const resolvedEmotions = message.selectedEmotionIds
-          .map((id: string) => emotions.find((e: AtlasEmotion) => e.id === id))
-          .filter((e: AtlasEmotion | undefined): e is AtlasEmotion => !!e);
+          .map((id: string) => emotions.find((e: Emotion) => e.id === id))
+          .filter((e: Emotion | undefined): e is Emotion => !!e);
 
         // Update local Admin store selection so components like EmotionCloud know what's selected
         selectMultiple(message.selectedEmotionIds);

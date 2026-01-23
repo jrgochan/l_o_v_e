@@ -1,6 +1,6 @@
 import { renderHook } from "@testing-library/react";
 import { usePathComparison } from "@/hooks/admin/usePathComparison";
-import type { EmotionPath } from "@/types/atlas-admin";
+import type { EmotionPath } from "@/types/visualization";
 
 describe("usePathComparison", () => {
   const mockPaths: EmotionPath[] = [

@@ -1,15 +1,15 @@
 import { useEffect, useCallback } from "react";
-import { useAtlasAdminStore } from "@/stores/useAtlasAdminStore";
+import { useVisualizationStore } from "@/stores/useVisualizationStore";
 import { logger } from "@/utils/logger";
 import { useShortcutGuards } from "./useShortcutUtils";
 
 export function useNavigationShortcuts() {
   const { shouldExecuteShortcut } = useShortcutGuards();
 
-  const computedPaths = useAtlasAdminStore((state) => state.computedPaths);
-  const selectedPathId = useAtlasAdminStore((state) => state.selectedPathId);
-  const setSelectedPath = useAtlasAdminStore((state) => state.setSelectedPath);
-  const selectedEmotionIds = useAtlasAdminStore((state) => state.selectedEmotionIds);
+  const computedPaths = useVisualizationStore((state) => state.computedPaths);
+  const selectedPathId = useVisualizationStore((state) => state.selectedPathId);
+  const setSelectedPath = useVisualizationStore((state) => state.setSelectedPath);
+  const selectedEmotionIds = useVisualizationStore((state) => state.selectedEmotionIds);
 
   const handleArrowNav = useCallback(
     (key: string, e: KeyboardEvent) => {

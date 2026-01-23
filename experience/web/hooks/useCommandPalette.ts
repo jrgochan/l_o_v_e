@@ -13,7 +13,7 @@ import { useCommandPaletteData } from "./command-palette/useCommandPaletteData";
 import { useCommandPaletteActions } from "./command-palette/useCommandPaletteActions";
 import { useCommandPaletteNavigation } from "./command-palette/useCommandPaletteNavigation";
 import { useCommandPaletteFilter } from "./command-palette/useCommandPaletteFilter";
-import { useAtlasAdminStore } from "@/stores/useAtlasAdminStore";
+import { useVisualizationStore } from "@/stores/useVisualizationStore";
 
 export function useCommandPalette() {
   // 1. State Management
@@ -30,7 +30,7 @@ export function useCommandPalette() {
     setSearch,
   } = useCommandPaletteState();
 
-  const selectedEmotionIds = useAtlasAdminStore((state) => state.selectedEmotionIds);
+  const selectedEmotionIds = useVisualizationStore((state) => state.selectedEmotionIds);
 
   // 2. Data & Persistence
   const { recentEmotions, favoriteEmotions, addToRecent, toggleFavorite, isRecent, isFavorite } =

@@ -1,6 +1,6 @@
 import { render, screen } from "@testing-library/react";
 import { EmotionDetails } from "@/components/admin/panels/InfoPanel/EmotionDetails";
-import { AtlasEmotion } from "@/types/atlas-admin";
+import { Emotion } from "@/types/visualization";
 import React from "react";
 import { Canvas } from "@react-three/fiber";
 
@@ -46,7 +46,7 @@ jest.mock("@/components/admin/spheres/PreviewSphere", () => ({
 }));
 
 describe("EmotionDetails", () => {
-  const mockEmotion: AtlasEmotion = {
+  const mockEmotion: Emotion = {
     id: "test-id",
     name: "Test Emotion",
     category: "Test Category",

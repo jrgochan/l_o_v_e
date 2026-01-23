@@ -52,7 +52,7 @@ export interface AdminSessionListResponse {
   limit: number;
 }
 
-export interface AtlasEmotion {
+export interface Emotion {
   id: string;
   emotion_name: string;
   category: string;
@@ -65,7 +65,7 @@ export interface AtlasEmotion {
   updated_at: string;
 }
 
-export interface AtlasEmotionUpdate {
+export interface EmotionUpdate {
   category?: string;
   definition?: string;
   vac_vector?: [number, number, number];

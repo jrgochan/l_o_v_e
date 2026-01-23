@@ -1,9 +1,9 @@
 import { renderHook } from "@testing-library/react";
 import { useViewActions } from "@/hooks/navigation/actions/useViewActions";
-import { useAtlasAdminStore } from "@/stores/useAtlasAdminStore";
+import { useVisualizationStore } from "@/stores/useVisualizationStore";
 import { logger } from "@/utils/logger";
 
-jest.mock("@/stores/useAtlasAdminStore");
+jest.mock("@/stores/useVisualizationStore");
 jest.mock("@/utils/logger");
 
 describe("useViewActions", () => {
@@ -15,7 +15,7 @@ describe("useViewActions", () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
-    (useAtlasAdminStore as unknown as jest.Mock).mockImplementation((selector) => {
+    (useVisualizationStore as unknown as jest.Mock).mockImplementation((selector) => {
       return selector({
         selectEmotion: mockSelectEmotion,
         setFocusedEmotion: mockSetFocusedEmotion,

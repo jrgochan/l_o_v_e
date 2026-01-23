@@ -1,6 +1,6 @@
 import { render, screen } from "@testing-library/react";
 import { EmotionList } from "@/components/admin/panels/InfoPanel/EmotionList";
-import { CATEGORY_COLORS } from "@/types/atlas-admin";
+import { CATEGORY_COLORS } from "@/types/visualization";
 
 // Mock CharacterSphere since it uses Three.js
 jest.mock("@/components/admin/spheres/CharacterSphere", () => ({

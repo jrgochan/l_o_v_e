@@ -1,8 +1,8 @@
 import { render, screen, fireEvent } from "@testing-library/react";
 import { PathDetails } from "@/components/admin/panels/InfoPanel/PathDetails";
-import { useAtlasAdminStore } from "@/stores/useAtlasAdminStore";
+import { useVisualizationStore } from "@/stores/useVisualizationStore";
 
-jest.mock("@/stores/useAtlasAdminStore");
+jest.mock("@/stores/useVisualizationStore");
 
 describe("PathDetails", () => {
   const mockSetHoveredEmotion = jest.fn();
@@ -40,15 +40,15 @@ describe("PathDetails", () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
-    (useAtlasAdminStore as unknown as jest.Mock).mockReturnValue(mockAllEmotions); // Default selector returns allEmotions in component
-    (useAtlasAdminStore as any).getState = mockGetState;
+    (useVisualizationStore as unknown as jest.Mock).mockReturnValue(mockAllEmotions); // Default selector returns allEmotions in component
+    (useVisualizationStore as any).getState = mockGetState;
   });
 
-  // Override mock implementation for useSelector vs useAtlasAdminStore(state => state.X)
-  // The component does: const setHovered = useAtlasAdminStore(state => state.setHoveredEquation)
+  // Override mock implementation for useSelector vs useVisualizationStore(state => state.X)
+  // The component does: const setHovered = useVisualizationStore(state => state.setHoveredEquation)
   // Detailed mock setup:
   beforeEach(() => {
-    (useAtlasAdminStore as unknown as jest.Mock).mockImplementation((selector) => {
+    (useVisualizationStore as unknown as jest.Mock).mockImplementation((selector) => {
       const state = {
         setHoveredEmotion: mockSetHoveredEmotion,
         allEmotions: mockAllEmotions,

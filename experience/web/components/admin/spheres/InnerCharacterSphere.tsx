@@ -3,7 +3,7 @@
 import { useRef, useMemo } from "react";
 import { useFrame } from "@react-three/fiber";
 import * as THREE from "three";
-import type { AtlasEmotion, PathAnimationMode } from "@/types/atlas-admin";
+import type { Emotion, PathAnimationMode } from "@/types/visualization";
 import { resolveEmotionColor } from "@/utils/emotion-colors";
 import { getEmotionAnimationParams } from "@/utils/emotionAnimationMapper";
 
@@ -17,7 +17,7 @@ export function InnerCharacterSphere({
   emotion,
   mode,
 }: {
-  emotion: AtlasEmotion;
+  emotion: Emotion;
   mode: PathAnimationMode;
 }) {
   const meshRef = useRef<THREE.Mesh>(null);

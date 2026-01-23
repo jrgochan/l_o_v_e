@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { atlasService } from "@/services/atlasService";
 import { EmotionCollection } from "@/types";
-import { useAtlasAdminStore } from "@/stores/useAtlasAdminStore";
+import { useVisualizationStore } from "@/stores/useVisualizationStore";
 import { reloadPage } from "@/utils/browser";
 
 export function CollectionSwitcher() {
@@ -12,7 +12,7 @@ export function CollectionSwitcher() {
 
     // Use local state for collections to avoid store complexity if not needed globally yet
     // or use store SET action
-    const { collections, setCollections, activeCollectionId, setActiveCollection } = useAtlasAdminStore();
+    const { collections, setCollections, activeCollectionId, setActiveCollection } = useVisualizationStore();
 
     useEffect(() => {
         loadCollections();

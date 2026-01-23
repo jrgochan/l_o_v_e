@@ -1,6 +1,6 @@
 import { render, screen } from "@testing-library/react";
 import { MatrixTooltip } from "@/components/admin/visualizations/PathMatrix/MatrixTooltip";
-import { DIFFICULTY_COLORS, EmotionPath } from "@/types/atlas-admin";
+import { DIFFICULTY_COLORS, EmotionPath } from "@/types/visualization";
 
 describe("MatrixTooltip", () => {
   const mockFromEmotion = {

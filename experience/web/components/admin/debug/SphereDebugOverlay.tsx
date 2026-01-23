@@ -2,7 +2,7 @@
 
 import { useExperienceStore } from "@/stores/useExperienceStore";
 import { useState, useEffect, useCallback } from "react";
-import type { AtlasEmotion } from "@/types";
+import type { Emotion } from "@/types";
 
 interface SyncMessage {
   timestamp: number;
@@ -15,7 +15,7 @@ interface SphereDebugOverlayProps {
   isConnected: boolean;
   isWaiting: boolean;
   targetVAC: number[] | null;
-  activeEmotions: AtlasEmotion[];
+  activeEmotions: Emotion[];
   debugLog: SyncMessage[];
 }
 

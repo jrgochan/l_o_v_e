@@ -1,7 +1,7 @@
 /**
  * Admin Soul Sphere Synchronization Hook
  *
- * Bridges useAtlasAdminStore (admin selections) with useExperienceStore (soul sphere state).
+ * Bridges useVisualizationStore (admin selections) with useExperienceStore (soul sphere state).
  * Calculates aggregate VAC from selected emotions and updates the sphere accordingly.
  * Refactored to compose specialized sync hooks.
  */

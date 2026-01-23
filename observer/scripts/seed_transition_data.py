@@ -8,8 +8,8 @@ Loads from canonical JSON data files and populates:
 4. Pattern-strategy mappings
 
 Data sources:
-- data/atlas/categories.json
-- data/atlas/category_transitions.json
+- data/brene_brown/categories.json
+- data/brene_brown/category_transitions.json
 - data/strategies/base/core_strategies.json
 - data/patterns/base/core_patterns.json
 - data/mappings/pattern_strategy_mappings.json
@@ -60,8 +60,8 @@ async def seed_category_transitions(force_reseed: bool = False):
     print("Seeding category transitions...")
     
     # Load data
-    categories_data = load_json_data("data/atlas/categories.json")
-    transitions_data = load_json_data("data/atlas/category_transitions.json")
+    categories_data = load_json_data("data/brene_brown/categories.json")
+    transitions_data = load_json_data("data/brene_brown/category_transitions.json")
     
     categories = [c["name"] for c in categories_data["categories"]]
     difficulty_matrix = transitions_data["difficulty_matrix"]
@@ -288,8 +288,8 @@ async def main(force_reseed: bool = False):
     # Validate all JSON files before seeding
     print("\nValidating JSON data files...")
     try:
-        load_json_data("data/atlas/categories.json")
-        load_json_data("data/atlas/category_transitions.json")
+        load_json_data("data/brene_brown/categories.json")
+        load_json_data("data/brene_brown/category_transitions.json")
         load_json_data("data/strategies/base/core_strategies.json")
         load_json_data("data/patterns/base/core_patterns.json")
         load_json_data("data/mappings/pattern_strategy_mappings.json")

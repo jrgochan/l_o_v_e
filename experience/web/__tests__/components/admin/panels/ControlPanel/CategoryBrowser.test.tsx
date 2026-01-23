@@ -1,6 +1,6 @@
 import { render, fireEvent } from "@testing-library/react";
 import { CategoryBrowser } from "../../../../../components/admin/panels/ControlPanel/CategoryBrowser";
-import { AtlasEmotion, CategoryFilter } from "@/types/atlas-admin";
+import { Emotion, CategoryFilter } from "@/types/visualization";
 
 // Use a mock setup for theme
 const mockUseAdminTheme = jest.fn();
@@ -13,7 +13,7 @@ describe("CategoryBrowser", () => {
     ["Cat1", { name: "Cat1", enabled: true, color: "#FF0000", emotionCount: 2 }],
   ]);
 
-  const mockEmotions = new Map<string, AtlasEmotion[]>([
+  const mockEmotions = new Map<string, Emotion[]>([
     [
       "Cat1",
       [

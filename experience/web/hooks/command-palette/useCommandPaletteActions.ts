@@ -5,7 +5,7 @@
  * Composes specialized action hooks to reduce complexity.
  */
 
-import { useAtlasAdminStore } from "@/stores/useAtlasAdminStore";
+import { useVisualizationStore } from "@/stores/useVisualizationStore";
 import type { CommandPage } from "@/types/command-palette";
 import { useEmotionActions } from "./actions/useEmotionActions";
 import { useJourneyActions } from "./actions/useJourneyActions";
@@ -26,7 +26,7 @@ export function useCommandPaletteActions({
   setCurrentPage,
   setSearch,
 }: ActionDependencies) {
-  const selectMultiple = useAtlasAdminStore((state) => state.selectMultiple);
+  const selectMultiple = useVisualizationStore((state) => state.selectMultiple);
 
   // 1. Emotion Actions (Select, Toggle, Add, etc)
   const { executeAction } = useEmotionActions({ addToRecent, close });

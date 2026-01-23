@@ -4,7 +4,7 @@
  * Types for the CMD+L keyboard-driven emotion navigation system.
  */
 
-import type { AtlasEmotion } from "./atlas-admin";
+import type { Emotion } from "./visualization";
 
 /**
  * Keyboard modifier keys
@@ -75,7 +75,7 @@ export interface CommandItem {
  */
 export interface EmotionCommandItem extends CommandItem {
   type: "emotion";
-  emotion: AtlasEmotion;
+  emotion: Emotion;
   category: string;
 }
 
@@ -86,7 +86,7 @@ export interface CategoryCommandItem extends CommandItem {
   type: "category";
   categoryName: string;
   emotionCount: number;
-  emotions: AtlasEmotion[];
+  emotions: Emotion[];
 }
 
 /**

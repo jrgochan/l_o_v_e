@@ -42,7 +42,7 @@ async def test_health_check_degraded(mock_db):
     response = await health.health_check(db=mock_db)
     
     assert response.status == "degraded"
-    assert response.atlas_emotions_count == 60
+    assert response.emotion_count == 60
 
 @pytest.mark.asyncio
 async def test_health_check_initializing(mock_db):

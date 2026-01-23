@@ -10,7 +10,7 @@
 import { useRef, useEffect, useMemo } from "react";
 import { useFrame, ThreeEvent } from "@react-three/fiber";
 import * as THREE from "three";
-import type { AtlasEmotion, PathAnimationMode } from "@/types/atlas-admin";
+import type { Emotion, PathAnimationMode } from "@/types/visualization";
 import { getEmotionAnimationParams } from "@/utils/emotionAnimationMapper";
 import {
   getModeConfig,
@@ -19,7 +19,7 @@ import {
 } from "@/utils/modeVisualConfigs";
 
 interface AnimatedEmotionNodeProps {
-  emotion: AtlasEmotion;
+  emotion: Emotion;
   color: THREE.Color;
   size: number;
   mode: PathAnimationMode;

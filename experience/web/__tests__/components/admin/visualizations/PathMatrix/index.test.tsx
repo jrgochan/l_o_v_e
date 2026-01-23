@@ -1,6 +1,6 @@
 import { render, screen, fireEvent, waitFor, act } from "@testing-library/react";
 import { PathMatrixGrid } from "@/components/admin/visualizations/PathMatrix";
-import { useAtlasAdminStore } from "@/stores/useAtlasAdminStore";
+import { useVisualizationStore } from "@/stores/useVisualizationStore";
 
 // Mocks
 const mockOnClose = jest.fn();
@@ -20,11 +20,11 @@ const mockState = {
   setSelectedPath: jest.fn(),
 };
 
-jest.mock("@/stores/useAtlasAdminStore", () => ({
-  useAtlasAdminStore: jest.fn((selector) => selector(mockState)),
+jest.mock("@/stores/useVisualizationStore", () => ({
+  useVisualizationStore: jest.fn((selector) => selector(mockState)),
 }));
 // We also need getState for line 169
-useAtlasAdminStore.getState = jest.fn(() => mockState as any);
+useVisualizationStore.getState = jest.fn(() => mockState as any);
 
 // Mock Hooks
 jest.mock("@/hooks/useComputeAllPaths", () => ({

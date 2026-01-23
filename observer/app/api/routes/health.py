@@ -13,7 +13,7 @@ Health Check Architecture:
         All systems operational:
         ✓ Database connected
         ✓ pgvector extension installed
-        ✓ Atlas fully seeded (87 emotions)
+        ✓ Dataset fully seeded
 
         Response: HTTP 200
         Use: Load balancer routes traffic
@@ -23,7 +23,7 @@ Health Check Architecture:
         Core functional but incomplete:
         ✓ Database connected
         ✓ pgvector installed
-        ⚠ Atlas partially seeded (50-86 emotions)
+        ⚠ Dataset partially seeded
 
         Response: HTTP 200
         Use: Service operational but needs attention
@@ -32,7 +32,7 @@ Health Check Architecture:
         ──────────────────
         System starting up:
         ✓ Database connected
-        ? Atlas seeding in progress (0-49 emotions)
+        ? Dataset seeding in progress
 
         Response: HTTP 200
         Use: Wait for full initialization
@@ -68,14 +68,14 @@ Validation Checks:
            Why: Vector similarity requires pgvector
            Critical: Yes (core functionality)
 
-        3. Atlas Emotion Count
+        3. Emotion Count
            ───────────────────
-           Query: SELECT COUNT(*) FROM atlas_definitions
-           Expected: 87 (complete atlas)
+           Query: SELECT COUNT(*) FROM emotion_definitions
+           Expected: ~87 (complete dataset)
            Acceptable: 50-86 (degraded)
            Warning: 0-49 (initializing)
 
-           Why: Atlas is foundation of all operations
+           Why: Data is foundation of all operations
            Critical: Yes (can't function without)
 
         4. Timestamp
@@ -248,7 +248,7 @@ class HealthResponse(BaseModel):
     status: str = Field(description="Overall status")
     database: str = Field(description="Database connection status")
     pgvector_version: str = Field(description="pgvector extension version")
-    atlas_emotions_count: int = Field(description="Number of emotions in Atlas")
+    emotion_count: int = Field(description="Number of seeded emotions")
     timestamp: datetime = Field(description="Check timestamp")
 
     model_config = ConfigDict(
@@ -257,7 +257,7 @@ class HealthResponse(BaseModel):
                 "status": "healthy",
                 "database": "connected",
                 "pgvector_version": "0.6.0",
-                "atlas_emotions_count": 87,
+                "emotion_count": 87,
                 "timestamp": "2025-12-03T09:45:00Z",
             }
         }
@@ -271,7 +271,7 @@ async def health_check(db: AsyncSession = Depends(get_db)) -> HealthResponse:
     Verifies:
     - Database connectivity
     - pgvector extension availability
-    - Atlas emotions count
+    - Emotion definitions count
 
     Returns:
         HealthResponse with system status
@@ -291,17 +291,17 @@ async def health_check(db: AsyncSession = Depends(get_db)) -> HealthResponse:
             logger.warning("pgvector extension not found")
             pgvector_version = "not installed"
 
-        # Count Atlas emotions
+        # Count emotions
         # pylint: disable=not-callable
         result = await db.execute(select(func.count(EmotionDefinition.id)))
         emotion_count = result.scalar() or 0
 
         # Determine overall status
-        # Healthy if we have all 87 emotions from Atlas of the Heart
-        if emotion_count == 87 and pgvector_version != "not installed":
+        # Healthy if we have seeded emotions (expecting ~87 for Bremé Brown dataset)
+        if emotion_count >= 87 and pgvector_version != "not installed":
             overall_status = "healthy"
         elif emotion_count >= 50:
-            overall_status = "degraded"  # Partial atlas
+            overall_status = "degraded"  # Partial seeding
         elif emotion_count > 0:
             overall_status = "initializing"  # Seeding in progress
         else:
@@ -311,7 +311,7 @@ async def health_check(db: AsyncSession = Depends(get_db)) -> HealthResponse:
             status=overall_status,
             database=db_status,
             pgvector_version=pgvector_version,
-            atlas_emotions_count=emotion_count,
+            emotion_count=emotion_count,
             timestamp=datetime.now(timezone.utc),
         )
 

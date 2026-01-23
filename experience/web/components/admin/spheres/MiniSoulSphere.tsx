@@ -10,11 +10,11 @@
 
 import { useMemo } from "react";
 import * as THREE from "three";
-import type { AtlasEmotion } from "@/types/atlas-admin";
+import type { Emotion } from "@/types/visualization";
 import { resolveEmotionColor } from "@/utils/emotion-colors";
 
 interface MiniSoulSphereProps {
-  emotion: AtlasEmotion;
+  emotion: Emotion;
   colorMode: "category" | "valence" | "arousal" | "connection";
   size?: number;
   onClick?: () => void;

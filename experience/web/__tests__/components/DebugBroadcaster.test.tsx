@@ -1,11 +1,11 @@
 import { render, screen, fireEvent, waitFor, act } from "@testing-library/react";
 import { DebugBroadcaster } from "@/components/DebugBroadcaster";
 import { useExperienceStore } from "@/stores/useExperienceStore";
-import { useAtlasAdminStore } from "@/stores/useAtlasAdminStore";
+import { useVisualizationStore } from "@/stores/useVisualizationStore";
 
 // Mock dependencies
 jest.mock("@/stores/useExperienceStore");
-jest.mock("@/stores/useAtlasAdminStore");
+jest.mock("@/stores/useVisualizationStore");
 
 describe("DebugBroadcaster", () => {
   const mockSelectedIds = new Set(["emotion-1"]);
@@ -16,7 +16,7 @@ describe("DebugBroadcaster", () => {
     localStorage.clear();
     jest.useFakeTimers();
 
-    (useAtlasAdminStore as unknown as jest.Mock).mockImplementation((selector) => {
+    (useVisualizationStore as unknown as jest.Mock).mockImplementation((selector) => {
       // Execute selector with mock state
       return selector({ selectedEmotionIds: mockSelectedIds });
     });

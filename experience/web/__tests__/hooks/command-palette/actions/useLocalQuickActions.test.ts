@@ -1,10 +1,10 @@
 import { renderHook } from "@testing-library/react";
 import { useLocalQuickActions } from "@/hooks/command-palette/actions/useLocalQuickActions";
-import { useAtlasAdminStore } from "@/stores/useAtlasAdminStore";
+import { useVisualizationStore } from "@/stores/useVisualizationStore";
 import { useExperienceStore } from "@/stores/useExperienceStore";
 
 // Mock stores
-jest.mock("@/stores/useAtlasAdminStore");
+jest.mock("@/stores/useVisualizationStore");
 jest.mock("@/stores/useExperienceStore");
 
 describe("useLocalQuickActions", () => {
@@ -19,7 +19,7 @@ describe("useLocalQuickActions", () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
-    (useAtlasAdminStore as unknown as jest.Mock).mockImplementation((selector) => {
+    (useVisualizationStore as unknown as jest.Mock).mockImplementation((selector) => {
       return selector({
         clearSelection: mockClearSelection,
         selectMultiple: mockSelectMultiple,
@@ -33,7 +33,7 @@ describe("useLocalQuickActions", () => {
       });
     });
     // Mock getState for non-selector usage
-    (useAtlasAdminStore.getState as jest.Mock).mockReturnValue({
+    (useVisualizationStore.getState as jest.Mock).mockReturnValue({
       allEmotions: [
         { id: "v1", name: "Vulnerability" },
         { id: "a1", name: "Awe" },

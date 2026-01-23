@@ -2,13 +2,13 @@ import { render, screen } from "@testing-library/react";
 import {
   EmotionLabelOverlay,
   getLabelStyle,
-} from "../../../../components/admin/atlas/EmotionLabelOverlay";
-import { useAtlasAdminStore } from "@/stores/useAtlasAdminStore";
+} from "../../../../components/admin/visualization/EmotionLabelOverlay";
+import { useVisualizationStore } from "@/stores/useVisualizationStore";
 
 // Mock Store
 const mockUseAtlasAdminStore = jest.fn();
-jest.mock("@/stores/useAtlasAdminStore", () => ({
-  useAtlasAdminStore: (selector: any) => selector(mockUseAtlasAdminStore()),
+jest.mock("@/stores/useVisualizationStore", () => ({
+  useVisualizationStore: (selector: any) => selector(mockUseAtlasAdminStore()),
 }));
 
 describe("EmotionLabelOverlay", () => {

@@ -24,11 +24,11 @@
 
 import { BaseEmotionChip } from "./BaseEmotionChip";
 import { PreviewSphere } from "../spheres/PreviewSphere";
-import type { AtlasEmotion } from "@/types/atlas-admin";
+import type { Emotion } from "@/types/visualization";
 import { resolveEmotionColor } from "@/utils/emotion-colors";
 
 interface EmotionCardProps {
-  emotion: AtlasEmotion;
+  emotion: Emotion;
   confidence?: number;
   showSphere?: boolean;
   showVAC?: boolean;

@@ -2,7 +2,7 @@ import { renderHook, act } from "@testing-library/react";
 import { useZenKeyboardShortcuts } from "../../../hooks/interaction/useZenKeyboardShortcuts";
 import { useExperienceStore } from "@/stores/useExperienceStore";
 import { useSettingsStore } from "@/stores/useSettingsStore";
-import { AtlasEmotion } from "@/types";
+import { Emotion } from "@/types";
 
 // Mock stores
 jest.mock("@/stores/useExperienceStore");
@@ -14,11 +14,11 @@ describe("useZenKeyboardShortcuts", () => {
   const mockSetHasAudioEnabled = jest.fn();
   const mockSetShowDebug = jest.fn();
 
-  const mockEmotions: AtlasEmotion[] = [
-    { id: "1", name: "Joy", category: "Happiness", vac: [0.8, 0.8, 0.8] } as AtlasEmotion,
-    { id: "2", name: "Contentment", category: "Happiness", vac: [0.6, 0.5, 0.5] } as AtlasEmotion,
-    { id: "3", name: "Sadness", category: "Sadness", vac: [-0.8, -0.5, -0.5] } as AtlasEmotion,
-    { id: "4", name: "Grief", category: "Sadness", vac: [-0.9, -0.6, -0.6] } as AtlasEmotion,
+  const mockEmotions: Emotion[] = [
+    { id: "1", name: "Joy", category: "Happiness", vac: [0.8, 0.8, 0.8] } as Emotion,
+    { id: "2", name: "Contentment", category: "Happiness", vac: [0.6, 0.5, 0.5] } as Emotion,
+    { id: "3", name: "Sadness", category: "Sadness", vac: [-0.8, -0.5, -0.5] } as Emotion,
+    { id: "4", name: "Grief", category: "Sadness", vac: [-0.9, -0.6, -0.6] } as Emotion,
   ];
 
   let mockSettingsStore: any;

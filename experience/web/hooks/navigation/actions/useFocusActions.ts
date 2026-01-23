@@ -1,15 +1,15 @@
 import { useCallback } from "react";
-import { useAtlasAdminStore } from "@/stores/useAtlasAdminStore";
+import { useVisualizationStore } from "@/stores/useVisualizationStore";
 import { logger } from "@/utils/logger";
-import type { AtlasEmotion } from "@/types/atlas-admin";
+import type { Emotion } from "@/types/visualization";
 
 interface UseFocusActionsOptions {
-  findEmotionByName: (name: string) => AtlasEmotion | null;
+  findEmotionByName: (name: string) => Emotion | null;
   onNavigate?: () => void;
 }
 
 export function useFocusActions({ findEmotionByName, onNavigate }: UseFocusActionsOptions) {
-  const setFocusedEmotion = useAtlasAdminStore((state) => state.setFocusedEmotion);
+  const setFocusedEmotion = useVisualizationStore((state) => state.setFocusedEmotion);
 
   const focusEmotion = useCallback(
     (emotionName: string, navigate: boolean = false) => {

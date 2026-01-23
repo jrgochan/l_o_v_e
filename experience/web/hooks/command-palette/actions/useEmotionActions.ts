@@ -1,9 +1,9 @@
 import { useCallback } from "react";
-import { useAtlasAdminStore } from "@/stores/useAtlasAdminStore";
+import { useVisualizationStore } from "@/stores/useVisualizationStore";
 import { useExperienceStore } from "@/stores/useExperienceStore";
 import { logger } from "@/utils/logger";
 import type { CommandAction, CommandActionResult, KeyModifiers } from "@/types/command-palette";
-import type { AtlasEmotion } from "@/types/atlas-admin";
+import type { Emotion } from "@/types/visualization";
 
 interface UseEmotionActionsDependencies {
   addToRecent: (id: string) => void;
@@ -11,16 +11,16 @@ interface UseEmotionActionsDependencies {
 }
 
 export function useEmotionActions({ addToRecent, close }: UseEmotionActionsDependencies) {
-  const selectEmotion = useAtlasAdminStore((state) => state.selectEmotion);
-  const selectMultiple = useAtlasAdminStore((state) => state.selectMultiple);
-  const toggleEmotionSelection = useAtlasAdminStore((state) => state.toggleEmotion);
-  const selectedEmotionIds = useAtlasAdminStore((state) => state.selectedEmotionIds);
-  const setFocusedEmotion = useAtlasAdminStore((state) => state.setFocusedEmotion);
+  const selectEmotion = useVisualizationStore((state) => state.selectEmotion);
+  const selectMultiple = useVisualizationStore((state) => state.selectMultiple);
+  const toggleEmotionSelection = useVisualizationStore((state) => state.toggleEmotion);
+  const selectedEmotionIds = useVisualizationStore((state) => state.selectedEmotionIds);
+  const setFocusedEmotion = useVisualizationStore((state) => state.setFocusedEmotion);
   const setTarget = useExperienceStore((state) => state.setTarget);
 
   const executeAction = useCallback(
     (
-      emotion: AtlasEmotion,
+      emotion: Emotion,
       action: CommandAction,
       modifiers: KeyModifiers
     ): CommandActionResult => {

@@ -49,7 +49,7 @@ Data Captured Per State Point:
         ────────────────────────
         - vac_values: [Valence, Arousal, Connection]
         - quaternion_state: [w, x, y, z] rotation
-        - dominant_emotion_id: Nearest atlas emotion
+        - dominant_emotion_id: Nearest emotion definition
 
         Temporal metrics:
         ────────────────
@@ -443,7 +443,7 @@ class UserTrajectory(Base):
     # Quaternion State: [w, x, y, z]
     quaternion_state: Mapped[Any] = mapped_column(Vector(4))
 
-    # Dominant Emotion (nearest Atlas emotion)
+    # Dominant Emotion (nearest emotion definition)
     dominant_emotion_id: Mapped[Optional[UUID]] = mapped_column(
         ForeignKey("emotion_definitions.id"), index=True
     )

@@ -12,10 +12,10 @@
 import { useRef, useMemo } from "react";
 import { useFrame, ThreeEvent } from "@react-three/fiber";
 import * as THREE from "three";
-import type { AtlasEmotion } from "@/types/atlas-admin";
+import type { Emotion } from "@/types/visualization";
 
 interface MysticalEmotionNodeProps {
-  emotion: AtlasEmotion;
+  emotion: Emotion;
   color: THREE.Color;
   size: number;
   isSelected: boolean;

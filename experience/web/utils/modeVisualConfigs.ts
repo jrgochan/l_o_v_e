@@ -11,7 +11,7 @@
  * - GLITCH: Digital reality, raw and chaotic
  */
 
-import type { PathAnimationMode } from "@/types/atlas-admin";
+import type { PathAnimationMode } from "@/types/visualization";
 import * as THREE from "three";
 
 /**

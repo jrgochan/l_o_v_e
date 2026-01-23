@@ -1,7 +1,7 @@
 import { useFrame } from "@react-three/fiber";
 import { RefObject } from "react";
 import * as THREE from "three";
-import type { PathAnimationMode } from "@/types/atlas-admin";
+import type { PathAnimationMode } from "@/types/visualization";
 
 export function useWaypointPulse(meshRef: RefObject<THREE.Mesh | null>, mode: PathAnimationMode) {
   useFrame((state) => {

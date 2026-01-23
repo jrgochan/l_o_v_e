@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useThree, useFrame } from "@react-three/fiber";
 import * as THREE from "three";
-import { useAtlasAdminStore } from "@/stores/useAtlasAdminStore";
+import { useVisualizationStore } from "@/stores/useVisualizationStore";
 import { useAmbientAudio } from "@/hooks/useAmbientAudio";
 import { Html } from "@react-three/drei";
 
@@ -12,7 +12,7 @@ const endPos = new THREE.Vector3(0, 0, 5); // Default view
 
 export function IntroSequence() {
   const { camera } = useThree();
-  const setIntroActive = useAtlasAdminStore((state) => state.setIntroActive);
+  const setIntroActive = useVisualizationStore((state) => state.setIntroActive);
   const { playWhoosh } = useAmbientAudio();
 
   const [opacity, setOpacity] = useState(1);

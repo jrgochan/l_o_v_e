@@ -7,10 +7,10 @@
 
 "use client";
 
-import { useAtlasAdminStore } from "@/stores/useAtlasAdminStore";
-import { BRIDGE_EMOTIONS } from "@/types/atlas-admin";
+import { useVisualizationStore } from "@/stores/useVisualizationStore";
+import { BRIDGE_EMOTIONS } from "@/types/visualization";
 import { resolveEmotionColor } from "@/utils/emotion-colors";
-import type { PathAnimationMode } from "@/types/atlas-admin";
+import type { PathAnimationMode } from "@/types/visualization";
 import type { LabelPosition } from "./EmotionLabelTracker";
 
 interface EmotionLabelOverlayProps {
@@ -18,10 +18,10 @@ interface EmotionLabelOverlayProps {
 }
 
 export function EmotionLabelOverlay({ labels }: EmotionLabelOverlayProps) {
-  const selectedIds = useAtlasAdminStore((state) => state.selectedEmotionIds);
-  const hoveredId = useAtlasAdminStore((state) => state.hoveredEmotionId);
-  const layers = useAtlasAdminStore((state) => state.layers);
-  const settings = useAtlasAdminStore((state) => state.settings);
+  const selectedIds = useVisualizationStore((state) => state.selectedEmotionIds);
+  const hoveredId = useVisualizationStore((state) => state.hoveredEmotionId);
+  const layers = useVisualizationStore((state) => state.layers);
+  const settings = useVisualizationStore((state) => state.settings);
   const mode = settings.pathAnimationMode;
 
   if (!layers.emotionLabels || labels.length === 0) {

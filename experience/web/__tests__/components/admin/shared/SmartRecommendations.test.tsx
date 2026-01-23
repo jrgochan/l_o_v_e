@@ -1,18 +1,18 @@
 import { render, screen, fireEvent, waitFor, act } from "@testing-library/react";
 import { SmartRecommendations } from "@/components/admin/shared/SmartRecommendations";
-import { useAtlasAdminStore } from "@/stores/useAtlasAdminStore";
+import { useVisualizationStore } from "@/stores/useVisualizationStore";
 
 // Mock store module
-jest.mock("@/stores/useAtlasAdminStore", () => {
+jest.mock("@/stores/useVisualizationStore", () => {
   const mockGetState = jest.fn();
   const mockStore = jest.fn();
   (mockStore as any).getState = mockGetState;
   return {
-    useAtlasAdminStore: mockStore,
+    useVisualizationStore: mockStore,
   };
 });
 
-const mockUseAtlasAdminStore = useAtlasAdminStore as unknown as jest.Mock & { getState: jest.Mock };
+const mockUseAtlasAdminStore = useVisualizationStore as unknown as jest.Mock & { getState: jest.Mock };
 
 const mockRecommendations = {
   curated_journeys: [

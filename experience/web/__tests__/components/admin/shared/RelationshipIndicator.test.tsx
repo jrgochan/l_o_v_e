@@ -9,7 +9,7 @@ const mockRelationship: EmotionRelationship = {
   id: "rel-1",
   emotion_a: "Joy",
   emotion_b: "Sadness",
-  type: "contradictory",
+  type: "contradicts",
   strength: 0.8,
   description: "They are opposites",
 };
@@ -53,7 +53,7 @@ const mockRelationships: EmotionRelationship[] = [
     id: "rel-6",
     emotion_a: "Anger",
     emotion_b: "Calm",
-    type: "contradictory",
+    type: "contradicts",
     strength: 0.85,
     description: "Opposites attract",
   },
@@ -64,7 +64,7 @@ describe("RelationshipIndicator", () => {
     render(<RelationshipIndicator relationship={mockRelationship} />);
     expect(screen.getByText("Joy")).toBeInTheDocument();
     expect(screen.getByText("Sadness")).toBeInTheDocument();
-    expect(screen.getByText(/contradictory/i)).toBeInTheDocument();
+    expect(screen.getByText(/contradicts/i)).toBeInTheDocument();
     expect(screen.getByText("(80%)")).toBeInTheDocument();
     expect(screen.getByText(/"They are opposites"/)).toBeInTheDocument();
     // Icon for contradictory
@@ -120,7 +120,7 @@ describe("RelationshipList", () => {
 
     // Should see headers
     // Contradictory should have 2 items now
-    expect(screen.getByText(/contradictory \(2\)/i)).toBeInTheDocument();
+    expect(screen.getByText(/contradicts \(2\)/i)).toBeInTheDocument();
     expect(screen.getByText(/amplifying \(1\)/i)).toBeInTheDocument();
   });
 

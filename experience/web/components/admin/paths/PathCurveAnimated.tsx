@@ -7,7 +7,7 @@
 "use client";
 
 import * as THREE from "three";
-import type { PathAnimationMode } from "@/types/atlas-admin";
+import type { PathAnimationMode } from "@/types/visualization";
 import { SubtleElegantPath } from "./SubtleElegantPath";
 import { DynamicPlayfulPath } from "./DynamicPlayfulPath";
 import { MysticalEtherealPath } from "./MysticalEtherealPath";

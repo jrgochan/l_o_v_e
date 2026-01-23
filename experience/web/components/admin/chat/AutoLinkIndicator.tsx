@@ -22,9 +22,9 @@ export function AutoLinkIndicator({
                     title={`Linked via ${rel.relationship_type}`}
                 >
                     <span>🔗</span>
-                    {rel.metadata && rel.metadata.score && (
+                    {rel.metadata && typeof rel.metadata.score === 'number' && (
                         <span className="opacity-75">
-                            {(rel.metadata.score * 100).toFixed(0)}%
+                            {((rel.metadata.score as number) * 100).toFixed(0)}%
                         </span>
                     )}
                 </button>

@@ -1,6 +1,6 @@
 import { render, screen, fireEvent } from "@testing-library/react";
 import { AnimationModeSelector } from "@/components/admin/panels/ControlPanel/AnimationModeSelector";
-import { PathAnimationMode } from "@/types/atlas-admin";
+import { PathAnimationMode } from "@/types/visualization";
 
 describe("AnimationModeSelector", () => {
   const mockOnModeChange = jest.fn();

@@ -1,10 +1,10 @@
 import { render, screen, fireEvent } from "@testing-library/react";
 import { DataVisualizationOverlay } from "@/components/admin/visualizations/DataVisualizationOverlay";
-import { useAtlasAdminStore } from "@/stores/useAtlasAdminStore";
+import { useVisualizationStore } from "@/stores/useVisualizationStore";
 
 // Mock the store
-jest.mock("@/stores/useAtlasAdminStore", () => ({
-  useAtlasAdminStore: jest.fn(),
+jest.mock("@/stores/useVisualizationStore", () => ({
+  useVisualizationStore: jest.fn(),
 }));
 
 // Mock MiniSoulSphere
@@ -57,7 +57,7 @@ describe("DataVisualizationOverlay", () => {
   const mockOnClose = jest.fn();
 
   const setupMockState = (scheme: string) => {
-    (useAtlasAdminStore as unknown as jest.Mock).mockImplementation((selector) => {
+    (useVisualizationStore as unknown as jest.Mock).mockImplementation((selector) => {
       const state = {
         allEmotions: mockEmotions,
         settings: { colorScheme: scheme },
@@ -157,7 +157,7 @@ describe("DataVisualizationOverlay", () => {
     // Simulate selection of a category that has no items?
     // Logic derives categories from available emotions, so normally impossible.
     // But we can test `sortedEmotions.length === 0` branch by mocking empty emotions?
-    (useAtlasAdminStore as unknown as jest.Mock).mockImplementation((selector) => {
+    (useVisualizationStore as unknown as jest.Mock).mockImplementation((selector) => {
       const state = {
         allEmotions: [],
         settings: { colorScheme: "category" },

@@ -1,15 +1,15 @@
 import { render, screen, fireEvent, act } from "@testing-library/react";
-import AtlasAdminPage from "@/app/admin/atlas/page";
+import AtlasAdminPage from "@/app/admin/visualization/page";
 import { useAmbientAudio } from "@/hooks/useAmbientAudio";
 import { useSphereSync } from "@/hooks/useSphereSync";
-import { useAtlasAdminStore } from "@/stores/useAtlasAdminStore";
+import { useVisualizationStore } from "@/stores/useVisualizationStore";
 import { useExperienceStore } from "@/stores/useExperienceStore";
 import { useEmotionAtlas } from "@/hooks/useEmotionAtlas";
 import { useAdminTheme } from "@/hooks/admin/useAdminTheme";
 
 // --- MOCK COMPONENTS ---
-jest.mock("@/components/admin/atlas/AtlasScene", () => ({
-  AtlasScene: () => <div data-testid="atlas-scene" />,
+jest.mock("@/components/admin/visualization/VisualizationScene", () => ({
+  VisualizationScene: () => <div data-testid="atlas-scene" />,
 }));
 jest.mock("@/components/VACAxisLabels3D", () => ({
   VACAxisLabels3D: () => <div data-testid="vac-axis" />,
@@ -20,13 +20,13 @@ jest.mock("@/components/admin/panels/ControlPanel", () => ({
 jest.mock("@/components/admin/panels/InfoPanel", () => ({
   InfoPanel: () => <div data-testid="info-panel" />,
 }));
-jest.mock("@/components/admin/atlas/LegendOverlay", () => ({
+jest.mock("@/components/admin/visualization/LegendOverlay", () => ({
   LegendOverlay: () => <div data-testid="legend-overlay" />,
 }));
-jest.mock("@/components/admin/atlas/EmotionLabelOverlay", () => ({
+jest.mock("@/components/admin/visualization/EmotionLabelOverlay", () => ({
   EmotionLabelOverlay: () => <div data-testid="label-overlay" />,
 }));
-jest.mock("@/components/admin/atlas/EmotionLabelTracker", () => ({
+jest.mock("@/components/admin/visualization/EmotionLabelTracker", () => ({
   EmotionLabelTracker: () => <div data-testid="label-tracker" />,
   LabelPosition: {},
 }));
@@ -60,10 +60,10 @@ jest.mock("@/components/admin/visualizations/DataVisualizationOverlay", () => ({
 jest.mock("@/components/CommandPalette", () => ({
   CommandPalette: () => <div data-testid="command-palette" />,
 }));
-jest.mock("@/components/admin/atlas/PathFlyover", () => ({
+jest.mock("@/components/admin/visualization/PathFlyover", () => ({
   PathFlyover: () => <div data-testid="path-flyover" />,
 }));
-jest.mock("@/components/admin/atlas/IntroSequence", () => ({
+jest.mock("@/components/admin/visualization/IntroSequence", () => ({
   IntroSequence: ({ onComplete }: any) => (
     <button data-testid="intro-complete" onClick={onComplete}>
       Complete Intro
@@ -136,8 +136,8 @@ jest.mock("@/hooks/admin/useAdminTheme", () => ({
 }));
 
 // --- MOCK STORES ---
-jest.mock("@/stores/useAtlasAdminStore", () => ({
-  useAtlasAdminStore: jest.fn(),
+jest.mock("@/stores/useVisualizationStore", () => ({
+  useVisualizationStore: jest.fn(),
 }));
 jest.mock("@/stores/useExperienceStore", () => ({
   useExperienceStore: jest.fn((selector) => selector({ isFlying: false })),
@@ -166,7 +166,7 @@ describe("AtlasAdminPage", () => {
     });
 
     // Store Mock
-    (useAtlasAdminStore as unknown as jest.Mock).mockImplementation((selector: any) =>
+    (useVisualizationStore as unknown as jest.Mock).mockImplementation((selector: any) =>
       selector({
         selectedEmotions: [],
         selectMultiple: jest.fn(),
@@ -244,9 +244,9 @@ describe("AtlasAdminPage", () => {
     // Mock store to return isIntroActive = true?
     // Or Component state?
     // Code: {isIntroActive && <IntroSequence />}
-    // isIntroActive comes from useAtlasAdminStore
+    // isIntroActive comes from useVisualizationStore
 
-    (useAtlasAdminStore as unknown as jest.Mock).mockImplementation((selector: any) =>
+    (useVisualizationStore as unknown as jest.Mock).mockImplementation((selector: any) =>
       selector({
         selectedEmotions: [],
         selectMultiple: jest.fn(),
@@ -303,7 +303,7 @@ describe("AtlasAdminPage", () => {
     document.body.appendChild(input);
 
     const mockSetIsFlying = jest.fn();
-    (useAtlasAdminStore.getState as jest.Mock) = jest.fn(() => ({ setIsFlying: mockSetIsFlying }));
+    (useVisualizationStore.getState as jest.Mock) = jest.fn(() => ({ setIsFlying: mockSetIsFlying }));
 
     fireEvent.keyDown(input, { key: " " });
     fireEvent.keyDown(input, { key: "ArrowRight" });
@@ -315,7 +315,7 @@ describe("AtlasAdminPage", () => {
 
   it("ignores Space key if no transitionPath", () => {
     const mockSetIsFlying = jest.fn();
-    (useAtlasAdminStore.getState as jest.Mock) = jest.fn(() => ({ setIsFlying: mockSetIsFlying }));
+    (useVisualizationStore.getState as jest.Mock) = jest.fn(() => ({ setIsFlying: mockSetIsFlying }));
 
     (useExperienceStore as unknown as jest.Mock).mockImplementation((selector: any) =>
       selector({
@@ -347,7 +347,7 @@ describe("AtlasAdminPage", () => {
     const mockUpdateLayer = jest.fn();
 
     // Update mock for this test
-    (useAtlasAdminStore.getState as jest.Mock) = jest.fn(() => ({
+    (useVisualizationStore.getState as jest.Mock) = jest.fn(() => ({
       selectedEmotionIds: { size: 2 }, // Mock Set.size
       cycleSelectedPath: mockCyclePath,
       setIsFlying: mockSetIsFlying,
@@ -355,7 +355,7 @@ describe("AtlasAdminPage", () => {
       updateLayer: mockUpdateLayer,
     }));
 
-    (useAtlasAdminStore as unknown as jest.Mock).mockImplementation((selector: any) =>
+    (useVisualizationStore as unknown as jest.Mock).mockImplementation((selector: any) =>
       selector({
         selectedEmotionIds: { size: 2 },
         selectMultiple: jest.fn(),
@@ -403,12 +403,12 @@ describe("AtlasAdminPage", () => {
     const mockUpdateLayer = jest.fn();
     const mockSetIsFlying = jest.fn();
 
-    (useAtlasAdminStore.getState as jest.Mock) = jest.fn(() => ({
+    (useVisualizationStore.getState as jest.Mock) = jest.fn(() => ({
       setIsFlying: mockSetIsFlying,
       updateLayer: mockUpdateLayer,
     }));
 
-    (useAtlasAdminStore as unknown as jest.Mock).mockImplementation((selector: any) =>
+    (useVisualizationStore as unknown as jest.Mock).mockImplementation((selector: any) =>
       selector({
         selectedEmotions: { size: 0 },
         layers: { transitionPaths: true }, // Already enabled
@@ -434,7 +434,7 @@ describe("AtlasAdminPage", () => {
 
   it("renders data visualization overlay and handles close", () => {
     const mockUpdateSetting = jest.fn();
-    (useAtlasAdminStore as unknown as jest.Mock).mockImplementation((selector: any) =>
+    (useVisualizationStore as unknown as jest.Mock).mockImplementation((selector: any) =>
       selector({
         selectedEmotionIds: [],
         selectMultiple: jest.fn(),
@@ -475,7 +475,7 @@ describe("AtlasAdminPage", () => {
 
   it("handles fallback keyboard navigation (no selection)", () => {
     // Mock store with 0 selected
-    (useAtlasAdminStore.getState as jest.Mock) = jest.fn(() => ({
+    (useVisualizationStore.getState as jest.Mock) = jest.fn(() => ({
       selectedEmotionIds: { size: 0 },
       allEmotions: [{ id: "e1", category: "Pos" }],
       cycleSelectedPath: jest.fn(),
@@ -492,7 +492,7 @@ describe("AtlasAdminPage", () => {
 
   it("handles fallback navigation with empty categories", () => {
     // Mock store with empty emotions
-    (useAtlasAdminStore.getState as jest.Mock) = jest.fn(() => ({
+    (useVisualizationStore.getState as jest.Mock) = jest.fn(() => ({
       selectedEmotionIds: { size: 0 },
       allEmotions: [], // Empty
       cycleSelectedPath: jest.fn(),
@@ -573,7 +573,7 @@ describe("AtlasAdminPage", () => {
     // Reset Error State from previous test
     (useEmotionAtlas as jest.Mock).mockReturnValue({ isLoading: false, error: null });
 
-    (useAtlasAdminStore as unknown as jest.Mock).mockImplementation((selector: any) =>
+    (useVisualizationStore as unknown as jest.Mock).mockImplementation((selector: any) =>
       selector({
         selectedEmotions: [],
         selectMultiple: jest.fn(),

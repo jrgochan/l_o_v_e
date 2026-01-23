@@ -1,12 +1,12 @@
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import { PathMatrixGrid } from "@/components/admin/visualizations/PathMatrix";
-import { useAtlasAdminStore } from "@/stores/useAtlasAdminStore";
+import { useVisualizationStore } from "@/stores/useVisualizationStore";
 import { useMatrixData } from "@/hooks/visualization/useMatrixData";
 import { useComputeAllPaths } from "@/hooks/useComputeAllPaths";
-import type { AtlasEmotion, EmotionPath } from "@/types/atlas-admin";
+import type { Emotion, EmotionPath } from "@/types/visualization";
 
 // Mocks
-jest.mock("@/stores/useAtlasAdminStore");
+jest.mock("@/stores/useVisualizationStore");
 jest.mock("@/hooks/visualization/useMatrixData");
 jest.mock("@/hooks/useComputeAllPaths");
 
@@ -29,7 +29,7 @@ afterAll(() => {
   console.error = originalConsoleError;
 });
 
-const MOCK_EMOTIONS: AtlasEmotion[] = [
+const MOCK_EMOTIONS: Emotion[] = [
   {
     id: "1",
     name: "Joy",
@@ -86,12 +86,12 @@ describe("PathMatrixGrid", () => {
       },
     };
 
-    (useAtlasAdminStore as unknown as jest.Mock).mockImplementation((selector) => {
+    (useVisualizationStore as unknown as jest.Mock).mockImplementation((selector) => {
       return selector ? selector(mockStoreState) : mockStoreState;
     });
 
     // Helper to mock getState for non-hook usage
-    (useAtlasAdminStore as any).getState = jest.fn().mockReturnValue({
+    (useVisualizationStore as any).getState = jest.fn().mockReturnValue({
       settings: { computeMode: "auto" },
       updateSetting: mockUpdateSetting,
       clearSelection: mockClearSelection,
@@ -215,12 +215,12 @@ describe("PathMatrixGrid", () => {
     render(<PathMatrixGrid onClose={mockOnClose} />);
 
     // Mock user store selector for allEmotions which is used inside the component
-    // We already mocked the useAtlasAdminStore hook above, but we need to ensure it returns allEmotions
-    // The component calls useAtlasAdminStore((state) => state.allEmotions)
+    // We already mocked the useVisualizationStore hook above, but we need to ensure it returns allEmotions
+    // The component calls useVisualizationStore((state) => state.allEmotions)
     // Our mock implementation above returns the whole object, so we need to adjust expected behavior
     // if the hook is called with a selector.
     // However, default jest mock setup often returns undefined for selector calls if not configured.
-    // Let's rely on `useAtlasAdminStore(selector)` pattern.
+    // Let's rely on `useVisualizationStore(selector)` pattern.
     // We'll fix the mock to handle selectors.
 
     const loadBtn = screen.getByText("Load Cached Paths");

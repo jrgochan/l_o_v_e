@@ -10,7 +10,7 @@
 import { useEffect, useRef } from "react";
 import { useFrame, useThree } from "@react-three/fiber";
 import * as THREE from "three";
-import { useAtlasAdminStore } from "@/stores/useAtlasAdminStore";
+import { useVisualizationStore } from "@/stores/useVisualizationStore";
 import { useExperienceStore } from "@/stores/useExperienceStore";
 import { TransitionPathResponse, WaypointInfo } from "@love/experience-shared";
 
@@ -18,13 +18,13 @@ import { useAmbientAudio } from "@/hooks/useAmbientAudio";
 
 export function PathFlyover() {
   const { camera } = useThree();
-  const setIsFlying = useAtlasAdminStore((state) => state.setIsFlying);
-  const isFlying = useAtlasAdminStore((state) => state.isFlying);
-  const selectedPathId = useAtlasAdminStore((state) => state.selectedPathId);
-  const computedPaths = useAtlasAdminStore((state) => state.computedPaths);
-  const setHoveredEmotion = useAtlasAdminStore((state) => state.setHoveredEmotion);
-  const hoveredEmotionId = useAtlasAdminStore((state) => state.hoveredEmotionId);
-  const allEmotions = useAtlasAdminStore((state) => state.allEmotions);
+  const setIsFlying = useVisualizationStore((state) => state.setIsFlying);
+  const isFlying = useVisualizationStore((state) => state.isFlying);
+  const selectedPathId = useVisualizationStore((state) => state.selectedPathId);
+  const computedPaths = useVisualizationStore((state) => state.computedPaths);
+  const setHoveredEmotion = useVisualizationStore((state) => state.setHoveredEmotion);
+  const hoveredEmotionId = useVisualizationStore((state) => state.hoveredEmotionId);
+  const allEmotions = useVisualizationStore((state) => state.allEmotions);
 
   // Experience Store Sync (for PathDetailsOverlay)
   const setTransitionPath = useExperienceStore((state) => state.setTransitionPath);
@@ -199,7 +199,7 @@ export function PathFlyover() {
   // Cleanup: Clear hover states when unmounting or stopping flight
   useEffect(() => {
     if (!isFlying) {
-      useAtlasAdminStore.getState().setHoveredEmotion(null);
+      useVisualizationStore.getState().setHoveredEmotion(null);
     }
   }, [isFlying]);
 

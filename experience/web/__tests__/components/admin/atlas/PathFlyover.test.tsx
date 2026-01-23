@@ -1,7 +1,7 @@
 import { render, act } from "@testing-library/react";
-import { PathFlyover } from "../../../../components/admin/atlas/PathFlyover";
+import { PathFlyover } from "../../../../components/admin/visualization/PathFlyover";
 import * as THREE from "three";
-import { useAtlasAdminStore } from "@/stores/useAtlasAdminStore";
+import { useVisualizationStore } from "@/stores/useVisualizationStore";
 import { useExperienceStore } from "@/stores/useExperienceStore";
 
 // Mock Three
@@ -17,11 +17,11 @@ jest.mock("three", () => {
 });
 
 // Mock Stores - implementation injected in beforeEach to avoid hoisting issues
-jest.mock("@/stores/useAtlasAdminStore", () => {
+jest.mock("@/stores/useVisualizationStore", () => {
   const mockfn: any = jest.fn();
   mockfn.getState = jest.fn();
   mockfn.setState = jest.fn();
-  return { useAtlasAdminStore: mockfn };
+  return { useVisualizationStore: mockfn };
 });
 
 jest.mock("@/stores/useExperienceStore", () => {
@@ -103,12 +103,12 @@ describe("PathFlyover", () => {
       hoveredEmotionId: null,
       allEmotions: [],
     });
-    // Wire up useAtlasAdminStore
-    (useAtlasAdminStore as unknown as jest.Mock).mockImplementation((selector: any) =>
+    // Wire up useVisualizationStore
+    (useVisualizationStore as unknown as jest.Mock).mockImplementation((selector: any) =>
       selector(mockState)
     );
-    (useAtlasAdminStore.getState as jest.Mock).mockReturnValue(mockState);
-    (useAtlasAdminStore.setState as jest.Mock).mockImplementation((newState: any) =>
+    (useVisualizationStore.getState as jest.Mock).mockReturnValue(mockState);
+    (useVisualizationStore.setState as jest.Mock).mockImplementation((newState: any) =>
       Object.assign(mockState, newState)
     );
 
@@ -320,7 +320,7 @@ describe("PathFlyover", () => {
     const { rerender } = render(<PathFlyover />);
 
     act(() => {
-      useAtlasAdminStore.setState({
+      useVisualizationStore.setState({
         selectedPathId: "path-1",
         computedPaths: mockState.computedPaths,
         allEmotions: mockState.allEmotions,
@@ -329,7 +329,7 @@ describe("PathFlyover", () => {
 
     // 2. Simulate flying
     act(() => {
-      useAtlasAdminStore.setState({ isFlying: true });
+      useVisualizationStore.setState({ isFlying: true });
     });
     rerender(<PathFlyover />);
 
@@ -350,7 +350,7 @@ describe("PathFlyover", () => {
 
     // Toggle isFlying to trigger effect check
     act(() => {
-      useAtlasAdminStore.setState({ isFlying: false });
+      useVisualizationStore.setState({ isFlying: false });
     });
     rerender(<PathFlyover />);
 
@@ -358,7 +358,7 @@ describe("PathFlyover", () => {
     (useExperienceStore.getState().setFlyoverProgress as jest.Mock).mockClear();
 
     act(() => {
-      useAtlasAdminStore.setState({ isFlying: true });
+      useVisualizationStore.setState({ isFlying: true });
     });
     rerender(<PathFlyover />);
 
@@ -377,7 +377,7 @@ describe("PathFlyover", () => {
     const { rerender } = render(<PathFlyover />);
 
     act(() => {
-      useAtlasAdminStore.setState({
+      useVisualizationStore.setState({
         selectedPathId: "path-1",
         computedPaths: mockState.computedPaths,
         allEmotions: mockState.allEmotions,
@@ -386,7 +386,7 @@ describe("PathFlyover", () => {
 
     // 2. Simulate flying
     act(() => {
-      useAtlasAdminStore.setState({ isFlying: true });
+      useVisualizationStore.setState({ isFlying: true });
     });
     rerender(<PathFlyover />);
 
@@ -404,7 +404,7 @@ describe("PathFlyover", () => {
 
     // 4. Switch to path-2
     act(() => {
-      useAtlasAdminStore.setState({ selectedPathId: "path-2" });
+      useVisualizationStore.setState({ selectedPathId: "path-2" });
     });
     rerender(<PathFlyover />);
 
@@ -418,7 +418,7 @@ describe("PathFlyover", () => {
     const { rerender } = render(<PathFlyover />);
 
     act(() => {
-      useAtlasAdminStore.setState({
+      useVisualizationStore.setState({
         selectedPathId: "path-1",
         computedPaths: mockState.computedPaths,
         allEmotions: mockState.allEmotions,
@@ -427,7 +427,7 @@ describe("PathFlyover", () => {
 
     // 2. Simulate flying
     act(() => {
-      useAtlasAdminStore.setState({ isFlying: true });
+      useVisualizationStore.setState({ isFlying: true });
     });
     rerender(<PathFlyover />);
 
@@ -447,7 +447,7 @@ describe("PathFlyover", () => {
     // 4. Update computedPaths (new Map reference)
     const newPaths = new Map(mockState.computedPaths);
     act(() => {
-      useAtlasAdminStore.setState({ computedPaths: newPaths });
+      useVisualizationStore.setState({ computedPaths: newPaths });
     });
     rerender(<PathFlyover />);
 

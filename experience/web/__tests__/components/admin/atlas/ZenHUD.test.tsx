@@ -1,12 +1,12 @@
 import { render, screen, fireEvent } from "@testing-library/react";
-import { ZenHUD } from "../../../../components/admin/atlas/ZenHUD";
+import { ZenHUD } from "../../../../components/admin/visualization/ZenHUD";
 
 // Mock Store
 const mockUseAtlasAdminStore = jest.fn();
 const mockSetIsFlying = jest.fn();
 
-jest.mock("@/stores/useAtlasAdminStore", () => ({
-  useAtlasAdminStore: (selector: any) => selector(mockUseAtlasAdminStore()),
+jest.mock("@/stores/useVisualizationStore", () => ({
+  useVisualizationStore: (selector: any) => selector(mockUseAtlasAdminStore()),
 }));
 
 describe("ZenHUD", () => {

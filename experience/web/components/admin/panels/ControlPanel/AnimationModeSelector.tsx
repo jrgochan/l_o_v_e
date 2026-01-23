@@ -11,7 +11,7 @@
 
 "use client";
 
-import type { PathAnimationMode } from "@/types/atlas-admin";
+import type { PathAnimationMode } from "@/types/visualization";
 
 interface AnimationModeSelectorProps {
   currentMode: PathAnimationMode;

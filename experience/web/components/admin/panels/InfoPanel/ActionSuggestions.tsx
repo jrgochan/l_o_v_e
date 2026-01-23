@@ -1,33 +1,33 @@
 "use client";
 
-import { useAtlasAdminStore } from "@/stores/useAtlasAdminStore";
+import { useVisualizationStore } from "@/stores/useVisualizationStore";
 import { useAmbientAudio } from "@/hooks/useAmbientAudio";
 import { useMemo } from "react";
-import { AtlasEmotion } from "@/types/atlas-admin";
+import { Emotion } from "@/types/visualization";
 
 export function ActionSuggestions() {
-  const selectedEmotionIds = useAtlasAdminStore((state) => state.selectedEmotionIds);
-  const selectedPathId = useAtlasAdminStore((state) => state.selectedPathId);
-  const allEmotions = useAtlasAdminStore((state) => state.allEmotions);
+  const selectedEmotionIds = useVisualizationStore((state) => state.selectedEmotionIds);
+  const selectedPathId = useVisualizationStore((state) => state.selectedPathId);
+  const allEmotions = useVisualizationStore((state) => state.allEmotions);
 
-  const cycleViewMode = useAtlasAdminStore((state) => state.cycleViewMode);
-  const selectEmotion = useAtlasAdminStore((state) => state.selectEmotion);
-  const setSelectedPath = useAtlasAdminStore((state) => state.setSelectedPath);
-  const setFocusedEmotion = useAtlasAdminStore((state) => state.setFocusedEmotion);
-  const setIsFlying = useAtlasAdminStore((state) => state.setIsFlying);
+  const cycleViewMode = useVisualizationStore((state) => state.cycleViewMode);
+  const selectEmotion = useVisualizationStore((state) => state.selectEmotion);
+  const setSelectedPath = useVisualizationStore((state) => state.setSelectedPath);
+  const setFocusedEmotion = useVisualizationStore((state) => state.setFocusedEmotion);
+  const setIsFlying = useVisualizationStore((state) => state.setIsFlying);
 
   const { playClickSound } = useAmbientAudio();
 
   // Helper to find "opposite" emotion (inverse VAC)
   const findOpposite = useMemo(
     () =>
-      (emotion: AtlasEmotion | undefined): AtlasEmotion | null => {
+      (emotion: Emotion | undefined): Emotion | null => {
         if (!emotion) return null;
         const [v, a, c] = emotion.vac;
         // Simple distance check to find furthest available emotion
         // In a perfect sphere, opposite is -v, -a, -c
         let maxDist = 0;
-        let opposite: AtlasEmotion | null = null;
+        let opposite: Emotion | null = null;
 
         allEmotions.forEach((candidate) => {
           if (candidate.id === emotion.id) return;

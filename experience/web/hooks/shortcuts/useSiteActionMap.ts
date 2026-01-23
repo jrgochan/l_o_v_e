@@ -1,6 +1,6 @@
 import { useCallback } from "react";
 import { useRouter } from "next/navigation";
-import { useAtlasAdminStore } from "@/stores/useAtlasAdminStore";
+import { useVisualizationStore } from "@/stores/useVisualizationStore";
 import { useExperienceStore } from "@/stores/useExperienceStore";
 import { logger } from "@/utils/logger";
 import { useShortcutGuards } from "./useShortcutUtils";
@@ -10,21 +10,21 @@ export function useSiteActionMap() {
   const { shouldExecuteShortcut } = useShortcutGuards();
 
   // Atlas data operations
-  const clearSelection = useAtlasAdminStore((state) => state.clearSelection);
-  const allEmotions = useAtlasAdminStore((state) => state.allEmotions);
-  const selectMultiple = useAtlasAdminStore((state) => state.selectMultiple);
+  const clearSelection = useVisualizationStore((state) => state.clearSelection);
+  const allEmotions = useVisualizationStore((state) => state.allEmotions);
+  const selectMultiple = useVisualizationStore((state) => state.selectMultiple);
 
   // View Modes
-  const cycleViewMode = useAtlasAdminStore((state) => state.cycleViewMode);
-  const viewMode = useAtlasAdminStore((state) => state.viewMode);
+  const cycleViewMode = useVisualizationStore((state) => state.cycleViewMode);
+  const viewMode = useVisualizationStore((state) => state.viewMode);
 
   // Flying state
-  const setAdminFlying = useAtlasAdminStore((state) => state.setIsFlying);
-  const adminIsFlying = useAtlasAdminStore((state) => state.isFlying);
+  const setAdminFlying = useVisualizationStore((state) => state.setIsFlying);
+  const adminIsFlying = useVisualizationStore((state) => state.isFlying);
   const setClientFlying = useExperienceStore((state) => state.setIsFlying);
   const clientIsFlying = useExperienceStore((state) => state.isFlying);
   const transitionPath = useExperienceStore((state) => state.transitionPath);
-  const selectedPathId = useAtlasAdminStore((state) => state.selectedPathId);
+  const selectedPathId = useVisualizationStore((state) => state.selectedPathId);
 
   const getActions = useCallback(
     (e: KeyboardEvent) => {

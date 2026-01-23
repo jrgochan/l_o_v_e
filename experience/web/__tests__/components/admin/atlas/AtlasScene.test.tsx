@@ -1,16 +1,16 @@
 import { render } from "@testing-library/react";
-import { AtlasScene } from "../../../../components/admin/atlas/AtlasScene";
+import { VisualizationScene } from "../../../../components/admin/visualization/VisualizationScene";
 
 // Mock child components
 jest.mock("@/components/SoulSphere", () => ({
   SoulSphere: () => <mesh data-testid="soul-sphere" />,
 }));
 
-jest.mock("../../../../components/admin/atlas/EmotionCloud", () => ({
+jest.mock("../../../../components/admin/visualization/EmotionCloud", () => ({
   EmotionCloud: () => <group data-testid="emotion-cloud" />,
 }));
 
-jest.mock("../../../../components/admin/atlas/PathNetwork", () => ({
+jest.mock("../../../../components/admin/visualization/PathNetwork", () => ({
   PathNetwork: () => <group data-testid="path-network" />,
 }));
 
@@ -31,7 +31,7 @@ jest.mock("@react-three/fiber", () => ({
   })),
 }));
 
-describe("AtlasScene", () => {
+describe("VisualizationScene", () => {
   beforeEach(() => {
     jest.clearAllMocks();
     mockUseSettingsStore.mockReturnValue({
@@ -41,10 +41,10 @@ describe("AtlasScene", () => {
   });
 
   it("should render all main components enabled", () => {
-    // Since AtlasScene returns a <group>, we can render it directly
+    // Since VisualizationScene returns a <group>, we can render it directly
     // But <group> is an R3F element. In testing-library render, it treats it as HTML tag <group>.
     // That's fine for existence check.
-    const { getByTestId } = render(<AtlasScene />);
+    const { getByTestId } = render(<VisualizationScene />);
 
     expect(getByTestId("soul-sphere")).toBeInTheDocument();
     expect(getByTestId("emotion-cloud")).toBeInTheDocument();
@@ -57,14 +57,14 @@ describe("AtlasScene", () => {
       showAxisLabels: true,
     });
 
-    const { queryByTestId } = render(<AtlasScene />);
+    const { queryByTestId } = render(<VisualizationScene />);
     expect(queryByTestId("soul-sphere")).not.toBeInTheDocument();
   });
 
   // Note: gridHelper is an intrinsic R3F element.
   // Checking for it directly renders as <gridHelper> in snapshot/DOM.
   it("should render grids if enabled", () => {
-    const { container } = render(<AtlasScene />);
+    const { container } = render(<VisualizationScene />);
     expect(container.querySelectorAll("gridhelper")).toHaveLength(3);
   });
 
@@ -74,7 +74,7 @@ describe("AtlasScene", () => {
       showAxisLabels: false,
     });
 
-    const { container } = render(<AtlasScene />);
+    const { container } = render(<VisualizationScene />);
     expect(container.querySelectorAll("gridhelper")).toHaveLength(0);
   });
 });

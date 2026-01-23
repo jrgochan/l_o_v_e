@@ -9,7 +9,7 @@
 
 // import { useState, useEffect } from "react";
 // import { useExperienceStore } from "@/stores/useExperienceStore";
-// import { getObserverClient, AtlasEmotion, TransitionPathResponse } from "@love/experience-shared";
+// import { getObserverClient, Emotion, TransitionPathResponse } from "@love/experience-shared";
 // import { logger } from "@/utils/logger";
 import { PersonalStrategies } from "./PersonalStrategies";
 import { useGoalSettingLogic } from "./GoalSettingLogic";

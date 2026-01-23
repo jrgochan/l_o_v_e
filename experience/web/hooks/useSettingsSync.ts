@@ -1,7 +1,7 @@
 /**
  * Settings Sync Hook
  *
- * One-way synchronization from useSettingsStore to useAtlasAdminStore.
+ * One-way synchronization from useSettingsStore to useVisualizationStore.
  * Settings Page is the source of truth, atlas store reads from it.
  */
 
@@ -9,7 +9,7 @@
 
 import { useEffect } from "react";
 import { useSettingsStore } from "@/stores/useSettingsStore";
-import { useAtlasAdminStore } from "@/stores/useAtlasAdminStore";
+import { useVisualizationStore } from "@/stores/useVisualizationStore";
 
 export function useSettingsSync() {
   useEffect(() => {
@@ -18,7 +18,7 @@ export function useSettingsSync() {
       const settings = useSettingsStore.getState();
 
       // Directly update atlas store state (bypass actions to avoid loops)
-      useAtlasAdminStore.setState((state) => ({
+      useVisualizationStore.setState((state) => ({
         settings: {
           ...state.settings,
           pathAnimationMode: settings.pathAnimationMode,

@@ -142,7 +142,7 @@ def main(
     verify: bool = False,
     dry_run: bool = False,
     force_reseed: bool = False,
-    dataset: str = "atlas"
+    dataset: str = "brene_brown"
 ):
     """Main orchestration function."""
     start_time = datetime.now()
@@ -173,7 +173,7 @@ def main(
     
     if dataset.lower() == 'all':
         datasets_to_seed = [
-            ("Atlas Emotions (87)", "data/atlas/emotions.json", "Atlas of the Heart"),
+            ("Brene Brown Emotions (87)", "data/brene_brown/emotions.json", "Atlas of the Heart"),
             ("Plutchik Emotions (8)", "data/plutchik/emotions.json", "Plutchik Wheel"),
             ("GoEmotions (28)", "data/goemotions/emotions.json", "GoEmotions"),
             ("UAL (Unified Affective Lexicon)", "data/ual/emotions.json", "Unified Affective Lexicon")
@@ -185,7 +185,7 @@ def main(
     elif dataset.lower() == "ual":
         datasets_to_seed = [("UAL (Unified Affective Lexicon)", "data/ual/emotions.json", "Unified Affective Lexicon")]
     else:
-        datasets_to_seed = [("Atlas Emotions (87)", "data/atlas/emotions.json", "Atlas of the Heart")]
+        datasets_to_seed = [("Brene Brown Emotions (87)", "data/brene_brown/emotions.json", "Atlas of the Heart")]
         
     for name, file_path, coll_name in datasets_to_seed:
         args_list = reseed_args.copy()
@@ -241,7 +241,7 @@ def main(
             failed_steps.append((step_name, output))
             
             # For critical steps, stop execution
-            if step_name in ["Atlas Emotions (87)", "Plutchik Emotions (8)", "GoEmotions (28)", "Transition System Data"]:
+            if step_name in ["Brene Brown Emotions (87)", "Plutchik Emotions (8)", "GoEmotions (28)", "Transition System Data"]:
                 print_error("Critical seeding step failed, stopping execution")
                 break
     
@@ -360,9 +360,9 @@ if __name__ == "__main__":
     )
     parser.add_argument(
         '--dataset',
-        choices=['atlas', 'plutchik', 'goemotions', 'ual', 'all'],
-        default='atlas',
-        help='Dataset to seed (default: atlas)'
+        choices=['atlas', 'brene_brown', 'plutchik', 'goemotions', 'ual', 'all'],
+        default='brene_brown',
+        help='Dataset to seed (default: brene_brown)'
     )
     
     args = parser.parse_args()

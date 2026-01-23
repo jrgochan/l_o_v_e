@@ -1,6 +1,6 @@
 import { renderHook } from "@testing-library/react";
 import { usePathSorting } from "@/hooks/admin/usePathSorting";
-import type { EmotionPath } from "@/types/atlas-admin";
+import type { EmotionPath } from "@/types/visualization";
 
 describe("usePathSorting", () => {
   const mockPaths: EmotionPath[] = [

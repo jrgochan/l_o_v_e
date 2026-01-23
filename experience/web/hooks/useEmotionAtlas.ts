@@ -5,8 +5,8 @@
  */
 
 import { useEffect, useCallback } from "react";
-import { useAtlasAdminStore } from "@/stores/useAtlasAdminStore";
-import type { AtlasEmotion, EmotionCollection } from "@/types/atlas-admin";
+import { useVisualizationStore } from "@/stores/useVisualizationStore";
+import type { Emotion, EmotionCollection } from "@/types/visualization";
 import type { ObserverEmotionResponse } from "@/types/api-responses";
 import { logger } from "@/utils/logger";
 import { getCanonicalEmotion } from "@love/experience-shared";
@@ -26,7 +26,7 @@ export function useEmotionAtlas() {
     setActiveCollection,
     setLoadingEmotions,
     setError,
-  } = useAtlasAdminStore();
+  } = useVisualizationStore();
 
   // 1. Fetch Collections
   const fetchCollections = useCallback(async () => {
@@ -74,7 +74,7 @@ export function useEmotionAtlas() {
       const data: ObserverEmotionResponse = await response.json();
 
       // Transform API response
-      const emotions: AtlasEmotion[] = data.emotions.map((emotion) => {
+      const emotions: Emotion[] = data.emotions.map((emotion) => {
         const canonical = getCanonicalEmotion(emotion.name);
         // Fix for potentially missing VACs in backend (fallback to canonical if available)
         const isSuspiciouslyNeutral =

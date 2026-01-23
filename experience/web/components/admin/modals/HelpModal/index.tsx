@@ -8,7 +8,7 @@
 "use client";
 
 import { useState } from "react";
-import { useAtlasAdminStore } from "@/stores/useAtlasAdminStore";
+import { useVisualizationStore } from "@/stores/useVisualizationStore";
 
 type TabType = "model" | "usage" | "shortcuts" | "concepts";
 
@@ -535,7 +535,7 @@ function ShortcutsTab() {
 }
 
 function ConceptsTab() {
-  const { allEmotions, getBridgeEmotions } = useAtlasAdminStore();
+  const { allEmotions, getBridgeEmotions } = useVisualizationStore();
   const bridgeEmotions = getBridgeEmotions();
 
   return (

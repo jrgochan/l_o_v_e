@@ -1,12 +1,12 @@
 import { getEmotionAnimationParams } from "../../utils/emotionAnimationMapper";
-import { AtlasEmotion } from "../../types/atlas-admin";
+import { Emotion } from "../../types/visualization";
 
 describe("emotionAnimationMapper", () => {
   const mockVac: [number, number, number] = [0, 0, 0];
   const mockQuaternion: [number, number, number, number] = [0, 0, 0, 1];
 
   it("should use movement_pattern when provided", () => {
-    const emotion: AtlasEmotion = {
+    const emotion: Emotion = {
       id: "1",
       name: "Test Emotion",
       category: "Any Category",
@@ -21,7 +21,7 @@ describe("emotionAnimationMapper", () => {
   });
 
   it("should fallback to category mapping when movement_pattern is missing", () => {
-    const emotion: AtlasEmotion = {
+    const emotion: Emotion = {
       id: "2",
       name: "Test Emotion",
       category: "Places We Go When It's Beyond Us",
@@ -36,7 +36,7 @@ describe("emotionAnimationMapper", () => {
   });
 
   it("should fallback to reaching for unknown categories without movement_pattern", () => {
-    const emotion: AtlasEmotion = {
+    const emotion: Emotion = {
       id: "3",
       name: "Test Emotion",
       category: "Unknown Category",
@@ -50,7 +50,7 @@ describe("emotionAnimationMapper", () => {
   });
 
   it("should ignore invalid movement_pattern values", () => {
-    const emotion: AtlasEmotion = {
+    const emotion: Emotion = {
       id: "4",
       name: "Test Emotion",
       category: "Unknown Category",

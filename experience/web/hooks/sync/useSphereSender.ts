@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef } from "react";
 import { useExperienceStore } from "@/stores/useExperienceStore";
-import { useAtlasAdminStore } from "@/stores/useAtlasAdminStore";
+import { useVisualizationStore } from "@/stores/useVisualizationStore";
 import { logger } from "@/utils/logger";
 import { HEARTBEAT_INTERVAL, SphereStateMessage, SyncMode } from "./types";
 
@@ -9,7 +9,7 @@ export function useSphereSender(mode: SyncMode, sendMessage: (msg: SphereStateMe
 
   const broadcastSphereState = useCallback(() => {
     const targetVAC = useExperienceStore.getState().targetVAC;
-    const selectedIds = useAtlasAdminStore.getState().selectedEmotionIds;
+    const selectedIds = useVisualizationStore.getState().selectedEmotionIds;
     const transitionPath = useExperienceStore.getState().transitionPath;
     const showPath = useExperienceStore.getState().showPath;
 

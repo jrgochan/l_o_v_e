@@ -2,12 +2,12 @@ import { render, screen, fireEvent, cleanup, within } from "@testing-library/rea
 import React from "react";
 import { WaypointDetailModal } from "@/components/admin/shared/WaypointDetailModal";
 import { useExperienceStore } from "@/stores/useExperienceStore";
-import { useAtlasAdminStore } from "@/stores/useAtlasAdminStore";
+import { useVisualizationStore } from "@/stores/useVisualizationStore";
 import * as THREE from "three";
 
 // Mock Stores
 jest.mock("@/stores/useExperienceStore");
-jest.mock("@/stores/useAtlasAdminStore");
+jest.mock("@/stores/useVisualizationStore");
 jest.mock("@react-three/fiber", () => ({
   useFrame: jest.fn(),
   Canvas: ({ children }: any) => <div>{children}</div>,
@@ -87,7 +87,7 @@ describe("WaypointDetailModal", () => {
     });
 
     // Strict selector implementation
-    (useAtlasAdminStore as unknown as jest.Mock).mockImplementation((selector) => {
+    (useVisualizationStore as unknown as jest.Mock).mockImplementation((selector) => {
       return selector({
         setSelectedEmotion: mockSetSelectedEmotion,
         setFocusedEmotion: mockSetFocusedEmotion,

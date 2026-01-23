@@ -8,17 +8,17 @@
  */
 
 import { useState, useMemo } from "react";
-import type { AtlasEmotion } from "@/types/atlas-admin";
+import type { Emotion } from "@/types/visualization";
 
 interface UseCategoryStateOptions {
-  allEmotions: AtlasEmotion[];
+  allEmotions: Emotion[];
   selectedIds: Set<string>;
 }
 
 interface UseCategoryStateReturn {
   expandedCategories: Set<string>;
   toggleCategoryExpansion: (category: string) => void;
-  emotionsByCategory: Map<string, AtlasEmotion[]>;
+  emotionsByCategory: Map<string, Emotion[]>;
   getCategorySelectionState: (category: string) => "all" | "some" | "none";
 }
 
@@ -33,7 +33,7 @@ export function useCategoryState({
 
   // Group emotions by category
   const emotionsByCategory = useMemo(() => {
-    const grouped = new Map<string, AtlasEmotion[]>();
+    const grouped = new Map<string, Emotion[]>();
     allEmotions.forEach((emotion) => {
       if (!grouped.has(emotion.category)) {
         grouped.set(emotion.category, []);

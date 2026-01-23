@@ -1,6 +1,6 @@
 import { renderHook, act } from "@testing-library/react";
 import { useBatchPaths } from "../../../hooks/pathfinding/useBatchPaths";
-import { useAtlasAdminStore } from "@/stores/useAtlasAdminStore";
+import { useVisualizationStore } from "@/stores/useVisualizationStore";
 
 // Mock store state
 const mockStore = {
@@ -13,8 +13,8 @@ const mockStore = {
   fetchPathFromBackend: jest.fn(),
 };
 
-jest.mock("@/stores/useAtlasAdminStore", () => ({
-  useAtlasAdminStore: {
+jest.mock("@/stores/useVisualizationStore", () => ({
+  useVisualizationStore: {
     getState: () => mockStore,
   },
 }));

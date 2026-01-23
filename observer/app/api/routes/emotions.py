@@ -1,31 +1,31 @@
-"""Atlas API Routes - Emotional Atlas Discovery & Path Matrix Management.
+"""Emotion API Routes - Emotional Collection Discovery & Path Matrix Management.
 
-REST endpoints for exploring Observer's 87-emotion atlas, initiating path matrix computation,
-and accessing intelligent recommendations. Primary interface for atlas browsing, category
+REST endpoints for exploring Observer's emotion collection, initiating path matrix computation,
+and accessing intelligent recommendations. Primary interface for emotion browsing, category
 exploration, and therapeutic journey discovery.
 
 API Architecture:
 
     Seven endpoint categories::
 
-        1. Atlas Browsing
-           GET /atlas/emotions - List all 87 emotions
-           GET /atlas/categories - List 12 categories
-           GET /atlas/emotions/{id} - Get specific emotion
-           GET /atlas/search - Search by name/definition
+        1. Emotion Browsing
+           GET /observer/emotions - List all emotions
+           GET /observer/categories - List categories
+           GET /observer/emotions/{id} - Get specific emotion
+           GET /observer/search - Search by name/definition
 
         2. Path Matrix Management
-           POST /atlas/compute-all-paths - Start batch computation
-           GET /atlas/computation-status/{job_id} - Monitor progress
-           GET /atlas/paths/all - Query cached paths
-           DELETE /atlas/paths/cache - Clear cache
+           POST /observer/compute-all-paths - Start batch computation
+           GET /observer/computation-status/{job_id} - Monitor progress
+           GET /observer/paths/all - Query cached paths
+           DELETE /observer/paths/cache - Clear cache
 
         3. Smart Recommendations
-           GET /atlas/recommendations - Context-aware suggestions
+           GET /observer/recommendations - Context-aware suggestions
 
 Endpoint Details:
 
-    GET /atlas/emotions
+    GET /observer/emotions
     ───────────────────
     Purpose: Retrieve all emotions, optionally filtered
 
@@ -54,7 +54,7 @@ Endpoint Details:
     - Dropdown population
     - Emotion selection menus
 
-    GET /atlas/categories
+    GET /observer/categories
     ─────────────────────
     Purpose: List[Any] all 12 emotional categories
 
@@ -75,7 +75,7 @@ Endpoint Details:
     - Category browser
     - Distribution analysis
 
-    GET /atlas/emotions/{emotion_id}
+    GET /observer/emotions/{emotion_id}
     ────────────────────────────────
     Purpose: Get detailed info for single emotion
 
@@ -86,7 +86,7 @@ Endpoint Details:
     - Tooltip information
     - Journey waypoint display
 
-    GET /atlas/search?query={text}
+    GET /observer/search?query={text}
     ──────────────────────────────
     Purpose: Text search across emotions
 
@@ -101,7 +101,7 @@ Endpoint Details:
     - Quick emotion lookup
     - Fuzzy finding
 
-    POST /atlas/compute-all-paths
+    POST /observer/compute-all-paths
     ─────────────────────────────
     Purpose: Start 7,482-path batch computation
 
@@ -121,7 +121,7 @@ Endpoint Details:
     - After VAC coordinate updates
     - Rebuild cache
 
-    GET /atlas/computation-status/{job_id}
+    GET /observer/computation-status/{job_id}
     ──────────────────────────────────────
     Purpose: Monitor batch computation progress
 
@@ -137,7 +137,7 @@ Endpoint Details:
 
     Poll interval: Every 5-10 seconds
 
-    GET /atlas/paths/all
+    GET /observer/paths/all
     ───────────────────
     Purpose: Query cached transition paths
 
@@ -155,7 +155,7 @@ Endpoint Details:
     - Find bridge paths
     - Paginated exploration
 
-    GET /atlas/statistics
+    GET /observer/statistics
     ────────────────────
     Purpose: Cache statistics and metrics
 
@@ -177,7 +177,7 @@ Endpoint Details:
     - Cache health monitoring
     - System status
 
-    DELETE /atlas/paths/cache
+    DELETE /observer/paths/cache
     ─────────────────────────
     Purpose: Clear all cached paths
 
@@ -188,7 +188,7 @@ Endpoint Details:
     - After atlas updates
     - Cache invalidation
 
-    GET /atlas/recommendations
+    GET /observer/recommendations
     ──────────────────────────
     Purpose: Intelligent exploration suggestions
 
@@ -289,9 +289,9 @@ async def get_all_emotions(
     collection_id: Optional[UUID] = Query(None, description="Filter by collection ID"),
     db: AsyncSession = Depends(get_db),
 ) -> Dict[str, Any]:
-    """Get all emotions from the atlas.
+    """Get all emotions from the collection.
 
-    Returns the complete emotion set (defaulting to Atlas of the Heart),
+    Returns the complete emotion set (defaulting to primary collection),
     optionally filtered by category.
     """
     try:
@@ -355,7 +355,7 @@ async def get_all_emotions(
 
 @router.get("/categories", tags=["Emotions"])
 async def get_categories(db: AsyncSession = Depends(get_db)) -> Dict[str, Any]:
-    """Get all emotion categories (the 13 'places' from Brené Brown's Atlas of the Heart).
+    """Get all emotion categories.
 
     Returns categories with emotion counts.
     """
@@ -485,7 +485,7 @@ async def compute_all_paths_batch(
     """Compute ALL 87×86 = 7,482 emotion-to-emotion transition paths.
 
     This endpoint starts a background job and returns immediately.
-    Use the returned job_id to poll /atlas/computation-status/{job_id} for progress.
+    Use the returned job_id to poll /observer/computation-status/{job_id} for progress.
 
     Results are cached in the database for instant retrieval on subsequent requests.
     """
@@ -507,7 +507,7 @@ async def compute_all_paths_batch(
             "total_paths": total_paths,
             "estimated_time": "8-10 minutes",
             "message": (
-                "Batch computation started. Poll /atlas/computation-status/{job_id} for progress."
+                "Batch computation started. Poll /observer/computation-status/{job_id} for progress."
             ),
         }
 
@@ -553,7 +553,7 @@ async def get_all_cached_paths(
     """Retrieve all cached paths from the path matrix.
 
     Returns paths with optional filtering and pagination.
-    First call to /atlas/compute-all-paths to populate the cache.
+    First call to /observer/compute-all-paths to populate the cache.
     """
     try:
         service = PathMatrixService(db)
@@ -581,7 +581,7 @@ async def get_all_cached_paths(
 
 
 @router.get("/statistics", tags=["Emotions", "Path Matrix"])
-async def get_atlas_statistics(db: AsyncSession = Depends(get_db)) -> Dict[str, Any]:
+async def get_path_statistics(db: AsyncSession = Depends(get_db)) -> Dict[str, Any]:
     """Get comprehensive statistics about the path matrix.
 
     Returns aggregated metrics including difficulty distribution,

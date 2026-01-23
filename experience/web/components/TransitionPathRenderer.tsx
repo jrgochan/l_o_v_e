@@ -15,7 +15,7 @@ import { useExperienceStore } from "@/stores/useExperienceStore";
 import { useSettingsStore } from "@/stores/useSettingsStore";
 import type { WaypointData } from "@/types/journeys";
 import { PathCurveAnimated } from "@/components/admin/paths/PathCurveAnimated";
-import type { PathAnimationMode } from "@/types/atlas-admin";
+import type { PathAnimationMode } from "@/types/visualization";
 
 interface PathRendererProps {
   path: TransitionPathResponse;

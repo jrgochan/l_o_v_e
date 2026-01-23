@@ -8,7 +8,7 @@
 
 "use client";
 
-import { useAtlasAdminStore } from "@/stores/useAtlasAdminStore";
+import { useVisualizationStore } from "@/stores/useVisualizationStore";
 import { useEmotionResolution } from "./navigation/useEmotionResolution";
 import { useNavigationActions } from "./navigation/useNavigationActions";
 
@@ -18,7 +18,7 @@ interface UseEmotionNavigationOptions {
 
 export function useEmotionNavigation(options: UseEmotionNavigationOptions = {}) {
   const { onNavigate } = options;
-  const getSelectedEmotions = useAtlasAdminStore((state) => state.getSelectedEmotions);
+  const getSelectedEmotions = useVisualizationStore((state) => state.getSelectedEmotions);
 
   // 1. Resolution Logic (Find by name)
   const { findEmotionByName } = useEmotionResolution();

@@ -1,11 +1,11 @@
 import { render, screen, fireEvent, act } from "@testing-library/react";
 import { ControlPanel } from "@/components/admin/panels/ControlPanel";
-import { useAtlasAdminStore } from "@/stores/useAtlasAdminStore";
+import { useVisualizationStore } from "@/stores/useVisualizationStore";
 import { useEmotionSearch } from "@/hooks/admin/useEmotionSearch";
 import { useCategoryState } from "@/hooks/admin/useCategoryState";
 
 // Mock hooks
-jest.mock("@/stores/useAtlasAdminStore");
+jest.mock("@/stores/useVisualizationStore");
 import { useSettingsStore } from "@/stores/useSettingsStore";
 jest.mock("@/stores/useSettingsStore");
 jest.mock("@/hooks/admin/useEmotionSearch");
@@ -105,7 +105,7 @@ describe("ControlPanel", () => {
       getCategorySelectionState: jest.fn(),
     };
 
-    (useAtlasAdminStore as unknown as jest.Mock).mockImplementation((selector) =>
+    (useVisualizationStore as unknown as jest.Mock).mockImplementation((selector) =>
       selector(mockStore)
     );
     (useSettingsStore as unknown as jest.Mock).mockImplementation(() => ({

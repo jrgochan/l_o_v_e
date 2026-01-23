@@ -266,7 +266,7 @@ if __name__ == "__main__":
     import argparse
     
     parser = argparse.ArgumentParser(description="Seed emotions into a collection")
-    parser.add_argument('--file', type=str, default='data/atlas/emotions.json',
+    parser.add_argument('--file', type=str, default='data/brene_brown/emotions.json',
                        help='Path to JSON data file')
     parser.add_argument('--collection', type=str, default='Atlas of the Heart',
                        help='Name of the collection')

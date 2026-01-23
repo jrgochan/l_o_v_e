@@ -44,14 +44,14 @@ Response Schema (StateResponse):
 
         Fields returned:
         - state_id: UUID of created trajectory point
-        - dominant_emotion: Nearest atlas emotion
+        - dominant_emotion: Nearest emotion from collection
         - quaternion: Rotation representation
         - previous_quaternion: Prior state (if exists)
         - metrics: Temporal analytics
         - timestamp: Recorded time
 
         Provides Observer intelligence:
-        - Atlas emotion classification
+        - Emotion classification
         - Quaternion conversion
         - Temporal metrics (E, R)
         - Alert detection
@@ -98,7 +98,7 @@ class StateResponse(BaseModel):
     """Response from recording emotional state."""
 
     state_id: str = Field(description="UUID of created state")
-    dominant_emotion: EmotionInfo = Field(description="Nearest emotion from Atlas")
+    dominant_emotion: EmotionInfo = Field(description="Nearest emotion from active collection")
     quaternion: QuaternionModel = Field(description="Quaternion representation")
     previous_quaternion: Optional[QuaternionModel] = Field(
         default=None, description="Previous quaternion state (if exists)"

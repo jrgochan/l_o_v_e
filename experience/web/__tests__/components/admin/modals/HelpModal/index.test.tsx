@@ -2,8 +2,8 @@ import { render, screen, fireEvent } from "@testing-library/react";
 import { HelpModal } from "@/components/admin/modals/HelpModal";
 
 // Mock store
-jest.mock("@/stores/useAtlasAdminStore", () => ({
-  useAtlasAdminStore: jest.fn(() => ({
+jest.mock("@/stores/useVisualizationStore", () => ({
+  useVisualizationStore: jest.fn(() => ({
     allEmotions: Array(10).fill({}),
     getBridgeEmotions: jest.fn(() => [
       { id: "1", name: "Vulnerability", vac: [0, 0, 0], definition: "Def" },

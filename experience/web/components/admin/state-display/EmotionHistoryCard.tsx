@@ -9,7 +9,7 @@
 
 import { useState } from "react";
 import type { EmotionHistoryEntry } from "@/stores/useEmotionHistoryStore";
-import { useAtlasAdminStore } from "@/stores/useAtlasAdminStore";
+import { useVisualizationStore } from "@/stores/useVisualizationStore";
 import { resolveEmotionColor } from "@/utils/emotion-colors";
 
 interface EmotionHistoryCardProps {
@@ -24,7 +24,7 @@ export function EmotionHistoryCard({
   onRemove,
 }: EmotionHistoryCardProps) {
   const [isExpanded, setIsExpanded] = useState(false);
-  const allEmotions = useAtlasAdminStore((state) => state.allEmotions);
+  const allEmotions = useVisualizationStore((state) => state.allEmotions);
 
   // Get category color
   const emotion = allEmotions.find((e) => e.name === entry.emotion);

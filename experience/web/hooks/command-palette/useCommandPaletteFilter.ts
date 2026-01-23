@@ -1,6 +1,6 @@
 import { useMemo } from "react";
-import { useAtlasAdminStore } from "@/stores/useAtlasAdminStore";
-import type { AtlasEmotion } from "@/types/atlas-admin";
+import { useVisualizationStore } from "@/stores/useVisualizationStore";
+import type { Emotion } from "@/types/visualization";
 
 interface UseCommandPaletteFilterOptions {
   search: string;
@@ -27,14 +27,14 @@ export function useCommandPaletteFilter({
   recentEmotions,
   selectedEmotionIds,
 }: UseCommandPaletteFilterOptions) {
-  const allEmotions = useAtlasAdminStore((state) => state.allEmotions);
-  const computedPaths = useAtlasAdminStore((state) => state.computedPaths);
+  const allEmotions = useVisualizationStore((state) => state.allEmotions);
+  const computedPaths = useVisualizationStore((state) => state.computedPaths);
 
   // Filter recent emotions
   const recentEmotionsList = useMemo(() => {
     return recentEmotions
       .map((id) => allEmotions.find((e) => e.id === id))
-      .filter((e): e is AtlasEmotion => {
+      .filter((e): e is Emotion => {
         return e !== undefined;
       })
       .slice(0, 5);
@@ -44,7 +44,7 @@ export function useCommandPaletteFilter({
   const favoriteEmotionsList = useMemo(() => {
     return favoriteEmotions
       .map((id) => allEmotions.find((e) => e.id === id))
-      .filter((e): e is AtlasEmotion => e !== undefined);
+      .filter((e): e is Emotion => e !== undefined);
   }, [favoriteEmotions, allEmotions]);
 
   const filteredEmotions = useMemo(() => {
@@ -211,7 +211,7 @@ export function useCommandPaletteFilter({
 
   // Group emotions by category for list view
   const emotionsByCategory = useMemo(() => {
-    const groups = new Map<string, AtlasEmotion[]>();
+    const groups = new Map<string, Emotion[]>();
 
     allEmotions.forEach((emotion) => {
       const category = emotion.category;

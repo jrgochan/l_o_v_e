@@ -1,7 +1,7 @@
 "use client";
 
 import { Command } from "cmdk";
-import type { AtlasEmotion, EmotionPath } from "@/types/atlas-admin";
+import type { Emotion, EmotionPath } from "@/types/visualization";
 
 interface QuickAction {
   command: string;
@@ -14,13 +14,13 @@ interface PaletteResultsProps {
   currentPage: string;
   selectedCategory: string | null;
   selectedEmotionIds: Set<string>;
-  filteredEmotions: AtlasEmotion[];
+  filteredEmotions: Emotion[];
   filteredPaths: EmotionPath[];
-  recentEmotionsList: AtlasEmotion[];
-  favoriteEmotionsList: AtlasEmotion[];
-  emotionsByCategory: Map<string, AtlasEmotion[]>;
+  recentEmotionsList: Emotion[];
+  favoriteEmotionsList: Emotion[];
+  emotionsByCategory: Map<string, Emotion[]>;
   quickActions: QuickAction[];
-  onSelectEmotion: (emotion: AtlasEmotion) => void;
+  onSelectEmotion: (emotion: Emotion) => void;
   onSelectPath: (pathId: string) => void;
   onSelectCategory: (category: string) => void;
   onQuickAction: (command: string) => void;

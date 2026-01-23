@@ -15,7 +15,7 @@ import {
   Info,
 } from "lucide-react";
 
-import { useAtlasAdminStore } from "@/stores/useAtlasAdminStore";
+import { useVisualizationStore } from "@/stores/useVisualizationStore";
 
 // Helper to get color from valence
 function getEmotionColor(valence: number): string {
@@ -55,7 +55,7 @@ function getVacComponentColor(value: number, component: "V" | "A" | "C"): string
 }
 
 import { WaypointDetailModal } from "@/components/admin/shared/WaypointDetailModal";
-import type { EmotionPath } from "@/types/atlas-admin";
+import type { EmotionPath } from "@/types/visualization";
 
 export function PathDetailsOverlay() {
   const transitionPath = useExperienceStore((state) => state.transitionPath);
@@ -71,7 +71,7 @@ export function PathDetailsOverlay() {
   const [modalWaypointIndex, setModalWaypointIndex] = useState(0);
 
   // Compute current category index
-  const allEmotions = useAtlasAdminStore((state) => state.allEmotions);
+  const allEmotions = useVisualizationStore((state) => state.allEmotions);
   const categoryInfo = useMemo(() => {
     if (!transitionPath?.current_state?.emotion) return { name: "UNKNOWN", index: 0 };
     const emotion = allEmotions.find((e) => e.name === transitionPath.current_state.emotion);
@@ -150,9 +150,9 @@ export function PathDetailsOverlay() {
   });
 
   // Nav Actions
-  const cycleSelectedPath = useAtlasAdminStore((state) => state.cycleSelectedPath);
-  const setAdminIsFlying = useAtlasAdminStore((state) => state.setIsFlying);
-  const viewMode = useAtlasAdminStore((state) => state.viewMode);
+  const cycleSelectedPath = useVisualizationStore((state) => state.cycleSelectedPath);
+  const setAdminIsFlying = useVisualizationStore((state) => state.setIsFlying);
+  const viewMode = useVisualizationStore((state) => state.viewMode);
 
   // Adapt transitionPath to EmotionPath for Modal
   const modalPath = useMemo(() => {
@@ -163,7 +163,7 @@ export function PathDetailsOverlay() {
       total_distance: transitionPath.path_metrics.total_distance,
       estimated_time: transitionPath.path_metrics.total_estimated_time,
       difficulty: transitionPath.path_metrics.overall_difficulty,
-      // Map states to AtlasEmotion shape (best effort)
+      // Map states to Emotion shape (best effort)
       from: {
         id: "start-node", // verification-only fallback
         name: transitionPath.current_state.emotion,

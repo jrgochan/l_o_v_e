@@ -1,15 +1,15 @@
 import { useCallback } from "react";
-import { useAtlasAdminStore } from "@/stores/useAtlasAdminStore";
-import type { EmotionPath, PathComputationResult, AtlasEmotion } from "@/types/atlas-admin";
+import { useVisualizationStore } from "@/stores/useVisualizationStore";
+import type { EmotionPath, PathComputationResult, Emotion } from "@/types/visualization";
 import { logger } from "@/utils/logger";
 
 const OBSERVER_API_URL = process.env.NEXT_PUBLIC_OBSERVER_API_URL || "http://localhost:8000";
 
 export function useSinglePath() {
-  const { addComputedPath } = useAtlasAdminStore();
+  const { addComputedPath } = useVisualizationStore();
 
   const computePath = useCallback(
-    async (from: AtlasEmotion, to: AtlasEmotion): Promise<void> => {
+    async (from: Emotion, to: Emotion): Promise<void> => {
       try {
         logger.debug("hooks", `Computing path: ${from.name} → ${to.name}`);
 

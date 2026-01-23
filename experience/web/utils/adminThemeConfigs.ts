@@ -5,7 +5,7 @@
  * Each theme provides tokens for colors, borders, fonts, and effects to match the 3D environment.
  */
 
-import type { PathAnimationMode } from "@/types/atlas-admin";
+import type { PathAnimationMode } from "@/types/visualization";
 
 export interface AdminUITheme {
   name: string;

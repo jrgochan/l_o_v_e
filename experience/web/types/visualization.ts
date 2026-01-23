@@ -10,7 +10,7 @@ export type { EmotionCollection };
 /**
  * Complete emotion definition from Observer API
  */
-export interface AtlasEmotion {
+export interface Emotion {
   id: string;
   collection_id?: string;
   name: string;
@@ -28,8 +28,8 @@ export interface AtlasEmotion {
  */
 export interface EmotionPath {
   id: string; // "${fromId}-${toId}"
-  from: AtlasEmotion;
-  to: AtlasEmotion;
+  from: Emotion;
+  to: Emotion;
   waypoints: PathWaypoint[];
   total_distance: number;
   estimated_time: string;
@@ -197,7 +197,7 @@ export interface CacheStatus {
 /**
  * Admin interface settings
  */
-export interface AtlasAdminSettings {
+export interface VisualizationSettings {
   computeMode: PathComputeMode;
   showAllPaths: boolean; // vs. show only selected pairs
   pathOpacity: number;
@@ -235,9 +235,10 @@ export const DIFFICULTY_COLORS = {
 } as const;
 
 /**
- * Bridge emotions list (the 6 critical gateway emotions)
+ * Default bridge emotions list (from Brené Brown's Atlas)
+ * @deprecated Use emotion.is_bridge from backend instead
  */
-export const BRIDGE_EMOTIONS = [
+export const DEFAULT_BRIDGE_EMOTIONS = [
   "Vulnerability",
   "Awe",
   "Compassion",
@@ -247,9 +248,14 @@ export const BRIDGE_EMOTIONS = [
 ] as const;
 
 /**
+ * @deprecated Use DEFAULT_BRIDGE_EMOTIONS or backend data
+ */
+export const BRIDGE_EMOTIONS = DEFAULT_BRIDGE_EMOTIONS;
+
+/**
  * Type representing valid bridge emotion names
  */
-export type BridgeEmotion = (typeof BRIDGE_EMOTIONS)[number];
+export type BridgeEmotion = (typeof DEFAULT_BRIDGE_EMOTIONS)[number];
 
 /**
  * Type guard to check if an emotion name is a bridge emotion
@@ -258,13 +264,14 @@ export type BridgeEmotion = (typeof BRIDGE_EMOTIONS)[number];
  * @returns True if the name is one of the 6 bridge emotions
  */
 export function isBridgeEmotion(name: string): name is BridgeEmotion {
-  return (BRIDGE_EMOTIONS as readonly string[]).includes(name);
+  return (DEFAULT_BRIDGE_EMOTIONS as readonly string[]).includes(name);
 }
 
 /**
- * Category color palette (13 categories from Brené Brown's Atlas)
+ * Default category color palette (from Brené Brown's Atlas)
+ * @deprecated Move to backend EmotionCollection configuration
  */
-export const CATEGORY_COLORS: Record<string, string> = {
+export const DEFAULT_CATEGORY_COLORS: Record<string, string> = {
   "Places We Go With Others": "#88FF44", // Green
   "When It's Beyond Us": "#FF8844", // Orange
   "When Life Is Good": "#FFFF44", // Yellow
@@ -278,12 +285,19 @@ export const CATEGORY_COLORS: Record<string, string> = {
   "When We Search for Connection": "#FFCC44", // Gold
   "When We Self-Assess": "#44FFCC", // Turquoise
   "When We're Hurting": "#4488FF", // Blue
+  // Add generic fallback
+  "Uncategorized": "#CCCCCC",
 };
+
+/**
+ * @deprecated Use DEFAULT_CATEGORY_COLORS or backend colors
+ */
+export const CATEGORY_COLORS = DEFAULT_CATEGORY_COLORS;
 
 /**
  * Default settings
  */
-export const DEFAULT_SETTINGS: AtlasAdminSettings = {
+export const DEFAULT_SETTINGS: VisualizationSettings = {
   computeMode: "cache-first",
   showAllPaths: true,
   pathOpacity: 0.6,

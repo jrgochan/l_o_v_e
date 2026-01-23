@@ -3,8 +3,8 @@ import { MultiEmotionCard } from "@/components/admin/emotion-display/MultiEmotio
 import type { DetectedEmotion, EmotionRelationship, AggregateState } from "@/types/chat";
 
 // Mock the store
-jest.mock("@/stores/useAtlasAdminStore", () => ({
-  useAtlasAdminStore: (selector: any) =>
+jest.mock("@/stores/useVisualizationStore", () => ({
+  useVisualizationStore: (selector: any) =>
     selector({
       settings: { pathAnimationMode: "subtle" },
     }),

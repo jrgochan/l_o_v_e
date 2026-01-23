@@ -76,9 +76,9 @@ def load_demo_journeys() -> Dict[str, Any]:
 
 async def get_emotion_id(session, emotion_name: str) -> Optional[UUID]:
     """Look up emotion ID from emotion_definitions by name."""
-    stmt = select(AtlasDefinition).where(AtlasDefinition.emotion_name == emotion_name)
+    stmt = select(EmotionDefinition).where(EmotionDefinition.emotion_name == emotion_name)
     result = await session.execute(stmt)
-    emotion = result.scalar_one_or_none()
+    emotion = result.scalars().first()  # Use first() to handle duplicates if any
     return emotion.id if emotion else None
 
 

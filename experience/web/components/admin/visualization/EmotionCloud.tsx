@@ -11,11 +11,11 @@ import { useMemo } from "react";
 import { ThreeEvent } from "@react-three/fiber";
 import { Html } from "@react-three/drei";
 import * as THREE from "three";
-import { useAtlasAdminStore } from "@/stores/useAtlasAdminStore";
+import { useVisualizationStore } from "@/stores/useVisualizationStore";
 import { useSettingsStore } from "@/stores/useSettingsStore";
-import { BRIDGE_EMOTIONS } from "@/types/atlas-admin";
+import { BRIDGE_EMOTIONS } from "@/types/visualization";
 import { resolveEmotionColor } from "@/utils/emotion-colors";
-import type { AtlasEmotion, PathAnimationMode } from "@/types/atlas-admin";
+import type { Emotion, PathAnimationMode } from "@/types/visualization";
 //
 import { AnimatedEmotionNode } from "../emotions/AnimatedEmotionNode";
 import { MysticalEmotionNode } from "../emotions/MysticalEmotionNode";
@@ -32,13 +32,13 @@ interface EmotionCloudProps {
 
 export function EmotionCloud({ enableFloatingLabels = false }: EmotionCloudProps) {
   // const { playHoverSound } = useAmbientAudio();
-  const allEmotions = useAtlasAdminStore((state) => state.allEmotions);
-  const selectedIds = useAtlasAdminStore((state) => state.selectedEmotionIds);
-  const hoveredId = useAtlasAdminStore((state) => state.hoveredEmotionId);
-  const focusedId = useAtlasAdminStore((state) => state.focusedEmotionId);
-  const categoryFilters = useAtlasAdminStore((state) => state.categoryFilters);
+  const allEmotions = useVisualizationStore((state) => state.allEmotions);
+  const selectedIds = useVisualizationStore((state) => state.selectedEmotionIds);
+  const hoveredId = useVisualizationStore((state) => state.hoveredEmotionId);
+  const focusedId = useVisualizationStore((state) => state.focusedEmotionId);
+  const categoryFilters = useVisualizationStore((state) => state.categoryFilters);
   const { layers } = useSettingsStore();
-  // settings store has flat properties, while useAtlasAdminStore nested them.
+  // settings store has flat properties, while useVisualizationStore nested them.
   // Actually useSettingsStore has 'layers' and flat settings.
   // We need to match what EmotionCloud expects.
   // EmotionCloud uses: settings.pathAnimationMode, settings.focusMode, settings.enableAnimations, settings.emotionSize, settings.showMotionIndicators
@@ -138,7 +138,7 @@ export function EmotionCloud({ enableFloatingLabels = false }: EmotionCloudProps
 }
 
 interface EmotionSphereProps {
-  emotion: AtlasEmotion;
+  emotion: Emotion;
   isSelected: boolean;
   isHovered: boolean;
   isFocused: boolean;
@@ -156,8 +156,8 @@ function EmotionSphere({
   showLabel,
   enableFloatingLabels,
 }: EmotionSphereProps) {
-  const toggleEmotion = useAtlasAdminStore((state) => state.toggleEmotion);
-  const setHoveredEmotion = useAtlasAdminStore((state) => state.setHoveredEmotion);
+  const toggleEmotion = useVisualizationStore((state) => state.toggleEmotion);
+  const setHoveredEmotion = useVisualizationStore((state) => state.setHoveredEmotion);
   const settings = useSettingsStore();
   // const toast = useToast();
   const { playHoverSound } = useAmbientAudio();
@@ -386,7 +386,7 @@ function FloatingEmotionLabel({
   isHovered,
   isBridge,
 }: {
-  emotion: AtlasEmotion;
+  emotion: Emotion;
   mode: PathAnimationMode;
   isSelected: boolean;
   isHovered: boolean;

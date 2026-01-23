@@ -1,6 +1,6 @@
 import { renderHook } from "@testing-library/react";
 import { useCommandPaletteActions } from "@/hooks/command-palette/useCommandPaletteActions";
-import { useAtlasAdminStore } from "@/stores/useAtlasAdminStore";
+import { useVisualizationStore } from "@/stores/useVisualizationStore";
 
 // Mock sub-hooks
 jest.mock("@/hooks/command-palette/actions/useEmotionActions", () => ({
@@ -22,12 +22,12 @@ jest.mock("@/hooks/command-palette/actions/useQuickActions", () => ({
   useQuickActions: () => ({ executeQuickAction: "mockQuick" }),
 }));
 
-jest.mock("@/stores/useAtlasAdminStore");
+jest.mock("@/stores/useVisualizationStore");
 
 describe("useCommandPaletteActions", () => {
   beforeEach(() => {
     jest.clearAllMocks();
-    (useAtlasAdminStore as unknown as jest.Mock).mockImplementation((selector) => {
+    (useVisualizationStore as unknown as jest.Mock).mockImplementation((selector) => {
       return selector({ selectMultiple: jest.fn() });
     });
   });

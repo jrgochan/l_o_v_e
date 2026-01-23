@@ -12,11 +12,11 @@
 
 import { Canvas } from "@react-three/fiber";
 import { BaseSphere, StandardLighting, getColorFromCategory } from "./BaseSphere";
-import type { AtlasEmotion } from "@/types/atlas-admin";
+import type { Emotion } from "@/types/visualization";
 import { resolveEmotionColor } from "@/utils/emotion-colors";
 
 interface PreviewSphereProps {
-  emotion: AtlasEmotion;
+  emotion: Emotion;
   size?: number;
   showLabels?: boolean;
 }

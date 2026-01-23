@@ -1,8 +1,8 @@
 import { useState, useCallback, useEffect } from "react";
-import type { AtlasEmotion } from "@/types/atlas-admin";
+import type { Emotion } from "@/types/visualization";
 
 interface NavigationProps {
-  filteredEmotions: AtlasEmotion[];
+  filteredEmotions: Emotion[];
   isOpen: boolean;
   search: string;
 }

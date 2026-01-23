@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useCallback } from "react";
 import { useExperienceStore } from "@/stores/useExperienceStore";
-import { useAtlasAdminStore } from "@/stores/useAtlasAdminStore";
+import { useVisualizationStore } from "@/stores/useVisualizationStore";
 
 export function DebugBroadcaster() {
   const [lastBroadcast, setLastBroadcast] = useState<number>(0);
@@ -10,7 +10,7 @@ export function DebugBroadcaster() {
   const [lsValue, setLsValue] = useState<string>("Reading...");
   const [error, setError] = useState<string | null>(null);
 
-  const selectedIds = useAtlasAdminStore((state) => state.selectedEmotionIds);
+  const selectedIds = useVisualizationStore((state) => state.selectedEmotionIds);
   const targetVAC = useExperienceStore((state) => state.targetVAC);
 
   const [origin, setOrigin] = useState("SSR");

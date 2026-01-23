@@ -8,7 +8,7 @@
 "use client";
 
 import type { EmotionHistoryEntry } from "@/stores/useEmotionHistoryStore";
-import { useAtlasAdminStore } from "@/stores/useAtlasAdminStore";
+import { useVisualizationStore } from "@/stores/useVisualizationStore";
 import { resolveEmotionColor } from "@/utils/emotion-colors";
 import { useAdminTheme } from "@/hooks/admin/useAdminTheme";
 
@@ -19,7 +19,7 @@ interface EmotionTimelineProps {
 
 export function EmotionTimeline({ entries, onToggleVisibility }: EmotionTimelineProps) {
   const theme = useAdminTheme();
-  const allEmotions = useAtlasAdminStore((state) => state.allEmotions);
+  const allEmotions = useVisualizationStore((state) => state.allEmotions);
 
   if (entries.length === 0) return null;
 

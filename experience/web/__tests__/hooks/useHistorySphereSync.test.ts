@@ -1,10 +1,10 @@
 import { renderHook, act } from "@testing-library/react";
 import { useHistorySphereSync } from "@/hooks/useHistorySphereSync";
 import { useEmotionHistoryStore } from "@/stores/useEmotionHistoryStore";
-import { useAtlasAdminStore } from "@/stores/useAtlasAdminStore";
+import { useVisualizationStore } from "@/stores/useVisualizationStore";
 
 jest.mock("@/stores/useEmotionHistoryStore");
-jest.mock("@/stores/useAtlasAdminStore");
+jest.mock("@/stores/useVisualizationStore");
 
 describe("useHistorySphereSync", () => {
   const mockSelectEmotion = jest.fn();
@@ -37,7 +37,7 @@ describe("useHistorySphereSync", () => {
       setVisibility: mockSetVisibility,
     };
 
-    (useAtlasAdminStore as unknown as jest.Mock).mockImplementation((selector) => {
+    (useVisualizationStore as unknown as jest.Mock).mockImplementation((selector) => {
       // Basic state shape for selector usage
       return selector(currentAtlasState);
     });

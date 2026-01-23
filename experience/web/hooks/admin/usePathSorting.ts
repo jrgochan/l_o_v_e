@@ -18,7 +18,7 @@
  */
 
 import { useMemo } from "react";
-import type { EmotionPath } from "@/types/atlas-admin";
+import type { EmotionPath } from "@/types/visualization";
 
 export interface PathBadges {
   isShort: boolean;

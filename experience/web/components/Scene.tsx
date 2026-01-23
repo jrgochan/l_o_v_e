@@ -12,7 +12,7 @@ import { Canvas } from "@react-three/fiber";
 import { ViewerPathFlyover } from "@/components/ViewerPathFlyover";
 import { OrbitControls } from "./OrbitControls";
 import { SoulSphere } from "./SoulSphere";
-import { EmotionCloud } from "@/components/admin/atlas/EmotionCloud";
+import { EmotionCloud } from "@/components/admin/visualization/EmotionCloud";
 import { TransitionPathRenderer } from "./TransitionPathRenderer";
 // import { WaypointTooltip } from "./WaypointTooltip";
 import { Stars } from "@react-three/drei";

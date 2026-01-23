@@ -1,6 +1,6 @@
 import { render, screen, fireEvent } from "@testing-library/react";
 import { MiniSoulSphere } from "@/components/admin/spheres/MiniSoulSphere";
-import { CATEGORY_COLORS } from "@/types/atlas-admin";
+import { CATEGORY_COLORS } from "@/types/visualization";
 
 const mockEmotion = {
   id: "1",

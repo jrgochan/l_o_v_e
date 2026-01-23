@@ -1,9 +1,9 @@
 import { renderHook, act } from "@testing-library/react";
 import { useCategoryState } from "@/hooks/admin/useCategoryState";
-import type { AtlasEmotion } from "@/types/atlas-admin";
+import type { Emotion } from "@/types/visualization";
 
 describe("useCategoryState", () => {
-  const mockEmotions: AtlasEmotion[] = [
+  const mockEmotions: Emotion[] = [
     {
       id: "1",
       name: "Joy",

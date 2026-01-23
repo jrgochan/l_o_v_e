@@ -8,22 +8,22 @@
 
 "use client";
 
-import { useAtlasAdminStore } from "@/stores/useAtlasAdminStore";
+import { useVisualizationStore } from "@/stores/useVisualizationStore";
 
 export function ZenHUD() {
-  const hoveredPathId = useAtlasAdminStore((state) => state.hoveredPathId);
-  const selectedPathId = useAtlasAdminStore((state) => state.selectedPathId);
-  const computedPaths = useAtlasAdminStore((state) => state.computedPaths);
-  const isFlying = useAtlasAdminStore((state) => state.isFlying);
-  const setIsFlying = useAtlasAdminStore((state) => state.setIsFlying);
+  const hoveredPathId = useVisualizationStore((state) => state.hoveredPathId);
+  const selectedPathId = useVisualizationStore((state) => state.selectedPathId);
+  const computedPaths = useVisualizationStore((state) => state.computedPaths);
+  const isFlying = useVisualizationStore((state) => state.isFlying);
+  const setIsFlying = useVisualizationStore((state) => state.setIsFlying);
 
   // Get active path
   const activePathId = hoveredPathId || selectedPathId;
   const activePath = activePathId ? computedPaths.get(activePathId) : null;
 
   // Get hovered emotion if any
-  const hoveredEmotionId = useAtlasAdminStore((state) => state.hoveredEmotionId);
-  const allEmotions = useAtlasAdminStore((state) => state.allEmotions);
+  const hoveredEmotionId = useVisualizationStore((state) => state.hoveredEmotionId);
+  const allEmotions = useVisualizationStore((state) => state.allEmotions);
   const hoveredEmotion = hoveredEmotionId
     ? allEmotions.find((e) => e.id === hoveredEmotionId)
     : null;

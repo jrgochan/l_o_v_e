@@ -8,12 +8,12 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import type { AtlasEmotion } from "@/types";
-import { CATEGORY_COLORS } from "@/types";
+import type { Emotion } from "@/types";
+// CATEGORY_COLORS removed
 import { resolveEmotionColor } from "@/utils/emotion-colors";
 
 interface Props {
-  activeEmotions: AtlasEmotion[];
+  activeEmotions: Emotion[];
   isWaiting: boolean;
   hasAudioEnabled: boolean;
   onEnableAudio: () => void;

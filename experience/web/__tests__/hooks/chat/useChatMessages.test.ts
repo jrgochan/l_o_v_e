@@ -1,5 +1,6 @@
 import { renderHook, act } from "@testing-library/react";
-import { useChatMessages, DisplayMessage } from "../../../hooks/chat/useChatMessages";
+import { useChatMessages } from "../../../hooks/chat/useChatMessages";
+import { DisplayMessage } from "@/types/chat";
 
 describe("useChatMessages", () => {
   const mockMessage: DisplayMessage = {

@@ -1,6 +1,6 @@
 import { renderHook } from "@testing-library/react";
 import { useMatrixProcessing } from "@/hooks/visualization/matrix/useMatrixProcessing";
-import { DIFFICULTY_COLORS } from "@/types/atlas-admin";
+import { DIFFICULTY_COLORS } from "@/types/visualization";
 
 describe("useMatrixProcessing", () => {
   const mockEmotions = [

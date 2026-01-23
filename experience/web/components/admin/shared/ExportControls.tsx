@@ -6,14 +6,14 @@
 
 "use client";
 
-import { useAtlasAdminStore } from "@/stores/useAtlasAdminStore";
+import { useVisualizationStore } from "@/stores/useVisualizationStore";
 import { logger } from "@/utils/logger";
-import { BRIDGE_EMOTIONS } from "@/types/atlas-admin";
+import { BRIDGE_EMOTIONS } from "@/types/visualization";
 
 export function ExportControls() {
-  const allEmotions = useAtlasAdminStore((state) => state.allEmotions);
-  const selectedIds = useAtlasAdminStore((state) => state.selectedEmotionIds);
-  const computedPaths = useAtlasAdminStore((state) => state.computedPaths);
+  const allEmotions = useVisualizationStore((state) => state.allEmotions);
+  const selectedIds = useVisualizationStore((state) => state.selectedEmotionIds);
+  const computedPaths = useVisualizationStore((state) => state.computedPaths);
 
   /**
    * Export selected emotions and paths as JSON

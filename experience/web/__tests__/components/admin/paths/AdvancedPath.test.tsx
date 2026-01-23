@@ -2,7 +2,7 @@ import React from "react";
 import { render } from "@testing-library/react";
 import { AdvancedPath } from "@/components/admin/paths/AdvancedPath";
 import * as THREE from "three";
-import { PathAnimationMode } from "@/types/atlas-admin";
+import { PathAnimationMode } from "@/types/visualization";
 
 // Mock React Three Fiber
 jest.mock("@react-three/fiber", () => ({

@@ -72,8 +72,8 @@ const mockSettings = {
 jest.mock("@/stores/useSettingsStore", () => ({
   useSettingsStore: jest.fn(() => mockSettings),
 }));
-jest.mock("@/stores/useAtlasAdminStore", () => ({
-  useAtlasAdminStore: jest.fn((selector) =>
+jest.mock("@/stores/useVisualizationStore", () => ({
+  useVisualizationStore: jest.fn((selector) =>
     selector({
       allEmotions: [{ id: "e1", name: "Joy", category: "Joy", vac: [1, 1, 1] }],
       selectMultiple: jest.fn(),

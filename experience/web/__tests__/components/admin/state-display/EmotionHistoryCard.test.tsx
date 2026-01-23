@@ -3,10 +3,10 @@ import { EmotionHistoryCard } from "@/components/admin/state-display/EmotionHist
 import type { EmotionHistoryEntry } from "@/stores/useEmotionHistoryStore";
 
 // Mock the store
-jest.mock("@/stores/useAtlasAdminStore", () => ({
-  useAtlasAdminStore: jest.fn(),
+jest.mock("@/stores/useVisualizationStore", () => ({
+  useVisualizationStore: jest.fn(),
 }));
-import { useAtlasAdminStore } from "@/stores/useAtlasAdminStore";
+import { useVisualizationStore } from "@/stores/useVisualizationStore";
 
 describe("EmotionHistoryCard", () => {
   const mockEntry: EmotionHistoryEntry = {
@@ -26,7 +26,7 @@ describe("EmotionHistoryCard", () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
-    (useAtlasAdminStore as unknown as jest.Mock).mockImplementation((selector) => {
+    (useVisualizationStore as unknown as jest.Mock).mockImplementation((selector) => {
       const state = {
         allEmotions: [
           { name: "Joy", category: "joy", vac: [0.8, 0.5, 0.7] },

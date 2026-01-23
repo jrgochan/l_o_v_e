@@ -8,9 +8,9 @@
 "use client";
 
 import { useState, useMemo } from "react";
-import { useAtlasAdminStore } from "@/stores/useAtlasAdminStore";
+import { useVisualizationStore } from "@/stores/useVisualizationStore";
 import { useSettingsStore } from "@/stores/useSettingsStore";
-import { BRIDGE_EMOTIONS } from "@/types/atlas-admin";
+import { BRIDGE_EMOTIONS } from "@/types/visualization";
 import { useEmotionSearch } from "@/hooks/admin/useEmotionSearch";
 import { useCategoryState } from "@/hooks/admin/useCategoryState";
 import { EmotionSearch } from "./EmotionSearch";
@@ -27,21 +27,21 @@ export function ControlPanel() {
   const [showRecommendations, setShowRecommendations] = useState(false);
 
   // Store state
-  const allEmotions = useAtlasAdminStore((state) => state.allEmotions);
-  const selectedIds = useAtlasAdminStore((state) => state.selectedEmotionIds);
-  const categoryFilters = useAtlasAdminStore((state) => state.categoryFilters);
-  const settings = useAtlasAdminStore((state) => state.settings);
-  const layers = useAtlasAdminStore((state) => state.layers);
+  const allEmotions = useVisualizationStore((state) => state.allEmotions);
+  const selectedIds = useVisualizationStore((state) => state.selectedEmotionIds);
+  const categoryFilters = useVisualizationStore((state) => state.categoryFilters);
+  const settings = useVisualizationStore((state) => state.settings);
+  const layers = useVisualizationStore((state) => state.layers);
 
   // Store actions
-  const toggleEmotion = useAtlasAdminStore((state) => state.toggleEmotion);
-  const toggleCategory = useAtlasAdminStore((state) => state.toggleCategory);
-  const clearSelection = useAtlasAdminStore((state) => state.clearSelection);
-  const toggleCategoryFilter = useAtlasAdminStore((state) => state.toggleCategoryFilter);
-  const enableAllCategories = useAtlasAdminStore((state) => state.enableAllCategories);
-  const disableAllCategories = useAtlasAdminStore((state) => state.disableAllCategories);
-  const updateSetting = useAtlasAdminStore((state) => state.updateSetting);
-  const toggleLayer = useAtlasAdminStore((state) => state.toggleLayer);
+  const toggleEmotion = useVisualizationStore((state) => state.toggleEmotion);
+  const toggleCategory = useVisualizationStore((state) => state.toggleCategory);
+  const clearSelection = useVisualizationStore((state) => state.clearSelection);
+  const toggleCategoryFilter = useVisualizationStore((state) => state.toggleCategoryFilter);
+  const enableAllCategories = useVisualizationStore((state) => state.enableAllCategories);
+  const disableAllCategories = useVisualizationStore((state) => state.disableAllCategories);
+  const updateSetting = useVisualizationStore((state) => state.updateSetting);
+  const toggleLayer = useVisualizationStore((state) => state.toggleLayer);
 
   // Custom hooks
   const { searchQuery, setSearchQuery, filteredEmotions, hasActiveSearch } = useEmotionSearch({

@@ -1,9 +1,9 @@
 import { render, screen, fireEvent } from "@testing-library/react";
 import { PathSummaryList } from "@/components/admin/panels/InfoPanel/PathSummaryList";
-import { useAtlasAdminStore } from "@/stores/useAtlasAdminStore";
+import { useVisualizationStore } from "@/stores/useVisualizationStore";
 import { usePathSorting } from "@/hooks/admin/usePathSorting";
 
-jest.mock("@/stores/useAtlasAdminStore");
+jest.mock("@/stores/useVisualizationStore");
 jest.mock("@/hooks/admin/usePathSorting");
 
 describe("PathSummaryList", () => {
@@ -25,7 +25,7 @@ describe("PathSummaryList", () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
-    (useAtlasAdminStore as unknown as jest.Mock).mockImplementation((selector) =>
+    (useVisualizationStore as unknown as jest.Mock).mockImplementation((selector) =>
       selector({
         setSelectedPath: mockSetSelectedPath,
       })

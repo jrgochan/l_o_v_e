@@ -1,5 +1,5 @@
 import { render, fireEvent } from "@testing-library/react";
-import { PathNetwork } from "../../../../components/admin/atlas/PathNetwork";
+import { PathNetwork } from "../../../../components/admin/visualization/PathNetwork";
 import * as THREE from "three";
 
 // Mock child components
@@ -14,7 +14,7 @@ jest.mock("../../../../components/admin/paths/PathCurveAnimated", () => ({
 }));
 
 // Mock extracted WaypointMarker to allow DOM interactions
-jest.mock("../../../../components/admin/atlas/WaypointMarker", () => ({
+jest.mock("../../../../components/admin/visualization/WaypointMarker", () => ({
   WaypointMarker: (props: any) => (
     <div
       data-testid="waypoint-marker"
@@ -41,8 +41,8 @@ jest.mock("three", () => {
 
 // Mock Stores
 const mockUseAtlasAdminStore = jest.fn();
-jest.mock("@/stores/useAtlasAdminStore", () => ({
-  useAtlasAdminStore: (selector: any) => mockUseAtlasAdminStore(selector),
+jest.mock("@/stores/useVisualizationStore", () => ({
+  useVisualizationStore: (selector: any) => mockUseAtlasAdminStore(selector),
 }));
 
 const mockUseExperienceStore = jest.fn();

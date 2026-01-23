@@ -1,11 +1,11 @@
 import { renderHook } from "@testing-library/react";
 import { useEmotionActions } from "@/hooks/command-palette/actions/useEmotionActions";
-import { useAtlasAdminStore } from "@/stores/useAtlasAdminStore";
+import { useVisualizationStore } from "@/stores/useVisualizationStore";
 import { useExperienceStore } from "@/stores/useExperienceStore";
-import type { AtlasEmotion } from "@/types/atlas-admin";
+import type { Emotion } from "@/types/visualization";
 
 // Mock stores
-jest.mock("@/stores/useAtlasAdminStore");
+jest.mock("@/stores/useVisualizationStore");
 jest.mock("@/stores/useExperienceStore");
 jest.mock("@/utils/logger");
 
@@ -19,7 +19,7 @@ describe("useEmotionActions", () => {
   const mockSetTarget = jest.fn();
   const mockSelectedEmotionIds = new Set<string>();
 
-  const mockEmotion: AtlasEmotion = {
+  const mockEmotion: Emotion = {
     id: "joy",
     name: "Joy",
     vac: [1, 1, 1],
@@ -30,7 +30,7 @@ describe("useEmotionActions", () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
-    (useAtlasAdminStore as unknown as jest.Mock).mockImplementation((selector) => {
+    (useVisualizationStore as unknown as jest.Mock).mockImplementation((selector) => {
       const state = {
         selectEmotion: mockSelectEmotion,
         selectMultiple: mockSelectMultiple,
@@ -66,7 +66,7 @@ describe("useEmotionActions", () => {
   });
 
   it("should handle 'add' action (new selection)", () => {
-    (useAtlasAdminStore as unknown as jest.Mock).mockImplementation((selector) =>
+    (useVisualizationStore as unknown as jest.Mock).mockImplementation((selector) =>
       selector({
         selectEmotion: mockSelectEmotion,
         selectMultiple: mockSelectMultiple,
@@ -85,7 +85,7 @@ describe("useEmotionActions", () => {
   });
 
   it("should handle 'add' action (existing selection)", () => {
-    (useAtlasAdminStore as unknown as jest.Mock).mockImplementation((selector) =>
+    (useVisualizationStore as unknown as jest.Mock).mockImplementation((selector) =>
       selector({
         selectEmotion: mockSelectEmotion,
         selectMultiple: mockSelectMultiple,
@@ -156,7 +156,7 @@ describe("useEmotionActions", () => {
   });
 
   it("should handle errors gracefully", () => {
-    (useAtlasAdminStore as unknown as jest.Mock).mockImplementation((selector) => {
+    (useVisualizationStore as unknown as jest.Mock).mockImplementation((selector) => {
       const state = {
         selectEmotion: jest.fn().mockImplementation(() => {
           throw new Error("Store error");
@@ -177,7 +177,7 @@ describe("useEmotionActions", () => {
   });
 
   it("should handle non-Error objects thrown gracefully", () => {
-    (useAtlasAdminStore as unknown as jest.Mock).mockImplementation((selector) => {
+    (useVisualizationStore as unknown as jest.Mock).mockImplementation((selector) => {
       const state = {
         selectEmotion: jest.fn().mockImplementation(() => {
           throw "String error";

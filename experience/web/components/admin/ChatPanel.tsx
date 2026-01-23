@@ -13,7 +13,7 @@ import { logger } from "@/utils/logger";
 import { useEmotionNavigation } from "@/hooks/useEmotionNavigation";
 import { useHistorySphereSync } from "@/hooks/useHistorySphereSync";
 import { useEmotionHistoryStore } from "@/stores/useEmotionHistoryStore";
-import { useAtlasAdminStore } from "@/stores/useAtlasAdminStore";
+import { useVisualizationStore } from "@/stores/useVisualizationStore";
 
 // Hooks
 import { useChatPanelState } from "@/hooks/chat/useChatPanelState";
@@ -110,7 +110,7 @@ export function ChatPanel({ sessionId }: ChatPanelProps) {
   const theme = useAdminTheme();
 
   // --- Local State ---
-  const viewMode = useAtlasAdminStore((state) => state.viewMode);
+  const viewMode = useVisualizationStore((state) => state.viewMode);
   const [messages, setMessages] = useState<DisplayMessage[]>([]);
   const [isProcessing, setIsProcessing] = useState(false);
 

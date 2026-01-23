@@ -1,10 +1,10 @@
-import type { AtlasEmotion } from "@/types/atlas-admin";
+import type { Emotion } from "@/types/visualization";
 import { useFocusActions } from "./actions/useFocusActions";
 import { useSelectionActions } from "./actions/useSelectionActions";
 import { useViewActions } from "./actions/useViewActions";
 
 interface UseNavigationActionsOptions {
-  findEmotionByName: (name: string) => AtlasEmotion | null;
+  findEmotionByName: (name: string) => Emotion | null;
   onNavigate?: () => void;
 }
 

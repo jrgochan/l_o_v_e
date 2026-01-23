@@ -2,8 +2,8 @@ import { useAuthStore } from "@/stores/authStore";
 import {
   AdminSession,
   AdminSessionListResponse,
-  AtlasEmotion,
-  AtlasEmotionUpdate,
+  Emotion,
+  EmotionUpdate,
   AtlasExportData,
   AtlasImportResult,
   TransitionStrategy,
@@ -112,22 +112,22 @@ export const adminApi = {
   },
 
   // Atlas Data Management
-  async getAtlasEmotions(): Promise<AtlasEmotion[]> {
-    return api.get<AtlasEmotion[]>("/admin/atlas/emotions");
+  async getEmotions(): Promise<Emotion[]> {
+    return api.get<Emotion[]>("/admin/visualization/emotions");
   },
 
-  async updateAtlasEmotion(id: string, data: AtlasEmotionUpdate): Promise<AtlasEmotion> {
-    return api.put<AtlasEmotion>(`/admin/atlas/emotions/${id}`, data);
+  async updateEmotion(id: string, data: EmotionUpdate): Promise<Emotion> {
+    return api.put<Emotion>(`/admin/visualization/emotions/${id}`, data);
   },
 
   async exportAtlasData(): Promise<AtlasExportData> {
-    return api.get<AtlasExportData>("/admin/atlas/export");
+    return api.get<AtlasExportData>("/admin/visualization/export");
   },
 
   async importAtlasData(data: {
     emotions: AtlasExportData["emotions"];
   }): Promise<AtlasImportResult> {
-    return api.post<AtlasImportResult>("/admin/atlas/import", data);
+    return api.post<AtlasImportResult>("/admin/visualization/import", data);
   },
 
   // AI Models

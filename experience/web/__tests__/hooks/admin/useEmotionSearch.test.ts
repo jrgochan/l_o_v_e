@@ -1,9 +1,9 @@
 import { renderHook, act } from "@testing-library/react";
 import { useEmotionSearch } from "@/hooks/admin/useEmotionSearch";
-import type { AtlasEmotion } from "@/types/atlas-admin";
+import type { Emotion } from "@/types/visualization";
 
 describe("useEmotionSearch", () => {
-  const mockEmotions: AtlasEmotion[] = [
+  const mockEmotions: Emotion[] = [
     {
       id: "1",
       name: "Joy",

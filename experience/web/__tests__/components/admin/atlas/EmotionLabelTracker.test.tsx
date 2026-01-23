@@ -1,11 +1,11 @@
 import { render } from "@testing-library/react";
-import { EmotionLabelTracker } from "../../../../components/admin/atlas/EmotionLabelTracker";
+import { EmotionLabelTracker } from "../../../../components/admin/visualization/EmotionLabelTracker";
 import * as THREE from "three";
 
 // Mock Store
 const mockUseAtlasAdminStore = jest.fn();
-jest.mock("@/stores/useAtlasAdminStore", () => ({
-  useAtlasAdminStore: (selector: any) => selector(mockUseAtlasAdminStore()),
+jest.mock("@/stores/useVisualizationStore", () => ({
+  useVisualizationStore: (selector: any) => selector(mockUseAtlasAdminStore()),
 }));
 
 // Mock ResizeObserver

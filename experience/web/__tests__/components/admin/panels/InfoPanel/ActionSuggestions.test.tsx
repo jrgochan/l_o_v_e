@@ -1,10 +1,10 @@
 import { render, screen, fireEvent } from "@testing-library/react";
 import { ActionSuggestions } from "@/components/admin/panels/InfoPanel/ActionSuggestions";
-import { useAtlasAdminStore } from "@/stores/useAtlasAdminStore";
+import { useVisualizationStore } from "@/stores/useVisualizationStore";
 import { useAmbientAudio } from "@/hooks/useAmbientAudio";
 
 // Mock hooks
-jest.mock("@/stores/useAtlasAdminStore");
+jest.mock("@/stores/useVisualizationStore");
 jest.mock("@/hooks/useAmbientAudio");
 
 describe("ActionSuggestions", () => {
@@ -23,7 +23,7 @@ describe("ActionSuggestions", () => {
   beforeEach(() => {
     jest.clearAllMocks();
     (useAmbientAudio as jest.Mock).mockReturnValue({ playClickSound: mockPlayClickSound });
-    (useAtlasAdminStore as unknown as jest.Mock).mockImplementation((selector) => {
+    (useVisualizationStore as unknown as jest.Mock).mockImplementation((selector) => {
       const state = {
         selectedEmotionIds: new Set(),
         selectedPathId: null,
@@ -55,7 +55,7 @@ describe("ActionSuggestions", () => {
   });
 
   it("renders context actions for single emotion", () => {
-    (useAtlasAdminStore as unknown as jest.Mock).mockImplementation((selector) =>
+    (useVisualizationStore as unknown as jest.Mock).mockImplementation((selector) =>
       selector({
         selectedEmotionIds: new Set(["joy"]),
         selectedPathId: null,
@@ -80,7 +80,7 @@ describe("ActionSuggestions", () => {
   });
 
   it("renders actions for selected path", () => {
-    (useAtlasAdminStore as unknown as jest.Mock).mockImplementation((selector) =>
+    (useVisualizationStore as unknown as jest.Mock).mockImplementation((selector) =>
       selector({
         selectedEmotionIds: new Set(["joy", "sadness"]),
         selectedPathId: "path-1",
@@ -102,7 +102,7 @@ describe("ActionSuggestions", () => {
   });
 
   it("renders null (empty) when multiple emotions selected but no path active", () => {
-    (useAtlasAdminStore as unknown as jest.Mock).mockImplementation((selector) =>
+    (useVisualizationStore as unknown as jest.Mock).mockImplementation((selector) =>
       selector({
         selectedEmotionIds: new Set(["joy", "sadness"]),
         selectedPathId: null, // explicit null
@@ -115,7 +115,7 @@ describe("ActionSuggestions", () => {
   });
 
   it("omits 'Find Path' if no opposite emotion exists", () => {
-    (useAtlasAdminStore as unknown as jest.Mock).mockImplementation((selector) =>
+    (useVisualizationStore as unknown as jest.Mock).mockImplementation((selector) =>
       selector({
         selectedEmotionIds: new Set(["joy"]),
         selectedPathId: null,
@@ -132,7 +132,7 @@ describe("ActionSuggestions", () => {
   });
 
   it("does nothing when Surprise Me clicked with empty emotions list", () => {
-    (useAtlasAdminStore as unknown as jest.Mock).mockImplementation((selector) =>
+    (useVisualizationStore as unknown as jest.Mock).mockImplementation((selector) =>
       selector({
         selectedEmotionIds: new Set(),
         selectedPathId: null,
@@ -151,7 +151,7 @@ describe("ActionSuggestions", () => {
 
   it("handles invalid emotion selection gracefully (no crash)", () => {
     // Case where selected ID is not in allEmotions
-    (useAtlasAdminStore as unknown as jest.Mock).mockImplementation((selector) =>
+    (useVisualizationStore as unknown as jest.Mock).mockImplementation((selector) =>
       selector({
         selectedEmotionIds: new Set(["invalid-id"]),
         selectedPathId: null,
@@ -196,7 +196,7 @@ describe("ActionSuggestions", () => {
       }, // Close (Should trigger else branch)
     ];
 
-    (useAtlasAdminStore as unknown as jest.Mock).mockImplementation((selector) =>
+    (useVisualizationStore as unknown as jest.Mock).mockImplementation((selector) =>
       selector({
         selectedEmotionIds: new Set(["joy"]),
         selectedPathId: null,

@@ -58,7 +58,7 @@ export interface EmotionCollection {
 /**
  * Emotion API Response Types
  */
-export interface AtlasEmotion {
+export interface Emotion {
   id: string;
   collection_id?: string;
   name: string;
@@ -69,9 +69,9 @@ export interface AtlasEmotion {
   movement_pattern?: string;
 }
 
-export interface AtlasEmotionsResponse {
+export interface EmotionsResponse {
   total_count: number;
-  emotions: AtlasEmotion[];
+  emotions: Emotion[];
 }
 
 /**
@@ -285,7 +285,7 @@ export class ObserverApiClient {
   /**
    * Load emotions for a specific collection
    */
-  async loadEmotions(collectionId?: string, category?: string): Promise<AtlasEmotionsResponse> {
+  async loadEmotions(collectionId?: string, category?: string): Promise<EmotionsResponse> {
     let url = `${this.config.baseUrl}/observer/emotions`;
     const params = new URLSearchParams();
 
@@ -303,7 +303,7 @@ export class ObserverApiClient {
         throw new Error(`Observer API error: ${response.status} ${response.statusText}`);
       }
 
-      const data = (await response.json()) as AtlasEmotionsResponse;
+      const data = (await response.json()) as EmotionsResponse;
       return data;
     } catch (error) {
       console.error("Failed to load emotions:", error);
@@ -314,7 +314,7 @@ export class ObserverApiClient {
   /**
    * Load the complete emotion atlas (legacy alias for loadEmotions)
    */
-  async loadEmotionAtlas(category?: string): Promise<AtlasEmotionsResponse> {
+  async loadEmotionAtlas(category?: string): Promise<EmotionsResponse> {
     return this.loadEmotions(undefined, category);
   }
 

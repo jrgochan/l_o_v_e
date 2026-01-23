@@ -2,7 +2,7 @@
 
 import { useMemo } from "react";
 import { useExperienceStore } from "@/stores/useExperienceStore";
-import { useAtlasAdminStore } from "@/stores/useAtlasAdminStore";
+import { useVisualizationStore } from "@/stores/useVisualizationStore";
 import { resolveEmotionColor } from "@/utils/emotion-colors";
 
 export function WaypointArrivalOverlay() {
@@ -13,7 +13,7 @@ export function WaypointArrivalOverlay() {
   const transitionPath = useExperienceStore((state) => state.transitionPath);
 
   // Access full emotion data for color resolution
-  const allEmotions = useAtlasAdminStore((state) => state.allEmotions);
+  const allEmotions = useVisualizationStore((state) => state.allEmotions);
 
   // Helper to resolve color by name
   const getColorByName = (name: string) => {

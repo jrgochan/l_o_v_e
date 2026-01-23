@@ -1,11 +1,11 @@
 import { renderHook, act } from "@testing-library/react";
 import { useSphereSender } from "@/hooks/sync/useSphereSender";
 import { useExperienceStore } from "@/stores/useExperienceStore";
-import { useAtlasAdminStore } from "@/stores/useAtlasAdminStore";
+import { useVisualizationStore } from "@/stores/useVisualizationStore";
 import { HEARTBEAT_INTERVAL } from "@/hooks/sync/types";
 
 jest.mock("@/stores/useExperienceStore");
-jest.mock("@/stores/useAtlasAdminStore");
+jest.mock("@/stores/useVisualizationStore");
 jest.mock("@/utils/logger", () => ({
   logger: {
     debug: jest.fn(),
@@ -27,7 +27,7 @@ describe("useSphereSender", () => {
       showPath: false,
     });
 
-    (useAtlasAdminStore.getState as jest.Mock) = jest.fn().mockReturnValue({
+    (useVisualizationStore.getState as jest.Mock) = jest.fn().mockReturnValue({
       selectedEmotionIds: new Set(["1"]),
     });
   });

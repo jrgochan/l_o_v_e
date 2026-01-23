@@ -1,8 +1,8 @@
 import { useMemo } from "react";
-import type { AtlasEmotion, EmotionPath, MatrixStats } from "@/types/atlas-admin";
+import type { Emotion, EmotionPath, MatrixStats } from "@/types/visualization";
 
 interface UseMatrixStatsOptions {
-  allEmotions: AtlasEmotion[];
+  allEmotions: Emotion[];
   computedPaths: Map<string, EmotionPath>;
 }
 

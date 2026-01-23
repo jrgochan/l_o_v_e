@@ -1,8 +1,8 @@
 import { renderHook } from "@testing-library/react";
 import { useEmotionResolution } from "@/hooks/navigation/useEmotionResolution";
-import { useAtlasAdminStore } from "@/stores/useAtlasAdminStore";
+import { useVisualizationStore } from "@/stores/useVisualizationStore";
 
-jest.mock("@/stores/useAtlasAdminStore");
+jest.mock("@/stores/useVisualizationStore");
 
 describe("useEmotionResolution", () => {
   // Use distinct names that don't overlap partially in reverse
@@ -12,7 +12,7 @@ describe("useEmotionResolution", () => {
   ];
 
   beforeEach(() => {
-    (useAtlasAdminStore as unknown as jest.Mock).mockImplementation((cb) =>
+    (useVisualizationStore as unknown as jest.Mock).mockImplementation((cb) =>
       cb({ allEmotions: mockEmotions })
     );
   });

@@ -22,8 +22,8 @@
  */
 
 import { useState, useMemo } from "react";
-import { useAtlasAdminStore } from "@/stores/useAtlasAdminStore";
-import type { PathWaypoint } from "@/types/atlas-admin";
+import { useVisualizationStore } from "@/stores/useVisualizationStore";
+import type { PathWaypoint } from "@/types/visualization";
 
 export type TabType = "info" | "stats";
 
@@ -40,17 +40,17 @@ export function useInfoPanelState() {
   const [selectedWaypoint, setSelectedWaypoint] = useState<SelectedWaypointState | null>(null);
 
   // Store state
-  const allEmotions = useAtlasAdminStore((state) => state.allEmotions);
-  const selectedIds = useAtlasAdminStore((state) => state.selectedEmotionIds);
-  const hoveredId = useAtlasAdminStore((state) => state.hoveredEmotionId);
-  const hoveredPathId = useAtlasAdminStore((state) => state.hoveredPathId);
-  const selectedPathId = useAtlasAdminStore((state) => state.selectedPathId);
-  const computedPaths = useAtlasAdminStore((state) => state.computedPaths);
-  const isComputingPaths = useAtlasAdminStore((state) => state.isComputingPaths);
-  const pathAnimationMode = useAtlasAdminStore((state) => state.settings.pathAnimationMode);
-  const deselectEmotion = useAtlasAdminStore((state) => state.deselectEmotion);
-  const setFocusedEmotionId = useAtlasAdminStore((state) => state.setFocusedEmotionId);
-  const focusedEmotionId = useAtlasAdminStore((state) => state.focusedEmotionId);
+  const allEmotions = useVisualizationStore((state) => state.allEmotions);
+  const selectedIds = useVisualizationStore((state) => state.selectedEmotionIds);
+  const hoveredId = useVisualizationStore((state) => state.hoveredEmotionId);
+  const hoveredPathId = useVisualizationStore((state) => state.hoveredPathId);
+  const selectedPathId = useVisualizationStore((state) => state.selectedPathId);
+  const computedPaths = useVisualizationStore((state) => state.computedPaths);
+  const isComputingPaths = useVisualizationStore((state) => state.isComputingPaths);
+  const pathAnimationMode = useVisualizationStore((state) => state.settings.pathAnimationMode);
+  const deselectEmotion = useVisualizationStore((state) => state.deselectEmotion);
+  const setFocusedEmotionId = useVisualizationStore((state) => state.setFocusedEmotionId);
+  const focusedEmotionId = useVisualizationStore((state) => state.focusedEmotionId);
 
   // Compute selected emotions (memoized to avoid infinite loops)
   const selectedEmotions = useMemo(() => {

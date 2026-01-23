@@ -9,7 +9,7 @@
 
 "use client";
 
-import { DIFFICULTY_COLORS } from "@/types/atlas-admin";
+import { DIFFICULTY_COLORS } from "@/types/visualization";
 
 interface MatrixLegendProps {
   stats: {

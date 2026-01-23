@@ -13,9 +13,9 @@
 "use client";
 
 import { usePathSorting } from "@/hooks/admin/usePathSorting";
-import { useAtlasAdminStore } from "@/stores/useAtlasAdminStore";
-import { DIFFICULTY_COLORS } from "@/types/atlas-admin";
-import type { EmotionPath, PathWaypoint } from "@/types/atlas-admin";
+import { useVisualizationStore } from "@/stores/useVisualizationStore";
+import { DIFFICULTY_COLORS } from "@/types/visualization";
+import type { EmotionPath, PathWaypoint } from "@/types/visualization";
 
 interface PathSummaryListProps {
   paths: EmotionPath[];
@@ -31,7 +31,7 @@ export function PathSummaryList({
   onWaypointClick,
 }: PathSummaryListProps) {
   const sortedPaths = usePathSorting(paths);
-  const setSelectedPath = useAtlasAdminStore((state) => state.setSelectedPath);
+  const setSelectedPath = useVisualizationStore((state) => state.setSelectedPath);
 
   if (paths.length === 0) return null;
 

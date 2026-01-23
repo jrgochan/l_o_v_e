@@ -1,10 +1,10 @@
 import { render, screen, fireEvent } from "@testing-library/react";
-import { LegendOverlay } from "../../../../components/admin/atlas/LegendOverlay";
+import { LegendOverlay } from "../../../../components/admin/visualization/LegendOverlay";
 
 // Mock store
 const mockUseAtlasAdminStore = jest.fn();
-jest.mock("@/stores/useAtlasAdminStore", () => ({
-  useAtlasAdminStore: (selector: any) => selector(mockUseAtlasAdminStore()),
+jest.mock("@/stores/useVisualizationStore", () => ({
+  useVisualizationStore: (selector: any) => selector(mockUseAtlasAdminStore()),
 }));
 
 describe("LegendOverlay", () => {

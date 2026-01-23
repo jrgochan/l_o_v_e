@@ -30,8 +30,8 @@ jest.mock("@/hooks/useHistorySphereSync", () => ({
 jest.mock("@/stores/useEmotionHistoryStore", () => ({
   useEmotionHistoryStore: jest.fn(),
 }));
-jest.mock("@/stores/useAtlasAdminStore", () => ({
-  useAtlasAdminStore: jest.fn(),
+jest.mock("@/stores/useVisualizationStore", () => ({
+  useVisualizationStore: jest.fn(),
 }));
 
 jest.mock("@/utils/logger", () => ({
@@ -86,7 +86,7 @@ import { useChatProgress } from "@/hooks/chat/useChatProgress";
 import { useWebSocketChat } from "@/hooks/useWebSocketChat";
 import { useEmotionNavigation } from "@/hooks/useEmotionNavigation";
 import { useEmotionHistoryStore } from "@/stores/useEmotionHistoryStore";
-import { useAtlasAdminStore } from "@/stores/useAtlasAdminStore";
+import { useVisualizationStore } from "@/stores/useVisualizationStore";
 
 describe("ChatPanel", () => {
   // Spies
@@ -230,7 +230,7 @@ describe("ChatPanel", () => {
       return selector({ addEntry: mockAddHistoryEntry });
     });
 
-    (useAtlasAdminStore as unknown as jest.Mock).mockImplementation((selector) => {
+    (useVisualizationStore as unknown as jest.Mock).mockImplementation((selector) => {
       return selector({ viewMode: "default" });
     });
   });

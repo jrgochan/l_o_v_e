@@ -1,14 +1,14 @@
 import { renderHook, act } from "@testing-library/react";
 import { useViewActions } from "../../../hooks/navigation/actions/useViewActions";
-import { useAtlasAdminStore } from "@/stores/useAtlasAdminStore";
+import { useVisualizationStore } from "@/stores/useVisualizationStore";
 
 // Mock dependencies
 const mockSelectEmotion = jest.fn();
 const mockSetFocusedEmotion = jest.fn();
 
 // Mock store
-jest.mock("@/stores/useAtlasAdminStore", () => ({
-  useAtlasAdminStore: (selector: any) => {
+jest.mock("@/stores/useVisualizationStore", () => ({
+  useVisualizationStore: (selector: any) => {
     const state = {
       selectEmotion: mockSelectEmotion,
       setFocusedEmotion: mockSetFocusedEmotion,

@@ -26,7 +26,7 @@ export function RelationshipIndicator({
     switch (relationship.type) {
       case "complementary":
         return "🤝";
-      case "contradictory":
+      case "contradicts":
         return "⟷";
       case "masking":
         return "→";
@@ -44,7 +44,7 @@ export function RelationshipIndicator({
     switch (relationship.type) {
       case "complementary":
         return "bg-blue-900/30 border-blue-500/50 text-blue-300";
-      case "contradictory":
+      case "contradicts":
         return "bg-orange-900/30 border-orange-500/50 text-orange-300";
       case "masking":
         return "bg-purple-900/30 border-purple-500/50 text-purple-300";
@@ -95,8 +95,8 @@ export function RelationshipIndicator({
             <span className="text-white">{relationship.emotion_a}</span>{" "}
             <span className="opacity-60">
               {relationship.type === "masking" ||
-              relationship.type === "amplifying" ||
-              relationship.type === "sequential"
+                relationship.type === "amplifying" ||
+                relationship.type === "sequential"
                 ? "→"
                 : "⟷"}
             </span>{" "}

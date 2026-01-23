@@ -1,14 +1,14 @@
 import { useState, useEffect } from "react";
 import { useExperienceStore } from "@/stores/useExperienceStore";
-import { getObserverClient, AtlasEmotion, TransitionPathResponse } from "@love/experience-shared";
+import { getObserverClient, Emotion, TransitionPathResponse } from "@love/experience-shared";
 import { logger } from "@/utils/logger";
 
 export function useGoalSettingLogic() {
   const [isOpen, setIsOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
-  const [emotions, setEmotions] = useState<AtlasEmotion[]>([]);
-  const [filteredEmotions, setFilteredEmotions] = useState<AtlasEmotion[]>([]);
-  const [selectedGoal, setSelectedGoal] = useState<AtlasEmotion | null>(null);
+  const [emotions, setEmotions] = useState<Emotion[]>([]);
+  const [filteredEmotions, setFilteredEmotions] = useState<Emotion[]>([]);
+  const [selectedGoal, setSelectedGoal] = useState<Emotion | null>(null);
   const [generatedPath, setGeneratedPath] = useState<TransitionPathResponse | null>(null);
   const [isGenerating, setIsGenerating] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -89,7 +89,7 @@ export function useGoalSettingLogic() {
     }
   };
 
-  const handleSelectGoal = (emotion: AtlasEmotion) => {
+  const handleSelectGoal = (emotion: Emotion) => {
     setSelectedGoal(emotion);
     setGeneratedPath(null); // Clear previous path
   };

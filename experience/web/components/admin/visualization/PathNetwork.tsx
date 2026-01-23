@@ -10,20 +10,20 @@
 import { useMemo } from "react";
 import { ThreeEvent } from "@react-three/fiber";
 import * as THREE from "three";
-import { useAtlasAdminStore } from "@/stores/useAtlasAdminStore";
+import { useVisualizationStore } from "@/stores/useVisualizationStore";
 import { useExperienceStore } from "@/stores/useExperienceStore";
-import { DIFFICULTY_COLORS } from "@/types/atlas-admin";
+import { DIFFICULTY_COLORS } from "@/types/visualization";
 import { resolveEmotionColor } from "@/utils/emotion-colors";
-import type { EmotionPath } from "@/types/atlas-admin";
+import type { EmotionPath } from "@/types/visualization";
 import { PathParticles } from "../visualizations/PathParticles";
 import { PathCurveAnimated } from "../paths/PathCurveAnimated";
 import { WaypointMarker } from "./WaypointMarker";
 
 export function PathNetwork() {
-  const computedPaths = useAtlasAdminStore((state) => state.computedPaths);
-  const selectedIds = useAtlasAdminStore((state) => state.selectedEmotionIds);
-  const layers = useAtlasAdminStore((state) => state.layers);
-  const settings = useAtlasAdminStore((state) => state.settings);
+  const computedPaths = useVisualizationStore((state) => state.computedPaths);
+  const selectedIds = useVisualizationStore((state) => state.selectedEmotionIds);
+  const layers = useVisualizationStore((state) => state.layers);
+  const settings = useVisualizationStore((state) => state.settings);
   const transitionPath = useExperienceStore((state) => state.transitionPath);
 
   // Identify active path from experience store (Browsing Mode)
@@ -73,12 +73,12 @@ interface PathCurveProps {
 }
 
 function PathCurve({ path, opacity, showWaypoints, activePathDetails }: PathCurveProps) {
-  const allEmotions = useAtlasAdminStore((state) => state.allEmotions);
-  const selectedPathId = useAtlasAdminStore((state) => state.selectedPathId);
-  const hoveredPathId = useAtlasAdminStore((state) => state.hoveredPathId);
-  const setHoveredPath = useAtlasAdminStore((state) => state.setHoveredPath);
-  const setSelectedPath = useAtlasAdminStore((state) => state.setSelectedPath);
-  const pathAnimationMode = useAtlasAdminStore((state) => state.settings.pathAnimationMode);
+  const allEmotions = useVisualizationStore((state) => state.allEmotions);
+  const selectedPathId = useVisualizationStore((state) => state.selectedPathId);
+  const hoveredPathId = useVisualizationStore((state) => state.hoveredPathId);
+  const setHoveredPath = useVisualizationStore((state) => state.setHoveredPath);
+  const setSelectedPath = useVisualizationStore((state) => state.setSelectedPath);
+  const pathAnimationMode = useVisualizationStore((state) => state.settings.pathAnimationMode);
 
   // Check if this specific path matches the active transition details
   const isActive = activePathDetails

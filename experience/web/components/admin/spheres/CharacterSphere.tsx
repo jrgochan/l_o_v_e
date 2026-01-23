@@ -14,12 +14,12 @@
 import { useMemo } from "react";
 import { Canvas } from "@react-three/fiber";
 import { StandardLighting } from "./BaseSphere";
-import type { AtlasEmotion, PathAnimationMode } from "@/types/atlas-admin";
+import type { Emotion, PathAnimationMode } from "@/types/visualization";
 import { getEmotionAnimationParams } from "@/utils/emotionAnimationMapper";
 import { InnerCharacterSphere } from "./InnerCharacterSphere";
 
 interface CharacterSphereProps {
-  emotion: AtlasEmotion;
+  emotion: Emotion;
   size?: number;
   animationMode?: PathAnimationMode;
   showLabel?: boolean;

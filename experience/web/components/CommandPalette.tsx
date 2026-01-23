@@ -9,11 +9,11 @@
 
 import { useEffect, useMemo, useState, useRef } from "react";
 import { Command } from "cmdk";
-import { useAtlasAdminStore } from "@/stores/useAtlasAdminStore";
+import { useVisualizationStore } from "@/stores/useVisualizationStore";
 import { useExperienceStore } from "@/stores/useExperienceStore";
 import { useCommandPalette } from "@/hooks/useCommandPalette";
 import { useCommandPaletteFilter } from "@/hooks/command-palette/useCommandPaletteFilter";
-import type { AtlasEmotion } from "@/types/atlas-admin";
+import type { Emotion } from "@/types/visualization";
 import type { CommandAction, KeyModifiers } from "@/types/command-palette";
 import { JOURNEY_TEMPLATES } from "@/data/journey-templates";
 
@@ -32,10 +32,10 @@ declare global {
 export function CommandPalette() {
   const palette = useCommandPalette();
 
-  const selectedEmotionIds = useAtlasAdminStore((state) => state.selectedEmotionIds);
+  const selectedEmotionIds = useVisualizationStore((state) => state.selectedEmotionIds);
   const inputRef = useRef<HTMLInputElement>(null);
-  const setSelectedPath = useAtlasAdminStore((state) => state.setSelectedPath);
-  const setFocusedEmotion = useAtlasAdminStore((state) => state.setFocusedEmotion);
+  const setSelectedPath = useVisualizationStore((state) => state.setSelectedPath);
+  const setFocusedEmotion = useVisualizationStore((state) => state.setFocusedEmotion);
 
   // Journey and session state from experience store
   const activeJourney = useExperienceStore((state) => state.activeJourney);
@@ -122,7 +122,7 @@ export function CommandPalette() {
   };
 
   // Handle emotion selection
-  const handleEmotionSelect = (emotion: AtlasEmotion) => {
+  const handleEmotionSelect = (emotion: Emotion) => {
     const action = getAction(modifiers);
     palette.executeAction(emotion, action, modifiers);
   };

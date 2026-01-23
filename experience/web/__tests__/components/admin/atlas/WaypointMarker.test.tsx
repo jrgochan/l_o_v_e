@@ -1,12 +1,12 @@
 import { render, fireEvent } from "@testing-library/react";
-import { WaypointMarker } from "../../../../components/admin/atlas/WaypointMarker";
+import { WaypointMarker } from "../../../../components/admin/visualization/WaypointMarker";
 // Mock useWaypointPulse hook (tested separately)
-jest.mock("../../../../components/admin/atlas/useWaypointPulse");
+jest.mock("../../../../components/admin/visualization/useWaypointPulse");
 
 // Mock Store
 const mockUseAtlasAdminStore = jest.fn();
-jest.mock("@/stores/useAtlasAdminStore", () => ({
-  useAtlasAdminStore: (selector: any) => mockUseAtlasAdminStore(selector),
+jest.mock("@/stores/useVisualizationStore", () => ({
+  useVisualizationStore: (selector: any) => mockUseAtlasAdminStore(selector),
 }));
 
 // Mock R3F elements since JSDOM doesn't support them natively with all props

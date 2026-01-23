@@ -64,7 +64,7 @@ describe("CharacterSphere", () => {
     });
   });
 
-  const mockEmotion: import("@/types/atlas-admin").AtlasEmotion = {
+  const mockEmotion: import("@/types/visualization").Emotion = {
     id: "1",
     name: "Joy",
     category: "joy",

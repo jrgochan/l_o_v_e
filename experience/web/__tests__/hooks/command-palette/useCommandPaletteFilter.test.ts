@@ -1,9 +1,9 @@
 import { renderHook } from "@testing-library/react";
 import { useCommandPaletteFilter } from "@/hooks/command-palette/useCommandPaletteFilter";
-import { useAtlasAdminStore } from "@/stores/useAtlasAdminStore";
+import { useVisualizationStore } from "@/stores/useVisualizationStore";
 
 // Mock store
-jest.mock("@/stores/useAtlasAdminStore");
+jest.mock("@/stores/useVisualizationStore");
 
 const MOCK_EMOTIONS = [
   { id: "1", name: "Joy", category: "positive", vac: [1, 1, 1], definition: "Happy" },
@@ -26,7 +26,7 @@ const MOCK_PATHS_STRUCT = new Map([
 
 describe("useCommandPaletteFilter coverage sweep", () => {
   beforeEach(() => {
-    (useAtlasAdminStore as unknown as jest.Mock).mockImplementation((selector) => {
+    (useVisualizationStore as unknown as jest.Mock).mockImplementation((selector) => {
       return selector({
         allEmotions: MOCK_EMOTIONS,
         computedPaths: MOCK_PATHS_STRUCT,
@@ -113,7 +113,7 @@ describe("useCommandPaletteFilter coverage sweep", () => {
       vac: [0.9, 0.9, 0.9],
       definition: "Very happy",
     };
-    (useAtlasAdminStore as unknown as jest.Mock).mockImplementation((selector) => {
+    (useVisualizationStore as unknown as jest.Mock).mockImplementation((selector) => {
       return selector({
         allEmotions: [...MOCK_EMOTIONS, MOCK_CLOSE],
         computedPaths: MOCK_PATHS_STRUCT,
@@ -441,7 +441,7 @@ describe("useCommandPaletteFilter coverage sweep", () => {
     };
     const SPECIAL_PATHS = new Map([["p2", MOCK_SPECIAL_PATH]]);
 
-    (useAtlasAdminStore as unknown as jest.Mock).mockImplementation((selector) => {
+    (useVisualizationStore as unknown as jest.Mock).mockImplementation((selector) => {
       return selector({
         allEmotions: MOCK_EMOTIONS,
         computedPaths: SPECIAL_PATHS,

@@ -12,7 +12,7 @@ import { useFrame } from "@react-three/fiber";
 import * as THREE from "three";
 import { useExperienceStore } from "@/stores/useExperienceStore";
 import { useSettingsStore } from "@/stores/useSettingsStore";
-import { useAtlasAdminStore } from "@/stores/useAtlasAdminStore";
+import { useVisualizationStore } from "@/stores/useVisualizationStore";
 
 // Inline vertex shader
 const vertexShader = `
@@ -251,8 +251,8 @@ export function SoulSphere() {
     }
   }, [pathAnimationMode]);
 
-  const allEmotions = useAtlasAdminStore((state) => state.allEmotions);
-  const selectedEmotionIds = useAtlasAdminStore((state) => state.selectedEmotionIds);
+  const allEmotions = useVisualizationStore((state) => state.allEmotions);
+  const selectedEmotionIds = useVisualizationStore((state) => state.selectedEmotionIds);
 
   // Compute aggregate VAC and Color
   const aggregateColor = useMemo(() => {

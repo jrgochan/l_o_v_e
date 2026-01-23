@@ -13,7 +13,7 @@ Package Organization:
         Shared models used across endpoints
         - VACVector: Emotional coordinates
         - QuaternionModel: Rotation representation
-        - EmotionInfo: Atlas emotion reference
+        - EmotionInfo: Emotion entity reference
         - MetricsInfo: Temporal metrics
 
         state.py

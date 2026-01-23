@@ -11,12 +11,12 @@
 
 "use client";
 
-import { isBridgeEmotion } from "@/types/atlas-admin";
-import type { AtlasEmotion, CategoryFilter } from "@/types/atlas-admin";
+import { isBridgeEmotion } from "@/types/visualization";
+import type { Emotion, CategoryFilter } from "@/types/visualization";
 
 interface CategoryBrowserProps {
   categoryFilters: Map<string, CategoryFilter>;
-  emotionsByCategory: Map<string, AtlasEmotion[]>;
+  emotionsByCategory: Map<string, Emotion[]>;
   expandedCategories: Set<string>;
   selectedIds: Set<string>;
   onToggleCategoryExpansion: (category: string) => void;

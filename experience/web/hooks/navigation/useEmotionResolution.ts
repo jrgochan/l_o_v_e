@@ -1,15 +1,15 @@
 import { useCallback } from "react";
-import { useAtlasAdminStore } from "@/stores/useAtlasAdminStore";
-import type { AtlasEmotion } from "@/types/atlas-admin";
+import { useVisualizationStore } from "@/stores/useVisualizationStore";
+import type { Emotion } from "@/types/visualization";
 
 export function useEmotionResolution() {
-  const allEmotions = useAtlasAdminStore((state) => state.allEmotions);
+  const allEmotions = useVisualizationStore((state) => state.allEmotions);
 
   /**
    * Find an emotion in the atlas by name (case-insensitive, partial match)
    */
   const findEmotionByName = useCallback(
-    (emotionName: string): AtlasEmotion | null => {
+    (emotionName: string): Emotion | null => {
       if (!emotionName) return null;
 
       const searchTerm = emotionName.toLowerCase().trim();

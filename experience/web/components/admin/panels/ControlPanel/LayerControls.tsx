@@ -11,18 +11,18 @@
 "use client";
 
 import { ExportControls } from "../../shared/ExportControls";
-import type { CategoryFilter, LayerVisibility, AtlasAdminSettings } from "@/types/atlas-admin";
+import type { CategoryFilter, LayerVisibility, VisualizationSettings } from "@/types/visualization";
 
 interface LayerControlsProps {
   categoryFilters: Map<string, CategoryFilter>;
   layers: LayerVisibility;
-  settings: AtlasAdminSettings;
+  settings: VisualizationSettings;
   allCategoriesEnabled: boolean;
   onToggleCategoryFilter: (category: string) => void;
   onToggleAllCategories: () => void;
-  onUpdateSetting: <K extends keyof AtlasAdminSettings>(
+  onUpdateSetting: <K extends keyof VisualizationSettings>(
     key: K,
-    value: AtlasAdminSettings[K]
+    value: VisualizationSettings[K]
   ) => void;
   onToggleLayer: (layer: keyof LayerVisibility) => void;
 }

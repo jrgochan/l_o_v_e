@@ -1,12 +1,12 @@
 
 import { render, screen, fireEvent, waitFor, act } from "@testing-library/react";
 import { CollectionSwitcher } from "@/components/admin/data/CollectionSwitcher";
-import { useAtlasAdminStore } from "@/stores/useAtlasAdminStore";
+import { useVisualizationStore } from "@/stores/useVisualizationStore";
 import { atlasService } from "@/services/atlasService";
 import { reloadPage } from "@/utils/browser";
 
 // Mocks
-jest.mock("@/stores/useAtlasAdminStore");
+jest.mock("@/stores/useVisualizationStore");
 jest.mock("@/services/atlasService");
 jest.mock("@/utils/browser");
 
@@ -24,7 +24,7 @@ describe("CollectionSwitcher", () => {
         jest.clearAllMocks();
 
         // Default store state
-        (useAtlasAdminStore as unknown as jest.Mock).mockReturnValue({
+        (useVisualizationStore as unknown as jest.Mock).mockReturnValue({
             collections: mockCollections,
             setCollections: mockSetCollections,
             activeCollectionId: "c1",
@@ -37,7 +37,7 @@ describe("CollectionSwitcher", () => {
     });
 
     it("renders loading state if collections are empty and loading", async () => {
-        (useAtlasAdminStore as unknown as jest.Mock).mockReturnValue({
+        (useVisualizationStore as unknown as jest.Mock).mockReturnValue({
             collections: [],
             setCollections: mockSetCollections,
             activeCollectionId: null,
@@ -147,7 +147,7 @@ describe("CollectionSwitcher", () => {
         const collectionsNoDesc = [
             { id: "c3", name: "No Desc", is_default: false, description: "" }
         ];
-        (useAtlasAdminStore as unknown as jest.Mock).mockReturnValue({
+        (useVisualizationStore as unknown as jest.Mock).mockReturnValue({
             collections: collectionsNoDesc,
             setCollections: mockSetCollections,
             activeCollectionId: null,

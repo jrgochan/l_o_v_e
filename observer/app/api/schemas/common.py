@@ -22,7 +22,7 @@ Schema Architecture:
 
         EmotionInfo
         ───────────
-        Atlas emotion reference
+        Emotion reference from a collection
         Fields: id, name, category, vac
         Use: Emotion classification results
 
@@ -87,7 +87,7 @@ Quaternion Schema:
 
 Emotion Info Schema:
 
-    Atlas emotion reference::
+    Emotion reference from an active collection::
 
         Fields:
         - id: UUID from atlas_definitions
@@ -202,11 +202,11 @@ class QuaternionModel(BaseModel):
 
 
 class EmotionInfo(BaseModel):
-    """Information about an emotion from the Atlas."""
+    """Information about an emotion from a collection."""
 
     id: str = Field(description="UUID of emotion")
     name: str = Field(description="Emotion name (e.g., 'Joy', 'Shame')")
-    category: str = Field(description="Atlas category")
+    category: str = Field(description="Category name")
     vac: List[float] = Field(description="VAC coordinates [v, a, c]")
 
     model_config = ConfigDict(

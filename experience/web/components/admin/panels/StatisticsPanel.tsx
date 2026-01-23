@@ -7,7 +7,7 @@
 
 "use client";
 
-import { DIFFICULTY_COLORS } from "@/types/atlas-admin";
+import { DIFFICULTY_COLORS } from "@/types/visualization";
 import { useLoadCachedPaths } from "@/hooks/useLoadCachedPaths";
 import { useStatistics } from "@/hooks/admin/useStatistics";
 

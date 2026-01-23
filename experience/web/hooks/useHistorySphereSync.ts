@@ -9,15 +9,15 @@
 
 import { useEffect, useRef } from "react";
 import { useEmotionHistoryStore } from "@/stores/useEmotionHistoryStore";
-import { useAtlasAdminStore } from "@/stores/useAtlasAdminStore";
+import { useVisualizationStore } from "@/stores/useVisualizationStore";
 import { logger } from "@/utils/logger";
 
 export function useHistorySphereSync() {
   const entries = useEmotionHistoryStore((state) => state.entries);
-  const allEmotions = useAtlasAdminStore((state) => state.allEmotions);
-  const selectedIds = useAtlasAdminStore((state) => state.selectedEmotionIds);
-  const selectEmotion = useAtlasAdminStore((state) => state.selectEmotion);
-  const deselectEmotion = useAtlasAdminStore((state) => state.deselectEmotion);
+  const allEmotions = useVisualizationStore((state) => state.allEmotions);
+  const selectedIds = useVisualizationStore((state) => state.selectedEmotionIds);
+  const selectEmotion = useVisualizationStore((state) => state.selectEmotion);
+  const deselectEmotion = useVisualizationStore((state) => state.deselectEmotion);
   const setVisibility = useEmotionHistoryStore((state) => state.setVisibility);
 
   // Track which emotions we're currently syncing to prevent circular updates

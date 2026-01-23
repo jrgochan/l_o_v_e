@@ -7,7 +7,7 @@ before seeding into the database.
 
 Usage:
     python scripts/validate_data.py
-    python scripts/validate_data.py --file data/atlas/emotions.json
+    python scripts/validate_data.py --file data/brene_brown/emotions.json
     python scripts/validate_data.py --strict
 
 Benefits:
@@ -100,7 +100,7 @@ def validate_all_data(strict: bool = False) -> bool:
     """
     # Define data files and their schemas
     validations = [
-        ("data/atlas/emotions.json", "data/atlas/schemas/emotions.schema.json"),
+        ("data/brene_brown/emotions.json", "data/brene_brown/schemas/emotions.schema.json"),
         ("data/strategies/base/core_strategies.json", "data/strategies/schemas/strategy.schema.json"),
         # Enhanced strategies (all use same schema)
         ("data/strategies/dbt_skills.json", "data/strategies/schemas/strategy.schema.json"),
@@ -194,7 +194,7 @@ if __name__ == "__main__":
         data_path = Path(args.file)
         # Infer schema path
         if 'emotions.json' in args.file:
-            schema_path = Path("data/atlas/schemas/emotions.schema.json")
+            schema_path = Path("data/brene_brown/schemas/emotions.schema.json")
         elif 'strategies' in args.file:
             schema_path = Path("data/strategies/schemas/strategy.schema.json")
         else:

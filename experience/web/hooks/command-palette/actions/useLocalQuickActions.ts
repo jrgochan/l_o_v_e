@@ -1,5 +1,5 @@
 import { useCallback } from "react";
-import { useAtlasAdminStore } from "@/stores/useAtlasAdminStore";
+import { useVisualizationStore } from "@/stores/useVisualizationStore";
 import { useExperienceStore } from "@/stores/useExperienceStore";
 import { CommandPage } from "@/types/command-palette";
 
@@ -14,11 +14,11 @@ export function useLocalQuickActions({
   setCurrentPage,
   setSearch,
 }: UseLocalQuickActionsDependencies) {
-  const clearSelection = useAtlasAdminStore((state) => state.clearSelection);
-  const selectMultiple = useAtlasAdminStore((state) => state.selectMultiple);
-  const updateSetting = useAtlasAdminStore((state) => state.updateSetting);
-  const toggleLayer = useAtlasAdminStore((state) => state.toggleLayer);
-  const settings = useAtlasAdminStore((state) => state.settings);
+  const clearSelection = useVisualizationStore((state) => state.clearSelection);
+  const selectMultiple = useVisualizationStore((state) => state.selectMultiple);
+  const updateSetting = useVisualizationStore((state) => state.updateSetting);
+  const toggleLayer = useVisualizationStore((state) => state.toggleLayer);
+  const settings = useVisualizationStore((state) => state.settings);
 
   const executeLocalAction = useCallback(
     (commandLower: string): boolean => {
@@ -29,7 +29,7 @@ export function useLocalQuickActions({
           return true;
         case "/bridge":
           {
-            const { getBridgeEmotions } = useAtlasAdminStore.getState();
+            const { getBridgeEmotions } = useVisualizationStore.getState();
             const bridgeEmotions = getBridgeEmotions();
             const ids = bridgeEmotions.map((e) => e.id);
             selectMultiple(ids);
