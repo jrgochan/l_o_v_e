@@ -89,6 +89,7 @@ show_help() {
     echo "    --ci                  Run in CI/CD mode (non-interactive, minimal output)"
     echo "    --module [name]       Run tests for specific module only (versor|observer|listener|experience)"
     echo "    --skip-deps           Skip service health checks (only run tests)"
+    echo "    --clean               Clean test artifacts (caches, coverage) before running"
     echo ""
     echo -e "${BOLD}EXAMPLES${NC}"
     echo "    Test everything:      $0"
@@ -100,6 +101,8 @@ show_help() {
 }
 
 # Parse Arguments
+CLEAN_MODE=false
+
 while [[ $# -gt 0 ]]; do
     case "$1" in
         -h|--help)
@@ -107,6 +110,10 @@ while [[ $# -gt 0 ]]; do
             ;;
         -v|--verbose)
             VERBOSE=true
+            shift
+            ;;
+        --clean)
+            CLEAN_MODE=true
             shift
             ;;
         --ci)
@@ -131,6 +138,15 @@ while [[ $# -gt 0 ]]; do
             ;;
     esac
 done
+
+# Execute Clean if requested
+if [ "$CLEAN_MODE" = true ]; then
+    print_info "Cleaning test artifacts..."
+    if [ -f "$SCRIPT_DIR/clean-love-stack.sh" ]; then
+        "$SCRIPT_DIR/clean-love-stack.sh" --keep-env
+    fi
+fi
+
 
 # Auto-detect CI environment variables
 if [[ "${CI:-}" == "true" ]]; then

@@ -34,6 +34,7 @@ fi
 
 FIX_MODE=false
 CI_MODE=false
+CLEAN_MODE=false
 TARGET_MODULE=""
 
 # Default to running all checks
@@ -50,6 +51,7 @@ while [[ $# -gt 0 ]]; do
             echo ""
             echo "Options:"
             echo "  --fix              Auto-fix issues where possible"
+            echo "  --clean            Clean lint artifacts (caches) before running"
             echo "  --ci               Run in CI mode (minimal output, strict)"
             echo "  --module [name]    Run checks for specific module:"
             echo "                     (infra, python, typescript, backend, frontend)"
@@ -69,6 +71,10 @@ while [[ $# -gt 0 ]]; do
             TARGET_MODULE="$2"
             shift 2
             ;;
+        --clean)
+            CLEAN_MODE=true
+            shift
+            ;;
         *)
             print_error "Unknown option: $1"
             echo "Try '$0 --help' for more information."
@@ -76,6 +82,14 @@ while [[ $# -gt 0 ]]; do
             ;;
     esac
 done
+
+if [ "$CLEAN_MODE" = true ]; then
+    print_info "Cleaning lint artifacts..."
+    if [ -f "$SCRIPT_DIR/clean-love-stack.sh" ]; then
+        "$SCRIPT_DIR/clean-love-stack.sh" --keep-env
+    fi
+fi
+
 
 # Filter based on module if set
 if [ -n "$TARGET_MODULE" ]; then
