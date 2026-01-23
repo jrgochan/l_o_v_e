@@ -8,11 +8,14 @@ from app.models.emotion_definition import EmotionDefinition
 
 @pytest.fixture
 def mock_db():
-    return AsyncMock(spec=AsyncSession)
+    db = AsyncMock(spec=AsyncSession)
+    db.execute = AsyncMock(return_value=MagicMock())
+    return db
 
 @pytest.fixture
 def generator(mock_db):
-    return InsightGenerator(mock_db)
+    with patch("app.services.insight_generator.logger", new_callable=MagicMock) as mock_logger:
+        yield InsightGenerator(mock_db)
 
 @pytest.mark.asyncio
 async def test_get_emotion_details_exact_match(generator, mock_db):

@@ -5,6 +5,11 @@ from uuid import uuid4
 from fastapi import HTTPException
 from app.api.routes import emotions
 
+@pytest.fixture(autouse=True)
+def mock_logger():
+    with patch("app.api.routes.emotions.logger", new_callable=MagicMock) as mock_logger:
+        yield mock_logger
+
 @pytest.fixture
 def mock_db():
     session = AsyncMock()

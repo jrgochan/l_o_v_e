@@ -227,7 +227,7 @@ References:
 """
 
 import logging
-from datetime import datetime
+from datetime import datetime, timezone
 
 from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel, ConfigDict, Field
@@ -312,7 +312,7 @@ async def health_check(db: AsyncSession = Depends(get_db)) -> HealthResponse:
             database=db_status,
             pgvector_version=pgvector_version,
             atlas_emotions_count=emotion_count,
-            timestamp=datetime.utcnow(),
+            timestamp=datetime.now(timezone.utc),
         )
 
     except Exception as e:

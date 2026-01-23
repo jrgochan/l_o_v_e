@@ -67,7 +67,10 @@ class TestMultiEmotionAnalyzer:
             mock_settings.LLM_TEMPERATURE = 0.5
             mock_settings.OLLAMA_BASE_URL = "http://localhost:11434"
             
-            mock_loop.return_value.run_until_complete.side_effect = Exception("Fail")
+            def mock_fail(coro):
+                coro.close()
+                raise Exception("Fail")
+            mock_loop.return_value.run_until_complete.side_effect = mock_fail
             
             analyzer = MultiEmotionAnalyzer(fetch_dynamic_model=True)
             assert analyzer.model == "default"
@@ -115,6 +118,12 @@ class TestMultiEmotionAnalyzer:
              patch("app.services.multi_emotion_analyzer.Ollama"):
              
              mock_fetcher.return_value.get_model_for_function = AsyncMock(return_value="model")
+             
+             def mock_run_coro(coro):
+                 coro.close()
+                 return "model"
+             mock_new_loop.return_value.run_until_complete.side_effect = mock_run_coro
+             
              analyzer = MultiEmotionAnalyzer(model=None)
              mock_new_loop.assert_called_once()
              mock_set_loop.assert_called_once()
@@ -257,7 +266,9 @@ class TestMultiEmotionAnalyzer:
     async def test_analyze_three_way_generic_error(self, analyzer):
         """Test handling of generic errors in 3-way analysis."""
         # Mock gather to raise exception
-        with patch("asyncio.gather", side_effect=Exception("Parallel failure")):
+        with patch("asyncio.gather", side_effect=Exception("Parallel failure")), \
+             patch.object(analyzer, "_analyze_content_only", new_callable=AsyncMock), \
+             patch.object(analyzer, "_analyze_voice_only", new_callable=AsyncMock):
             with pytest.raises(RuntimeError, match="3-way analysis error: Parallel failure"):
                 await analyzer.analyze_three_way("text")
 
@@ -300,7 +311,12 @@ class TestMultiEmotionAnalyzer:
              
              # Mock analyze to return valid response
              analyzer.analyze = AsyncMock(return_value=MagicMock())
-             mock_new.return_value.run_until_complete.return_value = MagicMock()
+             
+             def mock_run_coro(coro):
+                 coro.close()
+                 return MagicMock()
+             
+             mock_new.return_value.run_until_complete.side_effect = mock_run_coro
              
              analyzer.analyze_sync("test")
              mock_new.assert_called_once()
@@ -834,7 +850,11 @@ class TestMultiEmotionAnalyzer:
         analyzer.analyze = AsyncMock(return_value="result")
         
         with patch("asyncio.get_event_loop") as mock_loop:
-            mock_loop.return_value.run_until_complete.return_value = "result"
+            def mock_run_coro(coro):
+                coro.close()
+                return "result"
+                
+            mock_loop.return_value.run_until_complete.side_effect = mock_run_coro
             
             res = analyzer.analyze_sync("text")
             assert res == "result"

@@ -6,7 +6,7 @@ from app.models.emotion_definition import EmotionDefinition
 @pytest.fixture
 def mock_db():
     mock_db = AsyncMock()
-    mock_db.execute = AsyncMock()
+    mock_db.execute.return_value = MagicMock()
     mock_db.add = MagicMock()
     mock_db.delete = MagicMock()
     mock_db.commit = AsyncMock()
@@ -14,7 +14,8 @@ def mock_db():
 
 @pytest.fixture
 def generator(mock_db):
-    return InsightGenerator(mock_db)
+    with patch("app.services.insight_generator.logger", new_callable=MagicMock) as mock_logger:
+        yield InsightGenerator(mock_db)
 
 @pytest.mark.asyncio
 async def test_generate_warm_opening_branches(generator):

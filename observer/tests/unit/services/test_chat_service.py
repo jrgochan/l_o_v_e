@@ -16,7 +16,16 @@ def mock_session():
 
 @pytest.fixture
 def chat_service(mock_session):
-    return ChatService(mock_session)
+    # Patch logger to avoid issues if errors do occur
+    with patch("app.services.chat_service.logger", new_callable=MagicMock) as mock_logger:
+        # Patch the association engine to avoid import/runtime errors during auto-linking
+        # Since it's a local import, patching the source module works best
+        with patch("app.services.association_engine.get_association_engine") as mock_get_engine:
+            mock_engine = AsyncMock()
+            mock_engine.auto_link = AsyncMock(return_value=None)
+            mock_get_engine.return_value = mock_engine
+            
+            yield ChatService(mock_session)
 
 @pytest.mark.asyncio
 async def test_create_session(chat_service, mock_session):
@@ -700,3 +709,34 @@ def test_message_relationship_model_methods():
     assert data["relationship_metadata"] == {"a": 1}
     assert "source_message_id" in data
     assert "created_at" in data
+
+@pytest.mark.asyncio
+async def test_save_user_message_auto_link_failure(mock_session):
+    """Test that auto-linking failure is logged and does not block."""
+    session_id = uuid4()
+    session = ChatSession(id=session_id, message_count=0)
+    
+    # Manually setup service and patches to have access to logger
+    chat_service = ChatService(mock_session)
+    
+    with patch("app.services.chat_service.logger", new_callable=MagicMock) as mock_logger:
+        with patch("app.services.association_engine.get_association_engine") as mock_get_engine:
+            mock_engine = AsyncMock()
+            mock_engine.auto_link.side_effect = Exception("Auto-link failed")
+            mock_get_engine.return_value = mock_engine
+            
+            with patch.object(chat_service, 'get_session', return_value=session):
+                msg = await chat_service.save_user_message(session_id, "Hello")
+                
+                # Verify message was still saved successfully
+                assert msg.content == "Hello"
+                assert session.message_count == 1
+                
+                # Verify DB interaction
+                mock_session.add.assert_called()
+                mock_session.commit.assert_awaited()
+                
+                # Verify error was logged (this covers lines 391-392)
+                mock_logger.error.assert_called_once()
+                call_args = str(mock_logger.error.call_args)
+                assert "Auto-linking failed" in call_args

@@ -35,7 +35,8 @@ def insight_generator():
     mock_db.rollback = AsyncMock()
     mock_db.refresh = AsyncMock()
     mock_db.flush = AsyncMock()
-    return InsightGenerator(mock_db)
+    with patch("app.services.insight_generator.logger", new_callable=MagicMock) as mock_logger:
+        yield InsightGenerator(mock_db)
 
 class MockAsyncDb:
     def __init__(self, result=None, exception=None):

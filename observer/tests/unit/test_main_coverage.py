@@ -45,7 +45,7 @@ def test_bcrypt_monkeypatch_exception():
     # but let's try to verify we can at least reach it if we force an error.
     pass
 
-@pytest.mark.asyncio
+
 def test_lifespan_startup_shutdown():
     """Test that lifespan events run init_db and close_db."""
     from app.main import app

@@ -6,10 +6,11 @@ from app.api.routes.health import health_check
 @pytest.fixture
 def mock_db():
     mock_db = AsyncMock()
-    mock_db.execute = AsyncMock()
+    mock_db.execute.return_value = MagicMock()
     mock_db.add = MagicMock()
     mock_db.delete = MagicMock()
-    mock_db.commit = AsyncMock()
+    # commit and close are async by default on AsyncMock, but if we want to ensure return value
+    # we can leave them or set return_value. Default is AsyncMock.
     return mock_db
 
 @pytest.mark.asyncio
@@ -24,7 +25,7 @@ async def test_health_check_healthy(mock_db):
     mock_res_count = MagicMock()
     mock_res_count.scalar.return_value = 87
     
-    mock_db.execute = AsyncMock(side_effect=[mock_res_conn, mock_res_vector, mock_res_count])
+    mock_db.execute.side_effect = [mock_res_conn, mock_res_vector, mock_res_count]
     
     response = await health_check(mock_db)
     
@@ -42,7 +43,7 @@ async def test_health_check_degraded(mock_db):
     mock_res_count = MagicMock()
     mock_res_count.scalar.return_value = 60
     
-    mock_db.execute = AsyncMock(side_effect=[mock_res_conn, mock_res_vector, mock_res_count])
+    mock_db.execute.side_effect = [mock_res_conn, mock_res_vector, mock_res_count]
     
     response = await health_check(mock_db)
     assert response.status == "degraded"
@@ -56,7 +57,7 @@ async def test_health_check_initializing(mock_db):
     mock_res_count = MagicMock()
     mock_res_count.scalar.return_value = 10
     
-    mock_db.execute = AsyncMock(side_effect=[mock_res_conn, mock_res_vector, mock_res_count])
+    mock_db.execute.side_effect = [mock_res_conn, mock_res_vector, mock_res_count]
     
     response = await health_check(mock_db)
     assert response.status == "initializing"
@@ -70,7 +71,7 @@ async def test_health_check_missing_pgvector(mock_db):
     mock_res_count = MagicMock()
     mock_res_count.scalar.return_value = 87
     
-    mock_db.execute = AsyncMock(side_effect=[mock_res_conn, mock_res_vector, mock_res_count])
+    mock_db.execute.side_effect = [mock_res_conn, mock_res_vector, mock_res_count]
     
     response = await health_check(mock_db)
     assert response.pgvector_version == "not installed"
@@ -83,7 +84,7 @@ async def test_health_check_missing_pgvector(mock_db):
 @pytest.mark.asyncio
 async def test_health_check_db_failure(mock_db):
     """Test health check when DB is down."""
-    mock_db.execute = AsyncMock(side_effect=Exception("DB Down"))
+    mock_db.execute.side_effect = Exception("DB Down")
     
     with pytest.raises(HTTPException) as exc:
         await health_check(mock_db)

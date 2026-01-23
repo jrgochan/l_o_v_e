@@ -2,7 +2,7 @@ from datetime import datetime
 from typing import Any, Dict, List, Optional
 from uuid import UUID
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, ConfigDict
 
 from app.api.schemas.common import VACVector
 
@@ -49,6 +49,7 @@ class DisplayMessage(BaseModel):
     insights: Optional[InsightData] = None
     relationships: Optional[List[MessageRelationship]] = None
     
-    class Config:
-        from_attributes = True
-        populate_by_name = True
+    model_config = ConfigDict(
+        from_attributes=True,
+        populate_by_name=True
+    )

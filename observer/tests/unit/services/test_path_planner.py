@@ -18,7 +18,8 @@ def mock_session():
 
 @pytest.fixture
 def planner(mock_session):
-    return PathPlanner(mock_session)
+    with patch("app.services.path_planner.logger", new_callable=MagicMock) as mock_logger:
+        yield PathPlanner(mock_session)
 
 @pytest.fixture
 def mock_emotions():
@@ -864,8 +865,7 @@ async def test_validate_and_enhance_no_vulnerability(planner, mock_emotions):
     assert enhanced == path
     assert len(enhanced) == 2
 
-@pytest.mark.asyncio
-async def test_calculate_g_cost_with_history(planner, mock_emotions):
+def test_calculate_g_cost_with_history(planner, mock_emotions):
     """Test g_cost reduction from user history."""
     start = mock_emotions("Start", "A", [0,0,0])
     next_em = mock_emotions("Next", "B", [0.1,0,0])
