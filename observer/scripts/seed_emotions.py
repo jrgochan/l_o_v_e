@@ -238,7 +238,7 @@ async def seed_emotions(
                         semantic_embedding=embedding,
                         haptic_pattern_id=emotion.get('haptic_pattern_id'),
                         color_hint=emotion.get('color_hint'),
-                        movement_pattern=category_map.get(emotion['category'])
+                        movement_pattern=emotion.get('movement_pattern') or category_map.get(emotion['category'])
                     )
                     
                     session.add(emotion_entry)
