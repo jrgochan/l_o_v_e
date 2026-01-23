@@ -174,7 +174,7 @@ class PIIScrubber:
         covered_ranges = set()
 
         # Helper to add entity if no overlap
-        def add_entity(start, end, label, word, source="BERT"):
+        def add_entity(start: int, end: int, label: str, word: str, _source: str = "BERT") -> None:
             # Simple overlap check: if any index in range is already covered
             is_new = True
             for i in range(start, end):
@@ -240,7 +240,7 @@ class PIIScrubber:
         pii_found = []
         covered_ranges = set()
 
-        def add_finding(word, label, start, end, source):
+        def add_finding(word: str, label: str, start: int, end: int, _source: str) -> None:
             # Check overlap
             is_new = True
             for i in range(start, end):

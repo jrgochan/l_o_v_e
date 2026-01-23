@@ -1,7 +1,7 @@
 import pytest
 from app.core.security import verify_password, get_password_hash
 from pwdlib import PasswordHash
-from pwdlib.hashers.bcrypt import BcryptHasher
+
 
 def test_password_hashing():
     password = "secret"

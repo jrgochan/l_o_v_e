@@ -170,3 +170,101 @@ class TestPIIScrubber:
         scrubber = PIIScrubber()
         assert scrubber.scrub("") == ""
         assert scrubber.scrub(None) is None
+
+    def test_load_model_failure_transformers(self, mock_pipeline, mock_spacy):
+        """Test that failure to load Transformers raises RuntimeError."""
+        mock_pipeline.side_effect = Exception("Model not found")
+        
+        scrubber = PIIScrubber()
+        with pytest.raises(RuntimeError, match="Failed to load Transformers model"):
+            scrubber._load_models()
+
+    def test_scrub_no_structure(self, mock_pipeline, mock_spacy):
+        """Test scrubbing with keep_structure=False (Redaction)."""
+        scrubber = PIIScrubber()
+        
+        bert_mock = mock_pipeline.return_value
+        bert_mock.return_value = [
+             {'entity_group': 'PER', 'score': 0.99, 'word': 'John', 'start': 6, 'end': 10}
+        ]
+        
+        # Mock Spacy empty
+        mock_spacy.load.return_value.return_value.ents = []
+        
+        text = "Hello John"
+        # Should remove "John" entirely
+        result = scrubber.scrub(text, keep_structure=False)
+        assert result == "Hello"
+
+    def test_scrub_overlap_complex_break(self, mock_pipeline, mock_spacy):
+        """Test overlap logic causing 'break' in add_entity."""
+        scrubber = PIIScrubber()
+        
+        # BERT: "John Smith"
+        bert_mock = mock_pipeline.return_value
+        bert_mock.return_value = [
+             {'entity_group': 'PER', 'score': 0.99, 'word': 'John Smith', 'start': 0, 'end': 10}
+        ]
+        
+        # Spacy: "Smith" (5-10) -> Should be ignored due to overlap
+        spacy_nlp = mock_spacy.load.return_value
+        mock_doc = MagicMock()
+        ent = MagicMock()
+        ent.text = "Smith"
+        ent.label_ = "PERSON"
+        ent.start_char = 5
+        ent.end_char = 10
+        mock_doc.ents = [ent]
+        spacy_nlp.return_value = mock_doc
+        
+        text = "John Smith"
+        result = scrubber.scrub(text, keep_structure=True)
+        assert result == "[NAME]"
+
+    def test_detect_pii_overlap_logic_explicit(self, mock_pipeline, mock_spacy):
+        """Test the overlap break in detect_pii -> add_finding."""
+        scrubber = PIIScrubber()
+        
+        # BERT: "New York" (0-8)
+        bert_mock = mock_pipeline.return_value
+        bert_mock.return_value = [
+            {'entity_group': 'LOC', 'score': 0.99, 'word': 'New York', 'start': 0, 'end': 8}
+        ]
+        
+        # Spacy: "York" (4-8) - Overlaps
+        spacy_nlp = mock_spacy.load.return_value
+        mock_doc = MagicMock()
+        ent = MagicMock()
+        ent.text = "York"
+        ent.label_ = "GPE"
+        ent.start_char = 4
+        ent.end_char = 8
+        mock_doc.ents = [ent]
+        spacy_nlp.return_value = mock_doc
+        
+        findings = scrubber.detect_pii("New York")
+        assert len(findings) == 1
+        assert findings[0][0] == "New York"
+
+    def test_unknown_entity_label(self, mock_pipeline, mock_spacy):
+        """Test that unknown entity labels are ignored (coverage for 'if label in self.PII_ENTITIES' else case)."""
+        scrubber = PIIScrubber()
+        
+        # BERT: "Something" with unknown label "UNKNOWN_TYPE"
+        bert_mock = mock_pipeline.return_value
+        bert_mock.return_value = [
+            {'entity_group': 'UNKNOWN_TYPE', 'score': 0.99, 'word': 'Something', 'start': 0, 'end': 9}
+        ]
+        
+        # Mock Spacy empty
+        mock_spacy.load.return_value.return_value.ents = []
+        
+        text = "Something"
+        
+        # 1. Test scrub (should leave text alone)
+        result = scrubber.scrub(text)
+        assert result == "Something"
+        
+        # 2. Test detect_pii (should return empty)
+        findings = scrubber.detect_pii(text)
+        assert len(findings) == 0

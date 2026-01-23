@@ -148,7 +148,7 @@ class QuaternionBuilder:
             "iat": now,
             "type": "service",
         }
-        return jwt.encode(to_encode, settings.SECRET_KEY, algorithm=settings.ALGORITHM)
+        return str(jwt.encode(to_encode, settings.SECRET_KEY, algorithm=settings.ALGORITHM))
 
     async def from_vac(self, vac: List[float], validate: bool = True) -> List[float]:
         """Convert VAC coordinates to quaternion.

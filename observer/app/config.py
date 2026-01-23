@@ -72,7 +72,9 @@ class Settings(BaseSettings):
     SECRET_KEY: str = Field(default="dev-secret-key-change-in-production")
     ALGORITHM: str = Field(default="HS256")
     ACCESS_TOKEN_EXPIRE_MINUTES: int = Field(default=30)
-    ALLOWED_ORIGINS: str = Field(default='["http://localhost:3000", "http://127.0.0.1:3000", "http://localhost:19006"]')
+    ALLOWED_ORIGINS: str = Field(
+        default='["http://localhost:3000", "http://127.0.0.1:3000", "http://localhost:19006"]'
+    )
 
     @property
     def ALLOWED_ORIGINS_LIST(self) -> List[str]:

@@ -12,15 +12,16 @@ from app.config import settings
 # --- Security Tests ---
 
 def test_verify_password():
-    """Test password verification relies on pwd_context."""
-    with patch("app.core.security.pwd_context") as mock_pwd:
+    """Test password verification relies on password_hash."""
+    with patch("app.core.security.password_hash") as mock_pwd:
         mock_pwd.verify.return_value = True
         assert security.verify_password("plain", "hashed") is True
+        # Note: We now cast return value to bool in implementation, so mock return is used directly
         mock_pwd.verify.assert_called_with("plain", "hashed")
 
 def test_get_password_hash():
-    """Test password hashing relies on pwd_context."""
-    with patch("app.core.security.pwd_context") as mock_pwd:
+    """Test password hashing relies on password_hash."""
+    with patch("app.core.security.password_hash") as mock_pwd:
         mock_pwd.hash.return_value = "new_hash"
         assert security.get_password_hash("secret") == "new_hash"
         mock_pwd.hash.assert_called_with("secret")

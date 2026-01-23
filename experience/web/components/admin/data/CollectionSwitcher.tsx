@@ -71,10 +71,11 @@ export function CollectionSwitcher() {
               key={collection.id}
               className={`
               relative flex items-center p-4 rounded-lg border transition-all
-              ${collection.is_default
+              ${
+                collection.is_default
                   ? "bg-purple-900/20 border-purple-500 shadow-lg shadow-purple-900/20"
                   : "bg-gray-800 border-gray-700 hover:border-gray-600"
-                }
+              }
             `}
             >
               <div className="flex-1">
@@ -106,10 +107,11 @@ export function CollectionSwitcher() {
                     disabled={!!activating}
                     className={`
                     px-4 py-2 text-sm font-medium rounded text-white transition-all
-                    ${activating === collection.id
+                    ${
+                      activating === collection.id
                         ? "bg-gray-600 cursor-wait"
                         : "bg-purple-600 hover:bg-purple-500 shadow hover:shadow-purple-500/25"
-                      }
+                    }
                   `}
                   >
                     {activating === collection.id ? "Activating..." : "Select"}

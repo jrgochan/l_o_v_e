@@ -11,9 +11,9 @@ from app import database
 
 def test_password_hashing():
     pwd = "secretpassword"
-    with patch("app.core.security.pwd_context") as mock_pwd_context:
-        mock_pwd_context.hash.return_value = "hashed_secret"
-        mock_pwd_context.verify.return_value = True
+    with patch("app.core.security.password_hash") as mock_pwd_hash:
+        mock_pwd_hash.hash.return_value = "hashed_secret"
+        mock_pwd_hash.verify.return_value = True
         
         hashed = security.get_password_hash(pwd)
         assert hashed == "hashed_secret"
@@ -21,7 +21,7 @@ def test_password_hashing():
         valid = security.verify_password(pwd, hashed)
         assert valid
         
-        mock_pwd_context.verify.return_value = False
+        mock_pwd_hash.verify.return_value = False
         invalid = security.verify_password("wrong", hashed)
         assert not invalid
 

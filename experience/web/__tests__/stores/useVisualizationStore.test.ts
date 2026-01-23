@@ -440,7 +440,14 @@ describe("Additional Actions & Helpers", () => {
   it("should manage collections state", () => {
     const { setCollections, setActiveCollection } = useVisualizationStore.getState();
     const mockCollections = [
-      { id: "c1", name: "Collection 1", description: "desc", is_system: false, is_default: false },
+      {
+        id: "c1",
+        name: "Collection 1",
+        description: "desc",
+        is_system: false,
+        is_default: false,
+        is_active: true,
+      },
     ];
 
     act(() => {

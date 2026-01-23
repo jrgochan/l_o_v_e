@@ -2,6 +2,7 @@
 set -e
 
 DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+# shellcheck disable=SC1091
 source "$DIR/config.sh"
 
 echo "=================================================="
@@ -86,53 +87,44 @@ deploy_service() {
     echo "Deploying $service..."
     
     # Construct base command
-    local cmd="gcloud run deploy ${APP_NAME}-${service} \
-        --image $image \
+    # Construct base command as array
+    local cmd=(gcloud run deploy "${APP_NAME}-${service}" \
+        --image "$image" \
         --platform managed \
-        --region $REGION \
-        --vpc-connector $CONNECTOR_NAME \
+        --region "$REGION" \
+        --vpc-connector "$CONNECTOR_NAME" \
         --allow-unauthenticated \
-        --port $port \
-        --min-instances $MIN_INSTANCES \
-        --max-instances $MAX_INSTANCES \
-        --cpu $svc_cpu \
-        --memory $svc_mem \
-        --cpu $svc_cpu \
-        --memory $svc_mem \
-        --set-env-vars POSTGRES_HOST=$DB_IP,POSTGRES_PORT=5432,POSTGRES_DB=$DB_NAME,POSTGRES_USER=$DB_USER \
-        --set-env-vars REDIS_HOST=$REDIS_HOST,REDIS_PORT=$REDIS_PORT \
-        --set-env-vars OBSERVER_URL=$OBSERVER_URL,LISTENER_URL=$LISTENER_URL,VERSOR_URL=$VERSOR_URL \
-        --set-secrets JWT_SECRET_KEY=${JWT_SECRET_REF} \
-        --set-secrets POSTGRES_PASSWORD=${DB_SECRET_VERSION} \
-        --project $PROJECT_ID"
+        --port "$port" \
+        --min-instances "$MIN_INSTANCES" \
+        --max-instances "$MAX_INSTANCES" \
+        --cpu "$svc_cpu" \
+        --memory "$svc_mem" \
+        --set-env-vars "POSTGRES_HOST=$DB_IP,POSTGRES_PORT=5432,POSTGRES_DB=$DB_NAME,POSTGRES_USER=$DB_USER" \
+        --set-env-vars "REDIS_HOST=$REDIS_HOST,REDIS_PORT=$REDIS_PORT" \
+        --set-env-vars "OBSERVER_URL=$OBSERVER_URL,LISTENER_URL=$LISTENER_URL,VERSOR_URL=$VERSOR_URL" \
+        --set-secrets "JWT_SECRET_KEY=${JWT_SECRET_REF}" \
+        --set-secrets "POSTGRES_PASSWORD=${DB_SECRET_VERSION}" \
+        --project "$PROJECT_ID")
 
     # Add AI vars if Listener
     if [ "$service" == "listener" ]; then
-        cmd="$cmd --set-env-vars $AI_ENV_VARS"
+        cmd+=(--set-env-vars "$AI_ENV_VARS")
     fi
 
     # Add CORS/Allowed Origins if set
     if [ "$service" == "observer" ] && [ -n "$ALLOWED_ORIGINS" ]; then
          # Observer uses ALLOWED_ORIGINS list format
-         # If just a single URL is passed, wrap it in brackets if not already?
-         # But app/config.py expects a JSON list string.
-         # So we assume the input is formatted correctly or we simplisticly wrap it.
-         # For simplicity, if it doesn't start with [, wrap it.
-         if [[ "$ALLOWED_ORIGINS" != \[* ]]; then
-             ALLOWED_ORIGINS="[\"$ALLOWED_ORIGINS\"]"
+         local allowed_origins_val="$ALLOWED_ORIGINS"
+         if [[ "$allowed_origins_val" != \[* ]]; then
+             allowed_origins_val="[\"$allowed_origins_val\"]"
          fi
-         cmd="$cmd --set-env-vars ALLOWED_ORIGINS=$ALLOWED_ORIGINS"
+         cmd+=(--set-env-vars "ALLOWED_ORIGINS=$allowed_origins_val")
     elif [ "$service" == "versor" ] && [ -n "$CORS_ORIGINS" ]; then
-        # Versor uses CORS_ORIGINS list (pydantic), which usually parses a comma-separated string if it's a List[str]
-        # Versor Config: CORS_ORIGINS: List[str]
-        # Pydantic Settings parses JSON list OR comma separated string.
-        # We will pass it as is.
-        cmd="$cmd --set-env-vars CORS_ORIGINS=$CORS_ORIGINS"
+        cmd+=(--set-env-vars "CORS_ORIGINS=$CORS_ORIGINS")
     fi
     
     # Execute (suppress noise but show errors)
-    # Using eval to handle quotes properly if needed, but here simple vars works
-    $cmd >/dev/null 2>&1 || { echo "Deployment failed"; exit 1; }
+    "${cmd[@]}" >/dev/null 2>&1 || { echo "Deployment failed"; exit 1; }
         
     # Retrieve and print URL
     local url

@@ -15,8 +15,20 @@ describe("CollectionSwitcher", () => {
 
   // Mock data
   const mockCollections = [
-    { id: "c1", name: "Default Atlas", is_default: true, description: "System Default" },
-    { id: "c2", name: "Custom Set", is_default: false, description: "User Created" },
+    {
+      id: "c1",
+      name: "Default Atlas",
+      is_default: true,
+      description: "System Default",
+      is_active: true,
+    },
+    {
+      id: "c2",
+      name: "Custom Set",
+      is_default: false,
+      description: "User Created",
+      is_active: true,
+    },
   ];
 
   beforeEach(() => {
@@ -147,7 +159,9 @@ describe("CollectionSwitcher", () => {
     consoleSpy.mockRestore();
   });
   it("renders fallback description if missing", async () => {
-    const collectionsNoDesc = [{ id: "c3", name: "No Desc", is_default: false, description: "" }];
+    const collectionsNoDesc = [
+      { id: "c3", name: "No Desc", is_default: false, description: "", is_active: true },
+    ];
     (useVisualizationStore as unknown as jest.Mock).mockReturnValue({
       collections: collectionsNoDesc,
       setCollections: mockSetCollections,

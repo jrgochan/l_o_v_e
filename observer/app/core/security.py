@@ -17,12 +17,12 @@ password_hash = PasswordHash((Argon2Hasher(),))
 
 def verify_password(plain_password: str, hashed_password: str) -> bool:
     """Verify a password against its hash."""
-    return password_hash.verify(plain_password, hashed_password)
+    return bool(password_hash.verify(plain_password, hashed_password))
 
 
 def get_password_hash(password: str) -> str:
     """Hash a password for storage."""
-    return password_hash.hash(password)
+    return str(password_hash.hash(password))
 
 
 def create_access_token(data: Dict[str, Any], expires_delta: Optional[timedelta] = None) -> str:

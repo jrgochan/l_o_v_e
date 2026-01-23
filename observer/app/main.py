@@ -7,8 +7,6 @@ import logging
 from contextlib import asynccontextmanager
 from typing import Any, AsyncGenerator, Dict
 
-# Monkeypatch removed: using pwdlib instead of passlib
-
 from fastapi import FastAPI  # pylint: disable=wrong-import-position
 from fastapi.middleware.cors import CORSMiddleware  # pylint: disable=wrong-import-position
 
