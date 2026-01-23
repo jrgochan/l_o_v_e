@@ -11,7 +11,7 @@
 "use client";
 
 import { Canvas } from "@react-three/fiber";
-import { BaseSphere, StandardLighting, getColorFromCategory } from "./BaseSphere";
+import { BaseSphere, StandardLighting } from "./BaseSphere";
 import type { Emotion } from "@/types/visualization";
 import { resolveEmotionColor } from "@/utils/emotion-colors";
 

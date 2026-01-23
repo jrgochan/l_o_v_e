@@ -47,7 +47,7 @@ jest.mock("@/components/admin/debug/SphereDebugOverlay", () => ({
 
 // Mock Hooks
 jest.mock("@/hooks/useSphereSync");
-jest.mock("@/hooks/useEmotionAtlas", () => ({ useEmotionAtlas: jest.fn() }));
+jest.mock("@/hooks/useEmotionData", () => ({ useEmotionData: jest.fn() }));
 jest.mock("@/hooks/useAmbientAudio");
 jest.mock("@/hooks/interaction/useZenKeyboardShortcuts");
 

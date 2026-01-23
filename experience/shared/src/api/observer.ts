@@ -246,8 +246,6 @@ export class ObserverApiClient {
     }
   }
 
-
-
   /**
    * Get all available emotion collections
    */

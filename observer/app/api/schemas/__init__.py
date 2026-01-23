@@ -86,6 +86,10 @@ References:
 
 from typing import Any, Dict, List, Optional
 
+from app.api.schemas.chat import (
+    DisplayMessage,
+    MessageRelationship,
+)
 from app.api.schemas.common import (
     EmotionInfo,
     MetricsInfo,
@@ -95,10 +99,6 @@ from app.api.schemas.common import (
 from app.api.schemas.state import (
     StateInput,
     StateResponse,
-)
-from app.api.schemas.chat import (
-    DisplayMessage,
-    MessageRelationship,
 )
 
 __all__ = [

@@ -24,7 +24,13 @@ interface EmotionListProps {
   focusedEmotionId?: string | null;
 }
 
-export function EmotionList({ emotions, animationMode, onRemove, onFocus, focusedEmotionId }: EmotionListProps) {
+export function EmotionList({
+  emotions,
+  animationMode,
+  onRemove,
+  onFocus,
+  focusedEmotionId,
+}: EmotionListProps) {
   if (emotions.length === 0) {
     return (
       <section>
@@ -53,10 +59,11 @@ export function EmotionList({ emotions, animationMode, onRemove, onFocus, focuse
           <div
             key={emotion.id}
             onClick={() => onFocus?.(focusedEmotionId === emotion.id ? null : emotion.id)}
-            className={`bg-gray-800/50 border rounded-lg p-3 transition-all cursor-pointer group ${focusedEmotionId === emotion.id
-              ? "border-cyan-500/50 bg-gray-800 ring-1 ring-cyan-500/30"
-              : "border-gray-700/50 hover:bg-gray-800 hover:border-gray-600"
-              }`}
+            className={`bg-gray-800/50 border rounded-lg p-3 transition-all cursor-pointer group ${
+              focusedEmotionId === emotion.id
+                ? "border-cyan-500/50 bg-gray-800 ring-1 ring-cyan-500/30"
+                : "border-gray-700/50 hover:bg-gray-800 hover:border-gray-600"
+            }`}
           >
             <div className="flex gap-3 items-start">
               {/* Animated Character Sphere */}
@@ -88,7 +95,7 @@ export function EmotionList({ emotions, animationMode, onRemove, onFocus, focuse
 
                 {emotion.definition && (
                   <div className="text-xs text-gray-300 italic mb-3 leading-relaxed">
-                    "{emotion.definition}"
+                    &quot;{emotion.definition}&quot;
                   </div>
                 )}
                 <div className="text-xs text-gray-400 space-y-0.5">
@@ -116,6 +123,6 @@ export function EmotionList({ emotions, animationMode, onRemove, onFocus, focuse
           </div>
         ))}
       </div>
-    </section >
+    </section>
   );
 }

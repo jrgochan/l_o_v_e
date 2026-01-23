@@ -8,7 +8,14 @@
 
 import { useState, useRef, useEffect } from "react";
 import { useWebSocketChat } from "@/hooks/useWebSocketChat";
-import type { ToneMode, DeepFeelingServerMessage, InsightData, VAC, DisplayMessage, MessageRelationship } from "@/types/chat";
+import type {
+  ToneMode,
+  DeepFeelingServerMessage,
+  InsightData,
+  VAC,
+  DisplayMessage,
+  MessageRelationship,
+} from "@/types/chat";
 import { logger } from "@/utils/logger";
 import { ThreadView } from "./ThreadView";
 import { AutoLinkIndicator } from "./AutoLinkIndicator";
@@ -197,8 +204,9 @@ export function ChatDrawer({ isOpen, onToggle, sessionId }: ChatDrawerProps) {
       <div
         onMouseDown={handleMouseDown}
         data-testid="resize-handle"
-        className={`w-full h-2 cursor-row-resize hover:bg-cyan-500/30 transition flex items-center justify-center ${isResizing ? "bg-cyan-500/50" : ""
-          }`}
+        className={`w-full h-2 cursor-row-resize hover:bg-cyan-500/30 transition flex items-center justify-center ${
+          isResizing ? "bg-cyan-500/50" : ""
+        }`}
       >
         <div className="w-12 h-1 bg-gray-600 rounded-full" />
       </div>
@@ -230,8 +238,9 @@ export function ChatDrawer({ isOpen, onToggle, sessionId }: ChatDrawerProps) {
           {/* Tone Toggle */}
           <button
             onClick={handleToneToggle}
-            className={`px-4 py-2 rounded text-sm font-medium transition ${toneMode === "clinical" ? "bg-blue-600 text-white" : "bg-amber-600 text-white"
-              }`}
+            className={`px-4 py-2 rounded text-sm font-medium transition ${
+              toneMode === "clinical" ? "bg-blue-600 text-white" : "bg-amber-600 text-white"
+            }`}
             title={`Switch to ${toneMode === "clinical" ? "warm" : "clinical"} mode`}
           >
             {toneMode === "clinical" ? "🔬 Clinical" : "💗 Warm"}
@@ -262,14 +271,15 @@ export function ChatDrawer({ isOpen, onToggle, sessionId }: ChatDrawerProps) {
             className={`flex ${msg.type === "user" ? "justify-end" : "justify-start"}`}
           >
             <div
-              className={`max-w-[70%] rounded-lg px-4 py-3 ${msg.type === "user"
-                ? "bg-cyan-600 text-white"
-                : msg.type === "analysis"
-                  ? "bg-purple-900/50 border border-purple-500/30 text-white"
-                  : msg.type === "insight"
-                    ? "bg-gray-800 border border-gray-600 text-white"
-                    : "bg-gray-700 text-gray-200"
-                }`}
+              className={`max-w-[70%] rounded-lg px-4 py-3 ${
+                msg.type === "user"
+                  ? "bg-cyan-600 text-white"
+                  : msg.type === "analysis"
+                    ? "bg-purple-900/50 border border-purple-500/30 text-white"
+                    : msg.type === "insight"
+                      ? "bg-gray-800 border border-gray-600 text-white"
+                      : "bg-gray-700 text-gray-200"
+              }`}
             >
               {/* Message Content */}
               <div className="text-sm whitespace-pre-wrap">{msg.content}</div>

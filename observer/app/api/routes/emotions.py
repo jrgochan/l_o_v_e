@@ -49,7 +49,7 @@ Endpoint Details:
     }
 
     Use cases:
-    - Atlas explorer UI initialization
+    - Emotion Explorer UI initialization
     - Category filtering
     - Dropdown population
     - Emotion selection menus
@@ -117,7 +117,7 @@ Endpoint Details:
     }
 
     Use cases:
-    - Initial atlas setup
+    - Initial data setup
     - After VAC coordinate updates
     - Rebuild cache
 
@@ -185,7 +185,7 @@ Endpoint Details:
 
     Use cases:
     - Testing
-    - After atlas updates
+    - After dataset updates
     - Cache invalidation
 
     GET /observer/recommendations
@@ -258,7 +258,7 @@ Integration Points:
         - Testing: API-driven atlas exploration
 
 References:
-    - Atlas model: observer/app/models/atlas_definition.py
+    - Emotion definition model: observer/app/models/emotion_definition.py
     - Path matrix service: observer/app/services/path_matrix_service.py
     - Recommendation engine: observer/app/services/recommendation_engine.py
     - FastAPI docs: https://fastapi.tiangolo.com/
@@ -274,7 +274,7 @@ from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.database import get_db
-from app.models.emotion_definition import EmotionDefinition, EmotionCollection
+from app.models.emotion_definition import EmotionCollection, EmotionDefinition
 from app.services.path_matrix_service import PathMatrixService
 from app.services.recommendation_engine import RecommendationEngine
 
@@ -300,13 +300,13 @@ async def get_all_emotions(
         if not target_collection_id:
             # Get default collection
             default_coll = await db.scalar(
-                select(EmotionCollection).where(EmotionCollection.is_default == True)
+                select(EmotionCollection).where(EmotionCollection.is_default)
             )
             if default_coll:
                 target_collection_id = default_coll.id
 
         stmt = select(EmotionDefinition)
-        
+
         if target_collection_id:
             stmt = stmt.where(EmotionDefinition.collection_id == target_collection_id)
 

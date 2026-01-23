@@ -53,7 +53,9 @@ async def get_current_user(
             await db.commit()
             await db.refresh(user)
 
-        return user
+        if user:
+            return user
+        raise credentials_exception
 
     try:
         payload = jwt.decode(token, settings.SECRET_KEY, algorithms=[settings.ALGORITHM])
@@ -123,7 +125,9 @@ async def get_current_user_ws(
             await db.commit()
             await db.refresh(user)
 
-        return user
+        if user:
+            return user
+        raise credentials_exception
 
     try:
         payload = jwt.decode(token, settings.SECRET_KEY, algorithms=[settings.ALGORITHM])

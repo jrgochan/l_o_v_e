@@ -331,7 +331,7 @@ describe("ChatDrawer", () => {
 
     // Use fake timers to control ID generation
     jest.useFakeTimers();
-    jest.setSystemTime(new Date('2023-01-01T00:00:00.000Z'));
+    jest.setSystemTime(new Date("2023-01-01T00:00:00.000Z"));
     const fixedTimestamp = new Date().getTime().toString();
 
     await act(async () => {
@@ -343,7 +343,7 @@ describe("ChatDrawer", () => {
         source_message_id: fixedTimestamp,
         target_message_id: "thread-1",
         relationship_type: "reply",
-        created_at: new Date()
+        created_at: new Date(),
       });
     });
 
@@ -353,7 +353,7 @@ describe("ChatDrawer", () => {
     });
 
     const viewBtn = screen.getByText((content, element) => {
-      return element?.tagName.toLowerCase() === 'button' && content.includes("View Thread");
+      return element?.tagName.toLowerCase() === "button" && content.includes("View Thread");
     });
 
     fireEvent.click(viewBtn);
@@ -376,7 +376,7 @@ describe("ChatDrawer", () => {
     // Inject a message with ID "msg-1"
     const callbacks = getSocketCallbacks();
     jest.useFakeTimers();
-    jest.setSystemTime(new Date('2023-01-01T00:00:00.000Z'));
+    jest.setSystemTime(new Date("2023-01-01T00:00:00.000Z"));
     // We can't control the ID easily unless we mock Date for the first message too.
     // The previous test did this.
 
@@ -396,12 +396,12 @@ describe("ChatDrawer", () => {
         source_message_id: "non-existent-id",
         target_message_id: "thread-2",
         relationship_type: "reply",
-        created_at: new Date()
+        created_at: new Date(),
       });
     });
 
     // Check that our message is still there and valid (render didn't crash)
-    // And ideally that it DOESN'T have the relationship. 
+    // And ideally that it DOESN'T have the relationship.
     // But since it didn't have one before, we can't distinguish "didn't add" from "didn't have".
     // Wait, if it updated, it would have "relationships" array.
     // We can check that "View Thread" is NOT present.

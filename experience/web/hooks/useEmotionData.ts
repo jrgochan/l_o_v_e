@@ -1,19 +1,23 @@
 /**
- * useEmotionAtlas Hook
+ * useEmotionData Hook
  *
  * Fetches all emotions from the Observer API and loads them into the admin store.
  */
 
 import { useEffect, useCallback } from "react";
 import { useVisualizationStore } from "@/stores/useVisualizationStore";
-import type { Emotion, EmotionCollection } from "@/types/visualization";
+import {
+  type Emotion,
+  type EmotionCollection,
+  ATLAS_DATASET_BRIDGE_EMOTIONS,
+} from "@/types/visualization";
 import type { ObserverEmotionResponse } from "@/types/api-responses";
 import { logger } from "@/utils/logger";
 import { getCanonicalEmotion } from "@love/experience-shared";
 
 const OBSERVER_API_URL = process.env.NEXT_PUBLIC_OBSERVER_API_URL || "http://localhost:8000";
 
-export function useEmotionAtlas() {
+export function useEmotionData() {
   const {
     allEmotions,
     collections,
@@ -43,7 +47,8 @@ export function useEmotionAtlas() {
 
       // Set default active if none selected
       if (!activeCollectionId && loadedCollections.length > 0) {
-        const defaultCollection = loadedCollections.find((c) => c.is_default) || loadedCollections[0];
+        const defaultCollection =
+          loadedCollections.find((c) => c.is_default) || loadedCollections[0];
         setActiveCollection(defaultCollection.id);
         logger.info("api", `Set active collection to ${defaultCollection.name}`);
       }
@@ -78,20 +83,17 @@ export function useEmotionAtlas() {
         const canonical = getCanonicalEmotion(emotion.name);
         // Fix for potentially missing VACs in backend (fallback to canonical if available)
         const isSuspiciouslyNeutral =
-          !emotion.vac || (emotion.vac[0] === 0 && emotion.vac[1] === 0 && emotion.vac[2] === 0 && emotion.name.toLowerCase() !== "neutral");
+          !emotion.vac ||
+          (emotion.vac[0] === 0 &&
+            emotion.vac[1] === 0 &&
+            emotion.vac[2] === 0 &&
+            emotion.name.toLowerCase() !== "neutral");
 
         const vac = isSuspiciouslyNeutral && canonical ? canonical.vac : emotion.vac;
 
         // Bridge detection (fallback to hardcoded list if backend doesn't provide it)
-        // Hardcoded list from atlas-admin.ts types
-        const BRIDGE_NAMES = [
-          "Vulnerability",
-          "Awe",
-          "Compassion",
-          "Curiosity",
-          "Acceptance",
-          "Gratitude",
-        ];
+        // Hardcoded list from Atlas dataset
+        const BRIDGE_NAMES: readonly string[] = ATLAS_DATASET_BRIDGE_EMOTIONS;
         const isBridge = BRIDGE_NAMES.includes(emotion.name);
 
         return {

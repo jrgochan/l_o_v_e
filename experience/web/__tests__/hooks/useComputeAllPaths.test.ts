@@ -1,11 +1,11 @@
 import { renderHook, waitFor } from "@testing-library/react";
 import { useComputeAllPaths } from "@/hooks/useComputeAllPaths";
 import { useVisualizationStore } from "@/stores/useVisualizationStore";
-import { atlasService } from "@/services/atlasService";
+import { visualizationService } from "@/services/visualizationService";
 import { useBatchJob } from "@/hooks/pathfinding/useBatchJob";
 
 jest.mock("@/stores/useVisualizationStore");
-jest.mock("@/services/atlasService");
+jest.mock("@/services/visualizationService");
 jest.mock("@/hooks/pathfinding/useBatchJob");
 
 describe("useComputeAllPaths", () => {
@@ -44,12 +44,12 @@ describe("useComputeAllPaths", () => {
 
   it("should start batch job on confirmation", async () => {
     window.confirm = jest.fn(() => true);
-    (atlasService.computeAllPaths as jest.Mock).mockResolvedValue({ job_id: "job-123" });
+    (visualizationService.computeAllPaths as jest.Mock).mockResolvedValue({ job_id: "job-123" });
 
     const { result } = renderHook(() => useComputeAllPaths());
     await result.current.computeAllPaths();
 
-    expect(atlasService.computeAllPaths).toHaveBeenCalled();
+    expect(visualizationService.computeAllPaths).toHaveBeenCalled();
     expect(mockStartJob).toHaveBeenCalledWith("job-123", expect.any(Number));
   });
 
@@ -58,12 +58,12 @@ describe("useComputeAllPaths", () => {
     const { result } = renderHook(() => useComputeAllPaths());
     await result.current.computeAllPaths();
 
-    expect(atlasService.computeAllPaths).not.toHaveBeenCalled();
+    expect(visualizationService.computeAllPaths).not.toHaveBeenCalled();
   });
 
   it("should handle service error", async () => {
     window.confirm = jest.fn(() => true);
-    (atlasService.computeAllPaths as jest.Mock).mockRejectedValue(new Error("Fail"));
+    (visualizationService.computeAllPaths as jest.Mock).mockRejectedValue(new Error("Fail"));
 
     const { result } = renderHook(() => useComputeAllPaths());
     await result.current.computeAllPaths();
@@ -98,7 +98,7 @@ describe("useComputeAllPaths", () => {
         requires_bridge: false,
       },
     ];
-    (atlasService.getCachedPaths as jest.Mock).mockResolvedValue({ paths: mockPaths });
+    (visualizationService.getCachedPaths as jest.Mock).mockResolvedValue({ paths: mockPaths });
 
     renderHook(() => useComputeAllPaths());
 
@@ -106,7 +106,7 @@ describe("useComputeAllPaths", () => {
     await capturedOnComplete!();
 
     // 4. Verify addComputedPath was called
-    expect(atlasService.getCachedPaths).toHaveBeenCalled();
+    expect(visualizationService.getCachedPaths).toHaveBeenCalled();
     expect(mockAddComputedPath).toHaveBeenCalledWith(
       expect.objectContaining({
         id: "e1-e2",
@@ -126,7 +126,7 @@ describe("useComputeAllPaths", () => {
     await result.current.computeAllPaths();
 
     expect(window.alert).toHaveBeenCalledWith("No emotions loaded yet");
-    expect(atlasService.computeAllPaths).not.toHaveBeenCalled();
+    expect(visualizationService.computeAllPaths).not.toHaveBeenCalled();
   });
 
   it("should handle job failure callback", () => {
@@ -179,7 +179,7 @@ describe("useComputeAllPaths", () => {
         requires_bridge: false,
       },
     ];
-    (atlasService.getCachedPaths as jest.Mock).mockResolvedValue({ paths: mockPaths });
+    (visualizationService.getCachedPaths as jest.Mock).mockResolvedValue({ paths: mockPaths });
 
     renderHook(() => useComputeAllPaths());
     await capturedOnComplete!();

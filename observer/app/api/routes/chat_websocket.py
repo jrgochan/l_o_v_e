@@ -785,6 +785,7 @@ async def process_audio_message(
                     analysis_result=final_result,
                     tone_preference=tone_preference,
                     websocket=websocket,
+                    prosody_data=prosody_data,
                 )
             else:
                 await handle_single_emotion_result(
@@ -841,7 +842,7 @@ async def generate_insights(
                 tone_mode=tone_preference,
                 prosody_data=prosody_data,
                 reasoning=analysis_result.get("reasoning"),
-                use_atlas_mapping=True,  # Enable VAC-based fallback matching
+                use_emotion_mapping=True,  # Enable VAC-based fallback matching
                 session_id=str(db_session_id),  # NEW: Pass session ID for clinical alerts
             )
 
@@ -976,6 +977,7 @@ async def handle_multi_emotion_result(
     analysis_result: Dict[str, Any],
     tone_preference: str,
     websocket: WebSocket,
+    prosody_data: Optional[Dict[str, Any]] = None,
 ) -> None:
     """Handle multi-emotion analysis result (Deep Feeling mode)."""
     from app.database import AsyncSessionLocal
@@ -1108,10 +1110,14 @@ async def handle_multi_emotion_result(
                 "reasoning": analysis_result.get("reasoning", ""),
             },
             tone_preference,
+            prosody_data=prosody_data,
+            websocket=websocket,
         )
 
 
-@router.get("/chat/messages/{message_id}/thread", response_model=List[DisplayMessage], tags=["Chat"])
+@router.get(
+    "/chat/messages/{message_id}/thread", response_model=List[DisplayMessage], tags=["Chat"]
+)
 async def get_message_thread(
     message_id: UUID,
     limit: int = 10,
@@ -1133,8 +1139,8 @@ async def get_message_thread(
         List[DisplayMessage]: Chronological thread of messages
     """
     service = ChatService(db)
-    messages = await service.get_message_thread(message_id, limit=limit)
-    
+    messages = await service.get_message_thread(message_id, max_depth=limit)
+
     # Convert to Pydantic models
     # We use model_validate to handle the SQLAlchemy -> Pydantic conversion
     return [DisplayMessage.model_validate(msg) for msg in messages]

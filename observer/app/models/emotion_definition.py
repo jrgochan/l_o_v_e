@@ -16,7 +16,7 @@ from typing import Any, Dict, Optional
 from uuid import UUID, uuid4
 
 from pgvector.sqlalchemy import Vector
-from sqlalchemy import String, Text, func, ForeignKey, Boolean, UniqueConstraint
+from sqlalchemy import Boolean, ForeignKey, String, Text, UniqueConstraint, func
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.config import settings
@@ -25,7 +25,7 @@ from app.database import Base
 
 class EmotionCollection(Base):
     """Registry of emotion datasets (e.g., 'Atlas of the Heart', 'Plutchik')."""
-    
+
     __tablename__ = "emotion_collections"
 
     id: Mapped[UUID] = mapped_column(primary_key=True, default=uuid4)
@@ -33,11 +33,12 @@ class EmotionCollection(Base):
     description: Mapped[str] = mapped_column(Text, nullable=True)
     is_default: Mapped[bool] = mapped_column(Boolean, default=False)
     is_active: Mapped[bool] = mapped_column(Boolean, default=True)
-    
+
     created_at: Mapped[datetime] = mapped_column(server_default=func.now())
     updated_at: Mapped[datetime] = mapped_column(server_default=func.now(), onupdate=func.now())
 
     def __repr__(self) -> str:
+        """Represent the object as a string."""
         return f"<EmotionCollection(name='{self.name}', default={self.is_default})>"
 
 
@@ -53,10 +54,10 @@ class EmotionDefinition(Base):
     """
 
     __tablename__ = "emotion_definitions"
-    
+
     # Composite unique constraint: emotion name must be unique per collection
     __table_args__ = (
-        UniqueConstraint('collection_id', 'emotion_name', name='uq_collection_emotion_name'),
+        UniqueConstraint("collection_id", "emotion_name", name="uq_collection_emotion_name"),
     )
 
     # Primary Key
@@ -64,7 +65,7 @@ class EmotionDefinition(Base):
 
     # Collection Link
     collection_id: Mapped[UUID] = mapped_column(ForeignKey("emotion_collections.id"), index=True)
-    
+
     # Emotion Identity
     emotion_name: Mapped[str] = mapped_column(String(100), index=True)
     category: Mapped[str] = mapped_column(String(100), index=True)
@@ -88,7 +89,7 @@ class EmotionDefinition(Base):
     # Timestamps
     created_at: Mapped[datetime] = mapped_column(server_default=func.now())
     updated_at: Mapped[datetime] = mapped_column(server_default=func.now(), onupdate=func.now())
-    
+
     # Relationships
     collection: Mapped["EmotionCollection"] = relationship()
 

@@ -1,4 +1,4 @@
-# Soul Sphere Atlas - Admin Interface
+# Soul Sphere - Admin Interface
 
 A comprehensive visualization and analysis tool for exploring the 87 emotions in VAC space, with automatic path computation and interactive 3D exploration.
 
@@ -13,7 +13,7 @@ A comprehensive visualization and analysis tool for exploring the 87 emotions in
 
 ## Overview
 
-The Soul Sphere Atlas Admin Interface provides a powerful way to:
+The Soul Sphere Admin Interface provides a powerful way to:
 
 - Visualize all 87 emotions positioned in 3D VAC (Valence, Arousal, Connection) space
 - Select any combination of emotions (n+1 selection)
@@ -23,7 +23,7 @@ The Soul Sphere Atlas Admin Interface provides a powerful way to:
 
 ## Access
 
-Navigate to: `/admin/atlas`
+Navigate to: `/admin/visualization`
 
 ## Architecture
 
@@ -41,7 +41,7 @@ Navigate to: `/admin/atlas`
 
 ### State Management
 
-**Store**: `useAtlasAdminStore.ts`
+**Store**: `useVisualizationStore.ts`
 
 - Manages all 87 emotions
 - Tracks selected emotions
@@ -52,7 +52,7 @@ Navigate to: `/admin/atlas`
 
 ### Data Hooks
 
-**useEmotionAtlas**: Fetches all 87 emotions from Observer API
+**useEmotionData**: Fetches all 87 emotions from Observer API
 **usePathCalculator**: Computes paths between selected emotions using Observer's transition system
 **useLoadCachedPaths**: Automatically loads cached paths from backend database on page load
 **useComputeAllPaths**: Batch computes all 7,482 possible paths (87×86) with backend caching
@@ -176,7 +176,7 @@ The 6 gateway emotions that enable difficult transitions:
 
 ### Demonstration
 
-- Showcase the emotional atlas
+- Showcase the emotional map
 - Explain the VAC model
 - Illustrate transition pathways
 - Present the system to stakeholders
@@ -226,15 +226,15 @@ All computed paths are automatically cached in the Observer PostgreSQL database 
 
 **API Endpoints**:
 
-- `POST /observer/atlas/paths/batch` - Batch compute all paths
-- `GET /observer/atlas/paths/all` - Load all cached paths
-- `GET /observer/atlas/statistics` - Real-time aggregate metrics
+- `POST /observer/paths/batch` - Batch compute all paths
+- `GET /observer/paths/all` - Load all cached paths
+- `GET /observer/statistics` - Real-time aggregate metrics
 
 ## API Integration
 
 ### Observer API Endpoints Used
 
-**GET /observer/atlas/emotions**
+**GET /observer/emotions**
 
 - Fetches all 87 emotions with VAC coordinates
 - Called on page load
@@ -246,19 +246,19 @@ All computed paths are automatically cached in the Observer PostgreSQL database 
 - Returns waypoints, difficulty, time estimates
 - Results automatically cached in database
 
-**POST /observer/atlas/paths/batch**
+**POST /observer/paths/batch**
 
 - Batch compute all 7,482 possible paths
 - Stores results in `path_matrix_cache` table
 - Returns progress updates during computation
 
-**GET /observer/atlas/paths/all**
+**GET /observer/paths/all**
 
 - Retrieves all cached paths from database
 - Supports limit parameter for large datasets
 - Called automatically on page load
 
-**GET /observer/atlas/statistics**
+**GET /observer/statistics**
 
 - Real-time aggregate statistics from cache
 - Difficulty distribution, distance metrics
@@ -308,7 +308,7 @@ Potential additions:
 
 **Data Flow**:
 
-1. useEmotionAtlas fetches emotions → store
+1. useEmotionData fetches emotions → store
 2. User selects emotions → store updates
 3. usePathCalculator watches selection
 4. Paths computed via Observer API
@@ -320,7 +320,7 @@ Potential additions:
 **No emotions visible**:
 
 - Check Observer service is running (default: http://localhost:8001)
-- Verify /atlas/emotions endpoint is accessible
+- Verify /emotions endpoint is accessible
 - Check browser console for errors
 
 **Paths not computing**:

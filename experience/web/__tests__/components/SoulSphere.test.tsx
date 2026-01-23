@@ -30,18 +30,22 @@ jest.mock("three", () => {
     IcosahedronGeometry: jest.fn(),
     Color: jest.fn((...args) => {
       const colorInstance = {
-        r: 0, g: 0, b: 0,
+        r: 0,
+        g: 0,
+        b: 0,
         set: jest.fn(),
         setHSL: jest.fn((h, s, l) => {
           // Minimal HSL mock: just ensure it doesn't crash.
           // For testing, we might not need exact HSL->RGB conversion if we rely on the pre-HSL-boost values
           // or if we just want to ensure it changes.
           // A simple bypass: do nothing, or set to a recognizable value if critical.
-          // Given the test checks r > 0.3 etc, leaving r/g/b as is (from the mix) is probably safer/easier 
+          // Given the test checks r > 0.3 etc, leaving r/g/b as is (from the mix) is probably safer/easier
           // than implementing full HSL conversion.
         }),
         getHSL: jest.fn((target) => {
-          target.h = 0; target.s = 0.5; target.l = 0.5; // Dummy values
+          target.h = 0;
+          target.s = 0.5;
+          target.l = 0.5; // Dummy values
         }),
         copy: jest.fn(function (this: any, c: any) {
           if (c.r !== undefined) this.r = c.r;
@@ -51,15 +55,37 @@ jest.mock("three", () => {
         }),
       };
 
-      if (args.length === 1 && typeof args[0] === 'string') {
+      if (args.length === 1 && typeof args[0] === "string") {
         const hex = args[0];
-        if (hex === "#00FFFF") { colorInstance.r = 0; colorInstance.g = 1; colorInstance.b = 1; }
-        else if (hex === "#FF0000" || hex === "#FF4444") { colorInstance.r = 1; colorInstance.g = 0; colorInstance.b = 0; }
-        else if (hex === "#FFFF00") { colorInstance.r = 1; colorInstance.g = 1; colorInstance.b = 0; }
-        else if (hex === "#0000FF") { colorInstance.r = 0; colorInstance.g = 0; colorInstance.b = 1; }
-        else if (hex === "#800080") { colorInstance.r = 0.5; colorInstance.g = 0; colorInstance.b = 0.5; }
-        else if (hex === "#808080") { colorInstance.r = 0.5; colorInstance.g = 0.5; colorInstance.b = 0.5; }
-        else if (hex === "#44FF44") { colorInstance.r = 0.26; colorInstance.g = 1; colorInstance.b = 0.26; } // Approx
+        if (hex === "#00FFFF") {
+          colorInstance.r = 0;
+          colorInstance.g = 1;
+          colorInstance.b = 1;
+        } else if (hex === "#FF0000" || hex === "#FF4444") {
+          colorInstance.r = 1;
+          colorInstance.g = 0;
+          colorInstance.b = 0;
+        } else if (hex === "#FFFF00") {
+          colorInstance.r = 1;
+          colorInstance.g = 1;
+          colorInstance.b = 0;
+        } else if (hex === "#0000FF") {
+          colorInstance.r = 0;
+          colorInstance.g = 0;
+          colorInstance.b = 1;
+        } else if (hex === "#800080") {
+          colorInstance.r = 0.5;
+          colorInstance.g = 0;
+          colorInstance.b = 0.5;
+        } else if (hex === "#808080") {
+          colorInstance.r = 0.5;
+          colorInstance.g = 0.5;
+          colorInstance.b = 0.5;
+        } else if (hex === "#44FF44") {
+          colorInstance.r = 0.26;
+          colorInstance.g = 1;
+          colorInstance.b = 0.26;
+        } // Approx
       } else if (args.length >= 3) {
         colorInstance.r = args[0];
         colorInstance.g = args[1];
@@ -127,11 +153,11 @@ describe("SoulSphere", () => {
 
   describe("Aggregate Color Logic", () => {
     const mockEmotions = [
-      { id: "e1", name: "Joy", vac: [0.8, 0.6, 0.4] },      // High V, Mod A, some C
+      { id: "e1", name: "Joy", vac: [0.8, 0.6, 0.4] }, // High V, Mod A, some C
       { id: "e2", name: "Sadness", vac: [-0.8, -0.4, 0.1] }, // Neg V, Neg A
-      { id: "e3", name: "Anger", vac: [-0.6, 0.8, -0.2] },   // Neg V, High A
-      { id: "e4", name: "Love", vac: [0.9, 0.5, 0.9] },      // High V, High C
-      { id: "e5", name: "Neutral", vac: [0.001, -0.001, 0] },// Near Zero
+      { id: "e3", name: "Anger", vac: [-0.6, 0.8, -0.2] }, // Neg V, High A
+      { id: "e4", name: "Love", vac: [0.9, 0.5, 0.9] }, // High V, High C
+      { id: "e5", name: "Neutral", vac: [0.001, -0.001, 0] }, // Near Zero
     ];
 
     it("should default to Cyan when no emotions selected", () => {
@@ -148,7 +174,7 @@ describe("SoulSphere", () => {
       (shaderMaterial as any).uniforms = {
         uMode: { value: 0 },
         uColorNeg: { value: { copy: (c: any) => capturedColor.copy(c) } },
-        uColorPos: { value: { copy: jest.fn() } }
+        uColorPos: { value: { copy: jest.fn() } },
       };
 
       updateModeCallback();
@@ -162,7 +188,7 @@ describe("SoulSphere", () => {
       mockUseAtlasAdminStore.mockImplementation((selector: any) =>
         selector({
           allEmotions: mockEmotions,
-          selectedEmotionIds: new Set(["e2"])
+          selectedEmotionIds: new Set(["e2"]),
         })
       );
 
@@ -174,7 +200,7 @@ describe("SoulSphere", () => {
       (shaderMaterial as any).uniforms = {
         uMode: { value: 0 },
         uColorNeg: { value: { copy: (c: any) => capturedColor.copy(c) } },
-        uColorPos: { value: { copy: jest.fn() } }
+        uColorPos: { value: { copy: jest.fn() } },
       };
       updateModeCallback();
 
@@ -186,7 +212,7 @@ describe("SoulSphere", () => {
       mockUseAtlasAdminStore.mockImplementation((selector: any) =>
         selector({
           allEmotions: mockEmotions,
-          selectedEmotionIds: new Set(["e3"])
+          selectedEmotionIds: new Set(["e3"]),
         })
       );
 
@@ -198,7 +224,7 @@ describe("SoulSphere", () => {
       (shaderMaterial as any).uniforms = {
         uMode: { value: 0 },
         uColorNeg: { value: { copy: (c: any) => capturedColor.copy(c) } },
-        uColorPos: { value: { copy: jest.fn() } }
+        uColorPos: { value: { copy: jest.fn() } },
       };
       updateModeCallback();
 
@@ -210,7 +236,7 @@ describe("SoulSphere", () => {
       mockUseAtlasAdminStore.mockImplementation((selector: any) =>
         selector({
           allEmotions: mockEmotions,
-          selectedEmotionIds: new Set(["e4"])
+          selectedEmotionIds: new Set(["e4"]),
         })
       );
 
@@ -222,7 +248,7 @@ describe("SoulSphere", () => {
       (shaderMaterial as any).uniforms = {
         uMode: { value: 0 },
         uColorNeg: { value: { copy: (c: any) => capturedColor.copy(c) } },
-        uColorPos: { value: { copy: jest.fn() } }
+        uColorPos: { value: { copy: jest.fn() } },
       };
       updateModeCallback();
 
@@ -233,7 +259,7 @@ describe("SoulSphere", () => {
       mockUseAtlasAdminStore.mockImplementation((selector: any) =>
         selector({
           allEmotions: mockEmotions,
-          selectedEmotionIds: new Set(["e5"])
+          selectedEmotionIds: new Set(["e5"]),
         })
       );
 
@@ -245,7 +271,7 @@ describe("SoulSphere", () => {
       (shaderMaterial as any).uniforms = {
         uMode: { value: 0 },
         uColorNeg: { value: { copy: (c: any) => capturedColor.copy(c) } },
-        uColorPos: { value: { copy: jest.fn() } }
+        uColorPos: { value: { copy: jest.fn() } },
       };
       updateModeCallback();
 
@@ -316,7 +342,7 @@ describe("SoulSphere", () => {
     (shaderMaterial as any).uniforms = {
       uMode: { value: 0 },
       uColorNeg: { value: { copy: jest.fn() } },
-      uColorPos: { value: { copy: jest.fn() } }
+      uColorPos: { value: { copy: jest.fn() } },
     };
 
     // Find the mode update callback
@@ -351,7 +377,7 @@ describe("SoulSphere", () => {
     mockUseAtlasAdminStore.mockImplementation((selector: any) =>
       selector({
         allEmotions: mockEmotions,
-        selectedEmotionIds: new Set(["unknown_id_999"])
+        selectedEmotionIds: new Set(["unknown_id_999"]),
       })
     );
 
@@ -363,7 +389,7 @@ describe("SoulSphere", () => {
     (shaderMaterial as any).uniforms = {
       uMode: { value: 0 },
       uColorNeg: { value: { copy: (c: any) => capturedColor.copy(c) } },
-      uColorPos: { value: { copy: jest.fn() } }
+      uColorPos: { value: { copy: jest.fn() } },
     };
     updateModeCallback();
 

@@ -40,37 +40,41 @@ export function HelpModal({ onClose }: HelpModalProps) {
         <div className="flex border-b border-gray-700">
           <button
             onClick={() => setActiveTab("model")}
-            className={`flex-1 px-6 py-3 text-sm font-medium transition ${activeTab === "model"
-              ? "text-white bg-gray-800 border-b-2 border-cyan-500"
-              : "text-gray-400 hover:text-gray-300 hover:bg-gray-800/50"
-              }`}
+            className={`flex-1 px-6 py-3 text-sm font-medium transition ${
+              activeTab === "model"
+                ? "text-white bg-gray-800 border-b-2 border-cyan-500"
+                : "text-gray-400 hover:text-gray-300 hover:bg-gray-800/50"
+            }`}
           >
             🧠 VAC Model & Soul Sphere
           </button>
           <button
             onClick={() => setActiveTab("usage")}
-            className={`flex-1 px-6 py-3 text-sm font-medium transition ${activeTab === "usage"
-              ? "text-white bg-gray-800 border-b-2 border-cyan-500"
-              : "text-gray-400 hover:text-gray-300 hover:bg-gray-800/50"
-              }`}
+            className={`flex-1 px-6 py-3 text-sm font-medium transition ${
+              activeTab === "usage"
+                ? "text-white bg-gray-800 border-b-2 border-cyan-500"
+                : "text-gray-400 hover:text-gray-300 hover:bg-gray-800/50"
+            }`}
           >
             🎯 How to Use
           </button>
           <button
             onClick={() => setActiveTab("shortcuts")}
-            className={`flex-1 px-6 py-3 text-sm font-medium transition ${activeTab === "shortcuts"
-              ? "text-white bg-gray-800 border-b-2 border-cyan-500"
-              : "text-gray-400 hover:text-gray-300 hover:bg-gray-800/50"
-              }`}
+            className={`flex-1 px-6 py-3 text-sm font-medium transition ${
+              activeTab === "shortcuts"
+                ? "text-white bg-gray-800 border-b-2 border-cyan-500"
+                : "text-gray-400 hover:text-gray-300 hover:bg-gray-800/50"
+            }`}
           >
             ⌨️ Shortcuts
           </button>
           <button
             onClick={() => setActiveTab("concepts")}
-            className={`flex-1 px-6 py-3 text-sm font-medium transition ${activeTab === "concepts"
-              ? "text-white bg-gray-800 border-b-2 border-cyan-500"
-              : "text-gray-400 hover:text-gray-300 hover:bg-gray-800/50"
-              }`}
+            className={`flex-1 px-6 py-3 text-sm font-medium transition ${
+              activeTab === "concepts"
+                ? "text-white bg-gray-800 border-b-2 border-cyan-500"
+                : "text-gray-400 hover:text-gray-300 hover:bg-gray-800/50"
+            }`}
           >
             🌟 Key Concepts
           </button>
@@ -544,18 +548,21 @@ function ConceptsTab() {
         <h3 className="text-xl font-bold text-white mb-3">The {allEmotions.length} Emotions</h3>
         <div className="bg-gray-800 rounded-lg p-4 text-gray-300">
           <p className="mb-2">
-            The system maps <strong className="text-white">{allEmotions.length} distinct emotions</strong> to VAC space.
+            The system maps{" "}
+            <strong className="text-white">{allEmotions.length} distinct emotions</strong> to VAC
+            space.
           </p>
           <p>
-            These emotions are organized into categories representing different
-            &quot;places we go&quot; emotionally. Each emotion has a unique position in 3D VAC
-            space.
+            These emotions are organized into categories representing different &quot;places we
+            go&quot; emotionally. Each emotion has a unique position in 3D VAC space.
           </p>
         </div>
       </section>
 
       <section>
-        <h3 className="text-xl font-bold text-white mb-3">Bridge Emotions ({bridgeEmotions.length} Gateway States)</h3>
+        <h3 className="text-xl font-bold text-white mb-3">
+          Bridge Emotions ({bridgeEmotions.length} Gateway States)
+        </h3>
         <div className="space-y-2">
           {bridgeEmotions.length > 0 ? (
             bridgeEmotions.map((bridge) => (
@@ -566,7 +573,8 @@ function ConceptsTab() {
                     <h4 className="font-semibold text-white">
                       {bridge.name}{" "}
                       <span className="text-xs text-gray-400 font-mono">
-                        [{bridge.vac[0].toFixed(1)}, {bridge.vac[1].toFixed(1)}, {bridge.vac[2].toFixed(1)}]
+                        [{bridge.vac[0].toFixed(1)}, {bridge.vac[1].toFixed(1)},{" "}
+                        {bridge.vac[2].toFixed(1)}]
                       </span>
                     </h4>
                     <p className="text-sm text-gray-300 mt-1">{bridge.definition}</p>

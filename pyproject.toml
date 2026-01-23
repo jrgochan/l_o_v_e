@@ -46,6 +46,8 @@ warn_unused_ignores = true
 warn_no_return = true
 warn_unreachable = true
 ignore_missing_imports = true  # Many third-party packages lack stubs
+disallow_untyped_decorators = false
+disallow_subclassing_any = false
 
 # Per-module options if needed
 [[tool.mypy.overrides]]

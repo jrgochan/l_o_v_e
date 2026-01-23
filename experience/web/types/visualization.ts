@@ -1,5 +1,5 @@
 /**
- * Type Definitions for Atlas Admin Interface
+ * Type Definitions for Admin Interface
  *
  * Comprehensive types for the Soul Sphere admin visualization tool.
  */
@@ -235,10 +235,10 @@ export const DIFFICULTY_COLORS = {
 } as const;
 
 /**
- * Default bridge emotions list (from Brené Brown's Atlas)
+ * Default bridge emotions list (from Atlas of the Heart dataset)
  * @deprecated Use emotion.is_bridge from backend instead
  */
-export const DEFAULT_BRIDGE_EMOTIONS = [
+export const ATLAS_DATASET_BRIDGE_EMOTIONS = [
   "Vulnerability",
   "Awe",
   "Compassion",
@@ -248,14 +248,14 @@ export const DEFAULT_BRIDGE_EMOTIONS = [
 ] as const;
 
 /**
- * @deprecated Use DEFAULT_BRIDGE_EMOTIONS or backend data
+ * @deprecated Use ATLAS_DATASET_BRIDGE_EMOTIONS or backend data
  */
-export const BRIDGE_EMOTIONS = DEFAULT_BRIDGE_EMOTIONS;
+export const BRIDGE_EMOTIONS = ATLAS_DATASET_BRIDGE_EMOTIONS;
 
 /**
  * Type representing valid bridge emotion names
  */
-export type BridgeEmotion = (typeof DEFAULT_BRIDGE_EMOTIONS)[number];
+export type BridgeEmotion = (typeof ATLAS_DATASET_BRIDGE_EMOTIONS)[number];
 
 /**
  * Type guard to check if an emotion name is a bridge emotion
@@ -264,14 +264,14 @@ export type BridgeEmotion = (typeof DEFAULT_BRIDGE_EMOTIONS)[number];
  * @returns True if the name is one of the 6 bridge emotions
  */
 export function isBridgeEmotion(name: string): name is BridgeEmotion {
-  return (DEFAULT_BRIDGE_EMOTIONS as readonly string[]).includes(name);
+  return (ATLAS_DATASET_BRIDGE_EMOTIONS as readonly string[]).includes(name);
 }
 
 /**
- * Default category color palette (from Brené Brown's Atlas)
+ * Default category color palette (from Atlas of the Heart dataset)
  * @deprecated Move to backend EmotionCollection configuration
  */
-export const DEFAULT_CATEGORY_COLORS: Record<string, string> = {
+export const ATLAS_DATASET_CATEGORY_COLORS: Record<string, string> = {
   "Places We Go With Others": "#88FF44", // Green
   "When It's Beyond Us": "#FF8844", // Orange
   "When Life Is Good": "#FFFF44", // Yellow
@@ -286,13 +286,13 @@ export const DEFAULT_CATEGORY_COLORS: Record<string, string> = {
   "When We Self-Assess": "#44FFCC", // Turquoise
   "When We're Hurting": "#4488FF", // Blue
   // Add generic fallback
-  "Uncategorized": "#CCCCCC",
+  Uncategorized: "#CCCCCC",
 };
 
 /**
- * @deprecated Use DEFAULT_CATEGORY_COLORS or backend colors
+ * @deprecated Use ATLAS_DATASET_CATEGORY_COLORS or backend colors
  */
-export const CATEGORY_COLORS = DEFAULT_CATEGORY_COLORS;
+export const CATEGORY_COLORS = ATLAS_DATASET_CATEGORY_COLORS;
 
 /**
  * Default settings

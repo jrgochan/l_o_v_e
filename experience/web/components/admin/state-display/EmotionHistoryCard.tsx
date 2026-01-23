@@ -46,10 +46,11 @@ export function EmotionHistoryCard({
 
   return (
     <div
-      className={`bg-gray-800/50 border rounded-lg transition-all ${entry.isVisibleInSphere
-        ? "border-cyan-400 bg-cyan-900/20"
-        : "border-gray-700 hover:border-gray-600"
-        }`}
+      className={`bg-gray-800/50 border rounded-lg transition-all ${
+        entry.isVisibleInSphere
+          ? "border-cyan-400 bg-cyan-900/20"
+          : "border-gray-700 hover:border-gray-600"
+      }`}
     >
       {/* Main Card Content */}
       <div className="p-3">

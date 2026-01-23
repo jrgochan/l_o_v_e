@@ -51,10 +51,11 @@ export function EmotionTimeline({ entries, onToggleVisibility }: EmotionTimeline
               <div className="relative flex-shrink-0">
                 <button
                   onClick={() => onToggleVisibility(entry.id)}
-                  className={`w-7 h-7 rounded-full border-2 flex items-center justify-center transition ${entry.isVisibleInSphere
-                    ? "border-cyan-400 bg-cyan-500"
-                    : `${theme.colors.border} ${theme.colors.background} hover:brightness-125`
-                    }`}
+                  className={`w-7 h-7 rounded-full border-2 flex items-center justify-center transition ${
+                    entry.isVisibleInSphere
+                      ? "border-cyan-400 bg-cyan-500"
+                      : `${theme.colors.border} ${theme.colors.background} hover:brightness-125`
+                  }`}
                   style={{
                     backgroundColor: entry.isVisibleInSphere ? categoryColor : undefined,
                   }}
@@ -91,8 +92,9 @@ export function EmotionTimeline({ entries, onToggleVisibility }: EmotionTimeline
                     <div className={`text-xs ${theme.colors.text.muted} mb-0.5`}>V</div>
                     <div className="h-1.5 bg-gray-700/50 rounded overflow-hidden">
                       <div
-                        className={`h-full transition-all ${entry.vac.valence >= 0 ? "bg-cyan-400" : "bg-red-400"
-                          }`}
+                        className={`h-full transition-all ${
+                          entry.vac.valence >= 0 ? "bg-cyan-400" : "bg-red-400"
+                        }`}
                         style={{
                           width: `${Math.abs(entry.vac.valence) * 100}%`,
                         }}
@@ -114,8 +116,9 @@ export function EmotionTimeline({ entries, onToggleVisibility }: EmotionTimeline
                     <div className={`text-xs ${theme.colors.text.muted} mb-0.5`}>C</div>
                     <div className="h-1.5 bg-gray-700/50 rounded overflow-hidden">
                       <div
-                        className={`h-full transition-all ${entry.vac.connection >= 0 ? "bg-purple-400" : "bg-pink-400"
-                          }`}
+                        className={`h-full transition-all ${
+                          entry.vac.connection >= 0 ? "bg-purple-400" : "bg-pink-400"
+                        }`}
                         style={{
                           width: `${Math.abs(entry.vac.connection) * 100}%`,
                         }}

@@ -40,7 +40,7 @@ export function MysticalEmotionNode({
   const innerRef = useRef<THREE.Mesh>(null);
   const auraRef = useRef<THREE.Mesh>(null);
 
-  const [valence, , connection] = emotion.vac;
+  const [, , connection] = emotion.vac;
 
   // Inner core color - derive from the emotion's actual color but brighter
   const coreColor = useMemo(() => {

@@ -446,16 +446,16 @@ from datetime import datetime
 from typing import TYPE_CHECKING, Any, Dict, List, Optional
 from uuid import UUID, uuid4
 
+from pgvector.sqlalchemy import Vector
 from sqlalchemy import Float, ForeignKey, String, Text, func
 from sqlalchemy.dialects.postgresql import ARRAY, JSONB
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.database import Base
-from pgvector.sqlalchemy import Vector
 
 if TYPE_CHECKING:
-    from app.models.emotion_definition import EmotionDefinition
     from app.models.chat_session import ChatSession
+    from app.models.emotion_definition import EmotionDefinition
     from app.models.message_relationship import MessageRelationship
     from app.models.multi_emotion_analysis import MultiEmotionAnalysis
 
@@ -545,7 +545,7 @@ class ChatMessage(Base):
         Args:
             include_emotion: Whether to include full emotion details
         """
-        data = {
+        data: Dict[str, Any] = {
             "id": str(self.id),
             "session_id": str(self.session_id),
             "timestamp": self.timestamp.isoformat() if self.timestamp else None,
@@ -572,11 +572,11 @@ class ChatMessage(Base):
                 "rate": self.prosody_rate,
                 "features": self.prosody_features,
             }
-            data["prosody"] = prosody_dict  # type: ignore[assignment]
+            data["prosody"] = prosody_dict
 
         # Add insights if available
         if self.insights:
-            data["insights"] = self.insights  # type: ignore[assignment]
+            data["insights"] = self.insights
 
         # Include full emotion details if requested
         if include_emotion and self.emotion:
@@ -595,9 +595,7 @@ class ChatMessage(Base):
                     else None
                 ),
             }
-            data["emotion"] = emotion_dict  # type: ignore[assignment]
-
-            data["emotion"] = emotion_dict  # type: ignore[assignment]
+            data["emotion"] = emotion_dict
 
         # Add relationships if loaded/available
         # Check if relationship is loaded to avoid implicit I/O in sync method if possible,

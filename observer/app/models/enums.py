@@ -2,9 +2,10 @@
 
 from enum import Enum
 
+
 class RelationshipType(str, Enum):
     """Types of relationships between messages."""
-    
+
     REPLY = "reply"  # Standard conversational reply
     PRECIPITATED_BY = "precipitated_by"  # Causal link: Event A caused Emotion B
     RESOLVES = "resolves"  # Resolution: Message B resolves tension from Message A

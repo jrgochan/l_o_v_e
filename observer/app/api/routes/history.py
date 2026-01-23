@@ -245,7 +245,7 @@ References:
 
 import logging
 from datetime import datetime
-from typing import Optional
+from typing import Dict, List, Optional
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, HTTPException
@@ -255,9 +255,9 @@ from sqlalchemy.orm import selectinload
 
 from app.api.schemas.history import HistoryResponse, TrajectoryPoint
 from app.database import get_db
-from app.models.emotion_definition import EmotionDefinition
 from app.models.chat_message import ChatMessage
 from app.models.chat_session import ChatSession
+from app.models.emotion_definition import EmotionDefinition
 from app.models.user_trajectory import UserTrajectory
 
 logger = logging.getLogger(__name__)
@@ -322,7 +322,7 @@ async def get_history(
         # Pre-fetch messages in this time range to link relationships
         # We perform a separate query to avoid complex joins and potential Cartesian products
         # This assumes trajectory points and messages are roughly synchronized
-        message_map = {}
+        message_map: Dict[datetime, List[ChatMessage]] = {}
 
         min_ts = states[0].timestamp
         max_ts = states[-1].timestamp

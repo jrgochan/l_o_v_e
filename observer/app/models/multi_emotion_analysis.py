@@ -412,9 +412,9 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 from app.database import Base
 
 if TYPE_CHECKING:
-    from app.models.emotion_definition import EmotionDefinition
     from app.models.chat_message import ChatMessage
     from app.models.chat_session import ChatSession
+    from app.models.emotion_definition import EmotionDefinition
 
 
 class MultiEmotionAnalysis(Base):
@@ -489,7 +489,7 @@ class MultiEmotionAnalysis(Base):
             include_emotions: Include full emotion details
             include_relationships: Include relationship details
         """
-        data = {
+        data: Dict[str, Any] = {
             "id": str(self.id),
             "message_id": str(self.message_id) if self.message_id else None,
             "session_id": str(self.session_id) if self.session_id else None,
@@ -519,13 +519,13 @@ class MultiEmotionAnalysis(Base):
             emotions_list: List[Dict[str, Any]] = [
                 emotion.to_dict() for emotion in self.detected_emotions
             ]
-            data["emotions"] = emotions_list  # type: ignore[assignment]
+            data["emotions"] = emotions_list
 
         if include_relationships and self.emotion_relationships:
             relationships_list: List[Dict[str, Any]] = [
                 rel.to_dict() for rel in self.emotion_relationships
             ]
-            data["relationships"] = relationships_list  # type: ignore[assignment]
+            data["relationships"] = relationships_list
 
         return data
 
@@ -615,7 +615,7 @@ class DetectedEmotion(Base):
 
     def to_dict(self, include_emotion_details: bool = True) -> Dict[str, Any]:
         """Convert to dictionary for JSON serialization."""
-        data = {
+        data: Dict[str, Any] = {
             "id": str(self.id),
             "analysis_id": str(self.analysis_id),
             "emotion_id": str(self.emotion_id) if self.emotion_id else None,
@@ -726,7 +726,7 @@ class EmotionRelationship(Base):
 
     def to_dict(self, include_emotions: bool = True) -> Dict[str, Any]:
         """Convert to dictionary for JSON serialization."""
-        data = {
+        data: Dict[str, Any] = {
             "id": str(self.id),
             "analysis_id": str(self.analysis_id),
             "emotion_a_id": str(self.emotion_a_id),
@@ -739,9 +739,9 @@ class EmotionRelationship(Base):
 
         if include_emotions:
             if self.emotion_a:
-                data["emotion_a"] = self.emotion_a.to_dict(include_emotion_details=True)  # type: ignore[assignment]
+                data["emotion_a"] = self.emotion_a.to_dict(include_emotion_details=True)
             if self.emotion_b:
-                data["emotion_b"] = self.emotion_b.to_dict(include_emotion_details=True)  # type: ignore[assignment]
+                data["emotion_b"] = self.emotion_b.to_dict(include_emotion_details=True)
 
         return data
 
@@ -802,7 +802,9 @@ class EmotionGoal(Base):
 
     # Relationships
     session: Mapped[Optional["ChatSession"]] = relationship(foreign_keys=[session_id])
-    goal_emotion: Mapped[Optional["EmotionDefinition"]] = relationship(foreign_keys=[goal_emotion_id])
+    goal_emotion: Mapped[Optional["EmotionDefinition"]] = relationship(
+        foreign_keys=[goal_emotion_id]
+    )
 
     def __repr__(self) -> str:
         """Represent the object as a string."""
@@ -811,7 +813,7 @@ class EmotionGoal(Base):
 
     def to_dict(self, include_emotion_details: bool = True) -> Dict[str, Any]:
         """Convert to dictionary for JSON serialization."""
-        data = {
+        data: Dict[str, Any] = {
             "id": str(self.id),
             "session_id": str(self.session_id),
             "user_id": self.user_id,
@@ -839,7 +841,7 @@ class EmotionGoal(Base):
                     else None
                 ),
             }
-            data["goal_emotion"] = goal_emotion_dict  # type: ignore[assignment]
+            data["goal_emotion"] = goal_emotion_dict
 
         return data
 

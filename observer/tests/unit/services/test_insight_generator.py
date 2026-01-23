@@ -73,7 +73,7 @@ async def test_get_emotion_details_no_vac_vector(insight_generator):
         
         insight_generator.db = MockAsyncDb(result=mock_db_result)
         
-        details = await insight_generator._get_emotion_details("Joy", [0.8, 0.5, 0.2], use_atlas_mapping=True)
+        details = await insight_generator._get_emotion_details("Joy", [0.8, 0.5, 0.2], use_emotion_mapping=True)
         assert details["name"] == "Joy"
         assert details["vac"] == [0.8, 0.5, 0.2]
 
@@ -87,7 +87,7 @@ async def test_get_emotion_details_db_exception(insight_generator):
         
         insight_generator.db = MockAsyncDb(exception=Exception("DB Fail"))
         
-        details = await insight_generator._get_emotion_details("Joy", use_atlas_mapping=True)
+        details = await insight_generator._get_emotion_details("Joy", use_emotion_mapping=True)
         assert details is None
 
 @pytest.mark.asyncio
@@ -103,7 +103,7 @@ async def test_get_emotion_details_not_found_after_map(insight_generator):
         
         insight_generator.db = MockAsyncDb(result=mock_db_result)
         
-        details = await insight_generator._get_emotion_details("Joy", use_atlas_mapping=True)
+        details = await insight_generator._get_emotion_details("Joy", use_emotion_mapping=True)
         assert details is None
 
 @pytest.mark.asyncio
@@ -181,7 +181,7 @@ async def test_get_emotion_details_no_vac_vector_direct():
     mock_res.scalar_one_or_none.return_value = emotion
     mock_session.execute.return_value = mock_res
     
-    details = await generator._get_emotion_details("Joy", use_atlas_mapping=False)
+    details = await generator._get_emotion_details("Joy", use_emotion_mapping=False)
     assert details["vac"] is None
 @pytest.mark.asyncio
 async def test_generate_insights_warm_flow(insight_generator_service, mock_db):
@@ -301,16 +301,16 @@ async def test_get_emotion_details_logic(insight_generator_service, mock_db):
     mock_res.scalar_one_or_none.return_value = mock_emotion
     mock_db.execute.return_value = mock_res
     
-    res1 = await insight_generator_service._get_emotion_details("Joy", use_atlas_mapping=False)
+    res1 = await insight_generator_service._get_emotion_details("Joy", use_emotion_mapping=False)
     assert res1["name"] == "Joy"
     assert res1["vac"] == [0.1, 0.2, 0.3]
     
     mock_emotion.vac_vector = json.dumps([0.5, 0.5, 0.5])
-    res2 = await insight_generator_service._get_emotion_details("Joy", use_atlas_mapping=False)
+    res2 = await insight_generator_service._get_emotion_details("Joy", use_emotion_mapping=False)
     assert res2["vac"] == [0.5, 0.5, 0.5]
     
     mock_res.scalar_one_or_none.return_value = None
-    res3 = await insight_generator_service._get_emotion_details("Unknown", use_atlas_mapping=False)
+    res3 = await insight_generator_service._get_emotion_details("Unknown", use_emotion_mapping=False)
     assert res3 is None
     
     with patch("app.services.insight_generator.EmotionResolver") as MockMapper:
@@ -322,7 +322,7 @@ async def test_get_emotion_details_logic(insight_generator_service, mock_db):
         MockMapper.return_value.resolve_emotion = AsyncMock(return_value=mock_map_res)
         
         mock_res.scalar_one_or_none.return_value = mock_emotion
-        res4 = await insight_generator_service._get_emotion_details("Joyful", use_atlas_mapping=True)
+        res4 = await insight_generator_service._get_emotion_details("Joyful", use_emotion_mapping=True)
         assert res4["name"] == "Joy"
         assert res4["matched_by"] == "fuzzy"
 

@@ -92,7 +92,7 @@ export function getEmotionAnimationParams(
   let secondaryMotion: "stable" | "orbital" | "recoil" | "reaching" = "reaching";
 
   if (emotion.movement_pattern && validMotions.includes(emotion.movement_pattern)) {
-    secondaryMotion = emotion.movement_pattern as any;
+    secondaryMotion = emotion.movement_pattern as "stable" | "orbital" | "recoil" | "reaching";
   } else {
     secondaryMotion = getCategoryMotionType(category);
   }

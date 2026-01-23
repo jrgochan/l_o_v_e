@@ -66,9 +66,7 @@ class DetectedEmotionResponse(BaseModel):
     Listener returns what the LLM detected; Observer maps to Atlas.
     """
 
-    emotion_name: str = Field(
-        ..., description="Name of the detected emotion"
-    )
+    emotion_name: str = Field(..., description="Name of the detected emotion")
     original_name: Optional[str] = Field(
         None, description="Original AI name if mapped (populated by Observer)"
     )

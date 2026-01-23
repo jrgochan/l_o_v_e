@@ -39,8 +39,8 @@ Key Algorithm:
 
 Performance:
     - Typical execution time: 10-15ms (including embedding generation)
-    - Scales linearly with atlas size (O(n) where n=87)
-    - Cached atlas reduces query time
+    - Scales linearly with collection size (O(n))
+    - Cached definitions reduce query time
 
 References:
     - VAC Model: See docs/architecture/02-vac-model.md
@@ -87,7 +87,7 @@ class EmotionMapper:
         word_count: Optional[int] = None,
         collection_id: Optional[str] = None,
     ) -> EmotionDefinition:
-        """Find the nearest emotion from the Atlas.
+        """Find the nearest emotion from the collection.
 
         Args:
             vac_values: [valence, arousal, connection]
@@ -104,13 +104,14 @@ class EmotionMapper:
         stmt = select(EmotionDefinition)
         if collection_id:
             from uuid import UUID
+
             stmt = stmt.where(EmotionDefinition.collection_id == UUID(collection_id))
-            
+
         result = await self.session.execute(stmt)
         emotions = result.scalars().all()
 
         if not emotions:
-            raise ValueError("No emotions found in atlas_definitions table")
+            raise ValueError("No emotions found in emotion_definitions table")
 
         # Calculate distances for all emotions
         distances = {}
@@ -355,9 +356,7 @@ class EmotionMapper:
         return combined
 
     async def find_nearest_by_vac_only(
-        self, 
-        vac_values: List[float],
-        collection_id: Optional[str] = None
+        self, vac_values: List[float], collection_id: Optional[str] = None
     ) -> EmotionDefinition:
         """Find nearest emotion using only VAC distance.
 
@@ -394,13 +393,14 @@ class EmotionMapper:
         stmt = select(EmotionDefinition)
         if collection_id:
             from uuid import UUID
+
             stmt = stmt.where(EmotionDefinition.collection_id == UUID(collection_id))
 
         result = await self.session.execute(stmt)
         emotions = result.scalars().all()
 
         if not emotions:
-            raise ValueError("No emotions found in atlas_definitions table")
+            raise ValueError("No emotions found in emotion_definitions table")
 
         # Calculate distances
         emotion_distances = []

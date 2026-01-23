@@ -269,10 +269,20 @@ describe("ChatMessageList", () => {
         type: "analysis",
         content: "Linked message",
         timestamp: new Date(),
-        relationships: [{ id: "r1", relationship_type: "reply", source_message_id: 'a', target_message_id: 'b', created_at: new Date() } as any],
+        relationships: [
+          {
+            id: "r1",
+            relationship_type: "reply",
+            source_message_id: "a",
+            target_message_id: "b",
+            created_at: new Date(),
+          } as any,
+        ],
       },
     ];
-    render(<ChatMessageList {...defaultProps} messages={messages} onRelationshipClick={jest.fn()} />);
+    render(
+      <ChatMessageList {...defaultProps} messages={messages} onRelationshipClick={jest.fn()} />
+    );
     expect(screen.getByTestId("mock-autolink")).toBeInTheDocument();
   });
 

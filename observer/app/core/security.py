@@ -6,18 +6,22 @@ Handles password hashing and JWT token generation.
 from datetime import datetime, timedelta
 from typing import Any, Dict, Optional
 
+# Monkeypatch bcrypt to work with passlib 1.7.4
+import bcrypt
 from jose import jwt
 from passlib.context import CryptContext
 
 from app.config import settings
 
-# Monkeypatch bcrypt to work with passlib 1.7.4
-import bcrypt
 if not hasattr(bcrypt, "__about__"):
     try:
+
         class About:
-            __version__ = bcrypt.__version__
-        bcrypt.__about__ = About()
+            """Monkeypatched About class for bcrypt compatibility."""
+
+            __version__ = bcrypt.__version__  # type: ignore[attr-defined]
+
+        bcrypt.__about__ = About()  # type: ignore[attr-defined]
     except Exception:  # pragma: no cover
         pass
 

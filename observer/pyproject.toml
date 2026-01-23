@@ -41,6 +41,7 @@ plugins = [
 warn_return_any = true
 warn_unused_configs = true
 disallow_untyped_defs = true
+disallow_untyped_decorators = false
 disallow_any_unimported = false  # Too strict for libraries
 disallow_incomplete_defs = true
 check_untyped_defs = true

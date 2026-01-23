@@ -223,9 +223,7 @@ export function searchTemplates(query: string): JourneyTemplate[] {
 /**
  * Get templates valid for the current set of emotions
  */
-export function getValidTemplates(
-  availableEmotions: { name: string }[]
-): JourneyTemplate[] {
+export function getValidTemplates(availableEmotions: { name: string }[]): JourneyTemplate[] {
   const availableNames = new Set(availableEmotions.map((e) => e.name.toLowerCase()));
 
   return BASE_JOURNEY_TEMPLATES.filter((template) => {

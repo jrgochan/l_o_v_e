@@ -96,8 +96,9 @@ export function MatrixGrid({
               return (
                 <div
                   key={toCategory}
-                  className={`w-16 h-16 flex-shrink-0 border ${theme.colors.border} cursor-pointer transition-all flex items-center justify-center ${isHovered ? "ring-2 ring-cyan-400 z-30 scale-110 shadow-xl" : ""
-                    }`}
+                  className={`w-16 h-16 flex-shrink-0 border ${theme.colors.border} cursor-pointer transition-all flex items-center justify-center ${
+                    isHovered ? "ring-2 ring-cyan-400 z-30 scale-110 shadow-xl" : ""
+                  }`}
                   style={{
                     backgroundColor: getCategoryCellColor(fromCategory, toCategory),
                   }}
@@ -169,8 +170,9 @@ export function MatrixGrid({
             return (
               <div
                 key={toEmotion.id}
-                className={`w-8 h-8 flex-shrink-0 border ${theme.colors.border} cursor-pointer transition-all ${isHovered ? "ring-2 ring-cyan-400 z-30 scale-125 shadow-xl" : "hover:scale-105"
-                  }`}
+                className={`w-8 h-8 flex-shrink-0 border ${theme.colors.border} cursor-pointer transition-all ${
+                  isHovered ? "ring-2 ring-cyan-400 z-30 scale-125 shadow-xl" : "hover:scale-105"
+                }`}
                 style={{
                   backgroundColor: getCellColor(fromEmotion, toEmotion),
                 }}

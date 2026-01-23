@@ -11,7 +11,7 @@ The Challenge:
         semantic_vac:       Real-time VAC extraction (<3s target)
         multi_emotion:      Complex emotion detection (accuracy critical)
         insight_generation: Therapeutic guidance (empathy + nuance)
-        atlas_mapping:      87-emotion classification (precision)
+        emotion_mapping:    Canonical emotion classification (precision)
 
     Each function has different needs::
 
@@ -51,8 +51,8 @@ L.O.V.E.'s Four AI Functions:
            Accuracy need: Very high (therapeutic quality)
            Recommended models: llama3.1:8b, llama3.1:70b, mixtral:8x7b
 
-        4. atlas_mapping (Observer Module)
-           Purpose: Classify emotions to 87-emotion atlas
+        4. emotion_mapping (Observer Module)
+           Purpose: Classify emotions to canonical collection
            Speed requirement: <2 seconds
            Accuracy need: High (but classification is simpler task)
            Recommended models: phi-3:mini, llama3.1:8b
@@ -121,7 +121,7 @@ Model Recommendations:
         ✗ Not recommended: phi-3:mini (lacks therapeutic depth)
         Reasoning: Requires empathy and clinical knowledge.
 
-        atlas_mapping:
+        emotion_mapping:
         ✓ Recommended: phi-3:mini, llama3.1:8b
         ✗ Not recommended: llama3.1:70b (overkill)
         Reasoning: Classification task, speed matters more.
@@ -200,7 +200,7 @@ Integration Points:
     Used by::
 
         - Listener API: Queries for semantic_vac, multi_emotion models
-        - Observer API: Queries for insight_generation, atlas_mapping models
+        - Observer API: Queries for insight_generation, emotion_mapping models
         - Settings UI: Displays current assignments, allows changes
         - Dashboard: Shows performance metrics
 
@@ -261,7 +261,7 @@ class AIModelService:
         "semantic_vac",  # Real-time VAC extraction from text
         "multi_emotion",  # Complex multi-emotion detection
         "insight_generation",  # Therapeutic insights and guidance
-        "atlas_mapping",  # Emotion classification to 87-emotion atlas
+        "emotion_mapping",  # Emotion classification to canonical collection
     ]
 
     DEFAULT_MODEL = "llama3.1:8b-instruct-q4_0"
@@ -485,7 +485,7 @@ class AIModelService:
                 "not_recommended": ["phi-3:mini"],
                 "reasoning": "Therapeutic insights require empathy and clinical knowledge. Medium to large models perform best.",
             },
-            "atlas_mapping": {
+            "emotion_mapping": {
                 "recommended": ["phi-3:mini", "llama3.1:8b-instruct-q4_0"],
                 "not_recommended": ["llama3.1:70b-instruct-q4_0"],
                 "reasoning": "Classification task. Precision matters more than size. Fast, consistent models preferred.",

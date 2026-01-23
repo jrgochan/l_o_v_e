@@ -182,8 +182,8 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.models.emotion_definition import EmotionDefinition
-from app.services.emotion_resolver import EmotionResolver
 from app.services.clinical_alert_service import ClinicalAlertService
+from app.services.emotion_resolver import EmotionResolver
 from app.services.recommendation_engine import RecommendationEngine
 from app.services.session_analytics_service import SessionAnalyticsService
 
@@ -787,7 +787,7 @@ class InsightGenerator:
         tone_mode: str = "warm",
         prosody_data: Optional[Dict[str, Any]] = None,
         reasoning: Optional[str] = None,
-        use_atlas_mapping: bool = True,
+        use_emotion_mapping: bool = True,
         session_id: Optional[str] = None,
     ) -> Dict[str, Any]:
         """Generate comprehensive insights from analysis data.
@@ -799,25 +799,26 @@ class InsightGenerator:
             tone_mode: 'clinical' or 'warm'
             prosody_data: Optional voice prosody features
             reasoning: Optional reasoning from semantic analyzer
-            use_atlas_mapping: If True, use VAC-based fallback for unmapped emotions
+            reasoning: Optional reasoning from semantic analyzer
+            use_emotion_mapping: If True, use VAC-based fallback for unmapped emotions
             session_id: Optional chat session ID for clinical alert tracking
 
         Returns:
             Dictionary containing structured insights
         """
         # ═══════════════════════════════════════════════════════════════════════
-        # STEP 1: Resolve emotion name to full atlas definition
+        # STEP 1: Resolve emotion name to full emotion definition
         # ═══════════════════════════════════════════════════════════════════════
-        # AtlasMapper handles:
+        # EmotionResolver handles:
         #   - Exact matches ("Anxiety" → Anxiety)
         #   - Fuzzy matches ("anxious" → Anxiety, "joyful" → Joy)
         #   - VAC-based fallback (if emotion name not found, find nearest by VAC)
         #
         # This is critical because AI models may use variations:
-        #   Listener says "anxious" but atlas has "Anxiety"
+        #   Listener says "anxious" but collection has "Anxiety"
         #   Mapper resolves the variation automatically
         emotion = await self._get_emotion_details(
-            emotion_name, vac_coords=vac_data, use_atlas_mapping=use_atlas_mapping
+            emotion_name, vac_coords=vac_data, use_emotion_mapping=use_emotion_mapping
         )
 
         # Fallback if emotion can't be resolved
@@ -1026,19 +1027,19 @@ class InsightGenerator:
         self,
         emotion_name: str,
         vac_coords: Optional[Dict[str, float]] = None,
-        use_atlas_mapping: bool = True,
+        use_emotion_mapping: bool = True,
     ) -> Optional[Dict[str, Any]]:
-        """Get emotion details from atlas using AtlasMapper.
+        """Get emotion details from collection using EmotionResolver.
 
         Args:
             emotion_name: Name of the emotion to find
             vac_coords: VAC coordinates for fallback matching
-            use_atlas_mapping: If True, use fuzzy + VAC-based matching
+            use_emotion_mapping: If True, use fuzzy + VAC-based matching
 
         Returns:
             Emotion details dict or None
         """
-        if not use_atlas_mapping:
+        if not use_emotion_mapping:
             # Simple exact match only
             stmt = select(EmotionDefinition).where(
                 EmotionDefinition.emotion_name.ilike(f"%{emotion_name}%")
@@ -1487,8 +1488,8 @@ class InsightGenerator:
             "category": "Unknown",
             "vac": vac_data,
             "confidence": 0.0,
-            "summary": f"Detected emotion '{emotion_name}' but unable to find detailed information in atlas.",
+            "summary": f"Detected emotion '{emotion_name}' but unable to find detailed information in canonical definitions.",
             "vac_analysis": self._analyze_vac_coordinates(vac_data, tone_mode),
             "recommendations": [],
-            "guidance": "Consider exploring the emotional atlas to find related emotions.",
+            "guidance": "Consider exploring the emotion collection to find related emotions.",
         }

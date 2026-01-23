@@ -17,7 +17,8 @@ from typing import Any, Dict, List, Optional
 from sqlalchemy import select, text
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.models.emotion_definition import EmotionDefinition, EmotionCollection
+from app.config import settings
+from app.models.emotion_definition import EmotionCollection, EmotionDefinition
 
 logger = logging.getLogger(__name__)
 
@@ -45,32 +46,32 @@ class EmotionResolver:
     """
 
     def __init__(
-        self, 
-        db: AsyncSession, 
-        collection_name: str = "Atlas of the Heart",
+        self,
+        db: AsyncSession,
+        collection_name: Optional[str] = None,
         collection_id: Optional[str] = None,
-        fuzzy_threshold: float = 0.8, 
-        vac_threshold: float = 0.3
+        fuzzy_threshold: float = 0.8,
+        vac_threshold: float = 0.3,
     ) -> None:
         """Initialize Emotion Resolver.
 
         Args:
             db: SQLAlchemy async session
-            collection_name: Name of the collection to resolve against (default: "Atlas of the Heart")
+            collection_name: Name of the collection to resolve against (default: configured default)
             collection_id: Optional UUID of specific collection (overrides name if provided)
             fuzzy_threshold: Minimum similarity for fuzzy match (0-1, default 0.8)
             vac_threshold: Maximum VAC distance for semantic match (default 0.3)
         """
         self.db = db
-        self.collection_name = collection_name
+        self.collection_name = collection_name or settings.DEFAULT_EMOTION_COLLECTION
         self.collection_id = collection_id
         self.fuzzy_threshold = fuzzy_threshold
         self.vac_threshold = vac_threshold
-        
+
         self.emotions_cache: Dict[str, Any] = {}
         self.emotion_names: List[str] = []
         self._loaded = False
-        self._collection_uuid = None # Resolved UUID
+        self._collection_uuid: Optional[Any] = None  # Resolved UUID
 
         logger.info(
             f"EmotionResolver initialized for '{collection_name}' (ID: {collection_id}) "
@@ -85,23 +86,29 @@ class EmotionResolver:
         try:
             # Resolve Collection ID if not explicitly provided
             if not self.collection_id:
-                stmt = select(EmotionCollection).where(EmotionCollection.name == self.collection_name)
-                result = await self.db.execute(stmt)
+                stmt_coll = select(EmotionCollection).where(
+                    EmotionCollection.name == self.collection_name
+                )
+                result = await self.db.execute(stmt_coll)
                 collection = result.scalar_one_or_none()
-                
+
                 if not collection:
-                    logger.warning(f"Collection '{self.collection_name}' not found. Resolver will be empty.")
+                    logger.warning(
+                        f"Collection '{self.collection_name}' not found. Resolver will be empty."
+                    )
                     self._loaded = True
                     return
-                
+
                 self._collection_uuid = collection.id
             else:
                 self._collection_uuid = self.collection_id
 
             # Fetch emotions for this collection
-            stmt = select(EmotionDefinition).where(EmotionDefinition.collection_id == self._collection_uuid)
-            result = await self.db.execute(stmt)
-            emotions = result.scalars().all()
+            stmt_emotions = select(EmotionDefinition).where(
+                EmotionDefinition.collection_id == self._collection_uuid
+            )
+            result_emotions = await self.db.execute(stmt_emotions)
+            emotions = result_emotions.scalars().all()
 
             # Build lookup structures
             for emotion in emotions:
@@ -112,6 +119,7 @@ class EmotionResolver:
                 if emotion.vac_vector is not None:
                     if isinstance(emotion.vac_vector, str):
                         import json
+
                         vac_list = json.loads(emotion.vac_vector)
                     else:
                         vac_list = list(emotion.vac_vector)
@@ -125,12 +133,14 @@ class EmotionResolver:
                         if vac_list
                         else None
                     ),
-                    "embedding": emotion.semantic_embedding # Cache embedding if needed later?
+                    "embedding": emotion.semantic_embedding,  # Cache embedding if needed later?
                 }
                 self.emotion_names.append(name)
 
             self._loaded = True
-            logger.info(f"Loaded {len(self.emotion_names)} emotions from collection '{self.collection_name}'")
+            logger.info(
+                f"Loaded {len(self.emotion_names)} emotions from collection '{self.collection_name}'"
+            )
 
         except Exception as e:
             logger.error(f"Error loading emotions: {e}", exc_info=True)
@@ -212,7 +222,9 @@ class EmotionResolver:
                 )
 
         # No Match
-        logger.warning(f"No emotion match found for '{ai_name}' in collection '{self.collection_name}'")
+        logger.warning(
+            f"No emotion match found for '{ai_name}' in collection '{self.collection_name}'"
+        )
         return MappingResult(
             original_name=ai_name,
             emotion_name=None,
@@ -268,11 +280,7 @@ class EmotionResolver:
 
             vac_vector_str = f"[{valence},{arousal},{connection}]"
             result = await self.db.execute(
-                query, 
-                {
-                    "vac_input": vac_vector_str, 
-                    "collection_id": self._collection_uuid
-                }
+                query, {"vac_input": vac_vector_str, "collection_id": self._collection_uuid}
             )
             row = result.first()
 
@@ -281,6 +289,7 @@ class EmotionResolver:
 
                 if distance < self.vac_threshold:
                     import json
+
                     vac_list = None
                     if vac_vector is not None:
                         if isinstance(vac_vector, str):

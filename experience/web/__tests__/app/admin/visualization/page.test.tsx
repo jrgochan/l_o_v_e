@@ -1,10 +1,10 @@
 import { render, screen, fireEvent, act } from "@testing-library/react";
-import AtlasAdminPage from "@/app/admin/visualization/page";
+import VisualizationAdminPage from "@/app/admin/visualization/page";
 import { useAmbientAudio } from "@/hooks/useAmbientAudio";
 import { useSphereSync } from "@/hooks/useSphereSync";
 import { useVisualizationStore } from "@/stores/useVisualizationStore";
 import { useExperienceStore } from "@/stores/useExperienceStore";
-import { useEmotionAtlas } from "@/hooks/useEmotionAtlas";
+import { useEmotionData } from "@/hooks/useEmotionData";
 import { useAdminTheme } from "@/hooks/admin/useAdminTheme";
 
 // --- MOCK COMPONENTS ---
@@ -108,8 +108,8 @@ jest.mock("@react-three/drei", () => ({
 // Let's ignore it, it's a known issue with testing R3F with react-testing-library without a custom renderer.
 
 // --- MOCK HOOKS ---
-jest.mock("@/hooks/useEmotionAtlas", () => ({
-  useEmotionAtlas: jest.fn(() => ({ isLoading: false, error: null })),
+jest.mock("@/hooks/useEmotionData", () => ({
+  useEmotionData: jest.fn(() => ({ isLoading: false, error: null })),
 }));
 jest.mock("@/hooks/usePathCalculator", () => ({ usePathCalculator: jest.fn() }));
 jest.mock("@/hooks/useKeyboardShortcuts", () => ({ useKeyboardShortcuts: jest.fn() }));
@@ -153,7 +153,7 @@ jest.mock("@/components/admin/layout/AdminGuard", () => ({
   AdminGuard: ({ children }: any) => <div data-testid="admin-guard">{children}</div>,
 }));
 
-describe("AtlasAdminPage", () => {
+describe("VisualizationAdminPage", () => {
   beforeEach(() => {
     jest.clearAllMocks();
 
@@ -192,7 +192,7 @@ describe("AtlasAdminPage", () => {
   });
 
   it("renders core layout components", () => {
-    render(<AtlasAdminPage />);
+    render(<VisualizationAdminPage />);
     // Ensure Guard renders
     expect(screen.getByTestId("admin-guard")).toBeInTheDocument();
 
@@ -206,13 +206,13 @@ describe("AtlasAdminPage", () => {
   });
 
   it("initializes audio on interaction", () => {
-    render(<AtlasAdminPage />);
+    render(<VisualizationAdminPage />);
     fireEvent.click(window);
     expect(mockInitAudio).toHaveBeenCalled();
   });
 
   it("toggles Matrix view", () => {
-    render(<AtlasAdminPage />);
+    render(<VisualizationAdminPage />);
 
     const matrixBtn = screen.getByText(/Path Matrix/i);
 
@@ -229,7 +229,7 @@ describe("AtlasAdminPage", () => {
   });
 
   it("toggles Help modal", () => {
-    render(<AtlasAdminPage />);
+    render(<VisualizationAdminPage />);
 
     const helpBtn = screen.getByText(/Help/i);
 
@@ -256,19 +256,19 @@ describe("AtlasAdminPage", () => {
       })
     );
 
-    render(<AtlasAdminPage />);
+    render(<VisualizationAdminPage />);
     expect(screen.getByTestId("intro-complete")).toBeInTheDocument();
   });
 
   it("renders debug broadcaster when enabled", () => {
-    render(<AtlasAdminPage />);
+    render(<VisualizationAdminPage />);
     expect(screen.queryByTestId("debug-broadcaster")).toBeNull();
     fireEvent.keyDown(window, { key: "d" });
     expect(screen.getByTestId("debug-broadcaster")).toBeInTheDocument();
   });
 
   it("handles panel resizing", () => {
-    render(<AtlasAdminPage />);
+    render(<VisualizationAdminPage />);
 
     const handle = screen.getByTestId("resize-handle");
     fireEvent.mouseDown(handle, { clientX: 1000 });
@@ -298,12 +298,14 @@ describe("AtlasAdminPage", () => {
   });
 
   it("ignores shortcuts when typing in inputs", () => {
-    render(<AtlasAdminPage />);
+    render(<VisualizationAdminPage />);
     const input = document.createElement("input");
     document.body.appendChild(input);
 
     const mockSetIsFlying = jest.fn();
-    (useVisualizationStore.getState as jest.Mock) = jest.fn(() => ({ setIsFlying: mockSetIsFlying }));
+    (useVisualizationStore.getState as jest.Mock) = jest.fn(() => ({
+      setIsFlying: mockSetIsFlying,
+    }));
 
     fireEvent.keyDown(input, { key: " " });
     fireEvent.keyDown(input, { key: "ArrowRight" });
@@ -315,7 +317,9 @@ describe("AtlasAdminPage", () => {
 
   it("ignores Space key if no transitionPath", () => {
     const mockSetIsFlying = jest.fn();
-    (useVisualizationStore.getState as jest.Mock) = jest.fn(() => ({ setIsFlying: mockSetIsFlying }));
+    (useVisualizationStore.getState as jest.Mock) = jest.fn(() => ({
+      setIsFlying: mockSetIsFlying,
+    }));
 
     (useExperienceStore as unknown as jest.Mock).mockImplementation((selector: any) =>
       selector({
@@ -323,13 +327,13 @@ describe("AtlasAdminPage", () => {
       })
     );
 
-    render(<AtlasAdminPage />);
+    render(<VisualizationAdminPage />);
     fireEvent.keyDown(window, { key: " " });
     expect(mockSetIsFlying).not.toHaveBeenCalled();
   });
 
   it("toggles info panel expansion", () => {
-    render(<AtlasAdminPage />);
+    render(<VisualizationAdminPage />);
     const toggleBtn = screen.getByTitle("Expand panel"); // Default is collapsed? No, default state?
     // const [isInfoPanelExpanded, setIsInfoPanelExpanded] = useState(false);
     // Button text: {isInfoPanelExpanded ? "◀ Collapse" : "▶ Expand"}
@@ -375,7 +379,7 @@ describe("AtlasAdminPage", () => {
       })
     );
 
-    render(<AtlasAdminPage />);
+    render(<VisualizationAdminPage />);
 
     // Space: Play/Pause
     fireEvent.keyDown(window, { key: " " });
@@ -423,7 +427,7 @@ describe("AtlasAdminPage", () => {
       })
     );
 
-    render(<AtlasAdminPage />);
+    render(<VisualizationAdminPage />);
     fireEvent.keyDown(window, { key: " " });
 
     // Should NOT call updateLayer
@@ -444,7 +448,7 @@ describe("AtlasAdminPage", () => {
       })
     );
 
-    render(<AtlasAdminPage />);
+    render(<VisualizationAdminPage />);
     expect(screen.getByTestId("data-vis")).toBeInTheDocument();
 
     fireEvent.click(screen.getByText("Close"));
@@ -452,7 +456,7 @@ describe("AtlasAdminPage", () => {
   });
 
   it("toggles mute state", () => {
-    render(<AtlasAdminPage />);
+    render(<VisualizationAdminPage />);
     // Mute button has title "Mute Audio" or "Unmute Audio"
     // Default isMuted = false -> "Mute Audio"
     const muteBtn = screen.getByTitle("Mute Audio");
@@ -462,7 +466,7 @@ describe("AtlasAdminPage", () => {
   });
 
   it("exposes toggleHelp on window", () => {
-    render(<AtlasAdminPage />);
+    render(<VisualizationAdminPage />);
     expect((window as any).toggleHelp).toBeDefined();
 
     // Trigger it
@@ -483,7 +487,7 @@ describe("AtlasAdminPage", () => {
       updateLayer: jest.fn(),
     }));
 
-    render(<AtlasAdminPage />);
+    render(<VisualizationAdminPage />);
 
     fireEvent.keyDown(window, { key: "ArrowRight" });
     fireEvent.keyDown(window, { key: "ArrowLeft" });
@@ -498,13 +502,13 @@ describe("AtlasAdminPage", () => {
       cycleSelectedPath: jest.fn(),
     }));
 
-    render(<AtlasAdminPage />);
+    render(<VisualizationAdminPage />);
     fireEvent.keyDown(window, { key: "ArrowRight" });
     // Should return early (Line 223)
   });
 
   it("closes Path Matrix via callback", () => {
-    render(<AtlasAdminPage />);
+    render(<VisualizationAdminPage />);
 
     // Open Matrix
     fireEvent.click(screen.getByText(/Path Matrix/i));
@@ -515,7 +519,7 @@ describe("AtlasAdminPage", () => {
     expect(screen.queryByTestId("path-matrix")).toBeNull();
   });
   it("exposes openCommandPalette on window", () => {
-    render(<AtlasAdminPage />);
+    render(<VisualizationAdminPage />);
     expect((window as any).openCommandPalette).toBeDefined();
 
     act(() => {
@@ -546,7 +550,7 @@ describe("AtlasAdminPage", () => {
     // @ts-ignore
     delete window.crypto;
 
-    render(<AtlasAdminPage />);
+    render(<VisualizationAdminPage />);
 
     // Restore
     // @ts-ignore
@@ -558,12 +562,12 @@ describe("AtlasAdminPage", () => {
   });
   it("renders error state correctly", () => {
     // Mock hook to return error
-    (useEmotionAtlas as jest.Mock).mockReturnValue({
+    (useEmotionData as jest.Mock).mockReturnValue({
       isLoading: false,
       error: "Connection Failed",
     });
-    render(<AtlasAdminPage />);
-    expect(screen.getByText("Error Loading Atlas")).toBeInTheDocument();
+    render(<VisualizationAdminPage />);
+    expect(screen.getByText("Error Loading Visualization")).toBeInTheDocument();
     expect(screen.getByText("Connection Failed")).toBeInTheDocument();
     // Covers fallback URL display branch
     expect(screen.getByText(/http:\/\/localhost:8000/)).toBeInTheDocument();
@@ -571,7 +575,7 @@ describe("AtlasAdminPage", () => {
 
   it("renders Zen Mode HUD (PathDetailsOverlay)", () => {
     // Reset Error State from previous test
-    (useEmotionAtlas as jest.Mock).mockReturnValue({ isLoading: false, error: null });
+    (useEmotionData as jest.Mock).mockReturnValue({ isLoading: false, error: null });
 
     (useVisualizationStore as unknown as jest.Mock).mockImplementation((selector: any) =>
       selector({
@@ -584,7 +588,7 @@ describe("AtlasAdminPage", () => {
       })
     );
 
-    render(<AtlasAdminPage />);
+    render(<VisualizationAdminPage />);
     expect(screen.getByTestId("path-details")).toBeInTheDocument();
   });
 
@@ -597,7 +601,7 @@ describe("AtlasAdminPage", () => {
       playClickSound: jest.fn(),
     });
 
-    render(<AtlasAdminPage />);
+    render(<VisualizationAdminPage />);
     const btn = screen.getByTitle("Unmute Audio");
     expect(btn).toHaveClass("bg-red-900/50");
   });
@@ -615,8 +619,8 @@ describe("AtlasAdminPage", () => {
       typography: { fontFamily: "font-mono", tracking: "tracking-wide" },
     });
 
-    render(<AtlasAdminPage />);
-    const header = screen.getByText("Soul Sphere Atlas").closest("header");
+    render(<VisualizationAdminPage />);
+    const header = screen.getByText("Soul Sphere").closest("header");
     expect(header).toHaveStyle({ fontFamily: "monospace" });
   });
 });

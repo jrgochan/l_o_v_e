@@ -3,7 +3,7 @@
  *
  * Computes paths for all emotion pairs.
  * Uses new backend batch API for massive performance improvement.
- * Refactored to compose useBatchJob logic and atlasService.
+ * Refactored to compose useBatchJob logic and visualizationService.
  */
 
 import { useCallback } from "react";
@@ -11,7 +11,7 @@ import { useVisualizationStore } from "@/stores/useVisualizationStore";
 import type { EmotionPath } from "@/types/visualization";
 import { logger } from "@/utils/logger";
 import { useBatchJob } from "./pathfinding/useBatchJob";
-import { atlasService } from "@/services/atlasService";
+import { visualizationService } from "@/services/visualizationService";
 
 export function useComputeAllPaths() {
   const allEmotions = useVisualizationStore((state) => state.allEmotions);
@@ -19,7 +19,7 @@ export function useComputeAllPaths() {
 
   const loadCachedPaths = useCallback(async () => {
     try {
-      const data = await atlasService.getCachedPaths();
+      const data = await visualizationService.getCachedPaths();
 
       data.paths.forEach((pathData) => {
         const fromEmotion = allEmotions.find((e) => e.id === pathData.from_emotion.id);
@@ -75,8 +75,8 @@ export function useComputeAllPaths() {
     const totalPaths = totalCount * (totalCount - 1);
     const confirmed = confirm(
       `This will compute all ${totalPaths} paths using the backend batch API.\n\n` +
-      `This will take ~8-10 minutes running in the background.\n\n` +
-      `Continue?`
+        `This will take ~8-10 minutes running in the background.\n\n` +
+        `Continue?`
     );
 
     if (!confirmed) return;
@@ -85,7 +85,7 @@ export function useComputeAllPaths() {
 
     try {
       logger.info("hooks", "Starting batch computation via backend API");
-      const result = await atlasService.computeAllPaths();
+      const result = await visualizationService.computeAllPaths();
       logger.info("api", `Batch job started: ${result.job_id}`);
       startJob(result.job_id, totalPaths);
     } catch {

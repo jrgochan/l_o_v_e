@@ -633,8 +633,8 @@ class RecommendationEngine:
                 e.emotion_name as name,
                 e.category,
                 e.vac_vector as vac,
-                e.vac_vector <-> (SELECT vac_vector FROM atlas_definitions WHERE id = :emotion_id) as distance
-            FROM atlas_definitions e
+                e.vac_vector <-> (SELECT vac_vector FROM emotion_definitions WHERE id = :emotion_id) as distance
+            FROM emotion_definitions e
             WHERE e.id != :emotion_id
             ORDER BY distance ASC
             LIMIT :limit
@@ -688,8 +688,8 @@ class RecommendationEngine:
                 to_e.emotion_name as to_name,
                 to_e.category as to_category
             FROM path_matrix_cache pmc
-            JOIN atlas_definitions from_e ON pmc.from_emotion_id = from_e.id
-            JOIN atlas_definitions to_e ON pmc.to_emotion_id = to_e.id
+            JOIN emotion_definitions from_e ON pmc.from_emotion_id = from_e.id
+            JOIN emotion_definitions to_e ON pmc.to_emotion_id = to_e.id
             WHERE pmc.difficulty = 'difficult'
             ORDER BY pmc.distance DESC
             LIMIT :limit
@@ -782,7 +782,7 @@ class RecommendationEngine:
 
         stmt = text(
             """
-            SELECT id FROM atlas_definitions
+            SELECT id FROM emotion_definitions
             WHERE emotion_name = ANY(:names)
             ORDER BY emotion_name
         """

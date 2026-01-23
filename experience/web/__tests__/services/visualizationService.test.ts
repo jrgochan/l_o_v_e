@@ -1,4 +1,4 @@
-import { atlasService } from "../../services/atlasService";
+import { visualizationService } from "../../services/visualizationService";
 import { logger } from "@/utils/logger";
 import { API_BASE_URL } from "@/utils/api";
 
@@ -12,7 +12,7 @@ jest.mock("@/utils/logger", () => ({
 // Mock fetch
 global.fetch = jest.fn();
 
-describe("atlasService", () => {
+describe("visualizationService", () => {
   beforeEach(() => {
     jest.clearAllMocks();
   });
@@ -25,11 +25,9 @@ describe("atlasService", () => {
         json: async () => mockResponse,
       });
 
-      const result = await atlasService.getCachedPaths();
+      const result = await visualizationService.getCachedPaths();
       expect(result).toEqual(mockResponse);
-      expect(global.fetch).toHaveBeenCalledWith(
-        `${API_BASE_URL}/observer/paths/all?limit=10000`
-      );
+      expect(global.fetch).toHaveBeenCalledWith(`${API_BASE_URL}/observer/paths/all?limit=10000`);
     });
 
     it("should fetch cached paths with custom limit", async () => {
@@ -39,10 +37,8 @@ describe("atlasService", () => {
         json: async () => mockResponse,
       });
 
-      const result = await atlasService.getCachedPaths(50);
-      expect(global.fetch).toHaveBeenCalledWith(
-        `${API_BASE_URL}/observer/paths/all?limit=50`
-      );
+      const result = await visualizationService.getCachedPaths(50);
+      expect(global.fetch).toHaveBeenCalledWith(`${API_BASE_URL}/observer/paths/all?limit=50`);
     });
 
     it("should throw and log error on failure", async () => {
@@ -51,7 +47,7 @@ describe("atlasService", () => {
         statusText: "Server Error",
       });
 
-      await expect(atlasService.getCachedPaths()).rejects.toThrow(
+      await expect(visualizationService.getCachedPaths()).rejects.toThrow(
         "Failed to load cached paths: Server Error"
       );
       expect(logger.error).toHaveBeenCalledWith(
@@ -70,12 +66,11 @@ describe("atlasService", () => {
         json: async () => mockResponse,
       });
 
-      const result = await atlasService.computeAllPaths();
+      const result = await visualizationService.computeAllPaths();
       expect(result).toEqual(mockResponse);
-      expect(global.fetch).toHaveBeenCalledWith(
-        `${API_BASE_URL}/observer/compute-all-paths`,
-        { method: "POST" }
-      );
+      expect(global.fetch).toHaveBeenCalledWith(`${API_BASE_URL}/observer/compute-all-paths`, {
+        method: "POST",
+      });
     });
 
     it("should throw on failure", async () => {
@@ -84,7 +79,7 @@ describe("atlasService", () => {
         statusText: "Bad Request",
       });
 
-      await expect(atlasService.computeAllPaths()).rejects.toThrow(
+      await expect(visualizationService.computeAllPaths()).rejects.toThrow(
         "Failed to start batch computation: Bad Request"
       );
       expect(logger.error).toHaveBeenCalled();

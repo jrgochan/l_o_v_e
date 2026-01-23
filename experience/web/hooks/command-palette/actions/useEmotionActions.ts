@@ -19,11 +19,7 @@ export function useEmotionActions({ addToRecent, close }: UseEmotionActionsDepen
   const setTarget = useExperienceStore((state) => state.setTarget);
 
   const executeAction = useCallback(
-    (
-      emotion: Emotion,
-      action: CommandAction,
-      modifiers: KeyModifiers
-    ): CommandActionResult => {
+    (emotion: Emotion, action: CommandAction, modifiers: KeyModifiers): CommandActionResult => {
       logger.info(
         "user-interaction",
         `Command palette action: ${action} on ${emotion.name}`,

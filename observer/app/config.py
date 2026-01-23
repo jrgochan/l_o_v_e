@@ -106,6 +106,7 @@ class Settings(BaseSettings):
     API_VERSION: str = Field(default="v1")
     APP_NAME: str = Field(default="L.O.V.E. Observer API")
     APP_DESCRIPTION: str = Field(default="Emotional state persistence and context retrieval")
+    DEFAULT_EMOTION_COLLECTION: str = Field(default="Atlas of the Heart")
 
     model_config = SettingsConfigDict(env_file=".env", case_sensitive=True)
 

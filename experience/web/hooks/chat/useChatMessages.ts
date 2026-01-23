@@ -21,7 +21,7 @@
  */
 
 import { useState, useRef, useEffect } from "react";
-import type { InsightData, VAC, MultiEmotionAnalysis, DisplayMessage } from "@/types/chat";
+import type { DisplayMessage } from "@/types/chat";
 
 export function useChatMessages(isExpanded: boolean) {
   const [messages, setMessages] = useState<DisplayMessage[]>([]);

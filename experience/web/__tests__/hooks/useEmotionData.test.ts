@@ -1,5 +1,5 @@
 import { renderHook, waitFor } from "@testing-library/react";
-import { useEmotionAtlas } from "@/hooks/useEmotionAtlas";
+import { useEmotionData } from "@/hooks/useEmotionData";
 import { useVisualizationStore } from "@/stores/useVisualizationStore";
 import { logger } from "@/utils/logger";
 import fetchMock from "jest-fetch-mock";
@@ -15,7 +15,7 @@ jest.mock("@love/experience-shared", () => ({
   }),
 }));
 
-describe("useEmotionAtlas", () => {
+describe("useEmotionData", () => {
   const mockSetAllEmotions = jest.fn();
   const mockSetLoading = jest.fn();
   const mockSetError = jest.fn();
@@ -58,7 +58,7 @@ describe("useEmotionAtlas", () => {
     };
     fetchMock.mockResponseOnce(JSON.stringify(mockResponse));
 
-    renderHook(() => useEmotionAtlas());
+    renderHook(() => useEmotionData());
 
     // Expect loading to be true initially
     expect(mockSetLoading).toHaveBeenCalledWith(true);
@@ -100,7 +100,7 @@ describe("useEmotionAtlas", () => {
       setError: mockSetError,
     });
 
-    renderHook(() => useEmotionAtlas());
+    renderHook(() => useEmotionData());
 
     await waitFor(() => {
       // Expect collections to be fetched, then active collection set to the default one
@@ -117,7 +117,7 @@ describe("useEmotionAtlas", () => {
     fetchMock.resetMocks();
     fetchMock.mockReject(new Error("Network Error"));
 
-    renderHook(() => useEmotionAtlas());
+    renderHook(() => useEmotionData());
 
     await waitFor(() => {
       expect(logger.error).toHaveBeenCalledWith(
@@ -143,9 +143,9 @@ describe("useEmotionAtlas", () => {
       setError: mockSetError,
     });
 
-    renderHook(() => useEmotionAtlas());
+    renderHook(() => useEmotionData());
 
-    // The hook currently triggers a fetch when activeCollectionId changes or is present, 
+    // The hook currently triggers a fetch when activeCollectionId changes or is present,
     // regardless of existing data in the store (no check for data ownership).
     // So we expect 1 call to fetch emotions for the active collection.
     expect(fetchMock).toHaveBeenCalledTimes(1);
@@ -170,7 +170,7 @@ describe("useEmotionAtlas", () => {
 
     fetchMock.mockReject(new Error("API Error"));
 
-    renderHook(() => useEmotionAtlas());
+    renderHook(() => useEmotionData());
 
     await waitFor(() => {
       expect(mockSetError).toHaveBeenCalledWith("API Error");
@@ -195,7 +195,7 @@ describe("useEmotionAtlas", () => {
 
     fetchMock.mockImplementationOnce(() => Promise.reject("Not an Error object"));
 
-    renderHook(() => useEmotionAtlas());
+    renderHook(() => useEmotionData());
 
     await waitFor(() => {
       expect(mockSetError).toHaveBeenCalledWith("Unknown error");
@@ -228,7 +228,7 @@ describe("useEmotionAtlas", () => {
     // we will assume the behavior (or mock the entire import at top if needed).
 
     // Let's create the hook instance
-    renderHook(() => useEmotionAtlas());
+    renderHook(() => useEmotionData());
 
     await waitFor(() => {
       const calls = mockSetAllEmotions.mock.calls;
@@ -262,7 +262,7 @@ describe("useEmotionAtlas", () => {
       statusText: "Internal Server Error",
     });
 
-    renderHook(() => useEmotionAtlas());
+    renderHook(() => useEmotionData());
 
     await waitFor(() => {
       expect(mockSetError).toHaveBeenCalledWith("Failed to fetch emotions: Internal Server Error");
@@ -285,7 +285,7 @@ describe("useEmotionAtlas", () => {
       setError: mockSetError,
     });
 
-    const { result } = renderHook(() => useEmotionAtlas());
+    const { result } = renderHook(() => useEmotionData());
 
     // Expect initial fetch
     expect(fetchMock).toHaveBeenCalledTimes(1);
@@ -317,7 +317,7 @@ describe("useEmotionAtlas", () => {
     // Mock Collections to fail
     fetchMock.mockResponseOnce("Internal Server Error", { status: 500 });
 
-    renderHook(() => useEmotionAtlas());
+    renderHook(() => useEmotionData());
 
     await waitFor(() => {
       // Should log error but not crash
@@ -353,7 +353,7 @@ describe("useEmotionAtlas", () => {
       setError: mockSetError,
     });
 
-    renderHook(() => useEmotionAtlas());
+    renderHook(() => useEmotionData());
 
     await waitFor(() => {
       // Should pick first one (c1) since no default
@@ -381,7 +381,7 @@ describe("useEmotionAtlas", () => {
     };
     fetchMock.mockResponseOnce(JSON.stringify(mockResponse));
 
-    renderHook(() => useEmotionAtlas());
+    renderHook(() => useEmotionData());
 
     await waitFor(() => {
       expect(mockSetAllEmotions).toHaveBeenCalled();
@@ -410,10 +410,10 @@ describe("useEmotionAtlas", () => {
       setError: mockSetError,
     });
 
-    renderHook(() => useEmotionAtlas());
+    renderHook(() => useEmotionData());
 
     // Should NOT fetch emotions (because we are waiting for user to select collection, or it implies we have data but no selection)
-    // Actually, checking the code: 
+    // Actually, checking the code:
     // useEffect(() => { if (activeCollectionId || (!isLoadingCollections && collections.length === 0)) ... }, [activeCollectionId, ...])
     // The dependency array includes activeCollectionId.
 
@@ -455,7 +455,7 @@ describe("useEmotionAtlas", () => {
       setError: mockSetError,
     });
 
-    renderHook(() => useEmotionAtlas());
+    renderHook(() => useEmotionData());
 
     await waitFor(() => {
       // Should set empty array

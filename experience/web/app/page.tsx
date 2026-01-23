@@ -27,7 +27,7 @@ import { VACDisplay } from "@/components/VACDisplay";
 import { Header } from "@/components/layout/Header";
 import { useSettingsStore } from "@/stores/useSettingsStore";
 import { useSphereSync } from "@/hooks/useSphereSync";
-import { useEmotionAtlas } from "@/hooks/useEmotionAtlas";
+import { useEmotionData } from "@/hooks/useEmotionData";
 import { useVisualizationStore } from "@/stores/useVisualizationStore";
 import { useAmbientAudio } from "@/hooks/useAmbientAudio";
 import { PathDetailsOverlay } from "@/components/PathDetailsOverlay";
@@ -51,7 +51,7 @@ interface SyncMessage {
 
 export default function ZenExperience() {
   // Load emotions for internal lookups (not for editing)
-  useEmotionAtlas();
+  useEmotionData();
 
   // Sync store for emotion lookups
   const emotions = useVisualizationStore((state) => state.allEmotions);

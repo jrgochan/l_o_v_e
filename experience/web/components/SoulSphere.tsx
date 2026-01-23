@@ -221,7 +221,6 @@ void main() {
 }
 `;
 
-
 export function SoulSphere() {
   const meshRef = useRef<THREE.Mesh>(null);
   const materialRef = useRef<THREE.ShaderMaterial>(null);

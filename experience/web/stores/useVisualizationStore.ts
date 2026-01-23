@@ -85,7 +85,10 @@ interface VisualizationState {
     key: K,
     value: VisualizationSettings[K]
   ) => void;
-  updateSetting: <K extends keyof VisualizationSettings>(key: K, value: VisualizationSettings[K]) => void;
+  updateSetting: <K extends keyof VisualizationSettings>(
+    key: K,
+    value: VisualizationSettings[K]
+  ) => void;
   updateLayer: <K extends keyof LayerVisibility>(key: K, value: boolean) => void;
   updateBehaviorSetting: <K extends keyof VisualizationSettings>(
     key: K,

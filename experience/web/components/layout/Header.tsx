@@ -60,8 +60,6 @@ export function Header({ showAuth = true }: HeaderProps) {
                 <p className={`text-sm truncate ${theme.colors.text.primary}`}>{user.email}</p>
               </div>
 
-
-
               <Link
                 href="/users/profile"
                 className={`block px-4 py-2 text-sm hover:bg-white/10 ${theme.colors.text.secondary} hover:${theme.colors.text.primary}`}

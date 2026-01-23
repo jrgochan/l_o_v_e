@@ -24,7 +24,7 @@ interface ComputeResponse {
   status: string;
 }
 
-export const atlasService = {
+export const visualizationService = {
   /**
    * Load cached paths from the backend
    */
@@ -80,7 +80,9 @@ export const atlasService = {
   /**
    * Set active collection
    */
-  activateCollection: async (id: string): Promise<{ success: boolean; active_collection: { id: string; name: string } }> => {
+  activateCollection: async (
+    id: string
+  ): Promise<{ success: boolean; active_collection: { id: string; name: string } }> => {
     try {
       const response = await fetch(`${SERVICE_URL}/collections/${id}/activate`, {
         method: "POST",

@@ -39,7 +39,9 @@ export function PathDetails({ path, onWaypointClick, onShowDetails }: PathDetail
           <div className="flex gap-2">
             <button
               onClick={() =>
-                useVisualizationStore.getState().setIsFlying(!useVisualizationStore.getState().isFlying)
+                useVisualizationStore
+                  .getState()
+                  .setIsFlying(!useVisualizationStore.getState().isFlying)
               }
               className="px-2 py-1 bg-cyan-900/50 hover:bg-cyan-800 text-cyan-200 text-xs rounded border border-cyan-700/50 flex items-center gap-1 transition"
               title="Play Cinematic Journey"

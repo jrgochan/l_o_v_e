@@ -51,10 +51,11 @@ export function VisualSettings() {
             <button
               key={mode.value}
               onClick={() => settings.updateVisualSetting("pathAnimationMode", mode.value)}
-              className={`w-full text-left p-4 rounded-lg border-2 transition ${settings.pathAnimationMode === mode.value
+              className={`w-full text-left p-4 rounded-lg border-2 transition ${
+                settings.pathAnimationMode === mode.value
                   ? "bg-cyan-900/30 border-cyan-500 shadow-lg shadow-cyan-500/20"
                   : "bg-gray-800 border-gray-700 hover:border-gray-600"
-                }`}
+              }`}
             >
               <div className="flex items-start gap-3">
                 <span className="text-3xl mt-1">{mode.emoji}</span>
@@ -102,10 +103,11 @@ export function VisualSettings() {
             <button
               key={scheme.value}
               onClick={() => settings.updateVisualSetting("colorScheme", scheme.value)}
-              className={`p-4 rounded-lg border-2 transition text-left ${settings.colorScheme === scheme.value
+              className={`p-4 rounded-lg border-2 transition text-left ${
+                settings.colorScheme === scheme.value
                   ? "bg-cyan-900/30 border-cyan-500"
                   : "bg-gray-800 border-gray-700 hover:border-gray-600"
-                }`}
+              }`}
             >
               <div className="font-medium text-white">{scheme.name}</div>
               <div className="text-xs text-gray-400 mt-1">{scheme.desc}</div>

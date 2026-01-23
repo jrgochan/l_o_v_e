@@ -95,8 +95,8 @@ export function RelationshipIndicator({
             <span className="text-white">{relationship.emotion_a}</span>{" "}
             <span className="opacity-60">
               {relationship.type === "masking" ||
-                relationship.type === "amplifying" ||
-                relationship.type === "sequential"
+              relationship.type === "amplifying" ||
+              relationship.type === "sequential"
                 ? "→"
                 : "⟷"}
             </span>{" "}

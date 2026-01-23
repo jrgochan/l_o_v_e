@@ -31,7 +31,7 @@ async def test_get_emotion_details_exact_match(generator, mock_db):
     mock_result.scalar_one_or_none.return_value = mock_emotion
     mock_db.execute.return_value = mock_result
     
-    details = await generator._get_emotion_details("Joy", use_atlas_mapping=False)
+    details = await generator._get_emotion_details("Joy", use_emotion_mapping=False)
     assert details["name"] == "Joy"
     assert details["matched_by"] == "exact"
     assert details["vac"] == [1.0, 0.5, 0.5]
@@ -48,7 +48,7 @@ async def test_get_emotion_details_vac_string_parsing(generator, mock_db):
     mock_result.scalar_one_or_none.return_value = mock_emotion
     mock_db.execute.return_value = mock_result
     
-    details = await generator._get_emotion_details("Joy", use_atlas_mapping=False)
+    details = await generator._get_emotion_details("Joy", use_emotion_mapping=False)
     assert details["vac"] == [0.5, 0.5, 0.5]
 
 @pytest.mark.asyncio

@@ -76,7 +76,7 @@ class TrajectoryPoint(BaseModel):
     vac: List[float] = Field(description="VAC coordinates [v, a, c]")
     quaternion: List[float] = Field(description="Quaternion state [w, x, y, z]")
     emotion: str = Field(description="Dominant emotion name")
-    emotion: str = Field(description="Dominant emotion name")
+
     elasticity: float = Field(description="Speed of change (rad/s)")
 
     # Linkage to Chat Message

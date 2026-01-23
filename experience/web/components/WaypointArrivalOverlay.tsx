@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo } from "react";
+import { useCallback, useMemo } from "react";
 import { useExperienceStore } from "@/stores/useExperienceStore";
 import { useVisualizationStore } from "@/stores/useVisualizationStore";
 import { resolveEmotionColor } from "@/utils/emotion-colors";
@@ -16,10 +16,13 @@ export function WaypointArrivalOverlay() {
   const allEmotions = useVisualizationStore((state) => state.allEmotions);
 
   // Helper to resolve color by name
-  const getColorByName = (name: string) => {
-    const emotion = allEmotions.find((e) => e.name === name);
-    return resolveEmotionColor(emotion);
-  };
+  const getColorByName = useCallback(
+    (name: string) => {
+      const emotion = allEmotions.find((e) => e.name === name);
+      return resolveEmotionColor(emotion);
+    },
+    [allEmotions]
+  );
 
   // Calculate data derived from state (pure function of render)
   // Replaces useState/useEffect sync pattern
@@ -66,7 +69,7 @@ export function WaypointArrivalOverlay() {
       }
     }
     return null;
-  }, [isFlying, transitionPath, flyoverCurrentWaypointIndex, allEmotions]);
+  }, [isFlying, transitionPath, flyoverCurrentWaypointIndex, getColorByName]);
 
   if (!currentData) return null;
 

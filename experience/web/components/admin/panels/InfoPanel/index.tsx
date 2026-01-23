@@ -58,10 +58,11 @@ export function InfoPanel() {
         >
           <button
             onClick={() => setActiveTab("info")}
-            className={`flex-1 px-4 py-2 text-sm font-medium transition-all ${theme.layout.borderRadius} ${activeTab === "info"
-              ? `${theme.colors.primary} border border-white/10 shadow-sm bg-white/10`
-              : `${theme.colors.text.secondary} hover:${theme.colors.text.primary} hover:bg-white/5`
-              }`}
+            className={`flex-1 px-4 py-2 text-sm font-medium transition-all ${theme.layout.borderRadius} ${
+              activeTab === "info"
+                ? `${theme.colors.primary} border border-white/10 shadow-sm bg-white/10`
+                : `${theme.colors.text.secondary} hover:${theme.colors.text.primary} hover:bg-white/5`
+            }`}
             style={{
               fontFamily: theme.typography.fontFamily === "font-mono" ? "monospace" : undefined,
             }}
@@ -70,10 +71,11 @@ export function InfoPanel() {
           </button>
           <button
             onClick={() => setActiveTab("stats")}
-            className={`flex-1 px-4 py-2 text-sm font-medium transition-all ${theme.layout.borderRadius} ${activeTab === "stats"
-              ? `${theme.colors.primary} border border-white/10 shadow-sm bg-white/10`
-              : `${theme.colors.text.secondary} hover:${theme.colors.text.primary} hover:bg-white/5`
-              }`}
+            className={`flex-1 px-4 py-2 text-sm font-medium transition-all ${theme.layout.borderRadius} ${
+              activeTab === "stats"
+                ? `${theme.colors.primary} border border-white/10 shadow-sm bg-white/10`
+                : `${theme.colors.text.secondary} hover:${theme.colors.text.primary} hover:bg-white/5`
+            }`}
             style={{
               fontFamily: theme.typography.fontFamily === "font-mono" ? "monospace" : undefined,
             }}

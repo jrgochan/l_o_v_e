@@ -348,7 +348,10 @@ class WaypointExplainer:
         }
 
     async def _generate_fallback_explanation(
-        self, waypoint: EmotionDefinition, previous: EmotionDefinition, next_emotion: EmotionDefinition
+        self,
+        waypoint: EmotionDefinition,
+        previous: EmotionDefinition,
+        next_emotion: EmotionDefinition,
     ) -> Dict[str, Any]:
         """Generate explanation algorithmically when no template exists.
 

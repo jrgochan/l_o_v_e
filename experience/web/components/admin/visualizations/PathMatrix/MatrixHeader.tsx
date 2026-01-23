@@ -61,10 +61,11 @@ export function MatrixHeader({
         <div className="flex bg-gray-800 rounded-lg p-1 border border-gray-700">
           <button
             onClick={() => onViewModeChange("emotions")}
-            className={`px-4 py-2 text-sm rounded transition-all ${viewMode === "emotions"
+            className={`px-4 py-2 text-sm rounded transition-all ${
+              viewMode === "emotions"
                 ? "bg-cyan-600 text-white shadow-lg"
                 : "text-gray-400 hover:text-gray-200 hover:bg-gray-700"
-              }`}
+            }`}
           >
             <span className="flex items-center gap-2">
               <span>🎭</span>
@@ -73,10 +74,11 @@ export function MatrixHeader({
           </button>
           <button
             onClick={() => onViewModeChange("categories")}
-            className={`px-4 py-2 text-sm rounded transition-all ${viewMode === "categories"
+            className={`px-4 py-2 text-sm rounded transition-all ${
+              viewMode === "categories"
                 ? "bg-cyan-600 text-white shadow-lg"
                 : "text-gray-400 hover:text-gray-200 hover:bg-gray-700"
-              }`}
+            }`}
           >
             <span className="flex items-center gap-2">
               <span>📂</span>

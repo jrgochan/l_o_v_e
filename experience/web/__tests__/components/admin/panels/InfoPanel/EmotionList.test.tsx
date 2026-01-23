@@ -75,11 +75,7 @@ describe("EmotionList", () => {
   it("calls onFocus when emotion card is clicked", () => {
     const onFocus = jest.fn();
     render(
-      <EmotionList
-        emotions={[mockEmotions[0]] as any}
-        animationMode="dynamic"
-        onFocus={onFocus}
-      />
+      <EmotionList emotions={[mockEmotions[0]] as any} animationMode="dynamic" onFocus={onFocus} />
     );
 
     // Click anywhere on the card

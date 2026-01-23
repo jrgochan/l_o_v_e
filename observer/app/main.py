@@ -9,26 +9,31 @@ from typing import Any, AsyncGenerator, Dict
 
 # Monkeypatch bcrypt to work with passlib 1.7.4 (Must be before passlib imports)
 import bcrypt
+
 if not hasattr(bcrypt, "__about__"):
     try:
+
         class About:
-            __version__ = bcrypt.__version__
-        bcrypt.__about__ = About()
+            """Monkeypatched About class for bcrypt compatibility."""
+
+            __version__ = bcrypt.__version__  # type: ignore[attr-defined]
+
+        bcrypt.__about__ = About()  # type: ignore[attr-defined]
     except Exception:  # pragma: no cover
         pass
 
-from fastapi import FastAPI
-from fastapi.middleware.cors import CORSMiddleware
+from fastapi import FastAPI  # pylint: disable=wrong-import-position
+from fastapi.middleware.cors import CORSMiddleware  # pylint: disable=wrong-import-position
 
-from app.api.routes import (
+from app.api.routes import (  # pylint: disable=wrong-import-position
     admin,
     ai_settings,
-    collections,
-    emotions,
     auth,
     bootstrap,
     chat_websocket,
+    collections,
     current,
+    emotions,
     health,
     history,
     prompts,
@@ -36,9 +41,9 @@ from app.api.routes import (
     transitions,
     users,
 )
-from app.config import settings
-from app.database import close_db, init_db
-from app.websocket import websocket_router
+from app.config import settings  # pylint: disable=wrong-import-position
+from app.database import close_db, init_db  # pylint: disable=wrong-import-position
+from app.websocket import websocket_router  # pylint: disable=wrong-import-position
 
 # Configure logging
 logging.basicConfig(

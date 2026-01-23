@@ -13,7 +13,7 @@ describe("emotionAnimationMapper", () => {
       definition: "Test definition",
       vac: mockVac,
       quaternion: mockQuaternion,
-      movement_pattern: "recoil"
+      movement_pattern: "recoil",
     };
 
     const params = getEmotionAnimationParams(emotion, "subtle");
@@ -28,7 +28,7 @@ describe("emotionAnimationMapper", () => {
       definition: "Test definition",
       vac: mockVac,
       quaternion: mockQuaternion,
-      movement_pattern: null
+      movement_pattern: null,
     };
 
     const params = getEmotionAnimationParams(emotion, "subtle");
@@ -42,7 +42,7 @@ describe("emotionAnimationMapper", () => {
       category: "Unknown Category",
       definition: "Test definition",
       vac: mockVac,
-      quaternion: mockQuaternion
+      quaternion: mockQuaternion,
     };
 
     const params = getEmotionAnimationParams(emotion, "subtle");
@@ -57,7 +57,7 @@ describe("emotionAnimationMapper", () => {
       definition: "Test definition",
       vac: mockVac,
       quaternion: mockQuaternion,
-      movement_pattern: "invalid_type"
+      movement_pattern: "invalid_type",
     };
 
     const params = getEmotionAnimationParams(emotion, "subtle");

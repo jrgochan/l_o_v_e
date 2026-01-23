@@ -383,9 +383,9 @@ class ChatService:
         # Trigger Semantic Auto-Linking
         try:
             from app.services.association_engine import get_association_engine
-            
+
             engine = get_association_engine()
-            # We await here for simplicity in this version. 
+            # We await here for simplicity in this version.
             # In a high-scale env, this should be a BackgroundTask.
             await engine.auto_link(message.id, self.db)
         except Exception as e:
@@ -430,72 +430,72 @@ class ChatService:
 
     async def get_message_thread(self, root_id: UUID, max_depth: int = 10) -> List[ChatMessage]:
         """Fetch full conversation thread (descendants) using recursive CTE.
-        
+
         Retrieves all messages that reply to the root message (directly or indirectly).
         Direction: Finds messages that have 'target_id' pointing to the current lineage.
         (Since Reply = Source -> Target, we traverse "backwards" from Target to Source).
-        
+
         Args:
             root_id: The starting message ID (ancestor)
             max_depth: limit recursion depth
-            
+
         Returns:
             List of ChatMessage objects in the thread
         """
         # We need the class for the CTE
-        # Avoid circular imports if any, but models are usually safe here 
+        # Avoid circular imports if any, but models are usually safe here
         # (ChatMessage already imported)
-        
+
         # CTE Definition
         # Anchor: Relationships where target_id == root_id
         hierarchy = (
             select(
-                MessageRelationship.source_message_id, 
+                MessageRelationship.source_message_id,
                 MessageRelationship.target_message_id,
-                literal(1).label("depth")
+                literal(1).label("depth"),
             )
             .where(MessageRelationship.target_message_id == root_id)
             .cte(name="hierarchy", recursive=True)
         )
-        
+
         # Recursive Member: Relationships targeting the sources found in previous step
         # hierarchy.c.source_message_id is the ID of the child message found.
         # We want relationships where target_id == child_id
-        
+
         parent = aliased(hierarchy, name="parent")
         child = aliased(MessageRelationship, name="child")
-        
+
         hierarchy = hierarchy.union_all(
             select(
-                child.source_message_id, 
+                child.source_message_id,
                 child.target_message_id,
-                (parent.c.depth + 1).label("depth")
+                (parent.c.depth + 1).label("depth"),
             )
             .where(child.target_message_id == parent.c.source_message_id)
             .where(parent.c.depth < max_depth)
         )
-        
+
         # Final selection: Get Messages that matches the source_ids in the CTE
         # Plus the root message itself? The method implies "Thread", often includes root.
         # Let's fetch descendants + root.
-        
+
         # Helper stub for root (depth 0)
         # We can just fetch root separately or union ID list.
         # Let's fetch root + matched IDs.
-        
+
         stmt = (
             select(ChatMessage)
             .join(hierarchy, ChatMessage.id == hierarchy.c.source_message_id)
             .order_by(hierarchy.c.depth, ChatMessage.timestamp)
         )
-        
+
         # Fetch descendants
         result = await self.db.execute(stmt)
         descendants = result.scalars().all()
-        
+
         # Fetch root
         root = await self.get_message(root_id)
-        
+
         if root:
             # Return Root + Descendants
             return [root] + list(descendants)
@@ -505,11 +505,11 @@ class ChatService:
         self, message_id: UUID, direction: str = "outgoing"
     ) -> List[MessageRelationship]:
         """Get relationships for a message.
-        
+
         Args:
             message_id: The message ID
             direction: 'outgoing' (links FROM this msg) or 'incoming' (links TO this msg)
-        
+
         Returns:
             List of relationships
         """
@@ -597,10 +597,10 @@ class ChatService:
 
     async def get_message(self, message_id: UUID) -> Optional[ChatMessage]:
         """Fetch a single message by ID.
-        
+
         Args:
             message_id: Message ID
-            
+
         Returns:
             ChatMessage or None
         """

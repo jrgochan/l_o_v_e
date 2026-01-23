@@ -556,10 +556,10 @@ async def get_journey_status(
 
         # Get waypoints
         waypoint_stmt = select(JourneyWaypoint).where(JourneyWaypoint.journey_id == journey_id)
-        result = await db.execute(waypoint_stmt)
-        waypoints = result.scalars().all()
+        waypoint_result = await db.execute(waypoint_stmt)
+        waypoints = waypoint_result.scalars().all()
 
-        waypoints_reached = sum(1 for wp in waypoints if wp.reached)  # type: ignore[misc,attr-defined]
+        waypoints_reached = sum(1 for wp in waypoints if wp.reached)
 
         # Calculate time elapsed
         if journey.started_at:

@@ -153,7 +153,7 @@ Cache Invalidation Strategy:
 
         Why invalidation matters:
         - Emotion VAC coordinates may be refined
-        - Atlas updates require path recomputation
+        - Dataset updates require path recomputation
         - Cached paths become stale
 
         Hash calculation:
@@ -403,12 +403,12 @@ Operational Considerations:
     When to run batch computation::
 
         Initial setup:
-        - After atlas seeding
+        - After dataset seeding
         - Before production launch
         - During development testing
 
         Periodic updates:
-        - After atlas VAC refinements
+        - After dataset VAC refinements
         - When adding new emotions
         - After algorithm improvements
 
@@ -475,8 +475,9 @@ class PathMatrixService:
         stmt = select(EmotionDefinition).order_by(EmotionDefinition.emotion_name)
         if collection_id:
             from uuid import UUID
+
             stmt = stmt.where(EmotionDefinition.collection_id == UUID(collection_id))
-            
+
         result = await self.session.execute(stmt)
         all_emotions = result.scalars().all()
 
@@ -569,11 +570,11 @@ class PathMatrixService:
             raise
 
     async def _compute_single_path(
-        self, 
-        from_emotion: EmotionDefinition, 
-        to_emotion: EmotionDefinition, 
+        self,
+        from_emotion: EmotionDefinition,
+        to_emotion: EmotionDefinition,
         user_id: Optional[str],
-        collection_id: Optional[str] = None
+        collection_id: Optional[str] = None,
     ) -> Dict[str, Any]:
         """Compute a single path using PathPlanner.
 
@@ -622,7 +623,10 @@ class PathMatrixService:
         }
 
     async def _cache_path(
-        self, from_emotion: EmotionDefinition, to_emotion: EmotionDefinition, path_data: Dict[str, Any]
+        self,
+        from_emotion: EmotionDefinition,
+        to_emotion: EmotionDefinition,
+        path_data: Dict[str, Any],
     ) -> None:
         """Store computed path in cache table."""
         vac_hash = self._calculate_vac_hash(

@@ -518,10 +518,10 @@ class PathPlanner:
         )
 
     async def _get_valid_neighbors(
-        self, 
-        current: EmotionDefinition, 
+        self,
+        current: EmotionDefinition,
         goal: EmotionDefinition,
-        collection_id: Optional[str] = None
+        collection_id: Optional[str] = None,
     ) -> List[EmotionDefinition]:
         """Get emotions that are valid next steps.
 
@@ -536,8 +536,9 @@ class PathPlanner:
         stmt = select(EmotionDefinition)
         if collection_id:
             from uuid import UUID
+
             stmt = stmt.where(EmotionDefinition.collection_id == UUID(collection_id))
-            
+
         result = await self.session.execute(stmt)
         all_emotions = result.scalars().all()
 
@@ -635,7 +636,9 @@ class PathPlanner:
         ]
         return category in bridge_categories
 
-    def _is_direct_transition_valid(self, current: EmotionDefinition, goal: EmotionDefinition) -> bool:
+    def _is_direct_transition_valid(
+        self, current: EmotionDefinition, goal: EmotionDefinition
+    ) -> bool:
         """Check if we can go directly from current to goal."""
         # Case 1: Same emotion (no transition needed)
         if current.id == goal.id:

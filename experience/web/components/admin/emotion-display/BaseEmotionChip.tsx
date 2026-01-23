@@ -60,9 +60,9 @@ export function BaseEmotionChip({
   className = "",
 }: BaseEmotionChipProps) {
   // Get color: Explicit prop > Object hint > Category map > Default
-  const chipColor = color || resolveEmotionColor(
-    emotionObject || { category: category || "", color_hint: undefined }
-  );
+  const chipColor =
+    color ||
+    resolveEmotionColor(emotionObject || { category: category || "", color_hint: undefined });
 
   const isBridge = [
     "Vulnerability",

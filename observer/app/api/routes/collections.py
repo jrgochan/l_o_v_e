@@ -4,7 +4,7 @@ Endpoints for managing emotion datasets/collections (e.g., Atlas of the Heart, P
 """
 
 import logging
-from typing import Any, Dict, List
+from typing import Any, Dict
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, HTTPException
@@ -51,7 +51,7 @@ async def set_active_collection(
     collection_id: UUID, db: AsyncSession = Depends(get_db)
 ) -> Dict[str, Any]:
     """Set a collection as the default active collection.
-    
+
     This disables 'is_default' on all other collections.
     """
     try:
@@ -65,26 +65,21 @@ async def set_active_collection(
 
         # Begin transaction to swap default
         # 1. Set all to not default
-        await db.execute(
-            update(EmotionCollection).values(is_default=False)
-        )
-        
+        await db.execute(update(EmotionCollection).values(is_default=False))
+
         # 2. Set target to default
         await db.execute(
             update(EmotionCollection)
             .where(EmotionCollection.id == collection_id)
             .values(is_default=True, is_active=True)
         )
-        
+
         await db.commit()
-        
+
         return {
             "success": True,
             "message": f"Collection '{collection.name}' is now the default dataset",
-            "active_collection": {
-                "id": str(collection.id),
-                "name": collection.name
-            }
+            "active_collection": {"id": str(collection.id), "name": collection.name},
         }
 
     except HTTPException:

@@ -1,4 +1,3 @@
-
 import { act } from "@testing-library/react";
 import {
   useVisualizationStore,
@@ -16,7 +15,7 @@ jest.mock("zustand/middleware", () => ({
     if (options && options.partialize) {
       try {
         options.partialize(get());
-      } catch (e) { }
+      } catch (e) {}
     }
     return config(set, get, api);
   },
@@ -324,7 +323,8 @@ describe("useVisualizationStore", () => {
 
   describe("Derived State Helpers", () => {
     it("should get selected emotions", () => {
-      const { setAllEmotions, selectEmotion, getSelectedEmotions } = useVisualizationStore.getState();
+      const { setAllEmotions, selectEmotion, getSelectedEmotions } =
+        useVisualizationStore.getState();
 
       act(() => {
         setAllEmotions(mockEmotions);

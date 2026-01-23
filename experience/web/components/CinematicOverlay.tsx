@@ -79,10 +79,11 @@ export function CinematicOverlay({
       {/* Mode 1: Large Cinematic Text (Few Emotions) or Waiting State */}
       {(isWaiting || !isGridMode) && (
         <div
-          className={`text-center transition-all duration-1000 transform ${fadeState === "in"
-            ? "opacity-100 translate-y-0 scale-100"
-            : "opacity-0 translate-y-4 scale-95"
-            }`}
+          className={`text-center transition-all duration-1000 transform ${
+            fadeState === "in"
+              ? "opacity-100 translate-y-0 scale-100"
+              : "opacity-0 translate-y-4 scale-95"
+          }`}
         >
           <h1 className="text-4xl md:text-6xl lg:text-7xl font-thin text-white tracking-[0.2em] uppercase drop-shadow-[0_0_15px_rgba(255,255,255,0.3)] max-w-4xl leading-tight">
             {displayText}

@@ -12,7 +12,9 @@ jest.mock("@/stores/useVisualizationStore", () => {
   };
 });
 
-const mockUseAtlasAdminStore = useVisualizationStore as unknown as jest.Mock & { getState: jest.Mock };
+const mockUseAtlasAdminStore = useVisualizationStore as unknown as jest.Mock & {
+  getState: jest.Mock;
+};
 
 const mockRecommendations = {
   curated_journeys: [

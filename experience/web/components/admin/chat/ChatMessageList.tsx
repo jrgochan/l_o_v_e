@@ -72,12 +72,13 @@ export function ChatMessageList({
             </div>
           ) : (
             <div
-              className={`max-w-[70%] rounded-lg px-4 py-3 ${msg.type === "user"
-                ? "bg-cyan-600 text-white"
-                : msg.type === "analysis" || msg.type === "multi_emotion"
-                  ? `bg-purple-900/50 border border-purple-500/30 text-white`
-                  : `bg-white/5 ${theme.colors.text.secondary} border ${theme.colors.border}`
-                }`}
+              className={`max-w-[70%] rounded-lg px-4 py-3 ${
+                msg.type === "user"
+                  ? "bg-cyan-600 text-white"
+                  : msg.type === "analysis" || msg.type === "multi_emotion"
+                    ? `bg-purple-900/50 border border-purple-500/30 text-white`
+                    : `bg-white/5 ${theme.colors.text.secondary} border ${theme.colors.border}`
+              }`}
             >
               {/* Message Content */}
               <div className="text-sm whitespace-pre-wrap">{msg.content}</div>
