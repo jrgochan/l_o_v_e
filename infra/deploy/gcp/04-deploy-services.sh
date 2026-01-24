@@ -105,8 +105,10 @@ deploy_service() {
         --set-env-vars "POSTGRES_HOST=$DB_IP,POSTGRES_PORT=5432,POSTGRES_DB=$DB_NAME,POSTGRES_USER=$DB_USER" \
         --set-env-vars "REDIS_HOST=$REDIS_HOST,REDIS_PORT=$REDIS_PORT" \
         --set-env-vars "OBSERVER_URL=$OBSERVER_URL,LISTENER_URL=$LISTENER_URL,VERSOR_URL=$VERSOR_URL,DATASET=$DATASET" \
+        --set-env-vars "HF_TOKEN=$HF_TOKEN" \
         --set-secrets "JWT_SECRET_KEY=${JWT_SECRET_REF}" \
         --set-secrets "POSTGRES_PASSWORD=${DB_SECRET_VERSION}" \
+        --set-env-vars "FORCE_RESEED=${FORCE_RESEED:-false}" \
         --project "$PROJECT_ID")
 
     # Add AI vars if Listener
@@ -123,11 +125,16 @@ deploy_service() {
          fi
          cmd+=(--set-env-vars "ALLOWED_ORIGINS=$allowed_origins_val")
     elif [ "$service" == "versor" ] && [ -n "$CORS_ORIGINS" ]; then
-        cmd+=(--set-env-vars "CORS_ORIGINS=$CORS_ORIGINS")
+        # Versor uses CORS_ORIGINS list format
+        local cors_origins_val="$CORS_ORIGINS"
+        if [[ "$cors_origins_val" != \[* ]]; then
+            cors_origins_val="[\"$cors_origins_val\"]"
+        fi
+        cmd+=(--set-env-vars "CORS_ORIGINS=$cors_origins_val")
     fi
     
-    # Execute (suppress noise but show errors)
-    "${cmd[@]}" >/dev/null 2>&1 || { echo "Deployment failed"; exit 1; }
+    # Execute (allow output to be seen)
+    "${cmd[@]}" || { echo "Deployment failed"; exit 1; }
         
     # Retrieve and print URL
     local url

@@ -11,7 +11,9 @@ export function useOllamaCRUD() {
     setLoading(true);
     setError(null);
     try {
-      const response = await fetch("http://localhost:8002/listener/ai/models/local");
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_LISTENER_URL || "http://localhost:8002"}/listener/ai/models/local`
+      );
       if (!response.ok) {
         throw new Error(`Failed to fetch models: ${response.statusText}`);
       }
@@ -31,7 +33,7 @@ export function useOllamaCRUD() {
       setError(null);
       try {
         const response = await fetch(
-          `http://localhost:8002/listener/ai/models/${encodeURIComponent(modelName)}`,
+          `${process.env.NEXT_PUBLIC_LISTENER_URL || "http://localhost:8002"}/listener/ai/models/${encodeURIComponent(modelName)}`,
           { method: "DELETE" }
         );
 
@@ -52,7 +54,7 @@ export function useOllamaCRUD() {
   const getModelDetails = useCallback(async (modelName: string): Promise<ModelDetails | null> => {
     try {
       const response = await fetch(
-        `http://localhost:8002/listener/ai/models/${encodeURIComponent(modelName)}/details`
+        `${process.env.NEXT_PUBLIC_LISTENER_URL || "http://localhost:8002"}/listener/ai/models/${encodeURIComponent(modelName)}/details`
       );
 
       if (!response.ok) {
@@ -68,7 +70,9 @@ export function useOllamaCRUD() {
 
   const checkOllamaHealth = useCallback(async (): Promise<boolean> => {
     try {
-      const response = await fetch("http://localhost:8002/listener/ai/models/health");
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_LISTENER_URL || "http://localhost:8002"}/listener/ai/models/health`
+      );
       const data = await response.json();
       return data.status === "ok" && data.ollama === "running";
     } catch {

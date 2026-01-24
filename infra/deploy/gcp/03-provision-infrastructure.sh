@@ -29,13 +29,13 @@ gcloud compute addresses create google-managed-services-"$VPC_NAME" \
     --prefix-length=16 \
     --description="Peering for Google Managed Services" \
     --network="$VPC_NAME" \
-    --project="$PROJECT_ID" 2>/dev/null || echo "Address range likely exists or overlaps (skipping)"
+    --project="$PROJECT_ID" || echo "Address range likely exists or overlaps"
 
 gcloud services vpc-peerings connect \
     --service=servicenetworking.googleapis.com \
     --ranges=google-managed-services-"$VPC_NAME" \
     --network="$VPC_NAME" \
-    --project="$PROJECT_ID" 2>/dev/null || echo "Peering likely already active (skipping)"
+    --project="$PROJECT_ID"
 
 # 3. Serverless VPC Connector
 echo "Checking VPC Connector..."
@@ -78,6 +78,20 @@ if ! gcloud sql instances describe "$SQL_INSTANCE_NAME" --project="$PROJECT_ID" 
     echo "Cloud SQL created. Password saved to Secret Manager: ${APP_NAME}-db-password"
 else
     echo "Cloud SQL instance exists."
+fi
+
+# 4b. JWT Secret
+echo "Checking JWT Secret..."
+if ! gcloud secrets describe "$JWT_SECRET_NAME" --project="$PROJECT_ID" >/dev/null 2>&1; then
+    echo "Creating JWT Secret..."
+    # Generate a secure random key
+    JWT_KEY=$(openssl rand -base64 32)
+    
+    echo -n "$JWT_KEY" | gcloud secrets create "$JWT_SECRET_NAME" --data-file=- --project="$PROJECT_ID"
+    
+    echo "JWT Secret created: $JWT_SECRET_NAME"
+else
+    echo "JWT Secret exists."
 fi
 
 # 5. Redis (Memorystore)

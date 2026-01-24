@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect, useCallback } from "react";
 import { logger } from "@/utils/logger";
 
-const OBSERVER_API_URL = process.env.NEXT_PUBLIC_OBSERVER_API_URL || "http://localhost:8000";
+const OBSERVER_API_URL = process.env.NEXT_PUBLIC_OBSERVER_URL || "http://localhost:8000";
 const POLL_INTERVAL = 2000;
 
 export interface BatchProgress {

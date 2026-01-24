@@ -28,6 +28,11 @@ while [[ $# -gt 0 ]]; do
                 shift 1
             fi
             ;;
+        --force-reseed)
+            FORCE_RESEED="true"
+            export FORCE_RESEED
+            shift 1
+            ;;
         --project)
             PROJECT_ARG="$2"
             shift 2
@@ -74,6 +79,7 @@ fi
 # Export variables for child scripts
 export PROJECT_ID
 export CLOUD_MODE
+export HF_TOKEN
 
 # 1. Setup Project (APIs, AR)
 "$GCP_DIR/01-setup-project.sh"
@@ -157,11 +163,17 @@ echo "Listener: $listener"
 echo "Versor:   $versor"
 echo "=================================================="
 
-# Optional: Update Backend CORS (Pass 3)
-# echo ">>> STAGE 3: CORS Configuration"
-# echo "Updating backend CORS to allow $experience..."
-# # Logic to update ALLOWED_ORIGINS env var would go here
-# # For now, we rely on default loose CORS or manual update
+echo "=================================================="
+
+# Update Backend CORS (Pass 3)
+echo ""
+echo ">>> STAGE 3: CORS Configuration (Pass 3)"
+echo "Updating backend CORS to allow $experience..."
+export ALLOWED_ORIGINS="$experience"
+export CORS_ORIGINS="$experience"
+
+# Re-run backend deployment to apply CORS
+"$GCP_DIR/04-deploy-services.sh" backend
 
 # Cleanup
 rm -f deployed_services.tmp

@@ -2,6 +2,7 @@ import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import { User, LoginResponse } from "../types/auth";
 import { api } from "../utils/api";
+import { API_URL } from "@/config/environment";
 
 interface AuthState {
   user: User | null;
@@ -47,14 +48,11 @@ export const useAuthStore = create<AuthState>()(
           formData.append("username", username);
           formData.append("password", password);
 
-          const response = await fetch(
-            `${process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000"}/auth/login`,
-            {
-              method: "POST",
-              headers: { "Content-Type": "application/x-www-form-urlencoded" },
-              body: formData,
-            }
-          );
+          const response = await fetch(`${API_URL}/auth/login`, {
+            method: "POST",
+            headers: { "Content-Type": "application/x-www-form-urlencoded" },
+            body: formData,
+          });
 
           if (!response.ok) {
             throw new Error("Login failed");

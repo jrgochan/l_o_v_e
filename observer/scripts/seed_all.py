@@ -39,6 +39,8 @@ import sys
 from pathlib import Path
 from typing import List, Tuple
 from datetime import datetime
+from app.database import AsyncSessionLocal
+from sqlalchemy import text
 
 # Color codes for terminal output
 class Colors:
@@ -135,6 +137,31 @@ def run_seed_script(script_name: str, args: List[str] = None, required: bool = T
         return False, str(e)
 
 
+async def configure_dataset_activation(target_collection: str):
+    """Ensure target collection is active and default, others inactive."""
+    print_header(" Configuring Dataset Activation ")
+    print(f"Target: {target_collection}")
+    
+    async with AsyncSessionLocal() as session:
+        try:
+            # 1. Activate target
+            await session.execute(
+                text("UPDATE emotion_collections SET is_active = true, is_default = true WHERE name = :name"),
+                {"name": target_collection}
+            )
+            
+            # 2. Deactivate others
+            await session.execute(
+                text("UPDATE emotion_collections SET is_active = false, is_default = false WHERE name != :name"),
+                {"name": target_collection}
+            )
+            
+            await session.commit()
+            print_success(f"Set '{target_collection}' as exclusive active/default collection")
+        except Exception as e:
+            print_error(f"Failed to configure activation: {e}")
+
+
 def main(
     level: str = "enhanced",
     with_demo: bool = False,
@@ -173,9 +200,9 @@ def main(
     
     if dataset.lower() == 'all':
         datasets_to_seed = [
-            ("Brene Brown Emotions (87)", "data/brene_brown/emotions.json", "Atlas of the Heart"),
+            ("Brene Brown Emotions (87)", "data/brene_brown/emotions.json", "Atlas of the Heart", "--inactive"),
             ("Plutchik Emotions (8)", "data/plutchik/emotions.json", "Plutchik Wheel"),
-            ("GoEmotions (28)", "data/goemotions/emotions.json", "GoEmotions"),
+            ("GoEmotions (28)", "data/goemotions/emotions.json", "GoEmotions", "--default"),
             ("UAL (Unified Affective Lexicon)", "data/ual/emotions.json", "Unified Affective Lexicon")
         ]
     elif dataset.lower() == "plutchik":
@@ -251,11 +278,26 @@ def main(
             print(f"\nError output:\n{output}\n")
             failed_steps.append((step_name, output))
             
-            # For critical steps, stop execution
             if step_name in ["Brene Brown Emotions (87)", "Plutchik Emotions (8)", "GoEmotions (28)", "Transition System Data"]:
                 print_error("Critical seeding step failed, stopping execution")
                 break
     
+    # PHASE 4: Enforce Activation (Post-seeding fix)
+    # Determine target collection name based on dataset arg
+    target_collection_name = "GoEmotions" # Default fallback
+    if dataset.lower() == "goemotions":
+        target_collection_name = "GoEmotions"
+    elif dataset.lower() == "brene_brown":
+        target_collection_name = "brene_brown" 
+    elif dataset.lower() == "plutchik":
+        target_collection_name = "Plutchik Wheel"
+    elif dataset.lower() == "ual":
+        target_collection_name = "Unified Affective Lexicon"
+    
+    # Only run activation logic if we aren't in dry-run and seeding succeeded so far
+    if not dry_run and not failed_steps:
+        asyncio.run(configure_dataset_activation(target_collection_name))
+
     # Verification
     if verify and not dry_run and successful_steps:
         print_header("VERIFICATION")
@@ -372,8 +414,8 @@ if __name__ == "__main__":
     parser.add_argument(
         '--dataset',
         choices=['atlas', 'brene_brown', 'plutchik', 'goemotions', 'ual', 'all'],
-        default='brene_brown',
-        help='Dataset to seed (default: brene_brown)'
+        default='goemotions',
+        help='Dataset to seed (default: goemotions)'
     )
     
     args = parser.parse_args()

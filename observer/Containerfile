@@ -23,9 +23,20 @@ COPY app/ app/
 COPY alembic.ini .
 COPY migrations/ migrations/
 COPY scripts/ scripts/
+COPY data/ data/
+
+# Model Caching (Bake into image)
+ENV HF_HOME=/app/models_cache
+RUN mkdir -p /app/models_cache
+ARG HF_TOKEN
+RUN HF_TOKEN=$HF_TOKEN python scripts/download_models.py
+
+# Force offline mode for runtime (uses baked cache)
+ENV HF_HUB_OFFLINE=1
 
 # Environment variables
 ENV PYTHONUNBUFFERED=1
+ENV PYTHONPATH=/app
 
 # Expose port
 EXPOSE 8000

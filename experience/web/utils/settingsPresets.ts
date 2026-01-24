@@ -5,6 +5,8 @@
  * Users can load these as starting points or share them with team members.
  */
 
+import { OBSERVER_URL, LISTENER_URL, VERSOR_URL } from "@/config/environment";
+
 export interface SettingsPreset {
   id: string;
   name: string;
@@ -55,9 +57,9 @@ const performancePreset: SettingsPreset = {
           mode: "local",
           customEndpoints: false,
           endpoints: {
-            observer: "http://localhost:8000",
-            listener: "http://localhost:8002",
-            versor: "http://localhost:8001",
+            observer: OBSERVER_URL,
+            listener: LISTENER_URL,
+            versor: VERSOR_URL,
           },
         },
         chat: {
@@ -123,9 +125,9 @@ const clinicalPreset: SettingsPreset = {
           mode: "local",
           customEndpoints: false,
           endpoints: {
-            observer: "http://localhost:8000",
-            listener: "http://localhost:8002",
-            versor: "http://localhost:8001",
+            observer: OBSERVER_URL,
+            listener: LISTENER_URL,
+            versor: VERSOR_URL,
           },
         },
         chat: {
@@ -191,9 +193,9 @@ const demoPreset: SettingsPreset = {
           mode: "local",
           customEndpoints: false,
           endpoints: {
-            observer: "http://localhost:8000",
-            listener: "http://localhost:8002",
-            versor: "http://localhost:8001",
+            observer: OBSERVER_URL,
+            listener: LISTENER_URL,
+            versor: VERSOR_URL,
           },
         },
         chat: {
@@ -259,9 +261,9 @@ const accessibilityPreset: SettingsPreset = {
           mode: "local",
           customEndpoints: false,
           endpoints: {
-            observer: "http://localhost:8000",
-            listener: "http://localhost:8002",
-            versor: "http://localhost:8001",
+            observer: OBSERVER_URL,
+            listener: LISTENER_URL,
+            versor: VERSOR_URL,
           },
         },
         chat: {

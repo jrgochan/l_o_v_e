@@ -3,7 +3,7 @@ import { useVisualizationStore } from "@/stores/useVisualizationStore";
 import type { EmotionPath, PathComputationResult, Emotion } from "@/types/visualization";
 import { logger } from "@/utils/logger";
 
-const OBSERVER_API_URL = process.env.NEXT_PUBLIC_OBSERVER_API_URL || "http://localhost:8000";
+const OBSERVER_API_URL = process.env.NEXT_PUBLIC_OBSERVER_URL || "http://localhost:8000";
 
 export function useSinglePath() {
   const { addComputedPath } = useVisualizationStore();

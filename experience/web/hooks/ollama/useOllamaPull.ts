@@ -15,7 +15,8 @@ export function useOllamaPull({ localModels, fetchLocalModels, setError }: UseOl
     async (modelName: string) => {
       setError(null);
       try {
-        const response = await fetch("http://localhost:8002/listener/ai/models/pull", {
+        const listenerUrl = process.env.NEXT_PUBLIC_LISTENER_URL || "http://localhost:8002";
+        const response = await fetch(`${listenerUrl}/listener/ai/models/pull`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ name: modelName }),
@@ -29,7 +30,9 @@ export function useOllamaPull({ localModels, fetchLocalModels, setError }: UseOl
         let lastStatus = "";
         let messageCount = 0;
 
-        const ws = new WebSocket(`ws://localhost:8002/listener/ai/models/pull/${task_id}`);
+        // Convert http/https to ws/wss
+        const wsUrl = listenerUrl.replace(/^http/, "ws");
+        const ws = new WebSocket(`${wsUrl}/listener/ai/models/pull/${task_id}`);
 
         ws.onmessage = (event) => {
           logger.debug("websocket", "Pull progress message received", event.data);

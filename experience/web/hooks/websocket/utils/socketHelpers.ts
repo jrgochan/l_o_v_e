@@ -1,11 +1,21 @@
-const OBSERVER_WS_URL = process.env.NEXT_PUBLIC_OBSERVER_WS_URL || "ws://localhost:8000";
+import { WS_URL } from "@/config/environment";
 
 /**
  * Construct the WebSocket URL with token authentication
  */
-export const constructWebSocketUrl = (sessionId: string, token: string | null): string => {
-  const wsUrl = `${OBSERVER_WS_URL}/observer/ws/chat/${sessionId}`;
-  return token ? `${wsUrl}?token=${token}` : wsUrl;
+export const getWebSocketUrl = (endpoint: string, token?: string): string => {
+  // Ensure endpoint starts with /
+  const cleanEndpoint = endpoint.startsWith("/") ? endpoint : `/${endpoint}`;
+
+  // Construct base URL from centralized config
+  // WS_URL already handles protocol (ws/wss) based on API_URL
+  const baseUrl = `${WS_URL}${cleanEndpoint}`;
+
+  if (token) {
+    return `${baseUrl}?token=${encodeURIComponent(token)}`;
+  }
+
+  return baseUrl;
 };
 
 /**

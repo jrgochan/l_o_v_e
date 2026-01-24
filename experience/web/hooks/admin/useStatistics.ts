@@ -11,7 +11,7 @@
 import { useState, useEffect } from "react";
 import { logger } from "@/utils/logger";
 
-const OBSERVER_API_URL = process.env.NEXT_PUBLIC_OBSERVER_API_URL || "http://localhost:8000";
+const OBSERVER_API_URL = process.env.NEXT_PUBLIC_OBSERVER_URL || "http://localhost:8000";
 const REFRESH_INTERVAL = 10000; // 10 seconds
 
 interface PathStatistics {

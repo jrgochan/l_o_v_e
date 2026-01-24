@@ -53,6 +53,7 @@ PROJECT_NUMBER=$(gcloud projects describe "$PROJECT_ID" --format='value(projectN
 COMPUTE_SA="${PROJECT_NUMBER}-compute@developer.gserviceaccount.com"
 
 echo "Granting Secret Accessor to $COMPUTE_SA..."
+gcloud projects add-iam-policy-binding "$PROJECT_ID" \
     --member="serviceAccount:${COMPUTE_SA}" \
     --role="roles/secretmanager.secretAccessor" >/dev/null
 

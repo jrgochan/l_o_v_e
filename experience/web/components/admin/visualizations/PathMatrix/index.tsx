@@ -61,7 +61,7 @@ export function PathMatrixGrid({ onClose }: PathMatrixGridProps) {
       logger.info("api", "Loading all cached paths from backend...");
 
       const response = await fetch(
-        `${process.env.NEXT_PUBLIC_OBSERVER_API_URL || "http://localhost:8000"}/observer/atlas/paths/all?limit=10000`
+        `${process.env.NEXT_PUBLIC_OBSERVER_URL || "http://localhost:8000"}/observer/atlas/paths/all?limit=10000`
       );
 
       if (!response.ok) {

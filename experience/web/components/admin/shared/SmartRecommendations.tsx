@@ -14,8 +14,7 @@ import { useState, useEffect } from "react";
 import { useVisualizationStore } from "@/stores/useVisualizationStore";
 import { logger } from "@/utils/logger";
 import type { RecommendationsResponse } from "@/types/api-responses";
-
-const OBSERVER_API_URL = process.env.NEXT_PUBLIC_OBSERVER_API_URL || "http://localhost:8000";
+import { OBSERVER_URL } from "@/config/environment";
 
 type ContextType = "exploration" | "healing" | "growth";
 
@@ -60,7 +59,7 @@ export function SmartRecommendations() {
           selectedIds.size > 0 ? `&selected_ids=${Array.from(selectedIds).join(",")}` : "";
 
         const response = await fetch(
-          `${OBSERVER_API_URL}/observer/atlas/recommendations?context=${context}${selectedIdsParam}&limit=5`
+          `${OBSERVER_URL}/observer/atlas/recommendations?context=${context}${selectedIdsParam}&limit=5`
         );
 
         if (!response.ok) {

@@ -2,7 +2,7 @@ import { useRef, useCallback, useEffect } from "react";
 import { logger } from "@/utils/logger";
 import { useAuthStore } from "@/stores/authStore";
 import {
-  constructWebSocketUrl,
+  getWebSocketUrl,
   createWebSocketConnection,
   handleSocketClose,
 } from "./utils/socketHelpers";
@@ -58,7 +58,7 @@ export function useConnectionLifecycle({
     setErrorRef.current(null);
 
     try {
-      const url = constructWebSocketUrl(sessionId, token);
+      const url = getWebSocketUrl(sessionId, token || undefined);
       logger.info("websocket", `Connecting to ${url.split("?")[0]}...`);
 
       const ws = createWebSocketConnection(url, {

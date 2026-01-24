@@ -72,7 +72,7 @@ async def seed_category_transitions(dataset: str = "brene_brown", force_reseed: 
         transitions_file = "data/plutchik/category_transitions.json"
     elif dataset == "all":
         # Recursive call for each supported dataset
-        for ds in ["brene_brown", "goemotions", "plutchik"]:
+        for ds in ["brene_brown", "goemotions", "plutchik", "ual"]:
             await seed_category_transitions(ds, force_reseed)
         return
     else:

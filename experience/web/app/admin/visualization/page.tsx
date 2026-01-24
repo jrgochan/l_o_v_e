@@ -22,6 +22,7 @@ import { useSphereSync } from "@/hooks/useSphereSync";
 import { useVisualizationStore } from "@/stores/useVisualizationStore";
 import { useExperienceStore } from "@/stores/useExperienceStore";
 import { VisualizationScene } from "@/components/admin/visualization/VisualizationScene";
+import { OBSERVER_URL } from "@/config/environment";
 import { VACAxisLabels3D } from "@/components/VACAxisLabels3D";
 import { ControlPanel } from "@/components/admin/panels/ControlPanel";
 import { InfoPanel } from "@/components/admin/panels/InfoPanel";
@@ -277,8 +278,7 @@ const VisualizationAdminContent = () => {
           <h1 className="text-2xl font-bold mb-4">Error Loading Visualization</h1>
           <p className="text-red-400">{error}</p>
           <p className="text-gray-400 mt-4">
-            Make sure the Observer service is running at{" "}
-            {process.env.NEXT_PUBLIC_OBSERVER_API_URL || "http://localhost:8000"}
+            Make sure the Observer service is running at {OBSERVER_URL}
           </p>
         </div>
       </div>

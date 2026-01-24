@@ -15,7 +15,7 @@ import type { ObserverEmotionResponse } from "@/types/api-responses";
 import { logger } from "@/utils/logger";
 import { getCanonicalEmotion } from "@love/experience-shared";
 
-const OBSERVER_API_URL = process.env.NEXT_PUBLIC_OBSERVER_API_URL || "http://localhost:8000";
+const OBSERVER_API_URL = process.env.NEXT_PUBLIC_OBSERVER_URL || "http://localhost:8000";
 
 export function useEmotionData() {
   const {

@@ -2,10 +2,10 @@
 # GCP Project Configuration
 # shellcheck disable=SC2034
 
-PROJECT_ID="" # Leave empty to use 'gcloud config get-value project'
-CLOUD_MODE="false" # Set to "true" via --cloud flag
+PROJECT_ID="${PROJECT_ID:-}" # Leave empty to use 'gcloud config get-value project'
+CLOUD_MODE="${CLOUD_MODE:-false}" # Set to "true" via --cloud flag
 APP_NAME="love-stack"
-DATASET="goemotions" # Default dataset (can be overridden)
+DATASET="${DATASET:-all}" # Default dataset (can be overridden)
 
 # Region settings
 REGION="us-central1"
@@ -23,6 +23,7 @@ NEXT_PUBLIC_VERSOR_URL=""
 # Authentication (JWT)
 JWT_SECRET_NAME="${APP_NAME}-jwt-secret"
 JWT_SECRET_KEY=""
+HF_TOKEN="${HF_TOKEN:-}" # Hugging Face Token for model downloads
 
 # If secret key is not set, generate one (for initial setup)
 if [ -z "$JWT_SECRET_KEY" ]; then

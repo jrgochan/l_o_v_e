@@ -11,6 +11,7 @@ import { useState } from "react";
 import { analyzeText } from "@love/experience-shared";
 import { useExperienceStore } from "@/stores/useExperienceStore";
 import { logger } from "@/utils/logger";
+import { LISTENER_URL } from "@/config/environment";
 
 export function EmotionalInput() {
   const [text, setText] = useState("");
@@ -87,8 +88,7 @@ export function EmotionalInput() {
         <div className="p-3 bg-red-900/30 border border-red-700 rounded-lg">
           <div className="text-sm text-red-400">{error}</div>
           <div className="text-xs text-red-500 mt-1">
-            Make sure Listener API is running at{" "}
-            {process.env.NEXT_PUBLIC_LISTENER_URL || "http://localhost:8002"}
+            Make sure Listener API is running at {LISTENER_URL}
           </div>
         </div>
       )}

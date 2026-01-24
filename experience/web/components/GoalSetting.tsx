@@ -13,6 +13,7 @@
 // import { logger } from "@/utils/logger";
 import { PersonalStrategies } from "./PersonalStrategies";
 import { useGoalSettingLogic } from "./GoalSettingLogic";
+import { OBSERVER_URL } from "@/config/environment";
 
 export function GoalSetting() {
   const {
@@ -140,8 +141,7 @@ export function GoalSetting() {
         <div className="p-3 bg-red-900/30 border border-red-700 rounded-lg">
           <div className="text-sm text-red-400">{error}</div>
           <div className="text-xs text-red-500 mt-1">
-            Make sure Observer API is running at{" "}
-            {process.env.NEXT_PUBLIC_OBSERVER_URL || "http://localhost:8000"}
+            Make sure Observer API is running at {OBSERVER_URL}
           </div>
         </div>
       )}

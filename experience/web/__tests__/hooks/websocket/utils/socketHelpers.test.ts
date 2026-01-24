@@ -1,5 +1,5 @@
 import {
-  constructWebSocketUrl,
+  getWebSocketUrl,
   scheduleReconnect,
   createWebSocketConnection,
   handleSocketClose,
@@ -7,26 +7,15 @@ import {
 import { logger } from "@/utils/logger";
 
 describe("socketHelpers", () => {
-  describe("constructWebSocketUrl", () => {
-    const originalEnv = process.env;
-
-    beforeEach(() => {
-      jest.resetModules();
-      process.env = { ...originalEnv };
-    });
-
-    afterAll(() => {
-      process.env = originalEnv;
-    });
-
+  describe("getWebSocketUrl", () => {
     it("should construct url without token", () => {
-      const url = constructWebSocketUrl("session-123", null);
-      expect(url).toContain("/observer/ws/chat/session-123");
+      const url = getWebSocketUrl("/test/endpoint");
+      expect(url).toContain("/test/endpoint");
       expect(url).not.toContain("?token=");
     });
 
     it("should construct url with token", () => {
-      const url = constructWebSocketUrl("session-123", "abc");
+      const url = getWebSocketUrl("/test/endpoint", "abc");
       expect(url).toContain("?token=abc");
     });
   });

@@ -10,8 +10,7 @@ import { useVisualizationStore } from "@/stores/useVisualizationStore";
 import type { EmotionPath } from "@/types/visualization";
 import type { CachedPathData } from "@/types/api-responses";
 import { logger } from "@/utils/logger";
-
-const OBSERVER_API_URL = process.env.NEXT_PUBLIC_OBSERVER_API_URL || "http://localhost:8000";
+import { OBSERVER_URL } from "@/config/environment";
 
 export function useLoadCachedPaths() {
   const [isLoading, setIsLoading] = useState(false);
@@ -34,7 +33,7 @@ export function useLoadCachedPaths() {
       try {
         logger.info("api", "Loading cached paths from backend...");
 
-        const response = await fetch(`${OBSERVER_API_URL}/observer/atlas/paths/all?limit=10000`);
+        const response = await fetch(`${OBSERVER_URL}/observer/atlas/paths/all?limit=10000`);
 
         if (!response.ok) {
           logger.warn("api", "No cached paths available yet");

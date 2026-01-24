@@ -109,26 +109,31 @@ if [ -n "$API_URL" ]; then
     EXTRA_ARGS="$EXTRA_ARGS --build-arg NEXT_PUBLIC_API_URL=$API_URL"
 fi
 
+if [ -n "$HF_TOKEN" ]; then
+    echo "Files injected with HF_TOKEN (Hidden)"
+    EXTRA_ARGS="$EXTRA_ARGS --build-arg HF_TOKEN=$HF_TOKEN"
+fi
+
 case "$TARGET" in
     "backend")
         echo "Building Backend Services..."
-        build_and_push "versor" "versor"
-        build_and_push "observer" "observer"
-        build_and_push "listener" "listener"
+        build_and_push "versor" "versor" "$EXTRA_ARGS"
+        build_and_push "observer" "observer" "$EXTRA_ARGS"
+        build_and_push "listener" "listener" "$EXTRA_ARGS"
         ;;
     "frontend")
         echo "Building Frontend (Experience)..."
         # EXTRA_ARGS should contain --build-arg flags
-        # Use root context for experience module
-        build_and_push "experience" "experience" "$EXTRA_ARGS" "true"
+        # Use experience directory as context
+        build_and_push "experience" "experience" "$EXTRA_ARGS" "false"
         ;;
     *)
         echo "Building All Services (Default)..."
-        build_and_push "versor" "versor"
-        build_and_push "observer" "observer"
-        build_and_push "listener" "listener"
-        # Use root context for experience module
-        build_and_push "experience" "experience" "" "true"
+        build_and_push "versor" "versor" "$EXTRA_ARGS"
+        build_and_push "observer" "observer" "$EXTRA_ARGS"
+        build_and_push "listener" "listener" "$EXTRA_ARGS"
+        # Use experience directory as context
+        build_and_push "experience" "experience" "" "false"
         ;;
 esac
 

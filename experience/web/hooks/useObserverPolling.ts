@@ -17,6 +17,7 @@ import {
 } from "@love/experience-shared";
 import { useExperienceStore } from "@/stores/useExperienceStore";
 import { logger } from "@/utils/logger";
+import { OBSERVER_URL } from "@/config/environment";
 
 interface UseObserverPollingOptions {
   userId: string;
@@ -28,7 +29,7 @@ interface UseObserverPollingOptions {
 export function useObserverPolling({
   userId,
   enabled = false,
-  baseUrl = process.env.NEXT_PUBLIC_OBSERVER_URL || "http://localhost:8000",
+  baseUrl = OBSERVER_URL,
   intervalMs = 5000,
 }: UseObserverPollingOptions) {
   const managerRef = useRef<ObserverPollingManager | null>(null);

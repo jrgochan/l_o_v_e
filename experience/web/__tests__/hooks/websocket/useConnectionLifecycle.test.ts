@@ -30,7 +30,7 @@ const mockWebSocket = {
 let capturedCallbacks: any = {};
 
 jest.mock("@/hooks/websocket/utils/socketHelpers", () => ({
-  constructWebSocketUrl: jest.fn(() => "ws://test.url"),
+  getWebSocketUrl: jest.fn(() => "ws://test.url"),
   createWebSocketConnection: jest.fn((url, callbacks) => {
     capturedCallbacks = callbacks;
     return mockWebSocket;
