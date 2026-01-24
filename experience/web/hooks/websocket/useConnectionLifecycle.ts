@@ -58,7 +58,7 @@ export function useConnectionLifecycle({
     setErrorRef.current(null);
 
     try {
-      const url = getWebSocketUrl(sessionId, token || undefined);
+      const url = getWebSocketUrl(`observer/ws/${sessionId}`, token || undefined);
       logger.info("websocket", `Connecting to ${url.split("?")[0]}...`);
 
       const ws = createWebSocketConnection(url, {

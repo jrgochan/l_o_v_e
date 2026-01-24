@@ -83,7 +83,8 @@ class Settings(BaseSettings):
             result: List[str] = json.loads(self.ALLOWED_ORIGINS)
             return result
         except json.JSONDecodeError:
-            return ["http://localhost:3000"]
+            # Fallback to comma-separated string
+            return [origin.strip() for origin in self.ALLOWED_ORIGINS.split(",") if origin.strip()]
 
     # ============================================================================
     # PERFORMANCE TUNING
