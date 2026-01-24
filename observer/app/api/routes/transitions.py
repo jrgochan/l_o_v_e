@@ -247,17 +247,15 @@ router = APIRouter()
 
 @router.get("/atlas/paths/all", response_model=Dict[str, Any], tags=["Transitions"])
 async def get_all_cached_paths(
-    limit: int = 1000,
-    db: AsyncSession = Depends(get_db)
+    limit: int = 1000, db: AsyncSession = Depends(get_db)
 ) -> Dict[str, Any]:
     """Get pre-calculated transition paths for the Atlas.
-    
+
     Used by the frontend to display the Path Matrix visualization.
     Currently returns empty list as caching layer is not yet implemented.
     """
     # Placeholder for future implementation where we return pre-calculated paths
     return {"paths": []}
-
 
 
 @router.post("/transition-path", response_model=TransitionPathResponse, tags=["Transitions"])
