@@ -153,8 +153,8 @@ describe("useSettingsStore (Deep Coverage)", () => {
     });
 
     expect(result.current.network.mode).toBe("network");
-    // Check default cloud URL
-    expect(result.current.network.endpoints.observer).toContain("api.love-platform.com");
+    // Check default cloud URL (defaults to localhost fallback in test env)
+    expect(result.current.network.endpoints.observer).toContain("http://localhost:8000");
 
     // Test custom endpoints preservation
     act(() => {
@@ -292,7 +292,7 @@ describe("useSettingsStore (Deep Coverage)", () => {
 
     // JSDOM throws "Not implemented: navigation" on reload(), which creates a console.error
     // We suppress it for this test.
-    const consoleErrorSpy = jest.spyOn(console, "error").mockImplementation(() => {});
+    const consoleErrorSpy = jest.spyOn(console, "error").mockImplementation(() => { });
 
     act(() => {
       result.current.setUserId("data-to-clear");

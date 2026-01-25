@@ -11,7 +11,8 @@ from app.api.routes.transitions import (
     mark_waypoint_reached,
     get_journey_status,
     get_user_journey_history,
-    get_user_effective_strategies
+    get_user_effective_strategies,
+    get_all_cached_paths
 )
 from app.models.transition_strategy import UserJourney, JourneyWaypoint, StrategyAttempt
 
@@ -568,3 +569,10 @@ async def test_mark_waypoint_reached_waypoint_not_found(mock_db):
         )
     assert exc.value.status_code == 404
     assert "Waypoint not found" in exc.value.detail
+
+@pytest.mark.asyncio
+async def test_get_all_cached_paths(mock_db):
+    """Test get_all_cached_paths stub."""
+    response = await get_all_cached_paths(limit=100, db=mock_db)
+    assert response == {"paths": []}
+
