@@ -109,6 +109,7 @@ deploy_service() {
         --set-secrets "JWT_SECRET_KEY=${JWT_SECRET_REF}" \
         --set-secrets "POSTGRES_PASSWORD=${DB_SECRET_VERSION}" \
         --set-env-vars "FORCE_RESEED=${FORCE_RESEED:-false}" \
+        --timeout 600 \
         --project "$PROJECT_ID")
 
     # Add AI vars if Listener

@@ -33,7 +33,7 @@ export function useLoadCachedPaths() {
       try {
         logger.info("api", "Loading cached paths from backend...");
 
-        const response = await fetch(`${OBSERVER_URL}/observer/atlas/paths/all?limit=10000`);
+        const response = await fetch(`${OBSERVER_URL}/observer/paths/all?limit=10000`);
 
         if (!response.ok) {
           logger.warn("api", "No cached paths available yet");

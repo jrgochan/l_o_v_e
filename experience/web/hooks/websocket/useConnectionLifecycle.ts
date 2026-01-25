@@ -8,7 +8,7 @@ import {
 } from "./utils/socketHelpers";
 
 interface UseConnectionLifecycleOptions {
-  sessionId: string;
+  endpoint: string;
   enabled: boolean;
   autoReconnect: boolean;
   onMessage: (event: MessageEvent) => void;
@@ -19,7 +19,7 @@ interface UseConnectionLifecycleOptions {
 }
 
 export function useConnectionLifecycle({
-  sessionId,
+  endpoint,
   enabled,
   autoReconnect,
   onMessage,
@@ -58,7 +58,7 @@ export function useConnectionLifecycle({
     setErrorRef.current(null);
 
     try {
-      const url = getWebSocketUrl(`observer/ws/${sessionId}`, token || undefined);
+      const url = getWebSocketUrl(endpoint, token || undefined);
       logger.info("websocket", `Connecting to ${url.split("?")[0]}...`);
 
       const ws = createWebSocketConnection(url, {
@@ -104,7 +104,7 @@ export function useConnectionLifecycle({
       setErrorRef.current("Failed to establish WebSocket connection");
       onErrorRef.current?.("Failed to establish WebSocket connection");
     }
-  }, [sessionId, token, autoReconnect]); // Removed unstable callbacks from dependencies
+  }, [endpoint, token, autoReconnect]); // Removed unstable callbacks from dependencies
 
   const disconnect = useCallback(() => {
     if (reconnectTimeoutRef.current) {

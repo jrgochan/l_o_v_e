@@ -95,8 +95,10 @@ export function useWebSocketChat(options: UseWebSocketChatOptions): UseWebSocket
   });
 
   // 2. Connection Hook
+  const endpoint = `observer/ws/chat/${options.sessionId}`;
+
   const { wsRef, isConnected, isConnecting, disconnect, reconnect } = useWebSocketConnection({
-    sessionId: options.sessionId,
+    endpoint,
     enabled: options.enabled,
     autoReconnect: options.autoReconnect,
     onMessage: handleMessage,

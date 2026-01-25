@@ -45,7 +45,7 @@ describe("useConnectionLifecycle", () => {
     jest.clearAllMocks();
     capturedCallbacks = {};
     props = {
-      sessionId: "session-1",
+      endpoint: "observer/ws/chat/session-1",
       enabled: true,
       autoReconnect: true,
       onMessage: jest.fn(),
@@ -126,7 +126,7 @@ describe("useConnectionLifecycle", () => {
     const firstConnect = result.current.connect;
 
     // Rerender with new props
-    rerender({ ...props, onMessage: () => {} });
+    rerender({ ...props, onMessage: () => { } });
 
     expect(result.current.connect).toBe(firstConnect);
   });
@@ -211,7 +211,7 @@ describe("useConnectionLifecycle", () => {
     (
       require("@/hooks/websocket/utils/socketHelpers").handleSocketClose as jest.Mock
     ).mockImplementationOnce((e, options) => {
-      options.timeoutRef.current = setTimeout(() => {}, 1000);
+      options.timeoutRef.current = setTimeout(() => { }, 1000);
       // Simulate reconnection attempt
       options.connectFn();
     });

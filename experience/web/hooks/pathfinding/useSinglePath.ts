@@ -1,4 +1,4 @@
-import { useCallback } from "react";
+import { useCallback, useRef } from "react";
 import { useVisualizationStore } from "@/stores/useVisualizationStore";
 import type { EmotionPath, PathComputationResult, Emotion } from "@/types/visualization";
 import { logger } from "@/utils/logger";
@@ -7,9 +7,18 @@ const OBSERVER_API_URL = process.env.NEXT_PUBLIC_OBSERVER_URL || "http://localho
 
 export function useSinglePath() {
   const { addComputedPath } = useVisualizationStore();
+  const abortControllerRef = useRef<AbortController | null>(null);
 
   const computePath = useCallback(
     async (from: Emotion, to: Emotion): Promise<void> => {
+      // Cancel any pending request
+      if (abortControllerRef.current) {
+        abortControllerRef.current.abort();
+      }
+
+      const controller = new AbortController();
+      abortControllerRef.current = controller;
+
       try {
         logger.debug("hooks", `Computing path: ${from.name} → ${to.name}`);
 
@@ -24,6 +33,7 @@ export function useSinglePath() {
             goal_vac: to.vac,
             max_waypoints: 3,
           }),
+          signal: controller.signal,
         });
 
         if (!response.ok) {
@@ -45,7 +55,11 @@ export function useSinglePath() {
         };
 
         addComputedPath(path);
-      } catch (err) {
+      } catch (err: any) {
+        if (err.name === "AbortError") {
+          logger.info("hooks", `Path computation aborted: ${from.name} → ${to.name}`);
+          return;
+        }
         logger.error("hooks", `Error computing path ${from.name} → ${to.name}`, err);
         throw err;
       }

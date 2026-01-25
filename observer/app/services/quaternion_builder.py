@@ -231,27 +231,14 @@ class QuaternionBuilder:
                     float(current_state["z"]),
                 ]
 
-        except httpx.HTTPError as e:
+        except Exception as e:
             # ═══════════════════════════════════════════════════════════════════════
-            # FALLBACK STRATEGY: Versor unavailable
+            # FALLBACK STRATEGY: Versor unavailable or invalid response
             # ═══════════════════════════════════════════════════════════════════════
-            # If Versor API fails (network error, service down, timeout):
+            # If Versor API fails (network error, service down, timeout, invalid JSON):
             #   1. Log warning (ops team can investigate)
             #   2. Return identity quaternion [1, 0, 0, 0]
             #   3. System remains functional (degraded mode)
-            #
-            # Identity quaternion = no rotation = origin point [0, 0, 0] in VAC space
-            # Visual effect: Soul Sphere shows neutral position instead of actual emotion
-            # Clinical impact: Limited (numerical data still available, just no 3D visualization)
-            #
-            # Why not crash?
-            #   - Observer's primary function is analysis, not visualization
-            #   - Better to provide degraded service than no service
-            #   - Experience module can detect identity quaternion and show error message
-            #
-            # Alternative considered: Cache last known quaternion
-            #   - Rejected: Would show stale emotional state (clinically misleading)
-            #   - Better to show "unknown" than "wrong"
             logger.warning(f"Versor API call failed: {e}, using fallback")
             return [1.0, 0.0, 0.0, 0.0]  # Identity quaternion (no rotation)
 

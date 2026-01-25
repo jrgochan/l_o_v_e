@@ -37,6 +37,11 @@ while [[ $# -gt 0 ]]; do
             PROJECT_ARG="$2"
             shift 2
             ;;
+        --compute-paths)
+            COMPUTE_PATHS="true"
+            export COMPUTE_PATHS
+            shift 1
+            ;;
         *)
             shift
             ;;
@@ -169,11 +174,14 @@ echo "=================================================="
 echo ""
 echo ">>> STAGE 3: CORS Configuration (Pass 3)"
 echo "Updating backend CORS to allow $experience..."
-export ALLOWED_ORIGINS="$experience"
-export CORS_ORIGINS="$experience"
+export ALLOWED_ORIGINS="[\"$experience\"\\, \"http://localhost:3000\"\\, \"http://127.0.0.1:3000\"]"
+export CORS_ORIGINS="[\"$experience\"\\, \"http://localhost:3000\"\\, \"http://127.0.0.1:3000\"]"
 
 # Re-run backend deployment to apply CORS
 "$GCP_DIR/04-deploy-services.sh" backend
+
+# 7. Compute Path Matrix (Optional)
+"$GCP_DIR/06-compute-paths.sh"
 
 # Cleanup
 rm -f deployed_services.tmp

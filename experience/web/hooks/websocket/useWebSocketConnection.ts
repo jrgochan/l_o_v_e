@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { useConnectionLifecycle } from "./useConnectionLifecycle";
 
 interface ConnectionOptions {
-  sessionId: string;
+  endpoint: string; // Was sessionId
   enabled?: boolean;
   autoReconnect?: boolean;
   onMessage: (event: MessageEvent) => void;
@@ -11,12 +11,12 @@ interface ConnectionOptions {
 }
 
 export function useWebSocketConnection(options: ConnectionOptions) {
-  const { sessionId, enabled = true, autoReconnect = true, onMessage, onError, setError } = options;
+  const { endpoint, enabled = true, autoReconnect = true, onMessage, onError, setError } = options;
   const [isConnected, setIsConnected] = useState(false);
   const [isConnecting, setIsConnecting] = useState(false);
 
   const { wsRef, connect, disconnect, reconnect } = useConnectionLifecycle({
-    sessionId,
+    endpoint,
     enabled,
     autoReconnect,
     onMessage,
