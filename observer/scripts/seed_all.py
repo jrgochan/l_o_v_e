@@ -200,7 +200,6 @@ def main(
     
     if dataset.lower() == 'all':
         datasets_to_seed = [
-            ("Brene Brown Emotions (87)", "data/brene_brown/emotions.json", "Atlas of the Heart", "--inactive"),
             ("Plutchik Emotions (8)", "data/plutchik/emotions.json", "Plutchik Wheel"),
             ("GoEmotions (28)", "data/goemotions/emotions.json", "GoEmotions", "--default"),
             ("UAL (Unified Affective Lexicon)", "data/ual/emotions.json", "Unified Affective Lexicon")

@@ -40,6 +40,7 @@ echo "Deploying Cloud Run Job: $JOB_NAME..."
 
 # Note: We override the entrypoint to run our specific script
 # We pass environment variables identical to the main service so it can connect
+# shellcheck disable=SC2153
 gcloud run jobs deploy "$JOB_NAME" \
     --image "$IMAGE" \
     --region "$REGION" \
@@ -88,11 +89,12 @@ run_job() {
             ;;
     esac
     
-    local args_flag=""
+    local args_params=()
     
     if [ -n "$dataset_arg" ]; then
         # Override args (replaces the default args set in deploy)
-        args_flag="--args scripts/compute_path_matrix.py,--collection,$dataset_arg"
+        # We use an array to handle spaces in dataset names (e.g. "Unified Affective Lexicon") correctly
+        args_params=("--args" "scripts/compute_path_matrix.py,--collection,$dataset_arg")
         echo "  - Running for collection: $dataset_arg (alias: $dataset_alias)"
     else
         # Use default args (compute all)
@@ -105,7 +107,7 @@ run_job() {
         --region "$REGION" \
         --project "$PROJECT_ID" \
         --wait \
-        $args_flag
+        "${args_params[@]}"
 }
 
 if [ "$DATASET" == "all" ]; then

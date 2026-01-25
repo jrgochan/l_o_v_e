@@ -622,6 +622,13 @@ setup_python_module() {
     else
         print_warning "No requirements.txt found"
     fi
+
+    # Install dev dependencies if present
+    if [ -f "requirements-dev.txt" ]; then
+        print_info "Installing development dependencies..."
+        pip install -r requirements-dev.txt "${PIP_ARGS[@]}"
+        print_success "$module_name dev dependencies installed"
+    fi
     
 
     

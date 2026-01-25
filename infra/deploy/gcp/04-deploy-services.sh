@@ -124,14 +124,14 @@ deploy_service() {
          if [[ "$allowed_origins_val" != \[* ]]; then
              allowed_origins_val="[\"$allowed_origins_val\"]"
          fi
-         cmd+=(--set-env-vars "ALLOWED_ORIGINS=$allowed_origins_val")
+         cmd+=(--set-env-vars "^++^ALLOWED_ORIGINS=$allowed_origins_val")
     elif [ "$service" == "versor" ] && [ -n "$CORS_ORIGINS" ]; then
         # Versor uses CORS_ORIGINS list format
         local cors_origins_val="$CORS_ORIGINS"
         if [[ "$cors_origins_val" != \[* ]]; then
             cors_origins_val="[\"$cors_origins_val\"]"
         fi
-        cmd+=(--set-env-vars "CORS_ORIGINS=$cors_origins_val")
+        cmd+=(--set-env-vars "^++^CORS_ORIGINS=$cors_origins_val")
     fi
     
     # Execute (allow output to be seen)

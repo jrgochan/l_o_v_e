@@ -30,7 +30,7 @@ describe("useWebSocketConnection", () => {
   it("should delegate lifecycle methods", () => {
     const { result } = renderHook(() =>
       useWebSocketConnection({
-        sessionId: "123",
+        endpoint: "ws://test",
         onMessage: jest.fn(),
         setError: jest.fn(),
       })
@@ -43,7 +43,7 @@ describe("useWebSocketConnection", () => {
   it("should send heartbeat when connected", () => {
     const { result } = renderHook(() =>
       useWebSocketConnection({
-        sessionId: "123",
+        endpoint: "ws://test",
         onMessage: jest.fn(),
         setError: jest.fn(),
       })
@@ -68,7 +68,7 @@ describe("useWebSocketConnection", () => {
 
     const { result } = renderHook(() =>
       useWebSocketConnection({
-        sessionId: "123",
+        endpoint: "ws://test",
         onMessage: jest.fn(),
         setError: jest.fn(),
       })
@@ -88,7 +88,7 @@ describe("useWebSocketConnection", () => {
   it("should start disconnected", () => {
     const { result } = renderHook(() =>
       useWebSocketConnection({
-        sessionId: "123",
+        endpoint: "ws://test",
         onMessage: jest.fn(),
         setError: jest.fn(),
       })

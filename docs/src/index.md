@@ -145,7 +145,8 @@ Step-by-step guides, tutorials, and beginner-friendly explanations.
 
 ```bash
 # Required
-Python 3.11+
+## Backend (Python 3.12)
+Python 3.12+
 Node.js 18+
 PostgreSQL 16+
 Redis 7+

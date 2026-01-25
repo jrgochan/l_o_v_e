@@ -9,6 +9,7 @@
 
 import { useState } from "react";
 import { useSettingsStore, ApiService } from "@/stores/useSettingsStore";
+import { useVisualizationStore } from "@/stores/useVisualizationStore";
 
 type SettingsTab = "api" | "polling" | "visualization" | "accessibility" | "data" | "about";
 type RenderQuality = "low" | "medium" | "high";
@@ -27,6 +28,7 @@ export function Settings() {
 
   // Settings from store
   const settings = useSettingsStore();
+  const visualization = useVisualizationStore();
 
   const testConnection = async (service: ApiService) => {
     setTestingApi(service);
@@ -457,6 +459,43 @@ export function Settings() {
           {activeTab === "data" && (
             <div className="space-y-4">
               <h3 className="text-lg font-semibold text-white">Data & Privacy</h3>
+
+              <div className="space-y-4">
+                <h3 className="text-lg font-semibold text-white">Data Source</h3>
+                <div className="space-y-2">
+                  {visualization.collections.length === 0 ? (
+                    <div className="text-sm text-gray-500 italic">No collections loaded</div>
+                  ) : (
+                    visualization.collections.map((collection) => (
+                      <div
+                        key={collection.id}
+                        className={`p-3 rounded-lg border cursor-pointer transition-colors ${
+                          visualization.activeCollectionId === collection.id
+                            ? "bg-cyan-900/30 border-cyan-500"
+                            : "bg-gray-800 border-gray-700 hover:border-gray-500"
+                        }`}
+                        onClick={() => {
+                          if (visualization.activeCollectionId !== collection.id) {
+                            visualization.setActiveCollection(collection.id);
+                          }
+                        }}
+                      >
+                        <div className="flex justify-between items-center">
+                          <span className="font-medium text-white">{collection.name}</span>
+                          {visualization.activeCollectionId === collection.id && (
+                            <span className="text-xs text-cyan-400">Active</span>
+                          )}
+                        </div>
+                        {collection.description && (
+                          <p className="text-xs text-gray-400 mt-1">{collection.description}</p>
+                        )}
+                      </div>
+                    ))
+                  )}
+                </div>
+              </div>
+
+              <div className="h-px bg-gray-700 my-4" />
 
               <div className="space-y-2">
                 <button

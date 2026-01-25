@@ -205,6 +205,15 @@ test_versor_setup() {
             return 1
         }
         print_success "Versor dependencies installed"
+        
+        # Install dev dependencies
+        if [ -f "requirements-dev.txt" ]; then
+            pip install -q -r requirements-dev.txt || {
+                print_error "Failed to install Versor dev dependencies"
+                return 1
+            }
+            print_success "Versor dev dependencies installed"
+        fi
     fi
     
     print_step "Starting Versor API in background..."
@@ -280,6 +289,15 @@ test_observer_setup() {
             return 1
         }
         print_success "Observer dependencies installed"
+
+        # Install dev dependencies
+        if [ -f "requirements-dev.txt" ]; then
+            pip install -q -r requirements-dev.txt || {
+                print_error "Failed to install Observer dev dependencies"
+                return 1
+            }
+            print_success "Observer dev dependencies installed"
+        fi
     fi
     
     print_step "Checking environment configuration..."

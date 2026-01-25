@@ -55,8 +55,8 @@ export function useSinglePath() {
         };
 
         addComputedPath(path);
-      } catch (err: any) {
-        if (err.name === "AbortError") {
+      } catch (err: unknown) {
+        if (err instanceof Error && err.name === "AbortError") {
           logger.info("hooks", `Path computation aborted: ${from.name} → ${to.name}`);
           return;
         }

@@ -15,6 +15,7 @@ describe("CinematicOverlay", () => {
   const defaultProps = {
     activeEmotions: [mockEmotion("Joy")],
     isWaiting: false,
+    isConnected: true,
     hasAudioEnabled: true,
     onEnableAudio: jest.fn(),
     visible: true,

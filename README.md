@@ -8,9 +8,9 @@ This is a multi-repository monorepo structure where each module maintains its ow
 
 ```
 l_o_v_e/
-├── listener/          # Audio transcription & semantic VAC analysis (Python 3.14/FastAPI)
-├── observer/          # Data persistence & vector search (Python 3.14/FastAPI + PostgreSQL + pgvector)
-├── versor/            # Quaternion mathematics engine (Python 3.14/FastAPI)
+├── listener/          # Audio transcription & semantic VAC analysis (Python 3.12/FastAPI)
+├── observer/          # Data persistence & vector search (Python 3.12/FastAPI + PostgreSQL + pgvector)
+├── versor/            # Quaternion mathematics engine (Python 3.12/FastAPI)
 ├── experience/        # Next.js visualization (React 19, React Three Fiber/Three.js)
 └── infra/             # Infrastructure orchestration, deployment & documentation
 ```
@@ -27,7 +27,7 @@ l_o_v_e/
 
 ### Setup
 
-We provide a robust, cross-platform setup script that handles dependencies (including Python 3.14 installation on compatible systems), virtual environments, and database initialization.
+We provide a robust, cross-platform setup script that handles dependencies (including Python 3.12 installation on compatible systems), virtual environments, and database initialization.
 
 ```bash
 # Run the complete setup script
@@ -36,9 +36,9 @@ cd infra
 ```
 
 This will:
-- ✅ **Install System Tools**: Checks for and installs GCC, OpenBLAS, Homebrew (macOS), and other build tools.
-- ✅ **Verify Python 3.14**: Installs or verifies the required Python version.
-- ✅ **Create Environments**: Sets up isolated virtual environments for all modules.
+- [ ] **Install System Tools**: Checks for and installs GCC, OpenBLAS, Homebrew (macOS), and other build tools.
+- [x] **Verify Python 3.12**: Installs or verifies the required Python version.
+- [ ] **Create Environments**: Sets up isolated virtual environments for all modules.
 - ✅ **Seed Database**: Initializes PostgreSQL with 87+ Atlas emotions, strategies, and patterns.
 - ✅ **Download Models**: Fetches required AI models (Ollama/Llama 3, BERT, etc.).
 

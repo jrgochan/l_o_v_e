@@ -24,4 +24,22 @@ Configuration is managed via `.env` files.
 - `DATABASE_URL`: Observer -> Postgres
 - `REDIS_URL`: Async queue connection
 
-*(This document is a stub. See `infra/README.md` for executable instructions.)*
+## Google Cloud Deployment
+
+The stack is designed for production deployment on GCP.
+
+### Services
+- **Cloud Run Services**: Hosts `versor`, `observer`, and `listener` APIs.
+- **Cloud Run Jobs**: Handles the `compute-paths` task (previously local).
+- **Cloud SQL (PostgreSQL 16)**: Managed database with `pgvector` extension.
+- **Memorystore (Redis)**: Managed Redis for Asyncio task queuing.
+- **Secret Manager**: Securely stores DB passwords and API tokens.
+
+### Deployment Commands
+
+Deploying to GCP involves a multi-stage process handled by scripts in `infra/deploy/gcp/`:
+
+1.  **Build & Push**: `02-build-push.sh`
+2.  **Deploy Infra**: `03-provision-infra.sh` (Terraform/gcloud)
+3.  **Deploy Services**: `04-deploy-services.sh`
+4.  **Compute Paths**: `06-compute-paths.sh` (Runs remotely)

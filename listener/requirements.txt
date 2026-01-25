@@ -12,7 +12,7 @@ ffmpeg-python==0.2.0
 
 # Prosody Analysis
 librosa==0.10.2.post1
-numba>=0.59.0
+numba>=0.60.0
 soundfile==0.13.0
 praat-parselmouth==0.4.7
 
@@ -26,7 +26,7 @@ langchain-google-vertexai>=2.0.0
 
 # Core AI - Explicit version pinning for Python 3.12 compatibility
 torch==2.3.0
-numpy==1.26.4
+numpy==2.3.1
 
 # Task Queue
 arq==0.26.1
@@ -41,13 +41,5 @@ python-jose[cryptography]==3.3.0
 aiofiles==24.1.0
 httpx==0.28.1
 
-# Testing
-pytest==8.3.4
-pytest-asyncio==0.25.0
-pytest-cov==6.0.0
-pytest-mock==3.14.0
-
 # Development
 python-dotenv==1.0.1
-flake8==7.1.1
-mypy==1.14.0

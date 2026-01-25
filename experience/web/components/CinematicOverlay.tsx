@@ -14,6 +14,7 @@ import { resolveEmotionColor } from "@/utils/emotion-colors";
 
 interface Props {
   activeEmotions: Emotion[];
+  isConnected: boolean;
   isWaiting: boolean;
   hasAudioEnabled: boolean;
   onEnableAudio: () => void;
@@ -22,6 +23,7 @@ interface Props {
 
 export function CinematicOverlay({
   activeEmotions,
+  isConnected,
   isWaiting,
   hasAudioEnabled,
   onEnableAudio,
@@ -36,6 +38,17 @@ export function CinematicOverlay({
 
   // Handle text updates with fade transition (Only used for small numbers)
   useEffect(() => {
+    if (!isConnected) {
+      if (displayText !== "Connecting...") {
+        setTimeout(() => setFadeState("out"), 0);
+        setTimeout(() => {
+          setDisplayText("Connecting...");
+          setFadeState("in");
+        }, 500);
+      }
+      return;
+    }
+
     if (isWaiting) {
       if (displayText !== "Waiting for Session...") {
         setTimeout(() => setFadeState("out"), 0);
@@ -60,7 +73,7 @@ export function CinematicOverlay({
         }, 500);
       }
     }
-  }, [activeEmotions, isWaiting, displayText, isGridMode]);
+  }, [activeEmotions, isWaiting, isConnected, displayText, isGridMode]);
 
   return (
     <div
@@ -76,8 +89,8 @@ export function CinematicOverlay({
         </button>
       )}
 
-      {/* Mode 1: Large Cinematic Text (Few Emotions) or Waiting State */}
-      {(isWaiting || !isGridMode) && (
+      {/* Mode 1: Large Cinematic Text (Few Emotions) or Waiting/Disconnected State */}
+      {(!isConnected || isWaiting || !isGridMode) && (
         <div
           className={`text-center transition-all duration-1000 transform ${
             fadeState === "in"
@@ -91,7 +104,7 @@ export function CinematicOverlay({
           <div className="mt-4 h-px w-32 bg-gradient-to-r from-transparent via-white/50 to-transparent mx-auto" />
 
           {/* Context Subtitle */}
-          {!isWaiting && activeEmotions.length > 0 && (
+          {isConnected && !isWaiting && activeEmotions.length > 0 && (
             <p className="mt-4 text-cyan-400/60 font-light tracking-widest text-sm uppercase">
               Current Connection
             </p>
@@ -100,7 +113,7 @@ export function CinematicOverlay({
       )}
 
       {/* Mode 2: Beautiful Grid (Many Emotions) */}
-      {!isWaiting && isGridMode && (
+      {isConnected && !isWaiting && isGridMode && (
         <div className="w-full max-w-7xl max-h-[80vh] overflow-y-auto custom-scrollbar px-8 py-12 pointer-events-auto flex flex-col items-center">
           <div className="flex flex-wrap justify-center gap-3 shrink-0">
             {activeEmotions.map((emotion) => {

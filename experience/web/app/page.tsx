@@ -151,6 +151,7 @@ export default function ZenExperience() {
       {/* Cinematic Overlay (toggleable) */}
       <CinematicOverlay
         activeEmotions={activeEmotions}
+        isConnected={isConnected}
         isWaiting={isWaiting}
         hasAudioEnabled={hasAudioEnabled}
         onEnableAudio={handleEnableAudio}

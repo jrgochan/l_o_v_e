@@ -6,7 +6,7 @@ Loads environment variables from .env file.
 import json
 from typing import List
 
-from pydantic import Field
+from pydantic import Field, model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -110,6 +110,13 @@ class Settings(BaseSettings):
     APP_NAME: str = Field(default="L.O.V.E. Observer API")
     APP_DESCRIPTION: str = Field(default="Emotional state persistence and context retrieval")
     DEFAULT_EMOTION_COLLECTION: str = Field(default="goemotions")
+
+    @model_validator(mode="after")
+    def validate_embedding_config(self) -> "Settings":
+        """Validate embedding provider configuration."""
+        if self.EMBEDDING_PROVIDER == "openai" and not self.OPENAI_API_KEY:
+            raise ValueError("OPENAI_API_KEY must be set when EMBEDDING_PROVIDER is 'openai'")
+        return self
 
     model_config = SettingsConfigDict(env_file=".env", case_sensitive=True)
 
