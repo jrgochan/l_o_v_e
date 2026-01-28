@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Workspace
+   version = "1.0">
+   <FileRef
+      location = "group:Packages/SoulCore">
+   </FileRef>
+   <FileRef
+      location = "group:Packages/SoulUI">
+   </FileRef>
+   <FileRef
+      location = "group:Packages/SoulBrain">
+   </FileRef>
+   <FileRef
+      location = "group:Packages/SoulBio">
+   </FileRef>
+   <FileRef
+      location = "group:LoveApp.xcodeproj">
+   </FileRef>
+</Workspace>
