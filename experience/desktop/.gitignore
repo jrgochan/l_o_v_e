@@ -1,0 +1,9 @@
+# Rust / Tauri
+src-tauri/target/
+src-tauri/gen/
+src-tauri/schemas/
+target/
+**/.DS_Store
+
+# Icons (Sources are ok, but maybe not generated ones if we want to keep repo small?)
+# We usually commit icons so they are available for build.

@@ -110,14 +110,14 @@ export default function AdminUsersPage() {
                   <td className="px-6 py-4 text-right">
                     <div className="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
                       <Link
-                        href={`/admin/users/${user.id}`}
+                        href={`/admin/users/detail?id=${user.id}`}
                         className="p-1.5 text-gray-400 hover:text-white hover:bg-gray-700 rounded transition-colors"
                         title="View Details"
                       >
                         👁️
                       </Link>
                       <Link
-                        href={`/admin/users/${user.id}?edit=true`}
+                        href={`/admin/users/detail?id=${user.id}&edit=true`}
                         className="p-1.5 text-gray-400 hover:text-cyan-400 hover:bg-gray-700 rounded transition-colors"
                         title="Edit User"
                       >

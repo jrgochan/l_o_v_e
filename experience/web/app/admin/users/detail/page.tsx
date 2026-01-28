@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { useParams, useRouter } from "next/navigation";
+import { useSearchParams, useRouter } from "next/navigation";
 import { AdminLayout } from "@/components/admin/layout/AdminLayout";
 import { api } from "@/utils/api";
 import { User, UserRole } from "@/types/auth";
@@ -10,7 +10,8 @@ import { ChatSession, VACHistoryPoint } from "@/types/chat";
 import { TrajectoryChart } from "@/components/admin/users/TrajectoryChart";
 
 export default function AdminUserDetailsPage() {
-  const { id } = useParams();
+  const searchParams = useSearchParams();
+  const id = searchParams.get("id");
   const router = useRouter();
 
   const [user, setUser] = useState<User | null>(null);
@@ -93,7 +94,7 @@ export default function AdminUserDetailsPage() {
     return (
       <AdminLayout>
         <div className="p-4 bg-red-900/30 border border-red-800 rounded text-red-200">
-          {error ? error : /* istanbul ignore next */ "User not found"}
+          {error ? error : "User not found"}
         </div>
         <button onClick={() => router.back()} className="mt-4 text-cyan-400 hover:text-white">
           ← Back to Users

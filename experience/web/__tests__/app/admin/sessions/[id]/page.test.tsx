@@ -1,8 +1,21 @@
 import { render, screen, waitFor } from "@testing-library/react";
-import AdminSessionDetailPage from "@/app/admin/sessions/[id]/page";
+import AdminSessionDetailPage from "@/app/admin/sessions/detail/page";
 import { adminApi } from "@/utils/api";
 import { AdminSession } from "@/types/admin";
 import React from "react";
+
+// Mock next/navigation
+const mockBack = jest.fn();
+const mockSearchParams = { get: jest.fn().mockReturnValue("session-123") };
+
+jest.mock("next/navigation", () => ({
+  useParams: jest.fn(),
+  useSearchParams: () => mockSearchParams,
+  useRouter: () => ({
+    push: jest.fn(),
+    back: mockBack,
+  }),
+}));
 
 // Mock the API
 jest.mock("@/utils/api", () => ({
@@ -59,7 +72,6 @@ describe("AdminSessionDetailPage", () => {
     ],
   } as unknown as AdminSession; // Casting for simplification if types are strict
 
-  const mockParams = Promise.resolve({ id: "session-123" });
 
   beforeEach(() => {
     jest.clearAllMocks();
@@ -76,11 +88,11 @@ describe("AdminSessionDetailPage", () => {
 
   it("renders loading state initially", async () => {
     // Return a promise that doesn't resolve immediately to check loading state
-    (adminApi.getSessionDetails as jest.Mock).mockImplementation(() => new Promise(() => {}));
+    (adminApi.getSessionDetails as jest.Mock).mockImplementation(() => new Promise(() => { }));
 
     const { container } = render(
       <React.Suspense fallback={<div data-testid="suspense-loading">Loading...</div>}>
-        <AdminSessionDetailPage params={mockParams} />
+        render(<AdminSessionDetailPage />);
       </React.Suspense>
     );
 
@@ -99,7 +111,7 @@ describe("AdminSessionDetailPage", () => {
   it("renders session details on success", async () => {
     (adminApi.getSessionDetails as jest.Mock).mockResolvedValue(mockSession);
 
-    render(<AdminSessionDetailPage params={mockParams} />);
+    render(<AdminSessionDetailPage />);
 
     await waitFor(() => {
       expect(screen.getByRole("heading", { name: /Session Details/i })).toBeInTheDocument();
@@ -119,7 +131,7 @@ describe("AdminSessionDetailPage", () => {
       messages: [],
     });
 
-    render(<AdminSessionDetailPage params={mockParams} />);
+    render(<AdminSessionDetailPage />);
 
     await waitFor(() => {
       expect(screen.getByText("No messages recorded in this session.")).toBeInTheDocument();
@@ -132,7 +144,7 @@ describe("AdminSessionDetailPage", () => {
       user: null,
     });
 
-    render(<AdminSessionDetailPage params={mockParams} />);
+    render(<AdminSessionDetailPage />);
 
     await waitFor(() => {
       expect(screen.getByText("Guest Session")).toBeInTheDocument();
@@ -142,7 +154,7 @@ describe("AdminSessionDetailPage", () => {
   it("handles error state", async () => {
     (adminApi.getSessionDetails as jest.Mock).mockRejectedValue(new Error("Fetch failed"));
 
-    render(<AdminSessionDetailPage params={mockParams} />);
+    render(<AdminSessionDetailPage />);
 
     await waitFor(() => {
       expect(screen.getByText("Error: Fetch failed")).toBeInTheDocument();
@@ -167,7 +179,7 @@ describe("AdminSessionDetailPage", () => {
       ],
     });
 
-    render(<AdminSessionDetailPage params={mockParams} />);
+    render(<AdminSessionDetailPage />);
 
     await waitFor(() => {
       expect(screen.getByText("Voice Message")).toBeInTheDocument();
@@ -191,7 +203,7 @@ describe("AdminSessionDetailPage", () => {
       ],
     });
 
-    render(<AdminSessionDetailPage params={mockParams} />);
+    render(<AdminSessionDetailPage />);
 
     await waitFor(() => {
       expect(screen.getByText("Insight")).toBeInTheDocument();
@@ -201,7 +213,7 @@ describe("AdminSessionDetailPage", () => {
   it("handles non-Error rejection", async () => {
     (adminApi.getSessionDetails as jest.Mock).mockRejectedValue("String error");
 
-    render(<AdminSessionDetailPage params={mockParams} />);
+    render(<AdminSessionDetailPage />);
 
     await waitFor(() => {
       expect(screen.getByText("Error: Failed to load session details")).toBeInTheDocument();
@@ -211,7 +223,7 @@ describe("AdminSessionDetailPage", () => {
   it("handles null session response (not found)", async () => {
     (adminApi.getSessionDetails as jest.Mock).mockResolvedValue(null);
 
-    render(<AdminSessionDetailPage params={mockParams} />);
+    render(<AdminSessionDetailPage />);
 
     await waitFor(() => {
       expect(screen.getByText("Error: Session not found")).toBeInTheDocument();
@@ -224,7 +236,7 @@ describe("AdminSessionDetailPage", () => {
       user: { ...mockSession.user!, full_name: "" },
     });
 
-    render(<AdminSessionDetailPage params={mockParams} />);
+    render(<AdminSessionDetailPage />);
 
     await waitFor(() => {
       expect(screen.getByText("Unknown Name")).toBeInTheDocument();
@@ -237,7 +249,7 @@ describe("AdminSessionDetailPage", () => {
       tone_preference: "investigative",
     });
 
-    render(<AdminSessionDetailPage params={mockParams} />);
+    render(<AdminSessionDetailPage />);
 
     await waitFor(() => {
       const toneBadge = screen.getByText("investigative Tone");

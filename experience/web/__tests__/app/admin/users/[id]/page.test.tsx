@@ -1,5 +1,5 @@
 import { render, screen, waitFor, fireEvent } from "@testing-library/react";
-import AdminUserDetailsPage from "@/app/admin/users/[id]/page";
+import AdminUserDetailsPage from "@/app/admin/users/detail/page";
 import { api } from "@/utils/api";
 import { User, UserRole } from "@/types/auth";
 import { ChatSession } from "@/types/chat";
@@ -7,10 +7,11 @@ import { ChatSession } from "@/types/chat";
 // Mock next/navigation
 const mockPush = jest.fn();
 const mockBack = jest.fn();
-const mockUseParams = jest.fn(() => ({ id: "user-123" }));
+const mockSearchParams = { get: jest.fn().mockReturnValue("user-123") };
 
 jest.mock("next/navigation", () => ({
-  useParams: () => mockUseParams(),
+  useParams: jest.fn(),
+  useSearchParams: () => mockSearchParams,
   useRouter: () => ({
     push: mockPush,
     back: mockBack,
@@ -64,17 +65,17 @@ describe("AdminUserDetailsPage", () => {
 
   beforeEach(() => {
     jest.resetAllMocks();
-    mockUseParams.mockReturnValue({ id: "user-123" } as any);
+    mockSearchParams.get.mockReturnValue("user-123");
   });
 
   it("renders loading state initially", async () => {
-    (api.get as jest.Mock).mockImplementation(() => new Promise(() => {}));
+    (api.get as jest.Mock).mockImplementation(() => new Promise(() => { }));
     render(<AdminUserDetailsPage />);
     expect(screen.getByText("Loading user details...")).toBeInTheDocument();
   });
 
   it("handles missing id parameter", async () => {
-    mockUseParams.mockReturnValue({} as any); // No ID
+    mockSearchParams.get.mockReturnValue(null); // No ID
     render(<AdminUserDetailsPage />);
     // If no ID, effect doesn't run, stays loading
     expect(screen.getByText("Loading user details...")).toBeInTheDocument();

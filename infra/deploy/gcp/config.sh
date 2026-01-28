@@ -5,7 +5,7 @@
 PROJECT_ID="${PROJECT_ID:-}" # Leave empty to use 'gcloud config get-value project'
 CLOUD_MODE="${CLOUD_MODE:-false}" # Set to "true" via --cloud flag
 APP_NAME="love-stack"
-DATASET="${DATASET:-all}" # Default dataset (can be overridden)
+DATASET="${DATASET:-goemotions}" # Default dataset (can be overridden)
 
 # Region settings
 REGION="us-central1"

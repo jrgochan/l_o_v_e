@@ -1,23 +1,28 @@
 "use client";
 
-import { useEffect, useState, use } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 import { format } from "date-fns";
 import { adminApi } from "@/utils/api";
 import { AdminSession } from "@/types/admin";
 import { Loader2, ArrowLeft, Mic, AlertTriangle } from "lucide-react";
 import { AdminLayout } from "@/components/admin/layout/AdminLayout";
 
-export default function AdminSessionDetailPage({ params }: { params: Promise<{ id: string }> }) {
-  const { id } = use(params);
+export default function AdminSessionDetailPage() {
+  const searchParams = useSearchParams();
+  const id = searchParams.get("id");
+
   const [session, setSession] = useState<AdminSession | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
+    if (!id) return;
+
     async function fetchSession() {
       try {
-        const data = await adminApi.getSessionDetails(id);
+        const data = await adminApi.getSessionDetails(id as string);
         setSession(data);
       } catch (err) {
         setError(err instanceof Error ? err.message : "Failed to load session details");

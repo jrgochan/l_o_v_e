@@ -111,7 +111,7 @@ export default function AdminSessionsPage() {
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-right">
                       <Link
-                        href={`/admin/sessions/${session.id}`}
+                        href={`/admin/sessions/detail?id=${session.id}`}
                         className="text-cyan-400 hover:text-cyan-300 hover:underline font-medium"
                       >
                         View Transcript

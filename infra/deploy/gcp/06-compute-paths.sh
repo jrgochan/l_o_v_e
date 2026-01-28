@@ -48,7 +48,7 @@ gcloud run jobs deploy "$JOB_NAME" \
     --vpc-connector "$CONNECTOR_NAME" \
     --cpu "1" \
     --memory "2Gi" \
-    --task-timeout "3600s" \
+    --task-timeout "7200s" \
     --max-retries 0 \
     --set-env-vars "POSTGRES_HOST=$DB_IP,POSTGRES_PORT=5432,POSTGRES_DB=$DB_NAME,POSTGRES_USER=$DB_USER" \
     --set-env-vars "REDIS_HOST=$REDIS_HOST,REDIS_PORT=$REDIS_PORT" \
