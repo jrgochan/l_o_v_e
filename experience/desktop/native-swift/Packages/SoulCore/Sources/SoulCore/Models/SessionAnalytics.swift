@@ -9,17 +9,17 @@ public final class SessionAnalytics {
     public var startTime: Date
     public var endTime: Date?
     public var messageCount: Int
-    
+
     // Emotional Shift
     public var startValence: Double
     public var startArousal: Double
     public var endValence: Double?
     public var endArousal: Double?
-    
+
     // Time-Series Data (JSON Encoded [SessionMetric])
     // Storing as Data blob for simplicity and performance in SwiftData
     @Attribute(.externalStorage) public var timeSeriesData: Data?
-    
+
     public struct SessionMetric: Codable, Identifiable {
         public var id: Date { timestamp }
         public var timestamp: Date
@@ -30,7 +30,7 @@ public final class SessionAnalytics {
         public var hrv: Double // Added
         public var messageCount: Int // Added
     }
-    
+
     public init(
         id: UUID = UUID(),
         startTime: Date = Date(),
@@ -44,29 +44,29 @@ public final class SessionAnalytics {
         self.startArousal = startArousal
         self.timeSeriesData = try? JSONEncoder().encode([SessionMetric]())
     }
-    
+
     public var duration: TimeInterval {
         return (endTime ?? Date()).timeIntervalSince(startTime)
     }
-    
+
     /// Appends a new data point to the time series
     public func addMetric(vibe: Vibe, heartRate: Double, hrv: Double, messageCount: Int) {
         var metrics = getMetrics()
         let newMetric = SessionMetric(
-            timestamp: Date(), 
-            valence: vibe.valence, 
-            arousal: vibe.arousal, 
+            timestamp: Date(),
+            valence: vibe.valence,
+            arousal: vibe.arousal,
             connection: vibe.connection,
             heartRate: heartRate,
             hrv: hrv,
             messageCount: messageCount
         )
         metrics.append(newMetric)
-        
+
         // Save back
         self.timeSeriesData = try? JSONEncoder().encode(metrics)
     }
-    
+
     /// Retrieves decoded metrics
     public func getMetrics() -> [SessionMetric] {
         guard let data = timeSeriesData else { return [] }

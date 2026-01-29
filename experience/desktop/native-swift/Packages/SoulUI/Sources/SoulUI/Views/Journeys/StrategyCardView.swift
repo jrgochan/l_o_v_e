@@ -6,27 +6,27 @@ import SoulCore
 public struct StrategyCardView: View {
     public let strategy: TransitionStrategy
     public var onComplete: () -> Void
-    
+
     public init(strategy: TransitionStrategy, onComplete: @escaping () -> Void) {
         self.strategy = strategy
         self.onComplete = onComplete
     }
-    
+
     public var body: some View {
         VStack(alignment: .leading, spacing: 20) {
             headerView
-            
+
             Divider()
                 .background(.white.opacity(0.2))
-            
+
             descriptionView
-            
+
             if !strategy.detailedSteps.isEmpty {
                 instructionsView
             }
-            
+
             Spacer()
-            
+
             actionButton
         }
         .padding(24)
@@ -48,24 +48,24 @@ public struct StrategyCardView: View {
                 )
         )
     }
-    
+
     // MARK: - Subviews
-    
+
     private var headerView: some View {
         HStack {
             VStack(alignment: .leading, spacing: 4) {
                 Text(strategy.name)
                     .font(.title3.bold())
                     .foregroundStyle(.white)
-                
+
                 Text("Recommended Intervention")
                     .font(.caption)
                     .foregroundStyle(.white.opacity(0.6))
                     .textCase(.uppercase)
             }
-            
+
             Spacer()
-            
+
             // Duration Pill
             HStack(spacing: 4) {
                 Image(systemName: "clock")
@@ -78,21 +78,21 @@ public struct StrategyCardView: View {
             .clipShape(Capsule())
         }
     }
-    
+
     private var descriptionView: some View {
         Text(strategy.definition)
             .font(.body)
             .foregroundStyle(.white.opacity(0.9))
             .lineSpacing(4)
     }
-    
+
     private var instructionsView: some View {
         VStack(alignment: .leading, spacing: 12) {
             Text("Steps")
                 .font(.caption.bold())
                 .foregroundStyle(.white.opacity(0.6))
                 .textCase(.uppercase)
-            
+
             ForEach(0..<strategy.detailedSteps.count, id: \.self) { index in
                 let step = strategy.detailedSteps[index]
                 HStack(alignment: .top, spacing: 12) {
@@ -101,7 +101,7 @@ public struct StrategyCardView: View {
                         .foregroundStyle(.blue)
                         .frame(width: 24, height: 24)
                         .background(Circle().fill(.blue.opacity(0.2)))
-                    
+
                     Text(step)
                         .font(.system(size: 15))
                         .foregroundStyle(.white.opacity(0.8))
@@ -111,7 +111,7 @@ public struct StrategyCardView: View {
         .padding()
         .background(RoundedRectangle(cornerRadius: 12).fill(.white.opacity(0.05)))
     }
-    
+
     private var actionButton: some View {
         Button(action: onComplete) {
             HStack {

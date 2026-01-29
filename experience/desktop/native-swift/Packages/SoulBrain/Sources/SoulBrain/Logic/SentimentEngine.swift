@@ -2,17 +2,17 @@ import Foundation
 import SoulCore
 
 public struct SentimentEngine {
-    
+
     /// Analyzes text and returns a corresponding Vibe.
     /// Uses a keyword-based heuristic against the Atlas of Emotions.
     public static func analyze(_ text: String, baseVibe: Vibe = Vibe(valence: 0, arousal: 0, connection: 0)) -> Vibe {
         let words = text.lowercased().components(separatedBy: .punctuationCharacters).joined().components(separatedBy: .whitespaces)
-        
+
         var totalValence: Double = 0
         var totalArousal: Double = 0
         var totalConnection: Double = 0
         var matchCount: Double = 0
-        
+
         // Simple O(N*M) search
         for word in words {
             // Check direct exact match first
@@ -23,7 +23,7 @@ public struct SentimentEngine {
                 matchCount += 1.0
                 continue
             }
-            
+
             // Check partial or mapped synonyms
             if let score = score(for: word) {
                 totalValence += score.valence
@@ -32,7 +32,7 @@ public struct SentimentEngine {
                 matchCount += 1
             }
         }
-        
+
         if matchCount > 0 {
             // Return average of matches
             return Vibe(
@@ -44,7 +44,7 @@ public struct SentimentEngine {
             return baseVibe
         }
     }
-    
+
     // MARK: - Helper
     private struct SentimentScore {
         let valence: Double

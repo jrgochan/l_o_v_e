@@ -5,15 +5,15 @@ import SoulCore
 public struct BookmarksTab: View {
     @Query(sort: \ViewPreset.createdAt, order: .reverse) private var presets: [ViewPreset]
     @Environment(\.modelContext) private var context
-    
+
     var onSave: () -> Void
     var onRestore: (ViewPreset) -> Void
-    
+
     public init(onSave: @escaping () -> Void, onRestore: @escaping (ViewPreset) -> Void) {
         self.onSave = onSave
         self.onRestore = onRestore
     }
-    
+
     public var body: some View {
         VStack {
              // Header / Capture
@@ -29,7 +29,7 @@ public struct BookmarksTab: View {
                  .buttonStyle(.bordered)
              }
              .padding()
-             
+
              if presets.isEmpty {
                  ContentUnavailableView("No Bookmarks", systemImage: "bookmark.slash", description: Text("Capture a moment to save it here."))
              } else {
@@ -40,7 +40,7 @@ public struct BookmarksTab: View {
                                  Text(preset.name)
                                      .font(.headline)
                                      .lineLimit(1)
-                                 
+
                                  HStack {
                                      Circle()
                                          .fill(Color(
@@ -56,7 +56,7 @@ public struct BookmarksTab: View {
                              }
                              .padding()
                              .frame(maxWidth: .infinity, alignment: .leading)
-                             .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 12)) 
+                             .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 12))
                              .overlay(
                                  RoundedRectangle(cornerRadius: 12)
                                      .stroke(.white.opacity(0.1), lineWidth: 1)

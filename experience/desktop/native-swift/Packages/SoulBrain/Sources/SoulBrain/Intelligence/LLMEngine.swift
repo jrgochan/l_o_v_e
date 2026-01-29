@@ -6,10 +6,10 @@ import OSLog
 public protocol InferenceProvider: Sendable {
     /// Loads the model resources (weights, tokenizer).
     func load() async throws
-    
+
     /// Generates a response stream.
     func generate(prompt: String) async -> AsyncStream<String>
-    
+
     /// Returns true if the model is ready for inference.
     var isReady: Bool { get async }
 }
@@ -17,35 +17,35 @@ public protocol InferenceProvider: Sendable {
 /// The Intelligence Engine powering the "Mind".
 /// Coordinates Memory Retrieval and Inference Generation.
 public actor LLMEngine {
-    
+
     internal let memoryIndex = VectorIndex()
     internal var memoryContentArgs: [UUID: String] = [:]
-    
+
     private let embedder: Embedder
     private let inference: InferenceProvider
     private let logger = Logger(subsystem: "com.soul.brain", category: "LLMEngine")
-    
+
     // Default to Mock for now in Preview/Tests, but MLX in Production?
     // User requested decoupling.
     // Ideally: init(embedder: Embedder = MLXEmbedder(), inference: InferenceProvider = MLXInferenceProvider())
     // BUT MLXInferenceProvider is in same module? Yes.
-    
+
     public init(embedder: Embedder, inference: InferenceProvider) {
         self.embedder = embedder
         self.inference = inference
         logger.info("Initializing with \(type(of: inference))...")
     }
-    
+
     // Convenience Init for Production (uses MLX)
     // Note: Requires MLX imports available?
-    // We can leave this out and let the App Composition Root inject it, 
+    // We can leave this out and let the App Composition Root inject it,
     // OR we keep it if we import MLX here or use a Factory.
     // For now, let's keep it simple and require injection or provide a static factory?
     // Let's stick to explicit injection to force good habits, or default to MLX if possible.
     // To compile, we need MLXInferenceProvider visible.
-    
+
     // MARK: - Lifecycle
-    
+
     public func loadModel() async {
         do {
             try await inference.load()
@@ -55,9 +55,9 @@ public actor LLMEngine {
             logger.error("Failed to load inference provider: \(error)")
         }
     }
-    
+
     // MARK: - Memory Management
-    
+
     public func indexMemory(id: UUID, content: String) async {
         do {
             let vector = try await embedder.embed(content)
@@ -68,12 +68,12 @@ public actor LLMEngine {
             logger.error("Failed to embed memory: \(error)")
         }
     }
-    
+
     public struct MemoryImport {
         public let id: UUID
         public let content: String
         public let embedding: Data?
-        
+
         public init(id: UUID, content: String, embedding: Data?) {
             self.id = id
             self.content = content
@@ -84,7 +84,7 @@ public actor LLMEngine {
     public func rehydrate(memories: [MemoryImport]) async {
         print("🧠 LLMEngine: Rehydrating \(memories.count) memories...")
         var loadedCount = 0
-        
+
         for item in memories {
             if let data = item.embedding {
                 let vector = data.withUnsafeBytes {
@@ -99,7 +99,7 @@ public actor LLMEngine {
         }
         logger.info("Rehydrated \(loadedCount) memories from cache.")
     }
-    
+
     public func seedDebugMemories() async {
         print("🧠 LLMEngine: Seeding debug memories...")
         let memories = [
@@ -111,9 +111,9 @@ public actor LLMEngine {
             await indexMemory(id: UUID(), content: mem)
         }
     }
-    
+
     // MARK: - Generation
-    
+
     public func generate(
         prompt: String,
         vibe: Vibe,
@@ -134,7 +134,7 @@ public actor LLMEngine {
                 } catch {
                     logger.error("Retrieval failed: \(error)")
                 }
-                
+
                 // 2. Prompt Construction
                 let fullPrompt = SoulPersona.constructPrompt(
                     userPrompt: prompt,
@@ -143,13 +143,13 @@ public actor LLMEngine {
                     activeStrategy: strategy,
                     history: history
                 )
-                
+
                 // 3. Inference
                 let stream = await inference.generate(prompt: fullPrompt)
                 for await token in stream {
                     continuation.yield(token)
                 }
-                
+
                 continuation.finish()
             }
         }

@@ -3,13 +3,13 @@ import SoulCore
 
 public struct ModelSettingsView: View {
     @StateObject private var modelManager = ModelManager.shared
-    
+
     // Recommended Model
     let recommendedURL = URL(string: "https://huggingface.co/mlx-community/Llama-3.2-3B-Instruct-4bit/resolve/main/model.safetensors?download=true")!
     let recommendedFilename = "model.safetensors"
-    
+
     public init() {}
-    
+
     public var body: some View {
         Form {
             Section(header: Text("Active Intelligence")) {
@@ -26,9 +26,9 @@ public struct ModelSettingsView: View {
                                     .font(.caption)
                                     .foregroundStyle(.secondary)
                             }
-                            
+
                             Spacer()
-                            
+
                             if modelManager.activeModelId == model.id {
                                 Image(systemName: "checkmark.circle.fill")
                                     .foregroundColor(.green)
@@ -48,7 +48,7 @@ public struct ModelSettingsView: View {
                     }
                 }
             }
-            
+
             Section(header: Text("Download")) {
                 VStack(alignment: .leading, spacing: 10) {
                     Text("Llama 3.2 3B Instruct (4-bit)")
@@ -56,7 +56,7 @@ public struct ModelSettingsView: View {
                     Text("Recommended for most Macs. ~2.0 GB")
                         .font(.caption)
                         .foregroundStyle(.secondary)
-                    
+
                     if modelManager.isDownloading {
                         ProgressView(value: modelManager.downloadProgress) {
                             Text("\(Int(modelManager.downloadProgress * 100))%")
@@ -76,16 +76,16 @@ public struct ModelSettingsView: View {
                 }
                 .padding(.vertical, 5)
             }
-            
+
             Section(header: Text("Location")) {
                 HStack {
                     Text(modelManager.modelsDirectory.path)
                         .font(.caption)
                         .foregroundStyle(.secondary)
                         .textSelection(.enabled)
-                    
+
                     Spacer()
-                    
+
                     Button(action: {
                         NSWorkspace.shared.open(modelManager.modelsDirectory)
                     }, label: {

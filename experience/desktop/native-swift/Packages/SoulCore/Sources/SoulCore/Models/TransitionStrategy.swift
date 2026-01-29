@@ -15,7 +15,7 @@ public final class TransitionStrategy {
     public var difficultyLevel: Int // 1-5
     public var evidenceLevel: EvidenceLevel
     public var researchCitations: [String]
-    
+
     public init(
         id: UUID = UUID(),
         name: String,

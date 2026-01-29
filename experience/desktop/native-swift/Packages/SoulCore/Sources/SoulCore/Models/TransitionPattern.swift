@@ -12,10 +12,10 @@ public final class TransitionPattern {
     public var toCategory: String
     public var difficultyScore: Double // 0.0 to 1.0 (Higher is harder)
     public var psychologicalReasoning: String
-    
+
     // Relationship to strategies recommended for this pattern
     public var strategies: [TransitionStrategy]
-    
+
     public init(
         id: UUID = UUID(),
         name: String,

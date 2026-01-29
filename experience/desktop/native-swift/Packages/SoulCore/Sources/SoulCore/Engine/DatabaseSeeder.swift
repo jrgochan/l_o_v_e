@@ -4,7 +4,7 @@ import SwiftData
 /// Responsible for populating the database with initial emotion datasets.
 @available(macOS 14, iOS 17, *)
 public struct DatabaseSeeder {
-    
+
     private struct EmotionJSON: Codable {
         let emotion_name: String
         let definition: String
@@ -13,16 +13,16 @@ public struct DatabaseSeeder {
         let color_hint: String?
         let haptic_pattern_id: String?
     }
-    
+
     private struct CollectionJSON: Codable {
         let emotions: [EmotionJSON]
     }
-    
+
     enum SeedingError: Error {
         case fileNotFound(String)
         case decodingFailed(String, Error)
     }
-    
+
     public static func seed(modelContext: ModelContext) throws {
         // 1. Seed Atlas of the Heart
         // 1. Seed Atlas of the Heart
@@ -36,7 +36,7 @@ public struct DatabaseSeeder {
                 isActive: true
             )
         )
-        
+
         // 2. Seed Plutchik
         try seedCollection(
             context: modelContext,
@@ -48,7 +48,7 @@ public struct DatabaseSeeder {
                 isActive: false
             )
         )
-        
+
         // 3. Seed UAL (Unified Affective Lexicon)
         try seedCollection(
             context: modelContext,
@@ -60,7 +60,7 @@ public struct DatabaseSeeder {
                 isActive: false
             )
         )
-        
+
         // 4. Seed GoEmotions (Google)
         try seedCollection(
             context: modelContext,
@@ -72,11 +72,11 @@ public struct DatabaseSeeder {
                 isActive: false
             )
         )
-        
+
         // 5. Seed Strategies
         try seedStrategies(context: modelContext)
     }
-    
+
     private struct SeedConfig {
         let id: String
         let name: String
@@ -90,32 +90,32 @@ public struct DatabaseSeeder {
         let id = config.id
         let descriptor = FetchDescriptor<EmotionCollection>(predicate: #Predicate { $0.id == id })
         let existingCount = try context.fetchCount(descriptor)
-        
+
         if existingCount > 0 {
             print("🌱 Collection '\(config.name)' already exists. Skipping.")
             return
         }
-        
+
         print("🌱 Seeding collection: \(config.name)...")
-        
+
         // Load JSON from Bundle
         // Try multiple paths to be robust
         var url = Bundle.module.url(forResource: config.filename, withExtension: "json", subdirectory: "Seeds")
-        
+
         if url == nil {
              // Fallback: try top level if flattened
              url = Bundle.module.url(forResource: config.filename, withExtension: "json")
         }
-    
+
         if url == nil {
              // Fallback: try Resources/Seeds explicitly
              url = Bundle.module.url(forResource: config.filename, withExtension: "json", subdirectory: "Resources/Seeds")
         }
-        
+
         guard let validUrl = url else {
             throw SeedingError.fileNotFound("\(config.filename).json in Bundle: \(Bundle.module.bundlePath)")
         }
-        
+
         let data = try Data(contentsOf: validUrl)
         let collectionData: CollectionJSON
         do {
@@ -123,11 +123,11 @@ public struct DatabaseSeeder {
         } catch {
             throw SeedingError.decodingFailed(config.filename, error)
         }
-        
+
         // Create Collection
         let collection = EmotionCollection(id: config.id, name: config.name, desc: config.desc, isActive: config.isActive)
         context.insert(collection)
-        
+
         // Create Emotions
         for item in collectionData.emotions {
             let emotion = Emotion(
@@ -143,21 +143,21 @@ public struct DatabaseSeeder {
             emotion.collection = collection
             context.insert(emotion)
         }
-        
+
         try context.save()
         print("✅ Seeded \(collectionData.emotions.count) emotions into '\(config.name)'")
     }
     private static func seedStrategies(context: ModelContext) throws {
         let descriptor = FetchDescriptor<TransitionStrategy>()
         let count = try context.fetchCount(descriptor)
-        
+
         if count > 0 {
             print("🌱 Strategies already seeded. Skipping.")
             return
         }
-        
+
         print("🌱 Seeding core strategies...")
-        
+
         let strategies = [
             TransitionStrategy(
                 name: "Box Breathing",
@@ -196,11 +196,11 @@ public struct DatabaseSeeder {
                 evidenceLevel: .rct
             )
         ]
-        
+
         for strategy in strategies {
             context.insert(strategy)
         }
-        
+
         try context.save()
         print("✅ Seeded \(strategies.count) strategies.")
     }

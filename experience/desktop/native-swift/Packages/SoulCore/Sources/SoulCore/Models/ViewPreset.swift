@@ -8,18 +8,18 @@ public final class ViewPreset {
     @Attribute(.unique) public var id: UUID
     public var name: String
     public var createdAt: Date
-    
+
     // Vibe State (Flattened for SwiftData stability)
     public var valence: Double
     public var arousal: Double
     public var connection: Double
-    
+
     // Visual Configuration
     public var visualModeRaw: String // e.g., "liquid", "particles"
-    
+
     // Context
     public var targetEmotionId: UUID?
-    
+
     public init(
         id: UUID = UUID(),
         name: String,

@@ -13,10 +13,10 @@ public final class UserJourney {
     public var status: JourneyStatus
     public var startedAt: Date
     public var completedAt: Date?
-    
+
     // Metadata for analytics
     public var context: String?
-    
+
     public init(
         id: UUID = UUID(),
         startEmotion: Emotion?,
@@ -47,10 +47,10 @@ public final class JourneyWaypoint {
     public var isReached: Bool
     public var reachedAt: Date?
     public var strategiesTried: [String] // IDs or names of strategies used
-    
+
     // Inverse relationship (optional, but good for navigation)
     @Relationship(inverse: \UserJourney.waypoints) public var journey: UserJourney?
-    
+
     public init(
         id: UUID = UUID(),
         orderIndex: Int,

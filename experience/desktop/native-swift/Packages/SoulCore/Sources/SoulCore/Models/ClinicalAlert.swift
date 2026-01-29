@@ -12,7 +12,7 @@ public final class ClinicalAlert {
     public var triggerKeyword: String
     public var context: String // Surrounding text or state
     public var isResolved: Bool
-    
+
     public init(
         id: UUID = UUID(),
         timestamp: Date = Date(),

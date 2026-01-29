@@ -7,9 +7,9 @@ import SwiftData
 @available(macOS 14, iOS 17, *)
 public struct AnalyticsView: View {
     @State private var selectedSession: SessionAnalytics?
-    
+
     public init() {}
-    
+
     public var body: some View {
         NavigationSplitView {
             HistorySessionList(selectedSession: $selectedSession)
@@ -28,11 +28,11 @@ public struct AnalyticsView: View {
 public struct HistorySessionList: View {
     @Query(sort: \SessionAnalytics.startTime, order: .reverse) private var sessions: [SessionAnalytics]
     @Binding var selectedSession: SessionAnalytics?
-    
+
     public init(selectedSession: Binding<SessionAnalytics?>) {
         self._selectedSession = selectedSession
     }
-    
+
     public var body: some View {
         List(selection: $selectedSession) {
             ForEach(sessions) { session in
@@ -52,7 +52,7 @@ public struct HistorySessionList: View {
             }
         }
     }
-    
+
     func formatDuration(_ interval: TimeInterval) -> String {
         let formatter = DateComponentsFormatter()
         formatter.allowedUnits = [.minute, .second]
@@ -65,23 +65,23 @@ public struct HistorySessionList: View {
 public struct HistorySessionDetail: View {
     let session: SessionAnalytics
     @State private var showReplay = false
-    
+
     // Derived metrics
     var metrics: [SessionAnalytics.SessionMetric] {
         session.getMetrics()
     }
-    
+
     public var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 24) {
-                
+
                 // Header & Actions
                 HStack {
                     Text("Details")
                         .font(.title2.bold())
-                    
+
                     Spacer()
-                    
+
                     Button(action: { showReplay = true }, label: {
                         Label("Replay Session", systemImage: "play.fill")
                     })
@@ -90,16 +90,16 @@ public struct HistorySessionDetail: View {
                     .disabled(metrics.isEmpty)
                 }
                 .padding(.bottom, 8)
-                
+
                 // Summary Cards
                 HStack(spacing: 16) {
                     MetricCard(title: "Duration", value: formatDuration(session.duration), icon: "clock")
                     MetricCard(title: "Interactions", value: "\(session.messageCount)", icon: "bubble.left.and.bubble.right")
                     MetricCard(title: "End Vibe", value: String(format: "V:%.1f", session.endValence ?? session.startValence), icon: "face.smiling")
                 }
-                
+
                 Divider()
-                
+
                 if metrics.isEmpty {
                     ContentUnavailableView("No Data Points", systemImage: "waveform.path.ecg", description: Text("This session has no recorded time-series data."))
                 } else {
@@ -107,7 +107,7 @@ public struct HistorySessionDetail: View {
                     VStack(alignment: .leading, spacing: 8) {
                         Label("Emotional Journey (Valence)", systemImage: "brain.head.profile")
                             .font(.headline)
-                        
+
                         Chart(metrics) { point in
                             LineMark(
                                 x: .value("Time", point.timestamp),
@@ -115,7 +115,7 @@ public struct HistorySessionDetail: View {
                             )
                             .foregroundStyle(Color.blue.gradient)
                             .interpolationMethod(.catmullRom)
-                            
+
                             AreaMark(
                                 x: .value("Time", point.timestamp),
                                 y: .value("Valence", point.valence)
@@ -128,12 +128,12 @@ public struct HistorySessionDetail: View {
                     }
                     .padding()
                     .background(RoundedRectangle(cornerRadius: 16).fill(.white.opacity(0.05)))
-                    
+
                     VStack(alignment: .leading, spacing: 8) {
                         Label("Biometric Response (Heart Rate)", systemImage: "heart.fill")
                             .font(.headline)
                             .foregroundStyle(.pink)
-                        
+
                         Chart(metrics) { point in
                             LineMark(
                                 x: .value("Time", point.timestamp),
@@ -147,12 +147,12 @@ public struct HistorySessionDetail: View {
                     }
                     .padding()
                     .background(RoundedRectangle(cornerRadius: 16).fill(.white.opacity(0.05)))
-                    
+
                     // Arousal vs Heart Rate Correlation
                     VStack(alignment: .leading, spacing: 8) {
                         Label("Arousal vs Heart Rate", systemImage: "bolt.fill")
                             .font(.headline)
-                        
+
                         Chart(metrics) { point in
                             PointMark(
                                 x: .value("Arousal", point.arousal),
@@ -177,7 +177,7 @@ public struct HistorySessionDetail: View {
                 #endif
         }
     }
-    
+
     func formatDuration(_ interval: TimeInterval) -> String {
         let formatter = DateComponentsFormatter()
         formatter.allowedUnits = [.minute, .second]
@@ -190,7 +190,7 @@ struct MetricCard: View {
     let title: String
     let value: String
     let icon: String
-    
+
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
             HStack {
@@ -199,7 +199,7 @@ struct MetricCard: View {
             }
             .font(.caption)
             .foregroundStyle(.secondary)
-            
+
             Text(value)
                 .font(.title2.bold())
         }

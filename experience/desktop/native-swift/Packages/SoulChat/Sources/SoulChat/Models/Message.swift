@@ -8,18 +8,18 @@ final public class Message {
     public var text: String
     public var timestamp: Date
     public var isUser: Bool
-    
+
     // Optional: Snapshot of the vibe at this moment
     public var valence: Double
     public var arousal: Double
     public var connection: Double
-    
+
     public init(text: String, isUser: Bool, vibe: Vibe? = nil) {
         self.id = UUID()
         self.text = text
         self.timestamp = Date()
         self.isUser = isUser
-        
+
         if let v = vibe {
             self.valence = v.valence
             self.arousal = v.arousal

@@ -8,37 +8,37 @@ import SwiftData
 public struct JourneyActiveView: View {
     @Environment(\.dismiss) var dismiss
     @Environment(\.modelContext) var modelContext
-    
+
     let startEmotion: Emotion
     let goalEmotion: Emotion
     var onStrategyStart: (TransitionStrategy) -> Void
     var onStrategyComplete: (TransitionStrategy) -> Void
-    
+
     @State private var path: [Emotion] = []
     @State private var currentStepIndex: Int = 0
     @State private var isCalculating: Bool = true
     @State private var activeStrategy: TransitionStrategy?
     @Query var allEmotions: [Emotion]
     @Query var patterns: [TransitionPattern] // Needed for Pathfinder? Yes.
-    
+
     public init(start: Emotion, goal: Emotion, onStrategyStart: @escaping (TransitionStrategy) -> Void = { _ in }, onStrategyComplete: @escaping (TransitionStrategy) -> Void = { _ in }) {
         self.startEmotion = start
         self.goalEmotion = goal
         self.onStrategyStart = onStrategyStart
         self.onStrategyComplete = onStrategyComplete
     }
-    
+
     public var body: some View {
         ZStack {
             // Background (Dynamic Gradient based on current step)
             backgroundLayer
-            
+
             VStack(spacing: 0) {
                 // Header / Progress
                 progressHeader
                     .padding(.top, 20)
                     .padding(.bottom, 20)
-                
+
                 if isCalculating {
                     ProgressView("Calculating Path...")
                         .tint(.white)
@@ -56,7 +56,7 @@ public struct JourneyActiveView: View {
                     // Main Content
                     mainContentView
                 }
-                
+
                 Spacer()
             }
         }
@@ -64,13 +64,13 @@ public struct JourneyActiveView: View {
             calculatePath()
         }
     }
-    
+
     // MARK: - Subviews
-    
+
     private var backgroundLayer: some View {
         GeometryReader { proxy in
             let currentEmotion = path.indices.contains(currentStepIndex) ? path[currentStepIndex] : startEmotion
-            
+
             RadialGradient(
                 colors: [
                     Color(hue: Double(currentEmotion.valence + 1) / 2, saturation: 0.6, brightness: 0.2),
@@ -84,9 +84,9 @@ public struct JourneyActiveView: View {
             .animation(.easeInOut(duration: 1.0), value: currentStepIndex)
         }
     }
-    
+
     @Query var strategies: [TransitionStrategy] // Load all strategies
-    
+
     private var progressHeader: some View {
         VStack(spacing: 12) {
             HStack {
@@ -103,13 +103,13 @@ public struct JourneyActiveView: View {
                 }
             }
             .padding(.horizontal)
-            
+
             // Progress Bar
             GeometryReader { geo in
                 ZStack(alignment: .leading) {
                     Capsule().fill(.white.opacity(0.1))
                         .frame(height: 6)
-                    
+
                     if !path.isEmpty {
                         let progress = CGFloat(currentStepIndex) / CGFloat(path.count - 1)
                         Capsule().fill(Color.blue)
@@ -122,7 +122,7 @@ public struct JourneyActiveView: View {
             .padding(.horizontal)
         }
     }
-    
+
     private var mainContentView: some View {
         TabView(selection: $currentStepIndex) {
             ForEach(Array(path.enumerated()), id: \.offset) { index, emotion in
@@ -133,12 +133,12 @@ public struct JourneyActiveView: View {
                             .font(.caption.bold())
                             .foregroundStyle(.white.opacity(0.5))
                             .tracking(2)
-                        
+
                         Text(emotion.name)
                             .font(.system(size: 42, weight: .bold, design: .serif))
                             .foregroundStyle(.white)
                             .shadow(color: .white.opacity(0.3), radius: 10)
-                        
+
                         Text(emotion.category) // Assuming Category is a string
                              .font(.title3)
                              .foregroundStyle(.white.opacity(0.7))
@@ -148,14 +148,14 @@ public struct JourneyActiveView: View {
                              .clipShape(Capsule())
                     }
                     .padding(.top, 40)
-                    
+
                     // Strategy Suggestion (Real Logic)
                     if index < path.count - 1 {
                         VStack(spacing: 16) {
                             Text("Recommended Strategy")
                                 .font(.subheadline)
                                 .foregroundStyle(.white.opacity(0.6))
-                            
+
                             // Dynamically suggest strategy
                             if let strategy = StrategyEngine.suggestStrategy(
                                 from: emotion,
@@ -187,11 +187,11 @@ public struct JourneyActiveView: View {
                             Image(systemName: "checkmark.seal.fill")
                                 .font(.system(size: 64))
                                 .foregroundStyle(.green)
-                            
+
                             Text("You have arrived.")
                                 .font(.title2)
                                 .foregroundStyle(.white)
-                            
+
                             Button("Complete Session") {
                                 dismiss()
                             }
@@ -205,12 +205,12 @@ public struct JourneyActiveView: View {
         }
         .tabViewStyle(.automatic) // Page style unavailable on macOS
     }
-    
+
     // MARK: - Logic
-    
+
     private func calculatePath() {
         isCalculating = true
-        
+
         // Run on background thread
         DispatchQueue.global(qos: .userInitiated).async {
             // Need to fetch TransitionPattern models from SwiftData on main thread if passing to Pathfinder?
@@ -218,7 +218,7 @@ public struct JourneyActiveView: View {
             // Pathfinder needs [Emotion] and [TransitionPattern].
             // SwiftData objects are not thread safe.
             // For MVP, lets just run on main thread if dataset is small (< 1000 items).
-            
+
             DispatchQueue.main.async {
                 let foundPath = EmotionalPathfinder.findPath(
                     from: startEmotion,
@@ -226,7 +226,7 @@ public struct JourneyActiveView: View {
                     using: allEmotions,
                     patterns: patterns // Pass in the patterns
                 )
-                
+
                 withAnimation {
                     self.path = foundPath ?? []
                     self.isCalculating = false
@@ -234,7 +234,7 @@ public struct JourneyActiveView: View {
             }
         }
     }
-    
+
     private func advanceStep() {
         if currentStepIndex < path.count - 1 {
             withAnimation(.spring(response: 0.5, dampingFraction: 0.7)) {

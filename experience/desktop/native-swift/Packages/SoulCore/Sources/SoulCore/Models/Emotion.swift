@@ -10,18 +10,18 @@ public final class Emotion {
     public var name: String
     public var definition: String
     public var category: String
-    
+
     // VAC Vector (Valance, Arousal, Connection)
     public var valence: Double
     public var arousal: Double
     public var connection: Double
-    
+
     // UI Hints
     public var colorHint: String? // Hex e.g., "#FF0000"
     public var hapticHint: String? // e.g., "HEAVY_THROB"
-    
+
     @Relationship public var collection: EmotionCollection?
-    
+
     public init(
         id: UUID = UUID(),
         name: String,
@@ -43,12 +43,12 @@ public final class Emotion {
         self.colorHint = colorHint
         self.hapticHint = hapticHint
     }
-    
+
     /// Converts this storage model to a lightweight Vibe struct for math operations
     public var vibe: Vibe {
         Vibe(valence: valence, arousal: arousal, connection: connection)
     }
-    
+
     /// Returns the quaternion representation of this emotion's VAC state.
     public var quaternion: simd_quatf {
         SoulMath.VACVector(valence: Float(valence), arousal: Float(arousal), connection: Float(connection)).toQuaternion()

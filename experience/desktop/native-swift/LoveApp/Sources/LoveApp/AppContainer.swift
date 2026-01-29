@@ -6,12 +6,12 @@ import SwiftData
 
 struct AppContainer: View {
     @EnvironmentObject var deps: DependencyContainer
-    
+
     var body: some View {
         ZStack {
             // LAYER 1: The Void (Background)
             Color.black.ignoresSafeArea()
-            
+
             // LAYER 2: Admin Dashboard & Visualization
             // This replaces the simple VibeOrb background with the full 3D Admin Interface
             // LAYER 2: Admin Dashboard & Visualization
@@ -42,7 +42,7 @@ struct AppContainer: View {
                 }
             )
             .ignoresSafeArea()
-            
+
             // LAYER 3: Main Content (Grounded)
             // Overlay ChatView removed - now integrated into AdminDashboardView's "Chat" tab.
             VStack {
@@ -50,7 +50,7 @@ struct AppContainer: View {
             }
         }
     }
-    
+
     func toggleMic() {
         if deps.isMicRecording {
             deps.stopListening()
@@ -64,7 +64,7 @@ struct AppContainer: View {
     // Mock Context
     let config = ModelConfiguration(isStoredInMemoryOnly: true)
     let container = try! ModelContainer(for: EmotionCollection.self, Emotion.self, configurations: config)
-    
+
     return AppContainer()
         .environmentObject(DependencyContainer(context: container.mainContext))
 }

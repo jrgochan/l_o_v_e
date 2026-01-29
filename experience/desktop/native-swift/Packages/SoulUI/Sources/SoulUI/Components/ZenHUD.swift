@@ -7,14 +7,14 @@ public struct ZenHUD: View {
     var hoveredEmotion: String?
     var activePath: [String] = []
     @Binding var visualMode: VisualMode // NEW: Binding for mutation
-    
+
     public init(selectedEmotion: String? = nil, hoveredEmotion: String? = nil, activePath: [String] = [], visualMode: Binding<VisualMode>) {
         self.selectedEmotion = selectedEmotion
         self.hoveredEmotion = hoveredEmotion
         self.activePath = activePath
         self._visualMode = visualMode
     }
-    
+
     public var body: some View {
         HStack(spacing: 16) {
             if !activePath.isEmpty {
@@ -28,7 +28,7 @@ public struct ZenHUD: View {
                             .font(.caption2.bold())
                             .foregroundStyle(.secondary)
                     }
-                    
+
                     HStack(spacing: 0) {
                         Text(activePath.first ?? "?")
                         Text(" → ")
@@ -37,10 +37,10 @@ public struct ZenHUD: View {
                     }
                     .font(.headline)
                 }
-                
+
                 Divider()
                     .frame(height: 32)
-                
+
                 HStack {
                     Text("\(activePath.count)")
                         .font(.title2.bold().monospaced())
@@ -48,14 +48,14 @@ public struct ZenHUD: View {
                         .font(.caption2)
                         .foregroundStyle(.secondary)
                 }
-                
+
             } else if let emotion = hoveredEmotion ?? selectedEmotion {
                  // Hover or Selection Mode
                  VStack(alignment: .leading, spacing: 4) {
                      Text(emotion.uppercased())
                          .font(.system(size: 16, weight: .bold))
                          .kerning(2)
-                     
+
                      Text("EMOTIONAL STATE")
                          .font(.caption2)
                          .foregroundStyle(.secondary)

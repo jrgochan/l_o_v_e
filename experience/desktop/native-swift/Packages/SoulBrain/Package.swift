@@ -23,7 +23,7 @@ let package = Package(
         .target(
             name: "SoulBrain",
             dependencies: [
-                "SoulCore", 
+                "SoulCore",
                 .product(name: "MLX", package: "mlx-swift"),
                 .product(name: "MLXRandom", package: "mlx-swift"),
                 .product(name: "MLXNN", package: "mlx-swift"),

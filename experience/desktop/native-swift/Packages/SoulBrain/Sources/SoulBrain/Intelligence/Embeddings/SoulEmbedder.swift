@@ -11,18 +11,18 @@ public protocol Embedder: Sendable {
 /// Generates deterministic random vectors based on input string hash.
 public actor MockEmbedder: Embedder {
     public init() {}
-    
+
     public func load() async throws {
         // No-op for mock
     }
-    
+
     public func embed(_ text: String) async throws -> [Float] {
         // Basic deterministic generation for testing match stability.
         // real dims = 768 usually (BERT base)
-        
+
         let seed = UInt64(abs(text.hashValue))
         var generator = SplitMix64(state: seed)
-        
+
         return (0..<768).map { _ in
             // Normalize to small range [-1, 1]
             Float(Double(generator.next()) / Double(UInt64.max) * 2 - 1)

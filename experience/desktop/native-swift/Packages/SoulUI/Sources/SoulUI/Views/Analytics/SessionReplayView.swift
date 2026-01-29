@@ -8,37 +8,37 @@ import SoulChat // NEW import for Message model
 public struct SessionReplayView: View {
     let session: SessionAnalytics
     @StateObject private var engine: PlaybackEngine
-    
+
     // Dummy bindings for SoulView (visual settings only)
     @State private var selectedEmotion: String?
     @State private var hoveredEmotion: String?
     @State private var showParticles: Bool = true
     @State private var showLiquid: Bool = true
     @State private var visualMode: VisualMode = .mystical
-    
+
     // Query for SoulView context
     @Query private var emotions: [Emotion]
     @Environment(\.modelContext) private var context
-    
+
     @State private var sessionMessages: [Message] = []
-    
+
     public init(session: SessionAnalytics) {
         self.session = session
         _engine = StateObject(wrappedValue: PlaybackEngine(session: session))
     }
-    
+
     public var body: some View {
         ZStack {
             // Background
             Color.black.ignoresSafeArea()
-            
+
             // The Nebula - Driven by Engine
             SoulView(
                 vibe: $engine.currentVibe,
                 emotions: emotions,
                 selectedEmotion: $selectedEmotion,
                 hoveredEmotion: $hoveredEmotion,
-                splinePoints: [], 
+                splinePoints: [],
                 playSequence: .constant(false),
                 showParticles: $showParticles,
                 showLiquid: $showLiquid,
@@ -46,7 +46,7 @@ public struct SessionReplayView: View {
             )
             .ignoresSafeArea()
             .animation(.linear(duration: 0.1), value: engine.currentVibe.valence) // Smooth the ticks
-            
+
             // Overlay Controls
             VStack {
                 // Header
@@ -62,9 +62,9 @@ public struct SessionReplayView: View {
                     Spacer()
                 }
                 .padding()
-                
+
                 Spacer()
-                
+
                 // Playback Bar
                 VStack(spacing: 12) {
                     // Time Labels
@@ -77,7 +77,7 @@ public struct SessionReplayView: View {
                     }
                     .font(.caption2)
                     .foregroundStyle(.white.opacity(0.6))
-                    
+
                     // Timeline with Markers
                     ZStack(alignment: .leading) {
                         // Markers
@@ -86,10 +86,10 @@ public struct SessionReplayView: View {
                                 if session.timeSeriesData != nil, // Ensure series exists
                                    let totalDuration = session.endTime?.timeIntervalSince(session.startTime),
                                    totalDuration > 0 {
-                                    
+
                                     let offset = msg.timestamp.timeIntervalSince(session.startTime)
                                     let progress = offset / totalDuration
-                                    
+
                                     if progress >= 0 && progress <= 1 {
                                         Circle()
                                             .fill(msg.isUser ? Color.blue : Color.purple)
@@ -103,19 +103,19 @@ public struct SessionReplayView: View {
                             }
                         }
                         .frame(height: 20)
-                        
+
                         // Scrubber
                         Slider(value: $engine.progress, in: 0...1) { editing in
                             if editing { engine.pause() }
                         }
-                        .onChange(of: engine.progress) { _, newValue in 
+                        .onChange(of: engine.progress) { _, newValue in
                              if !engine.isPlaying {
                                  engine.seek(to: newValue)
                              }
                         }
                         .tint(.white)
                     }
-                    
+
                     // Controls
                     HStack(spacing: 40) {
                         Button {
@@ -124,14 +124,14 @@ public struct SessionReplayView: View {
                             Image(systemName: "backward.end.fill")
                                 .font(.title2)
                         }
-                        
+
                         Button {
                             engine.togglePlay()
                         } label: {
                             Image(systemName: engine.isPlaying ? "pause.circle.fill" : "play.circle.fill")
                                 .font(.system(size: 44))
                         }
-                        
+
                         Button {
                            // No-op forward
                         } label: {
@@ -153,16 +153,16 @@ public struct SessionReplayView: View {
             fetchMessages()
         }
     }
-    
+
     private func fetchMessages() {
         let start = session.startTime
         let end = session.endTime ?? Date()
-        
+
         let descriptor = FetchDescriptor<Message>(
             predicate: #Predicate { $0.timestamp >= start && $0.timestamp <= end },
             sortBy: [SortDescriptor(\.timestamp)]
         )
-        
+
         do {
             self.sessionMessages = try context.fetch(descriptor)
         } catch {

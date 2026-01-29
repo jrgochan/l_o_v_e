@@ -10,10 +10,10 @@ public final class EmotionCollection {
     public var name: String // e.g., "Atlas of the Heart"
     public var desc: String // "Brené Brown's framework..."
     public var isActive: Bool
-    
+
     @Relationship(deleteRule: .cascade, inverse: \Emotion.collection)
     public var emotions: [Emotion]?
-    
+
     public init(id: String, name: String, desc: String, isActive: Bool = false) {
         self.id = id
         self.name = name
