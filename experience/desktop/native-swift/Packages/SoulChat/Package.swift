@@ -14,7 +14,8 @@ let package = Package(
         )
     ],
     dependencies: [
-        .package(path: "../SoulCore")
+        .package(path: "../SoulCore"),
+        .package(url: "https://github.com/nalexn/ViewInspector", from: "0.9.11")
     ],
     targets: [
         .target(
@@ -23,7 +24,7 @@ let package = Package(
         ),
         .testTarget(
             name: "SoulChatTests",
-            dependencies: ["SoulChat"]
+            dependencies: ["SoulChat", "ViewInspector"]
         )
     ]
 )

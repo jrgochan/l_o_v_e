@@ -67,6 +67,8 @@ test:
 	@$(SWIFT) test --package-path Packages/SoulChat
 	@echo "  • SoulUI..."
 	@$(SWIFT) test --package-path Packages/SoulUI
+	@echo "  • LoveApp..."
+	@$(SWIFT) test --package-path LoveApp
 
 # ------------------------------
 # 🧹 Linting & Formatting

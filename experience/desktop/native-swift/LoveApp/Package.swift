@@ -18,7 +18,8 @@ let package = Package(
         .package(path: "../Packages/SoulBrain"),
         .package(path: "../Packages/SoulBio"),
         .package(path: "../Packages/SoulVoice"),
-        .package(path: "../Packages/SoulChat")
+        .package(path: "../Packages/SoulChat"),
+        .package(url: "https://github.com/nalexn/ViewInspector", from: "0.9.11")
     ],
     targets: [
         .target(
@@ -31,6 +32,10 @@ let package = Package(
                 "SoulVoice",
                 "SoulChat"
             ]
+        ),
+        .testTarget(
+            name: "LoveAppFeatureTests",
+            dependencies: ["LoveAppFeature", "SoulUI", "ViewInspector"]
         ),
         .executableTarget(
             name: "LoveApp",

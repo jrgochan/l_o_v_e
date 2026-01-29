@@ -20,7 +20,8 @@ let package = Package(
         .package(path: "../SoulBrain"),
         .package(path: "../SoulChat"),
         .package(path: "../SoulVoice"),
-        .package(path: "../SoulBio")
+        .package(path: "../SoulBio"),
+        .package(url: "https://github.com/nalexn/ViewInspector", from: "0.9.11")
     ],
     targets: [
         .target(
@@ -37,7 +38,7 @@ let package = Package(
         ),
         .testTarget(
             name: "SoulUITests",
-            dependencies: ["SoulUI"]
+            dependencies: ["SoulUI", "ViewInspector"]
         )
     ]
 )
