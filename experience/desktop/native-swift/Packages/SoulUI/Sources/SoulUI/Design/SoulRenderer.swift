@@ -271,6 +271,7 @@ public class SoulRenderer: NSObject, MTKViewDelegate {
             updateBlock(labels)
         }
     }
+}
 
 // MARK: - Matrix Helpers
 internal func makePerspectiveMatrix(fovyDegrees: Float, aspectRatio: Float, nearZ: Float, farZ: Float) -> matrix_float4x4 {
