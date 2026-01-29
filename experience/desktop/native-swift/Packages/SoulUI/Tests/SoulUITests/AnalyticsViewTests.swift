@@ -8,7 +8,7 @@ import SwiftData
 @available(macOS 14, iOS 17, *)
 @MainActor
 final class AnalyticsViewTests: XCTestCase {
-    
+
     var container: ModelContainer!
 
     override func setUp() async throws {
@@ -22,7 +22,7 @@ final class AnalyticsViewTests: XCTestCase {
 
         // Verify NavigationSplitView
         XCTAssertNoThrow(try sut.inspect().find(ViewType.NavigationSplitView.self))
-        
+
         // Verify HistorySessionList
         XCTAssertNoThrow(try sut.inspect().find(HistorySessionList.self))
     }

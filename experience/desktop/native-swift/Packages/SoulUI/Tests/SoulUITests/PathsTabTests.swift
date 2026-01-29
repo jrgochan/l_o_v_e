@@ -8,7 +8,7 @@ import SwiftData
 @available(macOS 14, iOS 17, *)
 @MainActor
 final class PathsTabTests: XCTestCase {
-    
+
     var container: ModelContainer!
 
     override func setUp() async throws {
@@ -20,14 +20,14 @@ final class PathsTabTests: XCTestCase {
     func testPathsTabForm() throws {
         let computed = Binding<[String]>(wrappedValue: [])
         let playing = Binding<Bool>(wrappedValue: false)
-        
+
         let sut = PathsTab(emotions: [], computedPath: computed, isPlayingPath: playing)
             .modelContainer(container)
 
         // Verify structure
         XCTAssertNoThrow(try sut.inspect().vStack())
         XCTAssertNoThrow(try sut.inspect().find(text: "Create Journey"))
-        
+
         // Verify Buttons exist
         XCTAssertNoThrow(try sut.inspect().find(button: "Generate Path"))
     }

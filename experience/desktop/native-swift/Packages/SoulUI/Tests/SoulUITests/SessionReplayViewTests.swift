@@ -9,7 +9,7 @@ import SwiftData
 @available(macOS 14, iOS 17, *)
 @MainActor
 final class SessionReplayViewTests: XCTestCase {
-    
+
     var container: ModelContainer!
 
     override func setUp() async throws {
@@ -22,15 +22,15 @@ final class SessionReplayViewTests: XCTestCase {
         let session = SessionAnalytics(startTime: Date(), startValence: 0.5, startArousal: 0.5)
         session.endTime = Date().addingTimeInterval(60)
         session.messageCount = 10
-        
+
         container.mainContext.insert(session)
-        
+
         let sut = SessionReplayView(session: session)
             .modelContainer(container)
 
         // Verify Controls
         XCTAssertNoThrow(try sut.inspect().find(text: "Replay"))
-        
+
         // Verify Slider
         XCTAssertNoThrow(try sut.inspect().find(ViewType.Slider.self))
     }

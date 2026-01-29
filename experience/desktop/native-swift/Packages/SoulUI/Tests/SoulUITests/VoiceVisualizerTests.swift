@@ -5,6 +5,7 @@ import ViewInspector
 @testable import SoulCore
 
 @available(macOS 14, iOS 17, *)
+@MainActor
 final class VoiceVisualizerTests: XCTestCase {
 
     func testVoiceVisualizerBars() throws {
@@ -20,13 +21,13 @@ final class VoiceVisualizerTests: XCTestCase {
     func testVoiceVisualizerLogic() throws {
         let sut = VoiceVisualizer(audioLevel: 1.0)
         let bars = try sut.inspect().hStack().forEach(0)
-        
+
         // Verify center bar (index 2) is tallest
-        // We can't easily get the exact frame without a layout pass, 
+        // We can't easily get the exact frame without a layout pass,
         // but we can verify the view structure construction.
         // Let's verify we have 5 bars.
         XCTAssertEqual(bars.count, 5)
-        
+
         // Let's verify the animation modifier exists on the first bar
         // Note: ViewInspector access to modifiers is typed.
         // We verify that the first bar is a ShapeView with an animation.

@@ -134,5 +134,3 @@ public struct ChatView: View {
         onSend?(text)
     }
 }
-
-

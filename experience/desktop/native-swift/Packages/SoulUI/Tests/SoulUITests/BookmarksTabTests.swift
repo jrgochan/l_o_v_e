@@ -8,7 +8,7 @@ import SwiftData
 @available(macOS 14, iOS 17, *)
 @MainActor
 final class BookmarksTabTests: XCTestCase {
-    
+
     var container: ModelContainer!
 
     override func setUp() async throws {
@@ -24,7 +24,7 @@ final class BookmarksTabTests: XCTestCase {
         // ViewInspector v0.9.11+ supports ContentUnavailableView inspection
         // If not, we look for the Text directly.
         XCTAssertNoThrow(try sut.inspect().find(text: "No Bookmarks"))
-        
+
         // Use ViewInspector specific find approach for ContentUnavailable if needed, 
         // but text search is robust.
     }

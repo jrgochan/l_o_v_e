@@ -8,7 +8,7 @@ import SwiftData
 @available(macOS 14, iOS 17, *)
 @MainActor
 final class JourneyTabRootTests: XCTestCase {
-    
+
     var container: ModelContainer!
 
     override func setUp() async throws {
@@ -22,7 +22,7 @@ final class JourneyTabRootTests: XCTestCase {
 
         // Verify NavigationStack exists
         XCTAssertNoThrow(try sut.inspect().find(ViewType.NavigationStack.self))
-        
+
         // Initial state should show GoalSelectionView
         XCTAssertNoThrow(try sut.inspect().find(GoalSelectionView.self))
     }

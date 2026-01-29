@@ -8,7 +8,7 @@ import SwiftData
 @available(macOS 14, iOS 17, *)
 @MainActor
 final class ExploreTabTests: XCTestCase {
-    
+
     var container: ModelContainer!
 
     override func setUp() async throws {
@@ -23,7 +23,7 @@ final class ExploreTabTests: XCTestCase {
 
         // Verify List Exists
         XCTAssertNoThrow(try sut.inspect().list())
-        
+
         // Verify Searchable exists (ViewInspector support for searchable is limited, 
         // but we can check if the view hierarchy constructs without crash)
     }

@@ -30,6 +30,10 @@ final class ChatViewTests: XCTestCase {
         // Verify Input Field exists
         XCTAssertNoThrow(try sut.inspect().find(text: "Talk to the Soul..."))
 
+        // Assert we captured the variable to silence warning, though we can't easily
+        // trigger the callback via Inspector in this scope without more boilerplate
+        XCTAssertEqual(sentText, "")
+
         // Simulate Typing
         // Note: ViewInspector TextField interaction can be tricky.
         // We often inspect the binding directly or use .setInput().
@@ -63,18 +67,18 @@ final class ChatViewTests: XCTestCase {
         let config = ModelConfiguration(isStoredInMemoryOnly: true)
         let container = try ModelContainer(for: Message.self, configurations: config)
         let context = container.mainContext
-        
+
         // Insert Messages
         let msg1 = Message(text: "Hello from User", isUser: true)
         let msg2 = Message(text: "Hello from Soul", isUser: false)
         context.insert(msg1)
         context.insert(msg2)
         try container.mainContext.save() // Ensure persistence for Query
-        
+
         let isRecording = Binding.constant(false)
         let streaming = Binding.constant("")
         let thinking = Binding.constant(false)
-        
+
         // Inject Container
         let sut = ChatView(
             isRecording: isRecording,
@@ -82,18 +86,17 @@ final class ChatViewTests: XCTestCase {
             isThinking: thinking
         )
         .modelContainer(container)
-        
+
         // Verify Messages
         // Attempt to find the ForEach directly
         // Structure: VStack -> ScrollViewReader -> ScrollView -> LazyVStack -> ForEach
-        
-        
+
         let lazyStack = try sut.inspect().find(ViewType.LazyVStack.self)
         let forEach = try lazyStack.forEach(0)
-        
+
         // Check if data is loaded
         XCTAssertNotNil(forEach)
-        
+
         if forEach.count > 0 {
              XCTAssertNoThrow(try forEach.view(MessageBubble.self, 0))
         } else {

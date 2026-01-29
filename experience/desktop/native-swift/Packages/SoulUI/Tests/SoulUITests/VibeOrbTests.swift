@@ -5,6 +5,7 @@ import ViewInspector
 @testable import SoulCore
 
 @available(macOS 14, iOS 17, *)
+@MainActor
 final class VibeOrbTests: XCTestCase {
 
     func testVibeOrbInit() throws {
@@ -13,7 +14,7 @@ final class VibeOrbTests: XCTestCase {
 
         // Verify ZStack structure
         XCTAssertNoThrow(try sut.inspect().zStack())
-        
+
         // IMPORTANT: We cannot deeply inspect `SoulView` (NSViewRepresentable) 
         // effectively in headless unit tests without booting Metal.
         // We verify the wrapper structure exists.
