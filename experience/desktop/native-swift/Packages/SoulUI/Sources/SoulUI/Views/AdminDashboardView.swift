@@ -128,7 +128,11 @@ public struct AdminDashboardView: View {
                 if let session = selectedSession {
                     HistorySessionDetail(session: session)
                 } else {
-                    ContentUnavailableView("Select a Session", systemImage: "chart.xyaxis.line", description: Text("View detailed analytics for past sessions."))
+                    ContentUnavailableView(
+                        "Select a Session",
+                        systemImage: "chart.xyaxis.line",
+                        description: Text("View detailed analytics for past sessions.")
+                    )
                 }
             } else {
                 ZStack {
@@ -136,7 +140,7 @@ public struct AdminDashboardView: View {
 
                 // Binding selectedEmotion here triggers the "flyTo" logic in SoulView if we wire it up
                 SoulView(vibe: $vibe,
-                         emotions: emotions.filter { $0.collection?.name == activeCollectionName }, // Pass Filtered Data
+                         emotions: emotions.filter { $0.collection?.name == activeCollectionName },
                          selectedEmotion: $selectedEmotion,
                          hoveredEmotion: $hoveredEmotion,
                          path: computedPath,
@@ -208,7 +212,11 @@ public struct AdminDashboardView: View {
         case .views:
              BookmarksTab(onSave: { savePreset() }, onRestore: { restorePreset($0) })
         case .explore:
-            ExploreTab(selectedEmotion: $selectedEmotion, activeCollectionName: activeCollectionName, onSearch: onSearch)
+            ExploreTab(
+                selectedEmotion: $selectedEmotion,
+                activeCollectionName: activeCollectionName,
+                onSearch: onSearch
+            )
         case .paths:
             PathsTab(emotions: emotions, computedPath: $computedPath, isPlayingPath: $isPlayingPath)
         case .chat:

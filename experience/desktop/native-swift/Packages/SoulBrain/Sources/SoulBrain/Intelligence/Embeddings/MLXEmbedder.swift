@@ -48,7 +48,11 @@ public actor MLXEmbedder: Embedder {
             // Lazy load or throw
             try await load()
             guard self.model != nil else {
-                throw NSError(domain: "Embedder", code: 500, userInfo: [NSLocalizedDescriptionKey: "Model failed to load"])
+                throw NSError(
+                    domain: "Embedder",
+                    code: 500,
+                    userInfo: [NSLocalizedDescriptionKey: "Model failed to load"]
+                )
             }
             return try await embed(text)
         }

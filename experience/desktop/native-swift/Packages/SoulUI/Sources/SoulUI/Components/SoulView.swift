@@ -27,7 +27,13 @@ class InteractiveMTKView: MTKView {
         }
 
         // Add .activeWhenFirstResponder maybe? Or just keep it simpler.
-        let options: NSTrackingArea.Options = [.activeInKeyWindow, .mouseMoved, .mouseEnteredAndExited, .inVisibleRect, .activeAlways]
+        let options: NSTrackingArea.Options = [
+            .activeInKeyWindow,
+            .mouseMoved,
+            .mouseEnteredAndExited,
+            .inVisibleRect,
+            .activeAlways
+        ]
         let trackingArea = NSTrackingArea(rect: self.bounds, options: options, owner: self, userInfo: nil)
         addTrackingArea(trackingArea)
     }

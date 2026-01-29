@@ -20,12 +20,14 @@ final class PlaybackEngineTests: XCTestCase {
         context.insert(session)
 
         // Add Metric at t=0: (0, 0)
-        let vibeStart = Vibe(timestamp: now, valence: 0.0, arousal: 0.0, connection: 0.5)
+        _ = Vibe(timestamp: now, valence: 0.0, arousal: 0.0, connection: 0.5)
         // We artificially force timestamp? No, addMetric uses Date().
         // We need to be careful with timestamps.
-        // Actually, SessionAnalytics.SessionMetric struct has public init? No, it's Codable/Identifiable struct inside SessionAnalytics.
+        // Actually, SessionAnalytics.SessionMetric struct has public init?
+        // No, it's Codable/Identifiable struct inside SessionAnalytics.
         // But addMetric() uses Date().
-        // To precisely control time, we might need to modify SessionAnalytics to allow injecting timestamp in addMetric, OR we construct the array manually and encode it (since it's public @Attribute).
+        // To precisely control time, we might need to modify SessionAnalytics
+        // to allow injecting timestamp in addMetric, OR we construct the array manually and encode it.
         // Since `SessionMetric` is public, we can just encode it manually.
 
         let startMetric = SessionAnalytics.SessionMetric(

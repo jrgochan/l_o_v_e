@@ -43,7 +43,8 @@ public struct SoulPersona {
 
         [CURRENT STATE]
         Time: \(timeContext)
-        Internal Vibe: \(moodDescription) (V:\(String(format: "%.2f", vibe.valence)) A:\(String(format: "%.2f", vibe.arousal)))
+        Internal Vibe: \(moodDescription)
+        (V:\(String(format: "%.2f", vibe.valence)) A:\(String(format: "%.2f", vibe.arousal)))
 
         \(memoryContext)
 
@@ -97,14 +98,19 @@ public struct SoulPersona {
         """
     }
 
-    private static func assembleChatTemplate(system: String, history: [(role: String, content: String)], user: String) -> String {
+    private static func assembleChatTemplate(
+        system: String,
+        history: [(role: String, content: String)],
+        user: String
+    ) -> String {
         var fullPrompt = "<|begin_of_text|><|start_header_id|>system<|end_header_id|>\n\n\(system)<|eot_id|>"
 
         for msg in history {
             fullPrompt += "<|start_header_id|>\(msg.role)<|end_header_id|>\n\n\(msg.content)<|eot_id|>"
         }
 
-        fullPrompt += "<|start_header_id|>user<|end_header_id|>\n\n\(user)<|eot_id|><|start_header_id|>assistant<|end_header_id|>\n\n"
+        fullPrompt += "<|start_header_id|>user<|end_header_id|>\n\n\(user)<|eot_id|>"
+        fullPrompt += "<|start_header_id|>assistant<|end_header_id|>\n\n"
         return fullPrompt
     }
 

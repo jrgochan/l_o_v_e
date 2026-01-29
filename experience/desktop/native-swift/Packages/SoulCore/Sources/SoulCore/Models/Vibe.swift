@@ -26,7 +26,11 @@ public struct Vibe: Codable, Sendable {
 
     /// Returns the quaternion representation of this Vibe.
     public var quaternion: simd_quatf {
-        SoulMath.VACVector(valence: Float(valence), arousal: Float(arousal), connection: Float(connection)).toQuaternion()
+        SoulMath.VACVector(
+            valence: Float(valence),
+            arousal: Float(arousal),
+            connection: Float(connection)
+        ).toQuaternion()
     }
 
     public static var neutral: Vibe {

@@ -196,7 +196,12 @@ extension SoulRenderer {
         guard viewportSize.width > 0 && viewportSize.height > 0 else { return nil }
 
         let aspect = Float(viewportSize.width / viewportSize.height)
-        let proj = makePerspectiveMatrix(fovyDegrees: camera.fov, aspectRatio: aspect, nearZ: camera.near, farZ: camera.far)
+        let proj = makePerspectiveMatrix(
+            fovyDegrees: camera.fov,
+            aspectRatio: aspect,
+            nearZ: camera.near,
+            farZ: camera.far
+        )
         let view = makeLookAtMatrix(eye: camera.position, center: camera.target, up: camera.up)
 
         let pos4 = SIMD4<Float>(position.x, position.y, position.z, 1.0)
@@ -241,7 +246,12 @@ extension SoulRenderer {
 
         // Inverse Projection Space
         let aspect = Float(viewport.width / viewport.height)
-        let projIdx = makePerspectiveMatrix(fovyDegrees: camera.fov, aspectRatio: aspect, nearZ: camera.near, farZ: camera.far)
+        let projIdx = makePerspectiveMatrix(
+            fovyDegrees: camera.fov,
+            aspectRatio: aspect,
+            nearZ: camera.near,
+            farZ: camera.far
+        )
         let viewIdx = makeLookAtMatrix(eye: camera.position, center: camera.target, up: camera.up)
 
         let invProj = projIdx.inverse

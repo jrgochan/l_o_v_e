@@ -11,12 +11,42 @@ final class StrategyEngineTests: XCTestCase {
 
     override func setUp() {
         super.setUp()
-        joy = Emotion(name: "Joy", definition: "Happy", category: "Positive", valence: 0.8, arousal: 0.5, connection: 0.7)
-        anxiety = Emotion(name: "Anxiety", definition: "Nervous", category: "Negative", valence: -0.5, arousal: 0.9, connection: -0.2)
+        joy = Emotion(
+            name: "Joy",
+            definition: "Happy",
+            category: "Positive",
+            valence: 0.8,
+            arousal: 0.5,
+            connection: 0.7
+        )
+        anxiety = Emotion(
+            name: "Anxiety",
+            definition: "Nervous",
+            category: "Negative",
+            valence: -0.5,
+            arousal: 0.9,
+            connection: -0.2
+        )
 
         strategies = [
-            TransitionStrategy(name: "Box Breathing", type: .physiologicalRegulation, definition: "Calm down", detailedSteps: [], timeRequired: 300, difficultyLevel: 1, evidenceLevel: .metaAnalysis),
-            TransitionStrategy(name: "Celebration", type: .behavioralActivation, definition: "Party", detailedSteps: [], timeRequired: 600, difficultyLevel: 1, evidenceLevel: .expertConsensus)
+            TransitionStrategy(
+                name: "Box Breathing",
+                type: .physiologicalRegulation,
+                definition: "Calm down",
+                detailedSteps: [],
+                timeRequired: 300,
+                difficultyLevel: 1,
+                evidenceLevel: .metaAnalysis
+            ),
+            TransitionStrategy(
+                name: "Celebration",
+                type: .behavioralActivation,
+                definition: "Party",
+                detailedSteps: [],
+                timeRequired: 600,
+                difficultyLevel: 1,
+                evidenceLevel: .expertConsensus
+            )
         ]
     }
 

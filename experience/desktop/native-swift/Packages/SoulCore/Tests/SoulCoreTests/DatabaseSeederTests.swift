@@ -16,7 +16,9 @@ final class DatabaseSeederTests: XCTestCase {
         try DatabaseSeeder.seed(modelContext: context)
 
         // 3. Verify Atlas Collection
-        let atlasDescriptor = FetchDescriptor<EmotionCollection>(predicate: #Predicate { $0.id == "atlas_of_the_heart" })
+        let atlasDescriptor = FetchDescriptor<EmotionCollection>(
+            predicate: #Predicate { $0.id == "atlas_of_the_heart" }
+        )
         let collections = try context.fetch(atlasDescriptor)
 
         XCTAssertEqual(collections.count, 1)
@@ -30,7 +32,9 @@ final class DatabaseSeederTests: XCTestCase {
 
         // 5. Verify Emotions Count (Should be 87 based on JSON)
         // Note: We need to ensure the relationship is loaded or fetch emotions directly
-        let emotionDescriptor = FetchDescriptor<Emotion>(predicate: #Predicate { $0.collection?.id == "atlas_of_the_heart" })
+        let emotionDescriptor = FetchDescriptor<Emotion>(
+            predicate: #Predicate { $0.collection?.id == "atlas_of_the_heart" }
+        )
         let emotions = try context.fetch(emotionDescriptor)
 
         // Check for full dataset count
@@ -42,11 +46,15 @@ final class DatabaseSeederTests: XCTestCase {
         XCTAssertEqual(joy!.valence, 0.9, accuracy: 0.1)
 
         // 6. Verify Plutchik
-        // let plutchikEmotions = try context.fetch(FetchDescriptor<Emotion>(predicate: #Predicate { $0.collection?.id == "plutchik_wheel" }))
+        // let plutchikEmotions = try context.fetch(
+        //    FetchDescriptor<Emotion>(predicate: #Predicate { $0.collection?.id == "plutchik_wheel" })
+        // )
         // XCTAssertGreaterThan(plutchikEmotions.count, 0)
 
         // 7. Verify GoEmotions
-        let goEmotions = try context.fetch(FetchDescriptor<Emotion>(predicate: #Predicate { $0.collection?.id == "go_emotions" }))
+        let goEmotions = try context.fetch(
+            FetchDescriptor<Emotion>(predicate: #Predicate { $0.collection?.id == "go_emotions" })
+        )
         XCTAssertGreaterThan(goEmotions.count, 25)
         let realization = goEmotions.first { $0.name == "Realization" }
         XCTAssertNotNil(realization)

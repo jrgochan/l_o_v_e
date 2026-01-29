@@ -31,7 +31,11 @@ public struct BookmarksTab: View {
              .padding()
 
              if presets.isEmpty {
-                 ContentUnavailableView("No Bookmarks", systemImage: "bookmark.slash", description: Text("Capture a moment to save it here."))
+                 ContentUnavailableView(
+                    "No Bookmarks",
+                    systemImage: "bookmark.slash",
+                    description: Text("Capture a moment to save it here.")
+                 )
              } else {
                  ScrollView {
                      LazyVGrid(columns: [GridItem(.adaptive(minimum: 140))], spacing: 16) {

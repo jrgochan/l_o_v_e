@@ -8,7 +8,12 @@ public struct ZenHUD: View {
     var activePath: [String] = []
     @Binding var visualMode: VisualMode // NEW: Binding for mutation
 
-    public init(selectedEmotion: String? = nil, hoveredEmotion: String? = nil, activePath: [String] = [], visualMode: Binding<VisualMode>) {
+    public init(
+        selectedEmotion: String? = nil,
+        hoveredEmotion: String? = nil,
+        activePath: [String] = [],
+        visualMode: Binding<VisualMode>
+    ) {
         self.selectedEmotion = selectedEmotion
         self.hoveredEmotion = hoveredEmotion
         self.activePath = activePath

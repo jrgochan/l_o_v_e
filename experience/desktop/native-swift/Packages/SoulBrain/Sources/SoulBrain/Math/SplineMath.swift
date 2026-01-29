@@ -11,7 +11,13 @@ public struct SplineMath {
     ///   - p2: Control point 2 (End)
     ///   - p3: Control point 3 (Next)
     ///   - t: Interpolation factor (0 to 1)
-    public static func catmullRom(p0: SIMD3<Float>, p1: SIMD3<Float>, p2: SIMD3<Float>, p3: SIMD3<Float>, t: Float) -> SIMD3<Float> {
+    public static func catmullRom(
+        p0: SIMD3<Float>,
+        p1: SIMD3<Float>,
+        p2: SIMD3<Float>,
+        p3: SIMD3<Float>,
+        t: Float
+    ) -> SIMD3<Float> {
         let t2 = t * t
         let t3 = t2 * t
 

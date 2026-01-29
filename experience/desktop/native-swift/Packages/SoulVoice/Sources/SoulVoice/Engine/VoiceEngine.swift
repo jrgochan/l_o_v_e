@@ -73,7 +73,10 @@ public class VoiceEngine: NSObject, ObservableObject, AVSpeechSynthesizerDelegat
         utterance.volume = params.volume
 
         synthesizer.speak(utterance)
-        print("🗣️ Speaking: \"\(text)\" (Pitch: \(String(format: "%.2f", params.pitch)), Rate: \(String(format: "%.2f", params.rate)))")
+        print(
+            "🗣️ Speaking: \"\(text)\" " +
+            "(Pitch: \(String(format: "%.2f", params.pitch)), Rate: \(String(format: "%.2f", params.rate)))"
+        )
     }
 
     public let speechFinishedSubject = PassthroughSubject<Void, Never>()
@@ -94,7 +97,11 @@ public class VoiceEngine: NSObject, ObservableObject, AVSpeechSynthesizerDelegat
         self.speakingAmplitude = 0.0
     }
 
-    public func speechSynthesizer(_ synthesizer: AVSpeechSynthesizer, willSpeakRangeOfSpeechString characterRange: NSRange, utterance: AVSpeechUtterance) {
+    public func speechSynthesizer(
+        _ synthesizer: AVSpeechSynthesizer,
+        willSpeakRangeOfSpeechString characterRange: NSRange,
+        utterance: AVSpeechUtterance
+    ) {
         // Simulate a "pulse" for each word spoken
         // This creates a "Lip Sync" visual effect without analyzing raw audio buffers.
 

@@ -14,7 +14,8 @@ final class SoulMathTests: XCTestCase {
     }
 
     func testToQuaternionIdentity() {
-        // Neutral (0,0,0) should ideally result in Identity Quaternion (0,0,0,1) or close to it depending on implementation.
+        // Neutral (0,0,0) should ideally result in Identity Quaternion (0,0,0,1)
+        // or close to it depending on implementation.
         // Let's assume lookAt(0,0,0) from (0,0,1) -> Identity.
 
         let vec = SoulMath.VACVector(valence: 0, arousal: 0, connection: 0)

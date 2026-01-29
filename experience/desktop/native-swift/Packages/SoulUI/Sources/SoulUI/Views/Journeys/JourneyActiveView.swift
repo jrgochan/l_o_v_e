@@ -21,7 +21,12 @@ public struct JourneyActiveView: View {
     @Query var allEmotions: [Emotion]
     @Query var patterns: [TransitionPattern] // Needed for Pathfinder? Yes.
 
-    public init(start: Emotion, goal: Emotion, onStrategyStart: @escaping (TransitionStrategy) -> Void = { _ in }, onStrategyComplete: @escaping (TransitionStrategy) -> Void = { _ in }) {
+    public init(
+        start: Emotion,
+        goal: Emotion,
+        onStrategyStart: @escaping (TransitionStrategy) -> Void = { _ in },
+        onStrategyComplete: @escaping (TransitionStrategy) -> Void = { _ in }
+    ) {
         self.startEmotion = start
         self.goalEmotion = goal
         self.onStrategyStart = onStrategyStart

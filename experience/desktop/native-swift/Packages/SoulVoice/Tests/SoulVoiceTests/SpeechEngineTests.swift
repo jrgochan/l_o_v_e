@@ -6,7 +6,11 @@ import AVFoundation
 final class SpeechEngineTests: XCTestCase {
 
     // Duplicated helper for robustness
-    func makeSineWaveBuffer(frequency: Float, sampleRate: Double = 44100.0, duration: Double = 0.5) -> AVAudioPCMBuffer? {
+    func makeSineWaveBuffer(
+        frequency: Float,
+        sampleRate: Double = 44100.0,
+        duration: Double = 0.5
+    ) -> AVAudioPCMBuffer? {
         let frameCount = AVAudioFrameCount(sampleRate * duration)
         guard let format = AVAudioFormat(standardFormatWithSampleRate: sampleRate, channels: 1),
               let buffer = AVAudioPCMBuffer(pcmFormat: format, frameCapacity: frameCount) else {

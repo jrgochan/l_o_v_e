@@ -18,7 +18,11 @@ public struct AnalyticsView: View {
             if let session = selectedSession {
                 HistorySessionDetail(session: session)
             } else {
-                ContentUnavailableView("Select a Session", systemImage: "chart.xyaxis.line", description: Text("View detailed analytics for past sessions."))
+                ContentUnavailableView(
+                    "Select a Session",
+                    systemImage: "chart.xyaxis.line",
+                    description: Text("View detailed analytics for past sessions.")
+                )
             }
         }
     }
@@ -93,15 +97,31 @@ public struct HistorySessionDetail: View {
 
                 // Summary Cards
                 HStack(spacing: 16) {
-                    MetricCard(title: "Duration", value: formatDuration(session.duration), icon: "clock")
-                    MetricCard(title: "Interactions", value: "\(session.messageCount)", icon: "bubble.left.and.bubble.right")
-                    MetricCard(title: "End Vibe", value: String(format: "V:%.1f", session.endValence ?? session.startValence), icon: "face.smiling")
+                    MetricCard(
+                        title: "Duration",
+                        value: formatDuration(session.duration),
+                        icon: "clock"
+                    )
+                    MetricCard(
+                        title: "Interactions",
+                        value: "\(session.messageCount)",
+                        icon: "bubble.left.and.bubble.right"
+                    )
+                    MetricCard(
+                        title: "End Vibe",
+                        value: String(format: "V:%.1f", session.endValence ?? session.startValence),
+                        icon: "face.smiling"
+                    )
                 }
 
                 Divider()
 
                 if metrics.isEmpty {
-                    ContentUnavailableView("No Data Points", systemImage: "waveform.path.ecg", description: Text("This session has no recorded time-series data."))
+                    ContentUnavailableView(
+                        "No Data Points",
+                        systemImage: "waveform.path.ecg",
+                        description: Text("This session has no recorded time-series data.")
+                    )
                 } else {
                     // Charts
                     VStack(alignment: .leading, spacing: 8) {
@@ -120,7 +140,13 @@ public struct HistorySessionDetail: View {
                                 x: .value("Time", point.timestamp),
                                 y: .value("Valence", point.valence)
                             )
-                            .foregroundStyle(LinearGradient(colors: [.blue.opacity(0.3), .clear], startPoint: .top, endPoint: .bottom))
+                            .foregroundStyle(
+                                LinearGradient(
+                                    colors: [.blue.opacity(0.3), .clear],
+                                    startPoint: .top,
+                                    endPoint: .bottom
+                                )
+                            )
                             .interpolationMethod(.catmullRom)
                         }
                         .frame(height: 200)

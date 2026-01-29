@@ -40,9 +40,19 @@ public struct GoalSelectionView: View {
                     ScrollView {
                         VStack(alignment: .leading, spacing: 32) {
                             if selectedStart == nil {
-                                selectionSection(title: "Where are you now?", emotions: filteredEmotions, selection: $selectedStart, color: .blue)
+                                selectionSection(
+                                    title: "Where are you now?",
+                                    emotions: filteredEmotions,
+                                    selection: $selectedStart,
+                                    color: .blue
+                                )
                             } else if selectedGoal == nil {
-                                selectionSection(title: "Where do you want to go?", emotions: filteredEmotions, selection: $selectedGoal, color: .purple)
+                                selectionSection(
+                                    title: "Where do you want to go?",
+                                    emotions: filteredEmotions,
+                                    selection: $selectedGoal,
+                                    color: .purple
+                                )
                             } else {
                                 // Summary / Confirmation View
                                 confirmationView
@@ -78,7 +88,12 @@ public struct GoalSelectionView: View {
         .padding(.top, 20)
     }
 
-    private func selectionSection(title: String, emotions: [Emotion], selection: Binding<Emotion?>, color: Color) -> some View {
+    private func selectionSection(
+        title: String,
+        emotions: [Emotion],
+        selection: Binding<Emotion?>,
+        color: Color
+    ) -> some View {
         VStack(alignment: .leading, spacing: 16) {
             Text(title)
                 .font(.title2.bold())

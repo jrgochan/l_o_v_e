@@ -110,7 +110,7 @@ class DependencyContainer: ObservableObject {
             .store(in: &cancellables)
 
          // Audio Level Sync (One-way: SpeechEngine -> DependencyContainer -> UI)
-         // Actually, SpeechEngine updates its own audioLevel. We need to mirror it if we want a single source of truth for UI?
+         // Actually, SpeechEngine updates its own audioLevel. We need to mirror it if we want a single source of truth?
          // Or just let AudioInputManager be the source.
          // Let's bind AudioInputManager's level to our published property for convenience
          // Unified Audio Level (Mic + Voice Engine)
@@ -233,7 +233,8 @@ class DependencyContainer: ObservableObject {
     }
 
     private func handleCriticalSafety(_ alert: ClinicalAlert) {
-        let safetyResponse = "I hear that you are in pain. Since I'm an AI, I can't provide clinical help. If you are in danger, please contact emergency services or a crisis line immediately."
+        let safetyResponse = "I hear that you are in pain. Since I'm an AI, I can't provide clinical help. " +
+                             "If you are in danger, please contact emergency services or a crisis line immediately."
         let responseMsg = Message(text: safetyResponse, isUser: false, vibe: self.currentVibe)
         self.context.insert(responseMsg)
         self.speak(safetyResponse)
@@ -338,7 +339,8 @@ class DependencyContainer: ObservableObject {
 
         // 3. Log to History
         let completionMsg = Message(
-            text: "✅ Completed Strategy: \(strategy.name)\n(\(strategy.type.rawValue.replacingOccurrences(of: "_", with: " ").capitalized))",
+            text: "✅ Completed Strategy: \(strategy.name)\n" +
+                  "(\(strategy.type.rawValue.replacingOccurrences(of: "_", with: " ").capitalized))",
             isUser: false, // System message essentially
             vibe: boostedVibe
         )

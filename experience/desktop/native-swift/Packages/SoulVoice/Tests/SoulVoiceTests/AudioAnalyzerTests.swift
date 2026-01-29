@@ -5,7 +5,11 @@ import AVFoundation
 final class AudioAnalyzerTests: XCTestCase {
 
     // Helper to generate sine wave buffer
-    func makeSineWaveBuffer(frequency: Float, sampleRate: Double = 44100.0, duration: Double = 0.5) -> AVAudioPCMBuffer? {
+    func makeSineWaveBuffer(
+        frequency: Float,
+        sampleRate: Double = 44100.0,
+        duration: Double = 0.5
+    ) -> AVAudioPCMBuffer? {
         let frameCount = AVAudioFrameCount(sampleRate * duration)
         guard let format = AVAudioFormat(standardFormatWithSampleRate: sampleRate, channels: 1),
               let buffer = AVAudioPCMBuffer(pcmFormat: format, frameCapacity: frameCount) else {
@@ -37,7 +41,10 @@ final class AudioAnalyzerTests: XCTestCase {
 
         let features = analyzer.process(buffer: buffer)
 
-        XCTAssertTrue(features.voiceActivity, "High energy sine wave should be detected as voice activity (simplistic VAD)")
+        XCTAssertTrue(
+            features.voiceActivity,
+            "High energy sine wave should be detected as voice activity (simplistic VAD)"
+        )
 
         // Allow some tolerance for basic autocorrelation
         XCTAssertEqual(features.pitch, targetFreq, accuracy: 20.0, "Pitch should be close to 150Hz")

@@ -5,7 +5,9 @@ public struct ModelSettingsView: View {
     @StateObject private var modelManager = ModelManager.shared
 
     // Recommended Model
-    let recommendedURL = URL(string: "https://huggingface.co/mlx-community/Llama-3.2-3B-Instruct-4bit/resolve/main/model.safetensors?download=true")!
+    let recommendedURL = URL(
+        string: "https://huggingface.co/mlx-community/Llama-3.2-3B-Instruct-4bit/resolve/main/model.safetensors?download=true" // swiftlint:disable:this line_length
+    )!
     let recommendedFilename = "model.safetensors"
 
     public init() {}
@@ -61,7 +63,9 @@ public struct ModelSettingsView: View {
                         ProgressView(value: modelManager.downloadProgress) {
                             Text("\(Int(modelManager.downloadProgress * 100))%")
                         }
-                    } else if modelManager.localModels.contains(where: { $0.url.lastPathComponent == recommendedFilename }) {
+                    } else if modelManager.localModels.contains(where: {
+                        $0.url.lastPathComponent == recommendedFilename
+                    }) {
                          Text("✓ Model Installed")
                              .foregroundStyle(.green)
                              .font(.caption)

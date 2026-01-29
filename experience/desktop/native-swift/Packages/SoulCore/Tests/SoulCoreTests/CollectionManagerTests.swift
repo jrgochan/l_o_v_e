@@ -33,10 +33,15 @@ final class CollectionManagerTests: XCTestCase {
         XCTAssertEqual(manager.activeCollectionName, "Collection B")
 
         // Verify DB
-        let colB = try! context.fetch(FetchDescriptor<EmotionCollection>(predicate: #Predicate { $0.name == "Collection B" })).first!
+        // Verify DB
+        let colB = try! context.fetch(
+            FetchDescriptor<EmotionCollection>(predicate: #Predicate { $0.name == "Collection B" })
+        ).first!
         XCTAssertTrue(colB.isActive)
 
-        let colA = try! context.fetch(FetchDescriptor<EmotionCollection>(predicate: #Predicate { $0.name == "Collection A" })).first!
+        let colA = try! context.fetch(
+            FetchDescriptor<EmotionCollection>(predicate: #Predicate { $0.name == "Collection A" })
+        ).first!
         XCTAssertFalse(colA.isActive)
     }
 

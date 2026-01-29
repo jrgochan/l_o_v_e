@@ -14,7 +14,10 @@ struct LoveApp: App {
         do {
             // 1. Initialize SwiftData Container
             let config = ModelConfiguration(isStoredInMemoryOnly: false)
-            let modelContainer = try ModelContainer(for: EmotionCollection.self, Emotion.self, Message.self, ViewPreset.self, configurations: config)
+            let modelContainer = try ModelContainer(
+                for: EmotionCollection.self, Emotion.self, Message.self, ViewPreset.self,
+                configurations: config
+            )
             self.container = modelContainer
 
             // 2. Seed Data (if needed)

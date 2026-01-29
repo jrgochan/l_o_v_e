@@ -63,7 +63,12 @@ public actor MLXInferenceProvider: InferenceProvider {
         }
     }
 
-    private func runInference(model: Llama, tokenizer: Tokenizer, prompt: String, continuation: AsyncStream<String>.Continuation) async {
+    private func runInference(
+        model: Llama,
+        tokenizer: Tokenizer,
+        prompt: String,
+        continuation: AsyncStream<String>.Continuation
+    ) async {
         let tokens = tokenizer.encode(text: prompt)
         let tokenArr = MLXArray(tokens).reshaped([1, tokens.count])
 

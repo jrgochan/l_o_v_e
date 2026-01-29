@@ -73,7 +73,11 @@ public class ModelManager: ObservableObject {
         do {
             // Recursive scan or just top level? Let's do recursive to find nested 'model.safetensors'
             let resourceKeys: [URLResourceKey] = [.fileSizeKey, .nameKey]
-            let enumerator = fileManager.enumerator(at: modelsDirectory, includingPropertiesForKeys: resourceKeys, options: [.skipsHiddenFiles])
+            let enumerator = fileManager.enumerator(
+                at: modelsDirectory,
+                includingPropertiesForKeys: resourceKeys,
+                options: [.skipsHiddenFiles]
+            )
 
             var foundModels: [LocalModel] = []
 

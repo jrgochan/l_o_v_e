@@ -50,7 +50,11 @@ public final class AudioInputManager: ObservableObject, @unchecked Sendable {
         // We don't need to do much here for macOS, but for iOS we'd set category
         #if os(iOS)
         do {
-            try AVAudioSession.sharedInstance().setCategory(.playAndRecord, mode: .default, options: [.mixWithOthers, .defaultToSpeaker])
+            try AVAudioSession.sharedInstance().setCategory(
+                .playAndRecord,
+                mode: .default,
+                options: [.mixWithOthers, .defaultToSpeaker]
+            )
             try AVAudioSession.sharedInstance().setActive(true)
         } catch {
             print("❌ AudioInputManager: Failed to set audio session: \(error)")

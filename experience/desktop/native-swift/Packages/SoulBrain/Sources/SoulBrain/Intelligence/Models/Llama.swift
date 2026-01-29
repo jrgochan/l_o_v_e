@@ -66,7 +66,11 @@ class Attention: Module {
         super.init()
     }
 
-    func callAsFunction(_ x: MLXArray, mask: MLXArray? = nil, cache: (MLXArray, MLXArray)? = nil) -> (MLXArray, (MLXArray, MLXArray)) {
+    func callAsFunction(
+        _ x: MLXArray,
+        mask: MLXArray? = nil,
+        cache: (MLXArray, MLXArray)? = nil
+    ) -> (MLXArray, (MLXArray, MLXArray)) {
         let (B, L, _ ) = x.shape3
 
         // Projections
@@ -251,7 +255,11 @@ public class Llama: Module {
     }
 
     // Main forward pass
-    public func callAsFunction(_ inputs: MLXArray, mask: MLXArray? = nil, cache: [(MLXArray, MLXArray)]? = nil) -> (MLXArray, [(MLXArray, MLXArray)]) {
+    public func callAsFunction(
+        _ inputs: MLXArray,
+        mask: MLXArray? = nil,
+        cache: [(MLXArray, MLXArray)]? = nil
+    ) -> (MLXArray, [(MLXArray, MLXArray)]) {
         var h = vocabEmbedding(inputs)
 
         var newCache: [(MLXArray, MLXArray)] = []
@@ -284,7 +292,11 @@ class TransformerBlock: Module {
         super.init()
     }
 
-    func callAsFunction(_ x: MLXArray, mask: MLXArray? = nil, cache: (MLXArray, MLXArray)? = nil) -> (MLXArray, (MLXArray, MLXArray)) {
+    func callAsFunction(
+        _ x: MLXArray,
+        mask: MLXArray? = nil,
+        cache: (MLXArray, MLXArray)? = nil
+    ) -> (MLXArray, (MLXArray, MLXArray)) {
         let normX = attentionNorm(x)
         let (attnOut, newCache) = attention(normX, mask: mask, cache: cache)
         let h = x + attnOut

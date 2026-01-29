@@ -12,7 +12,10 @@ public struct JourneyTabRoot: View {
     public var onStrategyStart: (TransitionStrategy) -> Void
     public var onStrategyComplete: (TransitionStrategy) -> Void
 
-    public init(onStrategyStart: @escaping (TransitionStrategy) -> Void = { _ in }, onStrategyComplete: @escaping (TransitionStrategy) -> Void = { _ in }) {
+    public init(
+        onStrategyStart: @escaping (TransitionStrategy) -> Void = { _ in },
+        onStrategyComplete: @escaping (TransitionStrategy) -> Void = { _ in }
+    ) {
         self.onStrategyStart = onStrategyStart
         self.onStrategyComplete = onStrategyComplete
     }
@@ -20,7 +23,12 @@ public struct JourneyTabRoot: View {
     public var body: some View {
         NavigationStack {
             if isActive, let start = activeStart, let goal = activeGoal {
-                JourneyActiveView(start: start, goal: goal, onStrategyStart: onStrategyStart, onStrategyComplete: onStrategyComplete)
+                JourneyActiveView(
+                    start: start,
+                    goal: goal,
+                    onStrategyStart: onStrategyStart,
+                    onStrategyComplete: onStrategyComplete
+                )
                     .navigationBarBackButtonHidden(true)
             } else {
                 GoalSelectionView { start, goal in

@@ -24,7 +24,12 @@ public class PIIFilter {
         let options: NLTagger.Options = [.omitPunctuation, .omitWhitespace, .joinNames]
         let tags: [NLTag] = [.personalName, .placeName, .organizationName]
 
-        tagger.enumerateTags(in: text.startIndex..<text.endIndex, unit: .word, scheme: .nameType, options: options) { tag, range in
+        tagger.enumerateTags(
+            in: text.startIndex..<text.endIndex,
+            unit: .word,
+            scheme: .nameType,
+            options: options
+        ) { tag, range in
             if let tag = tag, tags.contains(tag) {
                 let placeholder = placeholder(for: tag)
                 replacements.append((range, placeholder))

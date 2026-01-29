@@ -20,7 +20,8 @@ final class LLMEngineTests: XCTestCase {
         XCTAssertEqual(count, 1, "Memory should be indexed")
 
         // 4. Verify Retrieval logic manually (white-box)
-        // Since LLMEngine.generate is complex/async stream, let's test the underlying VectorIndex retrieval via the engine's internal components if possible.
+        // Since LLMEngine.generate is complex/async stream, let's test result quality
+        // via other means or verify internal state.
         // Actually, let's call indexMemory and verify.
 
         // Test Rehydration

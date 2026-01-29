@@ -51,7 +51,10 @@ public struct ChatView: View {
                                             .stroke(.white.opacity(0.1), lineWidth: 1)
                                     )
                                     .foregroundStyle(.white.opacity(streamingText.isEmpty ? 0.5 : 1.0))
-                                    .symbolEffect(.pulse, isActive: isThinking && streamingText.isEmpty) // Pulse if just thinking
+                                    .symbolEffect(
+                                        .pulse,
+                                        isActive: isThinking && streamingText.isEmpty
+                                    ) // Pulse if just thinking
                                     .id("GhostBubble")
 
                                 Spacer()

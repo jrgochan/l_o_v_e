@@ -14,20 +14,77 @@ final class EmotionalPathfinderTests: XCTestCase {
 
     override func setUp() {
         super.setUp()
+        setupEmotions()
+        setupPatterns()
+    }
 
-        joy = Emotion(name: "Joy", definition: "High energy positive", category: "Positive", valence: 0.8, arousal: 0.6, connection: 0.7)
-        neutral = Emotion(name: "Neutral", definition: "Baseline", category: "Neutral", valence: 0.0, arousal: 0.0, connection: 0.0)
-        sadness = Emotion(name: "Sadness", definition: "Low energy negative", category: "Negative", valence: -0.6, arousal: -0.4, connection: -0.2)
-        anger = Emotion(name: "Anger", definition: "High energy negative", category: "Negative", valence: -0.6, arousal: 0.7, connection: -0.3)
+    private func setupEmotions() {
+        joy = Emotion(
+            name: "Joy",
+            definition: "High energy positive",
+            category: "Positive",
+            valence: 0.8,
+            arousal: 0.6,
+            connection: 0.7
+        )
+        neutral = Emotion(
+            name: "Neutral",
+            definition: "Baseline",
+            category: "Neutral",
+            valence: 0.0,
+            arousal: 0.0,
+            connection: 0.0
+        )
+        sadness = Emotion(
+            name: "Sadness",
+            definition: "Low energy negative",
+            category: "Negative",
+            valence: -0.6,
+            arousal: -0.4,
+            connection: -0.2
+        )
+        anger = Emotion(
+            name: "Anger",
+            definition: "High energy negative",
+            category: "Negative",
+            valence: -0.6,
+            arousal: 0.7,
+            connection: -0.3
+        )
 
         allEmotions = [joy, neutral, sadness, anger]
+    }
 
-        // Define Patterns
+    private func setupPatterns() {
         patterns = [
-            TransitionPattern(name: "Calm Down", fromCategory: "Positive", toCategory: "Neutral", difficultyScore: 1.0, psychologicalReasoning: "Reduce arousal"),
-            TransitionPattern(name: "Get Sad", fromCategory: "Neutral", toCategory: "Negative", difficultyScore: 1.0, psychologicalReasoning: "Drop valence"),
-            TransitionPattern(name: "Recovery", fromCategory: "Negative", toCategory: "Neutral", difficultyScore: 2.0, psychologicalReasoning: "Stabilize"),
-            TransitionPattern(name: "Cheer Up", fromCategory: "Neutral", toCategory: "Positive", difficultyScore: 1.5, psychologicalReasoning: "Increase valence")
+            TransitionPattern(
+                name: "Calm Down",
+                fromCategory: "Positive",
+                toCategory: "Neutral",
+                difficultyScore: 1.0,
+                psychologicalReasoning: "Reduce arousal"
+            ),
+            TransitionPattern(
+                name: "Get Sad",
+                fromCategory: "Neutral",
+                toCategory: "Negative",
+                difficultyScore: 1.0,
+                psychologicalReasoning: "Drop valence"
+            ),
+            TransitionPattern(
+                name: "Recovery",
+                fromCategory: "Negative",
+                toCategory: "Neutral",
+                difficultyScore: 2.0,
+                psychologicalReasoning: "Stabilize"
+            ),
+            TransitionPattern(
+                name: "Cheer Up",
+                fromCategory: "Neutral",
+                toCategory: "Positive",
+                difficultyScore: 1.5,
+                psychologicalReasoning: "Increase valence"
+            )
         ]
     }
 
@@ -41,7 +98,14 @@ final class EmotionalPathfinderTests: XCTestCase {
 
     func testDirectConnectionIfCloseEnough() {
         // Assuming we add a node close to Joy in same category
-        let excited = Emotion(name: "Excited", definition: "Very high energy", category: "Positive", valence: 0.9, arousal: 0.8, connection: 0.8)
+        let excited = Emotion(
+            name: "Excited",
+            definition: "Very high energy",
+            category: "Positive",
+            valence: 0.9,
+            arousal: 0.8,
+            connection: 0.8
+        )
         var extendedPool = allEmotions!
         extendedPool.append(excited)
 
@@ -75,7 +139,13 @@ final class EmotionalPathfinderTests: XCTestCase {
     func testNoPathIfNoPattern() {
         // Break the chain: Remove Neutral -> Negative pattern
         let brokenPatterns = [
-             TransitionPattern(name: "Calm Down", fromCategory: "Positive", toCategory: "Neutral", difficultyScore: 1.0, psychologicalReasoning: "Reduce arousal")
+             TransitionPattern(
+                name: "Calm Down",
+                fromCategory: "Positive",
+                toCategory: "Neutral",
+                difficultyScore: 1.0,
+                psychologicalReasoning: "Reduce arousal"
+             )
              // Missing Neutral -> Negative
         ]
 

@@ -196,7 +196,12 @@ public class SoulRenderer: NSObject, MTKViewDelegate {
     private func makeUniforms(view: MTKView) -> Uniforms {
         let time = Float(Date().timeIntervalSince(startTime))
         let aspect = Float(view.drawableSize.width / view.drawableSize.height)
-        let projectionMatrix = makePerspectiveMatrix(fovyDegrees: camera.fov, aspectRatio: aspect, nearZ: camera.near, farZ: camera.far)
+        let projectionMatrix = makePerspectiveMatrix(
+            fovyDegrees: camera.fov,
+            aspectRatio: aspect,
+            nearZ: camera.near,
+            farZ: camera.far
+        )
         let viewMatrix = makeLookAtMatrix(eye: camera.position, center: camera.target, up: camera.up)
 
         return Uniforms(
@@ -274,7 +279,12 @@ public class SoulRenderer: NSObject, MTKViewDelegate {
 }
 
 // MARK: - Matrix Helpers
-internal func makePerspectiveMatrix(fovyDegrees: Float, aspectRatio: Float, nearZ: Float, farZ: Float) -> matrix_float4x4 {
+internal func makePerspectiveMatrix(
+    fovyDegrees: Float,
+    aspectRatio: Float,
+    nearZ: Float,
+    farZ: Float
+) -> matrix_float4x4 {
     let fov = fovyDegrees * .pi / 180.0
     let y = 1.0 / tan(fov * 0.5)
     let x = y / aspectRatio

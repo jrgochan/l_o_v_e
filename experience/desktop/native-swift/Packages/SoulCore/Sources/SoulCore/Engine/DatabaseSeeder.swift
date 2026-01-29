@@ -77,6 +77,20 @@ public struct DatabaseSeeder {
         try seedStrategies(context: modelContext)
     }
 
+    private static func resolveSeedUrl(for filename: String) -> URL? {
+        if let url = Bundle.module.url(forResource: filename, withExtension: "json", subdirectory: "Seeds") {
+            return url
+        }
+        if let url = Bundle.module.url(forResource: filename, withExtension: "json") {
+            return url
+        }
+        return Bundle.module.url(
+            forResource: filename,
+            withExtension: "json",
+            subdirectory: "Resources/Seeds"
+        )
+    }
+
     private struct SeedConfig {
         let id: String
         let name: String
@@ -100,17 +114,7 @@ public struct DatabaseSeeder {
 
         // Load JSON from Bundle
         // Try multiple paths to be robust
-        var url = Bundle.module.url(forResource: config.filename, withExtension: "json", subdirectory: "Seeds")
-
-        if url == nil {
-             // Fallback: try top level if flattened
-             url = Bundle.module.url(forResource: config.filename, withExtension: "json")
-        }
-
-        if url == nil {
-             // Fallback: try Resources/Seeds explicitly
-             url = Bundle.module.url(forResource: config.filename, withExtension: "json", subdirectory: "Resources/Seeds")
-        }
+        let url = resolveSeedUrl(for: config.filename)
 
         guard let validUrl = url else {
             throw SeedingError.fileNotFound("\(config.filename).json in Bundle: \(Bundle.module.bundlePath)")
@@ -125,7 +129,13 @@ public struct DatabaseSeeder {
         }
 
         // Create Collection
-        let collection = EmotionCollection(id: config.id, name: config.name, desc: config.desc, isActive: config.isActive)
+        // Create Collection
+        let collection = EmotionCollection(
+            id: config.id,
+            name: config.name,
+            desc: config.desc,
+            isActive: config.isActive
+        )
         context.insert(collection)
 
         // Create Emotions
@@ -158,24 +168,35 @@ public struct DatabaseSeeder {
 
         print("🌱 Seeding core strategies...")
 
-        let strategies = [
+        let strategies = getStrategies()
+
+        for strategy in strategies {
+            context.insert(strategy)
+        }
+
+        try context.save()
+        print("✅ Seeded \(strategies.count) strategies.")
+    }
+
+    private static func getStrategies() -> [TransitionStrategy] {
+        return getPhysiologicalStrategies() + getCognitiveStrategies() + getSocialStrategies()
+    }
+
+    private static func getPhysiologicalStrategies() -> [TransitionStrategy] {
+        [
             TransitionStrategy(
                 name: "Box Breathing",
                 type: .physiologicalRegulation,
                 definition: "A rhythmic breathing technique to calm the autonomic nervous system.",
-                detailedSteps: ["Inhale for 4 seconds", "Hold for 4 seconds", "Exhale for 4 seconds", "Hold for 4 seconds"],
+                detailedSteps: [
+                    "Inhale for 4 seconds",
+                    "Hold for 4 seconds",
+                    "Exhale for 4 seconds",
+                    "Hold for 4 seconds"
+                ],
                 timeRequired: 120,
                 difficultyLevel: 1,
                 evidenceLevel: .clinical
-            ),
-            TransitionStrategy(
-                name: "Perspective Shift",
-                type: .cognitiveReappraisal,
-                definition: "Identifying alternative explanations for the situation.",
-                detailedSteps: ["Identify the thought causing distress", "Ask: Is there another way to see this?", "Consider what a compassionate friend would say"],
-                timeRequired: 300,
-                difficultyLevel: 3,
-                evidenceLevel: .expertConsensus
             ),
             TransitionStrategy(
                 name: "Quick Movement",
@@ -185,23 +206,43 @@ public struct DatabaseSeeder {
                 timeRequired: 60,
                 difficultyLevel: 1,
                 evidenceLevel: .metaAnalysis
-            ),
+            )
+        ]
+    }
+
+    private static func getCognitiveStrategies() -> [TransitionStrategy] {
+        [
+            TransitionStrategy(
+                name: "Perspective Shift",
+                type: .cognitiveReappraisal,
+                definition: "Identifying alternative explanations for the situation.",
+                detailedSteps: [
+                    "Identify the thought causing distress",
+                    "Ask: Is there another way to see this?",
+                    "Consider what a compassionate friend would say"
+                ],
+                timeRequired: 300,
+                difficultyLevel: 3,
+                evidenceLevel: .expertConsensus
+            )
+        ]
+    }
+
+    private static func getSocialStrategies() -> [TransitionStrategy] {
+        [
             TransitionStrategy(
                 name: "Gratitude Message",
                 type: .socialConnection,
                 definition: "Reaching out to strengthen social bonds.",
-                detailedSteps: ["Think of someone you appreciate", "Draft a short text expressing thanks", "Send it without expecting a reply"],
+                detailedSteps: [
+                    "Think of someone you appreciate",
+                    "Draft a short text expressing thanks",
+                    "Send it without expecting a reply"
+                ],
                 timeRequired: 180,
                 difficultyLevel: 2,
                 evidenceLevel: .rct
             )
         ]
-
-        for strategy in strategies {
-            context.insert(strategy)
-        }
-
-        try context.save()
-        print("✅ Seeded \(strategies.count) strategies.")
     }
 }

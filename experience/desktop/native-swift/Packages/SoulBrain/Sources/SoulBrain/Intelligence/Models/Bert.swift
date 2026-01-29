@@ -267,7 +267,11 @@ public class Bert: Module {
         super.init()
     }
 
-    public func callAsFunction(_ inputIds: MLXArray, tokenTypeIds: MLXArray? = nil, attentionMask: MLXArray? = nil) -> (MLXArray, MLXArray) {
+    public func callAsFunction(
+        _ inputIds: MLXArray,
+        tokenTypeIds: MLXArray? = nil,
+        attentionMask: MLXArray? = nil
+    ) -> (MLXArray, MLXArray) {
         // Embeddings
         let embeddingOutput = embeddings(inputIds: inputIds, tokenTypeIds: tokenTypeIds)
 

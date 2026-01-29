@@ -26,70 +26,9 @@ extension SoulRenderer {
         var points: [PointInstance] = []
 
         for node in nodes {
-            // Map VAC to 3D Position
-            // Valence (X), Arousal (Y), Connection (Z)
-
-            // Hover/Selection Scale
-            var scale: Float = 1.0
-
-            var isSelected: Float = 0.0
-            if node.name == selectedEmotion {
-                scale = 2.0
-                isSelected = 1.0
-            }
-
-            var isHovered: Float = 0.0
-            if node.name == hoveredEmotion {
-                scale = 2.0
-                isHovered = 1.0
-            }
-
-            // Color Logic (Reference Palette)
-            let v = Float(node.vibe.valence)
-            let a = Float(node.vibe.arousal)
-
-            var color = SIMD4<Float>(1, 1, 1, 1.0)
-
-            if v > 0.2 {
-                // Positive: Cyan to Green
-                color = SIMD4<Float>(0.0, 1.0, 0.8, 0.9) // Cyan
-                if a > 0.5 {
-                    color = SIMD4<Float>(0.2, 1.0, 0.2, 1.0) // Eletric Green
-                }
-            } else if v < -0.2 {
-                // Negative: Magenta to Red
-                color = SIMD4<Float>(1.0, 0.0, 0.5, 0.9) // Magenta
-                if a > 0.5 {
-                    color = SIMD4<Float>(1.0, 0.2, 0.0, 1.0) // Red/Orange
-                }
-            } else {
-                // Neutral: Deep Blue/Purple
-                color = SIMD4<Float>(0.4, 0.4, 1.0, 0.6)
-            }
-
-            // Randomize size slightly for organic feel
-            // We need deterministic randomness for stability, or just random is fine?
-            // Swift.Float.random is fine if we rebuild fully only on data change.
-            let randomSize: Float = Float.random(in: 0.05...0.15)
-            let finalSize = scale * randomSize
-
-            let pos = SIMD4<Float>(
-                Float(node.vibe.valence) * 1.0,
-                Float(node.vibe.arousal) * 1.0,
-                Float(node.vibe.connection) * 1.0,
-                finalSize
-            )
-
-            let props = SIMD4<Float>(isSelected, isHovered, 0, 0)
-
-            // Calculate Quaternion from VAC
-            let vac = SoulMath.VACVector(valence: Float(node.vibe.valence), arousal: Float(node.vibe.arousal), connection: Float(node.vibe.connection))
-            let quat = vac.toQuaternion().vector
-
-            points.append(PointInstance(position: pos, color: color, props: props, quaternion: quat))
-
-            // Store location for flight computer / labels
-            self.emotionLocations[node.name] = SIMD3<Float>(pos.x, pos.y, pos.z)
+            let point = createPointInstance(for: node)
+            points.append(point)
+            self.emotionLocations[node.name] = SIMD3<Float>(point.position.x, point.position.y, point.position.z)
         }
 
         self.pointCount = points.count
@@ -98,6 +37,60 @@ extension SoulRenderer {
 
         let size = points.count * MemoryLayout<PointInstance>.stride
         self.pointBuffer = device.makeBuffer(bytes: points, length: size, options: .storageModeShared)
+    }
+
+    private func createPointInstance(for node: EmotionEngine.EmotionNode) -> PointInstance {
+        // Map VAC to 3D Position
+        var scale: Float = 1.0
+        var isSelected: Float = 0.0
+        if node.name == selectedEmotion {
+            scale = 2.0
+            isSelected = 1.0
+        }
+
+        var isHovered: Float = 0.0
+        if node.name == hoveredEmotion {
+            scale = 2.0
+            isHovered = 1.0
+        }
+
+        // Color Logic
+        let v = Float(node.vibe.valence)
+        let a = Float(node.vibe.arousal)
+        var color = SIMD4<Float>(1, 1, 1, 1.0)
+
+        if v > 0.2 {
+            // Positive
+            color = SIMD4<Float>(0.0, 1.0, 0.8, 0.9)
+            if a > 0.5 { color = SIMD4<Float>(0.2, 1.0, 0.2, 1.0) }
+        } else if v < -0.2 {
+            // Negative
+            color = SIMD4<Float>(1.0, 0.0, 0.5, 0.9)
+            if a > 0.5 { color = SIMD4<Float>(1.0, 0.2, 0.0, 1.0) }
+        } else {
+            // Neutral
+            color = SIMD4<Float>(0.4, 0.4, 1.0, 0.6)
+        }
+
+        let randomSize: Float = Float.random(in: 0.05...0.15)
+        let finalSize = scale * randomSize
+
+        let pos = SIMD4<Float>(
+            Float(node.vibe.valence) * 1.0,
+            Float(node.vibe.arousal) * 1.0,
+            Float(node.vibe.connection) * 1.0,
+            finalSize
+        )
+
+        let props = SIMD4<Float>(isSelected, isHovered, 0, 0)
+        let vac = SoulMath.VACVector(
+            valence: Float(node.vibe.valence),
+            arousal: Float(node.vibe.arousal),
+            connection: Float(node.vibe.connection)
+        )
+        let quat = vac.toQuaternion().vector
+
+        return PointInstance(position: pos, color: color, props: props, quaternion: quat)
     }
 
     public func updatePath(with emotionNames: [String]) {

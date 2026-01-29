@@ -42,7 +42,10 @@ public struct EmotionalPathfinder {
 
         while !openList.isEmpty {
             // Get node in openList with lowest fScore
-            guard let currentID = openList.min(by: { (fScore[$0] ?? Float.infinity) < (fScore[$1] ?? Float.infinity) }) else {
+            // Get node in openList with lowest fScore
+            guard let currentID = openList.min(by: { (lhs, rhs) in
+                (fScore[lhs] ?? Float.infinity) < (fScore[rhs] ?? Float.infinity)
+            }) else {
                 break
             }
 
@@ -68,8 +71,19 @@ public struct EmotionalPathfinder {
                 // Cost = Distance(current, neighbor) + Pattern Difficulty
 
                 // Let's use SoulMath.VACVector directly
-                let vac1 = SoulMath.VACVector(valence: Float(currentEmotion.valence), arousal: Float(currentEmotion.arousal), connection: Float(currentEmotion.connection)).simdValue
-                let vac2 = SoulMath.VACVector(valence: Float(neighbor.valence), arousal: Float(neighbor.arousal), connection: Float(neighbor.connection)).simdValue
+                let v1Vals = (
+                    Float(currentEmotion.valence),
+                    Float(currentEmotion.arousal),
+                    Float(currentEmotion.connection)
+                )
+                let vac1 = SoulMath.VACVector(valence: v1Vals.0, arousal: v1Vals.1, connection: v1Vals.2).simdValue
+
+                let v2Vals = (
+                    Float(neighbor.valence),
+                    Float(neighbor.arousal),
+                    Float(neighbor.connection)
+                )
+                let vac2 = SoulMath.VACVector(valence: v2Vals.0, arousal: v2Vals.1, connection: v2Vals.2).simdValue
 
                 let stepCost = weightedDistance(from: vac1, to: vac2) // Using weighted distance from design doc
                 let tentativeGScore = (gScore[currentID] ?? Float.infinity) + stepCost

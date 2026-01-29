@@ -51,6 +51,10 @@ public final class Emotion {
 
     /// Returns the quaternion representation of this emotion's VAC state.
     public var quaternion: simd_quatf {
-        SoulMath.VACVector(valence: Float(valence), arousal: Float(arousal), connection: Float(connection)).toQuaternion()
+        SoulMath.VACVector(
+            valence: Float(valence),
+            arousal: Float(arousal),
+            connection: Float(connection)
+        ).toQuaternion()
     }
 }
