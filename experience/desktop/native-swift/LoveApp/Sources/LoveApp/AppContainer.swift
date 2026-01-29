@@ -63,7 +63,9 @@ struct AppContainer: View {
 #Preview {
     // Mock Context
     let config = ModelConfiguration(isStoredInMemoryOnly: true)
-    let container = try! ModelContainer(for: EmotionCollection.self, Emotion.self, configurations: config)
+    let container = try? ModelContainer(for: EmotionCollection.self, Emotion.self, configurations: config)
+    if container == nil { fatalError("Preview setup failed") }
+    let validContainer = container!
 
     return AppContainer()
         .environmentObject(DependencyContainer(context: container.mainContext))

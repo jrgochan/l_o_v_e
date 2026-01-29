@@ -18,13 +18,13 @@ final class ModelManagerTests: XCTestCase {
         try? FileManager.default.removeItem(at: tempDir)
     }
 
-    func testRefreshFindsNewModels() {
+    func testRefreshFindsNewModels() throws {
         XCTAssertTrue(manager.localModels.isEmpty)
 
         // Create dummy .gguf file
         let dummyPath = tempDir.appendingPathComponent("test_model.gguf")
         let dummyData = Data("dummy content".utf8)
-        try! dummyData.write(to: dummyPath)
+        try dummyData.write(to: dummyPath)
 
         manager.refreshModels()
 
@@ -32,10 +32,10 @@ final class ModelManagerTests: XCTestCase {
         XCTAssertEqual(manager.localModels.first?.name, "test_model.gguf")
     }
 
-    func testIgnoresNonModels() {
+    func testIgnoresNonModels() throws {
         // Create text file
         let txtPath = tempDir.appendingPathComponent("readme.txt")
-        try! "info".write(to: txtPath, atomically: true, encoding: .utf8)
+        try "info".write(to: txtPath, atomically: true, encoding: .utf8)
 
         manager.refreshModels()
         XCTAssertTrue(manager.localModels.isEmpty)

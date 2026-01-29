@@ -27,19 +27,19 @@ final class CollectionManagerTests: XCTestCase {
         XCTAssertEqual(manager.activeCollectionName, "Collection A")
     }
 
-    func testSwitchByName() {
+    func testSwitchByName() throws {
         manager.switchCollection(toName: "Collection B")
 
         XCTAssertEqual(manager.activeCollectionName, "Collection B")
 
         // Verify DB
         // Verify DB
-        let colB = try! context.fetch(
+        let colB = try context.fetch(
             FetchDescriptor<EmotionCollection>(predicate: #Predicate { $0.name == "Collection B" })
         ).first!
         XCTAssertTrue(colB.isActive)
 
-        let colA = try! context.fetch(
+        let colA = try context.fetch(
             FetchDescriptor<EmotionCollection>(predicate: #Predicate { $0.name == "Collection A" })
         ).first!
         XCTAssertFalse(colA.isActive)

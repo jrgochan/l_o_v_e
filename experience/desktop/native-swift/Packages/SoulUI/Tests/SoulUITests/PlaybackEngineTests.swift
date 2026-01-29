@@ -50,7 +50,7 @@ final class PlaybackEngineTests: XCTestCase {
             messageCount: 5
         )
 
-        session.timeSeriesData = try! JSONEncoder().encode([startMetric, endMetric])
+        session.timeSeriesData = try JSONEncoder().encode([startMetric, endMetric])
         session.endTime = now.addingTimeInterval(10)
     }
 

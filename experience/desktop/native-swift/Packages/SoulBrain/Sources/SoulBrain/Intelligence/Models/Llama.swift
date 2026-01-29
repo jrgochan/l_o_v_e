@@ -123,11 +123,11 @@ class Attention: Module {
 
             func repeatHeads(_ x: MLXArray) -> MLXArray {
                 let shape = x.shape
-                let (B, H_kv, L, D) = (shape[0], shape[1], shape[2], shape[3])
+                let (B, hKV, L, D) = (shape[0], shape[1], shape[2], shape[3])
 
                 var newShape = x.shape
                 newShape.insert(1, at: 2)
-                let expanded = x.reshaped(newShape) // [B, H_kv, 1, L, D]
+                let expanded = x.reshaped(newShape) // [B, hKV, 1, L, D]
                 // broadcast_to is essentially tiling if we rely on implicit broadcasting or explicit tile
                 // But MLX doesn't have a simple 'repeat_interleave' yet in Swift?
                 // Let's rely on broadcasting in matmul if possible? NO, matmul broadcasts 1 -> N, not 8 -> 32.
@@ -140,7 +140,7 @@ class Attention: Module {
                 // Concatenate self nRep times?
 
                 let tiled = MLX.concatenated((0..<nRep).map { _ in expanded }, axis: 2)
-                return tiled.reshaped([B, H_kv * nRep, L, D])
+                return tiled.reshaped([B, hKV * nRep, L, D])
             }
 
             kGQA = repeatHeads(kP)

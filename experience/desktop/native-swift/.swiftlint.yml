@@ -4,7 +4,65 @@ excluded:
   - Packages/**/.build
 
 disabled_rules:
-  - force_cast
-  - force_try
-  - identifier_name
-  - type_body_length
+
+identifier_name:
+  allowed_symbols: ["_"]
+  min_length: 3
+  max_length: 40
+  excluded:
+    - x
+    - y
+    - z
+    - i
+    - j
+    - k
+    - t
+    - v
+    - q
+    - h
+    - w
+    - r
+    - g
+    - b
+    - a
+    - B
+    - L
+    - N
+    - D
+    - p0
+    - p1
+    - p2
+    - p3
+    - t2
+    - t3
+    - v0
+    - v1
+    - v2
+    - dv
+    - da
+    - dc
+    - to
+    - wq
+    - wk
+    - wv
+    - wo
+    - qP
+    - kP
+    - vP
+    - x1
+    - x2
+    - w1
+    - w2
+    - w3
+    - id
+    - ex
+    - p
+    - hr
+    - up
+    - e
+    - dt
+    - n
+    - d
+    - q1
+    - q2
+    - dr
