@@ -124,15 +124,22 @@ public struct SoulView: NSViewRepresentable {
 
     public func updateNSView(_ nsView: MTKView, context: Context) {
         let renderer = context.coordinator
+        
+        syncSettings(renderer)
+        pushData(renderer)
+        handleNavigation(renderer)
+        setupCallbacks(renderer)
+    }
+    
+    private func syncSettings(_ renderer: SoulRenderer) {
         renderer.vibe = SIMD3<Float>(Float(vibe.valence), Float(vibe.arousal), Float(vibe.connection))
         renderer.audioLevel = audioLevel
-        
-        // Settings Sync
         renderer.showParticles = showParticles
         renderer.showLiquid = showLiquid
         renderer.visualMode = visualMode
-        
-        // Push Data to GPU if needed
+    }
+    
+    private func pushData(_ renderer: SoulRenderer) {
         if !emotions.isEmpty && renderer.pointCount != emotions.count {
             let nodes = emotions.map {
                 EmotionEngine.EmotionNode(
@@ -144,14 +151,15 @@ public struct SoulView: NSViewRepresentable {
             }
             renderer.updatePointCloud(with: nodes)
         }
-        
+    }
+    
+    private func handleNavigation(_ renderer: SoulRenderer) {
         // Flight Control
         if let target = selectedEmotion {
              renderer.fly(to: target)
         }
         
         // Update Path
-        // Update Path (Either named emotions or raw spline)
         if !path.isEmpty {
             renderer.updatePath(with: path)
         } else if !splinePoints.isEmpty {
@@ -167,30 +175,23 @@ public struct SoulView: NSViewRepresentable {
                 self.playSequence = false
             }
         }
-        
-        // Update Callbacks
+    }
+    
+    private func setupCallbacks(_ renderer: SoulRenderer) {
         renderer.onSelectionChange = { name in
-            DispatchQueue.main.async {
-                self.selectedEmotion = name
-            }
+            DispatchQueue.main.async { self.selectedEmotion = name }
         }
         
         renderer.onHoverChange = { name in
-            DispatchQueue.main.async {
-                self.hoveredEmotion = name
-            }
+            DispatchQueue.main.async { self.hoveredEmotion = name }
         }
 
         renderer.onVisualModeChange = { mode in
-            DispatchQueue.main.async {
-                self.visualMode = mode
-            }
+            DispatchQueue.main.async { self.visualMode = mode }
         }
         
         renderer.onLabelsUpdate = { newLabels in
-            DispatchQueue.main.async {
-                self.labels = newLabels
-            }
+            DispatchQueue.main.async { self.labels = newLabels }
         }
     }
 

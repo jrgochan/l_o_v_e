@@ -206,70 +206,60 @@ public struct AdminDashboardView: View {
     func contextualPanel(for tab: AdminTab) -> some View {
         switch tab {
         case .views:
-             BookmarksTab(onSave: {
-                 savePreset()
-             }, onRestore: { preset in
-                 restorePreset(preset)
-             })
-             
+             BookmarksTab(onSave: { savePreset() }, onRestore: { restorePreset($0) })
         case .explore:
-            ExploreTab(selectedEmotion: $selectedEmotion,
-                       activeCollectionName: activeCollectionName,
-                       onSearch: onSearch)
-            
+            ExploreTab(selectedEmotion: $selectedEmotion, activeCollectionName: activeCollectionName, onSearch: onSearch)
         case .paths:
-            PathsTab(emotions: emotions, 
-                     computedPath: $computedPath, 
-                     isPlayingPath: $isPlayingPath)
-            
+            PathsTab(emotions: emotions, computedPath: $computedPath, isPlayingPath: $isPlayingPath)
         case .chat:
-            // Unified Chat View
-            ChatView(isRecording: $isMicRecording, 
-                     streamingText: $streamingResponse,
-                     isThinking: $isThinking,
-                     onSend: { text in
-                onChatInput(text)
-            }, onMicTap: {
-                isMicRecording.toggle()
-            })
-            .navigationTitle("Soul Chat")
-            
+            chatPanelView
         case .journeys:
             JourneyTabRoot(onStrategyStart: onStrategyStart, onStrategyComplete: onStrategyComplete)
                 .navigationTitle("Journey")
-            
         case .history:
             HistorySessionList(selectedSession: $selectedSession)
                 .navigationTitle("History")
-            
         case .settings:
-            Form {
-                Section("Graphics") {
-                    Toggle("Show Particles", isOn: $showParticles)
-                    Toggle("Show Liquid", isOn: $showLiquid)
-                    Picker("Visual Mode", selection: $visualMode) { // NEW
-                        ForEach(VisualMode.allCases, id: \.self) { mode in
-                            Text(mode.displayName).tag(mode)
-                        }
-                    }
-                }
-                
-                Section("Collection") {
-                    Picker("Active Dataset", selection: $activeCollectionName) {
-                        ForEach(collections) { collection in
-                            Text(collection.name).tag(collection.name)
-                        }
-                    }
-                }
-                
-                Section("Intelligence") {
-                    NavigationLink(destination: ModelSettingsView()) {
-                        Label("Brain Models", systemImage: "brain")
+            settingsPanelView
+        }
+    }
+    
+    private var chatPanelView: some View {
+        ChatView(isRecording: $isMicRecording, 
+                 streamingText: $streamingResponse,
+                 isThinking: $isThinking,
+                 onSend: { text in onChatInput(text) },
+                 onMicTap: { isMicRecording.toggle() })
+        .navigationTitle("Soul Chat")
+    }
+    
+    private var settingsPanelView: some View {
+        Form {
+            Section("Graphics") {
+                Toggle("Show Particles", isOn: $showParticles)
+                Toggle("Show Liquid", isOn: $showLiquid)
+                Picker("Visual Mode", selection: $visualMode) {
+                    ForEach(VisualMode.allCases, id: \.self) { mode in
+                        Text(mode.displayName).tag(mode)
                     }
                 }
             }
-            .navigationTitle("Settings")
+            
+            Section("Collection") {
+                Picker("Active Dataset", selection: $activeCollectionName) {
+                    ForEach(collections) { collection in
+                        Text(collection.name).tag(collection.name)
+                    }
+                }
+            }
+            
+            Section("Intelligence") {
+                NavigationLink(destination: ModelSettingsView()) {
+                    Label("Brain Models", systemImage: "brain")
+                }
+            }
         }
+        .navigationTitle("Settings")
     }
     // MARK: - Logic
     

@@ -108,7 +108,7 @@ if [ -n "$TARGET_MODULE" ]; then
         typescript|ts|frontend|experience|web)
             RUN_TYPESCRIPT=true
             ;;
-        swift|ios|macos|native)
+        swift|ios|macos|native|native-swift)
             RUN_SWIFT=true
             ;;
         all)

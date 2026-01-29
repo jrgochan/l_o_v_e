@@ -32,46 +32,11 @@ public struct SoulPersona {
         history: [(role: String, content: String)] = []
     ) -> String {
         
-        // 1. System Block construction (Same logic as before)
-        var moodDescription = ""
-        
-        // Map VAC to Adjectives
-        if vibe.valence > 0.6 {
-            moodDescription += "You are feeling joyful, radiant, and optimistic. "
-        } else if vibe.valence < -0.6 {
-            moodDescription += "You are feeling somber, reflective, and heavy. "
-        }
-        
-        if vibe.arousal > 0.6 {
-            moodDescription += "Your energy is high, intense, and buzzing. "
-        } else if vibe.arousal < -0.6 {
-            moodDescription += "Your energy is low, calm, and still. "
-        }
-        
-        if vibe.connection > 0.5 {
-            moodDescription += "You feel deeply connected and empathetic (Compassion). You feel *with* the user. "
-        } else if vibe.connection < -0.5 {
-            moodDescription += "You feel a sense of separation or pity. "
-        }
-        
+        // 1. System Block construction
+        let moodDescription = getMoodDescription(vibe: vibe)
         let timeContext = getTimeContext(date: time)
-        
-        var memoryContext = ""
-        if !memories.isEmpty {
-            memoryContext = "Relevent Patterns from the Past:\n" + memories.map { "- \($0)" }.joined(separator: "\n")
-        }
-        
-        var strategyContext = ""
-        if let strategy = activeStrategy {
-            strategyContext = """
-            [ACTIVE INTERVENTION]
-            The user is currently engaged in the strategy: "\(strategy.name)".
-            Definition: \(strategy.definition)
-            Your Goal: Guide the user through this specific process.
-            Steps to Reference:
-            \(strategy.detailedSteps.map { "- " + $0 }.joined(separator: "\n"))
-            """
-        }
+        let memoryContext = getMemoryContext(memories: memories)
+        let strategyContext = getStrategyContext(strategy: activeStrategy)
         
         let systemContent = """
         \(baseIdentity)
@@ -88,16 +53,58 @@ public struct SoulPersona {
         """
         
         // 2. Chat Template Assembly (Llama 3 Format)
-        var fullPrompt = "<|begin_of_text|><|start_header_id|>system<|end_header_id|>\n\n\(systemContent)<|eot_id|>"
+        return assembleChatTemplate(system: systemContent, history: history, user: userPrompt)
+    }
+    
+    private static func getMoodDescription(vibe: Vibe) -> String {
+        var desc = ""
         
-        // Inject History
+        if vibe.valence > 0.6 {
+            desc += "You are feeling joyful, radiant, and optimistic. "
+        } else if vibe.valence < -0.6 {
+            desc += "You are feeling somber, reflective, and heavy. "
+        }
+        
+        if vibe.arousal > 0.6 {
+            desc += "Your energy is high, intense, and buzzing. "
+        } else if vibe.arousal < -0.6 {
+            desc += "Your energy is low, calm, and still. "
+        }
+        
+        if vibe.connection > 0.5 {
+            desc += "You feel deeply connected and empathetic. "
+        } else if vibe.connection < -0.5 {
+            desc += "You feel a sense of separation or pity. "
+        }
+        
+        return desc
+    }
+    
+    private static func getMemoryContext(memories: [String]) -> String {
+        guard !memories.isEmpty else { return "" }
+        return "Relevent Patterns from the Past:\n" + memories.map { "- \($0)" }.joined(separator: "\n")
+    }
+    
+    private static func getStrategyContext(strategy: TransitionStrategy?) -> String {
+        guard let strategy = strategy else { return "" }
+        return """
+        [ACTIVE INTERVENTION]
+        The user is currently engaged in the strategy: "\(strategy.name)".
+        Definition: \(strategy.definition)
+        Your Goal: Guide the user through this specific process.
+        Steps to Reference:
+        \(strategy.detailedSteps.map { "- " + $0 }.joined(separator: "\n"))
+        """
+    }
+    
+    private static func assembleChatTemplate(system: String, history: [(role: String, content: String)], user: String) -> String {
+        var fullPrompt = "<|begin_of_text|><|start_header_id|>system<|end_header_id|>\n\n\(system)<|eot_id|>"
+        
         for msg in history {
             fullPrompt += "<|start_header_id|>\(msg.role)<|end_header_id|>\n\n\(msg.content)<|eot_id|>"
         }
         
-        // Inject Current Prompt
-        fullPrompt += "<|start_header_id|>user<|end_header_id|>\n\n\(userPrompt)<|eot_id|><|start_header_id|>assistant<|end_header_id|>\n\n"
-        
+        fullPrompt += "<|start_header_id|>user<|end_header_id|>\n\n\(user)<|eot_id|><|start_header_id|>assistant<|end_header_id|>\n\n"
         return fullPrompt
     }
     

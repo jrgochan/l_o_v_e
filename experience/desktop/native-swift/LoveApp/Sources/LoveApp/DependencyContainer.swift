@@ -185,136 +185,135 @@ class DependencyContainer: ObservableObject {
     }
     
     /// Processes user input (Text or Speech) through the VAC pipeline
+    /// Processes user input (Text or Speech) through the VAC pipeline
     func processInput(_ text: String) {
         print("👤 User Input: \(text)")
         
         // 0. Update Conversation History & Analytics
+        logUserMessage(text)
+        
+        // 1. Safety Check
+        guard performSafetyCheck(text) else { return }
+        
+        // 2. Analyze Sentiment
+        analyzeAndUpdateVibe(text)
+        
+        // 3. Generate Response
+        Task { await generateResponse(for: text) }
+    }
+    
+    // MARK: - Helper Methods
+    
+    private func logUserMessage(_ text: String) {
         let userMsg = Message(text: text, isUser: true, vibe: currentVibe)
         context.insert(userMsg)
-        
-        if let session = currentSession {
-            session.messageCount += 1
-        }
-        
-        // ---------------------------------------------------------
-        // SAFETY CHECK
-        // ---------------------------------------------------------
+        currentSession?.messageCount += 1
+    }
+    
+    private func performSafetyCheck(_ text: String) -> Bool {
         let safetyResult = safetyEngine.analyze(text)
-        if !safetyResult.isSafe {
-            print("🚨 Safety Alert Triggered: \(safetyResult.severity) - \(safetyResult.flaggedKeywords)")
-            
-            // Log Alert
-            let alert = ClinicalAlert(
-                severity: safetyResult.severity,
-                triggerKeyword: safetyResult.flaggedKeywords.first ?? "unknown",
-                context: text
-            )
-            context.insert(alert)
-            
-            // Handle Critical
-            if safetyResult.severity == .critical {
-                let safetyResponse = "I hear that you are in pain. Since I'm an AI, I can't provide clinical help. If you are in danger, please contact emergency services or a crisis line immediately."
-                
-                let responseMsg = Message(text: safetyResponse, isUser: false, vibe: self.currentVibe)
-                self.context.insert(responseMsg)
-                self.speak(safetyResponse)
-                return // HALT PROCESSING
-            }
-        }
-        // ---------------------------------------------------------
         
-        // 1. Analyze Sentiment (Simulated using Vibe Match)
+        guard !safetyResult.isSafe else { return true }
+        
+        print("🚨 Safety Alert Triggered: \(safetyResult.severity) - \(safetyResult.flaggedKeywords)")
+        
+        let alert = ClinicalAlert(
+            severity: safetyResult.severity,
+            triggerKeyword: safetyResult.flaggedKeywords.first ?? "unknown",
+            context: text
+        )
+        context.insert(alert)
+        
+        if safetyResult.severity == .critical {
+            handleCriticalSafety(alert)
+            return false
+        }
+        
+        return true
+    }
+    
+    private func handleCriticalSafety(_ alert: ClinicalAlert) {
+        let safetyResponse = "I hear that you are in pain. Since I'm an AI, I can't provide clinical help. If you are in danger, please contact emergency services or a crisis line immediately."
+        let responseMsg = Message(text: safetyResponse, isUser: false, vibe: self.currentVibe)
+        self.context.insert(responseMsg)
+        self.speak(safetyResponse)
+    }
+    
+    private func analyzeAndUpdateVibe(_ text: String) {
         if let matchedVibe = vibe(for: text) {
             print("🧠 Brain: Detected Emotion '\(text)'")
             updateVibe(to: matchedVibe)
         } else {
-            // Analyze using Sentiment Engine if not a direct database match
             let analyzedVibe = SoulBrain.SentimentEngine.analyze(text, baseVibe: currentVibe)
             updateVibe(to: analyzedVibe)
         }
+    }
+    
+    private func generateResponse(for text: String) async {
+        self.streamingResponse = ""
+        self.isThinking = true
         
-        // 2. Generate-Simulate Brain Response (Async)
-        // 2. Generate-Simulate Brain Response (Async)
-        Task {
-            // Signal Start
-            self.streamingResponse = ""
-            self.isThinking = true
-            
-            var accumulatedResponse = ""
-            
-            // LLMEngine now handles Prompt Construction & RAG injection internally.
-            
-            // 2.a Fetch Recent History (Short-Term Memory)
-            var recentHistory: [(role: String, content: String)] = []
-            do {
-                var descriptor = FetchDescriptor<Message>(sortBy: [SortDescriptor(\.timestamp, order: .reverse)])
-                descriptor.fetchLimit = 10
-                let rawMessages = try self.context.fetch(descriptor)
-                // Filter out the current user message effectively to avoid duplication if it was just inserted?
-                // Actually, Llama 3 prompt usually expects: [History] -> [Current User Prompt].
-                // So we should exclude the *just inserted* message from "History", or LLMEngine handles it?
-                // LLM Engine takes `prompt` separately.
-                // The `rawMessages` includes the user message we just inserted at line 188.
-                // We should filter it out or just rely on the fact that LLMEngine appends the prompt at the end?
-                // Let's filter out the very last message if it matches `text`
-                
-                let sortedHistory = rawMessages.sorted { $0.timestamp < $1.timestamp }
-                
-                // Exclude the most recent message (which is the current prompt) to avoid duplication
-                // Because constructPrompt appends the `userPrompt` at the end explicitly.
-                let historyMessages = sortedHistory.dropLast() 
-                
-                recentHistory = historyMessages.map { msg in
-                    (role: msg.isUser ? "user" : "assistant", content: msg.text)
-                }
-            } catch {
-                print("⚠️ Failed to fetch history: \(error)")
-            }
-
-            // PASS ACTIVE STRATEGY & HISTORY HERE
-            for await token in await llmEngine.generate(
-                prompt: text, 
-                vibe: self.currentVibe, 
-                strategy: self.activeStrategy, 
-                history: recentHistory
-            ) {
-                accumulatedResponse += token
-                self.streamingResponse = accumulatedResponse
-                
-                // If it's the first token, we stop "thinking" and start "streaming"
-                if self.isThinking { self.isThinking = false }
-            }
-            
-            // Cleanup
-            self.isThinking = false
-            self.streamingResponse = "" // Clear stream after commit? Or keep until next input? 
-            // Better to keep it until next input or clear it shortly after? 
-            // For now, let's keep it visible until we insert the final message, then maybe delay clear?
-            // Actually, simply clearing it might make it disappear before the chat bubble appears.
-            // The ChatView should likely switch from "Stream" to "History" automatically.
-            
-            let finalResponse = accumulatedResponse.trimmingCharacters(in: .whitespacesAndNewlines)
-            if finalResponse.isEmpty { return }
-            
-            print("🧠 Brain Response: \(finalResponse)")
-            
-            // 3. Save Response
-            let responseMsg = Message(text: finalResponse, isUser: false, vibe: self.currentVibe)
-            self.context.insert(responseMsg)
-            
-            if let session = currentSession {
-                session.messageCount += 1
-            }
-            
-            // 4. Speak
-            self.speak(finalResponse)
-            
-            // Reset Stream *after* commit so UI transition is smooth
-            // (Assuming UI logic: if streamingResponse != empty, show streaming bubble. Else show history.)
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-                self.streamingResponse = ""
-            }
+        var accumulatedResponse = ""
+        let recentHistory = fetchRecentHistory()
+        
+        for await token in await llmEngine.generate(
+            prompt: text,
+            vibe: self.currentVibe,
+            strategy: self.activeStrategy,
+            history: recentHistory
+        ) {
+            accumulatedResponse += token
+            self.streamingResponse = accumulatedResponse
+            if self.isThinking { self.isThinking = false }
         }
+        
+        self.isThinking = false
+        self.streamingResponse = ""
+        
+        let finalResponse = accumulatedResponse.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !finalResponse.isEmpty else { return }
+        
+        print("🧠 Brain Response: \(finalResponse)")
+            
+        // 3. Save Response
+        let responseMsg = Message(text: finalResponse, isUser: false, vibe: self.currentVibe)
+        self.context.insert(responseMsg) // Context is MainActor constrained? Yes, @MainActor class.
+        
+        if let session = self.currentSession {
+            session.messageCount += 1
+        }
+        
+        // 4. Speak
+        self.speak(finalResponse)
+        
+        // 5. Update Vibe based on own response? Optional.
+        
+        // Reset Stream *after* commit so UI transition is smooth
+        // (Assuming UI logic: if streamingResponse != empty, show streaming bubble. Else show history.)
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+            self.streamingResponse = ""
+        }
+    }
+    
+    private func fetchRecentHistory() -> [(role: String, content: String)] {
+        var recentHistory: [(role: String, content: String)] = []
+        do {
+            var descriptor = FetchDescriptor<Message>(sortBy: [SortDescriptor(\.timestamp, order: .reverse)])
+            descriptor.fetchLimit = 10
+            let rawMessages = try self.context.fetch(descriptor)
+            
+            let sortedHistory = rawMessages.sorted { $0.timestamp < $1.timestamp }
+            
+            // Exclude the most recent message (which is the current prompt) to avoid duplication
+            let historyMessages = sortedHistory.dropLast()
+            
+            recentHistory = historyMessages.map { msg in
+                (role: msg.isUser ? "user" : "assistant", content: msg.text)
+            }
+        } catch {
+            print("⚠️ Failed to fetch history: \(error)")
+        }
+        return recentHistory
     }
     
     // MARK: - Semantic Search

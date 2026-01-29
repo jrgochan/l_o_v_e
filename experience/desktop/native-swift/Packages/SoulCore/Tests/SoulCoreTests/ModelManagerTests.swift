@@ -23,7 +23,7 @@ final class ModelManagerTests: XCTestCase {
         
         // Create dummy .gguf file
         let dummyPath = tempDir.appendingPathComponent("test_model.gguf")
-        let dummyData = "dummy content".data(using: .utf8)!
+        let dummyData = Data("dummy content".utf8)
         try! dummyData.write(to: dummyPath)
         
         manager.refreshModels()

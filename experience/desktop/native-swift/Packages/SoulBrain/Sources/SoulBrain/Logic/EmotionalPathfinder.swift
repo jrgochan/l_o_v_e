@@ -160,10 +160,6 @@ public struct EmotionalPathfinder {
             pattern.fromCategory == from.category && pattern.toCategory == to.category
         }
     }
-    
-
-    
-
 }
 
 /// The therapeutic engine responsible for selecting and applying interventions.

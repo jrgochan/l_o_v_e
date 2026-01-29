@@ -36,13 +36,13 @@ public actor LLMEngine {
         logger.info("Initializing with \(type(of: inference))...")
     }
     
-    /// Convenience Init for Production (uses MLX)
-    /// Note: Requires MLX imports available?
-    /// We can leave this out and let the App Composition Root inject it, 
-    /// OR we keep it if we import MLX here or use a Factory.
-    /// For now, let's keep it simple and require injection or provide a static factory?
-    /// Let's stick to explicit injection to force good habits, or default to MLX if possible.
-    /// To compile, we need MLXInferenceProvider visible.
+    // Convenience Init for Production (uses MLX)
+    // Note: Requires MLX imports available?
+    // We can leave this out and let the App Composition Root inject it, 
+    // OR we keep it if we import MLX here or use a Factory.
+    // For now, let's keep it simple and require injection or provide a static factory?
+    // Let's stick to explicit injection to force good habits, or default to MLX if possible.
+    // To compile, we need MLXInferenceProvider visible.
     
     // MARK: - Lifecycle
     

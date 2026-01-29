@@ -157,22 +157,15 @@ public class SoulRenderer: NSObject, MTKViewDelegate {
     
     @MainActor
     public func draw(in view: MTKView) {
-        print("🎨 Draw Start")
         // Ensure viewport size is synced for hit testing
         if viewportSize == .zero { viewportSize = view.drawableSize }
-        
         updateCamera()
         
-        // Important: Set depth buffer in view!
         view.depthStencilPixelFormat = .depth32Float
         
         guard let drawable = view.currentDrawable,
-              let pipeline = pipelineState,
-              let pointPipeline = pointPipeline,
-              let commandBuffer = commandQueue.makeCommandBuffer(),
-              let descriptor = view.currentRenderPassDescriptor else {
-            return
-        }
+              let descriptor = view.currentRenderPassDescriptor,
+              let commandBuffer = commandQueue.makeCommandBuffer() else { return }
         
         // Clear Color: Black
         descriptor.colorAttachments[0].clearColor = MTLClearColor(red: 0, green: 0, blue: 0, alpha: 0)
@@ -183,30 +176,44 @@ public class SoulRenderer: NSObject, MTKViewDelegate {
         descriptor.depthAttachment.loadAction = .clear
         descriptor.depthAttachment.storeAction = .dontCare
         
-        let encoder = commandBuffer.makeRenderCommandEncoder(descriptor: descriptor)!
+        guard let encoder = commandBuffer.makeRenderCommandEncoder(descriptor: descriptor) else { return }
         
-        // Update Uniforms
+        // Prepare Uniforms
+        var uniforms = makeUniforms(view: view)
+        
+        // Render Passes
+        drawPointCloud(encoder: encoder, uniforms: &uniforms)
+        drawPaths(encoder: encoder, uniforms: &uniforms)
+        drawLiquidSphere(encoder: encoder, uniforms: &uniforms)
+        
+        encoder.endEncoding()
+        commandBuffer.present(drawable)
+        commandBuffer.commit()
+        
+        updateLabels()
+    }
+    
+    private func makeUniforms(view: MTKView) -> Uniforms {
         let time = Float(Date().timeIntervalSince(startTime))
-        
-        // Calculate Matrices
         let aspect = Float(view.drawableSize.width / view.drawableSize.height)
         let projectionMatrix = makePerspectiveMatrix(fovyDegrees: camera.fov, aspectRatio: aspect, nearZ: camera.near, farZ: camera.far)
         let viewMatrix = makeLookAtMatrix(eye: camera.position, center: camera.target, up: camera.up)
         
-        var uniforms = Uniforms(
+        return Uniforms(
             time: time,
             mode: Int32(visualMode.rawValue),
             resolution: SIMD2<Float>(Float(view.drawableSize.width), Float(view.drawableSize.height)),
             vibe: vibe,
-            audioLevel: audioLevel, // NEW
-            _padding2: SIMD3<Float>(0, 0, 0), // Adjusted padding
+            audioLevel: audioLevel,
+            _padding2: SIMD3<Float>(0, 0, 0),
             viewMatrix: viewMatrix,
             projectionMatrix: projectionMatrix,
-            invViewMatrix: viewMatrix.inverse // Invert here
+            invViewMatrix: viewMatrix.inverse
         )
-        
-        // Pass 1: Point Cloud (Opaque/Additive internal objects)
-        if showParticles, let pointBuffer = pointBuffer {
+    }
+    
+    private func drawPointCloud(encoder: MTLRenderCommandEncoder, uniforms: inout Uniforms) {
+        if showParticles, let pointBuffer = pointBuffer, let pointPipeline = pointPipeline {
             encoder.setRenderPipelineState(pointPipeline)
             if let depthState = depthState {
                 encoder.setDepthStencilState(depthState)
@@ -215,40 +222,40 @@ public class SoulRenderer: NSObject, MTKViewDelegate {
             encoder.setVertexBuffer(pointBuffer, offset: 0, index: 0)
             encoder.drawPrimitives(type: .point, vertexStart: 0, vertexCount: 1, instanceCount: pointCount)
         }
-        
-        // Pass 2: Path Lines (Internal Glowing Ribbons)
+    }
+    
+    private func drawPaths(encoder: MTLRenderCommandEncoder, uniforms: inout Uniforms) {
         if showPath, let pathBuffer = pathBuffer, let pathPipeline = pathPipeline {
             encoder.setRenderPipelineState(pathPipeline)
-             if let depthState = depthState {
+            if let depthState = depthState {
                 encoder.setDepthStencilState(depthState)
             }
             encoder.setVertexBytes(&uniforms, length: MemoryLayout<Uniforms>.stride, index: 1)
             encoder.setVertexBuffer(pathBuffer, offset: 0, index: 0)
-            
-            // Draw as Triangle Strip (Ribbon)
             encoder.drawPrimitives(type: .triangleStrip, vertexStart: 0, vertexCount: pathVertexCount)
         }
+    }
+    
+    private func drawLiquidSphere(encoder: MTLRenderCommandEncoder, uniforms: inout Uniforms) {
+        guard showLiquid, let pipeline = pipelineState else { return }
         
-        // Pass 3: Liquid Sphere (Transparent Shell - Drawn Last)
-        if showLiquid {
-            encoder.setRenderPipelineState(pipeline)
-            // Translucent Pass: Don't write depth, but TEST against existing depth (points)
-            let depthDesc = MTLDepthStencilDescriptor()
-            depthDesc.depthCompareFunction = .less
-            depthDesc.isDepthWriteEnabled = false 
-            let depthStateRead = device.makeDepthStencilState(descriptor: depthDesc)
-            
-            encoder.setDepthStencilState(depthStateRead)
-            
-            encoder.setFragmentBytes(&uniforms, length: MemoryLayout<Uniforms>.stride, index: 0)
-            encoder.setVertexBytes(&uniforms, length: MemoryLayout<Uniforms>.stride, index: 1)
-            encoder.drawPrimitives(type: .triangle, vertexStart: 0, vertexCount: 6)
+        encoder.setRenderPipelineState(pipeline)
+        
+        // Translucent Pass: Don't write depth, but TEST against existing depth
+        let depthDesc = MTLDepthStencilDescriptor()
+        depthDesc.depthCompareFunction = .less
+        depthDesc.isDepthWriteEnabled = false
+        let depthStateRead = device.makeDepthStencilState(descriptor: depthDesc)
+        
+        if let depthStateRead = depthStateRead {
+             encoder.setDepthStencilState(depthStateRead)
         }
         
-        encoder.endEncoding()
-        commandBuffer.present(drawable)
-        commandBuffer.commit()
-        
+        encoder.setFragmentBytes(&uniforms, length: MemoryLayout<Uniforms>.stride, index: 0)
+        encoder.setVertexBytes(&uniforms, length: MemoryLayout<Uniforms>.stride, index: 1)
+        encoder.drawPrimitives(type: .triangle, vertexStart: 0, vertexCount: 6)
+    }    
+    private func updateLabels() {
         // Post-Frame: Calculate Labels if needed
         if let updateBlock = onLabelsUpdate, !emotionLocations.isEmpty {
             var labels: [(String, CGPoint)] = []
@@ -264,7 +271,6 @@ public class SoulRenderer: NSObject, MTKViewDelegate {
             updateBlock(labels)
         }
     }
-}
 
 // MARK: - Matrix Helpers
 internal func makePerspectiveMatrix(fovyDegrees: Float, aspectRatio: Float, nearZ: Float, farZ: Float) -> matrix_float4x4 {
