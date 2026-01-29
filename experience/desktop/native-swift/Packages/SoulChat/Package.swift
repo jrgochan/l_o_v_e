@@ -1,0 +1,29 @@
+// swift-tools-version: 6.0
+import PackageDescription
+
+let package = Package(
+    name: "SoulChat",
+    platforms: [
+        .macOS(.v14),
+        .iOS(.v17)
+    ],
+    products: [
+        .library(
+            name: "SoulChat",
+            targets: ["SoulChat"]
+        )
+    ],
+    dependencies: [
+        .package(path: "../SoulCore")
+    ],
+    targets: [
+        .target(
+            name: "SoulChat",
+            dependencies: ["SoulCore"]
+        ),
+        .testTarget(
+            name: "SoulChatTests",
+            dependencies: ["SoulChat"]
+        )
+    ]
+)

@@ -1,0 +1,348 @@
+{
+    "version": "1.0",
+    "source": "GoEmotions (Google Research/Reddit)",
+    "metadata": {
+        "total_emotions": 28,
+        "categories": 28,
+        "coordinate_system": "VAC (Valence, Arousal, Connection)",
+        "created": "2026-01-20"
+    },
+    "emotions": [
+        {
+            "emotion_name": "Admiration",
+            "category": "Appreciation",
+            "definition": "Finding something impressive or worthy of respect.",
+            "vac": [
+                0.7,
+                0.4,
+                0.8
+            ],
+            "color_hint": "#44CCFF",
+            "movement_pattern": "orbital"
+        },
+        {
+            "emotion_name": "Amusement",
+            "category": "Joy",
+            "definition": "Finding something funny or entertaining.",
+            "vac": [
+                0.6,
+                0.5,
+                0.6
+            ],
+            "color_hint": "#FFFF44",
+            "movement_pattern": "stable"
+        },
+        {
+            "emotion_name": "Anger",
+            "category": "Anger",
+            "definition": "A strong feeling of annoyance, displeasure, or hostility.",
+            "vac": [
+                -0.6,
+                0.8,
+                -0.7
+            ],
+            "color_hint": "#FF4444",
+            "movement_pattern": "stable"
+        },
+        {
+            "emotion_name": "Annoyance",
+            "category": "Anger",
+            "definition": "Mild anger/irritation caused by a nuisance.",
+            "vac": [
+                -0.4,
+                0.5,
+                -0.4
+            ],
+            "color_hint": "#FF4444",
+            "movement_pattern": "stable"
+        },
+        {
+            "emotion_name": "Approval",
+            "category": "Appreciation",
+            "definition": "Having a positive opinion of something or someone.",
+            "vac": [
+                0.5,
+                0.2,
+                0.6
+            ],
+            "color_hint": "#88FF44",
+            "movement_pattern": "orbital"
+        },
+        {
+            "emotion_name": "Caring",
+            "category": "Love",
+            "definition": "Displaying kindness and concern for others.",
+            "vac": [
+                0.7,
+                0.3,
+                0.9
+            ],
+            "color_hint": "#FF44CC",
+            "movement_pattern": "orbital"
+        },
+        {
+            "emotion_name": "Confusion",
+            "category": "Confusion",
+            "definition": "Lack of understanding or uncertainty.",
+            "vac": [
+                -0.2,
+                0.4,
+                -0.3
+            ],
+            "color_hint": "#FF8844",
+            "movement_pattern": "reaching"
+        },
+        {
+            "emotion_name": "Curiosity",
+            "category": "Interest",
+            "definition": "A strong desire to know or learn something.",
+            "vac": [
+                0.4,
+                0.5,
+                0.5
+            ],
+            "color_hint": "#FF8844",
+            "movement_pattern": "reaching"
+        },
+        {
+            "emotion_name": "Desire",
+            "category": "Desire",
+            "definition": "A strong feeling of wanting to have something or wishing for something to happen.",
+            "vac": [
+                0.6,
+                0.7,
+                0.6
+            ],
+            "color_hint": "#FFCC44",
+            "movement_pattern": "reaching"
+        },
+        {
+            "emotion_name": "Disappointment",
+            "category": "Sadness",
+            "definition": "Sadness or displeasure caused by the nonfulfillment of one's hopes or expectations.",
+            "vac": [
+                -0.6,
+                -0.3,
+                -0.5
+            ],
+            "color_hint": "#4488FF",
+            "movement_pattern": "recoil"
+        },
+        {
+            "emotion_name": "Disapproval",
+            "category": "Disgust",
+            "definition": "Possession or expression of an unfavorable opinion.",
+            "vac": [
+                -0.5,
+                0.3,
+                -0.6
+            ],
+            "color_hint": "#8844FF",
+            "movement_pattern": "recoil"
+        },
+        {
+            "emotion_name": "Disgust",
+            "category": "Disgust",
+            "definition": "A feeling of revulsion or strong disapproval aroused by something unpleasant or offensive.",
+            "vac": [
+                -0.7,
+                0.6,
+                -0.8
+            ],
+            "color_hint": "#8844FF",
+            "movement_pattern": "recoil"
+        },
+        {
+            "emotion_name": "Embarrassment",
+            "category": "Self-Conscious",
+            "definition": "A feeling of self-consciousness, shame, or awkwardness.",
+            "vac": [
+                -0.4,
+                0.5,
+                -0.4
+            ],
+            "color_hint": "#FF4444",
+            "movement_pattern": "recoil"
+        },
+        {
+            "emotion_name": "Excitement",
+            "category": "Joy",
+            "definition": "A feeling of great enthusiasm and eagerness.",
+            "vac": [
+                0.8,
+                0.9,
+                0.7
+            ],
+            "color_hint": "#FFFF44",
+            "movement_pattern": "reaching"
+        },
+        {
+            "emotion_name": "Fear",
+            "category": "Fear",
+            "definition": "An unpleasant emotion caused by the belief that someone or something is dangerous, likely to cause pain, or a threat.",
+            "vac": [
+                -0.7,
+                0.9,
+                -0.6
+            ],
+            "color_hint": "#CCFF44",
+            "movement_pattern": "recoil"
+        },
+        {
+            "emotion_name": "Gratitude",
+            "category": "Appreciation",
+            "definition": "The quality of being thankful; readiness to show appreciation for and to return kindness.",
+            "vac": [
+                0.7,
+                0.2,
+                0.8
+            ],
+            "color_hint": "#FF44CC",
+            "movement_pattern": "orbital"
+        },
+        {
+            "emotion_name": "Grief",
+            "category": "Sadness",
+            "definition": "Deep sorrow, especially that caused by someone's death.",
+            "vac": [
+                -0.8,
+                0.4,
+                -0.7
+            ],
+            "color_hint": "#4488FF",
+            "movement_pattern": "recoil"
+        },
+        {
+            "emotion_name": "Joy",
+            "category": "Joy",
+            "definition": "A feeling of great pleasure and happiness.",
+            "vac": [
+                0.9,
+                0.6,
+                0.8
+            ],
+            "color_hint": "#FFFF44",
+            "movement_pattern": "stable"
+        },
+        {
+            "emotion_name": "Love",
+            "category": "Love",
+            "definition": "An intense feeling of deep affection.",
+            "vac": [
+                0.9,
+                0.5,
+                1.0
+            ],
+            "color_hint": "#FF44CC",
+            "movement_pattern": "orbital"
+        },
+        {
+            "emotion_name": "Nervousness",
+            "category": "Fear",
+            "definition": "The state of being anxious or apprehensive.",
+            "vac": [
+                -0.4,
+                0.7,
+                -0.3
+            ],
+            "color_hint": "#CCFF44",
+            "movement_pattern": "recoil"
+        },
+        {
+            "emotion_name": "Optimism",
+            "category": "Joy",
+            "definition": "Hopefulness and confidence about the future or the successful outcome of something.",
+            "vac": [
+                0.6,
+                0.4,
+                0.5
+            ],
+            "color_hint": "#FFFF44",
+            "movement_pattern": "reaching"
+        },
+        {
+            "emotion_name": "Pride",
+            "category": "Self-Conscious",
+            "definition": "A feeling of deep pleasure or satisfaction derived from one's own achievements.",
+            "vac": [
+                0.7,
+                0.6,
+                0.4
+            ],
+            "color_hint": "#44CCFF",
+            "movement_pattern": "stable"
+        },
+        {
+            "emotion_name": "Realization",
+            "category": "Surprise",
+            "definition": "An act of becoming fully aware of something as a fact.",
+            "vac": [
+                0.3,
+                0.5,
+                0.2
+            ],
+            "color_hint": "#FF8844",
+            "movement_pattern": "reaching"
+        },
+        {
+            "emotion_name": "Relief",
+            "category": "Joy",
+            "definition": "A feeling of reassurance and relaxation following release from anxiety or distress.",
+            "vac": [
+                0.6,
+                -0.4,
+                0.4
+            ],
+            "color_hint": "#FFFF44",
+            "movement_pattern": "stable"
+        },
+        {
+            "emotion_name": "Remorse",
+            "category": "Sadness",
+            "definition": "Deep regret or guilt for a wrong committed.",
+            "vac": [
+                -0.6,
+                0.4,
+                -0.5
+            ],
+            "color_hint": "#4488FF",
+            "movement_pattern": "recoil"
+        },
+        {
+            "emotion_name": "Sadness",
+            "category": "Sadness",
+            "definition": "Emotional pain associated with, or characterized by, feelings of disadvantage, loss, despair, grief, helplessness, disappointment and sorrow.",
+            "vac": [
+                -0.7,
+                -0.4,
+                -0.6
+            ],
+            "color_hint": "#4488FF",
+            "movement_pattern": "recoil"
+        },
+        {
+            "emotion_name": "Surprise",
+            "category": "Surprise",
+            "definition": "The feeling caused by something unexpected or unusual.",
+            "vac": [
+                0.2,
+                0.9,
+                0.1
+            ],
+            "color_hint": "#FF8844",
+            "movement_pattern": "reaching"
+        },
+        {
+            "emotion_name": "Neutral",
+            "category": "Neutral",
+            "definition": "No strong emotion felt or expressed.",
+            "vac": [
+                0.0,
+                0.0,
+                0.0
+            ],
+            "color_hint": "#888888",
+            "movement_pattern": "stable"
+        }
+    ]
+}

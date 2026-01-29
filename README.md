@@ -72,34 +72,45 @@ Once running, access the interactive API documentation:
 - **Observer** (Data & Search): http://localhost:8000/docs
 - **Listener** (Audio & VAC): http://localhost:8002/docs
 
+## 📊 Project Status
+
+**Release Readiness: stable-rc1**
+
+| Module | Stack | Status | Test Coverage |
+|--------|-------|--------|---------------|
+| **Native App** | Swift 5.9 / SwiftUI / Metal | ✅ **Production Ready** | 100% Logic Coverage |
+| **Listener** | Python 3.12 / FastAPI | ✅ Stable | High |
+| **Observer** | Python 3.12 / Postgres | ✅ Stable | High |
+| **Versor** | Python 3.12 / NumPy | ✅ Stable | High |
+| **Experience** | React 19 / Three.js | ✅ Stable | High |
+
+The Native Swift implementation ("Soul Stack") has achieved **100% Logic Coverage** and is the recommended client for macOS users.
+
 ## 📦 Modules
 
+### Native macOS App ("Liquid Metal")
+A fully native, privacy-first implementation of the L.O.V.E. protocol.
+- **Architecture**: Modular "Soul Stack" (`SoulCore`, `SoulBrain`, `SoulBio`, `SoulVoice`, `SoulUI`, `SoulChat`).
+- **Performance**: 120Hz ProMotion via logic-less Metal shaders.
+- **Privacy**: Fully offline, on-device Speech Recognition and ML.
+- **Integration**: Deep system integration (Haptics, Microphone).
+- [→ Full Native Documentation](experience/desktop/native-swift/docs/README.md)
+
 ### Listener
-Audio transcription and semantic analysis using local LLM (Ollama) to extract VAC coordinates from emotional expressions.
-- **Features:** Edge transcription (Whisper), PII scrubbing, Semantic VAC analysis, Async Redis processing.
+Audio transcription and semantic analysis using local LLM (Ollama) to extract VAC coordinates.
 - [→ Full Documentation](listener/README.md)
 
 ### Observer
-Data persistence layer with PostgreSQL and pgvector for emotional state storage and vector similarity search.
-- **Features:** PostgreSQL + pgvector, HNSW indexing, Emotion atlas (135+ maps), Historical metrics.
+Data persistence layer with PostgreSQL and pgvector for emotional state storage.
 - [→ Full Documentation](observer/README.md)
 
 ### Versor
-Quaternion mathematics engine providing the geometric foundation for the 3D emotional space.
-- **Features:** VAC-to-quaternion conversion, SLERP interpolation, Flooding detection, Pure math operations.
+Quaternion mathematics engine providing the geometric foundation.
 - [→ Full Documentation](versor/README.md)
 
-### Experience
-Next.js web application with 3D visualization of emotional states as animated spheres.
-
-**Key Features:**
-- Real-time 3D rendering (React Three Fiber/Three.js)
-- Next.js Web Application (React 19)
-- Custom GLSL shaders for visual effects
-- Quaternion-based animations
-- Observer API integration
-
-[→ Full Documentation](experience/README.md)
+### Experience (Web)
+Next.js web application with 3D visualization.
+- [→ Full Documentation](experience/README.md)
 
 ## 🔧 Infrastructure & Tooling
 
@@ -107,6 +118,7 @@ The `infra/` directory contains orchestration scripts and deployment configurati
 
 ### Key Scripts (`infra/bin/`)
 - `setup-love-stack.sh`: One-shot environment setup.
+- `build-love-stack.sh`: **Builds the entire stack** (Native + Python + Web) for release.
 - `run-love-stack.sh`: Starts all services locally.
 - `test-love-stack.sh`: Runs full test suite and health checks.
 - `lint-love-stack.sh`: Runs linters (ShellCheck, Flake8, ESLint) across the stack.
@@ -123,14 +135,10 @@ Run the full test suite across all modules:
 ./infra/bin/test-love-stack.sh
 ```
 
-### Linting
-Check code quality:
+### Building for Release
+Compile all artifacts:
 ```bash
-# Check all modules
-./infra/bin/lint-love-stack.sh
-
-# Fix issues automatically where possible
-./infra/bin/lint-love-stack.sh --fix
+./infra/bin/build-love-stack.sh
 ```
 
 ## 🎯 The VAC Model

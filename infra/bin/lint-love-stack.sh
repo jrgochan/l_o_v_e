@@ -41,6 +41,7 @@ TARGET_MODULE=""
 RUN_INFRA=true
 RUN_PYTHON=true
 RUN_TYPESCRIPT=true
+RUN_SWIFT=true
 
 while [[ $# -gt 0 ]]; do
     case "$1" in
@@ -107,10 +108,14 @@ if [ -n "$TARGET_MODULE" ]; then
         typescript|ts|frontend|experience|web)
             RUN_TYPESCRIPT=true
             ;;
+        swift|ios|macos|native)
+            RUN_SWIFT=true
+            ;;
         all)
             RUN_INFRA=true
             RUN_PYTHON=true
             RUN_TYPESCRIPT=true
+            RUN_SWIFT=true
             ;;
         *)
             print_error "Unknown module: $TARGET_MODULE"
@@ -206,6 +211,18 @@ if [ "$RUN_TYPESCRIPT" = true ]; then
     
     if "$PROJECT_ROOT/infra/scripts/check-typescript-quality.sh" "${TS_ARGS[@]+"${TS_ARGS[@]}"}"; then
         # Script prints its own success message
+        :
+    else
+        GLOBAL_EXIT_CODE=1
+    fi
+fi
+
+# --- 4. Swift (Native) ---
+if [ "$RUN_SWIFT" = true ]; then
+    echo ""
+    
+    # Call the new swift quality script
+    if "$PROJECT_ROOT/infra/scripts/check-swift-quality.sh"; then
         :
     else
         GLOBAL_EXIT_CODE=1

@@ -48,20 +48,15 @@ final class Memory {
 ```
 
 ### 1.3. `Vibe` (Emotional State)
-A discrete point on the Valence/Arousal graph.
-```swift
-@Model
-final class Vibe {
-    var timestamp: Date
-    var valence: Double // -1.0 (Sad) to 1.0 (Joy)
-    var arousal: Double // 0.0 (Calm) to 1.0 (Excited)
-    var source: VibeSource // .manual, .bio, .text
-}
+A discrete point on the Valence/Arousal graph. Implemented as a `Codable` struct for portability.
 
-enum VibeSource: Codable {
-    case manual // User dragged the slider
-    case bio // Calculated from HRV
-    case text // Extracted from Journal
+```swift
+public struct Vibe: Codable, Sendable {
+    public let id: UUID
+    public let timestamp: Date
+    public let valence: Double // -1.0 to 1.0
+    public let arousal: Double // -1.0 to 1.0
+    public let connection: Double // -1.0 to 1.0
 }
 ```
 

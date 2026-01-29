@@ -27,12 +27,25 @@ The architecture is fully documented in the `docs/` directory.
 12. [**Global Soul (i18n)**](docs/12_GLOBAL_SOUL_I18N.md): Localization and Cultural Emotions.
 13. [**Quality Assurance**](docs/13_QUALITY_ASSURANCE_AND_METRICS.md): MetricKit and Privacy-first Telemetry.
 
-## 🚀 Getting Started (Future)
+## 🚀 Quick Start
+    
+1.  **Setup Environment**
+    ```bash
+    make setup
+    ```
 
-*   Open `LoveSoul.xcworkspace` in Xcode 16+.
-*   Select the `LoveApp` target.
-*   Run (Cmd+R).
-
+2.  **Build & Run**
+    ```bash
+    make run
+    ```
+    
+3.  **Test**
+    ```bash
+    make test
+    ```
+    
+OR open `LoveSoul.xcworkspace` in Xcode 16+ and run the `LoveApp` scheme.
+    
 ## 🛠 Prerequisites
 
 *   **Xcode**: 16.0+ (Swift 6 support)

@@ -382,6 +382,36 @@ run_npm_test() {
     fi
 }
 
+run_native_swift_test() {
+    if [[ "$TARGET_MODULE" != "all" && "$TARGET_MODULE" != "native-swift" ]]; then return 0; fi
+    
+    print_info "Testing Native Swift..."
+    
+    local swift_exit_code=0
+    (
+        cd "experience/desktop/native-swift"
+        
+        # Check if make exists
+        if ! command -v make &> /dev/null; then
+            print_warning "Skipping Native Swift (make not found)"
+            exit 1
+        fi
+        
+        if [[ "$VERBOSE" == "true" ]]; then
+             make test
+        else
+             make test >/dev/null 2>&1
+        fi
+    ) || swift_exit_code=$?
+    
+    if [ $swift_exit_code -eq 0 ]; then
+        print_success "Native Swift tests passed"
+    else
+        print_error "Native Swift tests failed"
+        EXIT_CODE=1
+    fi
+}
+
 run_all_tests() {
     print_header "🧪 Running Tests"
     
@@ -389,6 +419,7 @@ run_all_tests() {
     run_pytest "observer" "Observer"
     run_pytest "listener" "Listener"
     run_npm_test
+    run_native_swift_test
 }
 
 check_critical() {

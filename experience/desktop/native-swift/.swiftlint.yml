@@ -1,0 +1,14 @@
+excluded:
+  - LoveApp/.build
+  - .build
+  - Packages/**/.build
+
+disabled_rules:
+  - trailing_whitespace
+  - line_length
+  - force_cast
+  - force_try
+  - identifier_name
+  - type_body_length
+  - function_body_length
+  - file_length
