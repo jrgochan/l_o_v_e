@@ -7,6 +7,7 @@ import SwiftData
 import LoveAppFeature
 
 @main
+@available(macOS 14, iOS 17, *)
 struct LoveApp: App {
     let container: ModelContainer
     @StateObject private var depContainer: DependencyContainer

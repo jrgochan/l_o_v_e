@@ -4,6 +4,7 @@ import SoulCore
 import SoulChat
 import SwiftData
 
+@available(macOS 14, iOS 17, *)
 public struct AppContainer: View {
     @EnvironmentObject var deps: DependencyContainer
 

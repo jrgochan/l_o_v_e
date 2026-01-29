@@ -4,6 +4,7 @@ import simd
 
 /// A* Pathfinding Engine for the Soul Sphere.
 /// Ports logic from `observer/app/services/path_planner.py`.
+@available(macOS 14, iOS 17, *)
 public struct EmotionalPathfinder {
 
     // Tuning Weights

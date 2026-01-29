@@ -4,7 +4,7 @@ import SoulCore
 
 /// The rhythmic heart of the AI.
 /// Translates VAC vectors into physical sensations.
-@available(macOS 10.15, iOS 13.0, *)
+@available(macOS 14, iOS 17, *)
 public class HapticEngine: ObservableObject, @unchecked Sendable {
     private var engine: CHHapticEngine?
     private var isEngineRunning = false

@@ -3,6 +3,7 @@ import SoulCore
 
 /// Defines the personality and context of the AI "Soul".
 /// Responsible for constructing the System Prompt injected into the LLM.
+@available(macOS 14, iOS 17, *)
 public struct SoulPersona {
 
     /// The core identity of the Soul.

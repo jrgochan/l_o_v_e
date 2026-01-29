@@ -4,6 +4,7 @@ import SoulCore
 import SoulBrain
 
 /// Manages semantic search capabilities including embedding generation and vector indexing.
+@available(macOS 14, iOS 17, *)
 actor SemanticSearchManager {
     private let embedder: Embedder
     private let index: VectorIndex

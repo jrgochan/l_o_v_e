@@ -2,6 +2,7 @@ import SwiftUI
 import SwiftData
 import SoulCore
 
+@available(macOS 14, iOS 17, *)
 public struct ChatView: View {
     @StateObject private var viewModel = ChatViewModel()
     @Query(sort: \Message.timestamp, order: .forward) private var messages: [Message]

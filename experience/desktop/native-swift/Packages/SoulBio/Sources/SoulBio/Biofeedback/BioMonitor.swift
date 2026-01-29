@@ -32,6 +32,7 @@ public actor SimulationBioSource: BioSource {
 }
 
 @MainActor
+@available(macOS 14, iOS 17, *)
 public class BioMonitor: ObservableObject {
     @Published public var heartRate: Double = 72.0
     @Published public var hrv: Double = 50.0

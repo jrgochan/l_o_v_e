@@ -10,6 +10,7 @@ import SoulChat
 
 /// Central Logic Hub: The connectivity tissue between Body (UI), Mind (Brain), and Soul (Core)
 @MainActor
+@available(macOS 14, iOS 17, *)
 public class DependencyContainer: ObservableObject {
     // Services
     let context: ModelContext

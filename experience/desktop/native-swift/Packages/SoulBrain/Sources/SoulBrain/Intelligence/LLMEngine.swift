@@ -16,6 +16,7 @@ public protocol InferenceProvider: Sendable {
 
 /// The Intelligence Engine powering the "Mind".
 /// Coordinates Memory Retrieval and Inference Generation.
+@available(macOS 14, iOS 17, *)
 public actor LLMEngine {
 
     internal let memoryIndex = VectorIndex()

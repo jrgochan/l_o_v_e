@@ -68,6 +68,7 @@ class InteractiveMTKView: MTKView {
     }
 }
 
+@available(macOS 14, iOS 17, *)
 public struct SoulView: NSViewRepresentable {
     @Binding var vibe: Vibe
     @Binding var selectedEmotion: String?
