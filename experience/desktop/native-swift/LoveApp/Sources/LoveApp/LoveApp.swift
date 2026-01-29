@@ -4,6 +4,7 @@ import SoulUI
 import SoulBrain
 import SoulChat
 import SwiftData
+import LoveAppFeature
 
 @main
 struct LoveApp: App {

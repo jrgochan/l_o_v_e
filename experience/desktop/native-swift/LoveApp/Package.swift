@@ -21,8 +21,8 @@ let package = Package(
         .package(path: "../Packages/SoulChat")
     ],
     targets: [
-        .executableTarget(
-            name: "LoveApp",
+        .target(
+            name: "LoveAppFeature",
             dependencies: [
                 "SoulCore",
                 "SoulUI",
@@ -30,6 +30,12 @@ let package = Package(
                 "SoulBio",
                 "SoulVoice",
                 "SoulChat"
+            ]
+        ),
+        .executableTarget(
+            name: "LoveApp",
+            dependencies: [
+                "LoveAppFeature"
             ],
             resources: [
                 // Add any resources here if needed

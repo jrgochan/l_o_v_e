@@ -4,16 +4,14 @@ import SoulCore
 import SoulChat
 import SwiftData
 
-struct AppContainer: View {
+public struct AppContainer: View {
     @EnvironmentObject var deps: DependencyContainer
 
-    var body: some View {
+    public var body: some View {
         ZStack {
             // LAYER 1: The Void (Background)
             Color.black.ignoresSafeArea()
 
-            // LAYER 2: Admin Dashboard & Visualization
-            // This replaces the simple VibeOrb background with the full 3D Admin Interface
             // LAYER 2: Admin Dashboard & Visualization
             // This replaces the simple VibeOrb background with the full 3D Admin Interface
             AdminDashboardView(
@@ -58,6 +56,8 @@ struct AppContainer: View {
             deps.startListening()
         }
     }
+
+    public init() {}
 }
 
 #Preview {
@@ -67,6 +67,6 @@ struct AppContainer: View {
     if container == nil { fatalError("Preview setup failed") }
     let validContainer = container!
 
-    return AppContainer()
-        .environmentObject(DependencyContainer(context: container.mainContext))
+    AppContainer()
+        .environmentObject(DependencyContainer(context: container!.mainContext))
 }

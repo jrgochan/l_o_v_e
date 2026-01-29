@@ -10,7 +10,7 @@ import SoulChat
 
 /// Central Logic Hub: The connectivity tissue between Body (UI), Mind (Brain), and Soul (Core)
 @MainActor
-class DependencyContainer: ObservableObject {
+public class DependencyContainer: ObservableObject {
     // Services
     let context: ModelContext
     let emotionEngine: EmotionEngine
@@ -53,7 +53,7 @@ class DependencyContainer: ObservableObject {
 
     private var cancellables = Set<AnyCancellable>()
 
-    init(context: ModelContext) {
+    public init(context: ModelContext) {
         // ... (Existing Inits)
         self.context = context
         self.collectionManager = CollectionManager(context: context)
