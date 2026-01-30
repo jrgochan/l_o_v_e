@@ -63,7 +63,7 @@ public struct GlassPane<Content: View>: View {
                             height: lastOffset.height + value.translation.height
                         )
                     }
-                    .onEnded { value in
+                    .onEnded { _ in
                         lastOffset = offset
                     }
             )

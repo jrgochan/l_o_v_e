@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>CFBundleIdentifier</key>
+    <string>com.jrgochan.LoveApp</string>
+    <key>CFBundleName</key>
+    <string>LoveApp</string>
+    <key>CFBundleShortVersionString</key>
+    <string>1.0</string>
+    <key>CFBundleVersion</key>
+    <string>1</string>
+    
+    <!-- Privacy - Microphone (Required for Voice Viz & Chat) -->
+    <key>NSMicrophoneUsageDescription</key>
+    <string>We need access to your microphone to visualize your voice and enable voice chat.</string>
+    
+    <!-- Privacy - Speech Recognition (Required for Transcription) -->
+    <key>NSSpeechRecognitionUsageDescription</key>
+    <string>We use speech recognition to transcribe your voice for the AI interaction.</string>
+    
+    <!-- Privacy - Health (Anticipatory for BioMonitor) -->
+    <key>NSHealthShareUsageDescription</key>
+    <string>We analyze heart rate data to adapt the AI's emotional responses.</string>
+    <key>NSHealthUpdateUsageDescription</key>
+    <string>We may sync relaxation sessions back to your health data.</string>
+    
+    <!-- UI Configuration -->
+    <key>UIViewControllerBasedStatusBarAppearance</key>
+    <false/>
+    <key>UIStatusBarHidden</key>
+    <true/>
+    <key>UISupportsDocumentBrowser</key>
+    <false/>
+    
+    <!-- Scoped Capabilities -->
+    <key>UIRequiredDeviceCapabilities</key>
+    <array>
+        <string>arm64</string>
+        <string>metal</string>
+    </array>
+</dict>
+</plist>

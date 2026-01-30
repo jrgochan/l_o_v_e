@@ -14,15 +14,16 @@ public struct AppContainer: View {
         SoulExperienceView(
             vibe: Bindable(deps).currentVibe,
             activeCollectionName: Bindable(deps).activeCollectionName,
-            isMicRecording: Bindable(deps).isMicRecording,
+            isMicRecording: Bindable(deps).isVoiceModeEnabled,
             audioLevel: Bindable(deps).audioLevel,
             streamingResponse: Bindable(deps).streamingResponse,
             isThinking: Bindable(deps).isThinking,
+            liveInputText: Bindable(deps).liveInputText,
             breathPublisher: deps.breathPublisher,
             hapticEngine: deps.hapticEngine,
             bioMonitor: deps.bioMonitor,
             onChatInput: { text in deps.processInput(text) },
-            onMicTap: { deps.isMicRecording.toggle() },
+            onMicTap: { deps.isVoiceModeEnabled.toggle() },
             onLongPressOrb: { deps.isMicRecording ? deps.stopListening() : deps.startListening() },
             onSearch: { q in await deps.searchEmotions(query: q) }
         )
@@ -41,8 +42,11 @@ public struct AppContainer: View {
 
 #Preview {
     let config = ModelConfiguration(isStoredInMemoryOnly: true)
-    let container = try! ModelContainer(for: Emotion.self, configurations: config)
-    
-    return AppContainer()
-        .environment(DependencyContainer(context: container.mainContext))
+    do {
+        let container = try ModelContainer(for: Emotion.self, configurations: config)
+        return AppContainer()
+            .environment(DependencyContainer(context: container.mainContext))
+    } catch {
+        return Text("Preview Error: \(error.localizedDescription)")
+    }
 }

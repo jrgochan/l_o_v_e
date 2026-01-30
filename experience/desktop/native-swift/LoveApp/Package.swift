@@ -57,6 +57,14 @@ let package = Package(
             ],
             swiftSettings: [
                 .unsafeFlags(["-Xfrontend", "-strict-concurrency=complete"])
+            ],
+            linkerSettings: [
+                .unsafeFlags([
+                    "-Xlinker", "-sectcreate",
+                    "-Xlinker", "__TEXT",
+                    "-Xlinker", "__info_plist",
+                    "-Xlinker", "Sources/LoveApp/Info.plist"
+                ])
             ]
         )
     ]

@@ -16,6 +16,7 @@ public struct SoulExperienceView: View {
     @Binding var audioLevel: Float
     @Binding var streamingResponse: String
     @Binding var isThinking: Bool
+    @Binding var liveInputText: String
     
     // Services
     var breathPublisher: BreathPublisher
@@ -54,6 +55,7 @@ public struct SoulExperienceView: View {
                 audioLevel: Binding<Float>,
                 streamingResponse: Binding<String>,
                 isThinking: Binding<Bool>,
+                liveInputText: Binding<String>,
                 breathPublisher: BreathPublisher,
                 hapticEngine: HapticEngine,
                 bioMonitor: BioMonitor,
@@ -67,6 +69,7 @@ public struct SoulExperienceView: View {
         self._audioLevel = audioLevel
         self._streamingResponse = streamingResponse
         self._isThinking = isThinking
+        self._liveInputText = liveInputText
         self.breathPublisher = breathPublisher
         self.hapticEngine = hapticEngine
         self.bioMonitor = bioMonitor
@@ -123,116 +126,7 @@ public struct SoulExperienceView: View {
             }
             
             // LAYER 3: HUD & Controls (Clean Replica Layout)
-            VStack {
-                // Top Status Pill
-                HStack {
-                    Spacer()
-                    HStack(spacing: 8) {
-                        Circle()
-                            .fill(Color.white.opacity(0.3))
-                            .frame(width: 6, height: 6)
-                        
-                        Text(selectedEmotion?.uppercased() ?? "NO ACTIVE JOURNEY")
-                            .font(.system(size: 11, weight: .bold, design: .monospaced))
-                            .kerning(1.5)
-                            .foregroundStyle(.white.opacity(0.8))
-                    }
-                    .padding(.horizontal, 16)
-                    .padding(.vertical, 8)
-                    .background(.ultraThinMaterial, in: Capsule())
-                    .overlay(Capsule().stroke(.white.opacity(0.1), lineWidth: 1))
-                    .padding(.top, 20)
-                    Spacer()
-                }
-                
-                Spacer()
-                
-                // Bottom Controls Area
-                HStack(alignment: .bottom) {
-                    // Left: Menu / Settings
-                    ZStack(alignment: .bottomLeading) {
-                        if isMenuOpen {
-                            SoulSideMenu(isPresented: $isMenuOpen) { action in
-                                hapticEngine.playSelection()
-                                
-                                if action == .visualMode {
-                                    // Cycle Visual Mode
-                                    if let idx = VisualMode.allCases.firstIndex(of: visualMode) {
-                                        let next = (idx + 1) % VisualMode.allCases.count
-                                        visualMode = VisualMode.allCases[next]
-                                    }
-                                } else {
-                                    withAnimation(.spring(response: 0.5, dampingFraction: 0.7)) {
-                                        activePane = action
-                                    }
-                                }
-                            }
-                            .offset(y: -70) // Float above button
-                        }
-                        
-                        Button {
-                            hapticEngine.playSelection()
-                            withAnimation(.bouncy) { isMenuOpen.toggle() }
-                        } label: {
-                            Image(systemName: isMenuOpen ? "xmark" : "line.3.horizontal")
-                                .font(.system(size: 20))
-                                .foregroundStyle(.white.opacity(0.8))
-                                .frame(width: 50, height: 50)
-                                .background(.ultraThinMaterial)
-                                .clipShape(Circle())
-                                .overlay(Circle().stroke(.white.opacity(0.1), lineWidth: 1))
-                        }
-                        .buttonStyle(.plain)
-                    }
-                    .frame(width: 60, height: 60)
-                    
-                    Spacer()
-                    
-                    // Center: The Soul Orb
-                    SoulOrb(
-                        vibe: $vibe,
-                        isListening: $isMicRecording,
-                        audioLevel: audioLevel,
-                        onTap: {
-                            // Orb Tap Action (e.g. Pulse or Reset)
-                            hapticEngine.playSelection()
-                        },
-                        onLongPress: {
-                            hapticEngine.playSelection()
-                            onLongPressOrb()
-                        }
-                    )
-                    .frame(width: 140, height: 140)
-                    .offset(y: 20) // Slight bleed off bottom
-                    
-                    Spacer()
-                    
-                    // Right: Chat Toggle
-                    Button {
-                        hapticEngine.playSelection()
-                        // Toggle Chat Pane directly
-                        withAnimation {
-                            if activePane == .chat {
-                                activePane = nil
-                            } else {
-                                activePane = .chat
-                            }
-                        }
-                    } label: {
-                        Image(systemName: "bubble.left.and.bubble.right.fill")
-                            .font(.system(size: 20))
-                            .foregroundStyle(activePane == .chat ? .white : .white.opacity(0.8))
-                            .frame(width: 50, height: 50)
-                            .background(activePane == .chat ? AnyShapeStyle(Color.indigo.opacity(0.5)) : AnyShapeStyle(.ultraThinMaterial))
-                            .clipShape(Circle())
-                            .overlay(Circle().stroke(.white.opacity(0.1), lineWidth: 1))
-                    }
-                    .buttonStyle(.plain)
-                    .frame(width: 60, height: 60)
-                }
-                .padding(.horizontal, 40)
-                .padding(.bottom, 30)
-            }
+            hudLayer
         }
     }
     
@@ -245,6 +139,7 @@ public struct SoulExperienceView: View {
                 isRecording: $isMicRecording,
                 streamingText: $streamingResponse,
                 isThinking: $isThinking,
+                transcribedText: $liveInputText,
                 onSend: { text in onChatInput(text) },
                 onMicTap: { onMicTap() }
             )
@@ -303,6 +198,121 @@ public struct SoulExperienceView: View {
             
         case .visualMode:
             EmptyView() // Handled inline, no pane needed
+        }
+    }
+    
+    
+    // MARK: - Subviews
+    private var hudLayer: some View {
+        VStack {
+            // Top Status Pill
+            HStack {
+                Spacer()
+                HStack(spacing: 8) {
+                    Circle()
+                        .fill(Color.white.opacity(0.3))
+                        .frame(width: 6, height: 6)
+                    
+                    Text(selectedEmotion?.uppercased() ?? "NO ACTIVE JOURNEY")
+                        .font(.system(size: 11, weight: .bold, design: .monospaced))
+                        .kerning(1.5)
+                        .foregroundStyle(.white.opacity(0.8))
+                }
+                .padding(.horizontal, 16)
+                .padding(.vertical, 8)
+                .background(.ultraThinMaterial, in: Capsule())
+                .overlay(Capsule().stroke(.white.opacity(0.1), lineWidth: 1))
+                .padding(.top, 20)
+                Spacer()
+            }
+            
+            Spacer()
+            
+            // Bottom Controls Area
+            HStack(alignment: .bottom) {
+                // Left: Menu / Settings
+                ZStack(alignment: .bottomLeading) {
+                    if isMenuOpen {
+                        SoulSideMenu(isPresented: $isMenuOpen) { action in
+                            hapticEngine.playSelection()
+                            
+                            if action == .visualMode {
+                                // Cycle Visual Mode
+                                if let idx = VisualMode.allCases.firstIndex(of: visualMode) {
+                                    let next = (idx + 1) % VisualMode.allCases.count
+                                    visualMode = VisualMode.allCases[next]
+                                }
+                            } else {
+                                withAnimation(.spring(response: 0.5, dampingFraction: 0.7)) {
+                                    activePane = action
+                                }
+                            }
+                        }
+                        .offset(y: -70) // Float above button
+                    }
+                    
+                    Button {
+                        hapticEngine.playSelection()
+                        withAnimation(.bouncy) { isMenuOpen.toggle() }
+                    } label: {
+                        Image(systemName: isMenuOpen ? "xmark" : "line.3.horizontal")
+                            .font(.system(size: 20))
+                            .foregroundStyle(.white.opacity(0.8))
+                            .frame(width: 50, height: 50)
+                            .background(.ultraThinMaterial)
+                            .clipShape(Circle())
+                            .overlay(Circle().stroke(.white.opacity(0.1), lineWidth: 1))
+                    }
+                    .buttonStyle(.plain)
+                }
+                .frame(width: 60, height: 60)
+                
+                Spacer()
+                
+                // Center: The Soul Orb
+                SoulOrb(
+                    vibe: $vibe,
+                    isListening: $isMicRecording,
+                    audioLevel: audioLevel,
+                    onTap: {
+                        // Orb Tap Action (e.g. Pulse or Reset)
+                        hapticEngine.playSelection()
+                    },
+                    onLongPress: {
+                        hapticEngine.playSelection()
+                        onLongPressOrb()
+                    }
+                )
+                .frame(width: 140, height: 140)
+                .offset(y: 20) // Slight bleed off bottom
+                
+                Spacer()
+                
+                // Right: Chat Toggle
+                Button {
+                    hapticEngine.playSelection()
+                    // Toggle Chat Pane directly
+                    withAnimation {
+                        if activePane == .chat {
+                            activePane = nil
+                        } else {
+                            activePane = .chat
+                        }
+                    }
+                } label: {
+                    Image(systemName: "bubble.left.and.bubble.right.fill")
+                        .font(.system(size: 20))
+                        .foregroundStyle(activePane == .chat ? .white : .white.opacity(0.8))
+                        .frame(width: 50, height: 50)
+                        .background(activePane == .chat ? AnyShapeStyle(Color.indigo.opacity(0.5)) : AnyShapeStyle(.ultraThinMaterial))
+                        .clipShape(Circle())
+                        .overlay(Circle().stroke(.white.opacity(0.1), lineWidth: 1))
+                }
+                .buttonStyle(.plain)
+                .frame(width: 60, height: 60)
+            }
+            .padding(.horizontal, 40)
+            .padding(.bottom, 30)
         }
     }
     

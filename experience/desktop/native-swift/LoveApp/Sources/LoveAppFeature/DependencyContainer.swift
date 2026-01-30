@@ -46,6 +46,7 @@ public class DependencyContainer {
     // Audio / Voice State
     public var isMicRecording: Bool = false
     public var audioLevel: Float = 0.0
+    public var liveInputText: String = "" // Live Transcription
     public var isVoiceModeEnabled: Bool = false {
         didSet {
             if isVoiceModeEnabled {
@@ -77,25 +78,24 @@ public class DependencyContainer {
         self.safetyEngine = SafetyEngine()
         self.breathPublisher = BreathPublisher()
 
-        // Semantic Search Init
+        // TEMPORARY: Force MockEmbedder on macOS to fix build crash until resources are bundled
         #if os(macOS)
-        let embedder = MLXEmbedder()
-        self.embedder = embedder
-        self.inference = MLXInferenceProvider()
+            let embedder = MockEmbedder()
+            self.embedder = embedder
+            // Use MockInferenceProvider if available, otherwise just nil safely or mock
+            // Assuming MLXInferenceProvider is also problematic if it depends on same libs
+            // But let's try just swapping embedder first, or both.
+            // Safest: Use Mock for everything to verify Voice Flow.
+            self.inference = MockInferenceProvider()
+            self.llmEngine = LLMEngine(embedder: self.embedder, inference: self.inference)
         #else
-        let embedder = MockEmbedder() // Use MockEmbedder as SoulEmbedder is not defined
-        self.embedder = embedder
-        // Assuming MockInferenceProvider exists and is public
-        self.inference = MockInferenceProvider() 
+            let embedder = MockEmbedder()
+            self.embedder = embedder
+            self.inference = MockInferenceProvider()
+            self.llmEngine = LLMEngine(embedder: self.embedder, inference: self.inference)
         #endif
         
         self.searchManager = SemanticSearchManager(container: context.container, embedder: self.embedder)
-        
-        #if os(macOS)
-            self.llmEngine = LLMEngine(embedder: self.embedder, inference: MLXInferenceProvider())
-        #else
-            self.llmEngine = LLMEngine(embedder: self.embedder, inference: MockInferenceProvider())
-        #endif
 
         print("🧬 DependencyContainer: Core Systems Online")
 
@@ -119,35 +119,27 @@ public class DependencyContainer {
     }
 
     private func setupSubscriptions() {
-        // Voice Mode Toggle
-        // In Observable world, we track this manually or use didSet/onChange in View.
-        // For logic internal to the controller, didSet on the property is cleaner.
-        // But activeCollectionName uses didSet, so we can move this logic to didSet or a setter.
-        // For now, let's keep it here but we need a meaningful replacement for $isVoiceModeEnabled.sink
-        // The property "isVoiceModeEnabled" is now just a var.
-        // Let's comment this out and move logic to `didSet` of `isVoiceModeEnabled`.
-
-         // Audio Level Sync (One-way: SpeechEngine -> DependencyContainer -> UI)
-         // Actually, SpeechEngine updates its own audioLevel. We need to mirror it if we want a single source of truth?
-         // Or just let AudioInputManager be the source.
-         // Let's bind AudioInputManager's level to our published property for convenience
-         // Unified Audio Level (Mic + Voice Engine)
-
-         // Audio Level Sync
-         // Since we can't easily Combine-chain Observable properties without boilerplate,
-         // and this is high-frequency UI state, let's observe the publisher from AudioInputManager directly if possible?
-         // AudioInputManager is likely still ObservableObject.
-         
-         audioInput.$audioLevel
-             .combineLatest(voiceEngine.$speakingAmplitude)
-             .map { micLevel, ttsLevel in
-                 return max(micLevel, ttsLevel)
-             }
-             .receive(on: RunLoop.main)
-             .sink { [weak self] level in
-                 self?.audioLevel = level
-             }
-             .store(in: &cancellables)
+        // Audio Level Sync
+        // Bind AudioInputManager's level to our published property for convenience
+        audioInput.$audioLevel
+            .combineLatest(voiceEngine.$speakingAmplitude)
+            .map { micLevel, ttsLevel in
+                return max(micLevel, ttsLevel)
+            }
+            .receive(on: RunLoop.main)
+            .sink { [weak self] level in
+                self?.audioLevel = level
+            }
+            .store(in: &cancellables)
+        
+        // Live Transcription Sync
+        speechEngine.$transcript
+            .receive(on: RunLoop.main)
+            .sink { text in
+                print("🔄 DepContainer received transcript: \(text)")
+                self.liveInputText = text
+            }
+            .store(in: &cancellables)
     }
 
     // MARK: - Helpers
@@ -166,7 +158,6 @@ public class DependencyContainer {
         hapticEngine.playTransition(valence: newVibe.valence, arousal: newVibe.arousal)
 
         // Update Session Analytics
-        // Update Session Analytics
         if let session = currentSession {
             session.addMetric(
                 vibe: newVibe,
@@ -184,7 +175,8 @@ public class DependencyContainer {
     private func vibe(for text: String) -> Vibe? {
         // Simple exact match lookup
         // In real app, semantic search handles this.
-        let emotions = try? context.fetch(FetchDescriptor<Emotion>())
+        let descriptor = FetchDescriptor<Emotion>()
+        let emotions = try? context.fetch(descriptor)
         if let match = emotions?.first(where: { $0.name.lowercased() == text.lowercased() }) {
             return Vibe(valence: match.valence, arousal: match.arousal, connection: match.connection)
         }
@@ -208,7 +200,6 @@ public class DependencyContainer {
         speechEngine.stopRecording()
     }
 
-    /// Processes user input (Text or Speech) through the VAC pipeline
     /// Processes user input (Text or Speech) through the VAC pipeline
     func processInput(_ text: String) {
         print("👤 User Input: \(text)")
@@ -365,7 +356,7 @@ public class DependencyContainer {
             let unsorted = try context.fetch(descriptor)
             
             // Restore search ranking order
-            let map = Dictionary(uniqueKeysWithValues: unsorted.map { ($0.id, $0) })
+            let map: [UUID: Emotion] = Dictionary(uniqueKeysWithValues: unsorted.map { ($0.id, $0) })
             return ids.compactMap { map[$0] }
         } catch {
             print("❌ DependencyContainer: Search fetch failed: \(error)")
@@ -404,3 +395,5 @@ public class DependencyContainer {
         self.speak(praise)
     }
 }
+
+

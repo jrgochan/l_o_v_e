@@ -16,15 +16,18 @@ public struct ChatView: View {
     // Streaming Bindings
     @Binding public var streamingText: String
     @Binding public var isThinking: Bool
+    @Binding public var transcribedText: String
 
     public init(isRecording: Binding<Bool>,
                 streamingText: Binding<String> = .constant(""),
                 isThinking: Binding<Bool> = .constant(false),
+                transcribedText: Binding<String> = .constant(""),
                 onSend: ((String) -> Void)? = nil,
                 onMicTap: (() -> Void)? = nil) {
         self._isRecording = isRecording
         self._streamingText = streamingText
         self._isThinking = isThinking
+        self._transcribedText = transcribedText
         self.onSend = onSend
         self.onMicTap = onMicTap
     }
@@ -122,6 +125,12 @@ public struct ChatView: View {
         }
         .padding()
         .background(.ultraThinMaterial.opacity(0.3))
+        .onChange(of: transcribedText) { _, newVal in
+            print("💬 ChatView received text: '\(newVal)' (Recording: \(isRecording))")
+            if isRecording {
+                viewModel.inputText = newVal
+            }
+        }
     }
 
     private func sendMessage() {

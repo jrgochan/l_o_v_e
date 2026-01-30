@@ -43,17 +43,27 @@ public struct SoulOrb: View {
                             .float(vibe.arousal + (isListening ? 0.3 + Double(audioLevel) * 0.5 : 0.0)) // Reactive Boost
                         )
                     )
-                    .shadow(color: Color(red: v(vibe.valence), green: 0.5, blue: 1.0 - v(vibe.valence)).opacity(0.5 + Double(audioLevel) * 0.5), radius: 20 + CGFloat(audioLevel * 20))
+                    .shadow(
+                        color: Color(red: v(vibe.valence), green: 0.5, blue: 1.0 - v(vibe.valence))
+                            .opacity(0.5 + Double(audioLevel) * 0.5),
+                        radius: 20 + CGFloat(audioLevel * 20)
+                    )
                 
                 // Ring indicator (Listening State)
                 if isListening {
                     Circle()
                         .strokeBorder(
-                            AngularGradient(colors: [.clear, .white, .clear], center: .center, angle: .degrees(elapsedTime * 90)),
+                            AngularGradient(
+                                colors: [.clear, .white, .clear],
+                                center: .center,
+                                angle: .degrees(elapsedTime * 90)
+                            ),
                             lineWidth: 2 + CGFloat(audioLevel * 4)
                         )
                         .frame(width: 140, height: 140)
-                        .scaleEffect(1.0 + 0.05 * sin(elapsedTime * 5) + CGFloat(audioLevel * 0.2)) // Pulse with voice
+                        .scaleEffect(
+                            1.0 + 0.05 * sin(elapsedTime * 5) + CGFloat(audioLevel * 0.2)
+                        ) // Pulse with voice
                 }
             }
         }

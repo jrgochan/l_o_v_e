@@ -186,16 +186,16 @@ public struct SoulView: PlatformViewRepresentable {
 
         let renderer = context.coordinator
 
-        view.onTap = { Point in
-            if let name = renderer.hitTest(at: Point) {
+        view.onTap = { point in
+            if let name = renderer.hitTest(at: point) {
                 print("🖱️ Clicked: \(name)")
                 renderer.fly(to: name)
                 renderer.selectEmotion(name)
             }
         }
 
-        view.onHover = { Point in
-            let name = renderer.hitTest(at: Point)
+        view.onHover = { point in
+            let name = renderer.hitTest(at: point)
             renderer.hoverEmotion(name)
         }
 

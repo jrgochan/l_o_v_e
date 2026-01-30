@@ -104,8 +104,11 @@ public final class AudioInputManager: ObservableObject, @unchecked Sendable {
 
     // Non-isolated because this runs on a background Audio Thread (from installTap)
     private func processAudio(buffer: AVAudioPCMBuffer) {
-        // Broadcast (Called from Audio Thread - Consumer must handle concurrency!)
+        // Broadcast
         onAudioBuffer?(buffer)
+        
+        let shouldLog = Int.random(in: 0...50) == 0
+        if shouldLog { print("🎤 AudioInputManager: Emitting buffer") }
 
         guard let channelData = buffer.floatChannelData?[0] else { return }
         let frames = Int(buffer.frameLength)
@@ -119,9 +122,12 @@ public final class AudioInputManager: ObservableObject, @unchecked Sendable {
         let rms = sqrt(sum / Float(frames))
 
         // Normalize (Empirical adjustment)
-        // Typical speech might be 0.01 to 0.1 RMS
         var level = rms * 5.0
         level = max(0.0, min(1.0, level))
+        
+        if shouldLog {
+            print("🎤 AudioInputManager: RMS: \(rms) (Level: \(level))")
+        }
 
         // Smooth
         analysisQueue.async { [weak self] in

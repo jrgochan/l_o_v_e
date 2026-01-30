@@ -34,13 +34,22 @@ public class SpeechEngine: NSObject, ObservableObject, @unchecked Sendable {
 
     public func requestPermission() {
         SFSpeechRecognizer.requestAuthorization { status in
-            DispatchQueue.main.async {
+            Task { @MainActor in
                 self.permissionStatus = status
             }
         }
     }
 
     public func startRecording(usingExternalSource: Bool = false) throws {
+        // Ensure perm requested
+        guard SFSpeechRecognizer.authorizationStatus() == .authorized else {
+            requestPermission()
+            // If not determined, we requested it. But we can't start yet.
+            // If denied, we can't start.
+            print("⚠️ SpeechEngine: Authorization check failed (Status: \(SFSpeechRecognizer.authorizationStatus().rawValue))")
+            return
+        }
+
         if recognitionTask != nil {
             recognitionTask?.cancel()
             recognitionTask = nil
@@ -57,6 +66,7 @@ public class SpeechEngine: NSObject, ObservableObject, @unchecked Sendable {
         guard let recognitionRequest = recognitionRequest else { fatalError("Unable to create request") }
 
         recognitionRequest.shouldReportPartialResults = true
+        print("🗣️ SpeechEngine: Starting recognition task...")
 
         recognitionTask = speechRecognizer?.recognitionTask(with: recognitionRequest) { result, error in
             var isFinal = false
@@ -67,11 +77,13 @@ public class SpeechEngine: NSObject, ObservableObject, @unchecked Sendable {
                 let safeText = self.piiFilter.scrub(rawText)
 
                 self.transcript = safeText
+                print("🗣️ SpeechEngine partial: \(safeText)")
                 isFinal = result.isFinal
                 self.resetSilenceTimer()
             }
 
             if error != nil || isFinal {
+                if let error = error { print("❌ SpeechEngine Error: \(error)") }
                 self.stopRecording()
             }
         }
@@ -102,7 +114,12 @@ public class SpeechEngine: NSObject, ObservableObject, @unchecked Sendable {
         // 2. Publish on main thread
         Task { @MainActor in
             self.prosody = features
-            self.audioLevel = features.energy * 5.0 // Boost for visualizer (moved logic here)
+            self.audioLevel = features.energy * 5.0 
+        }
+        
+        // Debug: Log buffer receipt (sample rate check)
+        if Int.random(in: 0...50) == 0 { // Throttle
+            print("🔊 SpeechEngine: Consuming buffer (len: \(buffer.frameLength))")
         }
     }
 
