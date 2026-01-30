@@ -18,18 +18,30 @@ public struct SoulPersona {
     /// Generates the dynamic System Prompt based on the current state.
     /// - Parameters:
     ///   - activeStrategy: (Optional) The current psychological intervention strategy.
-    /// - Returns: A formatted System Prompt string.
     /// Generates the dynamic Prompt based on the current state and history.
     /// - Parameters:
     ///   - activeStrategy: (Optional) The current psychological intervention strategy.
     ///   - history: Recent conversation history key-value pairs (role, message).
     /// - Returns: A formatted Prompt string using Llama 3 templating.
+    /// Data Snapshot for Strategy to ensure Thread Safety (Sendable)
+    public struct StrategySnapshot: Sendable {
+        public let name: String
+        public let definition: String
+        public let detailedSteps: [String]
+        
+        public init(name: String, definition: String, detailedSteps: [String]) {
+            self.name = name
+            self.definition = definition
+            self.detailedSteps = detailedSteps
+        }
+    }
+
     public static func constructPrompt(
         userPrompt: String,
         vibe: Vibe,
         time: Date = Date(),
         memories: [String] = [],
-        activeStrategy: TransitionStrategy? = nil,
+        activeStrategy: StrategySnapshot? = nil,
         history: [(role: String, content: String)] = []
     ) -> String {
 
@@ -87,7 +99,7 @@ public struct SoulPersona {
         return "Relevent Patterns from the Past:\n" + memories.map { "- \($0)" }.joined(separator: "\n")
     }
 
-    private static func getStrategyContext(strategy: TransitionStrategy?) -> String {
+    private static func getStrategyContext(strategy: StrategySnapshot?) -> String {
         guard let strategy = strategy else { return "" }
         return """
         [ACTIVE INTERVENTION]

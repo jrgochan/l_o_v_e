@@ -6,7 +6,8 @@ import PackageDescription
 let package = Package(
     name: "LoveApp",
     platforms: [
-        .macOS(.v14)
+        .macOS(.v14),
+        .iOS(.v17)
     ],
     products: [
         .executable(name: "LoveApp", targets: ["LoveApp"])
@@ -31,6 +32,15 @@ let package = Package(
                 "SoulBio",
                 "SoulVoice",
                 "SoulChat"
+            ],
+            swiftSettings: [
+                .unsafeFlags(["-Xfrontend", "-strict-concurrency=complete"])
+            ],
+            linkerSettings: [
+                .linkedFramework("Metal"),
+                .linkedFramework("MetalKit"),
+                .linkedFramework("CoreAudio"),
+                .linkedFramework("AVFoundation")
             ]
         ),
         .testTarget(
@@ -44,6 +54,9 @@ let package = Package(
             ],
             resources: [
                 // Add any resources here if needed
+            ],
+            swiftSettings: [
+                .unsafeFlags(["-Xfrontend", "-strict-concurrency=complete"])
             ]
         )
     ]

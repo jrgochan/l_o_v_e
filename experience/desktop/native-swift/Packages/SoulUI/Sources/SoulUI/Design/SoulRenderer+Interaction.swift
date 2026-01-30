@@ -8,7 +8,9 @@ extension SoulRenderer {
     // MARK: - Flight Logic
 
     public func fly(to emotionName: String) {
-        if emotionName == currentFlightTarget && isFlying { return }
+        // Prevent bouncing: If we are already flying to OR already at the target, do nothing.
+        // We only start a new flight if the target changed or if we manually moved away (target is nil)
+        if emotionName == currentFlightTarget { return }
         startFlight(to: emotionName)
     }
 
@@ -41,9 +43,16 @@ extension SoulRenderer {
         self.flightStartTime = Date().timeIntervalSinceReferenceDate
         self.flightDuration = 3.0
         self.flightProgress = 0.0
+        
+        // Reset flight target interpolation
+        self.flightTargetStart = camera.target
+        self.flightTargetEnd = targetPos // Look at the emotion
     }
 
-    internal func updateCamera() {
+    // MARK: - Flight Internal State (Properties moved to main Class)
+
+
+    internal func updateCamera(deltaTime: Double) {
         if isFlying {
             let now = Date().timeIntervalSinceReferenceDate
             let elapsed = Float(now - flightStartTime)
@@ -53,13 +62,16 @@ extension SoulRenderer {
             if t >= 1.0 {
                 isFlying = false
                 camera.position = flightPath.last ?? camera.position
+                camera.target = flightTargetEnd // Snap to look at target
                 if !flightQueue.isEmpty {
                     let next = flightQueue.removeFirst()
                     startFlight(to: next)
                 }
             } else {
                 camera.position = SoulBrain.SplineMath.getPointOnPath(points: flightPath, progress: easeT)
-                camera.target = SIMD3<Float>(0, 0, 0)
+                
+                // Interpolate Target for Cinematic Focus
+                camera.target = mix(flightTargetStart, flightTargetEnd, t: easeT)
             }
             updateFPS(120)
         } else {
@@ -70,16 +82,22 @@ extension SoulRenderer {
                 let hasMomentum = abs(rotationVelocity.x) > 0.0001 || abs(rotationVelocity.y) > 0.0001
                 if hasMomentum {
                     applyRotation(delta: rotationVelocity)
-                    rotationVelocity.x *= 0.92
-                    rotationVelocity.y *= 0.92
+                    
+                    // Frame-Independent Damping
+                    // Damping factor 0.92 at 60fps (16ms) matches original feel
+                    // Formula: new = old * pow(damping, dt * targetFPS)
+                    let damping = pow(0.92, Float(deltaTime * 60.0))
+                    
+                    rotationVelocity.x *= CGFloat(damping)
+                    rotationVelocity.y *= CGFloat(damping)
                     updateFPS(120)
                 } else {
                     let idleTime = now - lastInteractionTime
                     if idleTime > 5.0 {
-                        applyRotation(delta: CGPoint(x: 0.2, y: 0))
+                        applyRotation(delta: CGPoint(x: 0.2 * deltaTime * 60.0, y: 0))
                         updateFPS(30)
                     } else if idleTime > 3.0 {
-                        applyRotation(delta: CGPoint(x: 0.2, y: 0))
+                        applyRotation(delta: CGPoint(x: 0.2 * deltaTime * 60.0, y: 0))
                         updateFPS(60)
                     } else {
                         updateFPS(120)
@@ -110,8 +128,13 @@ extension SoulRenderer {
         self.isFlying = true
         self.flightStartTime = Date().timeIntervalSinceReferenceDate
         self.flightProgress = 0.0
+        
+        // Reset Focus
+        self.flightTargetStart = camera.target
+        self.flightTargetEnd = SIMD3<Float>(0, 0, 0)
 
         self.rotationVelocity = .zero
+        self.currentFlightTarget = nil // Clear state
         self.selectedEmotion = nil
         self.onSelectionChange?(nil)
     }
@@ -120,6 +143,7 @@ extension SoulRenderer {
 
     public func rotateCamera(delta: CGPoint) {
         lastInteractionTime = Date().timeIntervalSinceReferenceDate
+        self.currentFlightTarget = nil // Manual override breaks lock
         self.rotationVelocity = delta
         applyRotation(delta: delta)
     }
@@ -149,6 +173,7 @@ extension SoulRenderer {
 
     public func zoomCamera(delta: Float) {
         lastInteractionTime = Date().timeIntervalSinceReferenceDate
+        self.currentFlightTarget = nil // Manual override breaks lock
         let speed: Float = 0.1
         let zoomChange = delta * speed
 
@@ -167,7 +192,8 @@ extension SoulRenderer {
 
     public func hitTest(at point: CGPoint) -> String? {
         lastInteractionTime = Date().timeIntervalSinceReferenceDate
-        let p = CGPoint(x: point.x * 2.0, y: point.y * 2.0)
+        // Use dynamic scale factor (default 2.0 for Retina, but variable)
+        let p = CGPoint(x: point.x * contentScaleFactor, y: point.y * contentScaleFactor)
         let ray = screenPointToRay(point: p, viewport: viewportSize)
 
         for (name, position) in emotionLocations {

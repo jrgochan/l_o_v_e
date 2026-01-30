@@ -3,51 +3,29 @@ import SoulUI
 import SoulCore
 import SoulChat
 import SwiftData
+import Observation
 
 @available(macOS 14, iOS 17, *)
 public struct AppContainer: View {
-    @EnvironmentObject var deps: DependencyContainer
+    @Environment(DependencyContainer.self) var deps
 
     public var body: some View {
-        ZStack {
-            // LAYER 1: The Void (Background)
-            Color.black.ignoresSafeArea()
-
-            // LAYER 2: Admin Dashboard & Visualization
-            // This replaces the simple VibeOrb background with the full 3D Admin Interface
-            AdminDashboardView(
-                vibe: $deps.currentVibe,
-                activeCollectionName: $deps.activeCollectionName,
-                isMicRecording: $deps.isMicRecording,
-                audioLevel: $deps.audioLevel, // Synced Audio Level
-                streamingResponse: $deps.streamingResponse, // Streaming
-                isThinking: $deps.isThinking, // Thinking State
-                breathPublisher: deps.breathPublisher, // NEW
-                hapticEngine: deps.hapticEngine, // NEW
-                onStrategyStart: { strategy in
-                    print("🧠 App: Starting Strategy: \(strategy.name)")
-                    deps.activeStrategy = strategy
-                },
-                onStrategyComplete: { strategy in
-                    print("🧠 App: Strategy Complete: \(strategy.name)")
-                    deps.activeStrategy = nil
-                    deps.completeStrategy(strategy)
-                },
-                onChatInput: { text in
-                    deps.processInput(text)
-                },
-                onSearch: { query in
-                    await deps.searchEmotions(query: query)
-                }
-            )
-            .ignoresSafeArea()
-
-            // LAYER 3: Main Content (Grounded)
-            // Overlay ChatView removed - now integrated into AdminDashboardView's "Chat" tab.
-            VStack {
-                Spacer()
-            }
-        }
+        // V2 Experience Entry Point
+        SoulExperienceView(
+            vibe: Bindable(deps).currentVibe,
+            activeCollectionName: Bindable(deps).activeCollectionName,
+            isMicRecording: Bindable(deps).isMicRecording,
+            audioLevel: Bindable(deps).audioLevel,
+            streamingResponse: Bindable(deps).streamingResponse,
+            isThinking: Bindable(deps).isThinking,
+            breathPublisher: deps.breathPublisher,
+            hapticEngine: deps.hapticEngine,
+            bioMonitor: deps.bioMonitor,
+            onChatInput: { text in deps.processInput(text) },
+            onMicTap: { deps.isMicRecording.toggle() },
+            onLongPressOrb: { deps.isMicRecording ? deps.stopListening() : deps.startListening() },
+            onSearch: { q in await deps.searchEmotions(query: q) }
+        )
     }
 
     func toggleMic() {
@@ -62,12 +40,9 @@ public struct AppContainer: View {
 }
 
 #Preview {
-    // Mock Context
     let config = ModelConfiguration(isStoredInMemoryOnly: true)
-    let container = try? ModelContainer(for: EmotionCollection.self, Emotion.self, configurations: config)
-    if container == nil { fatalError("Preview setup failed") }
-    let validContainer = container!
-
-    AppContainer()
-        .environmentObject(DependencyContainer(context: container!.mainContext))
+    let container = try! ModelContainer(for: Emotion.self, configurations: config)
+    
+    return AppContainer()
+        .environment(DependencyContainer(context: container.mainContext))
 }

@@ -1,5 +1,5 @@
 import Foundation
-import Combine
+import Observation
 
 /// Monitors biological signals (Heart Rate, HRV) to influence the AI's state.
 /// Currently simulates data, but designed to wrap HealthKit.
@@ -33,9 +33,10 @@ public actor SimulationBioSource: BioSource {
 
 @MainActor
 @available(macOS 14, iOS 17, *)
-public class BioMonitor: ObservableObject {
-    @Published public var heartRate: Double = 72.0
-    @Published public var hrv: Double = 50.0
+@Observable
+public class BioMonitor {
+    public var heartRate: Double = 72.0
+    public var hrv: Double = 50.0
 
     private let source: BioSource
     private var monitoringTask: Task<Void, Never>?
@@ -67,7 +68,5 @@ public class BioMonitor: ObservableObject {
         self.hrv = hrv
     }
 
-    deinit {
-        monitoringTask?.cancel()
-    }
+
 }

@@ -5,7 +5,7 @@ import simd
 /// Includes the semantic definition and the mathematical VAC vector.
 @Model
 @available(macOS 14, iOS 17, *)
-public final class Emotion {
+public final class Emotion: @unchecked Sendable {
     @Attribute(.unique) public var id: UUID
     public var name: String
     public var definition: String

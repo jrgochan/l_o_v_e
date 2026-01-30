@@ -30,6 +30,13 @@ let package = Package(
             resources: [
                 .process("Resources")
             ],
+            swiftSettings: [
+                .unsafeFlags(["-Xfrontend", "-strict-concurrency=complete"])
+            ],
+            linkerSettings: [
+                .linkedFramework("Metal"),
+                .linkedFramework("MetalKit")
+            ],
             plugins: ["SoulShaderBuild"]
         ),
         .plugin(

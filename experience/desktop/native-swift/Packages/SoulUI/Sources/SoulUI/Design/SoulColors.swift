@@ -34,4 +34,9 @@ public extension ShapeStyle where Self == Color {
 
         return baseColor.opacity(opacity)
     }
+
+    // Glass Theme Tokens
+    static var soulGlassBackground: Color { Color.white.opacity(0.1) }
+    static var soulGlassBorder: Color { Color.white.opacity(0.2) }
+    static var soulGlassShadow: Color { Color.black.opacity(0.2) }
 }

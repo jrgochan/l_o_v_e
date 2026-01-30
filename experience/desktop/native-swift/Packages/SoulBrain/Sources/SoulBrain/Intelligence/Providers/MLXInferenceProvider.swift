@@ -1,3 +1,4 @@
+#if os(macOS)
 import Foundation
 import MLX
 import MLXRandom
@@ -100,3 +101,4 @@ public actor MLXInferenceProvider: InferenceProvider {
         continuation.finish()
     }
 }
+#endif

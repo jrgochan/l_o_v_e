@@ -1,3 +1,4 @@
+#if os(macOS)
 import Foundation
 import MLX
 import MLXNN
@@ -304,3 +305,4 @@ class TransformerBlock: Module {
         return (out, newCache)
     }
 }
+#endif

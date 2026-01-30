@@ -20,6 +20,9 @@ let package = Package(
             name: "SoulCore",
             resources: [
                 .process("Resources")
+            ],
+            swiftSettings: [
+                .unsafeFlags(["-Xfrontend", "-strict-concurrency=complete"])
             ]
         ),
         .testTarget(

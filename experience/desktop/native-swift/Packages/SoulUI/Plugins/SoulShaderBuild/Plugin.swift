@@ -23,7 +23,6 @@ struct SoulShaderBuild: BuildToolPlugin {
                     displayName: "Compiling \(file.url.lastPathComponent)",
                     executable: URL(fileURLWithPath: "/usr/bin/xcrun"),
                     arguments: [
-                        "-sdk", "macosx",
                         "metal",
                         "-c", file.url.path,
                         "-o", outputPath.path,
@@ -43,7 +42,6 @@ struct SoulShaderBuild: BuildToolPlugin {
                 displayName: "Linking Metal Library",
                 executable: URL(fileURLWithPath: "/usr/bin/xcrun"),
                 arguments: [
-                    "-sdk", "macosx",
                     "metallib"
                 ] + airFiles.map { $0.path } + [
                     "-o", metallibPath.path

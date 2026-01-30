@@ -5,13 +5,18 @@ import SoulBrain
 
 /// Manages semantic search capabilities including embedding generation and vector indexing.
 @available(macOS 14, iOS 17, *)
-actor SemanticSearchManager {
+actor SemanticSearchManager: ModelActor {
+    nonisolated public let modelContainer: ModelContainer
+    nonisolated public let modelExecutor: any ModelExecutor
+    
     private let embedder: Embedder
     private let index: VectorIndex
-    private let context: ModelContext
 
-    init(context: ModelContext, embedder: Embedder) {
-        self.context = context
+    init(container: ModelContainer, embedder: Embedder) {
+        self.modelContainer = container
+        let context = ModelContext(container)
+        self.modelExecutor = DefaultSerialModelExecutor(modelContext: context)
+        
         self.embedder = embedder
         self.index = VectorIndex()
     }
@@ -21,7 +26,7 @@ actor SemanticSearchManager {
         print("🔍 Semantic Search: Indexing emotions...")
         do {
             let descriptor = FetchDescriptor<Emotion>()
-            let emotions = try context.fetch(descriptor)
+            let emotions = try modelContext.fetch(descriptor)
 
             for emotion in emotions {
                 // Enrich the embedding text with definition and category
@@ -38,18 +43,13 @@ actor SemanticSearchManager {
     }
 
     /// Performs a semantic search against the indexed emotions
-    func search(query: String, limit: Int = 20) async -> [Emotion] {
+    func search(query: String, limit: Int = 20) async -> [UUID] {
         guard !query.isEmpty else { return [] }
 
         do {
             let queryVec = try await embedder.embed(query)
             let matchIds = index.search(query: queryVec, limit: limit)
-
-            // Resolve IDs to Objects (Preserving Order)
-            let allEmotions = try context.fetch(FetchDescriptor<Emotion>())
-            let emotionMap = Dictionary(uniqueKeysWithValues: allEmotions.map { ($0.id, $0) })
-
-            return matchIds.compactMap { emotionMap[$0] }
+            return matchIds
         } catch {
             print("❌ Semantic Search: Query failed: \(error)")
             return []

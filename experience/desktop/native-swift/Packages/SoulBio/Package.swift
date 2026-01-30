@@ -22,7 +22,10 @@ let package = Package(
     targets: [
         .target(
             name: "SoulBio",
-            dependencies: ["SoulCore"]
+            dependencies: ["SoulCore"],
+            swiftSettings: [
+                .unsafeFlags(["-Xfrontend", "-strict-concurrency=complete"])
+            ]
         ),
         .testTarget(
             name: "SoulBioTests",

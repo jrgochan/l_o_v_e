@@ -45,6 +45,13 @@ The architecture is fully documented in the `docs/` directory.
     ```
     
 OR open `LoveSoul.xcworkspace` in Xcode 16+ and run the `LoveApp` scheme.
+
+### 📱 Mobile (iOS)
+To preview on iOS:
+1.  Open `LoveApp/Package.swift` in **Xcode**.
+2.  Select the **LoveApp** scheme.
+3.  Choose an **iPhone Simulator** or Device.
+4.  Run (Cmd+R).
     
 ## 🛠 Prerequisites
 

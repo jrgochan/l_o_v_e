@@ -10,7 +10,7 @@ import LoveAppFeature
 @available(macOS 14, iOS 17, *)
 struct LoveApp: App {
     let container: ModelContainer
-    @StateObject private var depContainer: DependencyContainer
+    @State private var depContainer: DependencyContainer
 
     init() {
         do {
@@ -28,7 +28,7 @@ struct LoveApp: App {
             // 3. Initialize Logic Container with Data Context
             // Use local 'modelContainer' to avoid capturing 'self'
             let context = modelContainer.mainContext
-            _depContainer = StateObject(wrappedValue: DependencyContainer(context: context))
+            _depContainer = State(wrappedValue: DependencyContainer(context: context))
 
         } catch {
             fatalError("🔥 Critical Failure: Could not initialize Soul Brain. Error: \(error)")
@@ -38,11 +38,13 @@ struct LoveApp: App {
     var body: some Scene {
         WindowGroup {
             AppContainer()
-                .environmentObject(depContainer)
+                .environment(depContainer)
                 .modelContainer(container) // Inject into SwiftUI Environment
                 .background(Color.black)
                 .preferredColorScheme(.dark)
         }
+        #if os(macOS)
         .windowStyle(.hiddenTitleBar)
+        #endif
     }
 }

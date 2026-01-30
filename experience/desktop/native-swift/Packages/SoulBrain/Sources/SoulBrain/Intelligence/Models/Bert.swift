@@ -1,3 +1,4 @@
+#if os(macOS)
 import Foundation
 import MLX
 import MLXNN
@@ -299,3 +300,4 @@ public class Bert: Module {
         return (sequenceOutput, pooledOutput)
     }
 }
+#endif

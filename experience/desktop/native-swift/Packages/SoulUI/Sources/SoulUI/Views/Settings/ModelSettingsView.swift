@@ -91,7 +91,11 @@ public struct ModelSettingsView: View {
                     Spacer()
 
                     Button(action: {
+                        #if os(macOS)
                         NSWorkspace.shared.open(modelManager.modelsDirectory)
+                        #elseif os(iOS)
+                        UIApplication.shared.open(modelManager.modelsDirectory)
+                        #endif
                     }, label: {
                         Image(systemName: "folder")
                     })

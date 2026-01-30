@@ -54,23 +54,27 @@ extension SoulRenderer {
             isHovered = 1.0
         }
 
-        // Color Logic
+        // Advanced Spectral Color Mapping
+        // Valence (-1 to 1) -> Hue (Purple/Blue -> Cyan/Green -> Gold/Orange)
         let v = Float(node.vibe.valence)
         let a = Float(node.vibe.arousal)
-        var color = SIMD4<Float>(1, 1, 1, 1.0)
+        let c = Float(node.vibe.connection)
 
-        if v > 0.2 {
-            // Positive
-            color = SIMD4<Float>(0.0, 1.0, 0.8, 0.9)
-            if a > 0.5 { color = SIMD4<Float>(0.2, 1.0, 0.2, 1.0) }
-        } else if v < -0.2 {
-            // Negative
-            color = SIMD4<Float>(1.0, 0.0, 0.5, 0.9)
-            if a > 0.5 { color = SIMD4<Float>(1.0, 0.2, 0.0, 1.0) }
-        } else {
-            // Neutral
-            color = SIMD4<Float>(0.4, 0.4, 1.0, 0.6)
-        }
+        // Map Valence to Hue (0..1)
+        // -1 (Negative) = 0.75 (Purple)
+        // 0 (Neutral) = 0.5 (Cyan)
+        // +1 (Positive) = 0.1 (Gold/Orange)
+        let hue = 0.5 - (v * 0.35)
+
+        // Saturation driven by Arousal (Higher arousal = more intense color)
+        let sat = 0.6 + (a * 0.4)
+
+        // Lightness driven by Connection (Higher connection = brighter/lighter)
+        // But keep it visible regardless so clamp min.
+        let light = 0.3 + (c * 0.4) + (isSelected * 0.2)
+
+        let rgb = hslToRgb(h: hue, s: sat, l: light)
+        let color = SIMD4<Float>(rgb.x, rgb.y, rgb.z, 0.9)
 
         let randomSize: Float = Float.random(in: 0.05...0.15)
         let finalSize = scale * randomSize
@@ -82,15 +86,41 @@ extension SoulRenderer {
             finalSize
         )
 
-        let props = SIMD4<Float>(isSelected, isHovered, 0, 0)
-        let vac = SoulMath.VACVector(
+        // Encode VAC into props for shader animation
+        // x: Selection, y: Hover, z: Normalized Valence, w: Normalized Arousal
+        let props = SIMD4<Float>(isSelected, isHovered, v, a)
+        
+        // Pass Connection in quaternion.w if needed, or just rely on color
+        // Actually, let's pack Connection into quaternion.w since it's free real estate
+        var quat = SoulMath.VACVector(
             valence: Float(node.vibe.valence),
             arousal: Float(node.vibe.arousal),
             connection: Float(node.vibe.connection)
-        )
-        let quat = vac.toQuaternion().vector
+        ).toQuaternion().vector
+        
+        quat.w = c // Hijack W for Connection data
 
         return PointInstance(position: pos, color: color, props: props, quaternion: quat)
+    }
+
+    // Helper: HSL to RGB
+    private func hslToRgb(h: Float, s: Float, l: Float) -> SIMD3<Float> {
+        let c = (1.0 - abs(2.0 * l - 1.0)) * s
+        let x = c * (1.0 - abs(fmod(h * 6.0, 2.0) - 1.0))
+        let m = l - c / 2.0
+        
+        var r: Float = 0
+        var g: Float = 0
+        var b: Float = 0
+        
+        if h < 1.0/6.0 { r=c; g=x; b=0 }
+        else if h < 2.0/6.0 { r=x; g=c; b=0 }
+        else if h < 3.0/6.0 { r=0; g=c; b=x }
+        else if h < 4.0/6.0 { r=0; g=x; b=c }
+        else if h < 5.0/6.0 { r=x; g=0; b=c }
+        else { r=c; g=0; b=x }
+        
+        return SIMD3<Float>(r+m, g+m, b+m)
     }
 
     public func updatePath(with emotionNames: [String]) {

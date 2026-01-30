@@ -78,8 +78,8 @@ public struct JourneyActiveView: View {
 
             RadialGradient(
                 colors: [
-                    Color(hue: Double(currentEmotion.valence + 1) / 2, saturation: 0.6, brightness: 0.2),
-                    Color.black
+                    Color(hue: Double(currentEmotion.valence + 1) / 2, saturation: 0.6, brightness: 0.2).opacity(0.6),
+                    Color.clear
                 ],
                 center: .center,
                 startRadius: 100,

@@ -1,3 +1,4 @@
+#if os(macOS)
 import Foundation
 import MLX
 
@@ -20,3 +21,4 @@ public struct Weights {
         return weights
     }
 }
+#endif

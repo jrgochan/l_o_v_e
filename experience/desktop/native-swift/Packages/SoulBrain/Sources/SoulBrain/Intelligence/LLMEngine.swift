@@ -118,7 +118,7 @@ public actor LLMEngine {
     public func generate(
         prompt: String,
         vibe: Vibe,
-        strategy: TransitionStrategy? = nil,
+        strategy: SoulPersona.StrategySnapshot? = nil,
         history: [(role: String, content: String)] = []
     ) -> AsyncStream<String> {
         AsyncStream { continuation in

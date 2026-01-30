@@ -20,7 +20,10 @@ let package = Package(
     targets: [
         .target(
             name: "SoulChat",
-            dependencies: ["SoulCore"]
+            dependencies: ["SoulCore"],
+            swiftSettings: [
+                .unsafeFlags(["-Xfrontend", "-strict-concurrency=complete"])
+            ]
         ),
         .testTarget(
             name: "SoulChatTests",

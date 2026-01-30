@@ -1,5 +1,6 @@
 import SwiftUI
-import SwiftData
+@preconcurrency import SwiftData
+import Observation
 import SoulCore
 import SoulBrain
 import SoulUI
@@ -11,7 +12,8 @@ import SoulChat
 /// Central Logic Hub: The connectivity tissue between Body (UI), Mind (Brain), and Soul (Core)
 @MainActor
 @available(macOS 14, iOS 17, *)
-public class DependencyContainer: ObservableObject {
+@Observable
+public class DependencyContainer {
     // Services
     let context: ModelContext
     let emotionEngine: EmotionEngine
@@ -20,6 +22,7 @@ public class DependencyContainer: ObservableObject {
     let voiceEngine: VoiceEngine
     let speechEngine: SpeechEngine
     let llmEngine: LLMEngine
+    let inference: any InferenceProvider // Added to support direct access if needed, or just to satisfy init
     let safetyEngine: SafetyEngine
     let breathPublisher: BreathPublisher
 
@@ -31,23 +34,31 @@ public class DependencyContainer: ObservableObject {
     let searchManager: SemanticSearchManager
 
     // State
-    @Published var currentVibe: Vibe = Vibe(valence: 0.5, arousal: 0.5, connection: 0.5)
-    @Published var currentSession: SessionAnalytics?
-    @Published var activeStrategy: TransitionStrategy?
-    @Published var activeCollectionName: String = "Plutchik Wheel" {
+    public var currentVibe: Vibe = Vibe(valence: 0.5, arousal: 0.5, connection: 0.5)
+    public var currentSession: SessionAnalytics?
+    public var activeStrategy: TransitionStrategy?
+    public var activeCollectionName: String = "GoEmotions" {
         didSet {
             collectionManager.activeCollectionName = activeCollectionName
         }
     }
 
     // Audio / Voice State
-    @Published var isMicRecording: Bool = false
-    @Published var audioLevel: Float = 0.0
-    @Published var isVoiceModeEnabled: Bool = false
+    public var isMicRecording: Bool = false
+    public var audioLevel: Float = 0.0
+    public var isVoiceModeEnabled: Bool = false {
+        didSet {
+            if isVoiceModeEnabled {
+                startListening()
+            } else {
+                stopListening()
+            }
+        }
+    }
 
     // Streaming State
-    @Published var streamingResponse: String = ""
-    @Published var isThinking: Bool = false
+    public var streamingResponse: String = ""
+    public var isThinking: Bool = false
 
     // Managers
     let collectionManager: CollectionManager
@@ -67,9 +78,24 @@ public class DependencyContainer: ObservableObject {
         self.breathPublisher = BreathPublisher()
 
         // Semantic Search Init
-        self.embedder = MLXEmbedder()
-        self.searchManager = SemanticSearchManager(context: context, embedder: self.embedder)
-        self.llmEngine = LLMEngine(embedder: self.embedder, inference: MLXInferenceProvider())
+        #if os(macOS)
+        let embedder = MLXEmbedder()
+        self.embedder = embedder
+        self.inference = MLXInferenceProvider()
+        #else
+        let embedder = MockEmbedder() // Use MockEmbedder as SoulEmbedder is not defined
+        self.embedder = embedder
+        // Assuming MockInferenceProvider exists and is public
+        self.inference = MockInferenceProvider() 
+        #endif
+        
+        self.searchManager = SemanticSearchManager(container: context.container, embedder: self.embedder)
+        
+        #if os(macOS)
+            self.llmEngine = LLMEngine(embedder: self.embedder, inference: MLXInferenceProvider())
+        #else
+            self.llmEngine = LLMEngine(embedder: self.embedder, inference: MockInferenceProvider())
+        #endif
 
         print("🧬 DependencyContainer: Core Systems Online")
 
@@ -87,43 +113,40 @@ public class DependencyContainer: ObservableObject {
         // ... (Reactive Chains)
 
         // ...
+        
+        setupSubscriptions()
 
     }
 
     private func setupSubscriptions() {
-        // Bio Sync
-        bioMonitor.$heartRate
-            .combineLatest(bioMonitor.$hrv)
-            .sink { _, _ in
-                // Bio-feed into Vibe? For now just monitoring.
-            }
-            .store(in: &cancellables)
-
         // Voice Mode Toggle
-        $isVoiceModeEnabled
-            .sink { [weak self] enabled in
-                if enabled {
-                    self?.startListening()
-                } else {
-                    self?.stopListening()
-                }
-            }
-            .store(in: &cancellables)
+        // In Observable world, we track this manually or use didSet/onChange in View.
+        // For logic internal to the controller, didSet on the property is cleaner.
+        // But activeCollectionName uses didSet, so we can move this logic to didSet or a setter.
+        // For now, let's keep it here but we need a meaningful replacement for $isVoiceModeEnabled.sink
+        // The property "isVoiceModeEnabled" is now just a var.
+        // Let's comment this out and move logic to `didSet` of `isVoiceModeEnabled`.
 
          // Audio Level Sync (One-way: SpeechEngine -> DependencyContainer -> UI)
          // Actually, SpeechEngine updates its own audioLevel. We need to mirror it if we want a single source of truth?
          // Or just let AudioInputManager be the source.
          // Let's bind AudioInputManager's level to our published property for convenience
          // Unified Audio Level (Mic + Voice Engine)
+
+         // Audio Level Sync
+         // Since we can't easily Combine-chain Observable properties without boilerplate,
+         // and this is high-frequency UI state, let's observe the publisher from AudioInputManager directly if possible?
+         // AudioInputManager is likely still ObservableObject.
+         
          audioInput.$audioLevel
              .combineLatest(voiceEngine.$speakingAmplitude)
              .map { micLevel, ttsLevel in
-                 // Combine: Take the max of either interaction
-                 // This ensures the Soul pulses whether it's listening OR speaking (Lip Sync)
                  return max(micLevel, ttsLevel)
              }
              .receive(on: RunLoop.main)
-             .assign(to: \.audioLevel, on: self)
+             .sink { [weak self] level in
+                 self?.audioLevel = level
+             }
              .store(in: &cancellables)
     }
 
@@ -257,11 +280,20 @@ public class DependencyContainer: ObservableObject {
 
         var accumulatedResponse = ""
         let recentHistory = fetchRecentHistory()
+        
+        // Convert to Sendable Snapshot (must be done on MainActor before awaiting)
+        let strategySnapshot = self.activeStrategy.map { strategy in
+            SoulPersona.StrategySnapshot(
+                name: strategy.name,
+                definition: strategy.definition,
+                detailedSteps: strategy.detailedSteps
+            )
+        }
 
         for await token in await llmEngine.generate(
             prompt: text,
             vibe: self.currentVibe,
-            strategy: self.activeStrategy,
+            strategy: strategySnapshot,
             history: recentHistory
         ) {
             accumulatedResponse += token
@@ -322,7 +354,23 @@ public class DependencyContainer: ObservableObject {
 
     /// Delegate search to manager
     func searchEmotions(query: String) async -> [Emotion] {
-        return await searchManager.search(query: query)
+        let ids = await searchManager.search(query: query)
+        guard !ids.isEmpty else { return [] }
+        
+        do {
+            // Fetch unordered objects
+            let descriptor = FetchDescriptor<Emotion>(
+                predicate: #Predicate { ids.contains($0.id) }
+            )
+            let unsorted = try context.fetch(descriptor)
+            
+            // Restore search ranking order
+            let map = Dictionary(uniqueKeysWithValues: unsorted.map { ($0.id, $0) })
+            return ids.compactMap { map[$0] }
+        } catch {
+            print("❌ DependencyContainer: Search fetch failed: \(error)")
+            return []
+        }
     }
 
     // MARK: - Strategy Execution

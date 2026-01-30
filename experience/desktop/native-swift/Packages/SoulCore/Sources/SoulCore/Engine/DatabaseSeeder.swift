@@ -33,7 +33,7 @@ public struct DatabaseSeeder {
                 name: "Atlas of the Heart",
                 desc: "Brené Brown's framework of 87 emotions and experiences.",
                 filename: "Atlas",
-                isActive: true
+                isActive: false
             )
         )
 
@@ -69,7 +69,7 @@ public struct DatabaseSeeder {
                 name: "GoEmotions",
                 desc: "Google's fine-grained emotion dataset derived from Reddit comments.",
                 filename: "GoEmotions",
-                isActive: false
+                isActive: true
             )
         )
 

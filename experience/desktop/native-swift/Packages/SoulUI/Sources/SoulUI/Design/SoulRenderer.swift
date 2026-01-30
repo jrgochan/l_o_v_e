@@ -49,6 +49,7 @@ public class SoulRenderer: NSObject, MTKViewDelegate {
     internal let commandQueue: MTLCommandQueue
     internal var pipelineState: MTLRenderPipelineState?
     private var startTime: Date = Date()
+    internal var lastRenderTime: TimeInterval = 0 // NEW: Physics Delta Tracking
 
     // Properties to be updated from SwiftUI
     public var vibe: SIMD3<Float> = SIMD3<Float>(0, 0, 0)
@@ -111,6 +112,8 @@ public class SoulRenderer: NSObject, MTKViewDelegate {
     internal var flightProgress: Float = 0.0
     internal var flightDuration: Float = 5.0
     internal var flightStartTime: TimeInterval = 0
+    internal var flightTargetStart: SIMD3<Float> = SIMD3<Float>(0, 0, 0)
+    internal var flightTargetEnd: SIMD3<Float> = SIMD3<Float>(0, 0, 0)
 
     // Configuration
     public var showParticles: Bool = true
@@ -138,6 +141,7 @@ public class SoulRenderer: NSObject, MTKViewDelegate {
     public var onFrameRateChange: ((Int) -> Void)? // NEW: Adaptive FPS
     internal var currentFPS: Int = 120
     internal var depthState: MTLDepthStencilState?
+    public var contentScaleFactor: CGFloat = 2.0 // NEW: Dynamic Scale Support
 
     public init?(device: MTLDevice) {
         self.device = device
@@ -159,7 +163,13 @@ public class SoulRenderer: NSObject, MTKViewDelegate {
     public func draw(in view: MTKView) {
         // Ensure viewport size is synced for hit testing
         if viewportSize == .zero { viewportSize = view.drawableSize }
-        updateCamera()
+        
+        // Physics Loop (Delta-Time)
+        let now = Date().timeIntervalSince(startTime)
+        let deltaTime = (lastRenderTime == 0) ? 0.016 : (now - lastRenderTime)
+        lastRenderTime = now
+        
+        updateCamera(deltaTime: deltaTime)
 
         view.depthStencilPixelFormat = .depth32Float
 
@@ -270,7 +280,10 @@ public class SoulRenderer: NSObject, MTKViewDelegate {
 
             for name in activeNames {
                 if let pos = emotionLocations[name], let screenPos = project(pos) {
-                    labels.append((name, screenPos))
+                    // Convert Pixel Coordinates (Metal) -> Point Coordinates (SwiftUI)
+                    let scale = contentScaleFactor > 0 ? contentScaleFactor : 1.0
+                    let uiPos = CGPoint(x: screenPos.x / scale, y: screenPos.y / scale)
+                    labels.append((name, uiPos))
                 }
             }
             updateBlock(labels)

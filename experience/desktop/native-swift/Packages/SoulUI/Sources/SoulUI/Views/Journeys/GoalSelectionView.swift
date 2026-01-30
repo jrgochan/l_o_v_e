@@ -29,8 +29,9 @@ public struct GoalSelectionView: View {
     public var body: some View {
         NavigationStack {
             ZStack {
+
                 // Background
-                Color.black.ignoresSafeArea()
+                // Color.black.ignoresSafeArea() // REMOVED: Allow GlassPane to show through
 
                 VStack(spacing: 24) {
                     // Header
