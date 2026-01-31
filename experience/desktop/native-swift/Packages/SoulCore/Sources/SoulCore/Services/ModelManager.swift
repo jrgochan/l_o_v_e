@@ -1,5 +1,6 @@
 import Foundation
 import Combine
+import OSLog
 
 public struct LocalModel: Identifiable, Hashable {
     public let id: String
@@ -59,13 +60,22 @@ public class ModelManager: ObservableObject {
 
     private func createDirectoryIfNeeded() {
         if !fileManager.fileExists(atPath: modelsDirectory.path) {
-            try? fileManager.createDirectory(at: modelsDirectory, withIntermediateDirectories: true)
+            do {
+                try fileManager.createDirectory(at: modelsDirectory, withIntermediateDirectories: true)
+                SoulLog.brain.info("📂 Created models directory at: \(self.modelsDirectory.path)")
+            } catch {
+                SoulLog.brain.error("❌ Failed to create models directory: \(error.localizedDescription)")
+            }
         }
 
         // Also create a "llama3" specific folder if we want to organize
         let llamaDir = modelsDirectory.appendingPathComponent("llama3")
         if !fileManager.fileExists(atPath: llamaDir.path) {
-            try? fileManager.createDirectory(at: llamaDir, withIntermediateDirectories: true)
+            do {
+                try fileManager.createDirectory(at: llamaDir, withIntermediateDirectories: true)
+            } catch {
+                SoulLog.brain.error("❌ Failed to create llama3 directory: \(error.localizedDescription)")
+            }
         }
     }
 
@@ -88,7 +98,7 @@ public class ModelManager: ObservableObject {
             }
 
             self.localModels = foundModels
-            print("📦 ModelManager: Found \(foundModels.count) models.")
+            SoulLog.brain.info("📦 ModelManager: Found \(foundModels.count) models.")
         } // catch? Enumerator doesn't throw directly but effectively handles it
     }
 
@@ -110,7 +120,7 @@ public class ModelManager: ObservableObject {
         // Actually, for simplicity and robustness in this snippet, let's start with a simulation
         // IF the URL is a "test" URL, but support real download.
 
-        print("⬇️ ModelManager: Starting download from \(url)")
+        SoulLog.brain.info("⬇️ ModelManager: Starting download from \(url)")
 
         Task {
             // Real download logic utilizing async bytes if possible for progress
@@ -142,10 +152,10 @@ public class ModelManager: ObservableObject {
                     self.downloadProgress = 1.0
                     self.refreshModels()
                 }
-                print("✅ ModelManager: Download complete!")
+                SoulLog.brain.info("✅ ModelManager: Download complete!")
 
             } catch {
-                print("❌ ModelManager: Download failed: \(error)")
+                SoulLog.brain.error("❌ ModelManager: Download failed: \(error.localizedDescription)")
                 await MainActor.run {
                     self.isDownloading = false
                 }
@@ -155,8 +165,13 @@ public class ModelManager: ObservableObject {
 
     public func deleteModel(id: String) {
         guard let model = localModels.first(where: { $0.id == id }) else { return }
-        try? fileManager.removeItem(at: model.url)
-        refreshModels()
+        do {
+            try fileManager.removeItem(at: model.url)
+            SoulLog.brain.info("🗑️ Deleted model: \(model.name)")
+            refreshModels()
+        } catch {
+            SoulLog.brain.error("❌ Failed to delete model \(model.name): \(error.localizedDescription)")
+        }
     }
 
     public func getModelUrl(id: String) -> URL? {

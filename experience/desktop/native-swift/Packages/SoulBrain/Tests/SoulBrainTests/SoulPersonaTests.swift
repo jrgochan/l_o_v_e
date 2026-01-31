@@ -50,15 +50,10 @@ final class SoulPersonaTests: XCTestCase {
     }
 
     func testStrategycontext() {
-        let strategy = TransitionStrategy(
-            id: UUID(),
+        let strategy = SoulPersona.StrategySnapshot(
             name: "Test Breath",
-            type: .physiologicalRegulation,
             definition: "A testing strategy",
-            detailedSteps: ["Inhale", "Exhale"],
-            timeRequired: 60,
-            difficultyLevel: 1,
-            evidenceLevel: .expertConsensus
+            detailedSteps: ["Inhale", "Exhale"]
         )
 
         let prompt = SoulPersona.constructPrompt(

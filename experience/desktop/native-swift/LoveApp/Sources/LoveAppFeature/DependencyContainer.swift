@@ -22,7 +22,7 @@ public class DependencyContainer {
     let voiceEngine: VoiceEngine
     let speechEngine: SpeechEngine
     let llmEngine: LLMEngine
-    let inference: any InferenceProvider // Added to support direct access if needed, or just to satisfy init
+    var inference: any InferenceProvider // Added to support direct access if needed, or just to satisfy init
     let safetyEngine: SafetyEngine
     let breathPublisher: BreathPublisher
 
@@ -42,6 +42,7 @@ public class DependencyContainer {
             collectionManager.activeCollectionName = activeCollectionName
         }
     }
+    public var activeChatMode: SoulPersona.ChatMode = .standard
 
     // Audio / Voice State
     public var isMicRecording: Bool = false
@@ -59,7 +60,9 @@ public class DependencyContainer {
 
     // Streaming State
     public var streamingResponse: String = ""
-    public var isThinking: Bool = false
+    public var isThinking: Bool = false // General "Busy" state
+    public var isReflecting: Bool = false // Specific "Internal Monologue" state
+    public var thoughtContent: String = "" // The content of the reflection
 
     // Managers
     let collectionManager: CollectionManager
@@ -78,33 +81,34 @@ public class DependencyContainer {
         self.safetyEngine = SafetyEngine()
         self.breathPublisher = BreathPublisher()
 
-        // TEMPORARY: Force MockEmbedder on macOS to fix build crash until resources are bundled
+        // Embedder
+        let embedder = MockEmbedder()
+        self.embedder = embedder
+
+        // Default to Remote (Safe Default) - InferenceSettings sync happens in onAppear
         #if os(macOS)
-            let embedder = MockEmbedder()
-            self.embedder = embedder
-            // Use MockInferenceProvider if available, otherwise just nil safely or mock
-            // Assuming MLXInferenceProvider is also problematic if it depends on same libs
-            // But let's try just swapping embedder first, or both.
-            // Safest: Use Mock for everything to verify Voice Flow.
-            self.inference = MockInferenceProvider()
-            self.llmEngine = LLMEngine(embedder: self.embedder, inference: self.inference)
+            let localInference = SoulBrain.ExternalInferenceProvider(url: URL(string: "http://localhost:8081/v1/completions")!)
         #else
-            let embedder = MockEmbedder()
-            self.embedder = embedder
-            self.inference = MockInferenceProvider()
-            self.llmEngine = LLMEngine(embedder: self.embedder, inference: self.inference)
+            let localInference = MockInferenceProvider()
         #endif
         
-        self.searchManager = SemanticSearchManager(container: context.container, embedder: self.embedder)
+        self.inference = localInference
+        SoulLog.app.info("🧬 DependencyContainer: Initialized Inference (Default Safe Mode)")
+        
+        self.llmEngine = LLMEngine(embedder: embedder, inference: localInference)
+        
+        self.searchManager = SemanticSearchManager(container: context.container, embedder: embedder)
 
-        print("🧬 DependencyContainer: Core Systems Online")
+        SoulLog.app.info("🧬 DependencyContainer: Core Systems Online")
 
         // ... (Session/History Setup)
 
         // START AUDIO LISTENING (Ambient)
         // Wire AudioInput -> SpeechEngine
-        self.audioInput.onAudioBuffer = { [weak self] buffer in
-            self?.speechEngine.consumeBuffer(buffer)
+        // Capture specific non-isolated reference to avoid MainActor constraint on the closure
+        let speech = self.speechEngine
+        self.audioInput.onAudioBuffer = { buffer in
+            speech.consumeBuffer(buffer)
         }
         self.audioInput.start()
 
@@ -136,7 +140,7 @@ public class DependencyContainer {
         speechEngine.$transcript
             .receive(on: RunLoop.main)
             .sink { text in
-                print("🔄 DepContainer received transcript: \(text)")
+                SoulLog.voice.debug("🔄 DepContainer received transcript: \(text)")
                 self.liveInputText = text
             }
             .store(in: &cancellables)
@@ -192,7 +196,7 @@ public class DependencyContainer {
             // Use External Source (AudioInputManager)
             try speechEngine.startRecording(usingExternalSource: true)
         } catch {
-            print("🎤 Error starting recording: \(error)")
+            SoulLog.voice.error("🎤 Error starting recording: \(error.localizedDescription)")
         }
     }
 
@@ -202,7 +206,7 @@ public class DependencyContainer {
 
     /// Processes user input (Text or Speech) through the VAC pipeline
     func processInput(_ text: String) {
-        print("👤 User Input: \(text)")
+        SoulLog.brain.info("👤 User Input: \(text)")
 
         // 0. Update Conversation History & Analytics
         logUserMessage(text)
@@ -230,7 +234,7 @@ public class DependencyContainer {
 
         guard !safetyResult.isSafe else { return true }
 
-        print("🚨 Safety Alert Triggered: \(safetyResult.severity) - \(safetyResult.flaggedKeywords)")
+        SoulLog.brain.fault("🚨 Safety Alert Triggered: \(String(describing: safetyResult.severity)) - \(safetyResult.flaggedKeywords.joined(separator: ","))")
 
         let alert = ClinicalAlert(
             severity: safetyResult.severity,
@@ -257,7 +261,7 @@ public class DependencyContainer {
 
     private func analyzeAndUpdateVibe(_ text: String) {
         if let matchedVibe = vibe(for: text) {
-            print("🧠 Brain: Detected Emotion '\(text)'")
+            SoulLog.brain.debug("🧠 Brain: Detected Emotion '\(text)'")
             updateVibe(to: matchedVibe)
         } else {
             let analyzedVibe = SoulBrain.SentimentEngine.analyze(text, baseVibe: currentVibe)
@@ -281,27 +285,62 @@ public class DependencyContainer {
             )
         }
 
+        // Parser State
+        var buffer = ""
+        self.isReflecting = false
+        self.thoughtContent = ""
+
         for await token in await llmEngine.generate(
             prompt: text,
             vibe: self.currentVibe,
+            mode: self.activeChatMode,
             strategy: strategySnapshot,
             history: recentHistory
         ) {
             accumulatedResponse += token
-            self.streamingResponse = accumulatedResponse
-            if self.isThinking { self.isThinking = false }
+            buffer += token
+            
+            // Check for Reflection Tags
+            if buffer.contains("<reflection>") {
+                self.isReflecting = true
+                // Extract content between tags
+                if let start = buffer.range(of: "<reflection>"),
+                   let end = buffer.range(of: "</reflection>") {
+                    // Reflection Complete
+                    let content = buffer[start.upperBound..<end.lowerBound]
+                    self.thoughtContent = String(content)
+                    self.isReflecting = false
+                    
+                    // The Visible Response is what comes AFTER </reflection>
+                    // Only update streamingResponse with post-reflection text
+                    let visiblePart = buffer[end.upperBound...]
+                    self.streamingResponse = String(visiblePart)
+                } else {
+                    // Still Reflecting (Partial)
+                    if let start = buffer.range(of: "<reflection>") {
+                        let content = buffer[start.upperBound...]
+                        self.thoughtContent = String(content)
+                    }
+                }
+            } else {
+                // Normal Streaming
+                self.streamingResponse = buffer
+            }
         }
+        
+        // Cleanup final response (remove tags)
+        let finalCleanResponse = self.streamingResponse.trimmingCharacters(in: .whitespacesAndNewlines)
 
+        self.isReflecting = false
         self.isThinking = false
         self.streamingResponse = ""
 
-        let finalResponse = accumulatedResponse.trimmingCharacters(in: .whitespacesAndNewlines)
-        guard !finalResponse.isEmpty else { return }
+        guard !finalCleanResponse.isEmpty else { return }
 
-        print("🧠 Brain Response: \(finalResponse)")
+        SoulLog.brain.info("🧠 Brain Response: \(finalCleanResponse)")
 
         // 3. Save Response
-        let responseMsg = Message(text: finalResponse, isUser: false, vibe: self.currentVibe)
+        let responseMsg = Message(text: finalCleanResponse, isUser: false, vibe: self.currentVibe)
         self.context.insert(responseMsg) // Context is MainActor constrained? Yes, @MainActor class.
 
         if let session = self.currentSession {
@@ -309,7 +348,7 @@ public class DependencyContainer {
         }
 
         // 4. Speak
-        self.speak(finalResponse)
+        self.speak(finalCleanResponse)
 
         // 5. Update Vibe based on own response? Optional.
 
@@ -336,7 +375,7 @@ public class DependencyContainer {
                 (role: msg.isUser ? "user" : "assistant", content: msg.text)
             }
         } catch {
-            print("⚠️ Failed to fetch history: \(error)")
+            SoulLog.data.error("⚠️ Failed to fetch history: \(error.localizedDescription)")
         }
         return recentHistory
     }
@@ -359,7 +398,7 @@ public class DependencyContainer {
             let map: [UUID: Emotion] = Dictionary(uniqueKeysWithValues: unsorted.map { ($0.id, $0) })
             return ids.compactMap { map[$0] }
         } catch {
-            print("❌ DependencyContainer: Search fetch failed: \(error)")
+            SoulLog.data.error("❌ DependencyContainer: Search fetch failed: \(error.localizedDescription)")
             return []
         }
     }
@@ -368,7 +407,7 @@ public class DependencyContainer {
 
     /// meaningful state update when a user completes a strategy
     func completeStrategy(_ strategy: TransitionStrategy) {
-        print("✅ DependencyContainer: Strategy Completed - \(strategy.name)")
+        SoulLog.brain.info("✅ DependencyContainer: Strategy Completed - \(strategy.name)")
 
         // 1. Clear Active Context
         self.activeStrategy = nil
@@ -393,6 +432,33 @@ public class DependencyContainer {
         // 4. Speak Encouragement
         let praise = ["Well done.", "Good work.", "Feeling better?", "Nice focus."].randomElement() ?? "Well done."
         self.speak(praise)
+    }
+
+    // MARK: - Settings Support
+    
+    public func refreshInference() {
+        let settings = InferenceSettings.shared
+        SoulLog.app.info("🧬 DependencyContainer: Refreshing Inference to: \(String(describing: settings.mode))")
+        
+        let newProvider: InferenceProvider
+        
+        #if os(macOS)
+        switch settings.mode {
+        case .onDevice:
+            newProvider = MLXInferenceProvider()
+        case .remote:
+            newProvider = SoulBrain.ExternalInferenceProvider(url: URL(string: settings.remoteUrl)!)
+        }
+        #else
+            newProvider = MockInferenceProvider()
+        #endif
+        
+        self.inference = newProvider
+        
+        Task {
+            await llmEngine.updateProvider(inference: newProvider)
+            SoulLog.app.info("🧬 DependencyContainer: Hot-swap complete.")
+        }
     }
 }
 

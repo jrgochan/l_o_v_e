@@ -1,6 +1,7 @@
-import Foundation
 import Combine
 import QuartzCore
+import OSLog
+
 
 /// A global heartbeat for the UI, emitting a rhythmic "breath" signal.
 /// Designed to emulate a meditative breath cycle (approx 6 cycles/minute).
@@ -20,6 +21,7 @@ public class BreathPublisher: ObservableObject, @unchecked Sendable {
         self.timeProvider = timeProvider
         self.startTime = timeProvider()
         startBreathing()
+        SoulLog.ui.debug("🫁 BreathPublisher initialized")
     }
 
     private func startBreathing() {
@@ -54,5 +56,6 @@ public class BreathPublisher: ObservableObject, @unchecked Sendable {
 
     deinit {
         timer?.invalidate()
+        SoulLog.ui.debug("🫁 BreathPublisher deinitialized")
     }
 }

@@ -91,7 +91,7 @@ public struct PathsTab: View {
         if let path = pathEmotions {
             self.computedPath = path.map { $0.name }
         } else {
-            print("No path found")
+            SoulLog.brain.warning("No path found")
             self.computedPath = []
         }
     }

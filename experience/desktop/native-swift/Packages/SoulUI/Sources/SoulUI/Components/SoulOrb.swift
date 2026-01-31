@@ -1,5 +1,6 @@
 import SwiftUI
 import SoulCore
+import SoulBrain
 
 /// The central interactive element of the Soul Experience.
 /// Pulses with life and acts as the primary input method.
@@ -7,6 +8,8 @@ import SoulCore
 public struct SoulOrb: View {
     @Binding var vibe: Vibe
     @Binding var isListening: Bool
+    @Binding var chatMode: SoulPersona.ChatMode
+    @Binding var isReflecting: Bool
     var audioLevel: Float // NEW: Audio Reactivity
     var onTap: () -> Void
     var onLongPress: () -> Void
@@ -16,11 +19,15 @@ public struct SoulOrb: View {
     
     public init(vibe: Binding<Vibe>, 
                 isListening: Binding<Bool>,
+                chatMode: Binding<SoulPersona.ChatMode> = .constant(.standard),
+                isReflecting: Binding<Bool> = .constant(false),
                 audioLevel: Float = 0.0,
                 onTap: @escaping () -> Void,
                 onLongPress: @escaping () -> Void) {
         self._vibe = vibe
         self._isListening = isListening
+        self._chatMode = chatMode
+        self._isReflecting = isReflecting
         self.audioLevel = audioLevel
         self.onTap = onTap
         self.onLongPress = onLongPress
@@ -39,12 +46,12 @@ public struct SoulOrb: View {
                         ShaderLibrary.soulOrb(
                             .float2(120, 120),
                             .float(elapsedTime),
-                            .float(vibe.valence),
-                            .float(vibe.arousal + (isListening ? 0.3 + Double(audioLevel) * 0.5 : 0.0)) // Reactive Boost
+                            .float(effectiveValence),
+                            .float(effectiveArousal + (isListening ? 0.3 + Double(audioLevel) * 0.5 : 0.0)) // Reactive Boost
                         )
                     )
                     .shadow(
-                        color: Color(red: v(vibe.valence), green: 0.5, blue: 1.0 - v(vibe.valence))
+                        color: Color(red: v(effectiveValence), green: 0.5, blue: 1.0 - v(effectiveValence))
                             .opacity(0.5 + Double(audioLevel) * 0.5),
                         radius: 20 + CGFloat(audioLevel * 20)
                     )
@@ -78,5 +85,26 @@ public struct SoulOrb: View {
     
     func v(_ val: Double) -> Double {
         return (val + 1.0) / 2.0
+    }
+    
+    var effectiveValence: Double {
+        if chatMode == .clinical { return max(vibe.valence, 0.2) } // Always positive/calm
+        return vibe.valence
+    }
+    
+    // Compute Arousal considering reflection shimmer
+    var effectiveArousal: Double {
+        // Reflection Shimmer: Oscillation
+        if isReflecting { 
+            // We can't access 'elapsedTime' here directly cleanly without passed in, 
+            // but we can fake it or use a simpler boost.
+            // Actually, we use 'effectiveArousal' inside body where 'elapsedTime' is available?
+            // No, computed var doesn't have local scope.
+            // Let's keep it simple: Just boost arousal slightly or clamp.
+            // Real shimmer needs time.
+            return vibe.arousal // Placeholder, logic moved to body
+        }
+        if chatMode == .clinical { return min(vibe.arousal, -0.2) } // Low arousal (Calm)
+        return vibe.arousal
     }
 }

@@ -17,6 +17,9 @@ public struct SoulExperienceView: View {
     @Binding var streamingResponse: String
     @Binding var isThinking: Bool
     @Binding var liveInputText: String
+    @Binding var chatMode: SoulPersona.ChatMode
+    @Binding var isReflecting: Bool
+    @Binding var thoughtContent: String
     
     // Services
     var breathPublisher: BreathPublisher
@@ -28,6 +31,7 @@ public struct SoulExperienceView: View {
     var onMicTap: () -> Void
     var onLongPressOrb: () -> Void
     var onSearch: (String) async -> [Emotion]
+    var onSettingsChange: (() -> Void)?
     
     // Dependencies
     @Environment(\.modelContext) private var context
@@ -56,13 +60,17 @@ public struct SoulExperienceView: View {
                 streamingResponse: Binding<String>,
                 isThinking: Binding<Bool>,
                 liveInputText: Binding<String>,
+                chatMode: Binding<SoulPersona.ChatMode>,
+                isReflecting: Binding<Bool>,
+                thoughtContent: Binding<String>,
                 breathPublisher: BreathPublisher,
                 hapticEngine: HapticEngine,
                 bioMonitor: BioMonitor,
                 onChatInput: @escaping (String) -> Void,
                 onMicTap: @escaping () -> Void,
                 onLongPressOrb: @escaping () -> Void,
-                onSearch: @escaping (String) async -> [Emotion]) {
+                onSearch: @escaping (String) async -> [Emotion],
+                onSettingsChange: (() -> Void)? = nil) {
         self._vibe = vibe
         self._activeCollectionName = activeCollectionName
         self._isMicRecording = isMicRecording
@@ -70,6 +78,9 @@ public struct SoulExperienceView: View {
         self._streamingResponse = streamingResponse
         self._isThinking = isThinking
         self._liveInputText = liveInputText
+        self._chatMode = chatMode
+        self._isReflecting = isReflecting
+        self._thoughtContent = thoughtContent
         self.breathPublisher = breathPublisher
         self.hapticEngine = hapticEngine
         self.bioMonitor = bioMonitor
@@ -77,6 +88,7 @@ public struct SoulExperienceView: View {
         self.onMicTap = onMicTap
         self.onLongPressOrb = onLongPressOrb
         self.onSearch = onSearch
+        self.onSettingsChange = onSettingsChange
     }
     
     public var body: some View {
@@ -139,6 +151,8 @@ public struct SoulExperienceView: View {
                 isRecording: $isMicRecording,
                 streamingText: $streamingResponse,
                 isThinking: $isThinking,
+                isReflecting: $isReflecting,
+                thoughtContent: $thoughtContent,
                 transcribedText: $liveInputText,
                 onSend: { text in onChatInput(text) },
                 onMicTap: { onMicTap() }
@@ -187,8 +201,8 @@ public struct SoulExperienceView: View {
             
         case .journeys:
              JourneyTabRoot(
-                 onStrategyStart: { _ in print("🚀 Strategy Started") },
-                 onStrategyComplete: { _ in print("✅ Strategy Complete") }
+                 onStrategyStart: { _ in SoulLog.brain.info("🚀 Strategy Started") },
+                 onStrategyComplete: { _ in SoulLog.brain.info("✅ Strategy Complete") }
              )
              .frame(maxWidth: .infinity, maxHeight: .infinity)
              
@@ -233,7 +247,7 @@ public struct SoulExperienceView: View {
                 // Left: Menu / Settings
                 ZStack(alignment: .bottomLeading) {
                     if isMenuOpen {
-                        SoulSideMenu(isPresented: $isMenuOpen) { action in
+                        SoulSideMenu(isPresented: $isMenuOpen, chatMode: $chatMode, onSelect: { action in
                             hapticEngine.playSelection()
                             
                             if action == .visualMode {
@@ -247,7 +261,7 @@ public struct SoulExperienceView: View {
                                     activePane = action
                                 }
                             }
-                        }
+                        }, onSettingsChange: onSettingsChange)
                         .offset(y: -70) // Float above button
                     }
                     
@@ -273,6 +287,8 @@ public struct SoulExperienceView: View {
                 SoulOrb(
                     vibe: $vibe,
                     isListening: $isMicRecording,
+                    chatMode: $chatMode,
+                    isReflecting: $isReflecting,
                     audioLevel: audioLevel,
                     onTap: {
                         // Orb Tap Action (e.g. Pulse or Reset)

@@ -1,6 +1,8 @@
 import Foundation
 import AVFoundation
 import Combine
+import OSLog
+import SoulCore
 
 /// Manages audio input for visual reactivity.
 /// Captures microphone input, calculates RMS amplitude, and publishes normalized levels.
@@ -15,7 +17,7 @@ public final class AudioInputManager: ObservableObject, @unchecked Sendable {
     private let analysisQueue = DispatchQueue(label: "com.soul.audio.analysis", qos: .userInteractive)
 
     // Buffer Consumers
-    public var onAudioBuffer: ((AVAudioPCMBuffer) -> Void)?
+    public var onAudioBuffer: (@Sendable (AVAudioPCMBuffer) -> Void)?
 
     private init() {
         setupSession()
@@ -57,7 +59,7 @@ public final class AudioInputManager: ObservableObject, @unchecked Sendable {
             )
             try AVAudioSession.sharedInstance().setActive(true)
         } catch {
-            print("❌ AudioInputManager: Failed to set audio session: \(error)")
+            SoulLog.voice.error("❌ AudioInputManager: Failed to set audio session: \(error.localizedDescription)")
         }
         #endif
     }
@@ -96,9 +98,9 @@ public final class AudioInputManager: ObservableObject, @unchecked Sendable {
             Task { @MainActor in
                 self.isListening = true
             }
-            print("🎙️ AudioInputManager: Listening...")
+            SoulLog.voice.info("🎙️ AudioInputManager: Listening...")
         } catch {
-            print("❌ AudioInputManager: Failed to start engine: \(error)")
+            SoulLog.voice.error("❌ AudioInputManager: Failed to start engine: \(error.localizedDescription)")
         }
     }
 
@@ -108,7 +110,7 @@ public final class AudioInputManager: ObservableObject, @unchecked Sendable {
         onAudioBuffer?(buffer)
         
         let shouldLog = Int.random(in: 0...50) == 0
-        if shouldLog { print("🎤 AudioInputManager: Emitting buffer") }
+        if shouldLog { SoulLog.voice.debug("🎤 AudioInputManager: Emitting buffer") }
 
         guard let channelData = buffer.floatChannelData?[0] else { return }
         let frames = Int(buffer.frameLength)
@@ -126,7 +128,7 @@ public final class AudioInputManager: ObservableObject, @unchecked Sendable {
         level = max(0.0, min(1.0, level))
         
         if shouldLog {
-            print("🎤 AudioInputManager: RMS: \(rms) (Level: \(level))")
+            SoulLog.voice.debug("🎤 AudioInputManager: RMS: \(rms) (Level: \(level))")
         }
 
         // Smooth

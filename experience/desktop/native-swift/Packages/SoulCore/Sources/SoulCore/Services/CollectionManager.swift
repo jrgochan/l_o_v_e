@@ -23,7 +23,7 @@ public class CollectionManager: ObservableObject {
                 self.activeCollectionName = active.name
             }
         } catch {
-            print("⚠️ CollectionManager: Failed to sync initial state: \(error)")
+            SoulLog.data.warning("⚠️ CollectionManager: Failed to sync initial state: \(error.localizedDescription)")
         }
     }
 
@@ -34,7 +34,7 @@ public class CollectionManager: ObservableObject {
             .dropFirst() // Skip initial value
             .sink { [weak self] newName in
                 guard let self = self else { return }
-                print("🔄 UI triggered collection switch to: \(newName)")
+                SoulLog.data.info("🔄 UI triggered collection switch to: \(newName)")
                 self.switchCollection(toName: newName)
             }
             .store(in: &cancellables)
@@ -71,12 +71,12 @@ public class CollectionManager: ObservableObject {
 
             if found {
                 try context.save()
-                print("📚 Switched active collection to: \(identifier)")
+                SoulLog.data.info("📚 Switched active collection to: \(identifier)")
             } else {
-                print("⚠️ Collection '\(identifier)' not found.")
+                SoulLog.data.warning("⚠️ Collection '\(identifier)' not found.")
             }
         } catch {
-            print("❌ Failed to switch collection: \(error)")
+            SoulLog.data.error("❌ Failed to switch collection: \(error.localizedDescription)")
         }
     }
 }

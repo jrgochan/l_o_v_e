@@ -1,4 +1,6 @@
 import Foundation
+import OSLog
+import SoulCore
 
 public class Tokenizer {
     // Placeholder for BPE Tokenizer
@@ -8,7 +10,7 @@ public class Tokenizer {
 
     public init(url: URL) {
         // Load tokenizer.json or tokenizer.model
-        print("📖 Loading tokenizer from: \(url.path)")
+        SoulLog.brain.info("📖 Loading tokenizer from: \(url.path)")
     }
 
     // Mock Encode

@@ -23,7 +23,7 @@ actor SemanticSearchManager: ModelActor {
 
     /// Indexes all emotions currently in the database into the VectorIndex
     func indexEmotions() async {
-        print("🔍 Semantic Search: Indexing emotions...")
+        SoulLog.data.info("🔍 Semantic Search: Indexing emotions...")
         do {
             let descriptor = FetchDescriptor<Emotion>()
             let emotions = try modelContext.fetch(descriptor)
@@ -36,9 +36,9 @@ actor SemanticSearchManager: ModelActor {
                     index.add(id: emotion.id, vector: vector)
                 }
             }
-            print("✅ Semantic Search: Indexed \(emotions.count) emotions.")
+            SoulLog.data.info("✅ Semantic Search: Indexed \(emotions.count) emotions.")
         } catch {
-            print("❌ Semantic Search: Indexing failed: \(error)")
+            SoulLog.data.error("❌ Semantic Search: Indexing failed: \(error.localizedDescription)")
         }
     }
 
@@ -51,7 +51,7 @@ actor SemanticSearchManager: ModelActor {
             let matchIds = index.search(query: queryVec, limit: limit)
             return matchIds
         } catch {
-            print("❌ Semantic Search: Query failed: \(error)")
+            SoulLog.data.error("❌ Semantic Search: Query failed: \(error.localizedDescription)")
             return []
         }
     }

@@ -2,6 +2,8 @@
 import Foundation
 import MLX
 import MLXNN
+import OSLog
+import SoulCore
 
 public actor MLXEmbedder: Embedder {
 
@@ -14,7 +16,7 @@ public actor MLXEmbedder: Embedder {
     public init() {}
 
     public func load() async throws {
-        print("🧠 MLXEmbedder: Loading BERT model...")
+        SoulLog.brain.info("🧠 MLXEmbedder: Loading BERT model...")
         
         // Initialize Config
         let config = BertConfig()
@@ -24,7 +26,7 @@ public actor MLXEmbedder: Embedder {
         self.tokenizer = Tokenizer(url: URL(fileURLWithPath: "/tmp/dummy"))
 
         self.isLoaded = true
-        print("🧠 MLXEmbedder: BERT initialized (Weights pending)")
+        SoulLog.brain.info("🧠 MLXEmbedder: BERT initialized (Weights pending)")
     }
 
     public func embed(_ text: String) async throws -> [Float] {

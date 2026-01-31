@@ -166,7 +166,7 @@ public struct SessionReplayView: View {
         do {
             self.sessionMessages = try context.fetch(descriptor)
         } catch {
-            print("Failed to fetch session messages: \(error)")
+            SoulLog.data.error("Failed to fetch session messages: \(error.localizedDescription)")
         }
     }
 }

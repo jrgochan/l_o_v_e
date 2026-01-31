@@ -16,17 +16,23 @@ public struct ChatView: View {
     // Streaming Bindings
     @Binding public var streamingText: String
     @Binding public var isThinking: Bool
+    @Binding public var isReflecting: Bool
+    @Binding public var thoughtContent: String
     @Binding public var transcribedText: String
 
     public init(isRecording: Binding<Bool>,
                 streamingText: Binding<String> = .constant(""),
                 isThinking: Binding<Bool> = .constant(false),
+                isReflecting: Binding<Bool> = .constant(false),
+                thoughtContent: Binding<String> = .constant(""),
                 transcribedText: Binding<String> = .constant(""),
                 onSend: ((String) -> Void)? = nil,
                 onMicTap: (() -> Void)? = nil) {
         self._isRecording = isRecording
         self._streamingText = streamingText
         self._isThinking = isThinking
+        self._isReflecting = isReflecting
+        self._thoughtContent = thoughtContent
         self._transcribedText = transcribedText
         self.onSend = onSend
         self.onMicTap = onMicTap
@@ -95,7 +101,26 @@ public struct ChatView: View {
     }
 
     var inputSection: some View {
-        HStack {
+        VStack(spacing: 8) {
+            // Thought Bubble Overlay
+            if isReflecting {
+                HStack {
+                    Image(systemName: "sparkles")
+                        .symbolEffect(.variableColor.iterative.reversing)
+                    Text(thoughtContent.isEmpty ? "Reflecting..." : thoughtContent)
+                        .font(.caption.italic())
+                        .multilineTextAlignment(.leading)
+                    Spacer()
+                }
+                .padding(12)
+                .background(.ultraThinMaterial)
+                .clipShape(RoundedRectangle(cornerRadius: 12))
+                .overlay(RoundedRectangle(cornerRadius: 12).stroke(Color.teal.opacity(0.3), lineWidth: 1))
+                .padding(.horizontal, 20)
+                .transition(.move(edge: .bottom).combined(with: .opacity))
+            }
+
+            HStack {
             TextField(isRecording ? "Listening..." : "Talk to the Soul...", text: $viewModel.inputText)
                 .textFieldStyle(.plain)
                 .padding(12)
@@ -126,13 +151,13 @@ public struct ChatView: View {
         .padding()
         .background(.ultraThinMaterial.opacity(0.3))
         .onChange(of: transcribedText) { _, newVal in
-            print("💬 ChatView received text: '\(newVal)' (Recording: \(isRecording))")
+            SoulLog.brain.debug("💬 ChatView received text: '\(newVal)' (Recording: \(isRecording))")
             if isRecording {
                 viewModel.inputText = newVal
             }
         }
     }
-
+    }
     private func sendMessage() {
         let text = viewModel.inputText.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !text.isEmpty else { return }

@@ -23,8 +23,8 @@ public actor LLMEngine {
     internal var memoryContentArgs: [UUID: String] = [:]
 
     private let embedder: Embedder
-    private let inference: InferenceProvider
-    private let logger = Logger(subsystem: "com.soul.brain", category: "LLMEngine")
+    private var inference: InferenceProvider
+    private let logger = SoulLog.brain
 
     // Default to Mock for now in Preview/Tests, but MLX in Production?
     // User requested decoupling.
@@ -57,6 +57,11 @@ public actor LLMEngine {
         }
     }
 
+    public func updateProvider(inference: InferenceProvider) async {
+        self.inference = inference
+        logger.info("Hot-swapped inference provider to \(type(of: inference))")
+    }
+
     // MARK: - Memory Management
 
     public func indexMemory(id: UUID, content: String) async {
@@ -83,7 +88,7 @@ public actor LLMEngine {
     }
 
     public func rehydrate(memories: [MemoryImport]) async {
-        print("🧠 LLMEngine: Rehydrating \(memories.count) memories...")
+        logger.debug("🧠 LLMEngine: Rehydrating \(memories.count) memories...")
         var loadedCount = 0
 
         for item in memories {
@@ -102,7 +107,7 @@ public actor LLMEngine {
     }
 
     public func seedDebugMemories() async {
-        print("🧠 LLMEngine: Seeding debug memories...")
+        logger.debug("🧠 LLMEngine: Seeding debug memories...")
         let memories = [
             "User enjoys late night coding sessions.",
             "User feels calm when listening to rain sounds.",
@@ -118,6 +123,7 @@ public actor LLMEngine {
     public func generate(
         prompt: String,
         vibe: Vibe,
+        mode: SoulPersona.ChatMode = .standard,
         strategy: SoulPersona.StrategySnapshot? = nil,
         history: [(role: String, content: String)] = []
     ) -> AsyncStream<String> {
@@ -140,6 +146,7 @@ public actor LLMEngine {
                 let fullPrompt = SoulPersona.constructPrompt(
                     userPrompt: prompt,
                     vibe: vibe,
+                    mode: mode,
                     memories: relevantMemories,
                     activeStrategy: strategy,
                     history: history

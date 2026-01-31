@@ -106,11 +106,11 @@ public struct DatabaseSeeder {
         let existingCount = try context.fetchCount(descriptor)
 
         if existingCount > 0 {
-            print("🌱 Collection '\(config.name)' already exists. Skipping.")
+            SoulLog.data.info("🌱 Collection '\(config.name)' already exists. Skipping.")
             return
         }
 
-        print("🌱 Seeding collection: \(config.name)...")
+        SoulLog.data.info("🌱 Seeding collection: \(config.name)...")
 
         // Load JSON from Bundle
         // Try multiple paths to be robust
@@ -155,18 +155,18 @@ public struct DatabaseSeeder {
         }
 
         try context.save()
-        print("✅ Seeded \(collectionData.emotions.count) emotions into '\(config.name)'")
+        SoulLog.data.info("✅ Seeded \(collectionData.emotions.count) emotions into '\(config.name)'")
     }
     private static func seedStrategies(context: ModelContext) throws {
         let descriptor = FetchDescriptor<TransitionStrategy>()
         let count = try context.fetchCount(descriptor)
 
         if count > 0 {
-            print("🌱 Strategies already seeded. Skipping.")
+            SoulLog.data.info("🌱 Strategies already seeded. Skipping.")
             return
         }
 
-        print("🌱 Seeding core strategies...")
+        SoulLog.data.info("🌱 Seeding core strategies...")
 
         let strategies = getStrategies()
 
@@ -175,7 +175,7 @@ public struct DatabaseSeeder {
         }
 
         try context.save()
-        print("✅ Seeded \(strategies.count) strategies.")
+        SoulLog.data.info("✅ Seeded \(strategies.count) strategies.")
     }
 
     private static func getStrategies() -> [TransitionStrategy] {

@@ -56,14 +56,10 @@ final class LLMEngineTests: XCTestCase {
         let mockInference = MockInferenceProvider()
         let engine = LLMEngine(embedder: mockEmbedder, inference: mockInference)
 
-        let strategy = TransitionStrategy(
+        let strategy = SoulPersona.StrategySnapshot(
             name: "Deep Breathing",
-            type: .physiologicalRegulation,
             definition: "Calm down through breath",
-            detailedSteps: ["Inhale", "Exhale"],
-            timeRequired: 60,
-            difficultyLevel: 1,
-            evidenceLevel: .clinical
+            detailedSteps: ["Inhale", "Exhale"]
         )
 
         let vibe = Vibe(valence: 0.5, arousal: 0.5, connection: 0.5)

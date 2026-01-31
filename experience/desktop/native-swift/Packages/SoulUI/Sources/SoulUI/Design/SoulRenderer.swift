@@ -1,7 +1,7 @@
 import MetalKit
 import simd
+import OSLog
 import SoulCore
-import SoulBrain
 /// Defines the 7 distinct visual states for the Soul Rendering Engine.
 public enum VisualMode: Int, CaseIterable, Sendable {
     case subtle = 0
@@ -122,7 +122,7 @@ public class SoulRenderer: NSObject, MTKViewDelegate {
 
     public var visualMode: VisualMode = .subtle {
         didSet {
-            print("🎨 Renderer VisualMode Changed: \(visualMode.displayName) (Raw: \(visualMode.rawValue))")
+            SoulLog.ui.info("🎨 Renderer VisualMode Changed: \(self.visualMode.displayName) (Raw: \(self.visualMode.rawValue))")
             onVisualModeChange?(visualMode) // NEW: Notify UI
         }
     }

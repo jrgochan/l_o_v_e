@@ -1,4 +1,6 @@
 import SwiftUI
+import SoulBrain
+import SoulCore
 
 public enum SoulMenuAction: CaseIterable, Identifiable {
     case chat, history, journeys, explore, paths, bookmarks, visualMode, settings
@@ -20,11 +22,15 @@ public enum SoulMenuAction: CaseIterable, Identifiable {
 
 public struct SoulSideMenu: View {
     let onSelect: (SoulMenuAction) -> Void
+    var onSettingsChange: (() -> Void)? = nil
     @Binding var isPresented: Bool
+    @Binding var chatMode: SoulPersona.ChatMode
     
-    public init(isPresented: Binding<Bool>, onSelect: @escaping (SoulMenuAction) -> Void) {
+    public init(isPresented: Binding<Bool>, chatMode: Binding<SoulPersona.ChatMode>, onSelect: @escaping (SoulMenuAction) -> Void, onSettingsChange: (() -> Void)? = nil) {
         self._isPresented = isPresented
+        self._chatMode = chatMode
         self.onSelect = onSelect
+        self.onSettingsChange = onSettingsChange
     }
     
     public var body: some View {
@@ -67,6 +73,60 @@ public struct SoulSideMenu: View {
                 .buttonStyle(SoulbouncyButtonStyle())
                 .transition(.scale.combined(with: .opacity).animation(.spring(response: 0.3, dampingFraction: 0.6).delay(Double(action.hashValue % 5) * 0.05)))
             }
+
+            // Brain Settings
+            Section("Brain Settings") {
+                @Bindable var settings = InferenceSettings.shared
+                
+                Picker("Inference", selection: $settings.mode) {
+                    ForEach(InferenceMode.allCases, id: \.self) { mode in
+                        Text(mode.rawValue.capitalized).tag(mode)
+                    }
+                }
+                .pickerStyle(.segmented)
+                .onChange(of: settings.mode) { _, _ in 
+                    hapticFeedback()
+                    onSettingsChange?() 
+                }
+                
+                if settings.mode == .remote {
+                    TextField("Server URL", text: $settings.remoteUrl)
+                        .textFieldStyle(.roundedBorder)
+                        .font(.caption.monospaced())
+                        .onChange(of: settings.remoteUrl) { _, _ in onSettingsChange?() }
+                }
+            }
+            .padding(.vertical, 4)
+
+            
+            // Mode Toggle (Separate from general actions)
+            Divider().background(Color.white.opacity(0.2))
+            
+            Button {
+                hapticFeedback()
+                cycleChatMode()
+            } label: {
+                HStack {
+                    ZStack {
+                        Circle()
+                            .fill(.ultraThinMaterial)
+                            .frame(width: 44, height: 44)
+                            .overlay(Circle().stroke(.white.opacity(0.2), lineWidth: 1))
+                        
+                        Image(systemName: modeIcon)
+                            .font(.system(size: 18))
+                            .foregroundStyle(modeColor)
+                    }
+                    
+                    Text(chatMode.rawValue)
+                        .font(.caption.bold())
+                        .foregroundStyle(.white.opacity(0.9))
+                    
+                    Spacer()
+                }
+                .padding(.horizontal, 4)
+            }
+            .buttonStyle(SoulbouncyButtonStyle())
         }
         .padding(20)
         .background(
@@ -80,6 +140,30 @@ public struct SoulSideMenu: View {
         // Simple fallback if engine isn't passed, though ideally it should be tapped into the engine
         let generator = UIImpactFeedbackGenerator(style: .light)
         generator.impactOccurred()
+    }
+    
+    var modeIcon: String {
+        switch chatMode {
+        case .standard: return "bubble.left.and.bubble.right.fill"
+        case .clinical: return "cross.case.fill"
+        case .deepFeeling: return "brain.head.profile"
+        }
+    }
+    
+    var modeColor: Color {
+        switch chatMode {
+        case .standard: return .white
+        case .clinical: return .teal
+        case .deepFeeling: return .purple
+        }
+    }
+    
+    func cycleChatMode() {
+        let all = SoulPersona.ChatMode.allCases
+        if let idx = all.firstIndex(of: chatMode) {
+            let next = (idx + 1) % all.count
+            chatMode = all[next]
+        }
     }
 }
 

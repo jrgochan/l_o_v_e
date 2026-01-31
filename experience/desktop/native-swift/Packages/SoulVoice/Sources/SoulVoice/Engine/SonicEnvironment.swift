@@ -1,5 +1,6 @@
 import AVFoundation
 import SoulCore
+import OSLog
 
 /// The Ambient Soundscape Generator.
 /// Creates a generative audio drone based on emotional state.
@@ -13,7 +14,7 @@ public class SonicEnvironment: ObservableObject {
     }
 
     public func start() {
-        // print("🎶 Sonic Environment Started (Silent Mode)")
+        SoulLog.voice.info("🎶 Sonic Environment Started (Silent Mode)")
         isRunning = true
     }
 

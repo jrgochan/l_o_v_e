@@ -29,6 +29,12 @@ let package = Package(
                 .product(name: "MLXNN", package: "mlx-swift", condition: .when(platforms: [.macOS])),
                 .product(name: "MLXOptimizers", package: "mlx-swift", condition: .when(platforms: [.macOS]))
             ],
+            exclude: [
+                "Metal" // Exclude raw sources since we manually compiled them
+            ],
+            resources: [
+                .process("Resources") // Process the folder containing default.metallib
+            ],
             swiftSettings: [
                 .unsafeFlags(["-Xfrontend", "-strict-concurrency=complete"])
             ]

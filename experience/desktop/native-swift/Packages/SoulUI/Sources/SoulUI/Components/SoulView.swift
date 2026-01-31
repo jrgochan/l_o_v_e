@@ -188,7 +188,7 @@ public struct SoulView: PlatformViewRepresentable {
 
         view.onTap = { point in
             if let name = renderer.hitTest(at: point) {
-                print("🖱️ Clicked: \(name)")
+                SoulLog.ui.info("🖱️ Clicked: \(name)")
                 renderer.fly(to: name)
                 renderer.selectEmotion(name)
             }

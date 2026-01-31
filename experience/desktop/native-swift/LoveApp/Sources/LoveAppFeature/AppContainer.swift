@@ -19,14 +19,21 @@ public struct AppContainer: View {
             streamingResponse: Bindable(deps).streamingResponse,
             isThinking: Bindable(deps).isThinking,
             liveInputText: Bindable(deps).liveInputText,
+            chatMode: Bindable(deps).activeChatMode,
+            isReflecting: Bindable(deps).isReflecting,
+            thoughtContent: Bindable(deps).thoughtContent,
             breathPublisher: deps.breathPublisher,
             hapticEngine: deps.hapticEngine,
             bioMonitor: deps.bioMonitor,
             onChatInput: { text in deps.processInput(text) },
             onMicTap: { deps.isVoiceModeEnabled.toggle() },
             onLongPressOrb: { deps.isMicRecording ? deps.stopListening() : deps.startListening() },
-            onSearch: { q in await deps.searchEmotions(query: q) }
+            onSearch: { q in await deps.searchEmotions(query: q) },
+            onSettingsChange: { deps.refreshInference() }
         )
+        .onAppear {
+            deps.refreshInference()
+        }
     }
 
     func toggleMic() {

@@ -19,7 +19,7 @@ public class HapticEngine: ObservableObject, @unchecked Sendable {
 
     private func prepareHaptics() {
         guard CHHapticEngine.capabilitiesForHardware().supportsHaptics else {
-            print("🫀 Haptics not supported on this device.")
+            SoulLog.bio.warning("🫀 Haptics not supported on this device.")
             return
         }
 
@@ -28,19 +28,19 @@ public class HapticEngine: ObservableObject, @unchecked Sendable {
 
             // Handle Resume (e.g. returning from background)
             engine?.resetHandler = { [weak self] in
-                print("🫀 Haptic Engine Reset. Restarting...")
+                SoulLog.bio.info("🫀 Haptic Engine Reset. Restarting...")
                 try? self?.engine?.start()
             }
 
             engine?.stoppedHandler = { reason in
-                print("🫀 Haptic Engine Stopped: \(reason)")
+                SoulLog.bio.warning("🫀 Haptic Engine Stopped: \(reason.rawValue)")
             }
 
             try engine?.start()
             isEngineRunning = true
-            print("🫀 Haptic Engine Started.")
+            SoulLog.bio.info("🫀 Haptic Engine Started.")
         } catch {
-            print("❌ Failed to start HapticEngine: \(error)")
+            SoulLog.bio.error("❌ Failed to start HapticEngine: \(error.localizedDescription)")
         }
     }
 
@@ -110,7 +110,7 @@ public class HapticEngine: ObservableObject, @unchecked Sendable {
             let player = try engine?.makePlayer(with: pattern)
             try player?.start(atTime: 0)
         } catch {
-            print("❌ Failed to play heartbeat: \(error)")
+            SoulLog.bio.error("❌ Failed to play heartbeat: \(error.localizedDescription)")
         }
     }
 
@@ -142,7 +142,7 @@ public class HapticEngine: ObservableObject, @unchecked Sendable {
             let player = try engine?.makePlayer(with: pattern)
             try player?.start(atTime: 0)
         } catch {
-            print("❌ Failed to play transition: \(error)")
+            SoulLog.bio.error("❌ Failed to play transition: \(error.localizedDescription)")
         }
     }
 
@@ -165,7 +165,7 @@ public class HapticEngine: ObservableObject, @unchecked Sendable {
             let player = try engine?.makePlayer(with: pattern)
             try player?.start(atTime: 0)
         } catch {
-            print("❌ Failed to play selection: \(error)")
+            SoulLog.bio.error("❌ Failed to play selection: \(error.localizedDescription)")
         }
     }
 
@@ -187,7 +187,7 @@ public class HapticEngine: ObservableObject, @unchecked Sendable {
             let player = try engine?.makePlayer(with: pattern)
             try player?.start(atTime: 0)
         } catch {
-            print("❌ Failed to play hover: \(error)")
+            SoulLog.bio.error("❌ Failed to play hover: \(error.localizedDescription)")
         }
     }
 }

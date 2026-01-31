@@ -1,6 +1,8 @@
 import Foundation
 import Accelerate
 import AVFoundation
+import OSLog
+import SoulCore
 
 /// Extracts prosodic features (pitch, energy) from audio buffers.
 /// Mirrors `prosody_analyzer.py` from Listener.
@@ -11,7 +13,7 @@ public class AudioAnalyzer {
     private let maxFrequency: Float = 500.0
     private let sampleRate: Float = 44100.0
 
-    public struct ProsodyFeatures {
+    public struct ProsodyFeatures: Sendable {
         public let pitch: Float // Fundamental Frequency (Hz)
         public let energy: Float // RMS (0-1)
         public let zeroCrossingRate: Float
@@ -25,7 +27,7 @@ public class AudioAnalyzer {
 
     /// Processes a PCM audio buffer and returns prosodic features.
     public func process(buffer: AVAudioPCMBuffer) -> ProsodyFeatures {
-        print("🎤 Analyzer: Processing Buffer frameLength=\(buffer.frameLength)")
+        SoulLog.voice.debug("🎤 Analyzer: Processing Buffer frameLength=\(buffer.frameLength)")
         guard let channelData = buffer.floatChannelData?[0] else {
             return ProsodyFeatures(pitch: 0, energy: 0, zeroCrossingRate: 0, voiceActivity: false)
         }
@@ -50,7 +52,7 @@ public class AudioAnalyzer {
             pitch = calculatePitch(samples, sampleRate: Float(buffer.format.sampleRate))
         }
 
-        print("✅ Analyzer: Frame Complete")
+        SoulLog.voice.debug("✅ Analyzer: Frame Complete")
         return ProsodyFeatures(
             pitch: pitch,
             energy: energy,

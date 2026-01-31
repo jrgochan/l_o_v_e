@@ -1,5 +1,6 @@
 import MetalKit
 import SoulCore
+import OSLog
 
 // MARK: - Pipeline Configuration
 extension SoulRenderer {
@@ -16,74 +17,74 @@ extension SoulRenderer {
         configurePointPipeline(library: library)
         configurePathPipeline(library: library)
 
-        print("🏁 buildPipeline completed")
+        SoulLog.metal.info("🏁 buildPipeline completed")
     }
 
     private func loadMetalLibrary() -> MTLLibrary? {
-        print("🔍 Debugging Metal Library Loading...")
-        print("📂 Bundle.main path: \(Bundle.main.bundlePath)")
+        SoulLog.metal.debug("🔍 Debugging Metal Library Loading...")
+        SoulLog.metal.debug("📂 Bundle.main path: \(Bundle.main.bundlePath)")
 
         // Strategy 1: Automatic Bundle.module with Named Library
         do {
             let bundle = Bundle.module
-            print("📦 Bundle.module path: \(bundle.bundlePath)")
+            SoulLog.metal.debug("📦 Bundle.module path: \(bundle.bundlePath)")
 
             if let libURL = bundle.url(forResource: "SoulUI", withExtension: "metallib") {
                 let library = try device.makeLibrary(URL: libURL)
-                print("✅ Found SoulUI.metallib at \(libURL.lastPathComponent)")
+                SoulLog.metal.info("✅ Found SoulUI.metallib at \(libURL.lastPathComponent)")
                 return library
             } else {
                 let library = try device.makeDefaultLibrary(bundle: bundle)
-                print("✅ Found default.metallib in Bundle.module")
+                SoulLog.metal.info("✅ Found default.metallib in Bundle.module")
                 return library
             }
         } catch {
-            print("⚠️ Bundle.module load failed: \(error)")
+            SoulLog.metal.warning("⚠️ Bundle.module load failed: \(error.localizedDescription)")
         }
 
         // Strategy 2: Explicit Search for SoulUI_SoulUI.bundle
         if let bundleURL = Bundle.main.url(forResource: "SoulUI_SoulUI", withExtension: "bundle"),
            let bundle = Bundle(url: bundleURL) {
-            print("📦 Found explicit SoulUI_SoulUI.bundle at \(bundleURL)")
+            SoulLog.metal.info("📦 Found explicit SoulUI_SoulUI.bundle at \(bundleURL)")
             if let library = try? device.makeDefaultLibrary(bundle: bundle) {
-                print("✅ Loaded from explicit SoulUI bundle")
+                SoulLog.metal.info("✅ Loaded from explicit SoulUI bundle")
                 return library
             }
         }
 
         // Strategy 3: Bundle.main Fallback
-        print("⚠️ Trying Bundle.main...")
+        SoulLog.metal.warning("⚠️ Trying Bundle.main...")
         if let library = try? device.makeDefaultLibrary(bundle: Bundle.main) {
             return library
         }
 
         // Strategy 4: Device Default
-        print("⚠️ Trying System Default...")
+        SoulLog.metal.warning("⚠️ Trying System Default...")
         if let library = device.makeDefaultLibrary() {
             return library
         }
 
-        print("❌ ABSOLUTE FAILURE: Could not load Metal library in any way.")
+        SoulLog.metal.error("❌ ABSOLUTE FAILURE: Could not load Metal library in any way.")
         return nil
     }
 
     private func configureDepthState() {
-        print("⚙️ creating Depth State...")
+        SoulLog.metal.debug("⚙️ creating Depth State...")
         let depthDesc = MTLDepthStencilDescriptor()
         depthDesc.depthCompareFunction = .less
         depthDesc.isDepthWriteEnabled = false
         self.depthState = device.makeDepthStencilState(descriptor: depthDesc)
-        print("✅ Depth State created")
+        SoulLog.metal.info("✅ Depth State created")
     }
 
     private func configureLiquidPipeline(library: MTLLibrary) {
-        print("⚙️ configuring Liquid Pipeline...")
+        SoulLog.metal.debug("⚙️ configuring Liquid Pipeline...")
         let descriptor = MTLRenderPipelineDescriptor()
         descriptor.label = "Soul Shader Pipeline"
 
         guard let vertFunc = library.makeFunction(name: "vertexPassthrough"),
               let fragFunc = library.makeFunction(name: "liquidSoul") else {
-            print("❌ Failed to find liquid shader functions")
+            SoulLog.metal.error("❌ Failed to find liquid shader functions")
             return
         }
 
@@ -98,14 +99,14 @@ extension SoulRenderer {
 
         do {
             pipelineState = try device.makeRenderPipelineState(descriptor: descriptor)
-            print("✅ Liquid Pipeline created")
+            SoulLog.metal.info("✅ Liquid Pipeline created")
         } catch {
-            print("❌ Failed to create pipeline state: \(error)")
+            SoulLog.metal.error("❌ Failed to create pipeline state: \(error.localizedDescription)")
         }
     }
 
     private func configurePointPipeline(library: MTLLibrary) {
-        print("⚙️ configuring Point Pipeline...")
+        SoulLog.metal.debug("⚙️ configuring Point Pipeline...")
         let pointDesc = MTLRenderPipelineDescriptor()
         pointDesc.label = "Point Cloud Pipeline"
         pointDesc.vertexFunction = library.makeFunction(name: "vertexPoint")
@@ -119,14 +120,14 @@ extension SoulRenderer {
 
         do {
             pointPipeline = try device.makeRenderPipelineState(descriptor: pointDesc)
-            print("✅ Point Pipeline created")
+            SoulLog.metal.info("✅ Point Pipeline created")
         } catch {
-            print("❌ Failed to create point pipeline: \(error)")
+            SoulLog.metal.error("❌ Failed to create point pipeline: \(error.localizedDescription)")
         }
     }
 
     private func configurePathPipeline(library: MTLLibrary) {
-        print("⚙️ configuring Path Pipeline...")
+        SoulLog.metal.debug("⚙️ configuring Path Pipeline...")
         let pathDesc = MTLRenderPipelineDescriptor()
         pathDesc.label = "Path Pipeline"
         pathDesc.vertexFunction = library.makeFunction(name: "vertexLine")
@@ -140,9 +141,9 @@ extension SoulRenderer {
 
         do {
             pathPipeline = try device.makeRenderPipelineState(descriptor: pathDesc)
-            print("✅ Path Pipeline created")
+            SoulLog.metal.info("✅ Path Pipeline created")
         } catch {
-            print("❌ Failed to create path pipeline: \(error)")
+            SoulLog.metal.error("❌ Failed to create path pipeline: \(error.localizedDescription)")
         }
     }
 }

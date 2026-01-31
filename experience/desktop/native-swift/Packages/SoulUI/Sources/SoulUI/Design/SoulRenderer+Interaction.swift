@@ -1,6 +1,7 @@
 import MetalKit
 import SoulCore
 import SoulBrain
+import OSLog
 
 // MARK: - Interaction & Camera
 extension SoulRenderer {
@@ -25,7 +26,7 @@ extension SoulRenderer {
 
     internal func startFlight(to emotionName: String) {
         guard let targetPos = emotionLocations[emotionName] else {
-            print("❌ Flight Computer: Unknown destination '\(emotionName)'")
+            SoulLog.ui.warning("❌ Flight Computer: Unknown destination '\(emotionName)'")
             if !flightQueue.isEmpty {
                 let next = flightQueue.removeFirst()
                 startFlight(to: next)

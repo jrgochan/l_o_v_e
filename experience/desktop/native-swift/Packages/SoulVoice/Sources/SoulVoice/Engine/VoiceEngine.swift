@@ -19,8 +19,9 @@ public class VoiceEngine: NSObject, ObservableObject, AVSpeechSynthesizerDelegat
         do {
             try AVAudioSession.sharedInstance().setCategory(.playback, mode: .spokenAudio, options: [.mixWithOthers])
             try AVAudioSession.sharedInstance().setActive(true)
+            SoulLog.voice.info("✅ VoiceEngine AudioSession configured")
         } catch {
-            print("🗣️ VoiceEngine AudioSession Error: \(error)")
+            SoulLog.voice.error("🗣️ VoiceEngine AudioSession Error: \(error.localizedDescription)")
         }
         #endif
     }
@@ -73,9 +74,8 @@ public class VoiceEngine: NSObject, ObservableObject, AVSpeechSynthesizerDelegat
         utterance.volume = params.volume
 
         synthesizer.speak(utterance)
-        print(
-            "🗣️ Speaking: \"\(text)\" " +
-            "(Pitch: \(String(format: "%.2f", params.pitch)), Rate: \(String(format: "%.2f", params.rate)))"
+        SoulLog.voice.info(
+            "🗣️ Speaking: \"\(text)\" (Pitch: \(String(format: "%.2f", params.pitch)), Rate: \(String(format: "%.2f", params.rate)))"
         )
     }
 
@@ -87,6 +87,7 @@ public class VoiceEngine: NSObject, ObservableObject, AVSpeechSynthesizerDelegat
     public func stop() {
         synthesizer.stopSpeaking(at: .immediate)
         self.speakingAmplitude = 0.0
+        SoulLog.voice.debug("🛑 VoiceEngine stopped speaking")
     }
 
     // MARK: - AVSpeechSynthesizerDelegate

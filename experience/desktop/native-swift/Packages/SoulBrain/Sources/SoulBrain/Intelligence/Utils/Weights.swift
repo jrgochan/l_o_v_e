@@ -1,6 +1,8 @@
 #if os(macOS)
 import Foundation
 import MLX
+import OSLog
+import SoulCore
 
 public struct Weights {
     // Basic loader validation
@@ -9,7 +11,7 @@ public struct Weights {
         // MLX.load returns a dictionary of arrays.
         // We assume the user provides a .safetensors file or a directory of them.
 
-        print("📂 Loading weights from: \(url.path)")
+        SoulLog.brain.info("📂 Loading weights from: \(url.path)")
 
         let loaded = try MLX.loadArrays(url: url)
         return loaded

@@ -4,7 +4,7 @@ import SwiftData
 /// Represents a saved visual state (Bookmark) of the SoulSphere.
 @Model
 @available(macOS 14, iOS 17, *)
-public final class ViewPreset {
+public final class ViewPreset: @unchecked Sendable {
     @Attribute(.unique) public var id: UUID
     public var name: String
     public var createdAt: Date
