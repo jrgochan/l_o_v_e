@@ -169,7 +169,11 @@ start_api() {
     fi
 
     # Run Command
-    cmd="bash -c '. .venv/bin/activate && uvicorn app.main:app --host 0.0.0.0 --port $port --reload'"
+    local env_vars=""
+    if [ "$name" = "PersonaPlex" ]; then
+        env_vars="PYTORCH_ENABLE_MPS_FALLBACK=1"
+    fi
+    cmd="bash -c '. .venv/bin/activate && $env_vars uvicorn app.main:app --host 0.0.0.0 --port $port --reload'"
     run_cmd "$cmd" "$log_file"
 
     local pid=$!

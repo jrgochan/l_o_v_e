@@ -93,72 +93,74 @@ async def voice_session_endpoint(websocket: WebSocket):
 
     # --- Main Audio Processing Loops ---
 
+    # --- Main Audio Processing Loops ---
+
     async def recv_loop():
         """Receive audio from client -> OpusReader."""
+        logger.info("recv_loop started")
         try:
             while not close_event.is_set():
                 if websocket.client_state == WebSocketState.DISCONNECTED:
+                    logger.info("recv_loop: WebSocket disconnected state detected")
+                    close_event.set()
                     break
 
                 # We expect binary PCM messages
-                message = await websocket.receive()
+                try:
+                    message = await asyncio.wait_for(websocket.receive(), timeout=0.1)
+                except asyncio.TimeoutError:
+                    continue
 
                 if message["type"] == "websocket.disconnect":
+                    logger.info("recv_loop: received websocket.disconnect message")
                     close_event.set()
                     break
 
                 if "bytes" in message and message["bytes"]:
                     # Client sends Float32 PCM bytes
-                    # We feed this to OpusReader (which expects Opus or PCM?)
-                    # moshi.server expects Opus packets usually.
-                    # But sphn.OpusStreamReader... let's check input.
-                    # Actually moshi server receives msg[0]==1 (audio), then payload.
-                    # And calls opus_reader.append_bytes(payload).
-                    # If client sends raw PCM, we can't use opus_reader
-                    # directly unless it handles PCM?
-                    # No, OpusStreamReader decodes opus.
-
-                    # PROPOSAL: Frontend sends PCM.
-                    # FAST PATH: skip opus_reader, buffer PCM directly for Mimi.
-                    # But Mimi expects 24kHz.
-
                     payload = message["bytes"]
                     # Assume client sends raw Float32 PCM at 24kHz
                     pcm_chunk = np.frombuffer(payload, dtype=np.float32)
 
                     # We need to queue this for the processing loop
-                    # We'll use an asyncio Queue for inter-loop communication
                     await pcm_in_queue.put(pcm_chunk)
-
         except Exception as e:
-            logger.error(f"Receive loop error: {e}")
+            logger.error(f"Receive loop error: {e}", exc_info=True)
             close_event.set()
+        finally:
+            logger.info("recv_loop ended")
 
     async def processing_loop():
         """Mimi Encode -> Moshi -> Mimi Decode -> OpusWriter."""
+        logger.info("processing_loop started")
         try:
             frame_size = int(moshi_state.mimi.sample_rate / moshi_state.mimi.frame_rate)
             all_pcm_data = None
+            chunks_processed = 0
 
             while not close_event.is_set():
                 # Yield to other tasks
-                await asyncio.sleep(0.001)
+                await asyncio.sleep(0.005)  # Slight delay to prevent busy loop
 
                 # 1. Get PCM from input queue
                 try:
                     # Non-blocking check or short timeout
-                    if not pcm_in_queue.empty():
+                    while not pcm_in_queue.empty():
                         chunk = await pcm_in_queue.get()
                         if all_pcm_data is None:
                             all_pcm_data = chunk
                         else:
                             all_pcm_data = np.concatenate((all_pcm_data, chunk))
-                except Exception:
-                    pass
+
+                        chunks_processed += 1
+
+                except Exception as e:
+                    logger.error(f"Error getting from queue: {e}")
 
                 # 2. Process complete frames
                 if all_pcm_data is not None:
                     while all_pcm_data.shape[-1] >= frame_size:
+                        logger.info("Processing frame...")
                         chunk = all_pcm_data[:frame_size]
                         all_pcm_data = all_pcm_data[frame_size:]
 
@@ -176,40 +178,35 @@ async def voice_session_endpoint(websocket: WebSocket):
                                 continue
 
                             # Decode (Mimi)
-                            # tokens shape: [B, K] -> K=8 codebooks usually + 1 text
-                            # mimi.decode expects [B, K] codes (indices)
-                            # tokens[:, 1:9] are the audio codes (8 codebooks)
                             main_pcm = moshi_state.mimi.decode(tokens[:, 1:9])
                             _ = moshi_state.other_mimi.decode(tokens[:, 1:9])
 
                             main_pcm = main_pcm.cpu()
-                            # Output PCM is [B, C, T] -> [1, 1, frame_size]
-                            out_pcm_np = main_pcm[0, 0].numpy()
+                            out_pcm_np = main_pcm[0, 0].detach().numpy()
 
                             # Send Audio Callback
-                            # Send raw PCM back to client
-                            # Format: \x01 + PCM bytes
                             out_bytes = out_pcm_np.tobytes()
                             await websocket.send_bytes(b"\x01" + out_bytes)
 
                             # Handle Text Tokens
                             text_token = tokens[0, 0, 0].item()
-                            # 0=pad, 3=...? SentencePiece special IDs
                             if text_token not in (0, 3):
                                 _text = moshi_state.text_tokenizer.id_to_piece(text_token)
                                 _text = _text.replace(" ", " ")
-                                # Format: \x02 + UTF8 Text
                                 msg = json.dumps({"type": "text-delta", "text": _text})
                                 await websocket.send_text(msg)
 
         except Exception as e:
-            logger.error(f"Processing loop error: {e}")
+            logger.error(f"Processing loop error: {e}", exc_info=True)
             close_event.set()
+        finally:
+            logger.info("processing_loop ended")
 
     # Communication Queues
     pcm_in_queue = asyncio.Queue()
 
     # Start Handshake (Send Ready bytes)
+    logger.info("Sending handshake (ready bytes)")
     await websocket.send_bytes(b"\x00")
 
     # Run loops
@@ -221,6 +218,7 @@ async def voice_session_endpoint(websocket: WebSocket):
 
         try:
             done, pending = await asyncio.wait(tasks, return_when=asyncio.FIRST_COMPLETED)
+            logger.info(f"One of the tasks finished. Done: {done}")
         finally:
             logger.info(f"Cleaning up session {persona_id}")
             close_event.set()
@@ -230,7 +228,9 @@ async def voice_session_endpoint(websocket: WebSocket):
             # Wait for cancellations
             await asyncio.gather(*tasks, return_exceptions=True)
 
-    await websocket.close()
+    if websocket.client_state == WebSocketState.CONNECTED:
+        logger.info("Closing websocket")
+        await websocket.close()
 
 
 # Temporary placeholder until we copy the full loop logic

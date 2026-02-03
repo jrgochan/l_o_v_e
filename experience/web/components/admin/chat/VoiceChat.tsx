@@ -6,7 +6,7 @@
 
 "use client";
 
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import { usePersonaPlexVoice, type PersonaId } from "@/hooks/usePersonaPlexVoice";
 import { AudioVisualizer } from "./AudioVisualizer";
 
@@ -17,6 +17,14 @@ interface VoiceChatProps {
 }
 
 export function VoiceChat({ personaId, personaColor, personaDescription }: VoiceChatProps) {
+  const [debugLogs, setDebugLogs] = useState<string[]>([]);
+  const addLog = (msg: string) => setDebugLogs(prev => [...prev.slice(-50), msg]); // Keep more logs
+  const logsEndRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    logsEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [debugLogs]);
+
   const {
     isConnected,
     isConnecting,
@@ -30,15 +38,26 @@ export function VoiceChat({ personaId, personaColor, personaDescription }: Voice
   } = usePersonaPlexVoice({
     personaId,
     enabled: true,
-    onSessionStart: () => console.log("Voice session started"),
-    onSessionEnd: () => console.log("Voice session ended"),
-    onError: (err) => console.error("Voice session error:", err),
+    onSessionStart: () => {
+        console.log("Voice session started");
+        addLog("Session STARTED");
+    },
+    onSessionEnd: () => {
+        console.log("Voice session ended");
+        addLog("Session ENDED");
+    },
+    onError: (err) => {
+        console.error("Voice session error:", err);
+        addLog(`ERROR: ${err}`);
+    },
+    onDebug: addLog,
   });
 
   const handleSessionToggle = () => {
     if (isConnected) {
       stopSession();
     } else {
+      setDebugLogs([]); // Clear logs on start
       startSession();
     }
   };
@@ -161,6 +180,14 @@ export function VoiceChat({ personaId, personaColor, personaDescription }: Voice
           </p>
         </div>
       )}
+
+      {/* Debug Logs */}
+      <div className="mt-4 p-2 bg-black/50 rounded text-xs font-mono text-gray-500 overflow-y-auto max-h-32">
+        {debugLogs.map((log, i) => (
+            <div key={i}>{log}</div>
+        ))}
+        <div ref={logsEndRef} />
+      </div>
     </div>
   );
 }

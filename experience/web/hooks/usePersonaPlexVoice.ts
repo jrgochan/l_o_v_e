@@ -15,6 +15,7 @@ export interface UsePersonaPlexVoiceOptions {
   onSessionStart?: () => void;
   onSessionEnd?: () => void;
   onError?: (error: string) => void;
+  onDebug?: (msg: string) => void;
 }
 
 export interface UsePersonaPlexVoiceReturn {
@@ -37,6 +38,7 @@ export function usePersonaPlexVoice({
   onSessionStart,
   onSessionEnd,
   onError,
+  onDebug,
 }: UsePersonaPlexVoiceOptions): UsePersonaPlexVoiceReturn {
   const [isConnected, setIsConnected] = useState(false);
   const [isConnecting, setIsConnecting] = useState(false);
@@ -51,7 +53,22 @@ export function usePersonaPlexVoice({
   const mediaStreamRef = useRef<MediaStream | null>(null);
   const sourceRef = useRef<MediaStreamAudioSourceNode | null>(null);
 
+  const onSessionStartRef = useRef(onSessionStart);
+  const onSessionEndRef = useRef(onSessionEnd);
+  const onErrorRef = useRef(onError);
+  const onDebugRef = useRef(onDebug);
+
+  const isMutedRef = useRef(false);
+
+  useEffect(() => {
+    onSessionStartRef.current = onSessionStart;
+    onSessionEndRef.current = onSessionEnd;
+    onErrorRef.current = onError;
+    onDebugRef.current = onDebug;
+  }, [onSessionStart, onSessionEnd, onError, onDebug]);
+
   const stopSession = useCallback(() => {
+    onDebugRef.current?.("stopSession() called");
     // Close WebSocket
     if (wsRef.current) {
       wsRef.current.close();
@@ -88,8 +105,8 @@ export function usePersonaPlexVoice({
     setAudioLevel(0);
     setLatency(null);
 
-    onSessionEnd?.();
-  }, [onSessionEnd]);
+    onSessionEndRef.current?.();
+  }, []);
 
   const startSession = useCallback(async () => {
     if (!enabled) {
@@ -102,6 +119,7 @@ export function usePersonaPlexVoice({
 
     try {
       // 1. Initialize Audio Context
+      onDebugRef.current?.("Initializing AudioContext...");
       const AudioContextClass = window.AudioContext || (window as any).webkitAudioContext;
       // Request 24kHz if possible (Moshi native), but browser might ignore
       const audioContext = new AudioContextClass({ sampleRate: 24000 });
@@ -110,12 +128,14 @@ export function usePersonaPlexVoice({
       // 2. Load AudioWorklet
       // Note: In Next.js, public files are served at root
       try {
+          onDebugRef.current?.("Loading AudioWorklet module...");
           await audioContext.audioWorklet.addModule("/audio-processor.js");
       } catch (e) {
           throw new Error(`Failed to load audio-processor: ${e}`);
       }
 
       // 3. Get Microphone Access
+      onDebugRef.current?.("Requesting Microphone access...");
       const stream = await navigator.mediaDevices.getUserMedia({
           audio: {
               channelCount: 1,
@@ -126,6 +146,7 @@ export function usePersonaPlexVoice({
           }
       });
       mediaStreamRef.current = stream;
+      onDebugRef.current?.("Microphone access granted.");
 
       // 4. Create Nodes
       const source = audioContext.createMediaStreamSource(stream);
@@ -144,21 +165,29 @@ export function usePersonaPlexVoice({
       // If we are in dev mode, we usually proxy or hit port directly.
       const wsUrl = `ws://${wsHost}:8003/voice-session`;
 
+      onDebugRef.current?.(`Connecting to WebSocket: ${wsUrl}`);
       const ws = new WebSocket(wsUrl);
+      ws.binaryType = "arraybuffer"; // CRITICAL: Force ArrayBuffer for Python backend compatibility
       wsRef.current = ws;
 
       // 6. Worklet <-> Main Thread Communication
+      let chunkCount = 0;
       workletNode.port.onmessage = (event) => {
           const { type, data } = event.data;
 
           if (type === 'input') {
+              chunkCount++;
+
               // Audio from Mic (Float32Array)
               // Calculate Audio Level (RMS) for UI
               // Optimization: Don't calculate every chunk if not needed, but chunks are small here.
               // Maybe do it every N chunks or use a leaky integrator?
               // For now, quick RMS.
               // data is Float32Array (128 length usually)
-              if (isConnected && ws.readyState === WebSocket.OPEN && !isMuted) { // logic for mute
+
+              // CRITICAL FIX: Use ws.readyState to check connection (local scope)
+              // and isMutedRef for mute state (stable ref) to avoid stale closure issues.
+              if (ws.readyState === WebSocket.OPEN && !isMutedRef.current) {
                  ws.send(data); // Send raw float32
 
                  // RMS for Vis
@@ -172,6 +201,7 @@ export function usePersonaPlexVoice({
 
       ws.onopen = () => {
         console.log("PersonaPlex WebSocket connected");
+        onDebugRef.current?.("WebSocket OPEN. Sending handshake...");
 
         // Handshake
         ws.send(JSON.stringify({
@@ -182,7 +212,7 @@ export function usePersonaPlexVoice({
 
         setIsConnected(true);
         setIsConnecting(false);
-        onSessionStart?.();
+        onSessionStartRef.current?.();
       };
 
       ws.onmessage = async (event) => {
@@ -193,9 +223,9 @@ export function usePersonaPlexVoice({
                     console.log("AI:", msg.text);
                 }
             } catch (e) { console.error("WS Parse error", e); }
-        } else {
-            // Binary Audio (PCM Float32) from Server
-            const arrayBuffer = await event.data.arrayBuffer();
+        } else if (event.data instanceof ArrayBuffer) {
+            // Binary Audio (PCM Float32) from Server - Already ArrayBuffer due to binaryType="arraybuffer"
+            const arrayBuffer = event.data;
             const prefix = new Uint8Array(arrayBuffer, 0, 1)[0];
 
             if (prefix === 1) { // Audio
@@ -217,11 +247,13 @@ export function usePersonaPlexVoice({
       ws.onerror = (event) => {
         console.error("PersonaPlex WebSocket error", event);
         setError("Connection failed");
-        onError?.("Connection failed");
+        onDebugRef.current?.("WebSocket ERROR");
+        onErrorRef.current?.("Connection failed");
       };
 
       ws.onclose = () => {
         console.log("PersonaPlex WebSocket closed");
+        onDebugRef.current?.("WebSocket CLOSE");
         stopSession();
       };
 
@@ -234,25 +266,29 @@ export function usePersonaPlexVoice({
       const errorMsg = err instanceof Error ? err.message : "Failed to start voice session";
       console.error("Voice session error:", err);
       setError(errorMsg);
-      onError?.(errorMsg);
+      onErrorRef.current?.(errorMsg);
       setIsConnecting(false);
       stopSession();
     }
-  }, [enabled, personaId, onSessionStart, onError, stopSession, isConnected, isMuted]);
+  }, [enabled, personaId, stopSession]); // Remove isConnected, isMuted deps
 
   const toggleMute = useCallback(() => {
-      // In AudioWorklet model, we can handle mute by not sending data in the onmessage handler
-      // or by messaging the worklet to stop processing input.
-      // Logic above in onmessage checks isMuted.
-      setIsMuted((prev) => !prev);
+      setIsMuted((prev) => {
+          const next = !prev;
+          isMutedRef.current = next;
+          return next;
+      });
   }, []);
 
   // Cleanup
   useEffect(() => {
+    onDebugRef.current?.(`Effect MOUNT. isConnected=${isConnected}`);
     return () => {
+        onDebugRef.current?.(`Effect CLEANUP. isConnected=${isConnected}`);
         // We do not auto-stop on unmount if we want background voice?
         // No, typical react behavior is stop.
         if (isConnected) {
+            onDebugRef.current?.("Unmount/Update triggering stopSession");
             stopSession();
         }
     };
