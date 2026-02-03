@@ -1,0 +1,25 @@
+# PersonaPlex Service Dependencies
+
+# FastAPI and web framework
+fastapi==0.109.0
+uvicorn[standard]==0.27.0
+pydantic==2.5.3
+pydantic-settings==2.1.0
+python-multipart==0.0.6
+
+# CORS and WebSocket support
+websockets==12.0
+python-dotenv==1.0.0
+
+# Logging and monitoring
+python-json-logger==2.0.7
+structlog>=24.1.0
+asgi-correlation-id>=4.3.0
+
+# HTTP client (for health checks, etc.)
+httpx==0.26.0
+
+# Note: PersonaPlex dependencies will be installed separately
+# via: pip install moshi/.
+# This requires the NVIDIA PersonaPlex repository to be cloned
+# into the `moshi/` subdirectory.

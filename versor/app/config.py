@@ -43,10 +43,16 @@ Example:
 from typing import List
 
 from pydantic import Field
-from pydantic_settings import BaseSettings
+
+try:
+    from settings import LoveBaseSettings
+except ImportError:
+    # Fallback for when shared settings aren't in path (e.g. unit tests without full env)
+    # This minimal shim allows imports to work
+    from pydantic_settings import BaseSettings as LoveBaseSettings
 
 
-class Settings(BaseSettings):
+class Settings(LoveBaseSettings):
     """Application settings loaded from environment variables.
 
     This class defines all configurable parameters for Versor engine.
@@ -247,7 +253,7 @@ class Settings(BaseSettings):
     class Config:
         """Pydantic settings configuration."""
 
-        env_file = ".env"  # Load from .env file if present
+        env_file = (".env", "../../infra/config/base.env")  # Load from .env file and base.env
         case_sensitive = True  # Environment variable names must match exactly
         extra = "ignore"  # Ignore unexpected env vars (don't error)
 

@@ -31,6 +31,7 @@ import { ChatHeader } from "./chat/ChatHeader";
 import { ChatToggleFAB } from "./chat/ChatToggleFAB";
 import { ChatInput } from "./chat/ChatInput";
 import { ChatMessages } from "./chat/ChatMessages";
+import { VoiceChat } from "./chat/VoiceChat";
 import { AnalysisPanel } from "./panels/AnalysisPanel";
 import { EmotionHistoryPanel } from "./panels/EmotionHistoryPanel";
 
@@ -54,6 +55,29 @@ interface ChatPanelProps {
   sessionId: string;
 }
 
+// Helper to determine active persona based on UI state
+const getActivePersona = (toneMode: "warm" | "clinical", deepFeelingMode: boolean) => {
+  if (deepFeelingMode) {
+    return {
+      id: "metis" as const,
+      color: "#8B5CF6", // Purple
+      description: "Deep, insightful, multi-dimensional (Magician archetype)",
+    };
+  }
+  if (toneMode === "clinical") {
+    return {
+      id: "logos" as const,
+      color: "#06B6D4", // Cyan
+      description: "Clinical, objective, solution-oriented (Sage archetype)",
+    };
+  }
+  return {
+    id: "lumina" as const,
+    color: "#F59E0B", // Amber
+    description: "Warm, validation-focused, gentle (Caregiver archetype)",
+  };
+};
+
 export function ChatPanel({ sessionId }: ChatPanelProps) {
   // --- UI State ---
   const {
@@ -62,8 +86,10 @@ export function ChatPanel({ sessionId }: ChatPanelProps) {
     isFullscreen,
     height,
     setHeight,
+    chatMode,
     toneMode,
     toggleToneMode,
+    toggleChatMode,
     useAtlasMapping,
     setUseAtlasMapping,
     deepFeelingMode,
@@ -108,6 +134,8 @@ export function ChatPanel({ sessionId }: ChatPanelProps) {
   } = useChatProgress();
 
   const theme = useAdminTheme();
+
+  const activePersona = getActivePersona(toneMode, deepFeelingMode);
 
   // --- Local State ---
   const viewMode = useVisualizationStore((state) => state.viewMode);
@@ -500,9 +528,9 @@ export function ChatPanel({ sessionId }: ChatPanelProps) {
           onClick={handleToggleExpand}
           className={`
             fixed bottom-0 left-0 right-0 z-40
-            h-[60px] 
+            h-[60px]
             flex items-center justify-between px-6
-            ${theme.colors.background} ${theme.effects.backdropBlur}
+            \${theme.colors.background} \${theme.effects.backdropBlur}
             border-t border-cyan-500/30
             hover:bg-cyan-500/5 transition-all duration-300
             group
@@ -511,16 +539,16 @@ export function ChatPanel({ sessionId }: ChatPanelProps) {
           <div className="flex items-center gap-3">
             <div
               className={`
-              w-2 h-2 rounded-full 
-              ${isConnected ? "bg-green-500 animate-pulse" : "bg-red-500"}
+              w-2 h-2 rounded-full
+              \${isConnected ? "bg-green-500 animate-pulse" : "bg-red-500"}
               shadow-[0_0_8px_current]
             `}
             />
-            <span className={`text-sm font-medium ${theme.colors.text.primary}`}>
+            <span className={`text-sm font-medium \${theme.colors.text.primary}`}>
               Emotional Intelligence
             </span>
             <span
-              className={`text-xs ${theme.colors.text.muted} px-2 py-0.5 rounded-full bg-white/5`}
+              className={`text-xs \${theme.colors.text.muted} px-2 py-0.5 rounded-full bg-white/5`}
             >
               {isConnected ? "Connected" : "Disconnected"}
             </span>
@@ -552,10 +580,12 @@ export function ChatPanel({ sessionId }: ChatPanelProps) {
           } ${theme.colors.background} ${theme.effects.backdropBlur} border-t-2 ${theme.colors.border.replace("border-", "border-t-")} shadow-[0_-4px_20px_rgba(6,182,212,0.3)] flex flex-col transition-all duration-300`}
           style={{ height: isFullscreen ? "100vh" : `${height}px` }}
         >
+          {/* Solid Backing Layer to prevent bleed-through */}
+          <div className="absolute inset-0 bg-gray-950 -z-10" />
           {/* Resize Handle */}
           <div
             onMouseDown={handleMouseDown}
-            className={`w-full h-2 cursor-row-resize hover:bg-cyan-500/30 transition flex items-center justify-center ${
+            className={`w-full h-2 cursor-row-resize hover:bg-cyan-500/30 transition flex items-center justify-center \${
               isResizing ? "bg-cyan-500/50" : ""
             }`}
           >
@@ -569,11 +599,13 @@ export function ChatPanel({ sessionId }: ChatPanelProps) {
             isConnecting={isConnecting}
             isConnected={isConnected}
             wsError={wsError}
+            chatMode={chatMode}
             toneMode={toneMode}
             useAtlasMapping={useAtlasMapping}
             deepFeelingMode={deepFeelingMode}
             onToggleExpand={handleToggleExpand}
             onToggleFullscreen={handleToggleFullscreen}
+            onChatModeChange={toggleChatMode}
             onToneModeChange={toggleToneMode}
             onUseAtlasMappingChange={setUseAtlasMapping}
             onDeepFeelingModeChange={setDeepFeelingMode}
@@ -584,25 +616,42 @@ export function ChatPanel({ sessionId }: ChatPanelProps) {
             {/* Left: Emotion History */}
             {analysisExpandState !== "fullscreen" && <EmotionHistoryPanel />}
 
-            {/* Middle: Chat Messages */}
-            {analysisExpandState === "normal" && (
-              <ChatMessages
-                messages={messages}
-                showProgress={showProgress}
-                progressState={progressState}
-                toneMode={toneMode}
-                deepFeelingMode={deepFeelingMode}
-                onEmotionClick={(emotion) => viewInSphere(emotion)}
-              />
+            {/* Middle: Chat Messages OR Voice Chat */}
+            {(analysisExpandState === "normal" || analysisExpandState === "expanded") && (
+              <div
+                className={`
+                  flex-col overflow-hidden transition-all duration-300 ease-in-out min-w-0
+                  ${analysisExpandState === "expanded" ? "flex-[1] hidden md:flex" : "flex-1 flex"}
+                `}
+              >
+                {chatMode === "voice" ? (
+                  <div className="flex-1 bg-gray-900/50 rounded-lg overflow-hidden border border-gray-800">
+                    <VoiceChat
+                      personaId={activePersona.id}
+                      personaColor={activePersona.color}
+                      personaDescription={activePersona.description}
+                    />
+                  </div>
+                ) : (
+                  <ChatMessages
+                    messages={messages}
+                    showProgress={showProgress}
+                    progressState={progressState}
+                    toneMode={toneMode}
+                    deepFeelingMode={deepFeelingMode}
+                    onEmotionClick={(emotion) => viewInSphere(emotion)}
+                  />
+                )}
+              </div>
             )}
 
             {/* Right: Analysis Panel */}
             <div
-              className={`flex-shrink-0 transition-all duration-300 ease-in-out ${
+              className={`flex-shrink-0 transition-all duration-300 ease-in-out min-w-0 ${
                 analysisExpandState === "normal"
                   ? "w-96"
                   : analysisExpandState === "expanded"
-                    ? "w-[calc(100%-18rem)]" // approximate width calc
+                    ? "flex-[2]"
                     : "w-full"
               }`}
             >

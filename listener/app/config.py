@@ -46,10 +46,15 @@ See Also:
 from typing import Literal, Optional
 
 from pydantic import Field
-from pydantic_settings import BaseSettings, SettingsConfigDict
+from pydantic_settings import SettingsConfigDict
+
+try:
+    from settings import LoveBaseSettings
+except ImportError:
+    from pydantic_settings import BaseSettings as LoveBaseSettings
 
 
-class Settings(BaseSettings):
+class Settings(LoveBaseSettings):
     """Application settings loaded from environment variables with type validation.
 
     This Pydantic Settings class provides:
@@ -145,9 +150,9 @@ class Settings(BaseSettings):
     ARQ_JOB_TIMEOUT: int = 300
 
     model_config = SettingsConfigDict(
-        env_file=".env",
+        env_file=(".env", "../../infra/config/base.env"),
         case_sensitive=True,
-        extra="ignore",  # Changed from forbid to allow potential legacy/extra env vars, or just add the field
+        extra="ignore",
     )
 
 

@@ -1,0 +1,3 @@
+[submodule "personaplex/moshi"]
+	path = personaplex/moshi
+	url = https://github.com/NVIDIA/personaplex.git

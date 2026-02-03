@@ -14,10 +14,15 @@ COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Copy application code
-COPY app/ app/
+COPY versor/app/ app/
+# Copy shared libraries
+COPY infra/lib/python/ common/
 
 # Environment variables
 ENV PYTHONUNBUFFERED=1
+# Add venv to PATH and common to PYTHONPATH
+ENV PATH="/app/.venv/bin:$PATH"
+ENV PYTHONPATH="/app:/app/common"
 
 # Expose port
 EXPOSE 8001

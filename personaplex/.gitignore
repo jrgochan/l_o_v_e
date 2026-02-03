@@ -1,0 +1,43 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+.venv/
+venv/
+ENV/
+env/
+
+# PersonaPlex Models
+models/
+*.pt
+.models_ready
+
+# Environment
+.env
+.env.local
+
+# Setup markers
+.setup_complete
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Logs
+*.log
+logs/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Moshi submodule (tracked separately)
+# Note: moshi/ is a git submodule, but ignore any local changes
+moshi/.venv/
+moshi/__pycache__/
+moshi/.pytest_cache/

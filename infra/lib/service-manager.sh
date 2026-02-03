@@ -5,7 +5,7 @@
 # Source OS detection if not already loaded
 if ! command -v detect_os >/dev/null 2>&1; then
     # shellcheck source=./os-detect.sh
-    . "$(dirname "$0")/os-detect.sh"
+    . "$(dirname "${BASH_SOURCE[0]}")/os-detect.sh"
 fi
 
 # Map generic service name to platform-specific service name
@@ -14,10 +14,10 @@ fi
 map_service_name() {
     local service="$1"
     local init_system
-    
+
     init_system=$(detect_init_system)
     detect_package_manager >/dev/null
-    
+
     case "$service" in
         postgresql)
             case "$init_system" in
@@ -58,11 +58,11 @@ start_service() {
     local init_system
     local mapped_service
     local sudo_cmd
-    
+
     init_system=$(detect_init_system)
     mapped_service=$(map_service_name "$service")
     sudo_cmd=$(get_sudo)
-    
+
     case "$init_system" in
         brew-services)
             brew services start "$mapped_service"
@@ -106,11 +106,11 @@ stop_service() {
     local init_system
     local mapped_service
     local sudo_cmd
-    
+
     init_system=$(detect_init_system)
     mapped_service=$(map_service_name "$service")
     sudo_cmd=$(get_sudo)
-    
+
     case "$init_system" in
         brew-services)
             brew services stop "$mapped_service"
@@ -154,11 +154,11 @@ restart_service() {
     local init_system
     local mapped_service
     local sudo_cmd
-    
+
     init_system=$(detect_init_system)
     mapped_service=$(map_service_name "$service")
     sudo_cmd=$(get_sudo)
-    
+
     case "$init_system" in
         brew-services)
             brew services restart "$mapped_service"
@@ -191,10 +191,10 @@ check_service_running() {
     local service="$1"
     local init_system
     local mapped_service
-    
+
     init_system=$(detect_init_system)
     mapped_service=$(map_service_name "$service")
-    
+
     # For PostgreSQL and Redis, use functional checks first (more reliable)
     case "$service" in
         postgresql)
@@ -210,7 +210,7 @@ check_service_running() {
             fi
             ;;
     esac
-    
+
     # Priority 2: Check service manager status
     case "$init_system" in
         brew-services)
@@ -256,11 +256,11 @@ enable_service() {
     local init_system
     local mapped_service
     local sudo_cmd
-    
+
     init_system=$(detect_init_system)
     mapped_service=$(map_service_name "$service")
     sudo_cmd=$(get_sudo)
-    
+
     case "$init_system" in
         brew-services)
             # Homebrew services are enabled when started
@@ -290,11 +290,11 @@ disable_service() {
     local init_system
     local mapped_service
     local sudo_cmd
-    
+
     init_system=$(detect_init_system)
     mapped_service=$(map_service_name "$service")
     sudo_cmd=$(get_sudo)
-    
+
     case "$init_system" in
         brew-services)
             # Homebrew services are disabled when stopped
@@ -321,7 +321,7 @@ disable_service() {
 # Returns: status string
 get_service_status() {
     local service="$1"
-    
+
     if check_service_running "$service"; then
         echo "running"
     else
@@ -334,12 +334,12 @@ get_service_status() {
 start_ollama() {
     local init_system
     init_system=$(detect_init_system)
-    
+
     # Check if already running
     if check_service_running ollama; then
         return 0
     fi
-    
+
     case "$init_system" in
         brew-services)
             # Try brew services first
@@ -364,7 +364,7 @@ start_ollama() {
             nohup ollama serve >/dev/null 2>&1 &
             ;;
     esac
-    
+
     # Wait for Ollama to be ready
     local max_wait=10
     local count=0
@@ -375,7 +375,7 @@ start_ollama() {
         sleep 1
         count=$((count + 1))
     done
-    
+
     return 1
 }
 
@@ -384,7 +384,7 @@ start_ollama() {
 stop_ollama() {
     local init_system
     init_system=$(detect_init_system)
-    
+
     case "$init_system" in
         brew-services)
             if brew services list | grep ollama | grep -q "started"; then
@@ -445,7 +445,7 @@ wait_for_service() {
     local service="$1"
     local timeout="${2:-30}"
     local count=0
-    
+
     while [ $count -lt "$timeout" ]; do
         case "$service" in
             postgresql)
@@ -469,10 +469,10 @@ wait_for_service() {
                 fi
                 ;;
         esac
-        
+
         sleep 1
         count=$((count + 1))
     done
-    
+
     return 1
 }

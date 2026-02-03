@@ -19,6 +19,7 @@ import type {
 import { logger } from "@/utils/logger";
 import { ThreadView } from "./ThreadView";
 import { AutoLinkIndicator } from "./AutoLinkIndicator";
+import { VoiceChat } from "./VoiceChat";
 
 interface ChatDrawerProps {
   isOpen: boolean;
@@ -29,6 +30,7 @@ interface ChatDrawerProps {
 export function ChatDrawer({ isOpen, onToggle, sessionId }: ChatDrawerProps) {
   const [height, setHeight] = useState(400);
   const [isResizing, setIsResizing] = useState(false);
+  const [chatMode, setChatMode] = useState<"text" | "voice">("text");
   const [toneMode, setToneMode] = useState<ToneMode>("warm");
   const [inputText, setInputText] = useState("");
   const [messages, setMessages] = useState<DisplayMessage[]>([]);
@@ -118,6 +120,22 @@ export function ChatDrawer({ isOpen, onToggle, sessionId }: ChatDrawerProps) {
 
   const addMessage = (message: DisplayMessage) => {
     setMessages((prev) => [...prev, message]);
+  };
+
+  // Map current tone mode to PersonaPlex persona
+  const getPersonaId = (): "lumina" | "logos" | "metis" => {
+    if (toneMode === "warm") return "lumina";
+    if (toneMode === "clinical") return "logos";
+    return "metis"; // Default fallback
+  };
+
+  const getPersonaConfig = () => {
+    const personas = {
+      lumina: { color: "#F59E0B", description: "Warm, empathetic, validating" },
+      logos: { color: "#06B6D4", description: "Clinical, analytical, objective" },
+      metis: { color: "#8B5CF6", description: "Deep, insightful, multi-dimensional" },
+    };
+    return personas[getPersonaId()];
   };
 
   const handleSend = () => {
@@ -235,16 +253,31 @@ export function ChatDrawer({ isOpen, onToggle, sessionId }: ChatDrawerProps) {
         </div>
 
         <div className="flex items-center gap-2">
-          {/* Tone Toggle */}
+          {/* Mode Toggle */}
           <button
-            onClick={handleToneToggle}
+            onClick={() => setChatMode(chatMode === "text" ? "voice" : "text")}
             className={`px-4 py-2 rounded text-sm font-medium transition ${
-              toneMode === "clinical" ? "bg-blue-600 text-white" : "bg-amber-600 text-white"
+              chatMode === "voice"
+                ? "bg-purple-600 text-white"
+                : "bg-gray-700 text-gray-300 hover:bg-gray-600"
             }`}
-            title={`Switch to ${toneMode === "clinical" ? "warm" : "clinical"} mode`}
+            title={`Switch to ${chatMode === "text" ? "voice" : "text"} mode`}
           >
-            {toneMode === "clinical" ? "🔬 Clinical" : "💗 Warm"}
+            {chatMode === "voice" ? "🎙️ Voice" : "💬 Text"}
           </button>
+
+          {/* Tone Toggle (only in text mode) */}
+          {chatMode === "text" && (
+            <button
+              onClick={handleToneToggle}
+              className={`px-4 py-2 rounded text-sm font-medium transition ${
+                toneMode === "clinical" ? "bg-blue-600 text-white" : "bg-amber-600 text-white"
+              }`}
+              title={`Switch to ${toneMode === "clinical" ? "warm" : "clinical"} mode`}
+            >
+              {toneMode === "clinical" ? "🔬 Clinical" : "💗 Warm"}
+            </button>
+          )}
 
           {/* Close Button */}
           <button
@@ -256,8 +289,17 @@ export function ChatDrawer({ isOpen, onToggle, sessionId }: ChatDrawerProps) {
         </div>
       </div>
 
-      {/* Messages Area */}
-      <div className="flex-1 overflow-y-auto px-4 py-4 space-y-3">
+      {/* Conditional Content: Voice Mode or Text Mode */}
+      {chatMode === "voice" ? (
+        <VoiceChat
+          personaId={getPersonaId()}
+          personaColor={getPersonaConfig().color}
+          personaDescription={getPersonaConfig().description}
+        />
+      ) : (
+        <>
+          {/* Messages Area */}
+          <div className="flex-1 overflow-y-auto px-4 py-4 space-y-3">
         {messages.length === 0 && (
           <div className="text-center text-gray-400 py-8">
             <p className="text-lg mb-2">👋 How are you feeling?</p>
@@ -374,6 +416,8 @@ export function ChatDrawer({ isOpen, onToggle, sessionId }: ChatDrawerProps) {
           </button>
         </div>
       </div>
+        </>
+       )}
       {/* Thread View Overlay */}
       {activeThreadId && (
         <ThreadView

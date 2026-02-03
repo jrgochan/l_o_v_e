@@ -7,10 +7,15 @@ import json
 from typing import List
 
 from pydantic import Field, model_validator
-from pydantic_settings import BaseSettings, SettingsConfigDict
+from pydantic_settings import SettingsConfigDict
+
+try:
+    from settings import LoveBaseSettings
+except ImportError:
+    from pydantic_settings import BaseSettings as LoveBaseSettings
 
 
-class Settings(BaseSettings):
+class Settings(LoveBaseSettings):
     """Application settings loaded from environment variables."""
 
     # ============================================================================
@@ -23,13 +28,16 @@ class Settings(BaseSettings):
     POSTGRES_HOST: str = Field(default="localhost")
     POSTGRES_PORT: int = Field(default=5432)
 
-    @property
-    def DATABASE_URL(self) -> str:
-        """Construct async PostgreSQL connection URL."""
-        return (
-            f"postgresql+asyncpg://{self.POSTGRES_USER}:{self.POSTGRES_PASSWORD}"
-            f"@{self.POSTGRES_HOST}:{self.POSTGRES_PORT}/{self.POSTGRES_DB}"
-        )
+    DATABASE_URL: str | None = None
+
+    @model_validator(mode="after")
+    def assemble_db_connection(self) -> "Settings":
+        if not self.DATABASE_URL:
+            self.DATABASE_URL = (
+                f"postgresql+asyncpg://{self.POSTGRES_USER}:{self.POSTGRES_PASSWORD}"
+                f"@{self.POSTGRES_HOST}:{self.POSTGRES_PORT}/{self.POSTGRES_DB}"
+            )
+        return self
 
     # ============================================================================
     # EMBEDDING SERVICE
@@ -118,7 +126,9 @@ class Settings(BaseSettings):
             raise ValueError("OPENAI_API_KEY must be set when EMBEDDING_PROVIDER is 'openai'")
         return self
 
-    model_config = SettingsConfigDict(env_file=".env", case_sensitive=True)
+    model_config = SettingsConfigDict(
+        env_file=(".env", "../../infra/config/base.env"), case_sensitive=True, extra="ignore"
+    )
 
 
 # Global settings instance

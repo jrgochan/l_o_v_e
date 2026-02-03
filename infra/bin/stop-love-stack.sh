@@ -22,6 +22,7 @@ print_info "Stopping Experience Web..."
 pkill -f "next dev.*experience/web" 2>/dev/null || true
 kill_process_on_port 3000 2>/dev/null || true
 kill_process_on_port 3001 2>/dev/null || true
+kill_process_on_port 8003 2>/dev/null || true # PersonaPlex
 sleep 1
 
 if [ ! -f "$PID_FILE" ]; then

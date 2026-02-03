@@ -68,11 +68,28 @@ Example:
             --bind 0.0.0.0:8002
 """
 
+from app.api.routes import calculate, slerp
+from app.config import settings
+from asgi_correlation_id import CorrelationIdMiddleware
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from app.api.routes import calculate, slerp
-from app.config import settings
+# Configure structured logging
+try:
+    from logging_config import configure_logging
+
+    configure_logging(log_level=settings.LOG_LEVEL, json_format=not settings.DEBUG)
+except ImportError:
+    pass  # Fallback to default if shared lib not found
+
+# Configure rate limiting
+try:
+    from security import setup_rate_limiting
+except ImportError:
+
+    def setup_rate_limiting(app):
+        pass
+
 
 # ═══════════════════════════════════════════════════════════════════════
 # FASTAPI APPLICATION INITIALIZATION
@@ -112,6 +129,9 @@ app.add_middleware(
     allow_methods=["GET", "POST"],  # HTTP methods we support
     allow_headers=["Content-Type"],  # Headers we accept
 )
+
+app.add_middleware(CorrelationIdMiddleware)
+setup_rate_limiting(app)
 
 
 @app.get("/")

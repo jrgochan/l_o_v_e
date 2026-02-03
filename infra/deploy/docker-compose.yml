@@ -1,0 +1,155 @@
+version: '3.8'
+
+services:
+  # PostgreSQL Database
+  postgres:
+    image: postgres:18-alpine
+    environment:
+      POSTGRES_DB: love_db
+      POSTGRES_USER: love_user
+      POSTGRES_PASSWORD: love_password
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U love_user -d love_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Redis Cache
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+
+  # Versor Service (Core Engine)
+  versor:
+    build:
+      context: ../..
+      dockerfile: versor/Containerfile
+    ports:
+      - "8001:8001"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    environment:
+      - DB_HOST=postgres
+      - DB_PORT=5432
+      - DB_NAME=love_db
+      - DB_USER=love_user
+      - DB_PASSWORD=love_password
+      - REDIS_URL=redis://redis:6379
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8001/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Observer Service (VAC Analysis)
+  observer:
+    build:
+      context: ../..
+      dockerfile: observer/Containerfile
+    ports:
+      - "8000:8000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      versor:
+        condition: service_healthy
+    environment:
+      - DB_HOST=postgres
+      - DB_PORT=5432
+      - DB_NAME=love_db
+      - DB_USER=love_user
+      - DB_PASSWORD=love_password
+      - REDIS_URL=redis://redis:6379
+      - VERSOR_URL=http://versor:8001
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Listener Service (Audio/Text Input)
+  listener:
+    build:
+      context: ../..
+      dockerfile: listener/Containerfile
+    ports:
+      - "8002:8002"
+    depends_on:
+      redis:
+        condition: service_healthy
+      observer:
+        condition: service_healthy
+    environment:
+      - REDIS_URL=redis://redis:6379
+      - OBSERVER_URL=http://observer:8000
+      - AI_PROVIDER=${AI_PROVIDER:-ollama}
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8002/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # PersonaPlex Voice Service (Optional)
+  personaplex:
+    build:
+      context: ../..
+      dockerfile: personaplex/Containerfile
+    ports:
+      - "8003:8003"
+    environment:
+      - HF_TOKEN=${HF_TOKEN}
+      - PERSONAPLEX_CPU_OFFLOAD=${PERSONAPLEX_CPU_OFFLOAD:-false}
+      - ENVIRONMENT=production
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8003/health"]
+      interval: 15s
+      timeout: 10s
+      retries: 3
+    # Optional - only starts if built
+    profiles:
+      - voice
+
+  # Experience Web Frontend
+  experience:
+    build:
+      context: ../../experience/web
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    depends_on:
+      - observer
+      - listener
+    environment:
+      - NEXT_PUBLIC_API_URL=http://observer:8000
+      - NEXT_PUBLIC_LISTENER_URL=http://listener:8002
+      - NEXT_PUBLIC_PERSONAPLEX_URL=http://personaplex:8003
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  postgres_data:

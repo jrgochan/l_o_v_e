@@ -1,11 +1,9 @@
 FROM python:3.12-bookworm
+COPY --from=ghcr.io/astral-sh/uv:latest /uv /bin/uv
 
 WORKDIR /app
 
 # Install system dependencies
-# libpq-dev is required for psycopg2 build if source build needed, 
-# but we use psycopg2-binary. However asyncpg might need it too or basic gcc.
-# git is often needed for some pip installs or tools.
 RUN apt-get update && apt-get install -y --no-install-recommends \
   curl \
   gcc \
@@ -14,29 +12,37 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
   libpq-dev \
   && rm -rf /var/lib/apt/lists/*
 
-# Install Python dependencies
-COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
+# Enable bytecode compilation
+ENV UV_COMPILE_BYTECODE=1
+ENV UV_LINK_MODE=copy
 
-# Copy application code
-COPY app/ app/
-COPY alembic.ini .
-COPY migrations/ migrations/
-COPY scripts/ scripts/
-COPY data/ data/
+# Install Python dependencies
+COPY pyproject.toml uv.lock ./
+RUN uv sync --frozen --no-install-project --no-dev --group observer
+
+# Copy application code from module subdir
+COPY observer/app/ app/
+COPY infra/lib/python/ common/
+COPY observer/alembic.ini .
+COPY observer/migrations/ migrations/
+COPY observer/scripts/ scripts/
+COPY observer/data/ data/
+COPY observer/start.sh .
 
 # Model Caching (Bake into image)
 ENV HF_HOME=/app/models_cache
 RUN mkdir -p /app/models_cache
 ARG HF_TOKEN
-RUN HF_TOKEN=$HF_TOKEN python scripts/download_models.py
+# Use the venv's python to run the script
+RUN HF_TOKEN=$HF_TOKEN /app/.venv/bin/python scripts/download_models.py
 
-# Force offline mode for runtime (uses baked cache)
+# Force offline mode for runtime
 ENV HF_HUB_OFFLINE=1
 
 # Environment variables
 ENV PYTHONUNBUFFERED=1
-ENV PYTHONPATH=/app
+ENV PYTHONPATH="/app:/app/common"
+ENV PATH="/app/.venv/bin:$PATH"
 
 # Expose port
 EXPOSE 8000
@@ -45,9 +51,7 @@ EXPOSE 8000
 HEALTHCHECK --interval=30s --timeout=30s --start-period=10s --retries=3 \
   CMD curl -f http://localhost:8000/health || exit 1
 
-# Command
-# Copy startup script
-COPY start.sh .
+# Startup script permissions
 RUN chmod +x start.sh
 
 # Command

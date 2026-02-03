@@ -7,9 +7,7 @@ import logging
 from contextlib import asynccontextmanager
 from typing import Any, AsyncGenerator, Dict
 
-from fastapi import FastAPI  # pylint: disable=wrong-import-position
-from fastapi.middleware.cors import CORSMiddleware  # pylint: disable=wrong-import-position
-
+import structlog
 from app.api.routes import (  # pylint: disable=wrong-import-position
     admin,
     ai_settings,
@@ -29,13 +27,33 @@ from app.api.routes import (  # pylint: disable=wrong-import-position
 from app.config import settings  # pylint: disable=wrong-import-position
 from app.database import close_db, init_db  # pylint: disable=wrong-import-position
 from app.websocket import websocket_router  # pylint: disable=wrong-import-position
+from asgi_correlation_id import CorrelationIdMiddleware
+from fastapi import FastAPI  # pylint: disable=wrong-import-position
+from fastapi.middleware.cors import (
+    CORSMiddleware,  # pylint: disable=wrong-import-position
+)
 
 # Configure logging
-logging.basicConfig(
-    level=getattr(logging, settings.LOG_LEVEL),
-    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
-)
-logger = logging.getLogger(__name__)
+# Configure logging
+try:
+    from logging_config import configure_logging
+
+    configure_logging(log_level=settings.LOG_LEVEL, json_format=not settings.DEBUG)
+except ImportError:
+    logging.basicConfig(level=settings.LOG_LEVEL)
+
+if "structlog" in locals():
+    logger = structlog.get_logger(__name__)
+else:
+    logger = logging.getLogger(__name__)
+
+# Configure rate limiting
+try:
+    from security import setup_rate_limiting
+except ImportError:
+
+    def setup_rate_limiting(app):
+        pass
 
 
 @asynccontextmanager
@@ -94,9 +112,12 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+app.add_middleware(CorrelationIdMiddleware)
+setup_rate_limiting(app)
 
 
 # Register route modules
+
 app.include_router(health.router, tags=["Health"])
 app.include_router(state.router, tags=["State"])
 app.include_router(history.router, tags=["History"])
@@ -105,8 +126,8 @@ app.include_router(collections.router, prefix="/observer", tags=["Collections"])
 app.include_router(emotions.router, prefix="/observer", tags=["Emotions"])
 app.include_router(transitions.router, prefix="/observer", tags=["Transitions"])
 app.include_router(bootstrap.router, prefix="/observer/bootstrap", tags=["Bootstrap"])
-app.include_router(websocket_router, tags=["WebSocket"])
 app.include_router(chat_websocket.router, prefix="/observer", tags=["Chat"])
+app.include_router(websocket_router, tags=["WebSocket"])
 app.include_router(ai_settings.router, prefix="/observer", tags=["AI Settings"])
 app.include_router(auth.router, prefix="/auth", tags=["Authentication"])
 app.include_router(users.router, prefix="/users", tags=["Users"])

@@ -11,6 +11,7 @@ l_o_v_e/
 ├── listener/          # Audio transcription & semantic VAC analysis (Python 3.12/FastAPI)
 ├── observer/          # Data persistence & vector search (Python 3.12/FastAPI + PostgreSQL + pgvector)
 ├── versor/            # Quaternion mathematics engine (Python 3.12/FastAPI)
+├── personaplex/       # Voice mode with persona-conditioned responses (Python 3.12/FastAPI + NVIDIA PersonaPlex)
 ├── experience/        # Next.js visualization (React 19, React Three Fiber/Three.js)
 └── infra/             # Infrastructure orchestration, deployment & documentation
 ```
@@ -71,6 +72,7 @@ Once running, access the interactive API documentation:
 - **Versor** (Quaternion Math): http://localhost:8001/docs
 - **Observer** (Data & Search): http://localhost:8000/docs
 - **Listener** (Audio & VAC): http://localhost:8002/docs
+- **PersonaPlex** (Voice Mode): http://localhost:8003/docs *(optional)*
 
 ## 📊 Project Status
 

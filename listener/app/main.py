@@ -51,19 +51,36 @@ See Also:
 import logging
 from typing import Any, Dict
 
+import structlog
+from app.api.routes import ai_models, health, ingest
+from app.config import settings
+from asgi_correlation_id import CorrelationIdMiddleware
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from app.api.routes import ai_models, health, ingest
-from app.config import settings
-
 # Configure logging
-logging.basicConfig(
-    level=getattr(logging, settings.LOG_LEVEL),
-    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
-)
+try:
+    from logging_config import configure_logging
 
-logger = logging.getLogger(__name__)
+    configure_logging(
+        log_level=settings.LOG_LEVEL, json_format=settings.ENVIRONMENT == "production"
+    )
+except ImportError:
+    logging.basicConfig(level=settings.LOG_LEVEL)
+
+if "structlog" in locals():
+    logger = structlog.get_logger(__name__)
+else:
+    logger = logging.getLogger(__name__)
+
+# Configure rate limiting
+try:
+    from security import setup_rate_limiting
+except ImportError:
+
+    def setup_rate_limiting(app):
+        pass
+
 
 # Create FastAPI app
 app = FastAPI(
@@ -82,8 +99,11 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+app.add_middleware(CorrelationIdMiddleware)
+setup_rate_limiting(app)
 
 # Include routers
+
 app.include_router(health.router, tags=["Health"])
 app.include_router(ingest.router, prefix="/listener", tags=["Ingestion"])
 app.include_router(ai_models.router, prefix="/listener", tags=["AI Models"])

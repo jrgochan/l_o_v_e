@@ -33,7 +33,7 @@ export function EmotionHistoryPanel() {
   if (isCollapsed) {
     return (
       <div
-        className={`w-10 ${theme.colors.background}/80 border-r ${theme.colors.border} flex flex-col items-center py-4`}
+        className={`w-10 ${theme.colors.background} border-r ${theme.colors.border} flex flex-col items-center py-4`}
       >
         <button
           onClick={toggleCollapsed}
@@ -55,7 +55,7 @@ export function EmotionHistoryPanel() {
 
   return (
     <div
-      className={`w-72 ${theme.colors.background}/80 border-r ${theme.colors.border} flex flex-col`}
+      className={`w-72 ${theme.colors.background} border-r ${theme.colors.border} flex flex-col`}
     >
       {/* Header */}
       <div className={`p-3 border-b ${theme.colors.border} space-y-2`}>

@@ -7,6 +7,7 @@ export function useChatPanelState() {
   const [height, setHeight] = useState(70); // Collapsed height
   const [previousHeight, setPreviousHeight] = useState(400); // Store height before fullscreen
   const [isResizing, setIsResizing] = useState(false);
+  const [chatMode, setChatMode] = useState<"text" | "voice">("text");
   const [toneMode, setToneMode] = useState<ToneMode>("warm");
   const [useAtlasMapping, setUseAtlasMapping] = useState(true);
   const [deepFeelingMode, setDeepFeelingMode] = useState(false);
@@ -51,6 +52,10 @@ export function useChatPanelState() {
   const toggleToneMode = useCallback((checked: boolean) => {
     const newTone = checked ? "clinical" : "warm";
     setToneMode(newTone);
+  }, []);
+
+  const toggleChatMode = useCallback(() => {
+    setChatMode((prev) => (prev === "text" ? "voice" : "text"));
   }, []);
 
   const handleMouseDown = useCallback(
@@ -150,6 +155,8 @@ export function useChatPanelState() {
     height,
     setHeight,
     isResizing,
+    chatMode,
+    setChatMode,
     toneMode,
     setToneMode,
     useAtlasMapping,
@@ -163,5 +170,6 @@ export function useChatPanelState() {
     handleToggleAnalysisExpansion,
     handleMouseDown,
     toggleToneMode,
+    toggleChatMode,
   };
 }

@@ -1,12 +1,9 @@
 FROM python:3.12-bookworm
+COPY --from=ghcr.io/astral-sh/uv:latest /uv /bin/uv
 
 WORKDIR /app
 
 # Install system dependencies
-# ffmpeg: audio processing
-# libsndfile1: librosa dependency
-# build-essential: compilation tools
-# curl: healthcheck
 RUN apt-get update && apt-get install -y --no-install-recommends \
   curl \
   ffmpeg \
@@ -16,20 +13,27 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
   ninja-build \
   && rm -rf /var/lib/apt/lists/*
 
-# Install Python dependencies
-COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt && \
-  python -m spacy download en_core_web_sm
+# Enable bytecode compilation
+ENV UV_COMPILE_BYTECODE=1
+ENV UV_LINK_MODE=copy
+
+# Install dependencies
+COPY pyproject.toml uv.lock ./
+RUN uv sync --frozen --no-install-project --no-dev --group listener
+
+# Download additional models
+RUN /app/.venv/bin/python -m spacy download en_core_web_sm
 
 # Copy application code
-COPY app/ app/
-# Assuming scripts folder might exist or needed, strictly copying app/ is safer if likely self-contained.
-# But for listener, main.py is in app/ so we are good.
+COPY listener/app/ app/
+COPY infra/lib/python/ common/
 
 # Environment variables
 ENV PYTHONUNBUFFERED=1
+ENV PYTHONPATH="/app:/app/common"
+ENV PATH="/app/.venv/bin:$PATH"
 
-# Expose port (Listener uses 8002)
+# Expose port
 EXPOSE 8002
 
 # Healthcheck

@@ -8,11 +8,13 @@ interface ChatHeaderProps {
   isConnecting: boolean;
   isConnected: boolean;
   wsError: string | null;
+  chatMode: "text" | "voice";
   toneMode: ToneMode;
   useAtlasMapping: boolean;
   deepFeelingMode: boolean;
   onToggleExpand: () => void;
   onToggleFullscreen: () => void;
+  onChatModeChange: () => void;
   onToneModeChange: (checked: boolean) => void;
   onUseAtlasMappingChange: (checked: boolean) => void;
   onDeepFeelingModeChange: (checked: boolean) => void;
@@ -24,11 +26,13 @@ export function ChatHeader({
   isConnecting,
   isConnected,
   wsError,
+  chatMode,
   toneMode,
   useAtlasMapping,
   deepFeelingMode,
   onToggleExpand,
   onToggleFullscreen,
+  onChatModeChange,
   onToneModeChange,
   onUseAtlasMappingChange,
   onDeepFeelingModeChange,
@@ -84,6 +88,19 @@ export function ChatHeader({
             title={isFullscreen ? "Exit fullscreen" : "Fullscreen mode"}
           >
             {isFullscreen ? "⊡" : "⛶"}
+          </button>
+
+          {/* Voice/Text Mode Toggle */}
+          <button
+            onClick={onChatModeChange}
+            className={`px-3 py-1.5 rounded text-sm font-medium transition ${
+              chatMode === "voice"
+                ? "bg-purple-600 text-white hover:bg-purple-500"
+                : "bg-gray-700 text-white hover:bg-gray-600"
+            }`}
+            title={`Switch to ${chatMode === "text" ? "voice" : "text"} mode`}
+          >
+            {chatMode === "voice" ? "🎙️ Voice" : "💬 Text"}
           </button>
 
           {/* Toggle Group */}

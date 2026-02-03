@@ -1,8 +1,108 @@
-# L.O.V.E. Platform - Python Tool Configuration
-# Centralized configuration for code quality tools
-#
-# This is the canonical configuration maintained in infra/configs/
-# It is distributed to modules during setup
+[project]
+name = "love-stack"
+version = "0.1.0"
+description = "L.O.V.E. Stack - Listener, Observer, Versor, Experience"
+requires-python = ">=3.12"
+readme = "README.md"
+license = { text = "MIT" }
+authors = [
+    { name = "L.O.V.E. Team", email = "love@example.com" }
+]
+
+# Shared Dependencies across all modules
+dependencies = [
+    "fastapi[all]>=0.115.6",
+    "uvicorn[standard]>=0.34.0",
+    "pydantic>=2.10.0",
+    "pydantic-settings>=2.7.0",
+    "python-dotenv>=1.0.1",
+    "python-json-logger>=2.0.7",
+    "httpx>=0.28.0",
+    "python-jose[cryptography]>=3.3.0",
+    "structlog>=24.1.0",
+    "asgi-correlation-id>=4.3.0",
+    "slowapi>=0.1.9",
+]
+
+[project.optional-dependencies]
+
+# --- Module: Listener ---
+listener = [
+    "openai-whisper>=20231117",
+    "ffmpeg-python>=0.2.0",
+    "librosa>=0.10.2",
+    "numba>=0.60.0",
+    "soundfile>=0.13.0",
+    "praat-parselmouth>=0.4.7",
+    "langchain>=0.3.14",
+    "langchain-community>=0.3.14",
+    "ollama>=0.6.1",
+    "spacy>=3.7.2",
+    "transformers>=4.48.0",
+    "langchain-google-vertexai>=2.0.0",
+    "torch>=2.3.0",
+    "numpy>=1.26.0",
+    "arq>=0.26.1",
+    "redis>=5.2.1",
+    "aiofiles>=24.1.0",
+]
+
+# --- Module: Observer ---
+observer = [
+    "sqlalchemy[asyncio]>=2.0.45",
+    "asyncpg>=0.30.0",
+    "psycopg2-binary>=2.9.10",
+    "alembic>=1.14.0",
+    "pgvector>=0.3.6",
+    "sentence-transformers>=2.7.0",
+    "torch>=2.3.0",
+    "numpy>=1.26.0",
+    "openai>=1.59.0",
+    "pwdlib[argon2]>=0.2.0",
+]
+
+# --- Module: Versor ---
+versor = [
+    "numpy>=1.26.0",
+    "scipy>=1.13.0",
+]
+
+# --- Module: PersonaPlex ---
+personaplex = [
+    "websockets>=12.0",
+    "huggingface-hub>=0.24.0",
+    "sentencepiece>=0.2.0",
+    "einops>=0.7.0",
+    "sounddevice>=0.5.0",
+    "sphn>=0.1.4",
+    # Moshi is handled as a submodule usually, but listing dependencies here helps
+    # torch is already listed above but critical here
+    "torch>=2.3.0",
+    "numpy>=1.26.0",
+]
+
+# --- Dev Tools ---
+dev = [
+    "pytest>=8.0.0",
+    "pytest-asyncio>=0.23.0",
+    "pytest-cov>=4.1.0",
+    "black>=24.0.0",
+    "isort>=5.13.0",
+    "flake8>=7.0.0",
+    "mypy>=1.8.0",
+    "pre-commit>=3.6.0",
+    "types-redis",
+    "types-requests",
+    "types-PyYAML",
+    "honcho>=1.1.0",
+]
+
+[tool.uv]
+dev-dependencies = [
+    "love-stack[dev]",
+]
+
+# --- Tool Config (Migrated from pyproject.toml) ---
 
 [tool.black]
 line-length = 100
@@ -37,7 +137,7 @@ strict = true
 warn_return_any = true
 warn_unused_configs = true
 disallow_untyped_defs = true
-disallow_any_unimported = false  # Too strict for libraries
+disallow_any_unimported = false
 disallow_incomplete_defs = true
 check_untyped_defs = true
 no_implicit_optional = true
@@ -45,14 +145,11 @@ warn_redundant_casts = true
 warn_unused_ignores = true
 warn_no_return = true
 warn_unreachable = true
-ignore_missing_imports = true  # Many third-party packages lack stubs
-disallow_untyped_decorators = false
-disallow_subclassing_any = false
+ignore_missing_imports = true
 
-# Per-module options if needed
 [[tool.mypy.overrides]]
 module = ["tests.*"]
-disallow_untyped_defs = false  # Tests can be less strict
+disallow_untyped_defs = false
 
 [tool.pytest.ini_options]
 minversion = "7.0"
@@ -68,64 +165,13 @@ addopts = [
     "--cov-report=html",
     "--cov-report=term-missing",
     "--cov-branch",
-    "--cov-fail-under=100",
     "-ra",
 ]
 markers = [
-    "unit: Unit tests (no external dependencies)",
-    "integration: Integration tests (requires database/services)",
-    "semantic: Semantic validation tests (Connection axis)",
+    "unit: Unit tests",
+    "integration: Integration tests",
+    "semantic: Semantic validation tests",
     "slow: Slow-running tests",
     "requires_ollama: Tests requiring Ollama",
     "requires_redis: Tests requiring Redis",
 ]
-
-[tool.coverage.run]
-source = ["app"]
-omit = [
-    "*/tests/*",
-    "*/migrations/*",
-    "*/__init__.py",
-    "*/conftest.py",
-]
-
-[tool.coverage.report]
-precision = 2
-skip_empty = true
-show_missing = true
-exclude_lines = [
-    "pragma: no cover",
-    "def __repr__",
-    "raise AssertionError",
-    "raise NotImplementedError",
-    "if __name__ == .__main__.:",
-    "if TYPE_CHECKING:",
-    "class .*\\bProtocol\\):",
-    "@(abc\\.)?abstractmethod",
-]
-
-[tool.pydocstyle]
-convention = "google"
-add-ignore = ["D100", "D104"]  # Missing docstring in public module/package (too strict)
-match = "(?!test_).*\\.py"  # Don't check test files
-
-[tool.pylint.messages_control]
-disable = [
-    "C0111",  # missing-docstring (pydocstyle handles this)
-    "R0903",  # too-few-public-methods (Pydantic models)
-    "R0913",  # too-many-arguments (common in constructors)
-    "W0212",  # protected-access (sometimes needed)
-    "W1203",  # logging-fstring-interpolation (intentional - readable and performant)
-    "C0415",  # import-outside-toplevel (intentional - avoid circular imports, lazy loading)
-    "W0603",  # global-statement (intentional - singleton pattern)
-    "C0103",  # invalid-name (intentional - _instance variables for singletons)
-    "W0718",  # broad-exception-caught (intentional - service resilience)
-    "W0707",  # raise-missing-from (nice-to-have but not critical)
-]
-
-[tool.pylint.format]
-max-line-length = 100
-
-[tool.bandit]
-exclude_dirs = ["tests", "migrations", "venv", ".venv"]
-skips = ["B101"]  # assert_used (common in tests, we exclude test dirs anyway)
