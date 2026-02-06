@@ -1,27 +1,31 @@
+from unittest.mock import AsyncMock, patch
 
 import pytest
-from unittest.mock import AsyncMock, MagicMock, patch
 from fastapi.testclient import TestClient
+
 from app.main import app
-from app.config import settings
 
 # -----------------------------------------------------------------------------
 # Fixtures
 # -----------------------------------------------------------------------------
 
+
 @pytest.fixture
 def client():
     return TestClient(app)
 
+
 # -----------------------------------------------------------------------------
 # Tests: Startup & Shutdown Events
 # -----------------------------------------------------------------------------
+
 
 def test_lifespan_startup_success():
     """Test successful startup initialization via lifespan."""
     with patch("app.main.init_db", new_callable=AsyncMock) as mock_init:
         with TestClient(app):
             mock_init.assert_awaited_once()
+
 
 def test_lifespan_startup_failure():
     """Test startup failure handling via lifespan."""
@@ -31,26 +35,34 @@ def test_lifespan_startup_failure():
             with TestClient(app):
                 pass
 
+
 def test_lifespan_shutdown_success():
     """Test successful shutdown cleanup via lifespan."""
-    with patch("app.main.init_db", new_callable=AsyncMock), \
-         patch("app.main.close_db", new_callable=AsyncMock) as mock_close:
+    with (
+        patch("app.main.init_db", new_callable=AsyncMock),
+        patch("app.main.close_db", new_callable=AsyncMock) as mock_close,
+    ):
         with TestClient(app):
             pass  # Application runs here
         mock_close.assert_awaited_once()
 
+
 def test_lifespan_shutdown_failure():
     """Test shutdown failure handling via lifespan (should not raise)."""
-    with patch("app.main.init_db", new_callable=AsyncMock), \
-         patch("app.main.close_db", new_callable=AsyncMock) as mock_close:
+    with (
+        patch("app.main.init_db", new_callable=AsyncMock),
+        patch("app.main.close_db", new_callable=AsyncMock) as mock_close,
+    ):
         mock_close.side_effect = Exception("Cleanup fail")
         # Should catch and log error, not raise
         with TestClient(app):
             pass
 
+
 # -----------------------------------------------------------------------------
 # Tests: Root Endpoint
 # -----------------------------------------------------------------------------
+
 
 def test_read_root(client):
     """Test root endpoint returns API metadata."""

@@ -502,17 +502,17 @@ class SessionAnalyticsService:
     async def update_metrics(
         self,
         session_id: str,
-        emotion_name: str,
+        _emotion_name: str,
         category: str,
         vac_data: Dict[str, float],
         confidence: float,
         alerts: List[ClinicalAlert],
-    ) -> SessionAnalytics:
+    ) -> SessionAnalytics:  # pylint: disable=too-many-positional-arguments
         """Update session metrics after new emotion analysis.
 
         Args:
             session_id: Chat session UUID
-            emotion_name: Detected emotion
+            _emotion_name: Detected emotion
             category: Emotion category
             vac_data: VAC coordinates
             confidence: Confidence score
@@ -558,7 +558,36 @@ class SessionAnalyticsService:
         time_delta = (analytics.last_emotion_time - analytics.start_time).total_seconds()
         analytics.total_duration_seconds = int(time_delta)
 
-        # Update alert counts (alert.level is now a string value)
+        # Update alert counts
+        self._update_alert_counts(analytics, alerts)
+
+        # Update category counts
+        category_counts = analytics.category_counts or {}
+        category_counts[category] = category_counts.get(category, 0) + 1
+        analytics.category_counts = category_counts
+
+        # Update VAC statistics
+        self._update_vac_stats(analytics, vac_data)
+
+        analytics.updated_at = datetime.utcnow()
+
+        # Commit changes
+        await self.db.commit()
+        await self.db.refresh(analytics)
+
+        logger.info(
+            "Updated session analytics for %s: %d emotions, %d alerts",
+            session_id,
+            analytics.emotion_count,
+            len(alerts),
+        )
+
+        return analytics
+
+    def _update_alert_counts(
+        self, analytics: SessionAnalytics, alerts: List[ClinicalAlert]
+    ) -> None:
+        """Update alert counts in analytics object."""
         for alert in alerts:
             if alert.level == AlertLevel.CRITICAL.value:
                 analytics.critical_alert_count += 1
@@ -567,16 +596,11 @@ class SessionAnalyticsService:
             elif alert.level == AlertLevel.ATTENTION.value:
                 analytics.attention_alert_count += 1
 
-        # Update category counts
-        category_counts = analytics.category_counts or {}
-        category_counts[category] = category_counts.get(category, 0) + 1
-        analytics.category_counts = category_counts
-
-        # Update VAC statistics (running averages)
+    def _update_vac_stats(self, analytics: SessionAnalytics, vac_data: Dict[str, float]) -> None:
+        """Update VAC statistics in analytics object using running averages."""
         vac_stats = analytics.vac_stats or {}
-
-        # Calculate running averages for VAC
         n = analytics.emotion_count
+
         for dim in ["valence", "arousal", "connection"]:
             current_value = vac_data.get(dim, 0.0)
             avg_key = f"{dim}_avg"
@@ -596,17 +620,6 @@ class SessionAnalyticsService:
             vac_stats[max_key] = round(max(vac_stats.get(max_key, current_value), current_value), 3)
 
         analytics.vac_stats = vac_stats
-        analytics.updated_at = datetime.utcnow()
-
-        # Commit changes
-        await self.db.commit()
-        await self.db.refresh(analytics)
-
-        logger.info(
-            f"Updated session analytics for {session_id}: {analytics.emotion_count} emotions, {len(alerts)} alerts"
-        )
-
-        return analytics
 
     async def get_metrics(self, session_id: str) -> Optional[Dict[str, Any]]:
         """Get current metrics for a session.

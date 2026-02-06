@@ -84,22 +84,9 @@ References:
     - OpenAPI generation: https://swagger.io/specification/
 """
 
-from typing import Any, Dict, List, Optional
-
-from app.api.schemas.chat import (
-    DisplayMessage,
-    MessageRelationship,
-)
-from app.api.schemas.common import (
-    EmotionInfo,
-    MetricsInfo,
-    QuaternionModel,
-    VACVector,
-)
-from app.api.schemas.state import (
-    StateInput,
-    StateResponse,
-)
+from app.api.schemas.chat import DisplayMessage, MessageRelationship
+from app.api.schemas.common import EmotionInfo, MetricsInfo, QuaternionModel, VACVector
+from app.api.schemas.state import StateInput, StateResponse
 
 __all__ = [
     "VACVector",

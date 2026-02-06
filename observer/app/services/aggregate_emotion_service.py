@@ -482,8 +482,8 @@ class AggregateEmotionService:
             ("surprise", "confusion"),
             ("confusion", "understanding"),
             ("anger", "regret"),
-            ("shock", "grie"),
-            ("fear", "relie"),
+            ("shock", "grief"),
+            ("fear", "relief"),
         ]
 
         emotion_names = [e.get("emotion_name", "").lower() for e in emotions]

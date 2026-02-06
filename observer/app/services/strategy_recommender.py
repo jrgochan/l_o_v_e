@@ -179,6 +179,7 @@ References:
 
 import logging
 from typing import Any, Dict, List, Optional
+from uuid import UUID
 
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -225,14 +226,16 @@ class StrategyRecommender:
             List of strategy dictionaries with effectiveness ratings
         """
         logger.info(
-            f"Getting strategies for {from_emotion.emotion_name} → {to_emotion.emotion_name}"
+            "Getting strategies for %s → %s",
+            from_emotion.emotion_name,
+            to_emotion.emotion_name,
         )
 
         # 1. Identify which pattern this transition matches
         pattern = await self._match_to_pattern(from_emotion, to_emotion)
 
         if pattern:
-            logger.info(f"Matched to pattern: {pattern.pattern_name}")
+            logger.info("Matched to pattern: %s", pattern.pattern_name)
             # Get strategies for this pattern
             strategies = await self._get_pattern_strategies(pattern, user_id, limit)
         else:
@@ -251,6 +254,7 @@ class StrategyRecommender:
         1. Category match (from/to categories)
         2. VAC change characteristics (arousal decrease, connection increase, etc.)
         """
+        # pylint: disable=too-many-locals,too-many-branches
         # ═══════════════════════════════════════════════════════════════════════
         # STEP 1: Load all transition patterns from database
         # ═══════════════════════════════════════════════════════════════════════
@@ -437,7 +441,10 @@ class StrategyRecommender:
         stmt = (
             select(StrategyAttempt)
             .join(UserJourney, StrategyAttempt.journey_id == UserJourney.id)
-            .where(UserJourney.user_id == user_id, StrategyAttempt.strategy_id == strategy_id)
+            .where(
+                UserJourney.user_id == user_id,
+                StrategyAttempt.strategy_id == strategy_id,
+            )
         )
 
         result = await self.session.execute(stmt)
@@ -476,11 +483,54 @@ class StrategyRecommender:
 
     async def get_strategy_by_id(self, strategy_id: str) -> Optional[Dict[str, Any]]:
         """Get a single strategy by ID."""
-        from uuid import UUID
-
         stmt = select(TransitionStrategy).where(TransitionStrategy.id == UUID(strategy_id))
 
         result = await self.session.execute(stmt)
         strategy = result.scalar_one_or_none()
 
         return strategy.to_dict() if strategy else None
+
+    async def search_strategies(
+        self,
+        strategy_type: Optional[str] = None,
+        evidence_level: Optional[str] = None,
+        difficulty_min: Optional[int] = None,
+        difficulty_max: Optional[int] = None,
+        search_query: Optional[str] = None,
+        limit: int = 20,
+        offset: int = 0,
+    ) -> Dict[str, Any]:
+        """Search strategies with filters."""
+        stmt = select(TransitionStrategy)
+
+        if strategy_type:
+            stmt = stmt.where(TransitionStrategy.strategy_type == strategy_type)
+
+        if evidence_level:
+            stmt = stmt.where(TransitionStrategy.evidence_level == evidence_level)
+
+        if difficulty_min is not None:
+            stmt = stmt.where(TransitionStrategy.difficulty_level >= difficulty_min)
+
+        if difficulty_max is not None:
+            stmt = stmt.where(TransitionStrategy.difficulty_level <= difficulty_max)
+
+        if search_query:
+            term = f"%{search_query}%"
+            stmt = stmt.where(
+                (TransitionStrategy.strategy_name.ilike(term))
+                | (TransitionStrategy.description.ilike(term))
+            )
+
+        # Apply ordering and pagination
+        stmt = stmt.order_by(TransitionStrategy.strategy_name).limit(limit).offset(offset)
+
+        result = await self.session.execute(stmt)
+        strategies = result.scalars().all()
+
+        return {
+            "strategies": [s.to_dict() for s in strategies],
+            # Note: total count would require a separate count query
+            "limit": limit,
+            "offset": offset,
+        }

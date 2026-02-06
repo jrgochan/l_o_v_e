@@ -1,16 +1,18 @@
-
-import pytest
-from fastapi.testclient import TestClient
 from unittest.mock import patch
+
+from fastapi.testclient import TestClient
+
 from app.main import app
 
 client = TestClient(app)
+
 
 def test_root_endpoint():
     response = client.get("/")
     assert response.status_code == 200
     assert response.json()["service"] == "Listener API"
     assert "ingest" in response.json()["endpoints"]
+
 
 def test_startup_shutdown_events():
     # TestClient context manager triggers startup and shutdown events
@@ -19,11 +21,12 @@ def test_startup_shutdown_events():
             # Startup should have run
             pass
         # Shutdown should have run
-        
+
         # Verify logging calls
         # Note: Startup logs 4 info messages, Shutdown logs 1
         assert mock_logger.info.called
         assert mock_logger.info.call_count >= 5
+
 
 def test_cors_middleware():
     # Test CORS headers
@@ -31,16 +34,16 @@ def test_cors_middleware():
     # typically reflects the Origin header in Access-Control-Allow-Origin
     # when credentials are true, because '*' is invalid with credentials.
     origin = "http://localhost:3000"
-    response = client.options("/health", headers={
-        "Origin": origin,
-        "Access-Control-Request-Method": "GET"
-    })
+    response = client.options(
+        "/health", headers={"Origin": origin, "Access-Control-Request-Method": "GET"}
+    )
     assert response.status_code == 200
     assert response.headers["access-control-allow-origin"] == origin
     allow_methods = response.headers["access-control-allow-methods"]
     assert "GET" in allow_methods
     assert "POST" in allow_methods
     assert "OPTIONS" in allow_methods
+
 
 def test_routes_exist():
     # Verify all expected routes are registered
@@ -49,10 +52,10 @@ def test_routes_exist():
     assert "/listener/ingest" in routes
     assert "/listener/ai/models/local" in routes
 
+
 def test_health_check():
     response = client.get("/health")
     assert response.status_code == 200
     data = response.json()
     assert data["status"] == "healthy"
     assert data["service"] == "listener"
-

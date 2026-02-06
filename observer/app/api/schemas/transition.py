@@ -131,7 +131,8 @@ class JourneyStartRequest(BaseModel):
     path_id: str
     start_time: Optional[datetime] = None
     context: Optional[Dict[str, Any]] = Field(
-        default=None, description="Context: location, time_of_day, has_support, energy_level"
+        default=None,
+        description="Context: location, time_of_day, has_support, energy_level",
     )
 
     model_config = ConfigDict(
@@ -156,7 +157,8 @@ class WaypointReachedRequest(BaseModel):
     waypoint_index: int = Field(..., ge=0)
     reached_at: Optional[datetime] = None
     self_assessment: Dict[str, Any] = Field(
-        ..., description="User self-assessment: emotion_match (1-5), confidence (1-5), notes"
+        ...,
+        description="User self-assessment: emotion_match (1-5), confidence (1-5), notes",
     )
     strategies_tried: List[Dict[str, Any]]
     current_state_description: Optional[str] = None
@@ -279,6 +281,7 @@ class TransitionPathResponse(BaseModel):
     path_metrics: PathMetrics
     alternatives: List[AlternativePath] = []
     personalization_notes: List[str] = []
+    search_metadata: Optional[Dict[str, Any]] = None
 
 
 class JourneyStartResponse(BaseModel):

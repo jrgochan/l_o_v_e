@@ -13,6 +13,8 @@
 // import { logger } from "@/utils/logger";
 import { PersonalStrategies } from "./PersonalStrategies";
 import { useGoalSettingLogic } from "./GoalSettingLogic";
+import { PathComparisonView } from "./PathComparisonView";
+import { PathExplanationPanel } from "./PathExplanationPanel";
 import { OBSERVER_URL } from "@/config/environment";
 
 export function GoalSetting() {
@@ -308,6 +310,10 @@ export function GoalSetting() {
           ? "Loading emotional atlas..."
           : `Select an emotional goal from ${emotions.length} emotions to see the optimal path.`}
       </div>
+
+      {/* New Interactive Components */}
+      <PathComparisonView />
+      <PathExplanationPanel />
     </div>
   );
 }

@@ -233,7 +233,8 @@ Design Decisions:
         - Infinite history (no storage growth)
 
 References:
-    - Model comparison benchmarks: docs/modules/observer/senior-developers/06-performance-optimization.md
+    - Model comparison benchmarks:
+    - docs/modules/observer/senior-developers/06-performance-optimization.md
     - Ollama API: https://github.com/ollama/ollama/blob/main/docs/api.md
     - AI Settings UI: docs/features/ai-models/README.md
     - Listener integration: listener/app/services/semantic_analyzer.py
@@ -353,7 +354,9 @@ class AIModelService:
             else:
                 # Create new
                 assignment = ModelAssignment(
-                    function=function, ai_model_name=ai_model_name, assigned_by=assigned_by
+                    function=function,
+                    ai_model_name=ai_model_name,
+                    assigned_by=assigned_by,
                 )
                 self.db.add(assignment)
 
@@ -465,7 +468,10 @@ class AIModelService:
             "semantic_vac": {
                 "recommended": ["llama3.1:8b-instruct-q4_0", "phi-3:mini"],
                 "not_recommended": ["llama3.1:70b-instruct-q4_0"],
-                "reasoning": "Real-time analysis needs speed. Target <3s per analysis. Smaller models (3B-8B) work best.",
+                "reasoning": (
+                    "Real-time analysis needs speed. Target <3s per analysis. Smaller models "
+                    "(3B-8B) work best."
+                ),
             },
             "multi_emotion": {
                 "recommended": [
@@ -474,7 +480,10 @@ class AIModelService:
                     "llama3.1:70b-instruct-q4_0",
                 ],
                 "not_recommended": ["phi-3:mini"],
-                "reasoning": "Complex emotional analysis benefits from larger models with better nuance understanding.",
+                "reasoning": (
+                    "Complex emotional analysis benefits from larger models with better nuance "
+                    "understanding."
+                ),
             },
             "insight_generation": {
                 "recommended": [
@@ -483,12 +492,18 @@ class AIModelService:
                     "mixtral:8x7b-instruct-v0.1",
                 ],
                 "not_recommended": ["phi-3:mini"],
-                "reasoning": "Therapeutic insights require empathy and clinical knowledge. Medium to large models perform best.",
+                "reasoning": (
+                    "Therapeutic insights require empathy and clinical knowledge. Medium to large "
+                    "models perform best."
+                ),
             },
             "emotion_mapping": {
                 "recommended": ["phi-3:mini", "llama3.1:8b-instruct-q4_0"],
                 "not_recommended": ["llama3.1:70b-instruct-q4_0"],
-                "reasoning": "Classification task. Precision matters more than size. Fast, consistent models preferred.",
+                "reasoning": (
+                    "Classification task. Precision matters more than size. Fast, consistent "
+                    "models preferred."
+                ),
             },
         }
 

@@ -565,7 +565,8 @@ class UserJourney(Base):
 
     __table_args__ = (
         CheckConstraint(
-            status.in_(["in_progress", "completed", "abandoned", "paused"]), name="valid_status"
+            status.in_(["in_progress", "completed", "abandoned", "paused"]),
+            name="valid_status",
         ),
     )
 
@@ -577,7 +578,7 @@ class UserJourney(Base):
             "status": self.status,
             "current_waypoint": self.current_waypoint,
             "started_at": self.started_at.isoformat() if self.started_at else None,
-            "completed_at": self.completed_at.isoformat() if self.completed_at else None,
+            "completed_at": (self.completed_at.isoformat() if self.completed_at else None),
             "total_distance": self.total_distance,
             "estimated_time": self.estimated_time,
             "context": self.context_metadata,

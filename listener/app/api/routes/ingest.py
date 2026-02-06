@@ -75,12 +75,12 @@ logger = logging.getLogger(__name__)
 
 @router.post("/ingest")
 async def ingest(
-    audio: Optional[UploadFile] = File(None),
-    text: Optional[str] = Form(None),
-    user_id: str = Form(...),
-    session_id: str = Form(...),
-    current_user: dict[str, Any] = Depends(get_current_user),  # pylint: disable=unused-argument
-) -> Dict[str, Any]:
+    audio: Optional[UploadFile] = File(None),  # noqa: B008
+    text: Optional[str] = Form(None),  # noqa: B008
+    user_id: str = Form(...),  # noqa: B008
+    session_id: str = Form(...),  # noqa: B008
+    current_user: dict[str, Any] = Depends(get_current_user),  # noqa: B008
+) -> Dict[str, Any]:  # pylint: disable=too-many-locals
     """Ingest audio or text for processing.
 
     Either audio file or text must be provided.
@@ -117,17 +117,19 @@ async def ingest(
                 content = await audio.read()
                 await f.write(content)
 
-            logger.info(f"Audio file saved: {audio_path} ({len(content)} bytes)")
+            logger.info("Audio file saved: %s (%d bytes)", audio_path, len(content))
 
         except Exception as e:
-            logger.error(f"Failed to save audio file: {e}")
-            raise HTTPException(status_code=500, detail=f"Failed to save audio: {e}")
+            logger.error("Failed to save audio file: %s", e)
+            raise HTTPException(status_code=500, detail=f"Failed to save audio: {e}") from e
 
     # Queue job in Redis
     try:
         redis = await create_pool(
             RedisSettings(
-                host=settings.REDIS_HOST, port=settings.REDIS_PORT, database=settings.REDIS_DB
+                host=settings.REDIS_HOST,
+                port=settings.REDIS_PORT,
+                database=settings.REDIS_DB,
             )
         )
 
@@ -143,7 +145,7 @@ async def ingest(
         if not job:
             raise RuntimeError("Failed to enqueue job")
 
-        logger.info(f"Job queued: {job.job_id} for user {user_id}")
+        logger.info("Job queued: %s for user %s", job.job_id, user_id)
 
         return {
             "status": "queued",
@@ -154,17 +156,17 @@ async def ingest(
         }
 
     except Exception as e:
-        logger.error(f"Failed to queue job: {e}")
+        logger.error("Failed to queue job: %s", e)
         # Cleanup audio file if job queueing failed
         if audio_path and os.path.exists(audio_path):
             os.remove(audio_path)
-        raise HTTPException(status_code=500, detail=f"Failed to queue job: {e}")
+        raise HTTPException(status_code=500, detail=f"Failed to queue job: {e}") from e
 
 
 @router.get("/status/{job_id}")
 async def get_status(
     job_id: str,
-    current_user: dict[str, Any] = Depends(get_current_user),  # pylint: disable=unused-argument
+    current_user: dict[str, Any] = Depends(get_current_user),  # noqa: B008
 ) -> Dict[str, Any]:
     """Get processing status for a job.
 
@@ -177,15 +179,17 @@ async def get_status(
     try:
         redis = await create_pool(
             RedisSettings(
-                host=settings.REDIS_HOST, port=settings.REDIS_PORT, database=settings.REDIS_DB
+                host=settings.REDIS_HOST,
+                port=settings.REDIS_PORT,
+                database=settings.REDIS_DB,
             )
         )
 
         job = Job(job_id, redis)
 
         # Check if job exists in Redis?
-        # Job(job_id, redis) doesn't check existence immediately, but .info() will return None if not found?
-        # Typically job.info() returns JobDef or None.
+        # Job(job_id, redis) doesn't check existence immediately, but .info()
+        # will return None if not found? Typically job.info() returns JobDef or None.
 
         # Get job status
         status = await job.status()
@@ -196,28 +200,29 @@ async def get_status(
         # Add result if complete
         if status.value == "complete":
             try:
-                # job.result() waits for result, but since we know it's complete it should return immediately
+                # job.result() waits for result, but since we know it's complete
+                # it should return immediately
                 result = await job.result(timeout=0.1)
                 response["result"] = result
-            except Exception as e:
-                logger.warning(f"Failed to get result for complete job {job_id}: {e}")
+            except Exception as e:  # pylint: disable=broad-exception-caught
+                logger.warning("Failed to get result for complete job %s: %s", job_id, e)
 
         return response
 
     except HTTPException:
         raise
-    except Exception as e:
-        logger.error(f"Failed to get job status: {e}")
-        raise HTTPException(status_code=500, detail=f"Failed to get status: {e}")
+    except Exception as e:  # pylint: disable=broad-exception-caught
+        logger.error("Failed to get job status: %s", e)
+        raise HTTPException(status_code=500, detail=f"Failed to get status: {e}") from e
 
 
 @router.post("/analyze")
 async def analyze_text(
-    text: str = Form(...),
-    user_id: Optional[str] = Form("demo-user"),
-    session_id: Optional[str] = Form("demo-session"),
-    current_user: dict[str, Any] = Depends(get_current_user),  # pylint: disable=unused-argument
-) -> Dict[str, Any]:
+    text: str = Form(...),  # noqa: B008
+    user_id: Optional[str] = Form("demo-user"),  # noqa: B008
+    session_id: Optional[str] = Form("demo-session"),  # noqa: B008
+    current_user: dict[str, Any] = Depends(get_current_user),  # noqa: B008
+) -> Dict[str, Any]:  # pylint: disable=too-many-locals
     """Synchronous text analysis endpoint.
 
     For quick analysis without audio, processes immediately without queueing.
@@ -231,11 +236,17 @@ async def analyze_text(
     Returns:
         Emotional analysis result compatible with Experience module
     """
-    import time
+    import time  # pylint: disable=import-outside-toplevel
 
-    from app.services.observer_client import get_observer_client
-    from app.services.pii_scrubber import get_pii_scrubber
-    from app.services.semantic_analyzer import get_semantic_analyzer
+    from app.services.observer_client import (  # pylint: disable=import-outside-toplevel
+        get_observer_client,
+    )
+    from app.services.pii_scrubber import (  # pylint: disable=import-outside-toplevel
+        get_pii_scrubber,
+    )
+    from app.services.semantic_analyzer import (  # pylint: disable=import-outside-toplevel
+        get_semantic_analyzer,
+    )
 
     start_time = time.time()
 
@@ -261,9 +272,9 @@ async def analyze_text(
                 emotion=emotion,
                 timestamp=datetime.utcnow(),
             )
-            logger.info(f"State recorded to Observer for user {user_id}")
-        except Exception as observer_error:
-            logger.warning(f"Failed to record state to Observer: {observer_error}")
+            logger.info("State recorded to Observer for user %s", user_id)
+        except Exception as observer_error:  # pylint: disable=broad-exception-caught
+            logger.warning("Failed to record state to Observer: %s", observer_error)
             # Continue - Observer failure should not block the response
 
         # Return response in format expected by Experience module
@@ -283,17 +294,17 @@ async def analyze_text(
             "processing_time_ms": processing_time_ms,
         }
 
-    except Exception as e:
-        logger.error(f"Analysis failed: {e}")
-        raise HTTPException(status_code=500, detail=f"Analysis failed: {e}")
+    except Exception as e:  # pylint: disable=broad-exception-caught
+        logger.error("Analysis failed: %s", e)
+        raise HTTPException(status_code=500, detail=f"Analysis failed: {e}") from e
 
 
 @router.post("/extract-audio-features")
 async def extract_audio_features(
-    audio: UploadFile = File(...),
-    user_id: str = Form("admin"),  # pylint: disable=unused-argument
-    session_id: str = Form("chat-session"),  # pylint: disable=unused-argument
-    current_user: dict[str, Any] = Depends(get_current_user),  # pylint: disable=unused-argument
+    audio: UploadFile = File(...),  # noqa: B008
+    user_id: str = Form("admin"),  # pylint: disable=unused-argument  # noqa: B008
+    session_id: str = Form("chat-session"),  # pylint: disable=unused-argument  # noqa: B008
+    current_user: dict[str, Any] = Depends(get_current_user),  # noqa: B008
 ) -> Dict[str, Any]:
     """Extract audio features (transcription + prosody) without full analysis.
 
@@ -308,10 +319,14 @@ async def extract_audio_features(
     Returns:
         JSON with transcription and prosody data
     """
-    import time
+    import time  # pylint: disable=import-outside-toplevel
 
-    from app.services.prosody_analyzer import get_prosody_analyzer
-    from app.services.transcription import get_transcription_service
+    from app.services.prosody_analyzer import (  # pylint: disable=import-outside-toplevel
+        get_prosody_analyzer,
+    )
+    from app.services.transcription import (  # pylint: disable=import-outside-toplevel
+        get_transcription_service,
+    )
 
     start_time = time.time()
 
@@ -327,14 +342,14 @@ async def extract_audio_features(
             content = await audio.read()
             await f.write(content)
 
-        logger.info(f"Extracting audio features: {audio_path} ({len(content)} bytes)")
+        logger.info("Extracting audio features: %s (%d bytes)", audio_path, len(content))
 
         # Step 1: Transcription
         transcription_service = get_transcription_service()
         transcription = transcription_service.transcribe(audio_path)
         input_text = transcription.text
 
-        logger.info(f"Transcription: {input_text}")
+        logger.info("Transcription: %s", input_text)
 
         # Step 2: Prosody Analysis
         prosody_analyzer = get_prosody_analyzer()
@@ -349,9 +364,9 @@ async def extract_audio_features(
             "processing_time_seconds": processing_time,
         }
 
-    except Exception as e:
-        logger.error(f"Feature extraction failed: {e}", exc_info=True)
-        raise HTTPException(status_code=500, detail=f"Feature extraction failed: {str(e)}")
+    except Exception as e:  # pylint: disable=broad-exception-caught
+        logger.error("Feature extraction failed: %s", e, exc_info=True)
+        raise HTTPException(status_code=500, detail=f"Feature extraction failed: {str(e)}") from e
 
     finally:
         # Cleanup temp file
@@ -361,12 +376,12 @@ async def extract_audio_features(
 
 @router.post("/analyze-multi-emotion")
 async def analyze_multi_emotion(
-    text: str = Form(...),
-    prosody_data_json: Optional[str] = Form(None),
-    user_id: Optional[str] = Form("demo-user"),
-    session_id: Optional[str] = Form("demo-session"),
-    current_user: dict[str, Any] = Depends(get_current_user),  # pylint: disable=unused-argument
-) -> Dict[str, Any]:
+    text: str = Form(...),  # noqa: B008
+    prosody_data_json: Optional[str] = Form(None),  # noqa: B008
+    user_id: Optional[str] = Form("demo-user"),  # noqa: B008
+    session_id: Optional[str] = Form("demo-session"),  # noqa: B008
+    current_user: dict[str, Any] = Depends(get_current_user),  # noqa: B008
+) -> Dict[str, Any]:  # pylint: disable=too-many-locals
     """Synchronous multi-emotion analysis endpoint (Deep Feeling mode).
 
     Detects up to 3 concurrent emotions with relationships and aggregate state.
@@ -381,11 +396,15 @@ async def analyze_multi_emotion(
     Returns:
         Multi-emotion analysis with emotions, relationships, and aggregate state
     """
-    import json
-    import time
+    import json  # pylint: disable=import-outside-toplevel
+    import time  # pylint: disable=import-outside-toplevel
 
-    from app.services.multi_emotion_analyzer import get_multi_emotion_analyzer
-    from app.services.pii_scrubber import get_pii_scrubber
+    from app.services.multi_emotion_analyzer import (  # pylint: disable=import-outside-toplevel
+        get_multi_emotion_analyzer,
+    )
+    from app.services.pii_scrubber import (  # pylint: disable=import-outside-toplevel
+        get_pii_scrubber,
+    )
 
     start_time = time.time()
 
@@ -474,8 +493,9 @@ async def analyze_multi_emotion(
         processing_time_ms = int((time.time() - start_time) * 1000)
 
         logger.info(
-            f"Multi-emotion analysis complete: {len(multi_analysis.emotions)} emotions, "
-            f"complexity={multi_analysis.complexity_score:.2f}"
+            "Multi-emotion analysis complete: %d emotions, complexity=%.2f",
+            len(multi_analysis.emotions),
+            multi_analysis.complexity_score,
         )
 
         # Convert to dict for JSON response
@@ -529,18 +549,18 @@ async def analyze_multi_emotion(
 
         return response
 
-    except Exception as e:
-        logger.error(f"Multi-emotion analysis failed: {e}", exc_info=True)
-        raise HTTPException(status_code=500, detail=f"Multi-emotion analysis failed: {e}")
+    except Exception as e:  # pylint: disable=broad-exception-caught
+        logger.error("Multi-emotion analysis failed: %s", e, exc_info=True)
+        raise HTTPException(status_code=500, detail=f"Multi-emotion analysis failed: {e}") from e
 
 
 @router.post("/analyze-audio")
 async def analyze_audio_sync(
-    audio: UploadFile = File(...),
-    user_id: str = Form("admin"),  # pylint: disable=unused-argument
-    session_id: str = Form("chat-session"),  # pylint: disable=unused-argument
-    current_user: dict[str, Any] = Depends(get_current_user),  # pylint: disable=unused-argument
-) -> Dict[str, Any]:
+    audio: UploadFile = File(...),  # noqa: B008
+    user_id: str = Form("admin"),  # pylint: disable=unused-argument  # noqa: B008
+    session_id: str = Form("chat-session"),  # pylint: disable=unused-argument  # noqa: B008
+    current_user: dict[str, Any] = Depends(get_current_user),  # noqa: B008
+) -> Dict[str, Any]:  # pylint: disable=too-many-locals
     """Synchronous audio analysis endpoint for chat.
 
     Processes audio immediately without queueing (perfect for interactive chat).
@@ -554,12 +574,20 @@ async def analyze_audio_sync(
     Returns:
         Complete analysis with transcription, emotion, and prosody
     """
-    import time
+    import time  # pylint: disable=import-outside-toplevel
 
-    from app.services.pii_scrubber import get_pii_scrubber
-    from app.services.prosody_analyzer import get_prosody_analyzer
-    from app.services.semantic_analyzer import get_semantic_analyzer
-    from app.services.transcription import get_transcription_service
+    from app.services.pii_scrubber import (  # pylint: disable=import-outside-toplevel
+        get_pii_scrubber,
+    )
+    from app.services.prosody_analyzer import (  # pylint: disable=import-outside-toplevel
+        get_prosody_analyzer,
+    )
+    from app.services.semantic_analyzer import (  # pylint: disable=import-outside-toplevel
+        get_semantic_analyzer,
+    )
+    from app.services.transcription import (  # pylint: disable=import-outside-toplevel
+        get_transcription_service,
+    )
 
     start_time = time.time()
 
@@ -575,26 +603,26 @@ async def analyze_audio_sync(
             content = await audio.read()
             await f.write(content)
 
-        logger.info(f"Processing audio synchronously: {audio_path} ({len(content)} bytes)")
+        logger.info("Processing audio synchronously: %s (%d bytes)", audio_path, len(content))
 
         # Step 1: Transcription
         transcription_service = get_transcription_service()
         transcription = transcription_service.transcribe(audio_path)
         input_text = transcription.text
 
-        logger.info(f"Transcription: {input_text}")
+        logger.info("Transcription: %s", input_text)
 
         # Step 2: Prosody Analysis
         prosody_analyzer = get_prosody_analyzer()
         prosody_data = prosody_analyzer.analyze(audio_path)
 
-        logger.info(f"Prosody: pitch={prosody_data.get('pitch_mean', 0):.1f}Hz")
+        logger.info("Prosody: pitch=%.1fHz", prosody_data.get("pitch_mean", 0))
 
         # Step 3: Semantic Analysis
         analyzer = get_semantic_analyzer()
         emotion = await analyzer.analyze(input_text)
 
-        logger.info(f"Emotion: {emotion.primary_emotion}")
+        logger.info("Emotion: %s", emotion.primary_emotion)
 
         # Step 4: PII Scrubbing
         scrubber = get_pii_scrubber()
@@ -619,9 +647,9 @@ async def analyze_audio_sync(
             "processing_time_seconds": processing_time,
         }
 
-    except Exception as e:
-        logger.error(f"Audio analysis failed: {e}", exc_info=True)
-        raise HTTPException(status_code=500, detail=f"Audio analysis failed: {str(e)}")
+    except Exception as e:  # pylint: disable=broad-exception-caught
+        logger.error("Audio analysis failed: %s", e, exc_info=True)
+        raise HTTPException(status_code=500, detail=f"Audio analysis failed: {str(e)}") from e
 
     finally:
         # Cleanup temp file
@@ -632,11 +660,11 @@ async def analyze_audio_sync(
 
 @router.post("/analyze-audio-multi-emotion")
 async def analyze_audio_multi_emotion(
-    audio: UploadFile = File(...),
-    user_id: str = Form("admin"),  # pylint: disable=unused-argument
-    session_id: str = Form("chat-session"),  # pylint: disable=unused-argument
-    current_user: dict[str, Any] = Depends(get_current_user),  # pylint: disable=unused-argument
-) -> Dict[str, Any]:
+    audio: UploadFile = File(...),  # noqa: B008
+    user_id: str = Form("admin"),  # pylint: disable=unused-argument  # noqa: B008
+    session_id: str = Form("chat-session"),  # pylint: disable=unused-argument  # noqa: B008
+    current_user: dict[str, Any] = Depends(get_current_user),  # noqa: B008
+) -> Dict[str, Any]:  # pylint: disable=too-many-locals
     """Synchronous multi-emotion audio analysis endpoint (Deep Feeling mode).
 
     Combines transcription, prosody, and multi-emotion analysis in one call.
@@ -650,12 +678,20 @@ async def analyze_audio_multi_emotion(
     Returns:
         Complete multi-emotion analysis with transcription, prosody, emotions, relationships
     """
-    import time
+    import time  # pylint: disable=import-outside-toplevel
 
-    from app.services.multi_emotion_analyzer import get_multi_emotion_analyzer
-    from app.services.pii_scrubber import get_pii_scrubber
-    from app.services.prosody_analyzer import get_prosody_analyzer
-    from app.services.transcription import get_transcription_service
+    from app.services.multi_emotion_analyzer import (  # pylint: disable=import-outside-toplevel
+        get_multi_emotion_analyzer,
+    )
+    from app.services.pii_scrubber import (  # pylint: disable=import-outside-toplevel
+        get_pii_scrubber,
+    )
+    from app.services.prosody_analyzer import (  # pylint: disable=import-outside-toplevel
+        get_prosody_analyzer,
+    )
+    from app.services.transcription import (  # pylint: disable=import-outside-toplevel
+        get_transcription_service,
+    )
 
     start_time = time.time()
 
@@ -672,7 +708,9 @@ async def analyze_audio_multi_emotion(
             await f.write(content)
 
         logger.info(
-            f"Processing audio for multi-emotion analysis: {audio_path} ({len(content)} bytes)"
+            "Processing audio for multi-emotion analysis: %s (%d bytes)",
+            audio_path,
+            len(content),
         )
 
         # Step 1: Transcription
@@ -680,7 +718,7 @@ async def analyze_audio_multi_emotion(
         transcription = transcription_service.transcribe(audio_path)
         input_text = transcription.text
 
-        logger.info(f"Transcription: {input_text}")
+        logger.info("Transcription: %s", input_text)
 
         if not input_text or not input_text.strip():
             logger.warning("Transcription resulted in empty text. Aborting multi-emotion analysis.")
@@ -693,7 +731,9 @@ async def analyze_audio_multi_emotion(
         prosody_data = prosody_analyzer.analyze(audio_path)
 
         logger.info(
-            f"Prosody: pitch={prosody_data.get('pitch_mean', 0):.1f}Hz, energy={prosody_data.get('energy', 0):.3f}"
+            "Prosody: pitch=%.1fHz, energy=%.3f",
+            prosody_data.get("pitch_mean", 0),
+            prosody_data.get("energy", 0),
         )
 
         # Step 3: Multi-Emotion 3-Way Analysis (content, voice, blended)
@@ -707,9 +747,11 @@ async def analyze_audio_multi_emotion(
         discrepancy = three_way_result["discrepancy"]
 
         logger.info(
-            f"3-way analysis complete: Content={discrepancy['content_primary']}, "
-            f"Voice={discrepancy['voice_primary']}, Blended={discrepancy['blended_primary']}, "
-            f"Discrepancy={discrepancy['content_voice_distance']:.3f}"
+            "3-way analysis complete: Content=%s, Voice=%s, Blended=%s, Discrepancy=%.3f",
+            discrepancy["content_primary"],
+            discrepancy["voice_primary"],
+            discrepancy["blended_primary"],
+            discrepancy["content_voice_distance"],
         )
 
         # Step 4: PII Scrubbing
@@ -781,11 +823,11 @@ async def analyze_audio_multi_emotion(
 
     except HTTPException:
         raise
-    except Exception as e:
-        logger.error(f"Multi-emotion audio analysis failed: {e}", exc_info=True)
+    except Exception as e:  # pylint: disable=broad-exception-caught
+        logger.error("Multi-emotion audio analysis failed: %s", e, exc_info=True)
         raise HTTPException(
             status_code=500, detail=f"Multi-emotion audio analysis failed: {str(e)}"
-        )
+        ) from e
 
     finally:
         # Cleanup temp file

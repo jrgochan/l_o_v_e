@@ -214,7 +214,7 @@ References:
 
 import json
 import logging
-from typing import Any, Dict, List, Optional
+from typing import Annotated, Any, Dict, List, Optional
 
 from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy import text
@@ -228,7 +228,9 @@ router = APIRouter()
 
 
 @router.get("/strategy-effectiveness", tags=["Bootstrap"])
-async def get_strategy_effectiveness(db: AsyncSession = Depends(get_db)) -> Dict[str, Any]:
+async def get_strategy_effectiveness(
+    db: Annotated[AsyncSession, Depends(get_db)],
+) -> Dict[str, Any]:
     """Get global strategy effectiveness ratings from bootstrap data.
 
     Returns aggregate success rates and ratings for strategies,
@@ -259,7 +261,7 @@ async def get_strategy_effectiveness(db: AsyncSession = Depends(get_db)) -> Dict
         return {
             "success": True,
             "data_type": "strategy_effectiveness",
-            "ratings": content.get("ratings", []) if isinstance(content, dict) else content,
+            "ratings": (content.get("ratings", []) if isinstance(content, dict) else content),
         }
 
     except HTTPException:
@@ -271,10 +273,12 @@ async def get_strategy_effectiveness(db: AsyncSession = Depends(get_db)) -> Dict
 
 @router.get("/path-templates", tags=["Bootstrap"])
 async def get_path_templates(
-    from_emotion: Optional[str] = Query(None, description="Filter by starting emotion"),
-    to_emotion: Optional[str] = Query(None, description="Filter by goal emotion"),
-    max_difficulty: Optional[float] = Query(None, description="Maximum difficulty (0-1)"),
-    db: AsyncSession = Depends(get_db),
+    db: Annotated[AsyncSession, Depends(get_db)],
+    from_emotion: Annotated[Optional[str], Query(description="Filter by starting emotion")] = None,
+    to_emotion: Annotated[Optional[str], Query(description="Filter by goal emotion")] = None,
+    max_difficulty: Annotated[
+        Optional[float], Query(description="Maximum difficulty (0-1)")
+    ] = None,
 ) -> Dict[str, Any]:
     """Get pre-computed optimal path templates for common emotional transitions.
 
@@ -399,18 +403,19 @@ def _build_recommendations_dict(
 
 @router.get("/context-recommendations", tags=["Bootstrap"])
 async def get_context_recommendations(
-    time_of_day: Optional[str] = Query(
-        None, description="Time: morning, afternoon, evening, late_night"
-    ),
-    energy_level: Optional[str] = Query(None, description="Energy: high, moderate, low"),
-    location: Optional[str] = Query(None, description="Location: home, work, public"),
-    available_time: Optional[str] = Query(
-        None, description="Time: 5_minutes, 15_minutes, 30_minutes, 60_plus_minutes"
-    ),
-    experience_level: Optional[str] = Query(
-        None, description="Level: beginner, intermediate, advanced"
-    ),
-    db: AsyncSession = Depends(get_db),
+    db: Annotated[AsyncSession, Depends(get_db)],
+    time_of_day: Annotated[
+        Optional[str], Query(description="Time: morning, afternoon, evening, late_night")
+    ] = None,
+    energy_level: Annotated[Optional[str], Query(description="Energy: high, moderate, low")] = None,
+    location: Annotated[Optional[str], Query(description="Location: home, work, public")] = None,
+    available_time: Annotated[
+        Optional[str],
+        Query(description="Time: 5_minutes, 15_minutes, 30_minutes, 60_plus_minutes"),
+    ] = None,
+    experience_level: Annotated[
+        Optional[str], Query(description="Level: beginner, intermediate, advanced")
+    ] = None,
 ) -> Dict[str, Any]:
     """Get context-aware strategy recommendations based on situational factors.
 
@@ -469,8 +474,10 @@ async def get_context_recommendations(
 
 @router.get("/challenge-patterns", tags=["Bootstrap"])
 async def get_challenge_patterns(
-    challenge_name: Optional[str] = Query(None, description="Specific challenge pattern"),
-    db: AsyncSession = Depends(get_db),
+    db: Annotated[AsyncSession, Depends(get_db)],
+    challenge_name: Annotated[
+        Optional[str], Query(description="Specific challenge pattern")
+    ] = None,
 ) -> Dict[str, Any]:
     """Get common challenge patterns with recommended strategy progressions.
 
@@ -521,7 +528,7 @@ async def get_challenge_patterns(
 
 
 @router.get("/all", tags=["Bootstrap"])
-async def get_all_bootstrap_data(db: AsyncSession = Depends(get_db)) -> Dict[str, Any]:
+async def get_all_bootstrap_data(db: Annotated[AsyncSession, Depends(get_db)]) -> Dict[str, Any]:
     """Get all bootstrap data in one call.
 
     Useful for initial app load to cache bootstrap data on the client.

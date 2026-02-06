@@ -211,6 +211,7 @@ wait_for_backends() {
     done
 
     # Wait for all checks
+    # shellcheck disable=SC2086
     wait $pids
     echo ""
 }
@@ -338,7 +339,11 @@ if [ "$RUN_INFRA" = true ] && [ "$SKIP_INFRA_CHECKS" = false ]; then
     if check_service_running redis; then
         print_success "Redis running"
     else
-        start_service redis >/dev/null && print_success "Redis started" || print_warning "Failed to start Redis"
+    if start_service redis >/dev/null; then
+        print_success "Redis started"
+    else
+        print_warning "Failed to start Redis"
+    fi
     fi
 
     # Ollama
@@ -349,7 +354,11 @@ if [ "$RUN_INFRA" = true ] && [ "$SKIP_INFRA_CHECKS" = false ]; then
         if check_service_running ollama; then
             print_success "Ollama running"
         else
-            start_ollama && print_success "Ollama started" || print_warning "Failed to start Ollama"
+            if start_ollama; then
+                print_success "Ollama started"
+            else
+                print_warning "Failed to start Ollama"
+            fi
         fi
     fi
     echo ""
@@ -406,7 +415,11 @@ if [ "$RUN_FRONTEND" = true ]; then
         for p in 8000 8001 8002; do
             if ! check_url_responding "http://localhost:$p/health"; then HEALTHY=false; fi
         done
-        [ "$HEALTHY" = true ] && print_success "Backends healthy" || print_warning "Some backends unstable"
+        if [ "$HEALTHY" = true ]; then
+            print_success "Backends healthy"
+        else
+            print_warning "Some backends unstable"
+        fi
         echo ""
     fi
 

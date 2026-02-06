@@ -52,33 +52,25 @@ import logging
 from typing import Any, Dict
 
 import structlog
-from app.api.routes import ai_models, health, ingest
-from app.config import settings
 from asgi_correlation_id import CorrelationIdMiddleware
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
+from app.api.routes import ai_models, health, ingest
+from app.config import settings
+
 # Configure logging
-try:
-    from logging_config import configure_logging
+# Simple logging configuration
+logging.basicConfig(level=settings.LOG_LEVEL)
 
-    configure_logging(
-        log_level=settings.LOG_LEVEL, json_format=settings.ENVIRONMENT == "production"
-    )
-except ImportError:
-    logging.basicConfig(level=settings.LOG_LEVEL)
-
-if "structlog" in locals():
-    logger = structlog.get_logger(__name__)
-else:
-    logger = logging.getLogger(__name__)
+logger = structlog.get_logger(__name__)
 
 # Configure rate limiting
 try:
     from security import setup_rate_limiting
 except ImportError:
 
-    def setup_rate_limiting(app):
+    def setup_rate_limiting(_application):
         pass
 
 

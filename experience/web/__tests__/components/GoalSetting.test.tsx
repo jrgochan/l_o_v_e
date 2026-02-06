@@ -29,6 +29,22 @@ jest.mock("@/components/PersonalStrategies", () => ({
   PersonalStrategies: () => <div data-testid="personal-strategies">Strategies</div>,
 }));
 
+// Mock therapeutic service
+// Mock therapeutic service
+jest.mock("@/services/therapeuticService", () => ({
+  therapeuticService: {
+    findAlternativePaths: jest.fn().mockResolvedValue({ paths: [] }),
+  },
+}));
+
+// Mock global fetch to prevent "fetch is not defined" errors during service calls
+global.fetch = jest.fn(() =>
+  Promise.resolve({
+    ok: true,
+    json: () => Promise.resolve({}),
+  })
+) as jest.Mock;
+
 // Mock Data
 const mockEmotions = [
   { id: "joy", name: "Joy", category: "Positive", vac: [0.8, 0.6, 0.7], definition: "Happiness" },
@@ -66,9 +82,14 @@ describe("GoalSetting", () => {
   const mockLoadEmotionAtlas = jest.fn();
   const mockGenerateTransitionPath = jest.fn();
   const mockStartJourney = jest.fn();
+  const mockFindAlternativePaths = jest.fn();
 
   beforeEach(() => {
     jest.clearAllMocks();
+
+    // Setup therapeuticService mock implementation
+    const { therapeuticService } = require("@/services/therapeuticService");
+    therapeuticService.findAlternativePaths.mockResolvedValue({ paths: [mockPath] });
 
     // Properly reset store using store's reset action
     // This relies on NEUTRAL_VAC being defined in the mock above

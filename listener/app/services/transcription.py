@@ -176,9 +176,10 @@ class TranscriptionService:
         self._model_loaded = False
 
         logger.info(
-            f"TranscriptionService initialized: "
-            f"model={self.model_size}, device={self.device}, "
-            f"compute_type={self.compute_type}"
+            "TranscriptionService initialized: model=%s, device=%s, compute_type=%s",
+            self.model_size,
+            self.device,
+            self.compute_type,
         )
 
     def _load_model(self) -> None:
@@ -242,7 +243,7 @@ class TranscriptionService:
         if not WHISPER_AVAILABLE or whisper is None:
             raise RuntimeError("Whisper not installed. Install with: pip install openai-whisper")
 
-        logger.info(f"Loading OpenAI Whisper model: {self.model_size}")
+        logger.info("Loading OpenAI Whisper model: %s", self.model_size)
         start_time = time.time()
 
         try:
@@ -254,11 +255,11 @@ class TranscriptionService:
             load_time = time.time() - start_time
             self._model_loaded = True
 
-            logger.info(f"Model loaded successfully in {load_time:.2f}s")
+            logger.info("Model loaded successfully in %.2fs", load_time)
 
         except Exception as e:
-            logger.error(f"Failed to load Whisper model: {e}")
-            raise RuntimeError(f"Model loading failed: {e}")
+            logger.error("Failed to load Whisper model: %s", e)
+            raise RuntimeError(f"Model loading failed: {e}") from e
 
     def transcribe(
         self, audio_path: str, language: str = "en", _vad_filter: bool = True
@@ -364,7 +365,7 @@ class TranscriptionService:
                 transcribe_path = audio_path
 
             # Perform transcription with OpenAI Whisper
-            logger.info(f"Transcribing audio: {transcribe_path}")
+            logger.info("Transcribing audio: %s", transcribe_path)
             start_time = time.time()
 
             # Type narrowing: _load_model() guarantees _model is not None
@@ -383,7 +384,9 @@ class TranscriptionService:
             transcription_time = time.time() - start_time
 
             logger.info(
-                f"Transcription complete: {len(full_text)} chars " f"in {transcription_time:.2f}s"
+                "Transcription complete: %d chars in %.2fs",
+                len(full_text),
+                transcription_time,
             )
 
             return TranscriptionResult(
@@ -394,8 +397,8 @@ class TranscriptionService:
             )
 
         except Exception as e:
-            logger.error(f"Transcription failed: {e}")
-            raise RuntimeError(f"Transcription error: {e}")
+            logger.error("Transcription failed: %s", e)
+            raise RuntimeError(f"Transcription error: {e}") from e
 
         finally:
             # Clean up normalized temp file
@@ -490,7 +493,7 @@ class TranscriptionService:
 
 
 # Global service instance (singleton pattern)
-_service_instance: Optional[TranscriptionService] = None
+_SERVICE_INSTANCE: Optional[TranscriptionService] = None
 
 
 def get_transcription_service() -> TranscriptionService:
@@ -538,9 +541,9 @@ def get_transcription_service() -> TranscriptionService:
         - app/config.py for default settings
         - app/api/routes/ingest.py for usage examples
     """
-    global _service_instance
+    global _SERVICE_INSTANCE  # pylint: disable=global-statement
 
-    if _service_instance is None:
-        _service_instance = TranscriptionService()
+    if _SERVICE_INSTANCE is None:
+        _SERVICE_INSTANCE = TranscriptionService()
 
-    return _service_instance
+    return _SERVICE_INSTANCE

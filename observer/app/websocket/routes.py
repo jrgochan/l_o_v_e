@@ -170,6 +170,7 @@ References:
 import asyncio
 import json
 import logging
+from typing import Annotated
 
 from fastapi import APIRouter, Depends, WebSocket, WebSocketDisconnect
 from sqlalchemy import select
@@ -188,7 +189,7 @@ router = APIRouter()
 
 @router.websocket("/observer/ws/{user_id}")
 async def websocket_endpoint(
-    websocket: WebSocket, user_id: str, db: AsyncSession = Depends(get_db)
+    websocket: WebSocket, user_id: str, db: Annotated[AsyncSession, Depends(get_db)]
 ) -> None:
     """Websocket endpoint for real-time emotional state updates.
 
@@ -211,7 +212,10 @@ async def websocket_endpoint(
         # Send initial state if one exists
         stmt = (
             select(UserTrajectory, EmotionDefinition)
-            .join(EmotionDefinition, UserTrajectory.dominant_emotion_id == EmotionDefinition.id)
+            .join(
+                EmotionDefinition,
+                UserTrajectory.dominant_emotion_id == EmotionDefinition.id,
+            )
             .where(UserTrajectory.user_id == user_id)
             .order_by(UserTrajectory.timestamp.desc())
             .limit(1)
@@ -235,14 +239,14 @@ async def websocket_endpoint(
                         "elasticity": (
                             float(state.elasticity_metric) if state.elasticity_metric else 0.0
                         ),
-                        "rigidity": float(state.rigidity_score) if state.rigidity_score else 0.0,
+                        "rigidity": (float(state.rigidity_score) if state.rigidity_score else 0.0),
                         "alerts": [],
                     },
                     "timestamp": state.timestamp.isoformat(),
                 },
             }
             await websocket.send_json(initial_message)
-            logger.info(f"Sent initial state to user {user_id}")
+            logger.info("Sent initial state to user %s", user_id)
         else:
             # Send neutral state if no previous state
             await websocket.send_json(
@@ -273,24 +277,28 @@ async def websocket_endpoint(
 
                 # Handle client messages
                 if message.get("type") == "pong":
-                    logger.debug(f"Received pong from user {user_id}")
+                    logger.debug("Received pong from user %s", user_id)
                 else:
-                    logger.warning(f"Unknown message type from client: {message.get('type')}")
+                    logger.warning("Unknown message type from client: %s", message.get("type"))
 
             except WebSocketDisconnect:
-                logger.info(f"WebSocket disconnected normally for user {user_id}")
+                logger.info("WebSocket disconnected normally for user %s", user_id)
                 break
             except json.JSONDecodeError as e:
-                logger.error(f"Invalid JSON from client: {e}")
+                logger.error("Invalid JSON from client: %s", e)
                 await websocket.send_json(
-                    {"type": "error", "message": "Invalid JSON format", "code": "INVALID_JSON"}
+                    {
+                        "type": "error",
+                        "message": "Invalid JSON format",
+                        "code": "INVALID_JSON",
+                    }
                 )
-            except Exception as e:
-                logger.error(f"Error in WebSocket loop: {e}")
+            except Exception as e:  # pylint: disable=broad-exception-caught
+                logger.error("Error in WebSocket loop: %s", e)
                 break
 
-    except Exception as e:
-        logger.error(f"WebSocket error for user {user_id}: {e}")
+    except Exception as e:  # pylint: disable=broad-exception-caught
+        logger.error("WebSocket error for user %s: %s", user_id, e)
 
     finally:
         # Cancel heartbeat task
@@ -316,8 +324,8 @@ async def heartbeat_loop(_websocket: WebSocket, user_id: str) -> None:
         while True:
             await asyncio.sleep(30)  # Ping every 30 seconds
             await manager.send_ping(user_id)
-            logger.debug(f"Sent heartbeat ping to user {user_id}")
+            logger.debug("Sent heartbeat ping to user %s", user_id)
     except asyncio.CancelledError:
-        logger.debug(f"Heartbeat cancelled for user {user_id}")
-    except Exception as e:
-        logger.error(f"Heartbeat error for user {user_id}: {e}")
+        logger.debug("Heartbeat cancelled for user %s", user_id)
+    except Exception as e:  # pylint: disable=broad-exception-caught
+        logger.error("Heartbeat error for user %s: %s", user_id, e)

@@ -203,6 +203,7 @@ References:
 """
 
 import logging
+from typing import Annotated
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, HTTPException
@@ -221,7 +222,9 @@ router = APIRouter()
 
 
 @router.get("/observer/current/{user_id}", response_model=StateResponse, tags=["Current"])
-async def get_current_state(user_id: UUID, db: AsyncSession = Depends(get_db)) -> StateResponse:
+async def get_current_state(
+    user_id: UUID, db: Annotated[AsyncSession, Depends(get_db)]
+) -> StateResponse:
     """Get user's most recent emotional state.
 
     Args:
@@ -290,7 +293,8 @@ async def get_current_state(user_id: UUID, db: AsyncSession = Depends(get_db)) -
 
             metrics_calc = MetricsCalculator(db)
             angular_distance = metrics_calc._angular_distance(
-                list(current_state.quaternion_state), list(previous_state.quaternion_state)
+                list(current_state.quaternion_state),
+                list(previous_state.quaternion_state),
             )
 
         # Build response

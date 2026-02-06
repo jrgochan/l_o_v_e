@@ -27,7 +27,7 @@ async def process_audio(
     user_id: Optional[str] = None,
     session_id: Optional[str] = None,
     timestamp: Optional[str] = None,
-) -> Dict[str, Any]:
+) -> Dict[str, Any]:  # pylint: disable=too-many-locals
     """Process audio or text through complete pipeline.
 
     Pipeline:
@@ -55,7 +55,7 @@ async def process_audio(
         transcription_service = get_transcription_service()
 
         if audio_path:
-            logger.info(f"Transcribing audio: {audio_path}")
+            logger.info("Transcribing audio: %s", audio_path)
             transcription = transcription_service.transcribe(audio_path)
             input_text = transcription.text
         elif text:
@@ -65,7 +65,7 @@ async def process_audio(
         else:
             raise ValueError("Either audio_path or text must be provided")
 
-        logger.info(f"Transcription complete: {len(input_text)} characters")
+        logger.info("Transcription complete: %d characters", len(input_text))
 
         # Step 1.5: Prosody Analysis (if audio provided)
         prosody_data = None
@@ -73,7 +73,7 @@ async def process_audio(
             logger.info("Extracting prosody features...")
             prosody_analyzer = get_prosody_analyzer()
             prosody_data = prosody_analyzer.analyze(audio_path)
-            logger.info(f"Prosody extracted: pitch={prosody_data.get('pitch_mean', 0):.1f}Hz")
+            logger.info("Prosody extracted: pitch=%.1fHz", prosody_data.get("pitch_mean", 0))
 
         # Step 2: Semantic Analysis
         logger.info("Analyzing emotional content...")
@@ -81,8 +81,11 @@ async def process_audio(
         emotion = await analyzer.analyze(input_text)
 
         logger.info(
-            f"Emotion detected: {emotion.primary_emotion} "
-            f"(VAC: {emotion.vac.valence:.2f}, {emotion.vac.arousal:.2f}, {emotion.vac.connection:.2f})"
+            "Emotion detected: %s (VAC: %.2f, %.2f, %.2f)",
+            emotion.primary_emotion,
+            emotion.vac.valence,
+            emotion.vac.arousal,
+            emotion.vac.connection,
         )
 
         # Step 3: PII Scrubbing
@@ -109,7 +112,7 @@ async def process_audio(
                 emotion=emotion,
                 timestamp=ts,
             )
-            logger.info(f"State recorded in Observer: {observer_response.get('state_id')}")
+            logger.info("State recorded in Observer: %s", observer_response.get("state_id"))
         else:
             logger.warning("No user_id/session_id provided, skipping Observer storage")
             observer_response = None
@@ -144,12 +147,12 @@ async def process_audio(
             "observer_state_id": observer_response.get("state_id") if observer_response else None,
         }
 
-        logger.info(f"Processing complete in {processing_time:.2f}s")
+        logger.info("Processing complete in %.2fs", processing_time)
 
         return result
 
-    except Exception as e:
-        logger.error(f"Processing failed: {e}", exc_info=True)
+    except Exception as e:  # pylint: disable=broad-exception-caught
+        logger.error("Processing failed: %s", e, exc_info=True)
         return {
             "status": "error",
             "error": str(e),

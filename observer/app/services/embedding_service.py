@@ -153,7 +153,7 @@ References:
 import logging
 from typing import List, Optional, Protocol, Union, cast
 
-import numpy as np  # noqa: F401
+import numpy as np  # noqa: F401 # pylint: disable=unused-import
 
 from app.config import settings
 
@@ -165,11 +165,13 @@ class EmbeddingProvider(Protocol):
 
     async def generate_embedding(self, text: str) -> List[float]:
         """Generate embedding vector for text."""
+        # pylint: disable=unnecessary-ellipsis
         ...
 
     @property
     def dimension(self) -> int:
         """Embedding dimension."""
+        # pylint: disable=unnecessary-ellipsis
         ...
 
 
@@ -181,10 +183,12 @@ class LocalEmbeddingProvider:
 
     def __init__(self, model_name: Optional[str] = None):
         """Initialize local provider."""
-        from sentence_transformers import SentenceTransformer
+        from sentence_transformers import (  # pylint: disable=import-outside-toplevel
+            SentenceTransformer,
+        )
 
         self.model_name = model_name or settings.EMBEDDING_MODEL
-        logger.info(f"Loading local embedding model: {self.model_name}")
+        logger.info("Loading local embedding model: %s", self.model_name)
 
         # Load model (will download on first use)
         self.model = SentenceTransformer(self.model_name)
@@ -192,7 +196,7 @@ class LocalEmbeddingProvider:
         # Cache dimension
         self._dimension = self.model.get_sentence_embedding_dimension()
 
-        logger.info(f"Model loaded. Dimension: {self._dimension}")
+        logger.info("Model loaded. Dimension: %d", self._dimension)
 
     async def generate_embedding(self, text: str) -> List[float]:
         """Generate embedding for text using local model.
@@ -224,7 +228,7 @@ class OpenAIEmbeddingProvider:
 
     def __init__(self, model_name: Optional[str] = None, api_key: Optional[str] = None):
         """Initialize OpenAI provider."""
-        from openai import AsyncOpenAI
+        from openai import AsyncOpenAI  # pylint: disable=import-outside-toplevel
 
         self.model_name = model_name or settings.OPENAI_EMBEDDING_MODEL
         self.api_key = api_key or settings.OPENAI_API_KEY
@@ -232,7 +236,7 @@ class OpenAIEmbeddingProvider:
         if not self.api_key:
             raise ValueError("OPENAI_API_KEY must be set for OpenAI provider")
 
-        logger.info(f"Initializing OpenAI embedding provider: {self.model_name}")
+        logger.info("Initializing OpenAI embedding provider: %s", self.model_name)
 
         self.client = AsyncOpenAI(api_key=self.api_key)
 
@@ -262,7 +266,7 @@ class OpenAIEmbeddingProvider:
             return embedding
 
         except Exception as e:
-            logger.error(f"OpenAI embedding generation failed: {e}")
+            logger.error("OpenAI embedding generation failed: %s", e)
             raise
 
     @property
@@ -278,7 +282,8 @@ class EmbeddingService:
     """
 
     def __init__(
-        self, provider: Optional[Union[LocalEmbeddingProvider, OpenAIEmbeddingProvider]] = None
+        self,
+        provider: Optional[Union[LocalEmbeddingProvider, OpenAIEmbeddingProvider]] = None,
     ) -> None:
         """Initialize embedding service.
 
@@ -374,7 +379,7 @@ class EmbeddingService:
 
 
 # Singleton instance (lazy-loaded)
-_embedding_service_instance = None
+_EMBEDDING_SERVICE_INSTANCE = None
 
 
 def get_embedding_service() -> EmbeddingService:
@@ -385,9 +390,9 @@ def get_embedding_service() -> EmbeddingService:
     Returns:
         EmbeddingService instance
     """
-    global _embedding_service_instance
+    global _EMBEDDING_SERVICE_INSTANCE  # pylint: disable=global-statement
 
-    if _embedding_service_instance is None:
-        _embedding_service_instance = EmbeddingService()
+    if _EMBEDDING_SERVICE_INSTANCE is None:
+        _EMBEDDING_SERVICE_INSTANCE = EmbeddingService()
 
-    return _embedding_service_instance
+    return _EMBEDDING_SERVICE_INSTANCE

@@ -48,6 +48,7 @@ import { DebugBroadcaster } from "@/components/DebugBroadcaster";
 import { PathDetailsOverlay } from "@/components/PathDetailsOverlay";
 import { useAdminTheme } from "@/hooks/admin/useAdminTheme";
 import { WaypointArrivalOverlay } from "@/components/WaypointArrivalOverlay";
+import { StrategyLibraryBrowser } from "@/components/StrategyLibraryBrowser";
 
 const VisualizationAdminContent = () => {
   // Load emotions and set up path calculator
@@ -92,6 +93,7 @@ const VisualizationAdminContent = () => {
   const palette = useCommandPalette();
 
   const [showMatrix, setShowMatrix] = useState(false);
+  const [showStrategyLibrary, setShowStrategyLibrary] = useState(false);
   const [showHelp, setShowHelp] = useState(false);
   const [chatSessionId] = useState(() => {
     // Generate proper UUID for session ID (backend requires UUID format)
@@ -349,6 +351,12 @@ const VisualizationAdminContent = () => {
             >
               📊 Path Matrix
             </button>
+            <button
+              onClick={() => setShowStrategyLibrary(true)}
+              className={`px-4 py-2 text-sm transition-all duration-300 ${theme.layout.borderRadius} hover:bg-white/10 ${theme.colors.text.secondary} hover:${theme.colors.text.primary}`}
+            >
+              📚 Library
+            </button>
             {isLoading && (
               <div className="flex items-center gap-2 text-cyan-400">
                 <div className="animate-spin h-5 w-5 border-2 border-cyan-400 border-t-transparent rounded-full" />
@@ -485,6 +493,20 @@ const VisualizationAdminContent = () => {
 
       {/* Modals */}
       {showMatrix && <PathMatrixGrid onClose={() => setShowMatrix(false)} />}
+
+      {showStrategyLibrary && (
+        <div className="fixed inset-0 z-50 bg-black/95 backdrop-blur-xl animate-in fade-in duration-300">
+           <div className="absolute top-6 right-6 z-[60]">
+              <button
+                onClick={() => setShowStrategyLibrary(false)}
+                className="text-white/50 hover:text-white px-4 py-2 rounded-full hover:bg-white/10 transition-colors"
+              >
+                  ✕ Close Library
+              </button>
+           </div>
+           <StrategyLibraryBrowser />
+        </div>
+      )}
 
       {showHelp && <HelpModal onClose={() => setShowHelp(false)} />}
 

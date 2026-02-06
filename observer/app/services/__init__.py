@@ -8,10 +8,7 @@ from app.services.embedding_service import (
 )
 from app.services.emotion_mapper import EmotionMapper
 from app.services.metrics_calculator import MetricsCalculator
-from app.services.quaternion_builder import (
-    QuaternionBuilder,
-    get_quaternion_builder,
-)
+from app.services.quaternion_builder import QuaternionBuilder, get_quaternion_builder
 
 __all__ = [
     # Embedding

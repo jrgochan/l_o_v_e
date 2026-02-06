@@ -40,7 +40,9 @@ async def get_current_user(
 
         if not user:
             # Auto-create dev admin if not exists
-            from app.core.security import get_password_hash
+            from app.core.security import (  # pylint: disable=import-outside-toplevel
+                get_password_hash,
+            )
 
             user = User(
                 email="dev@admin.com",
@@ -63,8 +65,8 @@ async def get_current_user(
         if email is None:
             raise credentials_exception
         token_data = TokenData(email=email)
-    except (JWTError, ValidationError):
-        raise credentials_exception
+    except (JWTError, ValidationError) as e:
+        raise credentials_exception from e
 
     stmt = select(User).where(User.email == token_data.email)
     result = await db.execute(stmt)
@@ -89,7 +91,8 @@ async def get_current_admin(
     """Ensure the current user is an admin."""
     if current_user.role != UserRole.ADMIN:
         raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN, detail="The user doesn't have enough privileges"
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="The user doesn't have enough privileges",
         )
     return current_user
 
@@ -111,8 +114,12 @@ async def get_current_user_ws(
         user = result.scalars().first()
         if not user:
             # Auto-create dev admin if not exists (same logic as HTTP auth)
-            from app.core.security import get_password_hash
-            from app.models.user import UserRole
+            from app.core.security import (  # pylint: disable=import-outside-toplevel
+                get_password_hash,
+            )
+            from app.models.user import (  # pylint: disable=import-outside-toplevel,reimported
+                UserRole,
+            )
 
             user = User(
                 email="dev@admin.com",
@@ -135,8 +142,8 @@ async def get_current_user_ws(
         if email is None:
             raise credentials_exception
         token_data = TokenData(email=email)
-    except (JWTError, ValidationError):
-        raise credentials_exception
+    except (JWTError, ValidationError) as e:
+        raise credentials_exception from e
 
     stmt = select(User).where(User.email == token_data.email)
     result = await db.execute(stmt)

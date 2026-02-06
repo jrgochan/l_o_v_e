@@ -32,8 +32,8 @@ async def get_current_user(token: Annotated[str, Depends(oauth2_scheme)]) -> dic
 
         # We return the payload (claims) directly since Listener doesn't have a DB
         return payload  # type: ignore[no-any-return]
-    except JWTError:
-        raise credentials_exception
+    except JWTError as e:
+        raise credentials_exception from e
 
 
 async def get_current_user_ws(token: Annotated[str, Query()]) -> dict[str, Any]:
@@ -49,5 +49,5 @@ async def get_current_user_ws(token: Annotated[str, Query()]) -> dict[str, Any]:
         if email is None:
             raise credentials_exception
         return payload  # type: ignore[no-any-return]
-    except JWTError:
-        raise credentials_exception
+    except JWTError as e:
+        raise credentials_exception from e

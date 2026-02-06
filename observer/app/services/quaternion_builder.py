@@ -122,20 +122,22 @@ class QuaternionBuilder:
         self.use_http = use_http
 
         if use_http:
-            logger.info(f"Quaternion builder using HTTP API: {self.versor_url}")
+            logger.info("Quaternion builder using HTTP API: %s", self.versor_url)
         else:
             logger.info("Quaternion builder using direct import")
             # Import Versor's VACVector class
             try:
-                from versor.app.core.vac_model import VACVector
+                from versor.app.core.vac_model import (  # pylint: disable=import-outside-toplevel
+                    VACVector,
+                )
 
-                self.VACVector = VACVector
+                self.VACVector = VACVector  # pylint: disable=invalid-name
                 logger.info("Successfully imported Versor VACVector")
             except ImportError as e:
-                logger.error(f"Failed to import Versor: {e}")
+                logger.error("Failed to import Versor: %s", e)
                 raise ImportError(
                     "Versor package not found. Either install Versor or use HTTP mode."
-                )
+                ) from e
 
     def _create_service_token(self) -> str:
         """Create a service-to-service JWT token for Versor authentication."""
@@ -143,7 +145,7 @@ class QuaternionBuilder:
         now = datetime.now(timezone.utc)
         expire = now + timedelta(minutes=5)
         to_encode = {
-            "sub": "observer-service@love.stack",  # Recognized as valid user (any non-null sub works)
+            "sub": "observer-service@love.stack",  # Recognized as valid user (any non-null works
             "exp": expire,
             "iat": now,
             "type": "service",
@@ -210,14 +212,14 @@ class QuaternionBuilder:
                             "arousal": vac[1],  # Energy/activation level
                             "connection": vac[2],  # Social connection/isolation
                         },
-                        "time_delta_seconds": 1.0,  # Not used for current_state, but required by API
+                        "time_delta_seconds": 1.0,  # Not used for current_state, but required
                     },
                     headers=headers,
                 )
                 response.raise_for_status()
 
                 # Extract quaternion from response
-                # Response structure: {"current_state": {"w": ..., "x": ..., "y": ..., "z": ...}, ...}
+                # Response structure: {"current_state": {"w": ..., "x": ..., "y": ..., "z": ...}}
                 data = response.json()
                 current_state = data["current_state"]
 
@@ -231,7 +233,7 @@ class QuaternionBuilder:
                     float(current_state["z"]),
                 ]
 
-        except Exception as e:
+        except Exception as e:  # pylint: disable=broad-exception-caught
             # ═══════════════════════════════════════════════════════════════════════
             # FALLBACK STRATEGY: Versor unavailable or invalid response
             # ═══════════════════════════════════════════════════════════════════════
@@ -239,7 +241,7 @@ class QuaternionBuilder:
             #   1. Log warning (ops team can investigate)
             #   2. Return identity quaternion [1, 0, 0, 0]
             #   3. System remains functional (degraded mode)
-            logger.warning(f"Versor API call failed: {e}, using fallback")
+            logger.warning("Versor API call failed: %s, using fallback", e)
             return [1.0, 0.0, 0.0, 0.0]  # Identity quaternion (no rotation)
 
     def _from_vac_direct(self, vac: List[float]) -> List[float]:
@@ -258,7 +260,12 @@ class QuaternionBuilder:
         quaternion = vac_vector.to_quaternion()
 
         # Return as list [w, x, y, z] with native Python floats
-        return [float(quaternion.w), float(quaternion.x), float(quaternion.y), float(quaternion.z)]
+        return [
+            float(quaternion.w),
+            float(quaternion.x),
+            float(quaternion.y),
+            float(quaternion.z),
+        ]
 
     def _validate_vac(self, vac: List[float]) -> None:
         """Validate VAC coordinates.
@@ -273,7 +280,7 @@ class QuaternionBuilder:
             raise ValueError(f"VAC must have 3 components, got {len(vac)}")
 
         labels = ["valence", "arousal", "connection"]
-        for i, (value, label) in enumerate(zip(vac, labels)):
+        for _, (value, label) in enumerate(zip(vac, labels)):
             if not -1.0 <= value <= 1.0:
                 raise ValueError(f"{label} must be in range [-1.0, 1.0], got {value}")
 
@@ -317,7 +324,7 @@ class QuaternionBuilder:
 
 
 # Singleton instance
-_quaternion_builder_instance = None
+_QUATERNION_BUILDER_INSTANCE = None
 
 
 def get_quaternion_builder() -> QuaternionBuilder:
@@ -326,9 +333,9 @@ def get_quaternion_builder() -> QuaternionBuilder:
     Returns:
         QuaternionBuilder instance
     """
-    global _quaternion_builder_instance
+    global _QUATERNION_BUILDER_INSTANCE  # pylint: disable=global-statement
 
-    if _quaternion_builder_instance is None:
-        _quaternion_builder_instance = QuaternionBuilder()
+    if _QUATERNION_BUILDER_INSTANCE is None:
+        _QUATERNION_BUILDER_INSTANCE = QuaternionBuilder()
 
-    return _quaternion_builder_instance
+    return _QUATERNION_BUILDER_INSTANCE

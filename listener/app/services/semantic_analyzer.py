@@ -48,7 +48,8 @@ from app.services.llm_factory import get_llm
 from app.services.model_fetcher import get_model_fetcher
 
 # Default Prompt (Fallback)
-DEFAULT_SYSTEM_MESSAGE = """You are the Listener, an expert psychometrician trained in emotional analysis.
+DEFAULT_SYSTEM_MESSAGE = """You are the Listener, an expert psychometrician trained in \
+emotional analysis.
 
 Your task is to analyze text and map it to the 3-dimensional VAC Model:
 - **Valence** (X-axis): Pleasure (+1) to Displeasure (-1)
@@ -89,7 +90,14 @@ Analysis:
 - Valence: Slightly negative (witnessing suffering) → -0.3
 - Arousal: Low (reflective, not active) → -0.1
 - Connection: NEGATIVE (feeling FOR, not WITH - creates separation, condescension) → -0.7
-Output: {{"primary_emotion": "Pity", "category": "Places We Go With Others", "vac": {{"valence": -0.3, "arousal": -0.1, "connection": -0.7}}, "confidence": 0.9, "reasoning": "Pity is characterized by separation. The phrase 'for them' indicates distance and lack of shared experience."}}
+Output: {{
+  "primary_emotion": "Pity",
+  "category": "Places We Go With Others",
+  "vac": {{"valence": -0.3, "arousal": -0.1, "connection": -0.7}},
+  "confidence": 0.9,
+  "reasoning": "Pity is characterized by separation. The phrase 'for them' indicates \
+distance and lack of shared experience."
+}}
 
 Example 2 - COMPASSION (feeling WITH):
 Input: "I understand their pain. I'm here for them."
@@ -97,11 +105,24 @@ Analysis:
 - Valence: Neutral to slightly positive (offering support) → 0.5
 - Arousal: Low to moderate (calm presence) → 0.2
 - Connection: POSITIVE (feeling WITH - shared humanity, alignment) → 0.9
-Output: {{"primary_emotion": "Compassion", "category": "Places We Go With Others", "vac": {{"valence": 0.5, "arousal": 0.2, "connection": 0.9}}, "confidence": 0.95, "reasoning": "Compassion involves feeling with someone. The commitment 'I'm here' shows connection and solidarity."}}
+Output: {{
+  "primary_emotion": "Compassion",
+  "category": "Places We Go With Others",
+  "vac": {{"valence": 0.5, "arousal": 0.2, "connection": 0.9}},
+  "confidence": 0.95,
+  "reasoning": "Compassion involves feeling with someone. The commitment 'I'm here' \
+shows connection and solidarity."
+}}
 
 Example 3 - JOY:
 Input: "I'm feeling amazing today, everything is clicking!"
-Output: {{"primary_emotion": "Joy", "category": "Places We Go When Life Is Good", "vac": {{"valence": 0.9, "arousal": 0.7, "connection": 0.8}}, "confidence": 0.92, "reasoning": "High positive affect, energized, sense of flow and connection to life."}}
+Output: {{
+  "primary_emotion": "Joy",
+  "category": "Places We Go When Life Is Good",
+  "vac": {{"valence": 0.9, "arousal": 0.7, "connection": 0.8}},
+  "confidence": 0.92,
+  "reasoning": "High positive affect, energized, sense of flow and connection to life."
+}}
 
 Example 4 - GRIEF (negative valence but POSITIVE connection):
 Input: "I miss them so much. The pain is overwhelming."
@@ -109,15 +130,36 @@ Analysis:
 - Valence: Very negative (pain, loss) → -0.8
 - Arousal: Low (heavy, weighted) → -0.3
 - Connection: POSITIVE (love persists despite loss) → 0.7
-Output: {{"primary_emotion": "Grief", "category": "Places We Go When Things Don't Go As Planned", "vac": {{"valence": -0.8, "arousal": -0.3, "connection": 0.7}}, "confidence": 0.88, "reasoning": "Grief involves profound pain but the connection through love remains. Missing someone shows the bond endures."}}
+Output: {{
+  "primary_emotion": "Grief",
+  "category": "Places We Go When Things Don't Go As Planned",
+  "vac": {{"valence": -0.8, "arousal": -0.3, "connection": 0.7}},
+  "confidence": 0.88,
+  "reasoning": "Grief involves profound pain but the connection through love remains. \
+Missing someone shows the bond endures."
+}}
 
 Example 5 - LONELINESS:
 Input: "I feel so alone. Nobody gets me."
-Output: {{"primary_emotion": "Loneliness", "category": "Places We Go When We Search for Connection", "vac": {{"valence": -0.7, "arousal": -0.2, "connection": -0.9}}, "confidence": 0.93, "reasoning": "Deep disconnection is the defining feature of loneliness. The feeling of not being understood amplifies isolation."}}
+Output: {{
+  "primary_emotion": "Loneliness",
+  "category": "Places We Go When We Search for Connection",
+  "vac": {{"valence": -0.7, "arousal": -0.2, "connection": -0.9}},
+  "confidence": 0.93,
+  "reasoning": "Deep disconnection is the defining feature of loneliness. The \
+feeling of not being understood amplifies isolation."
+}}
 
 Example 6 - OVERWHELM:
 Input: "I'm feeling overwhelmed by everything."
-Output: {{"primary_emotion": "Overwhelm", "category": "Places We Go When Things Are Uncertain", "vac": {{"valence": -0.6, "arousal": 0.9, "connection": -0.3}}, "confidence": 0.85, "reasoning": "High arousal (too much to handle), negative valence (stress), moderate disconnection (feeling lost)."}}
+Output: {{
+  "primary_emotion": "Overwhelm",
+  "category": "Places We Go When Things Are Uncertain",
+  "vac": {{"valence": -0.6, "arousal": 0.9, "connection": -0.3}},
+  "confidence": 0.85,
+  "reasoning": "High arousal (too much to handle), negative valence (stress), \
+moderate disconnection (feeling lost)."
+}}
 
 Now analyze the following input. Respond with ONLY valid JSON, no additional text:"""
 
@@ -250,9 +292,9 @@ class SemanticAnalyzer:
                 self.model = loop.run_until_complete(
                     fetcher.get_model_for_function("semantic_vac", settings.OLLAMA_MODEL)
                 )
-                logger.info(f"Using dynamically assigned model for semantic_vac: {self.model}")
+                logger.info("Using dynamically assigned model for semantic_vac: %s", self.model)
             except Exception as e:
-                logger.warning(f"Failed to fetch dynamic model, using default: {e}")
+                logger.warning("Failed to fetch dynamic model, using default: %s", e)
                 self.model = settings.OLLAMA_MODEL
         else:
             self.model = model or settings.OLLAMA_MODEL
@@ -283,7 +325,7 @@ class SemanticAnalyzer:
         # Given the bottleneck is LLM inference, checking cache in analyze() is fine.
 
         logger.info(
-            f"SemanticAnalyzer initialized: model={self.model}, " f"temperature={self.temperature}"
+            "SemanticAnalyzer initialized: model=%s, temperature=%s", self.model, self.temperature
         )
 
     def _create_default_prompt(self) -> ChatPromptTemplate:
@@ -312,20 +354,22 @@ class SemanticAnalyzer:
                 self.prompt = ChatPromptTemplate.from_messages(
                     [("system", system_msg), ("user", user_msg)]
                 )
-                logger.debug(f"Updated prompt to version {prompt_data.get('version')}")
+                logger.debug("Updated prompt to version %s", prompt_data.get("version"))
 
         except Exception as e:
-            logger.warning(f"Failed to refresh prompt: {e}")
+            logger.warning("Failed to refresh prompt: %s", e)
 
         # _create_prompt removed as it is replaced by _create_default_prompt and dynamic fetching
 
         logger.info(
-            f"SemanticAnalyzer initialized: model={self.model}, " f"temperature={self.temperature}"
+            "SemanticAnalyzer initialized: model=%s, temperature=%s", self.model, self.temperature
         )
 
     # _create_prompt is removed/replaced
 
-    async def analyze(self, text: str) -> EmotionalClassification:
+    async def analyze(
+        self, text: str
+    ) -> EmotionalClassification:  # pylint: disable=too-many-locals
         """Extract VAC coordinates and emotion classification from text using LLM.
 
         This is the main pipeline method that transforms natural language into the VAC
@@ -371,7 +415,10 @@ class SemanticAnalyzer:
             >>> result = await analyzer.analyze("I'm feeling grateful for this opportunity")
             >>> print(result.primary_emotion)
             'Gratitude'
-            >>> print(f"VAC: ({result.vac.valence:.2f}, {result.vac.arousal:.2f}, {result.vac.connection:.2f})")
+            >>> print(
+            ...     f"VAC: ({result.vac.valence:.2f}, {result.vac.arousal:.2f}, "
+            ...     f"{result.vac.connection:.2f})"
+            ... )
             'VAC: (0.82, 0.35, 0.78)'
 
             Test the Connection axis (pity vs. compassion):
@@ -406,7 +453,8 @@ class SemanticAnalyzer:
             - Sync version: analyze_sync()
             - Tests: tests/semantic/test_connection_axis.py
             - API endpoint: app/api/routes/ingest.py::analyze_text()
-            - Documentation: docs/modules/listener/senior-developers/02-semantic-analysis-internals.md
+            - Documentation: docs/modules/listener/senior-developers/
+              02-semantic-analysis-internals.md
         """
         if not text or len(text.strip()) == 0:
             raise ValueError("Input text cannot be empty")
@@ -414,7 +462,7 @@ class SemanticAnalyzer:
         # Refresh prompt configuration (cached)
         await self._refresh_prompt()
 
-        logger.info(f"Analyzing text: {text[:100]}...")
+        logger.info("Analyzing text: %s...", text[:100])
         start_time = time.time()
 
         try:
@@ -429,7 +477,7 @@ class SemanticAnalyzer:
             response = await self.llm.ainvoke(prompt_str)
 
             # Parse JSON response
-            logger.debug(f"LLM response: {response[:200]}...")
+            logger.debug("LLM response: %s...", response[:200])
 
             # Clean response (remove markdown code blocks if present)
             cleaned_response = response.strip()
@@ -453,9 +501,16 @@ class SemanticAnalyzer:
                 result_dict = {
                     "primary_emotion": "Uncertainty",
                     "category": "Places We Go When Things Are Uncertain",
-                    "vac": {"valence": 0.0, "arousal": 0.0, "connection": 0.0},
+                    # Valence: 0.8 (Positive)
+                    # Arousal: 0.8 (Active)
+                    # Connection: 0.0 (Neutral/Self-focused)
+                    "vac": {"valence": 0.8, "arousal": 0.8, "connection": 0.0},
                     "confidence": 0.0,
-                    "reasoning": "Your message doesn't contain enough emotional content for analysis. Try describing what you're experiencing in more detail - what are you feeling, thinking, or going through?",
+                    "reasoning": (
+                        "Your message doesn't contain enough emotional content for "
+                        "analysis. Try describing what you're experiencing in more detail "
+                        "- what are you feeling, thinking, or going through?"
+                    ),
                 }
 
             # Validate and construct Pydantic model
@@ -463,21 +518,24 @@ class SemanticAnalyzer:
 
             analysis_time = time.time() - start_time
             logger.info(
-                f"Analysis complete: {result.primary_emotion} "
-                f"(VAC: {result.vac.valence:.2f}, {result.vac.arousal:.2f}, {result.vac.connection:.2f}) "
-                f"in {analysis_time:.2f}s"
+                "Analysis complete: %s (VAC: %.2f, %.2f, %.2f) in %.2fs",
+                result.primary_emotion,
+                result.vac.valence,  # pylint: disable=no-member
+                result.vac.arousal,  # pylint: disable=no-member
+                result.vac.connection,  # pylint: disable=no-member
+                analysis_time,
             )
 
             return result
 
         except json.JSONDecodeError as e:
-            logger.error(f"Failed to parse JSON response: {e}")
-            logger.error(f"Response was: {response}")
-            raise RuntimeError(f"Invalid JSON response from LLM: {e}")
+            logger.error("Failed to parse JSON response: %s", e)
+            logger.error("Response was: %s", response)
+            raise RuntimeError(f"Invalid JSON response from LLM: {e}") from e
 
         except Exception as e:
-            logger.error(f"Semantic analysis failed: {e}")
-            raise RuntimeError(f"Analysis error: {e}")
+            logger.error("Semantic analysis failed: %s", e)
+            raise RuntimeError(f"Analysis error: {e}") from e
 
     def analyze_sync(self, text: str) -> EmotionalClassification:
         """Synchronous version of analyze() for non-async contexts.
@@ -544,7 +602,7 @@ class SemanticAnalyzer:
 
 
 # Global service instance (singleton pattern)
-_analyzer_instance: Optional[SemanticAnalyzer] = None
+_ANALYZER_INSTANCE: Optional[SemanticAnalyzer] = None
 
 
 def get_semantic_analyzer() -> SemanticAnalyzer:
@@ -592,9 +650,9 @@ def get_semantic_analyzer() -> SemanticAnalyzer:
         - app/config.py for default settings
         - app/api/routes/ingest.py for usage examples
     """
-    global _analyzer_instance
+    global _ANALYZER_INSTANCE  # pylint: disable=global-statement
 
-    if _analyzer_instance is None:
-        _analyzer_instance = SemanticAnalyzer()
+    if _ANALYZER_INSTANCE is None:
+        _ANALYZER_INSTANCE = SemanticAnalyzer()
 
-    return _analyzer_instance
+    return _ANALYZER_INSTANCE

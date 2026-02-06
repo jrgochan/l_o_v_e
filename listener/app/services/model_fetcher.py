@@ -174,7 +174,7 @@ class ModelFetcher:
         if use_cache and function in self._cache:
             cache_age = time.time() - self._cache_time.get(function, 0)
             if cache_age < cache_ttl:
-                logger.debug(f"Using cached model for {function}: {self._cache[function]}")
+                logger.debug("Using cached model for %s: %s", function, self._cache[function])
                 return self._cache[function]
 
         # Fetch from Observer
@@ -191,13 +191,15 @@ class ModelFetcher:
                 self._cache[function] = model
                 self._cache_time[function] = time.time()
 
-                logger.info(f"Fetched model assignment for {function}: {model}")
+                logger.info("Fetched model assignment for %s: %s", function, model)
                 return model
 
         except Exception as e:
             logger.warning(
-                f"Failed to fetch model assignment for {function}: {e}. "
-                f"Using default: {default}"
+                "Failed to fetch model assignment for %s: %s. Using default: %s",
+                function,
+                e,
+                default,
             )
             return default
 
@@ -227,7 +229,7 @@ class ModelFetcher:
         if use_cache and function in self._prompt_cache:
             cache_age = time.time() - self._prompt_cache_time.get(function, 0)
             if cache_age < cache_ttl:
-                logger.debug(f"Using cached prompt for {function}")
+                logger.debug("Using cached prompt for %s", function)
                 return cast(Dict[str, Any], self._prompt_cache[function])
 
         # Fetch from Observer
@@ -252,16 +254,16 @@ class ModelFetcher:
                 self._prompt_cache[function] = prompt_data
                 self._prompt_cache_time[function] = time.time()
 
-                logger.info(f"Fetched prompt for {function} (v{prompt_data.get('version')})")
+                logger.info("Fetched prompt for %s (v%s)", function, prompt_data.get("version"))
                 return cast(Dict[str, Any], prompt_data)
 
-        except Exception as e:
-            logger.warning(f"Failed to fetch prompt for {function}: {e}")
+        except Exception as e:  # pylint: disable=broad-exception-caught
+            logger.warning("Failed to fetch prompt for %s: %s", function, e)
             return None
 
 
 # Global instance
-_fetcher_instance: Optional[ModelFetcher] = None
+_FETCHER_INSTANCE: Optional[ModelFetcher] = None
 
 
 def get_model_fetcher(observer_url: str = "http://localhost:8000") -> ModelFetcher:
@@ -273,9 +275,9 @@ def get_model_fetcher(observer_url: str = "http://localhost:8000") -> ModelFetch
     Returns:
         ModelFetcher instance
     """
-    global _fetcher_instance
+    global _FETCHER_INSTANCE  # pylint: disable=global-statement
 
-    if _fetcher_instance is None:
-        _fetcher_instance = ModelFetcher(observer_url)
+    if _FETCHER_INSTANCE is None:
+        _FETCHER_INSTANCE = ModelFetcher(observer_url)
 
-    return _fetcher_instance
+    return _FETCHER_INSTANCE

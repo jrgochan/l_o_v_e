@@ -1,166 +1,87 @@
+from unittest.mock import AsyncMock, patch
+from uuid import uuid4
 
 import pytest
-from unittest.mock import MagicMock, AsyncMock, patch
-from uuid import uuid4
-from sqlalchemy.ext.asyncio import AsyncSession
-from app.services.recommendation_engine import RecommendationEngine, CURATED_JOURNEYS
+
+from app.services.recommendation_engine import RecommendationEngine
+
 
 @pytest.fixture
 def mock_session():
-    # Remove spec=AsyncSession to avoid auto-creation of async mocks for internal attributes
-    # that might not be consumed/awaited, causing RuntimeWarnings.
     db = AsyncMock()
-    db.execute = AsyncMock(return_value=MagicMock())
-    db.add = MagicMock()
-    db.delete = MagicMock()
-    db.close = AsyncMock()
     return db
+
 
 @pytest.fixture
 def engine(mock_session):
-    return RecommendationEngine(mock_session)
+    # Mock initialization of components
+    with (
+        patch("app.services.recommendation.engine.CurationProvider") as MockCuration,
+        patch("app.services.recommendation.engine.SpatialAnalyzer") as MockSpatial,
+        patch("app.services.recommendation.engine.DiscoveryEngine") as MockDiscovery,
+    ):
 
-@pytest.mark.asyncio
-async def test_get_similar_emotions(engine, mock_session):
-    """Test VAC distance retrieval."""
-    
-    # Mock SQL result
-    # Columns: id, name, category, vac, distance
-    mock_rows = [
-        (uuid4(), "Joy", "Happiness", "[0.5, 0.5, 0.5]", 0.1),
-        (uuid4(), "Elation", "Happiness", "[0.6, 0.6, 0.6]", 0.2)
-    ]
-    
-    mock_result = MagicMock()
-    mock_result.fetchall.return_value = mock_rows
-    mock_session.execute.return_value = mock_result
-    
-    similar = await engine.get_similar_emotions(uuid4())
-    
-    assert len(similar) == 2
-    assert similar[0]["name"] == "Joy"
-    assert similar[0]["distance"] == 0.1
-    assert similar[0]["vac"] == [0.5, 0.5, 0.5]
+        e = RecommendationEngine(mock_session)
+        # Set instance mocks (since init creates them)
+        e.curation = MockCuration.return_value
+        e.spatial = MockSpatial.return_value
+        e.discovery = MockDiscovery.return_value
 
-@pytest.mark.asyncio
-async def test_get_curated_journeys(engine, mock_session):
-    """Test retrieving and filtering curated journeys."""
-    
-    # Mock emotion ID lookup
-    mock_ids_result = MagicMock()
-    mock_ids_result.fetchall.return_value = [(uuid4(),), (uuid4(),)]
-    mock_session.execute.return_value = mock_ids_result
-    
-    # 1. Healing Context
-    healing = await engine.get_curated_journeys("healing")
-    assert all(j["category"] == "healing" for j in healing)
-    assert len(healing) > 0
-    assert "emotion_ids" in healing[0]
-    
-    # 2. Growth Context
-    growth = await engine.get_curated_journeys("growth")
-    assert all(j["category"] == "growth" for j in growth)
+        # Ensure async methods are awaitable
+        e.curation.get_curated_journeys = AsyncMock()
+        e.spatial.get_similar_emotions = AsyncMock()
+        e.discovery.get_problematic_transitions = AsyncMock()
+        e.discovery.get_complementary_paths = AsyncMock()
 
-@pytest.mark.asyncio
-async def test_get_problematic_transitions(engine, mock_session):
-    """Test fetching difficult path queries."""
-    
-    # Columns: from, to, dist, diff, wp_count, bridge, from_name, from_cat, to_name, to_cat
-    mock_rows = [
-        (uuid4(), uuid4(), 3.5, "difficult", 5, True, "Rage", "Anger", "Peace", "Calm")
-    ]
-    
-    mock_result = MagicMock()
-    mock_result.fetchall.return_value = mock_rows
-    mock_session.execute.return_value = mock_result
-    
-    transitions = await engine.get_problematic_transitions()
-    
-    assert len(transitions) == 1
-    assert transitions[0]["from_name"] == "Rage"
-    assert transitions[0]["distance"] == 3.5
+        yield e
+
 
 @pytest.mark.asyncio
 async def test_get_recommendations_pipeline(engine):
-    """Test the orchestration method."""
-    
-    # Mock sub-methods to isolate orchestration logic
-    engine.get_similar_emotions = AsyncMock(return_value=["sim"])
-    engine.get_curated_journeys = AsyncMock(return_value=["curated"])
-    engine.get_problematic_transitions = AsyncMock(return_value=["prob"])
-    engine.get_complementary_paths = AsyncMock(return_value=["comp"])
-    
+    """Test the orchestration method delegates correctly."""
+
+    engine.spatial.get_similar_emotions = AsyncMock(return_value=["sim"])
+    engine.curation.get_curated_journeys = AsyncMock(return_value=["curated"])
+    engine.discovery.get_problematic_transitions = AsyncMock(return_value=["prob"])
+    engine.discovery.get_complementary_paths = AsyncMock(return_value=["comp"])
+
     # Case 1: Exploration
     recs = await engine.get_recommendations(
-        context="exploration", 
-        current_emotion_id=uuid4(),
-        selected_emotions=[uuid4()]
+        context="exploration", current_emotion_id=uuid4(), selected_emotions=[uuid4()]
     )
-    
-    assert "similar_emotions" in recs
-    assert "curated_journeys" in recs
-    assert "problematic_transitions" in recs
-    assert "complementary_suggestions" in recs
-    
+
+    assert recs["similar_emotions"] == ["sim"]
+    assert recs["curated_journeys"] == ["curated"]
+    assert recs["problematic_transitions"] == ["prob"]
+    assert recs["complementary_suggestions"] == ["comp"]
+
     # Case 2: Healing (filters out problematic)
     recs_healing = await engine.get_recommendations(context="healing")
     assert "problematic_transitions" not in recs_healing
 
-@pytest.mark.asyncio
-async def test_complementary_paths(engine):
-    """Test bridge loop logic."""
-    
-    # Mock internal helpers which we didn't fully see but can patch
-    with patch.object(engine, '_suggest_bridges', new_callable=AsyncMock) as mock_bridges, \
-         patch.object(engine, '_suggest_triangle_completion', new_callable=AsyncMock) as mock_triangle, \
-         patch.object(engine, '_suggest_opposites', new_callable=AsyncMock) as mock_opposite:
-         
-        mock_bridges.return_value = ["bridge"]
-        mock_triangle.return_value = ["triangle"]
-        mock_opposite.return_value = ["opposite"]
-        
-        # 1. No selections
-        empty = await engine.get_complementary_paths([])
-        assert empty == []
-        
 
 @pytest.mark.asyncio
-async def test_recommendation_curated_journeys_context():
-    engine = RecommendationEngine(AsyncMock())
-    mock_result = MagicMock()
-    mock_result.fetchall.return_value = [(uuid4(),), (uuid4(),)]
-    engine.session.execute.return_value = mock_result
-    healing = await engine.get_curated_journeys(context="healing")
-    assert len(healing) > 0
+async def test_get_similar_emotions_delegation(engine):
+    """Test direct delegation."""
+    eid = uuid4()
+    await engine.get_similar_emotions(eid, 5)
+    engine.spatial.get_similar_emotions.assert_awaited_with(eid, 5)
+
 
 @pytest.mark.asyncio
-async def test_recommendation_curated_journeys_no_context():
-    engine = RecommendationEngine(AsyncMock())
-    mock_result = MagicMock()
-    mock_result.fetchall.return_value = []
-    engine.session.execute.return_value = mock_result
-    all_journeys = await engine.get_curated_journeys(context=None)
-    assert len(all_journeys) == len(CURATED_JOURNEYS)
+async def test_get_problematic_transitions_delegation(engine):
+    await engine.get_problematic_transitions(10)
+    engine.discovery.get_problematic_transitions.assert_awaited_with(10)
+
 
 @pytest.mark.asyncio
-async def test_recommendation_complementary_paths_triangle():
-    mock_db = AsyncMock()
-    engine = RecommendationEngine(mock_db)
-    engine._suggest_bridges = AsyncMock(return_value=[])
-    engine._suggest_triangle_completion = AsyncMock(return_value=[{"name": "Triangle"}])
-    engine._suggest_opposites = AsyncMock(return_value=[])
-    selected = [uuid4(), uuid4()]
-    result = await engine.get_complementary_paths(selected_emotions=selected)
-    engine._suggest_triangle_completion.assert_called_once()
-    assert len(result) == 1
+async def test_get_curated_journeys_delegation(engine):
+    await engine.get_curated_journeys("ctx")
+    engine.curation.get_curated_journeys.assert_awaited_with("ctx")
+
 
 @pytest.mark.asyncio
-async def test_recommendation_complementary_paths_single():
-    mock_db = AsyncMock()
-    engine = RecommendationEngine(mock_db)
-    engine._suggest_bridges = AsyncMock(return_value=[])
-    engine._suggest_opposites = AsyncMock(return_value=[])
-    engine._suggest_triangle_completion = AsyncMock(return_value=[])
-    selected = [uuid4()]
-    result = await engine.get_complementary_paths(selected_emotions=selected)
-    engine._suggest_triangle_completion.assert_not_called()
+async def test_get_complementary_paths_delegation(engine):
+    sel = [uuid4()]
+    await engine.get_complementary_paths(sel, 5)
+    engine.discovery.get_complementary_paths.assert_awaited_with(sel, 5)

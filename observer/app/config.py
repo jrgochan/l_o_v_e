@@ -12,10 +12,12 @@ from pydantic_settings import SettingsConfigDict
 try:
     from settings import LoveBaseSettings
 except ImportError:
-    from pydantic_settings import BaseSettings as LoveBaseSettings
+    from pydantic_settings import (
+        BaseSettings as LoveBaseSettings,  # pylint: disable=ungrouped-imports
+    )
 
 
-class Settings(LoveBaseSettings):
+class Settings(LoveBaseSettings):  # pylint: disable=invalid-name
     """Application settings loaded from environment variables."""
 
     # ============================================================================
@@ -92,7 +94,11 @@ class Settings(LoveBaseSettings):
             return result
         except json.JSONDecodeError:
             # Fallback to comma-separated string
-            return [origin.strip() for origin in self.ALLOWED_ORIGINS.split(",") if origin.strip()]
+            return [
+                origin.strip()
+                for origin in self.ALLOWED_ORIGINS.split(",")  # pylint: disable=no-member
+                if origin.strip()
+            ]
 
     # ============================================================================
     # PERFORMANCE TUNING
@@ -127,7 +133,9 @@ class Settings(LoveBaseSettings):
         return self
 
     model_config = SettingsConfigDict(
-        env_file=(".env", "../../infra/config/base.env"), case_sensitive=True, extra="ignore"
+        env_file=(".env", "../../infra/config/base.env"),
+        case_sensitive=True,
+        extra="ignore",
     )
 
 

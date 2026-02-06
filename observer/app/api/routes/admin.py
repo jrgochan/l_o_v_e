@@ -23,11 +23,7 @@ from app.models.transition_strategy import TransitionStrategy
 from app.models.user import User
 from app.models.user_trajectory import UserTrajectory
 from app.schemas.ai_models import ModelAssignmentResponse, ModelAssignmentUpdate
-from app.schemas.bootstrap import (
-    BootstrapDataCreate,
-    BootstrapDataResponse,
-    BootstrapDataUpdate,
-)
+from app.schemas.bootstrap import BootstrapDataCreate, BootstrapDataResponse, BootstrapDataUpdate
 from app.schemas.emotions import EmotionResponse, EmotionUpdate
 from app.schemas.prompts import (
     PromptTemplateCreate,
@@ -35,10 +31,7 @@ from app.schemas.prompts import (
     PromptTemplateUpdate,
     PromptTestRequest,
 )
-from app.schemas.strategies import (
-    StrategyResponse,
-    StrategyUpdate,
-)
+from app.schemas.strategies import StrategyResponse, StrategyUpdate
 from app.schemas.user import UserResponse, UserUpdate
 from app.services.prompt_service import PromptService, get_prompt_service
 
@@ -99,7 +92,7 @@ async def update_user(
     # but for admin helper we might want to reset password.
     # For now, excluding password update from this generic update for safety
     if "password" in update_data:
-        from app.core.security import get_password_hash
+        from app.core.security import get_password_hash  # pylint: disable=import-outside-toplevel
 
         update_data["password_hash"] = get_password_hash(update_data.pop("password"))
 
@@ -171,15 +164,17 @@ async def list_sessions(
 ) -> Any:
     """List all chat sessions (paginated)."""
     # Get total count
-    from sqlalchemy import func
+    # Get total count
+    from sqlalchemy import func  # pylint: disable=import-outside-toplevel
 
     count_stmt = select(func.count(ChatSession.id))  # pylint: disable=not-callable
     count_res = await db.execute(count_stmt)
     total = count_res.scalar()
 
     # Get sessions with user info
+    # Get sessions with user info
     # We want to eager load the user if possible, but user relationship is optional
-    from sqlalchemy.orm import selectinload
+    from sqlalchemy.orm import selectinload  # pylint: disable=import-outside-toplevel
 
     stmt = (
         select(ChatSession)
@@ -207,7 +202,8 @@ async def get_session_details(
     current_admin: Annotated[User, Depends(get_current_admin)],
 ) -> Any:
     """Get full details of a session including messages."""
-    from sqlalchemy.orm import selectinload
+    """Get full details of a session including messages."""
+    from sqlalchemy.orm import selectinload  # pylint: disable=import-outside-toplevel
 
     stmt = (
         select(ChatSession)
@@ -274,8 +270,9 @@ async def update_atlas_emotion(
     update_data = emotion_in.model_dump(exclude_unset=True)
 
     # 1. Handle VAC Change -> Recalculate Quaternion
+    # 1. Handle VAC Change -> Recalculate Quaternion
     if "vac_vector" in update_data:
-        from app.services import get_quaternion_builder
+        from app.services import get_quaternion_builder  # pylint: disable=import-outside-toplevel
 
         try:
             qb = get_quaternion_builder()
@@ -289,9 +286,10 @@ async def update_atlas_emotion(
             raise HTTPException(status_code=400, detail=f"Failed to calculate quaternion: {str(e)}")
 
     # 2. Handle Definition Change -> Recalculate Embedding
-    # Note: If name changed, we'd need that too, but name is not in Update schema currently (immutable identity)
+    # Note: If name changed, we'd need that too, but name is not in Update schema currently
+    # (immutable identity)
     if "definition" in update_data:
-        from app.services import get_embedding_service
+        from app.services import get_embedding_service  # pylint: disable=import-outside-toplevel
 
         try:
             es = get_embedding_service()
@@ -362,7 +360,8 @@ async def import_atlas_data(
     if "emotions" not in import_data or not isinstance(import_data["emotions"], list):
         raise HTTPException(status_code=400, detail="Invalid format: missing 'emotions' list")
 
-    from app.services import get_embedding_service, get_quaternion_builder
+    from app.services import get_embedding_service  # pylint: disable=import-outside-toplevel
+    from app.services import get_quaternion_builder
 
     es = get_embedding_service()
     qb = get_quaternion_builder()
@@ -506,8 +505,8 @@ async def export_strategies(
 @router.post("/strategies/import", response_model=dict)
 async def import_strategies(
     data: Dict[str, Any],
-    db: AsyncSession = Depends(get_db),
-    current_user: User = Depends(get_current_admin),
+    db: Annotated[AsyncSession, Depends(get_db)],
+    current_user: Annotated[User, Depends(get_current_admin)],
 ) -> Dict[str, Any]:
     """Import strategies from JSON."""
     if "strategies" not in data:
@@ -520,7 +519,8 @@ async def import_strategies(
 
     for item in strategies_list:
         try:
-            # Check if strategy exists by name (unique constraint usually on name or we use it as key)
+            # Check if strategy exists by name (unique constraint usually on name)
+            # or we use it as key
             strategy_name = item.get("name") or item.get("strategy_name")
             if not strategy_name:
                 continue
@@ -561,7 +561,7 @@ async def import_strategies(
     try:
         await db.commit()
     except Exception as e:
-        logger.error(f"Commit failed for strategies: {e}")
+        logger.error("Commit failed for strategies: %s", e)
         # If commit fails, we might have partial state or rollback needed
         # For this bulk op, just reporting it is safest fallback
         errors.append(f"Commit failed: {str(e)}")
@@ -602,7 +602,8 @@ async def update_ai_model(
 
     if not assignment:
         # If it doesn't exist yet (e.g. first time config), create it
-        # Note: assigned_by should ideally be user ID, but using email content for now or just string
+        # Note: assigned_by should ideally be user ID, but using email content for now or just
+        # string
         assignment = ModelAssignment(
             function=function,
             ai_model_name=update_data.ai_model_name,
@@ -636,7 +637,8 @@ async def list_clinical_alerts(
 
     Optional filter by severity level.
     """
-    from sqlalchemy import func
+
+    from sqlalchemy import func  # pylint: disable=import-outside-toplevel
 
     # Base query
     query = select(ClinicalAlert)
@@ -675,7 +677,7 @@ async def list_bootstrap_data(
     data_type: Optional[str] = None,
 ) -> Any:
     """List bootstrap data items (optional filter by type)."""
-    from app.models.bootstrap_data import BootstrapData
+    from app.models.bootstrap_data import BootstrapData  # pylint: disable=import-outside-toplevel
 
     stmt = select(BootstrapData)
     if data_type:
@@ -693,7 +695,7 @@ async def create_bootstrap_data(
     current_admin: Annotated[User, Depends(get_current_admin)],
 ) -> Any:
     """Create new bootstrap data item."""
-    from app.models.bootstrap_data import BootstrapData
+    from app.models.bootstrap_data import BootstrapData  # pylint: disable=import-outside-toplevel
 
     item = BootstrapData(
         data_type=data_in.data_type,
@@ -714,7 +716,7 @@ async def update_bootstrap_data(
     current_admin: Annotated[User, Depends(get_current_admin)],
 ) -> Any:
     """Update bootstrap data item."""
-    from app.models.bootstrap_data import BootstrapData
+    from app.models.bootstrap_data import BootstrapData  # pylint: disable=import-outside-toplevel
 
     stmt = select(BootstrapData).where(BootstrapData.id == item_id)
     result = await db.execute(stmt)
@@ -740,7 +742,7 @@ async def delete_bootstrap_data(
     current_admin: Annotated[User, Depends(get_current_admin)],
 ) -> Any:
     """Delete bootstrap data item."""
-    from app.models.bootstrap_data import BootstrapData
+    from app.models.bootstrap_data import BootstrapData  # pylint: disable=import-outside-toplevel
 
     stmt = select(BootstrapData).where(BootstrapData.id == item_id)
     result = await db.execute(stmt)
@@ -761,9 +763,9 @@ async def delete_bootstrap_data(
 
 @router.get("/prompts", response_model=List[PromptTemplateResponse])
 async def list_prompts(
+    prompt_service: Annotated[PromptService, Depends(get_prompt_service)],
+    current_admin: Annotated[User, Depends(get_current_admin)],
     function_name: Optional[str] = None,
-    prompt_service: PromptService = Depends(get_prompt_service),
-    current_admin: User = Depends(get_current_admin),
 ) -> Any:
     """List prompt templates."""
     return await prompt_service.list_prompts(function_name)
@@ -772,8 +774,8 @@ async def list_prompts(
 @router.post("/prompts", response_model=PromptTemplateResponse)
 async def create_prompt(
     prompt_in: PromptTemplateCreate,
-    prompt_service: PromptService = Depends(get_prompt_service),
-    current_admin: User = Depends(get_current_admin),
+    prompt_service: Annotated[PromptService, Depends(get_prompt_service)],
+    current_admin: Annotated[User, Depends(get_current_admin)],
 ) -> Any:
     """Create a new prompt template version."""
     return await prompt_service.create_prompt(
@@ -791,8 +793,8 @@ async def create_prompt(
 async def update_prompt(
     prompt_id: UUID,
     prompt_in: PromptTemplateUpdate,
-    prompt_service: PromptService = Depends(get_prompt_service),
-    current_admin: User = Depends(get_current_admin),
+    prompt_service: Annotated[PromptService, Depends(get_prompt_service)],
+    current_admin: Annotated[User, Depends(get_current_admin)],
 ) -> Any:
     """Update a prompt template."""
     updated = await prompt_service.update_prompt(
@@ -810,17 +812,8 @@ async def test_prompt_render(
     request: PromptTestRequest,
     current_admin: Annotated[User, Depends(get_current_admin)],
 ) -> Any:
-    """Test render a prompt template with variables.
-
-    Does not save anything.
-    """
     try:
-        # Use Jinja2 or simple format
-        # For now assuming langchain style f-string format or simple replacement
-        # if using format(), need to be careful about braces
-
         # Simple implementation using python formatting
-        # In real usage, we might want to stick to what LangChain uses (f-strings usually)
         rendered = request.template_content.format(**request.input_variables)
         return {"rendered_content": rendered}
     except KeyError as e:

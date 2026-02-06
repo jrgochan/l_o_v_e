@@ -100,7 +100,7 @@ active_pulls: Dict[str, Any] = {}
 
 @router.get("/local", response_model=List[ModelInfo])
 async def list_local_models(
-    current_user: dict[str, Any] = Depends(get_current_user),  # pylint: disable=unused-argument
+    current_user: dict[str, Any] = Depends(get_current_user),  # noqa: B008
 ) -> List[ModelInfo]:
     """List all Ollama models currently installed locally.
 
@@ -112,22 +112,22 @@ async def list_local_models(
         models = await ollama.list_local_models()
         await ollama.close()
         return models
-    except Exception as e:
-        logger.error(f"Failed to list local models: {e}")
-        raise HTTPException(status_code=500, detail=f"Failed to list models: {str(e)}")
+    except Exception as e:  # pylint: disable=broad-exception-caught
+        logger.error("Failed to list local models: %s", e)
+        raise HTTPException(status_code=500, detail=f"Failed to list models: {str(e)}") from e
 
 
 @router.post("/pull", response_model=PullModelResponse)
 async def start_model_pull(
     request: PullModelRequest,
-    current_user: dict[str, Any] = Depends(get_current_user),  # pylint: disable=unused-argument
+    current_user: dict[str, Any] = Depends(get_current_user),  # noqa: B008
 ) -> PullModelResponse:
     """Start pulling (downloading) a model from Ollama registry.
 
     Returns task_id for tracking progress via WebSocket.
     """
     try:
-        import uuid
+        import uuid  # pylint: disable=import-outside-toplevel
 
         task_id = str(uuid.uuid4())
 
@@ -138,19 +138,19 @@ async def start_model_pull(
             "progress": None,
         }
 
-        logger.info(f"Starting pull for model {request.name}, task_id: {task_id}")
+        logger.info("Starting pull for model %s, task_id: %s", request.name, task_id)
 
         return PullModelResponse(task_id=task_id, ai_model_name=request.name, status="started")
-    except Exception as e:
-        logger.error(f"Failed to start model pull: {e}")
-        raise HTTPException(status_code=500, detail=f"Failed to start pull: {str(e)}")
+    except Exception as e:  # pylint: disable=broad-exception-caught
+        logger.error("Failed to start model pull: %s", e)
+        raise HTTPException(status_code=500, detail=f"Failed to start pull: {str(e)}") from e
 
 
 @router.websocket("/pull/{task_id}")
 async def stream_pull_progress(
     websocket: WebSocket,
     task_id: str,
-    current_user: dict[str, Any] = Depends(get_current_user_ws),  # pylint: disable=unused-argument
+    current_user: dict[str, Any] = Depends(get_current_user_ws),  # noqa: B008
 ) -> None:
     """Websocket endpoint for streaming model pull progress.
 
@@ -191,8 +191,8 @@ async def stream_pull_progress(
                     break
         except WebSocketDisconnect:
             raise  # Re-raise to be caught by outer handler
-        except Exception as e:
-            logger.error(f"Error during model pull: {e}")
+        except Exception as e:  # pylint: disable=broad-exception-caught
+            logger.error("Error during model pull: %s", e)
             await websocket.send_json({"task_id": task_id, "status": "error", "error": str(e)})
         finally:
             await ollama.close()
@@ -210,7 +210,7 @@ async def stream_pull_progress(
 @router.delete("/{model_name}")
 async def delete_model(
     model_name: str,
-    current_user: dict[str, Any] = Depends(get_current_user),  # pylint: disable=unused-argument
+    current_user: dict[str, Any] = Depends(get_current_user),  # noqa: B008
 ) -> Dict[str, Any]:
     """Delete a model from local storage.
 
@@ -225,17 +225,17 @@ async def delete_model(
         result = await ollama.delete_model(model_name)
         await ollama.close()
 
-        logger.info(f"Deleted model {model_name}")
+        logger.info("Deleted model %s", model_name)
         return {"status": "success", "model": model_name, "result": result}
-    except Exception as e:
-        logger.error(f"Failed to delete model {model_name}: {e}")
-        raise HTTPException(status_code=500, detail=f"Failed to delete model: {str(e)}")
+    except Exception as e:  # pylint: disable=broad-exception-caught
+        logger.error("Failed to delete model %s: %s", model_name, e)
+        raise HTTPException(status_code=500, detail=f"Failed to delete model: {str(e)}") from e
 
 
 @router.get("/{model_name}/details", response_model=ModelDetails)
 async def get_model_details(
     model_name: str,
-    current_user: dict[str, Any] = Depends(get_current_user),  # pylint: disable=unused-argument
+    current_user: dict[str, Any] = Depends(get_current_user),  # noqa: B008
 ) -> ModelDetails:
     """Get detailed information about a specific model.
 
@@ -250,14 +250,14 @@ async def get_model_details(
         details = await ollama.get_model_details(model_name)
         await ollama.close()
         return details
-    except Exception as e:
-        logger.error(f"Failed to get details for {model_name}: {e}")
-        raise HTTPException(status_code=404, detail=f"Model not found or error: {str(e)}")
+    except Exception as e:  # pylint: disable=broad-exception-caught
+        logger.error("Failed to get details for %s: %s", model_name, e)
+        raise HTTPException(status_code=404, detail=f"Model not found or error: {str(e)}") from e
 
 
 @router.get("/health")
 async def check_ollama_health(
-    current_user: dict[str, Any] = Depends(get_current_user),  # pylint: disable=unused-argument
+    current_user: dict[str, Any] = Depends(get_current_user),  # noqa: B008
 ) -> Dict[str, str]:
     """Check if Ollama is running and accessible.
 
@@ -273,5 +273,6 @@ async def check_ollama_health(
             return {"status": "ok", "ollama": "running"}
 
         return {"status": "error", "ollama": "not running"}
-    except Exception as e:
+        return {"status": "error", "ollama": "not running"}
+    except Exception as e:  # pylint: disable=broad-exception-caught
         return {"status": "error", "ollama": "not accessible", "error": str(e)}

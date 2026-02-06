@@ -472,7 +472,7 @@ class UserTrajectory(Base):
             "timestamp": self.timestamp.isoformat() if self.timestamp else None,
             "input_transcription": self.input_transcription,
             "vac_values": list(self.vac_values) if self.vac_values else None,
-            "quaternion_state": list(self.quaternion_state) if self.quaternion_state else None,
+            "quaternion_state": (list(self.quaternion_state) if self.quaternion_state else None),
             "dominant_emotion_id": (
                 str(self.dominant_emotion_id) if self.dominant_emotion_id else None
             ),

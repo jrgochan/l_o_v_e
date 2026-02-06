@@ -16,16 +16,35 @@ jest.mock("@love/experience-shared", () => ({
   NEUTRAL_VAC: [0, 0, 0],
 }));
 
+// Mock therapeutic service
+jest.mock("@/services/therapeuticService", () => ({
+  therapeuticService: {
+    findAlternativePaths: jest.fn().mockResolvedValue({ paths: [] }),
+  },
+}));
+
 describe("useGoalSettingLogic", () => {
   const mockLoadEmotionAtlas = jest.fn();
   const mockGenerateTransitionPath = jest.fn();
   const mockStartJourney = jest.fn();
+
+  const mockPath = {
+    path_id: "test",
+    waypoints: [],
+    path_metrics: {},
+    current_state: {},
+    goal_state: {},
+  };
 
   beforeEach(() => {
     jest.clearAllMocks();
     act(() => {
       useExperienceStore.getState().reset();
     });
+
+    // Mock therapeutic service default response
+    const { therapeuticService } = require("@/services/therapeuticService");
+    therapeuticService.findAlternativePaths.mockResolvedValue({ paths: [mockPath] });
 
     (getObserverClient as jest.Mock).mockReturnValue({
       loadEmotionAtlas: mockLoadEmotionAtlas,
@@ -89,6 +108,7 @@ describe("useGoalSettingLogic", () => {
       await result.current.handleGeneratePath();
     });
 
+    expect(mockGenerateTransitionPath).toHaveBeenCalled();
     expect(result.current.error).toBe("Failed to generate path");
   });
 
@@ -122,6 +142,7 @@ describe("useGoalSettingLogic", () => {
       await result.current.handleGeneratePath();
     });
 
+    expect(mockGenerateTransitionPath).toHaveBeenCalled();
     expect(result.current.error).toBe("Gen Fail");
   });
 

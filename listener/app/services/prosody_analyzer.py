@@ -159,7 +159,7 @@ class ProsodyAnalyzer:
         Returns:
             Dictionary with prosody features
         """
-        logger.info(f"Analyzing prosody for: {audio_path}")
+        logger.info("Analyzing prosody for: %s", audio_path)
 
         if not self.librosa_available:
             return self._get_mock_prosody()
@@ -172,7 +172,7 @@ class ProsodyAnalyzer:
             # Convert sample rate to int (it's always a whole number conceptually)
             sr = int(sr_float)
 
-            logger.debug(f"Audio loaded: duration={duration:.2f}s, sr={sr}Hz")
+            logger.debug("Audio loaded: duration=%.2fs, sr=%dHz", duration, sr)
 
             # Extract basic prosody
             prosody: Dict[str, Any] = {}
@@ -199,13 +199,15 @@ class ProsodyAnalyzer:
             prosody["interpretation"] = self._interpret_prosody(prosody)
 
             logger.info(
-                f"Prosody analysis complete: pitch={prosody.get('pitch_mean', 0):.1f}Hz, energy={prosody.get('energy', 0):.2f}"
+                "Prosody analysis complete: pitch=%.1fHz, energy=%.2f",
+                prosody.get("pitch_mean", 0),
+                prosody.get("energy", 0),
             )
 
             return prosody
 
-        except Exception as e:
-            logger.error(f"Prosody analysis failed: {e}", exc_info=True)
+        except Exception as e:  # pylint: disable=broad-exception-caught
+            logger.error("Prosody analysis failed: %s", e, exc_info=True)
             return self._get_mock_prosody()
 
     def _extract_pitch(self, y: NDArray[np.float32], sr: int) -> Dict[str, float]:
@@ -291,8 +293,8 @@ class ProsodyAnalyzer:
                 "pitch_range": 0.0,
             }
 
-        except Exception as e:
-            logger.error(f"Pitch extraction failed: {e}")
+        except Exception as e:  # pylint: disable=broad-exception-caught
+            logger.error("Pitch extraction failed: %s", e)
             return {}
 
     def _extract_energy(self, y: NDArray[np.float32]) -> Dict[str, float]:
@@ -340,8 +342,8 @@ class ProsodyAnalyzer:
                 "energy_max": float(np.max(rms)),  # Peak intensity
             }
 
-        except Exception as e:
-            logger.error(f"Energy extraction failed: {e}")
+        except Exception as e:  # pylint: disable=broad-exception-caught
+            logger.error("Energy extraction failed: %s", e)
             return {}
 
     def _estimate_speech_rate(self, y: NDArray[np.float32], sr: int, duration: float) -> float:
@@ -394,8 +396,8 @@ class ProsodyAnalyzer:
 
             return 0.0
 
-        except Exception as e:
-            logger.error(f"Speech rate estimation failed: {e}")
+        except Exception as e:  # pylint: disable=broad-exception-caught
+            logger.error("Speech rate estimation failed: %s", e)
             return 0.0
 
     def _extract_voice_quality(self, audio_path: str) -> Dict[str, Any]:
@@ -464,13 +466,15 @@ class ProsodyAnalyzer:
             jitter = call(point_process, "Get jitter (local)", 0, 0, 0.0001, 0.02, 1.3)
 
             # Shimmer (local) - amplitude period-to-period variability
-            # Parameters: shortest_period=0.0001, longest_period=0.02, max_period_factor=1.3, max_amplitude_factor=1.6
+            # Parameters: shortest_period=0.0001, longest_period=0.02,
+            # max_period_factor=1.3, max_amplitude_factor=1.6
             shimmer = call(
                 [snd, point_process], "Get shimmer (local)", 0, 0, 0.0001, 0.02, 1.3, 1.6
             )
 
             # Harmonicity (HNR) - ratio of periodic to aperiodic components
-            # Parameters: time_step=0.01, pitch_floor=75, silence_threshold=0.1, periods_per_window=1.0
+            # Parameters: time_step=0.01, pitch_floor=75, silence_threshold=0.1,
+            # periods_per_window=1.0
             harmonicity = call(snd, "To Harmonicity (cc)", 0.01, 75, 0.1, 1.0)
             hnr = call(harmonicity, "Get mean", 0, 0)
 
@@ -487,8 +491,8 @@ class ProsodyAnalyzer:
                 "voice_quality": voice_quality,  # Categorical assessment
             }
 
-        except Exception as e:
-            logger.error(f"Voice quality extraction failed: {e}")
+        except Exception as e:  # pylint: disable=broad-exception-caught
+            logger.error("Voice quality extraction failed: %s", e)
             return {}
 
     def _interpret_prosody(self, prosody: Dict[str, Any]) -> Dict[str, str]:
@@ -560,49 +564,61 @@ class ProsodyAnalyzer:
         interpretation = {}
 
         # Pitch interpretation
-        pitch_mean = prosody.get("pitch_mean", 0)
-        if pitch_mean > 0:
-            if pitch_mean < 120:
-                interpretation["pitch"] = "Low pitch (calm or low energy)"
-            elif pitch_mean < 200:
-                interpretation["pitch"] = "Moderate pitch (normal conversation)"
-            else:
-                interpretation["pitch"] = "High pitch (excited or stressed)"
+        interpretation["pitch"] = self._interpret_pitch(prosody.get("pitch_mean", 0))
 
         # Energy interpretation
-        energy = prosody.get("energy", 0)
-        if energy < 0.02:
-            interpretation["energy"] = "Very low vocal energy (quiet or subdued)"
-        elif energy < 0.05:
-            interpretation["energy"] = "Low vocal energy (calm)"
-        elif energy < 0.1:
-            interpretation["energy"] = "Moderate vocal energy (normal)"
-        else:
-            interpretation["energy"] = "High vocal energy (intense or loud)"
+        interpretation["energy"] = self._interpret_energy(prosody.get("energy", 0))
 
         # Rate interpretation
-        rate = prosody.get("rate", 0)
-        if rate > 0:
-            if rate < 2.5:
-                interpretation["rate"] = "Slow speech (deliberate or tired)"
-            elif rate < 4.5:
-                interpretation["rate"] = "Normal speech rate"
-            else:
-                interpretation["rate"] = "Fast speech (excited or anxious)"
+        interpretation["rate"] = self._interpret_rate(prosody.get("rate", 0))
 
         # Voice quality interpretation
-        hnr = prosody.get("hnr")
-        if hnr is not None:
-            if hnr > 15:
-                interpretation["quality"] = "Excellent voice quality (clear, strong)"
-            elif hnr > 10:
-                interpretation["quality"] = "Good voice quality"
-            elif hnr > 5:
-                interpretation["quality"] = "Moderate quality (some breathiness)"
-            else:
-                interpretation["quality"] = "Poor quality (hoarse or strained)"
+        interpretation["quality"] = self._interpret_quality(prosody.get("hnr"))
 
-        return interpretation
+        # Remove None values
+        return {k: v for k, v in interpretation.items() if v is not None}
+
+    def _interpret_pitch(self, pitch_mean: float) -> Optional[str]:
+        """Interpret pitch level."""
+        if pitch_mean <= 0:
+            return None
+        if pitch_mean < 120:
+            return "Low pitch (calm or low energy)"
+        if pitch_mean < 200:
+            return "Moderate pitch (normal conversation)"
+        return "High pitch (excited or stressed)"
+
+    def _interpret_energy(self, energy: float) -> Optional[str]:
+        """Interpret energy level."""
+        if energy < 0.02:
+            return "Very low vocal energy (quiet or subdued)"
+        if energy < 0.05:
+            return "Low vocal energy (calm)"
+        if energy < 0.1:
+            return "Moderate vocal energy (normal)"
+        return "High vocal energy (intense or loud)"
+
+    def _interpret_rate(self, rate: float) -> Optional[str]:
+        """Interpret speech rate."""
+        if rate <= 0:
+            return None
+        if rate < 2.5:
+            return "Slow speech (deliberate or tired)"
+        if rate < 4.5:
+            return "Normal speech rate"
+        return "Fast speech (excited or anxious)"
+
+    def _interpret_quality(self, hnr: Optional[float]) -> Optional[str]:
+        """Interpret voice quality."""
+        if hnr is None:
+            return None
+        if hnr > 15:
+            return "Excellent voice quality (clear, strong)"
+        if hnr > 10:
+            return "Good voice quality"
+        if hnr > 5:
+            return "Moderate quality (some breathiness)"
+        return "Poor quality (hoarse or strained)"
 
     def _get_mock_prosody(self) -> Dict[str, Any]:
         """Return mock/placeholder prosody data when librosa is unavailable.
@@ -661,7 +677,7 @@ class ProsodyAnalyzer:
 
 
 # Global instance
-_prosody_analyzer_instance: Optional[ProsodyAnalyzer] = None
+_PROSODY_ANALYZER_INSTANCE: Optional[ProsodyAnalyzer] = None
 
 
 def get_prosody_analyzer() -> ProsodyAnalyzer:
@@ -707,9 +723,9 @@ def get_prosody_analyzer() -> ProsodyAnalyzer:
         - ProsodyAnalyzer class for direct instantiation
         - app/api/routes/ingest.py for usage examples
     """
-    global _prosody_analyzer_instance
+    global _PROSODY_ANALYZER_INSTANCE  # pylint: disable=global-statement
 
-    if _prosody_analyzer_instance is None:
-        _prosody_analyzer_instance = ProsodyAnalyzer()
+    if _PROSODY_ANALYZER_INSTANCE is None:
+        _PROSODY_ANALYZER_INSTANCE = ProsodyAnalyzer()
 
-    return _prosody_analyzer_instance
+    return _PROSODY_ANALYZER_INSTANCE

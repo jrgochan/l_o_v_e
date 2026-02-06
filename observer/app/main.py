@@ -8,10 +8,14 @@ from contextlib import asynccontextmanager
 from typing import Any, AsyncGenerator, Dict
 
 import structlog
-from app.api.routes import (  # pylint: disable=wrong-import-position
+from asgi_correlation_id import CorrelationIdMiddleware
+from fastapi import FastAPI  # pylint: disable=wrong-import-position
+from fastapi.middleware.cors import CORSMiddleware  # pylint: disable=wrong-import-position
+
+from app.api.routes import auth  # pylint: disable=wrong-import-position
+from app.api.routes import (
     admin,
     ai_settings,
-    auth,
     bootstrap,
     chat_websocket,
     collections,
@@ -27,37 +31,25 @@ from app.api.routes import (  # pylint: disable=wrong-import-position
 from app.config import settings  # pylint: disable=wrong-import-position
 from app.database import close_db, init_db  # pylint: disable=wrong-import-position
 from app.websocket import websocket_router  # pylint: disable=wrong-import-position
-from asgi_correlation_id import CorrelationIdMiddleware
-from fastapi import FastAPI  # pylint: disable=wrong-import-position
-from fastapi.middleware.cors import (
-    CORSMiddleware,  # pylint: disable=wrong-import-position
-)
 
 # Configure logging
 # Configure logging
-try:
-    from logging_config import configure_logging
+# Simple logging configuration
+logging.basicConfig(level=settings.LOG_LEVEL)
 
-    configure_logging(log_level=settings.LOG_LEVEL, json_format=not settings.DEBUG)
-except ImportError:
-    logging.basicConfig(level=settings.LOG_LEVEL)
-
-if "structlog" in locals():
-    logger = structlog.get_logger(__name__)
-else:
-    logger = logging.getLogger(__name__)
+logger = structlog.get_logger(__name__)
 
 # Configure rate limiting
 try:
     from security import setup_rate_limiting
 except ImportError:
 
-    def setup_rate_limiting(app):
+    def setup_rate_limiting(_app):
         pass
 
 
 @asynccontextmanager
-async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
+async def lifespan(_app: FastAPI) -> AsyncGenerator[None, None]:
     """Application lifespan events.
 
     Handles startup and shutdown tasks:
@@ -67,18 +59,21 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
     """
     # Startup
     logger.info("Starting Observer Module...")
-    logger.info(f"Environment: {'DEBUG' if settings.DEBUG else 'PRODUCTION'}")
+    logger.info("Environment: %s", "DEBUG" if settings.DEBUG else "PRODUCTION")
     logger.info(
-        f"Database: {settings.POSTGRES_HOST}:{settings.POSTGRES_PORT}/{settings.POSTGRES_DB}"
+        "Database: %s:%s/%s",
+        settings.POSTGRES_HOST,
+        settings.POSTGRES_PORT,
+        settings.POSTGRES_DB,
     )
-    logger.info(f"Embedding Provider: {settings.EMBEDDING_PROVIDER}")
-    logger.info(f"Versor URL: {settings.VERSOR_URL}")
+    logger.info("Embedding Provider: %s", settings.EMBEDDING_PROVIDER)
+    logger.info("Versor URL: %s", settings.VERSOR_URL)
 
     try:
         await init_db()
         logger.info("Database initialized successfully")
     except Exception as e:
-        logger.error(f"Failed to initialize database: {e}")
+        logger.error("Failed to initialize database: %s", e)
         raise
 
     yield
@@ -90,7 +85,7 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
         await close_db()
         logger.info("Database connections closed")
     except Exception as e:  # pragma: no cover
-        logger.error(f"Error during shutdown: {e}")
+        logger.error("Error during shutdown: %s", e)
 
 
 # Initialize FastAPI application
@@ -154,7 +149,7 @@ async def root() -> Dict[str, Any]:
     }
 
 
-if __name__ == "__main__":
+if __name__ == "__main__":  # pragma: no cover
     import uvicorn
 
     uvicorn.run(

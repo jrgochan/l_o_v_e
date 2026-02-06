@@ -112,11 +112,11 @@ def _ensure_uuid(value: str) -> str:
     except (ValueError, AttributeError):
         # Not a valid UUID, generate one deterministically from the string
         generated_uuid = uuid5(NAMESPACE_DNS, value)
-        logger.debug(f"Generated UUID for '{value}': {generated_uuid}")
+        logger.debug("Generated UUID for '%s': %s", value, generated_uuid)
         return str(generated_uuid)
 
 
-class ObserverClient:
+class ObserverClient:  # pylint: disable=too-many-instance-attributes
     """HTTP client for communicating with the Observer module.
 
     Provides methods to:
@@ -199,7 +199,7 @@ class ObserverClient:
         self.base_url = base_url or settings.OBSERVER_URL
         self.timeout = timeout
 
-        logger.info(f"ObserverClient initialized: {self.base_url}")
+        logger.info("ObserverClient initialized: %s", self.base_url)
 
     async def record_state(
         self,
@@ -319,13 +319,16 @@ class ObserverClient:
         }
 
         logger.info(
-            f"Recording state for user {user_id}: "
-            f"{emotion.primary_emotion} (V={emotion.vac.valence:.2f}, "
-            f"A={emotion.vac.arousal:.2f}, C={emotion.vac.connection:.2f})"
+            "Recording state for user %s: %s (V=%.2f, A=%.2f, C=%.2f)",
+            user_id,
+            emotion.primary_emotion,
+            emotion.vac.valence,
+            emotion.vac.arousal,
+            emotion.vac.connection,
         )
 
         # DEBUG: Log the actual payload being sent
-        logger.debug(f"Observer payload: {payload}")
+        logger.debug("Observer payload: %s", payload)
 
         async with httpx.AsyncClient(timeout=self.timeout) as client:
             try:
@@ -333,12 +336,12 @@ class ObserverClient:
                 response.raise_for_status()
 
                 result: Dict[str, Any] = response.json()
-                logger.info(f"State recorded successfully: {result.get('state_id')}")
+                logger.info("State recorded successfully: %s", result.get("state_id"))
 
                 return result
 
             except httpx.HTTPError as e:
-                logger.error(f"Failed to record state: {e}")
+                logger.error("Failed to record state: %s", e)
                 raise
 
     async def get_insights(self, user_id: str, limit: int = 10) -> Dict[str, Any]:
@@ -361,7 +364,7 @@ class ObserverClient:
                 return cast(Dict[str, Any], response.json())
 
             except httpx.HTTPError as e:
-                logger.error(f"Failed to get insights: {e}")
+                logger.error("Failed to get insights: %s", e)
                 raise
 
     async def health_check(self) -> bool:
@@ -374,13 +377,13 @@ class ObserverClient:
             try:
                 response = await client.get(f"{self.base_url}/health")
                 return response.status_code == 200
-            except Exception as e:
-                logger.warning(f"Observer health check failed: {e}")
+            except Exception as e:  # pylint: disable=broad-exception-caught
+                logger.warning("Observer health check failed: %s", e)
                 return False
 
 
 # Global client instance
-_client_instance: Optional[ObserverClient] = None
+_CLIENT_INSTANCE: Optional[ObserverClient] = None
 
 
 def get_observer_client() -> ObserverClient:
@@ -389,9 +392,9 @@ def get_observer_client() -> ObserverClient:
     Returns:
         ObserverClient instance
     """
-    global _client_instance
+    global _CLIENT_INSTANCE  # pylint: disable=global-statement
 
-    if _client_instance is None:
-        _client_instance = ObserverClient()
+    if _CLIENT_INSTANCE is None:
+        _CLIENT_INSTANCE = ObserverClient()
 
-    return _client_instance
+    return _CLIENT_INSTANCE

@@ -129,6 +129,19 @@ global.ResizeObserver = jest.fn().mockImplementation(() => ({
   disconnect: jest.fn(),
 }));
 
+// Mock global fetch (if not already defined)
+if (!global.fetch) {
+  global.fetch = jest.fn(() =>
+    Promise.resolve({
+      ok: true,
+      json: () => Promise.resolve({}),
+      text: () => Promise.resolve(""),
+      headers: new Headers(),
+    })
+  ) as any;
+  (global.fetch as jest.Mock).mockName("fetch");
+}
+
 // Suppress console errors and warnings in tests (unless explicitly needed)
 const originalError = console.error;
 const originalWarn = console.warn;

@@ -81,7 +81,9 @@ class PIIScrubber:
     REGEX_PATTERNS = {
         "DATE": [
             r"\b(Monday|Tuesday|Wednesday|Thursday|Friday|Saturday|Sunday)\b",
-            r"\b(January|February|March|April|May|June|July|August|September|October|November|December)\s+\d{1,2}(?:st|nd|rd|th)?(?:,\s+\d{4})?\b",
+            r"\b(January|February|March|April|May|June|July|August|September|"
+            r"October|November|December)"
+            r"\s+\d{1,2}(?:st|nd|rd|th)?(?:,\s+\d{4})?\b",
             r"\b\d{1,2}/\d{1,2}/\d{2,4}\b",
             r"\b\d{4}-\d{1,2}-\d{1,2}\b",
         ],
@@ -111,9 +113,7 @@ class PIIScrubber:
         for label, patterns in self.REGEX_PATTERNS.items():
             self._compiled_patterns[label] = [re.compile(p, re.IGNORECASE) for p in patterns]
 
-            self._compiled_patterns[label] = [re.compile(p, re.IGNORECASE) for p in patterns]
-
-        logger.info(f"PIIScrubber initialized with BERT model: {model_name}")
+        logger.info("PIIScrubber initialized with BERT model: %s", model_name)
 
     def _load_models(self) -> Tuple[Any, Any]:
         """Load both Spacy and BERT models with lazy initialization."""
@@ -126,10 +126,12 @@ class PIIScrubber:
                     tokenizer=self.model_name,
                     aggregation_strategy="simple",
                 )
-                logger.info(f"Transformers model loaded: {self.model_name}")
+                logger.info("Transformers model loaded: %s", self.model_name)
             except Exception as e:
-                logger.error(f"Failed to load Transformers model: {e}")
-                raise RuntimeError(f"Failed to load Transformers model '{self.model_name}': {e}")
+                logger.error("Failed to load Transformers model: %s", e)
+                raise RuntimeError(
+                    f"Failed to load Transformers model '{self.model_name}': {e}"
+                ) from e
 
         # Load Spacy
         if self._nlp_spacy is None:
@@ -137,8 +139,9 @@ class PIIScrubber:
                 self._nlp_spacy = spacy.load("en_core_web_sm")
                 logger.info("Spacy model loaded: en_core_web_sm")
             except Exception as e:
-                logger.error(f"Failed to load Spacy model: {e}")
-                # Fallback to just BERT if Spacy fails (though strictly we want both per user request)
+                logger.error("Failed to load Spacy model: %s", e)
+                # Fallback to just BERT if Spacy fails (though strictly we want both
+                # per user request)
                 logger.warning("Continuing without Spacy (BERT only)")
 
         return self._nlp_bert, self._nlp_spacy
@@ -153,7 +156,9 @@ class PIIScrubber:
                     entities.append((match.start(), match.end(), f"[{label}]", match.group()))
         return entities
 
-    def scrub(self, text: str, keep_structure: bool = True) -> str:
+    def scrub(
+        self, text: str, keep_structure: bool = True
+    ) -> str:  # pylint: disable=too-many-locals
         """Remove personally identifiable information from text using NER + Regex.
 
         Args:
@@ -224,7 +229,9 @@ class PIIScrubber:
 
         if entities_to_scrub:
             logger.info(
-                f"Scrubbed {len(entities_to_scrub)} PII entities: {[e[2] for e in entities_to_scrub]}"
+                "Scrubbed %d PII entities: %s",
+                len(entities_to_scrub),
+                [e[2] for e in entities_to_scrub],
             )
 
         return scrubbed.strip()
@@ -293,14 +300,14 @@ class PIIScrubber:
 
 
 # Global scrubber instance
-_scrubber_instance = None
+_SCRUBBER_INSTANCE = None
 
 
 def get_pii_scrubber() -> PIIScrubber:
     """Get or create global PIIScrubber instance (singleton pattern)."""
-    global _scrubber_instance
+    global _SCRUBBER_INSTANCE  # pylint: disable=global-statement
 
-    if _scrubber_instance is None:
-        _scrubber_instance = PIIScrubber()
+    if _SCRUBBER_INSTANCE is None:
+        _SCRUBBER_INSTANCE = PIIScrubber()
 
-    return _scrubber_instance
+    return _SCRUBBER_INSTANCE

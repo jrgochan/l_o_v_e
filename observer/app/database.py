@@ -7,11 +7,7 @@ import logging
 import uuid
 from typing import AsyncGenerator
 
-from sqlalchemy.ext.asyncio import (
-    AsyncSession,
-    async_sessionmaker,
-    create_async_engine,
-)
+from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 from sqlalchemy.orm import DeclarativeBase
 
 from app.config import settings
@@ -35,7 +31,7 @@ engine = create_async_engine(
 )
 
 # Session factory
-AsyncSessionLocal = async_sessionmaker(
+AsyncSessionLocal = async_sessionmaker(  # pylint: disable=invalid-name
     engine,
     class_=AsyncSession,
     expire_on_commit=False,
@@ -64,7 +60,7 @@ async def get_db() -> AsyncGenerator[AsyncSession, None]:
         try:
             yield session
         except Exception as e:
-            logger.error(f"Database session error: {e}")
+            logger.error("Database session error: %s", e)
             await session.rollback()
             raise
         finally:
@@ -84,7 +80,7 @@ async def init_db() -> None:
         # Test connection
         async with engine.begin() as conn:
             # Import all models to register them with Base
-            from app.models import (  # noqa: F401 # pylint: disable=unused-import
+            from app.models import (  # noqa: F401
                 chat_message,
                 chat_session,
                 clinical_alert,
@@ -100,7 +96,7 @@ async def init_db() -> None:
 
         logger.info("Database initialized successfully")
     except Exception as e:
-        logger.error(f"Failed to initialize database: {e}")
+        logger.error("Failed to initialize database: %s", e)
         raise
 
 

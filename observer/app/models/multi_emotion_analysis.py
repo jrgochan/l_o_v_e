@@ -507,7 +507,7 @@ class MultiEmotionAnalysis(Base):
             "emotional_clarity": self.emotional_clarity,
             "temporal_pattern": self.temporal_pattern,
             "created_at": self.created_at.isoformat() if self.created_at else None,
-            "emotion_count": len(self.detected_emotions) if self.detected_emotions else 0,
+            "emotion_count": (len(self.detected_emotions) if self.detected_emotions else 0),
             # 3-way analysis data
             "three_way_enabled": self.three_way_enabled,
             "content_only_data": self.content_only_data,
@@ -817,7 +817,7 @@ class EmotionGoal(Base):
             "id": str(self.id),
             "session_id": str(self.session_id),
             "user_id": self.user_id,
-            "goal_emotion_id": str(self.goal_emotion_id) if self.goal_emotion_id else None,
+            "goal_emotion_id": (str(self.goal_emotion_id) if self.goal_emotion_id else None),
             "priority": self.priority,
             "target_date": self.target_date.isoformat() if self.target_date else None,
             "status": self.status,

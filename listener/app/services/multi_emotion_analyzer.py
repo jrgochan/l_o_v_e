@@ -54,9 +54,7 @@ from langchain_core.output_parsers import PydanticOutputParser
 from langchain_core.prompts import ChatPromptTemplate
 
 from app.config import settings
-from app.models.multi_emotion_response import (
-    MultiEmotionAnalysisResponse,
-)
+from app.models.multi_emotion_response import MultiEmotionAnalysisResponse
 from app.services.llm_factory import get_llm
 from app.services.model_fetcher import get_model_fetcher
 
@@ -66,9 +64,11 @@ logger = logging.getLogger(__name__)
 # Default Prompts (Fallbacks)
 # -----------------------------------------------------------------------------
 
-DEFAULT_MULTI_EMOTION_SYSTEM = """You are the Listener with Deep Feeling mode, an expert in multi-emotion analysis trained in emotional analysis.
+DEFAULT_MULTI_EMOTION_SYSTEM = """You are the Listener with Deep Feeling mode, an expert in \
+multi-emotion analysis trained in emotional analysis.
 
-Your task is to detect MULTIPLE EMOTIONS (1-3) in the input text and analyze how they relate to each other.
+Your task is to detect MULTIPLE EMOTIONS (1-3) in the input text and analyze how they relate to \
+each other.
 
 **3-Dimensional VAC Model:**
 - **Valence** (X): Pleasure (+1) to Displeasure (-1)
@@ -78,7 +78,8 @@ Your task is to detect MULTIPLE EMOTIONS (1-3) in the input text and analyze how
 **Prominence Levels:**
 1. **Primary**: The most prominent, confident emotion (highest confidence)
 2. **Secondary**: Significant emotions that co-occur (moderate confidence, 0.5-0.8)
-3. **Underlying**: Emotions that are present but hidden/suppressed (may have high confidence but not expressed overtly)
+3. **Underlying**: Emotions that are present but hidden/suppressed (may have high confidence but \
+not expressed overtly)
 
 **Relationship Types:**
 - **Complementary**: Emotions that naturally co-occur and support each other (e.g., joy + gratitude)
@@ -105,11 +106,13 @@ Your task is to detect MULTIPLE EMOTIONS (1-3) in the input text and analyze how
 **CRITICAL EXAMPLES:**
 
 Example 1 - Ambivalence (Contradictory Emotions):
-Input: "I'm nervous about the presentation tomorrow, but I'm also kind of excited? It's a big opportunity."
+Input: "I'm nervous about the presentation tomorrow, but I'm also kind of excited? \
+It's a big opportunity."
 Analysis:
 - Primary: Anxiety (0.75) - VAC: (-0.4, 0.7, 0.2) - Most prominent feeling
 - Secondary: Excitement (0.62) - VAC: (0.6, 0.8, 0.5) - Anticipation about opportunity
-- Relationship: Anxiety ⟷ Excitement (contradictory, strength 0.8) - "Ambivalence about the opportunity"
+- Relationship: Anxiety ⟷ Excitement (contradictory, strength 0.8) - \
+"Ambivalence about the opportunity"
 - Aggregate VAC: Weighted average → (-0.05, 0.73, 0.32)
 - Complexity: 0.65 (moderate - two conflicting emotions)
 - Clarity: 0.72 (fairly clear - person recognizes both feelings)
@@ -208,7 +211,8 @@ DEFAULT_CONTENT_ONLY_SYSTEM = """You are analyzing ONLY the semantic content and
 - **Connection** (Z): Connected (+1) to Disconnected (-1)
 
 **Your Task:**
-Analyze what emotions are expressed in the CONTENT of the text itself, based purely on the words and their semantic meaning.
+Analyze what emotions are expressed in the CONTENT of the text itself, based purely on the words \
+and their semantic meaning.
 
 **Response Format (JSON):**
 {{
@@ -258,7 +262,8 @@ DEFAULT_VOICE_ONLY_SYSTEM = """You are analyzing ONLY the vocal characteristics 
 - **Poor voice quality (high jitter/shimmer, low HNR)** → Stress, Distress, Fatigue
 
 **Your Task:**
-Based ONLY on the prosody features provided, determine what emotions the speaker's VOICE is expressing, regardless of their words.
+Based ONLY on the prosody features provided, determine what emotions the speaker's VOICE is \
+expressing, regardless of their words.
 
 **Response Format (JSON):**
 {{
@@ -305,7 +310,7 @@ DEFAULT_VOICE_ONLY_USER = """Analyze these vocal prosody features:
 Based ONLY on these vocal characteristics, what emotions does this voice express?"""
 
 
-class MultiEmotionAnalyzer:
+class MultiEmotionAnalyzer:  # pylint: disable=too-many-instance-attributes,duplicate-code
     """Extract multiple concurrent emotions (up to 3) with relationships.
 
     The key innovation is detecting emotional complexity:
@@ -316,7 +321,7 @@ class MultiEmotionAnalyzer:
     - Aggregate emotional state
     """
 
-    def __init__(
+    def __init__(  # pylint: disable=too-many-positional-arguments
         self,
         model: Optional[str] = None,
         temperature: Optional[float] = None,
@@ -348,9 +353,9 @@ class MultiEmotionAnalyzer:
                 self.model = loop.run_until_complete(
                     fetcher.get_model_for_function("multi_emotion", settings.OLLAMA_MODEL)
                 )
-                logger.info(f"Using dynamically assigned model for multi_emotion: {self.model}")
+                logger.info("Using dynamically assigned model for multi_emotion: %s", self.model)
             except Exception as e:
-                logger.warning(f"Failed to fetch dynamic model, using default: {e}")
+                logger.warning("Failed to fetch dynamic model, using default: %s", e)
                 self.model = settings.OLLAMA_MODEL
         else:
             self.model = model or settings.OLLAMA_MODEL
@@ -373,8 +378,10 @@ class MultiEmotionAnalyzer:
         self.voice_only_prompt = self._create_default_voice_only_prompt()
 
         logger.info(
-            f"MultiEmotionAnalyzer initialized: model={self.model}, "
-            f"temperature={self.temperature}, min_confidence={self.min_confidence}"
+            "MultiEmotionAnalyzer initialized: model=%s, temperature=%s, min_confidence=%s",
+            self.model,
+            self.temperature,
+            self.min_confidence,
         )
 
     def _create_default_prompt(self) -> ChatPromptTemplate:
@@ -431,16 +438,20 @@ class MultiEmotionAnalyzer:
                         [("system", system_msg), ("user", user_msg)]
                     )
                     setattr(self, attr_name, new_prompt)
-                    logger.debug(f"Updated {function_name} prompt to v{prompt_data.get('version')}")
+                    logger.debug(
+                        "Updated %s prompt to v%s", function_name, prompt_data.get("version")
+                    )
 
         except Exception as e:
-            logger.warning(f"Failed to refresh multi-emotion prompts: {e}")
+            logger.warning("Failed to refresh multi-emotion prompts: %s", e)
 
         # Old methods removed as replaced by defaults and dynamic fetching
 
         logger.info(
-            f"MultiEmotionAnalyzer initialized: model={self.model}, "
-            f"temperature={self.temperature}, min_confidence={self.min_confidence}"
+            "MultiEmotionAnalyzer initialized: model=%s, temperature=%s, min_confidence=%s",
+            self.model,
+            self.temperature,
+            self.min_confidence,
         )
 
     def _filter_and_validate_emotions(self, emotions: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
@@ -464,7 +475,7 @@ class MultiEmotionAnalyzer:
 
         # Limit to maximum 3 emotions
         if len(filtered) > 3:
-            logger.info(f"Limiting {len(filtered)} emotions to top 3 by confidence")
+            logger.info("Limiting %d emotions to top 3 by confidence", len(filtered))
             filtered = filtered[:3]
 
         return filtered
@@ -534,7 +545,7 @@ class MultiEmotionAnalyzer:
         # Refresh prompts
         await self._refresh_prompts()
 
-        logger.info(f"Analyzing text (multi-emotion): {text[:100]}...")
+        logger.info("Analyzing text (multi-emotion): %s...", text[:100])
         start_time = time.time()
 
         try:
@@ -547,7 +558,7 @@ class MultiEmotionAnalyzer:
             response = await self.llm.ainvoke(prompt_str)
 
             # Parse JSON response
-            logger.debug(f"LLM response: {response[:300]}...")
+            logger.debug("LLM response: %s...", response[:300])
 
             # Clean response
             cleaned_response = response.strip()
@@ -594,20 +605,22 @@ class MultiEmotionAnalyzer:
 
             analysis_time = time.time() - start_time
             logger.info(
-                f"Multi-emotion analysis complete: {len(result.emotions)} emotions detected "
-                f"in {analysis_time:.2f}s (complexity: {result.complexity_score:.2f})"
+                "Multi-emotion analysis complete: %d emotions detected in %.2fs (complexity: %.2f)",
+                len(result.emotions),
+                analysis_time,
+                result.complexity_score,
             )
 
             return result
 
         except json.JSONDecodeError as e:
-            logger.error(f"Failed to parse JSON response: {e}")
-            logger.error(f"Response was: {response}")
-            raise RuntimeError(f"Invalid JSON response from LLM: {e}")
+            logger.error("Failed to parse JSON response: %s", e)
+            logger.error("Response was: %s", response)
+            raise RuntimeError(f"Invalid JSON response from LLM: {e}") from e
 
         except Exception as e:
-            logger.error(f"Multi-emotion analysis failed: {e}", exc_info=True)
-            raise RuntimeError(f"Analysis error: {e}")
+            logger.error("Multi-emotion analysis failed: %s", e, exc_info=True)
+            raise RuntimeError(f"Analysis error: {e}") from e
 
     async def _analyze_content_only(self, text: str) -> MultiEmotionAnalysisResponse:
         """Analyze emotions based ONLY on text semantic content.
@@ -621,7 +634,7 @@ class MultiEmotionAnalyzer:
         Returns:
             MultiEmotionAnalysisResponse from content analysis only
         """
-        logger.info(f"Running content-only analysis on: {text[:50]}...")
+        logger.info("Running content-only analysis on: %s...", text[:50])
 
         # Format content-only prompt
         formatted_prompt = self.content_only_prompt.format_messages(input_text=text)
@@ -721,8 +734,9 @@ class MultiEmotionAnalyzer:
 
             total_time = time.time() - start_time
             logger.info(
-                f"3-way analysis complete in {total_time:.2f}s "
-                f"(discrepancy: {discrepancy_metrics.get('content_voice_distance', 0):.3f})"
+                "3-way analysis complete in %.2fs (discrepancy: %.3f)",
+                total_time,
+                discrepancy_metrics.get("content_voice_distance", 0),
             )
 
             return {
@@ -733,8 +747,8 @@ class MultiEmotionAnalyzer:
             }
 
         except Exception as e:
-            logger.error(f"3-way analysis failed: {e}", exc_info=True)
-            raise RuntimeError(f"3-way analysis error: {e}")
+            logger.error("3-way analysis failed: %s", e, exc_info=True)
+            raise RuntimeError(f"3-way analysis error: {e}") from e
 
     def _process_llm_response(
         self, response: str, analysis_type: str
@@ -1010,18 +1024,33 @@ class MultiEmotionAnalyzer:
             # Check for specific patterns
             if content_vac.valence > 0.3 and voice_vac.valence < -0.3:
                 flags.append("emotional_suppression")
-                interpretation = "Content suggests positive emotions, but voice reveals underlying distress. This may indicate emotional suppression or 'putting on a brave face.'"
+                interpretation = (
+                    "Content suggests positive emotions, but voice reveals underlying distress. "
+                    "This may indicate emotional suppression or 'putting on a brave face.'"
+                )
             elif content_vac.valence < -0.3 and voice_vac.valence > 0.3:
                 flags.append("minimization")
-                interpretation = "Content expresses distress, but voice sounds relatively calm. May indicate minimization, intellectualization, or emotional numbing."
+                interpretation = (
+                    "Content expresses distress, but voice sounds relatively calm. May indicate "
+                    "minimization, intellectualization, or emotional numbing."
+                )
             elif abs(content_vac.arousal - voice_vac.arousal) > 0.7:
                 flags.append("arousal_mismatch")
                 if content_vac.arousal > voice_vac.arousal:
-                    interpretation = "Words suggest high energy/activation, but voice is subdued. May indicate exhaustion or emotional depletion."
+                    interpretation = (
+                        "Words suggest high energy/activation, but voice is subdued. May indicate "
+                        "exhaustion or emotional depletion."
+                    )
                 else:
-                    interpretation = "Voice shows high activation, but words are measured. May indicate anxiety or agitation not fully expressed in content."
+                    interpretation = (
+                        "Voice shows high activation, but words are measured. May indicate anxiety "
+                        "or agitation not fully expressed in content."
+                    )
             else:
-                interpretation = "Significant discrepancy detected between voice and content across multiple VAC dimensions."
+                interpretation = (
+                    "Significant discrepancy detected between voice and content across multiple "
+                    "VAC dimensions."
+                )
         elif voice_vac and content_voice_distance < 0.3:
             flags.append("well_aligned")
             interpretation = (
@@ -1029,7 +1058,10 @@ class MultiEmotionAnalyzer:
             )
         elif voice_vac and 0.3 <= content_voice_distance <= 0.5:
             flags.append("moderate_discrepancy")
-            interpretation = "Moderate discrepancy detected. May indicate emotional regulation, mixed feelings, or partial awareness of emotional state."
+            interpretation = (
+                "Moderate discrepancy detected. May indicate emotional regulation, mixed feelings, "
+                "or partial awareness of emotional state."
+            )
 
         return {
             "content_voice_distance": round(content_voice_distance, 3),
@@ -1151,7 +1183,7 @@ class MultiEmotionAnalyzer:
 
 
 # Global service instance (singleton pattern)
-_multi_emotion_analyzer_instance: Optional[MultiEmotionAnalyzer] = None
+_MULTI_EMOTION_ANALYZER_INSTANCE: Optional[MultiEmotionAnalyzer] = None
 
 
 def get_multi_emotion_analyzer() -> MultiEmotionAnalyzer:
@@ -1200,9 +1232,9 @@ def get_multi_emotion_analyzer() -> MultiEmotionAnalyzer:
         - app/api/routes/ingest.py for usage examples
         - Deep Feeling feature: docs/features/deep-feeling/OVERVIEW.md
     """
-    global _multi_emotion_analyzer_instance
+    global _MULTI_EMOTION_ANALYZER_INSTANCE  # pylint: disable=global-statement
 
-    if _multi_emotion_analyzer_instance is None:
-        _multi_emotion_analyzer_instance = MultiEmotionAnalyzer()
+    if _MULTI_EMOTION_ANALYZER_INSTANCE is None:
+        _MULTI_EMOTION_ANALYZER_INSTANCE = MultiEmotionAnalyzer()
 
-    return _multi_emotion_analyzer_instance
+    return _MULTI_EMOTION_ANALYZER_INSTANCE

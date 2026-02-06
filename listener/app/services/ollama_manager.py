@@ -147,7 +147,7 @@ class OllamaManager:
         try:
             response = await self.client.get("/")
             return response.status_code == 200
-        except Exception:
+        except Exception:  # pylint: disable=broad-exception-caught
             return False
 
     async def list_local_models(self) -> List[ModelInfo]:
@@ -191,7 +191,7 @@ class OllamaManager:
 
             return models
         except Exception as e:
-            raise RuntimeError(f"Failed to list local models: {str(e)}")
+            raise RuntimeError(f"Failed to list local models: {str(e)}") from e
 
     async def pull_model(self, model_name: str) -> AsyncIterator[PullProgress]:
         """Pull (download) a model from Ollama registry.
@@ -231,7 +231,7 @@ class OllamaManager:
             yield PullProgress(
                 status="error", digest=None, total=None, completed=None, percent=None
             )
-            raise RuntimeError(f"Failed to pull model {model_name}: {str(e)}")
+            raise RuntimeError(f"Failed to pull model {model_name}: {str(e)}") from e
 
     async def delete_model(self, model_name: str) -> Dict[str, str]:
         """Delete a model from local storage."""
@@ -241,7 +241,7 @@ class OllamaManager:
             result: Dict[str, str] = response.json()
             return result
         except Exception as e:
-            raise RuntimeError(f"Failed to delete model {model_name}: {str(e)}")
+            raise RuntimeError(f"Failed to delete model {model_name}: {str(e)}") from e
 
     async def get_model_details(self, model_name: str) -> ModelDetails:
         """Get detailed information about a model."""
@@ -278,7 +278,7 @@ class OllamaManager:
                 recommended_for=recommendations,
             )
         except Exception as e:
-            raise RuntimeError(f"Failed to get details for model {model_name}: {str(e)}")
+            raise RuntimeError(f"Failed to get details for model {model_name}: {str(e)}") from e
 
     async def close(self) -> None:
         """Close the HTTP client."""

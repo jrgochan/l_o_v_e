@@ -241,8 +241,10 @@ class MetricsCalculator:
         elasticity = angular_dist / delta_time
 
         logger.debug(
-            f"Elasticity: θ={angular_dist:.4f} rad, Δt={delta_time:.2f}s, "
-            f"E={elasticity:.4f} rad/s"
+            "Elasticity: θ=%.4f rad, Δt=%.2fs, E=%.4f rad/s",
+            angular_dist,
+            delta_time,
+            elasticity,
         )
 
         return elasticity
@@ -358,7 +360,7 @@ class MetricsCalculator:
         # Return 0 (no rigidity measurable yet)
         # Will naturally increase as user builds history
         if len(states) < 2:
-            logger.debug(f"Insufficient states ({len(states)}) for rigidity calculation")
+            logger.debug("Insufficient states (%d) for rigidity calculation", len(states))
             return 0.0
 
         # ═══════════════════════════════════════════════════════════════════════
@@ -427,7 +429,10 @@ class MetricsCalculator:
         rigidity = 1.0 / variance
 
         logger.debug(
-            f"Rigidity: {len(states)} states, variance={variance:.6f}, " f"R={rigidity:.4f}"
+            "Rigidity: %d states, variance=%.6f, R=%.4f",
+            len(states),
+            variance,
+            rigidity,
         )
 
         return rigidity
@@ -469,7 +474,7 @@ class MetricsCalculator:
         is_flooding = elasticity > threshold
 
         if is_flooding:
-            logger.warning(f"Flooding detected: E={elasticity:.2f} rad/s > {threshold}")
+            logger.warning("Flooding detected: E=%.2f rad/s > %.2f", elasticity, threshold)
 
         return is_flooding
 
@@ -491,7 +496,10 @@ class MetricsCalculator:
 
         if is_stuck:
             logger.warning(
-                f"Stuckness detected: R={rigidity:.2f} > {threshold}, " f"valence={vac_valence:.2f}"
+                "Stuckness detected: R=%.2f > %.2f, valence=%.2f",
+                rigidity,
+                threshold,
+                vac_valence,
             )
 
         return is_stuck

@@ -250,7 +250,9 @@ class WaypointExplainer:
 
         # Try to find template in database
         template = await self._lookup_template(
-            from_id=previous_emotion.id, to_id=next_emotion.id, waypoint_id=waypoint_emotion.id
+            from_id=previous_emotion.id,
+            to_id=next_emotion.id,
+            waypoint_id=waypoint_emotion.id,
         )
 
         if template:
@@ -366,7 +368,10 @@ class WaypointExplainer:
         previous_context = {
             "from_emotion": previous.emotion_name,
             "what_changed": self._infer_changes_from_vac(vac_analysis),
-            "why_necessary": f"{waypoint.emotion_name} provides a necessary intermediate step in this emotional transition.",
+            "why_necessary": (
+                f"{waypoint.emotion_name} provides a necessary intermediate step in "
+                "this emotional transition."
+            ),
             "research": None,
         }
 
@@ -376,7 +381,10 @@ class WaypointExplainer:
                 f"Movement toward {next_emotion.emotion_name}",
                 "Continued emotional progression",
             ],
-            "preparation": f"{waypoint.emotion_name} prepares you for {next_emotion.emotion_name} by creating the necessary emotional foundation.",
+            "preparation": (
+                f"{waypoint.emotion_name} prepares you for {next_emotion.emotion_name} "
+                "by creating the necessary emotional foundation."
+            ),
             "research": None,
         }
 
@@ -496,7 +504,10 @@ class WaypointExplainer:
     def _explain_connection_meaning(self, delta: float) -> str:
         """Explain psychological meaning of connection shift."""
         if delta > 0.5:
-            return "This shift toward connection is often the most therapeutically significant - isolation maintains suffering, connection enables healing"
+            return (
+                "This shift toward connection is often the most therapeutically significant - "
+                "isolation maintains suffering, connection enables healing"
+            )
         if delta > 0:
             return "Increasing connection provides relational support for emotional transition"
         if delta < -0.5:

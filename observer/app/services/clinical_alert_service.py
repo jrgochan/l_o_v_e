@@ -459,7 +459,7 @@ class ClinicalAlertService:
         if alerts:
             self.db.add_all(alerts)
             await self.db.commit()
-            logger.info(f"Generated {len(alerts)} clinical alerts for session {session_id}")
+            logger.info("Generated %d clinical alerts for session %s", len(alerts), session_id)
 
         return alerts
 
@@ -481,7 +481,10 @@ class ClinicalAlertService:
                 message="High distress detected",
                 suggestion="Consider crisis assessment protocols",
                 triggered_by={"arousal": arousal, "valence": valence},
-                threshold_used={"arousal": threshold_arousal, "valence": threshold_valence},
+                threshold_used={
+                    "arousal": threshold_arousal,
+                    "valence": threshold_valence,
+                },
                 version=self.THRESHOLDS["version"],
             )
 

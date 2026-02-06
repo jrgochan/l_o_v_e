@@ -1,7 +1,8 @@
 """Emotion Resolver Service.
 
-Maps AI/LLM-generated emotion names to canonical emotions key-value pairs from a specific collection
-(e.g., "Atlas of the Heart"). Critical for handling LLM variability and ensuring consistency.
+Maps AI/LLM-generated emotion names to canonical emotions key-value pairs from a specific
+collection (e.g., "Atlas of the Heart"). Critical for handling LLM variability and ensuring
+consistency.
 
 Three-Tier Matching Strategy:
 1. Exact Match (Case-Insensitive)
@@ -139,7 +140,8 @@ class EmotionResolver:
 
             self._loaded = True
             logger.info(
-                f"Loaded {len(self.emotion_names)} emotions from collection '{self.collection_name}'"
+                f"Loaded {len(self.emotion_names)} emotions from collection "
+                f"'{self.collection_name}'"
             )
 
         except Exception as e:
@@ -280,7 +282,8 @@ class EmotionResolver:
 
             vac_vector_str = f"[{valence},{arousal},{connection}]"
             result = await self.db.execute(
-                query, {"vac_input": vac_vector_str, "collection_id": self._collection_uuid}
+                query,
+                {"vac_input": vac_vector_str, "collection_id": self._collection_uuid},
             )
             row = result.first()
 

@@ -43,11 +43,11 @@ class AudioProcessor:
         path = Path(file_path)
 
         if not path.exists():
-            logger.error(f"Audio file not found: {file_path}")
+            logger.error("Audio file not found: %s", file_path)
             return False
 
         if path.suffix.lower() not in cls.SUPPORTED_FORMATS:
-            logger.error(f"Unsupported format: {path.suffix}")
+            logger.error("Unsupported format: %s", path.suffix)
             return False
 
         return True
@@ -66,8 +66,8 @@ class AudioProcessor:
             probe = ffmpeg.probe(file_path)
             duration = float(probe["format"]["duration"])
             return duration
-        except Exception as e:
-            logger.error(f"Error getting audio duration: {e}")
+        except Exception as e:  # pylint: disable=broad-exception-caught
+            logger.error("Error getting audio duration: %s", e)
             return 0.0
 
     @classmethod
@@ -93,7 +93,7 @@ class AudioProcessor:
             output_path = str(input_file.parent / f"{input_file.stem}_normalized.wav")
 
         try:
-            logger.info(f"Normalizing audio: {input_path} -> {output_path}")
+            logger.info("Normalizing audio: %s -> %s", input_path, output_path)
 
             # Use ffmpeg to convert to 16kHz mono WAV
             stream = ffmpeg.input(input_path)
@@ -112,13 +112,13 @@ class AudioProcessor:
             # Run the conversion
             ffmpeg.run(stream, capture_stdout=True, capture_stderr=True)
 
-            logger.info(f"Audio normalized successfully: {output_path}")
+            logger.info("Audio normalized successfully: %s", output_path)
             return output_path
 
         except ffmpeg.Error as e:
             stderr = e.stderr.decode() if e.stderr else "Unknown error"
-            logger.error(f"ffmpeg error: {stderr}")
-            raise RuntimeError(f"Audio normalization failed: {stderr}")
+            logger.error("ffmpeg error: %s", stderr)
+            raise RuntimeError(f"Audio normalization failed: {stderr}") from e
 
     @classmethod
     def convert_to_wav(cls, input_path: str, output_path: Optional[str] = None) -> str:
@@ -145,7 +145,7 @@ class AudioProcessor:
 
         except ffmpeg.Error as e:
             stderr = e.stderr.decode() if e.stderr else "Unknown error"
-            raise RuntimeError(f"WAV conversion failed: {stderr}")
+            raise RuntimeError(f"WAV conversion failed: {stderr}") from e
 
     @classmethod
     def get_audio_info(cls, file_path: str) -> Dict[str, Any]:
@@ -172,8 +172,8 @@ class AudioProcessor:
                 "bit_rate": int(audio_stream.get("bit_rate", 0)),
             }
 
-        except Exception as e:
-            logger.error(f"Error getting audio info: {e}")
+        except Exception as e:  # pylint: disable=broad-exception-caught
+            logger.error("Error getting audio info: %s", e)
             return {}
 
 
@@ -188,5 +188,5 @@ def cleanup_temp_files(*file_paths: str) -> None:
             if file_path and os.path.exists(file_path):
                 os.remove(file_path)
                 logger.debug(f"Deleted temp file: {file_path}")
-        except Exception as e:
-            logger.warning(f"Could not delete temp file {file_path}: {e}")
+        except Exception as e:  # pylint: disable=broad-exception-caught
+            logger.warning("Could not delete temp file %s: %s", file_path, e)

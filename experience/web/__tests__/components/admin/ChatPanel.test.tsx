@@ -813,7 +813,7 @@ describe("ChatPanel", () => {
     // Find the div wrapping AnalysisPanel
     // It has "w-[calc(100%-18rem)]"
     const wrapper = screen.getByTestId("analysis-panel").parentElement;
-    expect(wrapper).toHaveClass("w-[calc(100%-18rem)]");
+    expect(wrapper).toHaveClass("flex-[2]");
   });
 
   it("renders analysis panel fullscreen state", () => {

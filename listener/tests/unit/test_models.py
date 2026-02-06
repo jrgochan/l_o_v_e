@@ -1,6 +1,8 @@
 """Unit tests for Listener Pydantic models."""
+
 import pytest
 from pydantic import ValidationError
+
 from app.models.multi_emotion_response import (
     DetectedEmotionResponse,
     EmotionRelationshipResponse,
@@ -11,30 +13,23 @@ from app.models.vac_response import VACVector
 # Valid reusable objects
 VALID_VAC = VACVector(valence=0.5, arousal=0.5, connection=0.5)
 VALID_EMOTION_PRIMARY = DetectedEmotionResponse(
-    emotion_name="Joy",
-    category="Happiness",
-    vac=VALID_VAC,
-    confidence=0.9,
-    prominence="primary"
+    emotion_name="Joy", category="Happiness", vac=VALID_VAC, confidence=0.9, prominence="primary"
 )
 VALID_EMOTION_SECONDARY = DetectedEmotionResponse(
     emotion_name="Sadness",
     category="Sadness",
     vac=VALID_VAC,
     confidence=0.8,
-    prominence="secondary"
+    prominence="secondary",
 )
+
 
 class TestDetectedEmotionResponse:
     def test_valid_prominence(self):
         """Test valid prominence values."""
         for p in ["primary", "secondary", "underlying"]:
             model = DetectedEmotionResponse(
-                emotion_name="Test",
-                category="Test",
-                vac=VALID_VAC,
-                confidence=1.0,
-                prominence=p
+                emotion_name="Test", category="Test", vac=VALID_VAC, confidence=1.0, prominence=p
             )
             assert model.prominence == p
 
@@ -46,20 +41,17 @@ class TestDetectedEmotionResponse:
                 category="Test",
                 vac=VALID_VAC,
                 confidence=1.0,
-                prominence="invalid"
+                prominence="invalid",
             )
         assert "Prominence must be one of" in str(exc.value)
+
 
 class TestEmotionRelationshipResponse:
     def test_valid_type(self):
         """Test valid relationship types."""
         for t in ["complementary", "contradictory", "masking", "amplifying", "sequential"]:
             model = EmotionRelationshipResponse(
-                emotion_a="A",
-                emotion_b="B",
-                type=t,
-                strength=0.5,
-                description="desc"
+                emotion_a="A", emotion_b="B", type=t, strength=0.5, description="desc"
             )
             assert model.type == t
 
@@ -67,13 +59,10 @@ class TestEmotionRelationshipResponse:
         """Test invalid relationship type raises ValueError."""
         with pytest.raises(ValidationError) as exc:
             EmotionRelationshipResponse(
-                emotion_a="A",
-                emotion_b="B",
-                type="invalid",
-                strength=0.5,
-                description="desc"
+                emotion_a="A", emotion_b="B", type="invalid", strength=0.5, description="desc"
             )
         assert "Relationship type must be one of" in str(exc.value)
+
 
 class TestMultiEmotionAnalysisResponse:
     def test_valid_temporal_pattern(self):
@@ -86,7 +75,7 @@ class TestMultiEmotionAnalysisResponse:
                 complexity_score=0.5,
                 emotional_clarity=0.5,
                 temporal_pattern=p,
-                reasoning="test"
+                reasoning="test",
             )
             assert model.temporal_pattern == p
 
@@ -100,7 +89,7 @@ class TestMultiEmotionAnalysisResponse:
                 complexity_score=0.5,
                 emotional_clarity=0.5,
                 temporal_pattern="invalid",
-                reasoning="test"
+                reasoning="test",
             )
         assert "Temporal pattern must be one of" in str(exc.value)
 
@@ -113,7 +102,7 @@ class TestMultiEmotionAnalysisResponse:
             complexity_score=0.5,
             emotional_clarity=0.5,
             temporal_pattern="concurrent",
-            reasoning="test"
+            reasoning="test",
         )
         assert len(model.emotions) == 2
 
@@ -127,7 +116,7 @@ class TestMultiEmotionAnalysisResponse:
                 complexity_score=0.5,
                 emotional_clarity=0.5,
                 temporal_pattern="concurrent",
-                reasoning="test"
+                reasoning="test",
             )
         assert "Must have exactly 1 primary emotion" in str(exc.value)
 
@@ -141,7 +130,7 @@ class TestMultiEmotionAnalysisResponse:
                 complexity_score=0.5,
                 emotional_clarity=0.5,
                 temporal_pattern="concurrent",
-                reasoning="test"
+                reasoning="test",
             )
         assert "Must have exactly 1 primary emotion" in str(exc.value)
 
@@ -156,8 +145,6 @@ class TestMultiEmotionAnalysisResponse:
                 complexity_score=0.5,
                 emotional_clarity=0.5,
                 temporal_pattern="concurrent",
-                reasoning="test"
+                reasoning="test",
             )
         assert "Must have 1-3 emotions" in str(exc.value)
-
-

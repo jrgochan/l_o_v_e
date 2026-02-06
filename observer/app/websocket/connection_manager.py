@@ -235,8 +235,9 @@ class ConnectionManager:
         self._connection_count += 1
 
         logger.info(
-            f"WebSocket connected for user {user_id} "
-            f"(total connections: {self._connection_count})"
+            "WebSocket connected for user %s (total connections: %d)",
+            user_id,
+            self._connection_count,
         )
 
     def disconnect(self, websocket: WebSocket, user_id: str) -> None:
@@ -253,11 +254,12 @@ class ConnectionManager:
             # Remove user entry if no connections remain
             if not self.active_connections[user_id]:
                 del self.active_connections[user_id]
-                logger.info(f"Last connection for user {user_id} disconnected")
+                logger.info("Last connection for user %s disconnected", user_id)
 
         logger.info(
-            f"WebSocket disconnected for user {user_id} "
-            f"(total connections: {self._connection_count})"
+            "WebSocket disconnected for user %s (total connections: %d)",
+            user_id,
+            self._connection_count,
         )
 
     async def send_to_user(self, user_id: str, message: dict[str, Any]) -> None:
@@ -268,7 +270,7 @@ class ConnectionManager:
             message: The message dictionary to send (will be JSON serialized)
         """
         if user_id not in self.active_connections:
-            logger.debug(f"No active connections for user {user_id}, skipping broadcast")
+            logger.debug("No active connections for user %s, skipping broadcast", user_id)
             return
 
         dead_connections = set()
@@ -278,8 +280,8 @@ class ConnectionManager:
             try:
                 await connection.send_json(message)
                 sent_count += 1
-            except Exception as e:
-                logger.error(f"Failed to send to connection: {e}")
+            except Exception as e:  # pylint: disable=broad-exception-caught
+                logger.error("Failed to send to connection: %s", e)
                 dead_connections.add(connection)
 
         # Clean up dead connections
@@ -287,7 +289,7 @@ class ConnectionManager:
             self.disconnect(conn, user_id)
 
         if sent_count > 0:
-            logger.debug(f"Broadcast to {sent_count} connection(s) for user {user_id}")
+            logger.debug("Broadcast to %d connection(s) for user %s", sent_count, user_id)
 
     async def broadcast_to_all(self, message: dict[str, Any]) -> None:
         """Broadcast a message to all connected users.
@@ -303,7 +305,7 @@ class ConnectionManager:
         for user_id in list(self.active_connections.keys()):
             await self.send_to_user(user_id, message)
 
-        logger.info(f"Broadcast to {user_count} user(s)")
+        logger.info("Broadcast to %d user(s)", user_count)
 
     async def send_state_update(self, user_id: str, state_data: dict[str, Any]) -> None:
         """Send an emotional state update to a user.

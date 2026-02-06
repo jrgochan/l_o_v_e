@@ -585,7 +585,7 @@ export function ChatPanel({ sessionId }: ChatPanelProps) {
           {/* Resize Handle */}
           <div
             onMouseDown={handleMouseDown}
-            className={`w-full h-2 cursor-row-resize hover:bg-cyan-500/30 transition flex items-center justify-center \${
+            className={`w-full h-2 cursor-row-resize hover:bg-cyan-500/30 transition flex items-center justify-center ${
               isResizing ? "bg-cyan-500/50" : ""
             }`}
           >

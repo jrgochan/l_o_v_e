@@ -241,7 +241,7 @@ References:
 """
 
 import logging
-from typing import Any, Dict
+from typing import Annotated, Any, Dict
 
 from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel
@@ -278,7 +278,7 @@ class AssignModelResponse(BaseModel):
 
 
 @router.get("/assignments")
-async def get_model_assignments(db: AsyncSession = Depends(get_db)) -> Dict[str, Any]:
+async def get_model_assignments(db: Annotated[AsyncSession, Depends(get_db)]) -> Dict[str, Any]:
     """Get current model assigned to each AI function.
 
     Returns:
@@ -300,7 +300,7 @@ async def get_model_assignments(db: AsyncSession = Depends(get_db)) -> Dict[str,
 
 @router.post("/assignments", response_model=AssignModelResponse)
 async def assign_model(
-    request: AssignModelRequest, db: AsyncSession = Depends(get_db)
+    request: AssignModelRequest, db: Annotated[AsyncSession, Depends(get_db)]
 ) -> Dict[str, Any]:
     """Assign a model to a specific AI function.
 
@@ -328,7 +328,9 @@ async def assign_model(
 
 
 @router.get("/recommendations")
-async def get_model_recommendations(db: AsyncSession = Depends(get_db)) -> Dict[str, Any]:
+async def get_model_recommendations(
+    db: Annotated[AsyncSession, Depends(get_db)],
+) -> Dict[str, Any]:
     """Get recommended models for each AI function.
 
     Based on:
@@ -353,7 +355,7 @@ async def get_model_recommendations(db: AsyncSession = Depends(get_db)) -> Dict[
 
 
 @router.get("/performance")
-async def get_performance_stats(db: AsyncSession = Depends(get_db)) -> Dict[str, Any]:
+async def get_performance_stats(db: Annotated[AsyncSession, Depends(get_db)]) -> Dict[str, Any]:
     """Get performance statistics for all model assignments.
 
     Includes:
@@ -368,7 +370,10 @@ async def get_performance_stats(db: AsyncSession = Depends(get_db)) -> Dict[str,
         service = AIModelService(db)
         stats = await service.get_performance_stats()
 
-        return {"performance": stats, "note": "Statistics are exponential moving averages"}
+        return {
+            "performance": stats,
+            "note": "Statistics are exponential moving averages",
+        }
     except Exception as e:
         logger.error(f"Failed to get performance stats: {e}")
         raise HTTPException(status_code=500, detail=f"Failed to get stats: {str(e)}")

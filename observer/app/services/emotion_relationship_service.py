@@ -407,30 +407,70 @@ class EmotionRelationshipService:
     # Known emotion pairs and their typical relationships
     KNOWN_RELATIONSHIPS = {
         # Complementary pairs (naturally co-occur)
-        ("joy", "gratitude"): ("complementary", 0.9, "Joy and gratitude often arise together"),
-        ("grie", "love"): ("complementary", 0.9, "Love persists in grie"),
-        ("pride", "satisfaction"): ("complementary", 0.8, "Pride accompanies satisfaction"),
-        ("fear", "vulnerability"): ("complementary", 0.7, "Fear heightens sense of vulnerability"),
+        ("joy", "gratitude"): (
+            "complementary",
+            0.9,
+            "Joy and gratitude often arise together",
+        ),
+        ("grief", "love"): ("complementary", 0.9, "Love persists in grief"),
+        ("pride", "satisfaction"): (
+            "complementary",
+            0.8,
+            "Pride accompanies satisfaction",
+        ),
+        ("fear", "vulnerability"): (
+            "complementary",
+            0.7,
+            "Fear heightens sense of vulnerability",
+        ),
         # Contradictory pairs (ambivalence)
-        ("anxiety", "excitement"): ("contradictory", 0.8, "Ambivalence about opportunity"),
-        ("fear", "curiosity"): ("contradictory", 0.7, "Tension between caution and exploration"),
-        ("anger", "compassion"): ("contradictory", 0.7, "Conflicting responses to situation"),
-        ("sadness", "relie"): ("contradictory", 0.6, "Mixed feelings about loss and release"),
+        ("anxiety", "excitement"): (
+            "contradictory",
+            0.8,
+            "Ambivalence about opportunity",
+        ),
+        ("fear", "curiosity"): (
+            "contradictory",
+            0.7,
+            "Tension between caution and exploration",
+        ),
+        ("anger", "compassion"): (
+            "contradictory",
+            0.7,
+            "Conflicting responses to situation",
+        ),
+        ("sadness", "relief"): (
+            "contradictory",
+            0.6,
+            "Mixed feelings about loss and release",
+        ),
         # Masking pairs (one hides another)
         ("anger", "hurt"): ("masking", 0.8, "Anger protecting deeper hurt"),
         ("anger", "fear"): ("masking", 0.7, "Anger masking vulnerability"),
-        ("irritation", "sadness"): ("masking", 0.6, "Surface irritation covering sadness"),
+        ("irritation", "sadness"): (
+            "masking",
+            0.6,
+            "Surface irritation covering sadness",
+        ),
         ("indifference", "pain"): ("masking", 0.7, "Detachment protecting from pain"),
         # Amplifying pairs (one intensifies another)
-        ("grie", "regret"): ("amplifying", 0.8, "Regret intensifies grie"),
+        ("grief", "regret"): ("amplifying", 0.8, "Regret intensifies grief"),
         ("shame", "fear"): ("amplifying", 0.7, "Shame amplifying fear of judgment"),
         ("loneliness", "sadness"): ("amplifying", 0.8, "Loneliness deepening sadness"),
-        ("anxiety", "overwhelm"): ("amplifying", 0.7, "Anxiety contributing to overwhelm"),
+        ("anxiety", "overwhelm"): (
+            "amplifying",
+            0.7,
+            "Anxiety contributing to overwhelm",
+        ),
         # Sequential pairs (temporal progression)
         ("surprise", "confusion"): ("sequential", 0.8, "Surprise leads to confusion"),
-        ("confusion", "understanding"): ("sequential", 0.9, "Confusion resolves to understanding"),
-        ("shock", "grie"): ("sequential", 0.8, "Shock transitions to grie"),
-        ("fear", "relie"): ("sequential", 0.7, "Fear resolves to relie"),
+        ("confusion", "understanding"): (
+            "sequential",
+            0.9,
+            "Confusion resolves to understanding",
+        ),
+        ("shock", "grief"): ("sequential", 0.8, "Shock transitions to grief"),
+        ("fear", "relief"): ("sequential", 0.7, "Fear resolves to relief"),
         ("anger", "regret"): ("sequential", 0.6, "Anger may lead to regret"),
     }
 
@@ -575,7 +615,10 @@ class EmotionRelationshipService:
                 "emotion_b": emotion_b["emotion_name"],
                 "type": "contradictory",
                 "strength": round(min(valence_diff / 2.0, 1.0), 2),
-                "description": f"Conflicting {emotion_a['emotion_name'].lower()} and {emotion_b['emotion_name'].lower()}",
+                "description": (
+                    f"Conflicting {emotion_a['emotion_name'].lower()} and "
+                    f"{emotion_b['emotion_name'].lower()}"
+                ),
             }
 
         # 2. MASKING: One is underlying, opposite valence, high arousal difference
@@ -585,7 +628,10 @@ class EmotionRelationshipService:
                 "emotion_b": emotion_b["emotion_name"],
                 "type": "masking",
                 "strength": round(min((valence_diff + arousal_diff) / 2.5, 1.0), 2),
-                "description": f"{emotion_a['emotion_name']} may be masking {emotion_b['emotion_name'].lower()}",
+                "description": (
+                    f"{emotion_a['emotion_name']} may be masking "
+                    f"{emotion_b['emotion_name'].lower()}"
+                ),
             }
         elif prom_b == "primary" and prom_a == "underlying" and valence_diff > 0.8:
             return {
@@ -593,7 +639,10 @@ class EmotionRelationshipService:
                 "emotion_b": emotion_a["emotion_name"],
                 "type": "masking",
                 "strength": round(min((valence_diff + arousal_diff) / 2.5, 1.0), 2),
-                "description": f"{emotion_b['emotion_name']} may be masking {emotion_a['emotion_name'].lower()}",
+                "description": (
+                    f"{emotion_b['emotion_name']} may be masking "
+                    f"{emotion_a['emotion_name'].lower()}"
+                ),
             }
 
         # 3. COMPLEMENTARY: Similar VAC vectors (close in space)
@@ -603,7 +652,10 @@ class EmotionRelationshipService:
                 "emotion_b": emotion_b["emotion_name"],
                 "type": "complementary",
                 "strength": round(1.0 - distance, 2),
-                "description": f"{emotion_a['emotion_name']} and {emotion_b['emotion_name'].lower()} naturally co-occur",
+                "description": (
+                    f"{emotion_a['emotion_name']} and {emotion_b['emotion_name'].lower()} "
+                    "naturally co-occur"
+                ),
             }
 
         # 4. AMPLIFYING: Similar valence, one much higher arousal
@@ -615,7 +667,10 @@ class EmotionRelationshipService:
                     "emotion_b": emotion_b["emotion_name"],
                     "type": "amplifying",
                     "strength": round(arousal_diff, 2),
-                    "description": f"{emotion_a['emotion_name']} intensifying {emotion_b['emotion_name'].lower()}",
+                    "description": (
+                        f"{emotion_a['emotion_name']} intensifying "
+                        f"{emotion_b['emotion_name'].lower()}"
+                    ),
                 }
             else:
                 return {
@@ -623,7 +678,10 @@ class EmotionRelationshipService:
                     "emotion_b": emotion_a["emotion_name"],
                     "type": "amplifying",
                     "strength": round(arousal_diff, 2),
-                    "description": f"{emotion_b['emotion_name']} intensifying {emotion_a['emotion_name'].lower()}",
+                    "description": (
+                        f"{emotion_b['emotion_name']} intensifying "
+                        f"{emotion_a['emotion_name'].lower()}"
+                    ),
                 }
 
         # 5. SEQUENTIAL: Moderate distance, different arousal levels
@@ -635,7 +693,10 @@ class EmotionRelationshipService:
                     "emotion_b": emotion_b["emotion_name"],
                     "type": "sequential",
                     "strength": 0.5,
-                    "description": f"{emotion_a['emotion_name']} may transition to {emotion_b['emotion_name'].lower()}",
+                    "description": (
+                        f"{emotion_a['emotion_name']} may transition to "
+                        f"{emotion_b['emotion_name'].lower()}"
+                    ),
                 }
             else:
                 return {
@@ -643,7 +704,10 @@ class EmotionRelationshipService:
                     "emotion_b": emotion_a["emotion_name"],
                     "type": "sequential",
                     "strength": 0.5,
-                    "description": f"{emotion_b['emotion_name']} may transition to {emotion_a['emotion_name'].lower()}",
+                    "description": (
+                        f"{emotion_b['emotion_name']} may transition to "
+                        f"{emotion_a['emotion_name'].lower()}"
+                    ),
                 }
 
         # Default: Weak complementary if not clearly anything else
@@ -653,7 +717,10 @@ class EmotionRelationshipService:
                 "emotion_b": emotion_b["emotion_name"],
                 "type": "complementary",
                 "strength": round(0.3, 2),
-                "description": f"{emotion_a['emotion_name']} and {emotion_b['emotion_name'].lower()} co-occurring",
+                "description": (
+                    f"{emotion_a['emotion_name']} and {emotion_b['emotion_name'].lower()} "
+                    "co-occurring"
+                ),
             }
 
         return None  # No clear relationship

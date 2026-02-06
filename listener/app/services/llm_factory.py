@@ -107,7 +107,7 @@ def get_llm(
     provider = settings.AI_PROVIDER
     temp = temperature if temperature is not None else settings.LLM_TEMPERATURE
 
-    logger.info(f"Initializing LLM with provider: {provider}")
+    logger.info("Initializing LLM with provider: %s", provider)
 
     if provider == "google_vertex":
         if not settings.GOOGLE_CLOUD_PROJECT:

@@ -231,6 +231,11 @@ class MetricsInfo(BaseModel):
 
     model_config = ConfigDict(
         json_schema_extra={
-            "example": {"elasticity": 0.8, "rigidity": 0.2, "angular_distance": 1.2, "alerts": []}
+            "example": {
+                "elasticity": 0.8,
+                "rigidity": 0.2,
+                "angular_distance": 1.2,
+                "alerts": [],
+            }
         }
     )

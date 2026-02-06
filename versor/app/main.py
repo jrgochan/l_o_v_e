@@ -68,19 +68,17 @@ Example:
             --bind 0.0.0.0:8002
 """
 
-from app.api.routes import calculate, slerp
-from app.config import settings
+# Configure structured logging
+import logging
+
 from asgi_correlation_id import CorrelationIdMiddleware
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-# Configure structured logging
-try:
-    from logging_config import configure_logging
+from app.api.routes import calculate, slerp
+from app.config import settings
 
-    configure_logging(log_level=settings.LOG_LEVEL, json_format=not settings.DEBUG)
-except ImportError:
-    pass  # Fallback to default if shared lib not found
+logging.basicConfig(level=settings.LOG_LEVEL)
 
 # Configure rate limiting
 try:

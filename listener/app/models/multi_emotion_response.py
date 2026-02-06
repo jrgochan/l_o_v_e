@@ -9,7 +9,7 @@ complex emotional states (e.g., "hopeful but anxious").
 
 Key Models:
     DetectedEmotionResponse: Individual emotion with VAC, confidence, and prominence
-    EmotionRelationshipResponse: Relationship between two emotions (complementary, contradictory, etc.)
+    EmotionRelationshipResponse: Relationship between two emotions (complementary, etc.)
     MultiEmotionAnalysisResponse: Complete analysis with emotions, relationships, aggregate state
 
 Features:
@@ -131,7 +131,9 @@ class EmotionRelationshipResponse(BaseModel):
                 "emotion_b": "Excitement",
                 "type": "contradictory",
                 "strength": 0.8,
-                "description": "Ambivalence about the opportunity - nervous but also looking forward to it",
+                "description": (
+                    "Ambivalence about the opportunity - nervous but also looking forward to it"
+                ),
             }
         }
 
@@ -209,6 +211,9 @@ class MultiEmotionAnalysisResponse(BaseModel):
                 "complexity_score": 0.65,
                 "emotional_clarity": 0.72,
                 "temporal_pattern": "concurrent",
-                "reasoning": "The speaker expresses both nervousness and anticipation about a future event...",
+                "reasoning": (
+                    "The speaker expresses both nervousness and anticipation "
+                    "about a future event..."
+                ),
             }
         }

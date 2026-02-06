@@ -28,7 +28,8 @@ if ! command -v uv &> /dev/null; then
          # Fallback to pip install if script fails or path issues
          print_warning "uv install script failed, trying pip..."
          python3 -m pip install uv --user
-         export PATH="$(python3 -m site --user-base)/bin:$PATH"
+         USER_BASE_BIN="$(python3 -m site --user-base)/bin"
+         export PATH="$USER_BASE_BIN:$PATH"
     fi
 fi
 
