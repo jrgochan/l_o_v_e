@@ -61,7 +61,7 @@ async def test_explain_transition_path_coverage(mock_db):
             ]
         )
 
-        result = await explain_transition_path(e1_id, e2_id, user_id, 3, mock_db)
+        result = await explain_transition_path(e1_id, e2_id, user_id, mock_db, max_waypoints=3)
 
         assert result["path_summary"] == "Path from E1 to E2"
         assert result["path_metrics"]["requires_bridge"] is True
@@ -77,7 +77,7 @@ async def test_explain_transition_path_not_found(mock_db):
     mock_db.execute.return_value = res_emotions
 
     with pytest.raises(HTTPException) as exc:
-        await explain_transition_path(uuid4(), uuid4(), uuid4(), 3, mock_db)
+        await explain_transition_path(uuid4(), uuid4(), uuid4(), mock_db, max_waypoints=3)
 
     # If it fails with 500, we want to know why
     if exc.value.status_code == 500:
@@ -92,7 +92,7 @@ async def test_explain_transition_path_error(mock_db):
     mock_db.execute.side_effect = Exception("Boom")
 
     with pytest.raises(HTTPException) as exc:
-        await explain_transition_path(uuid4(), uuid4(), uuid4(), 3, mock_db)
+        await explain_transition_path(uuid4(), uuid4(), uuid4(), mock_db, max_waypoints=3)
     assert exc.value.status_code == 500
 
 

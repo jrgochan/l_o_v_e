@@ -261,8 +261,9 @@ class TestMultiEmotionAnalyzer:
             '"confidence": 0.95, "prominence": "primary", '
             '"vac": {"valence": 0.8, "arousal": 0.7, "connection": 0.6}}], '
             '"aggregate_vac": {"valence": 0.8, "arousal": 0.7, "connection": 0.6}, '
+            '"relationships": [], '
             '"reasoning": "Test reasoning.", "complexity_score": 0.5, '
-            '"emotional_clarity": 0.8, "temporal_pattern": "focused"}'
+            '"emotional_clarity": 0.8, "temporal_pattern": "concurrent"}'
         )
 
         # 1. ```json prefix (Case A: 553)
@@ -779,13 +780,23 @@ class TestMultiEmotionAnalyzer:
         """Test processing with relationships and missing keys."""
         response = """```json
         {
-            "emotions": [],
+            "emotions": [
+                {
+                    "emotion_name": "Joy",
+                    "category": "Happiness",
+                    "vac": {"valence": 0.8, "arousal": 0.7, "connection": 0.6},
+                    "confidence": 0.9,
+                    "prominence": "primary"
+                }
+            ],
             "relationships": [
                 {"source": "Joy", "target": "Sadness", "relationship_type": "conflict"},
                 {"source": "Joy", "relationship_type": "bad"}
             ],
-            "complexity_score": 0.5
-            // Missing clarity, aggregate_vac, etc.
+            "emotional_clarity": 0.5,
+            "aggregate_vac": {"valence": 0, "arousal": 0, "connection": 0},
+            "reasoning": "test",
+            "temporal_pattern": "concurrent"
         }
         ```"""
         # Note: missing aggregate_vac is not testing here because Pydantic model requires it?
@@ -842,14 +853,24 @@ class TestMultiEmotionAnalyzer:
         # Test 2: Missing relationships
         # If "relationships" not in dict. Skips 855.
         no_rels = {
-            "emotions": [],
-            "aggregate_vac": {},
+            "emotions": [
+                {
+                    "emotion_name": "Joy",
+                    "category": "Happiness",
+                    "vac": {"valence": 0.8, "arousal": 0.7, "connection": 0.6},
+                    "confidence": 0.9,
+                    "prominence": "primary",
+                }
+            ],
+            "aggregate_vac": {"valence": 0, "arousal": 0, "connection": 0},
             "reasoning": "r",
             "complexity_score": 0.1,
             "emotional_clarity": 0.1,
             "temporal_pattern": "c",
         }
-        with pytest.raises(ValidationError):  # Validation error on empty emotions or vac
+        with pytest.raises(
+            ValidationError
+        ):  # Validation error on missing relationships (if required)
             analyzer._process_llm_response(f"```json{json.dumps(no_rels)}```", "t")
 
         # Test 3: Missing complexity/clarity

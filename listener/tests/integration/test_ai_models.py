@@ -12,18 +12,13 @@ client = TestClient(app)
 
 @pytest.fixture
 def mock_ollama():
-    with (
-        patch.object(ai_models, "OllamaManager", autospec=True) as mock,
-        patch(
-            "app.api.routes.ai_models.get_model_fetcher",
-            side_effect=lambda: AsyncMock(get_models=AsyncMock(return_value=[])),
-        ),
-    ):
+    with patch.object(ai_models, "OllamaManager", autospec=True) as mock:
         instance = mock.return_value
         # Since autospec creates a mock that matches the class,
         # instance methods that are async will be AsyncMock automatically.
         # But we still want to return specific values in tests.
-        yield instance
+        with patch("asyncio.sleep", new_callable=AsyncMock):
+            yield instance
 
 
 def test_list_local_models(mock_ollama):

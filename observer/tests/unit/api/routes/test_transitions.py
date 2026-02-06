@@ -308,15 +308,15 @@ async def test_journey_history_exception():
 @pytest.mark.asyncio
 async def test_effective_strategies_exception():
     """Test get_user_effective_strategies exception handling."""
-    mock_db = AsyncMock()
-    mock_db.add = MagicMock()
-    mock_db.delete = MagicMock()
-    mock_db.execute.side_effect = Exception("DB Fail")
+    from app.api.routes.transitions.analysis import get_user_effective_strategies as real_func
+
+    local_mock_db = AsyncMock()
+    local_mock_db.add = MagicMock()
+    local_mock_db.delete = MagicMock()
+    local_mock_db.execute.side_effect = Exception("DB Fail")
 
     with pytest.raises(Exception, match="DB Fail"):
-        await get_user_effective_strategies(
-            uuid4(), db=mock_db
-        )  # Changed transitions.get_user_effective_strategies to get_user_effective_strategies
+        await real_func(user_id=uuid4(), db=local_mock_db)
 
 
 @pytest.mark.asyncio
@@ -510,7 +510,7 @@ async def test_get_user_effective_strategies(mock_db):
     result.scalars.return_value.all.return_value = attempts
     mock_db.execute.return_value = result
 
-    response = await get_user_effective_strategies(user_id, 5, mock_db)
+    response = await get_user_effective_strategies(user_id, mock_db, limit=5)
 
     assert response.total_strategies_tried == 2
     assert len(response.top_strategies) == 1

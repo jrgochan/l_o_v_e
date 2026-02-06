@@ -6,6 +6,13 @@ Provides database sessions, test data, and mocks.
 import uuid
 from typing import AsyncGenerator, List
 
+try:
+    import nest_asyncio
+
+    nest_asyncio.apply()
+except ImportError:
+    pass
+
 # import nest_asyncio
 import pytest
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
@@ -14,8 +21,6 @@ from sqlalchemy.pool import NullPool
 from app.models.emotion_definition import EmotionCollection, EmotionDefinition
 from app.models.user import User
 from tests.test_data import TEST_EMOTIONS
-
-# nest_asyncio.apply()
 
 # ============================================================================
 # DATABASE FIXTURES
