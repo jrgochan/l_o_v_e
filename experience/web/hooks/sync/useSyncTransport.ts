@@ -10,6 +10,7 @@ interface TransportOptions {
 export function useSyncTransport({ mode, onMessage }: TransportOptions) {
   const channelRef = useRef<BroadcastChannel | null>(null);
   const [lastMessageTime, setLastMessageTime] = useState<number>(0);
+  const lastMessageTimeRef = useRef<number>(0); // Track latest time without triggering effect
   const [isConnected, setIsConnected] = useState(true);
 
   // Use ref for callback to make it stable
@@ -41,7 +42,8 @@ export function useSyncTransport({ mode, onMessage }: TransportOptions) {
       if (mode === "listener" && e.key === CHANNEL_NAME && e.newValue) {
         try {
           const msg = JSON.parse(e.newValue);
-          if (msg.timestamp > lastMessageTime) {
+          if (msg.timestamp > lastMessageTimeRef.current) {
+            lastMessageTimeRef.current = msg.timestamp;
             setLastMessageTime(msg.timestamp);
             callbackRef.current?.(msg);
           }
@@ -73,8 +75,11 @@ export function useSyncTransport({ mode, onMessage }: TransportOptions) {
         if (mode === "listener") {
           channelRef.current.onmessage = (event) => {
             const msg = event.data;
-            setLastMessageTime(msg.timestamp);
-            callbackRef.current?.(msg);
+            if (msg.timestamp > lastMessageTimeRef.current) {
+              lastMessageTimeRef.current = msg.timestamp;
+              setLastMessageTime(msg.timestamp);
+              callbackRef.current?.(msg);
+            }
           };
         }
       } else {
@@ -90,7 +95,7 @@ export function useSyncTransport({ mode, onMessage }: TransportOptions) {
       channelRef.current?.close();
       setIsConnected(false);
     };
-  }, [mode, lastMessageTime]);
+  }, [mode]); // Removed lastMessageTime from dependencies
 
   return { sendMessage, isConnected, lastMessageTime };
 }
