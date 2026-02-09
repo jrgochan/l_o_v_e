@@ -1,8 +1,8 @@
 # Observer Code Enhancement Plan - Detailed File-by-File
 
-**Date:** January 2, 2026  
-**Status:** IN PROGRESS  
-**Total Files:** 35 (6 enhanced, 29 remaining)  
+**Date:** January 2, 2026
+**Status:** IN PROGRESS
+**Total Files:** 35 (6 enhanced, 29 remaining)
 **Estimated Time:** 7-9 hours for remaining files
 
 ---
@@ -11,7 +11,7 @@
 
 Each file must have:
 - ✅ Module-level docstring with: Purpose, Key Concepts, Example, Performance, References
-- ✅ All classes documented with overview and responsibilities  
+- ✅ All classes documented with overview and responsibilities
 - ✅ All methods with Google-style docstrings (Args, Returns, Raises, Example)
 - ✅ Complex algorithms explained inline
 - ✅ Performance characteristics noted
@@ -75,7 +75,7 @@ Each file must have:
 
 **1. strategy_recommender.py** (~30 min)
 
-**Current state:** Basic docstrings  
+**Current state:** Basic docstrings
 **Enhancement needed:**
 - Module docs explaining strategy matching algorithm
 - Pattern recognition system
@@ -94,7 +94,7 @@ Each file must have:
 
 **2. waypoint_explainer.py** (~30 min)
 
-**Current state:** Basic docstrings  
+**Current state:** Basic docstrings
 **Enhancement needed:**
 - Module docs explaining waypoint explanation generation
 - Template system for explanations
@@ -113,7 +113,7 @@ Each file must have:
 
 **3. insight_generator.py** (~30 min)
 
-**Current state:** Has method docs but could enhance module docs  
+**Current state:** Has method docs but could enhance module docs
 **Enhancement needed:**
 - Module docs explaining insight generation system
 - Warm vs clinical tone modes
@@ -132,7 +132,7 @@ Each file must have:
 
 **4. chat_service.py** (~30 min)
 
-**Current state:** Has method docs but could enhance module docs  
+**Current state:** Has method docs but could enhance module docs
 **Enhancement needed:**
 - Module docs explaining WebSocket session management
 - Message type handling
@@ -151,7 +151,7 @@ Each file must have:
 
 **5. aggregate_emotion_service.py** (~20 min)
 
-**Current state:** Basic docstrings  
+**Current state:** Basic docstrings
 **Enhancement needed:**
 - Module docs explaining multi-emotion aggregation
 - Weighted VAC calculation
@@ -163,14 +163,14 @@ Each file must have:
 **Key points to document:**
 - How multiple emotions are weighted
 - Complexity formula
-- Clarity formula  
+- Clarity formula
 - Distance to goal calculation
 
 ---
 
 **6. ai_model_service.py** (~20 min)
 
-**Current state:** Basic docstrings  
+**Current state:** Basic docstrings
 **Enhancement needed:**
 - Module docs explaining AI model routing
 - Model assignment by function
@@ -189,7 +189,7 @@ Each file must have:
 
 **7. clinical_alert_service.py** (~20 min)
 
-**Current state:** Has method docs but could enhance module docs  
+**Current state:** Has method docs but could enhance module docs
 **Enhancement needed:**
 - Module docs explaining clinical risk detection
 - Alert types and severity levels
@@ -208,7 +208,7 @@ Each file must have:
 
 **8. emotion_relationship_service.py** (~20 min)
 
-**Current state:** Basic docstrings  
+**Current state:** Basic docstrings
 **Enhancement needed:**
 - Module docs explaining emotion relationship analysis
 - Relationship classification (complement, opposite, similar, complex)
@@ -226,7 +226,7 @@ Each file must have:
 
 **9. path_matrix_service.py** (~20 min)
 
-**Current state:** Basic docstrings  
+**Current state:** Basic docstrings
 **Enhancement needed:**
 - Module docs explaining path pre-computation system
 - Batch computation strategy
@@ -245,7 +245,7 @@ Each file must have:
 
 **10. recommendation_engine.py** (~20 min)
 
-**Current state:** Basic docstrings  
+**Current state:** Basic docstrings
 **Enhancement needed:**
 - Module docs explaining recommendation system
 - Curated journey discovery
@@ -264,7 +264,7 @@ Each file must have:
 
 **11. session_analytics_service.py** (~20 min)
 
-**Current state:** Basic docstrings  
+**Current state:** Basic docstrings
 **Enhancement needed:**
 - Module docs explaining session analytics
 - Metrics aggregation
@@ -289,7 +289,7 @@ Each file must have:
 
 **1. atlas_definition.py** (~20 min)
 
-**Current state:** SQLAlchemy model with basic docs  
+**Current state:** SQLAlchemy model with basic docs
 **Enhancement needed:**
 - Module docs explaining the atlas emotion model
 - Field descriptions (vac_vector, semantic_embedding, quaternion_constant)
@@ -308,7 +308,7 @@ Each file must have:
 
 **2. user_trajectory.py** (~20 min)
 
-**Current state:** SQLAlchemy model with basic docs  
+**Current state:** SQLAlchemy model with basic docs
 **Enhancement needed:**
 - Module docs explaining emotional trajectory storage
 - Time-series data structure
@@ -327,7 +327,7 @@ Each file must have:
 
 **3. transition_strategy.py** (~15 min)
 
-**Current state:** SQLAlchemy model with basic docs  
+**Current state:** SQLAlchemy model with basic docs
 **Enhancement needed:**
 - Module docs explaining therapeutic strategy model
 - Evidence-based sourcing
@@ -345,7 +345,7 @@ Each file must have:
 
 **4. chat_session.py** (~15 min)
 
-**Current state:** SQLAlchemy model with basic docs  
+**Current state:** SQLAlchemy model with basic docs
 **Enhancement needed:**
 - Module docs explaining chat session model
 - Status lifecycle (active → ended)
@@ -362,7 +362,7 @@ Each file must have:
 
 **5. chat_message.py** (~15 min)
 
-**Current state:** SQLAlchemy model with basic docs  
+**Current state:** SQLAlchemy model with basic docs
 **Enhancement needed:**
 - Module docs explaining message model
 - Message types (user, analysis, insight)
@@ -378,7 +378,7 @@ Each file must have:
 
 **6. clinical_alert.py** (~15 min)
 
-**Current state:** SQLAlchemy model with basic docs  
+**Current state:** SQLAlchemy model with basic docs
 **Enhancement needed:**
 - Module docs explaining alert model
 - Alert types and severity
@@ -395,7 +395,7 @@ Each file must have:
 
 **7. model_assignment.py** (~15 min)
 
-**Current state:** SQLAlchemy model with basic docs  
+**Current state:** SQLAlchemy model with basic docs
 **Enhancement needed:**
 - Module docs explaining AI model routing
 - Function to model mapping
@@ -411,7 +411,7 @@ Each file must have:
 
 **8. multi_emotion_analysis.py** (~15 min)
 
-**Current state:** SQLAlchemy model with basic docs  
+**Current state:** SQLAlchemy model with basic docs
 **Enhancement needed:**
 - Module docs explaining multi-emotion state
 - Primary vs component emotions
@@ -427,7 +427,7 @@ Each file must have:
 
 **9. session_analytics.py** (~15 min)
 
-**Current state:** SQLAlchemy model with basic docs  
+**Current state:** SQLAlchemy model with basic docs
 **Enhancement needed:**
 - Module docs explaining session metrics
 - Aggregated statistics
@@ -449,7 +449,7 @@ Each file must have:
 
 **1. atlas.py** (~15 min)
 
-**Current state:** Has basic endpoint docs  
+**Current state:** Has basic endpoint docs
 **Enhancement needed:**
 - Module docs explaining atlas query endpoints
 - Endpoint overview
@@ -466,7 +466,7 @@ Each file must have:
 
 **2. state.py** (~15 min)
 
-**Current state:** Has basic endpoint docs  
+**Current state:** Has basic endpoint docs
 **Enhancement needed:**
 - Module docs explaining state storage
 - Integration with Listener
@@ -483,7 +483,7 @@ Each file must have:
 
 **3. transitions.py** (~15 min)
 
-**Current state:** Has basic endpoint docs  
+**Current state:** Has basic endpoint docs
 **Enhancement needed:**
 - Module docs explaining transition endpoints
 - Journey management
@@ -499,7 +499,7 @@ Each file must have:
 
 **4. history.py** (~10 min)
 
-**Current state:** Has basic endpoint docs  
+**Current state:** Has basic endpoint docs
 **Enhancement needed:**
 - Module docs explaining trajectory queries
 - Pagination strategy
@@ -510,7 +510,7 @@ Each file must have:
 
 **5. current.py** (~10 min)
 
-**Current state:** Has basic endpoint docs  
+**Current state:** Has basic endpoint docs
 **Enhancement needed:**
 - Module docs explaining current state queries
 - Latest state retrieval
@@ -521,7 +521,7 @@ Each file must have:
 
 **6. health.py** (~10 min)
 
-**Current state:** Has basic endpoint docs  
+**Current state:** Has basic endpoint docs
 **Enhancement needed:**
 - Module docs explaining health checks
 - Readiness vs liveness
@@ -532,7 +532,7 @@ Each file must have:
 
 **7. bootstrap.py** (~15 min)
 
-**Current state:** Has basic endpoint docs  
+**Current state:** Has basic endpoint docs
 **Enhancement needed:**
 - Module docs explaining bootstrap pattern endpoints
 - Path templates
@@ -543,7 +543,7 @@ Each file must have:
 
 **8. chat_websocket.py** (~15 min)
 
-**Current state:** Has basic endpoint docs  
+**Current state:** Has basic endpoint docs
 **Enhancement needed:**
 - Module docs explaining WebSocket protocol
 - Message types
@@ -554,7 +554,7 @@ Each file must have:
 
 **9. ai_settings.py** (~10 min)
 
-**Current state:** Has basic endpoint docs  
+**Current state:** Has basic endpoint docs
 **Enhancement needed:**
 - Module docs explaining AI model configuration
 - Assignment management
@@ -567,7 +567,7 @@ Each file must have:
 
 ### Session 1 (Current): Services (11 files)
 
-**Time:** 4-5 hours  
+**Time:** 4-5 hours
 **Order:** By complexity (complex → simple)
 
 1. strategy_recommender.py (30 min)
@@ -629,14 +629,14 @@ Key Concepts:
 
 Algorithm/Pattern:
     [If applicable, explain the core algorithm or pattern]
-    
+
     [Include formulas, pseudocode, or decision trees]
 
 Example:
     Basic usage::
-    
+
         [Working code example]
-        
+
     [Additional examples for complex cases]
 
 Performance:
@@ -646,7 +646,7 @@ Performance:
 
 Integration:
     [How this module integrates with others]
-    
+
     Used by: [List of callers]
     Calls: [List of dependencies]
 
@@ -663,24 +663,24 @@ References:
 def method_name(self, param1: Type1, param2: Type2) -> ReturnType:
     """
     [One-line summary of what method does]
-    
+
     [Optional: Additional paragraph explaining details]
-    
+
     Args:
         param1: Description of param1
         param2: Description of param2
-        
+
     Returns:
         Description of return value
-        
+
     Raises:
         ExceptionType: When and why this exception is raised
-        
+
     Example:
         >>> result = method_name(value1, value2)
         >>> print(result)
         Expected output
-        
+
     Note:
         [Important caveats, performance notes, or usage guidelines]
     """
@@ -759,5 +759,5 @@ Documentation is complete when:
 
 ---
 
-**Ready to proceed?** 
+**Ready to proceed?**
 Toggle to Act mode and I'll systematically enhance all remaining files following this plan.

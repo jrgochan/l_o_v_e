@@ -10,8 +10,8 @@
 
 Subtle Elegant mode embodies **therapeutic presence** - calm, grounded, and supportive. Like a gentle breath or the slow rhythm of ocean waves, it suggests transformation without demanding attention.
 
-**Emotional Resonance**: Safety, patience, groundedness  
-**Use Case**: Clinical work, focused exploration, default experience  
+**Emotional Resonance**: Safety, patience, groundedness
+**Use Case**: Clinical work, focused exploration, default experience
 **Feeling**: 😌 Peaceful, 🌊 Flowing, 🕊️ Gentle
 
 ---
@@ -70,29 +70,29 @@ Subtle Elegant mode embodies **therapeutic presence** - calm, grounded, and supp
 function SubtleElegantPath({ path, isSelected, opacity }: PathProps) {
   const meshRef = useRef<THREE.Mesh>(null);
   const materialRef = useRef<THREE.MeshStandardMaterial>(null);
-  
+
   useFrame((state) => {
     if (!meshRef.current || !materialRef.current) return;
-    
+
     const time = state.clock.elapsedTime;
-    
+
     // 1. Gentle breathing (3.5s cycle)
     const breathe = 1.0 + Math.sin(time * (Math.PI * 2 / 3.5)) * 0.075;
     meshRef.current.scale.set(breathe, 1.0, breathe);
-    
+
     // 2. Soft undulation (subtle vertical movement)
     const wobble = Math.sin(time * 0.3) * 0.005;
     meshRef.current.position.y = wobble;
-    
+
     // 3. Opacity shimmer (4s cycle)
     const shimmer = 0.675 + Math.sin(time * (Math.PI * 2 / 4.0)) * 0.075;
     materialRef.current.opacity = shimmer * opacity;
-    
+
     // 4. Subtle glow pulse (5s cycle)
     const glow = 1.0 + Math.sin(time * (Math.PI * 2 / 5.0)) * 0.05;
     materialRef.current.emissiveIntensity = glow * (isSelected ? 2.0 : 1.0);
   });
-  
+
   return (
     <mesh ref={meshRef} geometry={tubeGeometry}>
       <meshStandardMaterial
@@ -201,9 +201,9 @@ Same animations but:
 
 ## 🧪 Performance Profile
 
-**GPU Load**: Very Low  
-**CPU Load**: Minimal  
-**Frame Impact**: <1ms  
+**GPU Load**: Very Low
+**CPU Load**: Minimal
+**Frame Impact**: <1ms
 **Recommended For**: All devices
 
 **Why It's Fast:**

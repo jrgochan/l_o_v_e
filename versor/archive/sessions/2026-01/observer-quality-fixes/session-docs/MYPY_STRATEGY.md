@@ -2,7 +2,7 @@
 
 ## Current Situation
 
-**Mypy Strict Mode Errors:** 319 (increased from ~200 after auto-fixes)  
+**Mypy Strict Mode Errors:** 319 (increased from ~200 after auto-fixes)
 **Root Cause:** SQLAlchemy ORM conflicts with mypy strict mode
 
 ## Why SQLAlchemy + Mypy Strict is Hard
@@ -12,7 +12,7 @@
 # SQLAlchemy defines columns like this:
 class User(Base):
     name = Column(String)  # Type at runtime: Column[String]
-    
+
 # But we assign like this:
 user = User()
 user.name = "John"  # Mypy expects: Column[String] = str ❌
@@ -67,10 +67,10 @@ disallow_untyped_defs = False  # Models have complex ORM types
 disable_error_code = assignment
 ```
 
-**Effort:** 30 minutes to configure  
+**Effort:** 30 minutes to configure
 **Result:** ~250 errors disappear, ~70 legitimate ones remain
 
-### Option B: **Full Manual Typing** 
+### Option B: **Full Manual Typing**
 **Fix every single error individually**
 
 1. Convert all models to use `Mapped[]` (SQLAlchemy 2.0 style)
@@ -79,8 +79,8 @@ disable_error_code = assignment
 4. Fix ~40 generic type parameters
 5. Address ~100 complex edge cases
 
-**Effort:** 6-8 hours of careful, manual work  
-**Risk:** High - easy to introduce bugs  
+**Effort:** 6-8 hours of careful, manual work
+**Risk:** High - easy to introduce bugs
 **Benefit:** 100% strict mode compliance
 
 ### Option C: **Hybrid Approach**
@@ -93,7 +93,7 @@ disable_error_code = assignment
 5. ⚠️  Add `# type: ignore[assignment]` to Column assignments (2 hours)
 6. ⚠️  Accept remaining SQLAlchemy complexity
 
-**Effort:** ~3-4 hours  
+**Effort:** ~3-4 hours
 **Result:** ~200 errors fixed, ~100 documented with type: ignore
 
 ## 📊 Current Progress

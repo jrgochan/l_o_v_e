@@ -248,7 +248,7 @@ from pydantic import BaseModel
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.database import get_db
-from app.services.ai_model_service import AIModelService
+from app.services.ai.models import AIModelService
 
 logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/ai", tags=["AI Settings"])
@@ -294,8 +294,8 @@ async def get_model_assignments(db: Annotated[AsyncSession, Depends(get_db)]) ->
             "default_model": AIModelService.DEFAULT_MODEL,
         }
     except Exception as e:
-        logger.error(f"Failed to get model assignments: {e}")
-        raise HTTPException(status_code=500, detail=f"Failed to get assignments: {str(e)}")
+        logger.error("Failed to get model assignments: %s", e)
+        raise HTTPException(status_code=500, detail=f"Failed to get assignments: {str(e)}") from e
 
 
 @router.post("/assignments", response_model=AssignModelResponse)
@@ -321,10 +321,10 @@ async def assign_model(
         return result
     except ValueError as e:
         # Invalid function name
-        raise HTTPException(status_code=400, detail=str(e))
+        raise HTTPException(status_code=400, detail=str(e)) from e
     except Exception as e:
-        logger.error(f"Failed to assign model: {e}")
-        raise HTTPException(status_code=500, detail=f"Failed to assign model: {str(e)}")
+        logger.error("Failed to assign model: %s", e)
+        raise HTTPException(status_code=500, detail=f"Failed to assign model: {str(e)}") from e
 
 
 @router.get("/recommendations")
@@ -350,8 +350,10 @@ async def get_model_recommendations(
             "note": "Recommendations based on performance testing and use case analysis",
         }
     except Exception as e:
-        logger.error(f"Failed to get recommendations: {e}")
-        raise HTTPException(status_code=500, detail=f"Failed to get recommendations: {str(e)}")
+        logger.error("Failed to get recommendations: %s", e)
+        raise HTTPException(
+            status_code=500, detail=f"Failed to get recommendations: {str(e)}"
+        ) from e
 
 
 @router.get("/performance")
@@ -375,8 +377,8 @@ async def get_performance_stats(db: Annotated[AsyncSession, Depends(get_db)]) ->
             "note": "Statistics are exponential moving averages",
         }
     except Exception as e:
-        logger.error(f"Failed to get performance stats: {e}")
-        raise HTTPException(status_code=500, detail=f"Failed to get stats: {str(e)}")
+        logger.error("Failed to get performance stats: %s", e)
+        raise HTTPException(status_code=500, detail=f"Failed to get stats: {str(e)}") from e
 
 
 @router.get("/functions")

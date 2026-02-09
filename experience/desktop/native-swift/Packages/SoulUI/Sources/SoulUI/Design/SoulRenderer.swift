@@ -163,12 +163,12 @@ public class SoulRenderer: NSObject, MTKViewDelegate {
     public func draw(in view: MTKView) {
         // Ensure viewport size is synced for hit testing
         if viewportSize == .zero { viewportSize = view.drawableSize }
-        
+
         // Physics Loop (Delta-Time)
         let now = Date().timeIntervalSince(startTime)
         let deltaTime = (lastRenderTime == 0) ? 0.016 : (now - lastRenderTime)
         lastRenderTime = now
-        
+
         updateCamera(deltaTime: deltaTime)
 
         view.depthStencilPixelFormat = .depth32Float

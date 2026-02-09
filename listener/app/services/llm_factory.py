@@ -23,14 +23,14 @@ except ImportError:
 logger = logging.getLogger(__name__)
 
 
-class UnifiedLLM(Protocol):
+class UnifiedLLM(Protocol):  # pylint: disable=too-few-public-methods
     """Protocol for unified LLM interface."""
 
     async def ainvoke(self, input_text: str) -> str:
         """Async invoke the LLM with text input and return text output."""
 
 
-class OllamaAdapter:
+class OllamaAdapter:  # pylint: disable=too-few-public-methods
     """Adapter for LangChain Ollama LLM."""
 
     def __init__(self, model: str, temperature: float, base_url: str):
@@ -41,7 +41,7 @@ class OllamaAdapter:
             temperature: Sampling temperature.
             base_url: Ollama API base URL.
         """
-        self.llm = Ollama(
+        self.llm = Ollama(  # pylint: disable=not-callable
             model=model,
             temperature=temperature,
             base_url=base_url,
@@ -57,7 +57,7 @@ class OllamaAdapter:
         return cast(str, result)
 
 
-class VertexAdapter:
+class VertexAdapter:  # pylint: disable=too-few-public-methods
     """Adapter for Google Vertex AI Chat Model."""
 
     def __init__(self, model: str, temperature: float, project: str, location: str):

@@ -8,7 +8,7 @@ import SoulBrain
 actor SemanticSearchManager: ModelActor {
     nonisolated public let modelContainer: ModelContainer
     nonisolated public let modelExecutor: any ModelExecutor
-    
+
     private let embedder: Embedder
     private let index: VectorIndex
 
@@ -16,7 +16,7 @@ actor SemanticSearchManager: ModelActor {
         self.modelContainer = container
         let context = ModelContext(container)
         self.modelExecutor = DefaultSerialModelExecutor(modelContext: context)
-        
+
         self.embedder = embedder
         self.index = VectorIndex()
     }

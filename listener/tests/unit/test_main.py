@@ -7,14 +7,14 @@ from app.main import app
 client = TestClient(app)
 
 
-def test_root_endpoint():
+def test_root_endpoint() -> None:
     response = client.get("/")
     assert response.status_code == 200
     assert response.json()["service"] == "Listener API"
     assert "ingest" in response.json()["endpoints"]
 
 
-def test_startup_shutdown_events():
+def test_startup_shutdown_events() -> None:
     # TestClient context manager triggers startup and shutdown events
     with patch("app.main.logger") as mock_logger:
         with TestClient(app) as _:
@@ -28,7 +28,7 @@ def test_startup_shutdown_events():
         assert mock_logger.info.call_count >= 5
 
 
-def test_cors_middleware():
+def test_cors_middleware() -> None:
     # Test CORS headers
     # Note: CORSMiddleware with allow_origins=["*"] and allow_credentials=True
     # typically reflects the Origin header in Access-Control-Allow-Origin
@@ -45,15 +45,15 @@ def test_cors_middleware():
     assert "OPTIONS" in allow_methods
 
 
-def test_routes_exist():
+def test_routes_exist() -> None:
     # Verify all expected routes are registered
-    routes = [r.path for r in app.routes]
+    routes = [r.path for r in app.routes]  # type: ignore[attr-defined]
     assert "/health" in routes
     assert "/listener/ingest" in routes
     assert "/listener/ai/models/local" in routes
 
 
-def test_health_check():
+def test_health_check() -> None:
     response = client.get("/health")
     assert response.status_code == 200
     data = response.json()

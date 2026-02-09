@@ -1,8 +1,8 @@
 # RFC 003: Native "Liquid Metal" Architecture (macOS)
 
-**Status**: Proposal  
-**Date**: 2026-01-27  
-**Module**: Experience (macOS)  
+**Status**: Proposal
+**Date**: 2026-01-27
+**Module**: Experience (macOS)
 **Goal**: Build the most optimized, beautiful, and sellable version of L.O.V.E. for the Mac App Store.
 
 ## 1. Executive Summary
@@ -52,7 +52,7 @@ We remove the heavy Python runtime.
 *   **Embeddings**: Use Apple's `NaturalLanguage` framework `NLEmbedding` or a quantized BERT model converted to CoreML.
 *   **LLM**: Convert Llama-3-8B (or smaller "Soul" tuned models) to **CoreML** format using `coremltools`.
     *   *Optimization*: These run on the ANE (Neural Engine), freeing up the GPU for UI rendering.
-*   **Vector Search**: 
+*   **Vector Search**:
     - For < 100k vectors (Personal Soul), brute-force cosine similarity using Apple's **Accelerate** (vDSP) framework is incredibly fast (sub-millisecond).
     - No need for a complex vector DB. Just store arrays of Float and use SIMD instructions.
 

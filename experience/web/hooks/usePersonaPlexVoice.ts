@@ -30,8 +30,6 @@ export interface UsePersonaPlexVoiceReturn {
   error: string | null;
 }
 
-const PERSONAPLEX_URL = process.env.NEXT_PUBLIC_PERSONAPLEX_URL || "http://localhost:8003";
-
 export function usePersonaPlexVoice({
   personaId,
   enabled,
@@ -77,15 +75,15 @@ export function usePersonaPlexVoice({
 
     // Stop Worklet
     if (workletNodeRef.current) {
-        workletNodeRef.current.port.postMessage({ type: 'clear' });
-        workletNodeRef.current.disconnect();
-        workletNodeRef.current = null;
+      workletNodeRef.current.port.postMessage({ type: "clear" });
+      workletNodeRef.current.disconnect();
+      workletNodeRef.current = null;
     }
 
     // Stop Source
     if (sourceRef.current) {
-        sourceRef.current.disconnect();
-        sourceRef.current = null;
+      sourceRef.current.disconnect();
+      sourceRef.current = null;
     }
 
     // Stop Media Stream
@@ -120,6 +118,7 @@ export function usePersonaPlexVoice({
     try {
       // 1. Initialize Audio Context
       onDebugRef.current?.("Initializing AudioContext...");
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const AudioContextClass = window.AudioContext || (window as any).webkitAudioContext;
       // Request 24kHz if possible (Moshi native), but browser might ignore
       const audioContext = new AudioContextClass({ sampleRate: 24000 });
@@ -128,22 +127,22 @@ export function usePersonaPlexVoice({
       // 2. Load AudioWorklet
       // Note: In Next.js, public files are served at root
       try {
-          onDebugRef.current?.("Loading AudioWorklet module...");
-          await audioContext.audioWorklet.addModule("/audio-processor.js");
+        onDebugRef.current?.("Loading AudioWorklet module...");
+        await audioContext.audioWorklet.addModule("/audio-processor.js");
       } catch (e) {
-          throw new Error(`Failed to load audio-processor: ${e}`);
+        throw new Error(`Failed to load audio-processor: ${e}`);
       }
 
       // 3. Get Microphone Access
       onDebugRef.current?.("Requesting Microphone access...");
       const stream = await navigator.mediaDevices.getUserMedia({
-          audio: {
-              channelCount: 1,
-              sampleRate: 24000, // Try to match context
-              echoCancellation: true,
-              noiseSuppression: true,
-              autoGainControl: true
-          }
+        audio: {
+          channelCount: 1,
+          sampleRate: 24000, // Try to match context
+          echoCancellation: true,
+          noiseSuppression: true,
+          autoGainControl: true,
+        },
       });
       mediaStreamRef.current = stream;
       onDebugRef.current?.("Microphone access granted.");
@@ -152,7 +151,7 @@ export function usePersonaPlexVoice({
       const source = audioContext.createMediaStreamSource(stream);
       sourceRef.current = source;
 
-      const workletNode = new AudioWorkletNode(audioContext, 'personaplex-audio-processor');
+      const workletNode = new AudioWorkletNode(audioContext, "personaplex-audio-processor");
       workletNodeRef.current = workletNode;
 
       // Connect: Source -> Worklet -> Destination
@@ -171,32 +170,29 @@ export function usePersonaPlexVoice({
       wsRef.current = ws;
 
       // 6. Worklet <-> Main Thread Communication
-      let chunkCount = 0;
       workletNode.port.onmessage = (event) => {
-          const { type, data } = event.data;
+        const { type, data } = event.data;
 
-          if (type === 'input') {
-              chunkCount++;
+        if (type === "input") {
+          // Audio from Mic (Float32Array)
+          // Calculate Audio Level (RMS) for UI
+          // Optimization: Don't calculate every chunk if not needed, but chunks are small here.
+          // Maybe do it every N chunks or use a leaky integrator?
+          // For now, quick RMS.
+          // data is Float32Array (128 length usually)
 
-              // Audio from Mic (Float32Array)
-              // Calculate Audio Level (RMS) for UI
-              // Optimization: Don't calculate every chunk if not needed, but chunks are small here.
-              // Maybe do it every N chunks or use a leaky integrator?
-              // For now, quick RMS.
-              // data is Float32Array (128 length usually)
+          // CRITICAL FIX: Use ws.readyState to check connection (local scope)
+          // and isMutedRef for mute state (stable ref) to avoid stale closure issues.
+          if (ws.readyState === WebSocket.OPEN && !isMutedRef.current) {
+            ws.send(data); // Send raw float32
 
-              // CRITICAL FIX: Use ws.readyState to check connection (local scope)
-              // and isMutedRef for mute state (stable ref) to avoid stale closure issues.
-              if (ws.readyState === WebSocket.OPEN && !isMutedRef.current) {
-                 ws.send(data); // Send raw float32
-
-                 // RMS for Vis
-                 let sum = 0;
-                 for (let i = 0; i < data.length; i++) sum += data[i] * data[i];
-                 const rms = Math.sqrt(sum / data.length);
-                 setAudioLevel(prev => prev * 0.8 + (rms * 5) * 0.2); // Smooth
-              }
+            // RMS for Vis
+            let sum = 0;
+            for (let i = 0; i < data.length; i++) sum += data[i] * data[i];
+            const rms = Math.sqrt(sum / data.length);
+            setAudioLevel((prev) => prev * 0.8 + rms * 5 * 0.2); // Smooth
           }
+        }
       };
 
       ws.onopen = () => {
@@ -204,11 +200,13 @@ export function usePersonaPlexVoice({
         onDebugRef.current?.("WebSocket OPEN. Sending handshake...");
 
         // Handshake
-        ws.send(JSON.stringify({
-           type: "configure",
-           persona_id: personaId,
-           mode: "default"
-        }));
+        ws.send(
+          JSON.stringify({
+            type: "configure",
+            persona_id: personaId,
+            mode: "default",
+          })
+        );
 
         setIsConnected(true);
         setIsConnecting(false);
@@ -217,30 +215,33 @@ export function usePersonaPlexVoice({
 
       ws.onmessage = async (event) => {
         if (typeof event.data === "string") {
-            try {
-                const msg = JSON.parse(event.data);
-                if (msg.type === "text-delta") {
-                    console.log("AI:", msg.text);
-                }
-            } catch (e) { console.error("WS Parse error", e); }
-        } else if (event.data instanceof ArrayBuffer) {
-            // Binary Audio (PCM Float32) from Server - Already ArrayBuffer due to binaryType="arraybuffer"
-            const arrayBuffer = event.data;
-            const prefix = new Uint8Array(arrayBuffer, 0, 1)[0];
-
-            if (prefix === 1) { // Audio
-                const audioBytes = arrayBuffer.slice(1);
-                // Assume server sends Float32
-                const audioFloat32 = new Float32Array(audioBytes);
-
-                // Send to Worklet for Playback
-                if (workletNodeRef.current) {
-                    workletNodeRef.current.port.postMessage({
-                        type: 'enqueue',
-                        data: audioFloat32
-                    });
-                }
+          try {
+            const msg = JSON.parse(event.data);
+            if (msg.type === "text-delta") {
+              console.log("AI:", msg.text);
             }
+          } catch (e) {
+            console.error("WS Parse error", e);
+          }
+        } else if (event.data instanceof ArrayBuffer) {
+          // Binary Audio (PCM Float32) from Server - Already ArrayBuffer due to binaryType="arraybuffer"
+          const arrayBuffer = event.data;
+          const prefix = new Uint8Array(arrayBuffer, 0, 1)[0];
+
+          if (prefix === 1) {
+            // Audio
+            const audioBytes = arrayBuffer.slice(1);
+            // Assume server sends Float32
+            const audioFloat32 = new Float32Array(audioBytes);
+
+            // Send to Worklet for Playback
+            if (workletNodeRef.current) {
+              workletNodeRef.current.port.postMessage({
+                type: "enqueue",
+                data: audioFloat32,
+              });
+            }
+          }
         }
       };
 
@@ -258,10 +259,9 @@ export function usePersonaPlexVoice({
       };
 
       // Resume context if suspended (browser requirements)
-      if (audioContext.state === 'suspended') {
-          await audioContext.resume();
+      if (audioContext.state === "suspended") {
+        await audioContext.resume();
       }
-
     } catch (err) {
       const errorMsg = err instanceof Error ? err.message : "Failed to start voice session";
       console.error("Voice session error:", err);
@@ -273,24 +273,24 @@ export function usePersonaPlexVoice({
   }, [enabled, personaId, stopSession]); // Remove isConnected, isMuted deps
 
   const toggleMute = useCallback(() => {
-      setIsMuted((prev) => {
-          const next = !prev;
-          isMutedRef.current = next;
-          return next;
-      });
+    setIsMuted((prev) => {
+      const next = !prev;
+      isMutedRef.current = next;
+      return next;
+    });
   }, []);
 
   // Cleanup
   useEffect(() => {
     onDebugRef.current?.(`Effect MOUNT. isConnected=${isConnected}`);
     return () => {
-        onDebugRef.current?.(`Effect CLEANUP. isConnected=${isConnected}`);
-        // We do not auto-stop on unmount if we want background voice?
-        // No, typical react behavior is stop.
-        if (isConnected) {
-            onDebugRef.current?.("Unmount/Update triggering stopSession");
-            stopSession();
-        }
+      onDebugRef.current?.(`Effect CLEANUP. isConnected=${isConnected}`);
+      // We do not auto-stop on unmount if we want background voice?
+      // No, typical react behavior is stop.
+      if (isConnected) {
+        onDebugRef.current?.("Unmount/Update triggering stopSession");
+        stopSession();
+      }
     };
   }, [stopSession, isConnected]);
 

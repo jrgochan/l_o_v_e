@@ -31,3 +31,16 @@ repos:
     hooks:
       - id: flake8
         additional_dependencies: [flake8-bugbear]
+        args: ["--max-line-length=100", "--max-complexity=15", "--exclude=migrations,__pycache__"]
+
+  - repo: https://github.com/pre-commit/mirrors-mypy
+    rev: v1.8.0
+    hooks:
+      - id: mypy
+        args: ["--strict", "--ignore-missing-imports", "--no-error-summary"]
+
+  - repo: https://github.com/shellcheck-py/shellcheck-py
+    rev: v0.9.0.6
+    hooks:
+      - id: shellcheck
+        args: ["--format=gcc"]

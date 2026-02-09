@@ -1,7 +1,7 @@
 # API Reference
 
-**Audience:** Developers integrating with Observer  
-**Base URL:** `http://localhost:8000` (development) or `https://api.love-platform.dev` (production)  
+**Audience:** Developers integrating with Observer
+**Base URL:** `http://localhost:8000` (development) or `https://api.love-platform.dev` (production)
 **Authentication:** JWT Bearer token (provided by Experience module)
 
 ---
@@ -718,14 +718,14 @@ async def store_emotional_state():
             }
         )
         state = response.json()
-        
+
         # 2. Get similar past moments
         history = await client.get(
             f"http://localhost:8000/observer/history/{state['user_id']}",
             params={"emotion": state["emotion"]["name"], "limit": 5}
         )
         similar = history.json()
-        
+
         return state, similar
 ```
 
@@ -744,7 +744,7 @@ async def navigate_emotions():
             }
         )
         path = path_response.json()
-        
+
         # 2. Start journey
         journey_response = await client.post(
             "http://localhost:8000/journey/start",
@@ -756,7 +756,7 @@ async def navigate_emotions():
             }
         )
         journey = journey_response.json()
-        
+
         # 3. Mark waypoint reached
         await client.post(
             f"http://localhost:8000/journey/{journey['journey_id']}/waypoint-reached",
@@ -774,8 +774,8 @@ async def navigate_emotions():
 
 Observer auto-generates OpenAPI (Swagger) documentation:
 
-**Interactive docs:** `http://localhost:8000/docs`  
-**ReDoc:** `http://localhost:8000/redoc`  
+**Interactive docs:** `http://localhost:8000/docs`
+**ReDoc:** `http://localhost:8000/redoc`
 **OpenAPI JSON:** `http://localhost:8000/openapi.json`
 
 ---

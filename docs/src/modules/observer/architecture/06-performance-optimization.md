@@ -1,8 +1,8 @@
 # Performance Optimization
 
-**Reading Time:** ~40 minutes  
-**Audience:** Senior developers, performance engineers  
-**Prerequisites:** [Database Architecture](02-database-architecture.md), [Vector Search](03-vector-search.md)  
+**Reading Time:** ~40 minutes
+**Audience:** Senior developers, performance engineers
+**Prerequisites:** [Database Architecture](02-database-architecture.md), [Vector Search](03-vector-search.md)
 **Goal:** Master techniques for optimizing Observer performance at scale
 
 ---
@@ -31,7 +31,7 @@
 CREATE EXTENSION IF NOT EXISTS pg_stat_statements;
 
 -- Find slowest queries
-SELECT 
+SELECT
     substring(query, 1, 100) as query_preview,
     calls,
     total_exec_time / 1000 as total_sec,
@@ -53,7 +53,7 @@ SELECT * FROM user_trajectory WHERE user_id = 'user123';
 SELECT * FROM atlas_definitions WHERE id = emotion_id;
 
 -- ✅ GOOD: Single query with JOIN
-SELECT 
+SELECT
     t.*,
     e.name as emotion_name,
     e.category as emotion_category
@@ -63,7 +63,7 @@ WHERE t.user_id = 'user123';
 
 
 -- ❌ BAD: Full table scan
-SELECT * FROM user_trajectory 
+SELECT * FROM user_trajectory
 WHERE EXTRACT(MONTH FROM timestamp) = 1;
 
 -- ✅ GOOD: Index-friendly
@@ -104,7 +104,7 @@ engine = create_async_engine(
     pool_timeout=30,       # Wait before giving up
     pool_recycle=3600,     # Recycle hourly (avoid stale connections)
     pool_pre_ping=True,    # Verify connections are alive
-    
+
     # Connection-level timeouts
     connect_args={
         "command_timeout": 60,      # Query timeout
@@ -134,7 +134,7 @@ pool_size = (100 × 0.05) / 0.2 = 25
 
 ```sql
 -- Monitor index bloat
-SELECT 
+SELECT
     schemaname,
     tablename,
     indexname,
@@ -146,7 +146,7 @@ WHERE schemaname = 'public'
 ORDER BY pg_relation_size(indexrelid) DESC;
 
 -- Unused indexes (candidates for removal)
-SELECT 
+SELECT
     schemaname,
     tablename,
     indexname,
@@ -178,23 +178,23 @@ class AtlasCache:
     def __init__(self, ttl: int = 3600):
         self._cache = TTLCache(maxsize=1, ttl=ttl)
         self._lock = asyncio.Lock()
-    
+
     async def get_atlas(self, db: AsyncSession) -> List[AtlasDefinition]:
         """Get atlas with caching"""
         cache_key = "atlas_emotions"
-        
+
         if cache_key in self._cache:
             return self._cache[cache_key]
-        
+
         async with self._lock:
             # Double-check after acquiring lock
             if cache_key in self._cache:
                 return self._cache[cache_key]
-            
+
             # Load from database
             result = await db.execute(select(AtlasDefinition))
             emotions = result.scalars().all()
-            
+
             # Cache
             self._cache[cache_key] = emotions
             return emotions
@@ -211,7 +211,7 @@ atlas_cache = AtlasCache(ttl=3600)
 class PathMatrixCache:
     def __init__(self):
         self._cache: Dict[Tuple[UUID, UUID], TransitionPath] = {}
-    
+
     async def get_path(
         self,
         db: AsyncSession,
@@ -220,11 +220,11 @@ class PathMatrixCache:
     ) -> Optional[TransitionPath]:
         """Get cached path or compute"""
         cache_key = (from_id, to_id)
-        
+
         # Check memory cache
         if cache_key in self._cache:
             return self._cache[cache_key]
-        
+
         # Check database cache
         result = await db.execute(
             select(PathMatrixCache)
@@ -234,15 +234,15 @@ class PathMatrixCache:
             )
         )
         cached = result.scalar_one_or_none()
-        
+
         if cached:
             # Deserialize and cache in memory
             path = TransitionPath.from_dict(cached.path)
             self._cache[cache_key] = path
             return path
-        
+
         return None
-    
+
     async def store_path(
         self,
         db: AsyncSession,
@@ -253,7 +253,7 @@ class PathMatrixCache:
         """Store computed path in cache"""
         # Store in memory
         self._cache[(from_id, to_id)] = path
-        
+
         # Store in database
         cache_entry = PathMatrixCache(
             from_emotion_id=from_id,
@@ -275,22 +275,22 @@ class EmbeddingService:
     def __init__(self):
         self.model = SentenceTransformer('all-MiniLM-L6-v2')
         self._cache = TTLCache(maxsize=10000, ttl=3600)
-    
+
     async def generate_embedding(self, text: str) -> List[float]:
         """Generate embedding with caching"""
         # Normalize text for cache key
         cache_key = text.strip().lower()
-        
+
         if cache_key in self._cache:
             return self._cache[cache_key]
-        
+
         # Generate (expensive operation)
         embedding = await asyncio.to_thread(
             self.model.encode,
             text,
             normalize_embeddings=True
         )
-        
+
         # Cache
         self._cache[cache_key] = embedding.tolist()
         return embedding.tolist()
@@ -309,14 +309,14 @@ async def generate_embeddings_batch(
 ) -> List[List[float]]:
     """
     Generate embeddings in batches for efficiency.
-    
+
     ~5x faster than one-at-a-time
     """
     embeddings = []
-    
+
     for i in range(0, len(texts), batch_size):
         batch = texts[i:i + batch_size]
-        
+
         # Generate batch (runs in thread pool)
         batch_embeddings = await asyncio.to_thread(
             model.encode,
@@ -324,9 +324,9 @@ async def generate_embeddings_batch(
             batch_size=batch_size,
             show_progress_bar=False
         )
-        
+
         embeddings.extend(batch_embeddings.tolist())
-    
+
     return embeddings
 ```
 
@@ -342,12 +342,12 @@ async def bulk_insert_trajectories(
     for traj in trajectories:
         db.add(UserTrajectory(**traj))
         await db.commit()  # N commits!
-    
+
     # ✅ GOOD: Batch commit
     for traj in trajectories:
         db.add(UserTrajectory(**traj))
     await db.commit()  # 1 commit
-    
+
     # ✅ BETTER: Bulk insert with execute
     await db.execute(
         insert(UserTrajectory),
@@ -369,24 +369,24 @@ async def process_emotion_state(
     text: str
 ) -> Dict:
     """Run independent operations in parallel"""
-    
+
     # ❌ BAD: Sequential (total: 150ms)
     emotion = await find_nearest_emotion(vac, text)  # 50ms
     quaternion = await convert_to_quaternion(vac)     # 50ms
     embedding = await generate_embedding(text)        # 50ms
-    
+
     # ✅ GOOD: Parallel (total: 50ms)
     emotion_task = asyncio.create_task(find_nearest_emotion(vac, text))
     quaternion_task = asyncio.create_task(convert_to_quaternion(vac))
     embedding_task = asyncio.create_task(generate_embedding(text))
-    
+
     # Wait for all
     emotion, quaternion, embedding = await asyncio.gather(
         emotion_task,
         quaternion_task,
         embedding_task
     )
-    
+
     return {
         "emotion": emotion,
         "quaternion": quaternion,
@@ -415,14 +415,14 @@ class VersorClient:
                 max_keepalive_connections=20
             )
         )
-    
+
     async def convert_vac(self, vac: List[float]):
         response = await self.client.post(
             f"{VERSOR_URL}/convert",
             json={"vac": vac}
         )
         return response.json()["quaternion"]
-    
+
     async def close(self):
         await self.client.aclose()
 
@@ -441,7 +441,7 @@ class EmotionMapper:
     def __init__(self, db: AsyncSession):
         self.db = db
         self._atlas_cache = None  # Load on demand
-    
+
     async def _get_atlas(self) -> List[AtlasDefinition]:
         """Lazy load atlas"""
         if self._atlas_cache is None:
@@ -465,7 +465,7 @@ async def get_trajectory(
     # all_trajectories = await db.execute(
     #     select(UserTrajectory).where(UserTrajectory.user_id == user_id)
     # )
-    
+
     # ✅ GOOD: Paginated
     result = await db.execute(
         select(UserTrajectory)
@@ -474,9 +474,9 @@ async def get_trajectory(
         .offset(skip)
         .limit(limit)
     )
-    
+
     trajectories = result.scalars().all()
-    
+
     # Return with pagination metadata
     return {
         "trajectories": trajectories,
@@ -504,11 +504,11 @@ async def export_trajectory(
             .where(UserTrajectory.user_id == user_id)
             .order_by(UserTrajectory.timestamp)
         )
-        
+
         async for trajectory in result.scalars():
             # Convert to JSON and yield
             yield trajectory.to_json() + "\n"
-    
+
     return StreamingResponse(
         generate(),
         media_type="application/x-ndjson"
@@ -523,17 +523,17 @@ async def export_trajectory(
 
 ```sql
 -- Default (balanced)
-CREATE INDEX ON user_trajectory 
+CREATE INDEX ON user_trajectory
 USING hnsw (embedding vector_cosine_ops)
 WITH (m = 16, ef_construction = 64);
 
 -- High throughput (more memory, faster queries)
-CREATE INDEX ON user_trajectory 
+CREATE INDEX ON user_trajectory
 USING hnsw (embedding vector_cosine_ops)
 WITH (m = 32, ef_construction = 128);
 
 -- Memory constrained (less memory, acceptable speed)
-CREATE INDEX ON user_trajectory 
+CREATE INDEX ON user_trajectory
 USING hnsw (embedding vector_cosine_ops)
 WITH (m = 8, ef_construction = 32);
 ```
@@ -547,7 +547,7 @@ async def find_similar_optimized(
     accuracy: str = "balanced"
 ):
     """Adjust search parameters based on accuracy needs"""
-    
+
     # Set ef_search based on accuracy requirement
     if accuracy == "high":
         await db.execute(text("SET hnsw.ef_search = 200"))
@@ -555,14 +555,14 @@ async def find_similar_optimized(
         await db.execute(text("SET hnsw.ef_search = 40"))
     else:  # "fast"
         await db.execute(text("SET hnsw.ef_search = 20"))
-    
+
     # Execute search
     result = await db.execute(
         select(UserTrajectory)
         .order_by(UserTrajectory.embedding.cosine_distance(query_embedding))
         .limit(10)
     )
-    
+
     return result.scalars().all()
 ```
 
@@ -597,25 +597,25 @@ class MultiLevelCache:
     def __init__(self):
         # L1: Recent (LRU, 100 items)
         self.l1_cache = LRUCache(maxsize=100)
-        
+
         # L2: Time-based (TTL, 1000 items, 1 hour)
         self.l2_cache = TTLCache(maxsize=1000, ttl=3600)
-    
+
     def get(self, key: str) -> Optional[Any]:
         """Check L1, then L2"""
         # Try L1
         if key in self.l1_cache:
             return self.l1_cache[key]
-        
+
         # Try L2
         if key in self.l2_cache:
             value = self.l2_cache[key]
             # Promote to L1
             self.l1_cache[key] = value
             return value
-        
+
         return None
-    
+
     def set(self, key: str, value: Any):
         """Store in both levels"""
         self.l1_cache[key] = value
@@ -630,15 +630,15 @@ class CacheManager:
         """Invalidate all caches for a user"""
         # Invalidate trajectory cache
         trajectory_cache.pop(f"trajectory:{user_id}", None)
-        
+
         # Invalidate metrics cache
         metrics_cache.pop(f"metrics:{user_id}", None)
-        
+
         # Invalidate session cache
         for key in list(session_cache.keys()):
             if key.startswith(f"session:{user_id}"):
                 session_cache.pop(key)
-    
+
     async def invalidate_atlas_cache(self):
         """Invalidate atlas cache when emotions updated"""
         atlas_cache._cache.clear()
@@ -656,12 +656,12 @@ from locust import HttpUser, task, between
 
 class ObserverUser(HttpUser):
     wait_time = between(1, 3)  # Realistic user behavior
-    
+
     @task(3)  # Weight: 3x more common
     def get_emotions(self):
         """Load test: Get emotions"""
         self.client.get("/atlas/emotions")
-    
+
     @task(2)
     def find_similar(self):
         """Load test: Similarity search"""
@@ -670,7 +670,7 @@ class ObserverUser(HttpUser):
             "arousal": 0.6,
             "connection": 0.7
         })
-    
+
     @task(1)
     def find_path(self):
         """Load test: Pathfinding"""
@@ -679,7 +679,7 @@ class ObserverUser(HttpUser):
             "to_emotion": "Calm",
             "user_id": "test-user"
         })
-    
+
     def on_start(self):
         """Setup before tasks"""
         pass
@@ -736,22 +736,22 @@ active_connections = Gauge(
 @app.middleware("http")
 async def metrics_middleware(request: Request, call_next):
     start = time.time()
-    
+
     response = await call_next(request)
-    
+
     duration = time.time() - start
-    
+
     request_count.labels(
         method=request.method,
         endpoint=request.url.path,
         status=response.status_code
     ).inc()
-    
+
     request_latency.labels(
         method=request.method,
         endpoint=request.url.path
     ).observe(duration)
-    
+
     return response
 ```
 
@@ -759,7 +759,7 @@ async def metrics_middleware(request: Request, call_next):
 
 ```sql
 -- Active queries
-SELECT 
+SELECT
     pid,
     now() - query_start as duration,
     state,
@@ -770,7 +770,7 @@ WHERE state != 'idle'
 ORDER BY duration DESC;
 
 -- Lock monitoring
-SELECT 
+SELECT
     blocked_locks.pid AS blocked_pid,
     blocked_activity.usename AS blocked_user,
     blocking_locks.pid AS blocking_pid,
@@ -799,12 +799,12 @@ def profile_function():
     """Profile a function"""
     profiler = cProfile.Profile()
     profiler.enable()
-    
+
     # Run function
     result = await expensive_function()
-    
+
     profiler.disable()
-    
+
     # Print stats
     stats = pstats.Stats(profiler)
     stats.sort_stats(SortKey.CUMULATIVE)

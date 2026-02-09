@@ -25,7 +25,7 @@ class TestConnectionAxis:
     """
 
     @pytest.mark.asyncio
-    async def test_pity_vs_compassion(self, pity_text, compassion_text):
+    async def test_pity_vs_compassion(self, pity_text: str, compassion_text: str) -> None:
         """
         THE CRITICAL TEST: Pity vs. Compassion distinction.
 
@@ -87,7 +87,7 @@ class TestConnectionAxis:
         print(f"   Pity→Compassion difference: {connection_difference:.2f}")
 
     @pytest.mark.asyncio
-    async def test_grief_positive_connection(self, grief_text):
+    async def test_grief_positive_connection(self, grief_text: str) -> None:
         """
         Test that Grief has POSITIVE Connection despite negative Valence.
 
@@ -116,7 +116,7 @@ class TestConnectionAxis:
         print(f"   Reasoning: {result.reasoning}")
 
     @pytest.mark.asyncio
-    async def test_belonging_vs_fitting_in(self, belonging_text, fitting_in_text):
+    async def test_belonging_vs_fitting_in(self, belonging_text: str, fitting_in_text: str) -> None:
         """
         Test distinction between Belonging and Fitting In.
 
@@ -150,7 +150,7 @@ class TestConnectionAxis:
         assert connection_diff > 0.5, f"Connection difference too small: {connection_diff:.2f}"
 
     @pytest.mark.asyncio
-    async def test_loneliness_negative_connection(self):
+    async def test_loneliness_negative_connection(self) -> None:
         """Test that Loneliness has very negative Connection"""
         analyzer = SemanticAnalyzer()
 
@@ -171,7 +171,7 @@ class TestVACExtraction:
     """Test general VAC extraction accuracy"""
 
     @pytest.mark.asyncio
-    async def test_joy_high_valence_arousal(self, joy_text):
+    async def test_joy_high_valence_arousal(self, joy_text: str) -> None:
         """Test Joy has high Valence and Arousal"""
         analyzer = SemanticAnalyzer()
         result = await analyzer.analyze(joy_text)
@@ -190,7 +190,7 @@ class TestVACExtraction:
         print(f"   Connection: {result.vac.connection:.2f}")
 
     @pytest.mark.asyncio
-    async def test_overwhelm_high_arousal(self, sample_text):
+    async def test_overwhelm_high_arousal(self, sample_text: str) -> None:
         """Test Overwhelm has high Arousal despite negative Valence"""
         analyzer = SemanticAnalyzer()
         result = await analyzer.analyze(sample_text)
@@ -210,7 +210,7 @@ class TestVACExtraction:
         print(f"   Valence: {result.vac.valence:.2f} (negative)")
 
     @pytest.mark.asyncio
-    async def test_vac_values_in_range(self, sample_text):
+    async def test_vac_values_in_range(self, sample_text: str) -> None:
         """Test that all VAC values are within [-1, 1] range"""
         analyzer = SemanticAnalyzer()
         result = await analyzer.analyze(sample_text)

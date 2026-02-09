@@ -1,5 +1,5 @@
-import { create } from 'zustand';
-import { devtools } from 'zustand/middleware';
+import { create } from "zustand";
+import { devtools } from "zustand/middleware";
 
 export interface EmotionState {
   emotion: string;
@@ -17,6 +17,8 @@ export interface Waypoint {
   difficulty: string;
 }
 
+import { StrategyStep } from "../services/therapeuticService";
+
 export interface Path {
   path_id: string;
   current_state: EmotionState;
@@ -30,7 +32,7 @@ export interface Path {
     bridge_emotions?: string[];
     success_probability?: number;
   };
-  steps?: any[]; // For explanation details
+  steps?: StrategyStep[]; // For explanation details
 }
 
 interface PathExplorerState {
@@ -47,7 +49,7 @@ interface PathExplorerState {
   // Explanation UX
   selectedStepIndex: number | null;
   showExplanation: boolean;
-  explanationMode: 'simple' | 'detailed';
+  explanationMode: "simple" | "detailed";
 
   // Actions
   setStartEmotion: (emotion: EmotionState | null) => void;
@@ -56,7 +58,7 @@ interface PathExplorerState {
   setAlternativePaths: (paths: Path[]) => void;
   selectStep: (index: number | null) => void;
   toggleExplanation: (show: boolean) => void;
-  setExplanationMode: (mode: 'simple' | 'detailed') => void;
+  setExplanationMode: (mode: "simple" | "detailed") => void;
   setLoading: (loading: boolean) => void;
   setError: (error: string | null) => void;
   reset: () => void;
@@ -64,47 +66,50 @@ interface PathExplorerState {
 }
 
 export const usePathExplorerStore = create<PathExplorerState>()(
-  devtools((set) => ({
-    startEmotion: null,
-    goalEmotion: null,
-    primaryPath: null,
-    alternativePaths: [],
-    isLoading: false,
-    error: null,
-    selectedStepIndex: null,
-    showExplanation: false,
-    explanationMode: 'simple',
+  devtools(
+    (set) => ({
+      startEmotion: null,
+      goalEmotion: null,
+      primaryPath: null,
+      alternativePaths: [],
+      isLoading: false,
+      error: null,
+      selectedStepIndex: null,
+      showExplanation: false,
+      explanationMode: "simple",
 
-    setStartEmotion: (emotion) => set({ startEmotion: emotion }),
-    setGoalEmotion: (emotion) => set({ goalEmotion: emotion }),
-    setPrimaryPath: (path) => set({ primaryPath: path }),
-    setAlternativePaths: (paths) => set({ alternativePaths: paths }),
-    selectStep: (index) => set({ selectedStepIndex: index }),
-    toggleExplanation: (show) => set({ showExplanation: show }),
-    setExplanationMode: (mode) => set({ explanationMode: mode }),
-    setLoading: (loading) => set({ isLoading: loading }),
-    setError: (error) => set({ error }),
-    reset: () => set({
-        startEmotion: null,
-        goalEmotion: null,
-        primaryPath: null,
-        alternativePaths: [],
-        error: null,
-        selectedStepIndex: null,
-        showExplanation: false
-    }),
-    updateWaypoint: (index, newWaypoint) => set((state) => {
-        if (!state.primaryPath) return {};
+      setStartEmotion: (emotion) => set({ startEmotion: emotion }),
+      setGoalEmotion: (emotion) => set({ goalEmotion: emotion }),
+      setPrimaryPath: (path) => set({ primaryPath: path }),
+      setAlternativePaths: (paths) => set({ alternativePaths: paths }),
+      selectStep: (index) => set({ selectedStepIndex: index }),
+      toggleExplanation: (show) => set({ showExplanation: show }),
+      setExplanationMode: (mode) => set({ explanationMode: mode }),
+      setLoading: (loading) => set({ isLoading: loading }),
+      setError: (error) => set({ error }),
+      reset: () =>
+        set({
+          startEmotion: null,
+          goalEmotion: null,
+          primaryPath: null,
+          alternativePaths: [],
+          error: null,
+          selectedStepIndex: null,
+          showExplanation: false,
+        }),
+      updateWaypoint: (index, newWaypoint) =>
+        set((state) => {
+          if (!state.primaryPath) return {};
 
-        // Deep clone path to avoid mutation issues
-        const newPath = { ...state.primaryPath };
-        const newWaypoints = [...newPath.waypoints];
+          // Deep clone path to avoid mutation issues
+          const newPath = { ...state.primaryPath };
+          const newWaypoints = [...newPath.waypoints];
 
-        // Update specific waypoint (offset by 1 if steps include start?)
-        // The store 'waypoints' array usually excludes start/goal in Python,
-        // but 'steps' often includes them.
-        // Let's assume index matches the 'waypoints' array for now.
-        if (index >= 0 && index < newWaypoints.length) {
+          // Update specific waypoint (offset by 1 if steps include start?)
+          // The store 'waypoints' array usually excludes start/goal in Python,
+          // but 'steps' often includes them.
+          // Let's assume index matches the 'waypoints' array for now.
+          if (index >= 0 && index < newWaypoints.length) {
             newWaypoints[index] = newWaypoint;
             newPath.waypoints = newWaypoints;
 
@@ -114,9 +119,11 @@ export const usePathExplorerStore = create<PathExplorerState>()(
 
             // Mark as user-modified (optional logic)
             // (could add a 'modified' flag to Path interface later)
-        }
+          }
 
-        return { primaryPath: newPath };
+          return { primaryPath: newPath };
+        }),
     }),
-  }), { name: 'PathExplorerStore' })
+    { name: "PathExplorerStore" }
+  )
 );

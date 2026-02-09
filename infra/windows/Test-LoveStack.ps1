@@ -33,10 +33,10 @@ try {
     Write-Host "  L.O.V.E. Stack - Health Checks & Tests" -ForegroundColor Cyan
     Write-Host "═══════════════════════════════════════════════════════════" -ForegroundColor Blue
     Write-Host ""
-    
+
     # Always use Ubuntu-22.04 explicitly
     $distro = "Ubuntu-22.04"
-    
+
     # Check WSL installation
     if (-not (Test-WSLInstalled)) {
         Write-ColoredMessage -Message "WSL is not installed" -Type Error
@@ -44,25 +44,25 @@ try {
         Write-Host "Please run Setup-LoveStack.ps1 first to install WSL and set up the stack." -ForegroundColor Yellow
         exit 1
     }
-    
+
     if (-not (Test-WSLDistributionInstalled)) {
         Write-ColoredMessage -Message "Ubuntu-22.04 distribution not found" -Type Error
         Write-Host ""
         Write-Host "Please run Setup-LoveStack.ps1 first to install Ubuntu and set up the stack." -ForegroundColor Yellow
         exit 1
     }
-    
+
     Write-ColoredMessage -Message "WSL is running" -Type Success
     Write-Host ""
-    
+
     # Check if test script exists
     $testScript = Join-Path $ScriptDir "test-love-stack.sh"
-    
+
     if (-not (Test-Path $testScript)) {
         Write-ColoredMessage -Message "Test script not found: $testScript" -Type Error
         exit 1
     }
-    
+
     Write-ColoredMessage -Message "Running L.O.V.E. stack health checks..." -Type Info
     Write-Host ""
     Write-Host "This will verify:" -ForegroundColor Cyan
@@ -73,9 +73,9 @@ try {
     Write-Host "  • Virtual environments" -ForegroundColor White
     Write-Host "  • API endpoints (if running)" -ForegroundColor White
     Write-Host ""
-    
+
     $wslProjectPath = Convert-WindowsPathToWSL -Path $ProjectRoot
-    
+
     # Run the test script in WSL with explicit distribution
     $exitCode = 0
     try {
@@ -86,9 +86,9 @@ try {
         Write-ColoredMessage -Message "Test script execution failed: $_" -Type Error
         exit 1
     }
-    
+
     Write-Host ""
-    
+
     if ($exitCode -eq 0) {
         Write-Host "═══════════════════════════════════════════════════════════" -ForegroundColor Green
         Write-Host "  All Tests Passed! ✅" -ForegroundColor Green

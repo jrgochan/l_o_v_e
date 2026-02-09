@@ -11,12 +11,12 @@ from app.services import llm_factory
 
 
 @pytest.mark.asyncio
-async def test_vertex_adapter_ainvoke():
+async def test_vertex_adapter_ainvoke() -> None:
     """Test VertexAdapter.ainvoke returns content string."""
     # Mock ChatVertexAI
-    with patch("app.services.llm_factory.ChatVertexAI") as MockChatClass:
+    with patch("app.services.llm_factory.ChatVertexAI") as mock_chat_cls:
         # Mock instance
-        mock_instance = MockChatClass.return_value
+        mock_instance = mock_chat_cls.return_value
         # Mock response from ainvoke
         mock_response = MagicMock()
         mock_response.content = "Vertex Response"
@@ -31,7 +31,7 @@ async def test_vertex_adapter_ainvoke():
             mock_instance.ainvoke.assert_called_once_with("Hello")
 
 
-def test_vertex_adapter_init_error():
+def test_vertex_adapter_init_error() -> None:
     """Test VertexAdapter raises ImportError if package missing."""
     with patch("app.services.llm_factory.VERTEX_AVAILABLE", False):
         with pytest.raises(ImportError, match="langchain-google-vertexai not installed"):
@@ -42,10 +42,10 @@ def test_vertex_adapter_init_error():
 
 
 @pytest.mark.asyncio
-async def test_ollama_adapter_ainvoke():
+async def test_ollama_adapter_ainvoke() -> None:
     """Test OllamaAdapter.ainvoke returns string."""
-    with patch("app.services.llm_factory.Ollama") as MockOllama:
-        mock_instance = MockOllama.return_value
+    with patch("app.services.llm_factory.Ollama") as mock_ollama_cls:
+        mock_instance = mock_ollama_cls.return_value
         mock_instance.ainvoke = AsyncMock(return_value="Ollama Response")
 
         adapter = llm_factory.OllamaAdapter("llama2", 0.5, "http://localhost:11434")
@@ -58,7 +58,7 @@ async def test_ollama_adapter_ainvoke():
 # --- Factory Tests ---
 
 
-def test_get_llm_default():
+def test_get_llm_default() -> None:
     """Test factory returns Ollama adapter by default (when provider is not google_vertex)."""
     with patch("app.config.settings.AI_PROVIDER", "ollama"):
         adapter = llm_factory.get_llm()
@@ -66,7 +66,7 @@ def test_get_llm_default():
         assert adapter.provider == "ollama"
 
 
-def test_get_llm_vertex_fallback():
+def test_get_llm_vertex_fallback() -> None:
     """Test fallback to Ollama if Google Project not set."""
     with patch("app.config.settings.AI_PROVIDER", "google_vertex"):
         with patch("app.config.settings.GOOGLE_CLOUD_PROJECT", ""):  # Empty project
@@ -75,7 +75,7 @@ def test_get_llm_vertex_fallback():
             assert adapter.provider == "ollama"
 
 
-def test_get_llm_vertex_success():
+def test_get_llm_vertex_success() -> None:
     """Test getting Vertex adapter when configured correctly."""
     with (
         patch("app.config.settings.AI_PROVIDER", "google_vertex"),
@@ -90,18 +90,18 @@ def test_get_llm_vertex_success():
         assert adapter.provider == "google_vertex"
 
 
-def test_get_llm_vertex_model_override():
+def test_get_llm_vertex_model_override() -> None:
     """Test preserving gemini model name override."""
     with (
         patch("app.config.settings.AI_PROVIDER", "google_vertex"),
         patch("app.config.settings.GOOGLE_CLOUD_PROJECT", "my-project"),
         patch("app.services.llm_factory.VERTEX_AVAILABLE", True),
-        patch("app.services.llm_factory.ChatVertexAI") as MockChat,
+        patch("app.services.llm_factory.ChatVertexAI") as mock_chat,
     ):
 
         # Case 1: passing a gemini model
         llm_factory.get_llm(model="gemini-1.5-pro")
-        MockChat.assert_called_with(
+        mock_chat.assert_called_with(
             model_name="gemini-1.5-pro",
             temperature=settings.LLM_TEMPERATURE,
             project="my-project",
@@ -120,7 +120,7 @@ def test_get_llm_vertex_model_override():
 # --- Import Logic Tests ---
 
 
-def test_vertex_import_logic():
+def test_vertex_import_logic() -> None:
     """Test the try/except ImportError block at module level."""
     # Use reload mechanism
     with patch.dict(sys.modules):
@@ -145,7 +145,7 @@ def test_vertex_import_logic():
 
     with patch.dict(sys.modules):
         # Hide the real module
-        sys.modules["langchain_google_vertexai"] = None
+        sys.modules["langchain_google_vertexai"] = None  # type: ignore[assignment]
 
         # Reload
         importlib.reload(llm_factory)

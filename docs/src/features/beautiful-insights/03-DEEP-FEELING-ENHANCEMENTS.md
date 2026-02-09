@@ -33,7 +33,7 @@ Both modes add these fields when `deepFeelingMode = True`:
 ```python
 {
   # ... base warm mode fields ...
-  
+
   # Deep Feeling additions
   "multi_emotion_narrative": str,  # Synthesis of complexity
   "relationship_insights": [str],  # How emotions interact (accessible)
@@ -50,7 +50,7 @@ Both modes add these fields when `deepFeelingMode = True`:
 ```python
 {
   # ... base clinical mode fields ...
-  
+
   # Deep Feeling additions
   "complexity_assessment": str,  # Clinical interpretation of complexity
   "pattern_analysis": str,  # Relationship pattern (masking, etc.)
@@ -77,7 +77,7 @@ Both modes add these fields when `deepFeelingMode = True`:
 def _generate_multi_emotion_narrative(emotions, relationships, aggregate):
     primary = [e for e in emotions if e['prominence'] == 'primary'][0]
     secondary = [e for e in emotions if e['prominence'] == 'secondary']
-    
+
     # Opening
     if len(emotions) == 2:
         narrative = f"I'm sensing a blend of {primary['emotion_name'].lower()} and {secondary[0]['emotion_name'].lower()}. "
@@ -85,14 +85,14 @@ def _generate_multi_emotion_narrative(emotions, relationships, aggregate):
         narrative = f"I'm sensing something complex here - primarily {primary['emotion_name'].lower()}, but also {secondary[0]['emotion_name'].lower()} and {secondary[1]['emotion_name'].lower()}. "
     else:
         narrative = f"You're experiencing a rich emotional landscape right now - {primary['emotion_name'].lower()} is most prominent, with several other emotions present. "
-    
+
     # Complexity validation
     complexity = aggregate['complexity_score']
     if complexity > 0.7:
         narrative += "This is what I call emotional complexity - you're not just feeling one thing, you're experiencing multiple valid emotions at once. This is actually a sign of emotional depth and self-awareness."
     else:
         narrative += "These emotions are related and make sense together - they're all responding to what you're experiencing."
-    
+
     return narrative
 ```
 
@@ -126,7 +126,7 @@ RELATIONSHIP_TEMPLATES = {
 
 def _generate_relationship_insights(relationships):
     insights = []
-    
+
     for rel in relationships[:3]:  # Max 3 relationships
         template = RELATIONSHIP_TEMPLATES[rel['type']]['template']
         insight = template.format(
@@ -134,7 +134,7 @@ def _generate_relationship_insights(relationships):
             emotion_b=rel['emotion_b'].lower()
         )
         insights.append(insight)
-    
+
     return insights
 ```
 
@@ -145,25 +145,25 @@ def _generate_relationship_insights(relationships):
 ```python
 def _generate_integrated_guidance(emotions, relationships, aggregate):
     primary = [e for e in emotions if e['prominence'] == 'primary'][0]
-    
+
     # Start with primary
     guidance = f"Given this complexity, I'd suggest starting with the {primary['emotion_name'].lower()} - it's the most accessible right now. "
-    
+
     # Check for masking pattern
     masking_rels = [r for r in relationships if r['type'] == 'masking']
     if masking_rels:
         masked = masking_rels[0]['emotion_b']
         guidance += f"As you work with that, you might notice the {masked.lower()} that's beneath it. That's okay - emotions often reveal themselves in layers."
-    
+
     # Check for contradictory pattern
     contradictory = [r for r in relationships if r['type'] == 'contradictory']
     if contradictory:
         guidance += " The conflicting feelings you're experiencing are real - sometimes we need to hold multiple truths at once."
-    
+
     # Add grounding if high complexity
     if aggregate['complexity_score'] > 0.7:
         guidance += " When emotions feel this complex, it can help to focus on just one breath at a time."
-    
+
     return guidance
 ```
 
@@ -178,13 +178,13 @@ def _generate_complexity_assessment(emotions, aggregate):
     complexity = aggregate['complexity_score']
     clarity = aggregate['emotional_clarity']
     pattern = aggregate['temporal_pattern']
-    
+
     # Base assessment
     if complexity > 0.7:
         assessment = "Multi-emotion presentation with high complexity score (>0.7) suggests "
     else:
         assessment = "Multi-emotion presentation with moderate complexity suggests "
-    
+
     # Add pattern
     if pattern == "concurrent":
         assessment += "concurrent emotional activation. "
@@ -192,13 +192,13 @@ def _generate_complexity_assessment(emotions, aggregate):
         assessment += "sequential emotional transitions. "
     else:
         assessment += "emerging emotional pattern (developing state). "
-    
+
     # Add clarity interpretation
     if clarity < 0.5:
         assessment += "Low emotional clarity (<0.5) indicates conflicted/ambivalent state."
     else:
         assessment += f"Emotional clarity score of {clarity:.2f} suggests patient has some insight."
-    
+
     return assessment
 ```
 
@@ -208,11 +208,11 @@ def _generate_complexity_assessment(emotions, aggregate):
 def _generate_pattern_analysis(relationships):
     if not relationships:
         return "No significant emotion relationships detected"
-    
+
     # Identify dominant pattern
     masking = [r for r in relationships if r['type'] == 'masking']
     contradictory = [r for r in relationships if r['type'] == 'contradictory']
-    
+
     if masking:
         rel = masking[0]
         analysis = f"{rel['emotion_a']}-masking-{rel['emotion_b']} pattern detected "
@@ -224,7 +224,7 @@ def _generate_pattern_analysis(relationships):
     else:
         rel = relationships[0]
         analysis = f"{rel['type'].capitalize()} relationship pattern between {rel['emotion_a']} and {rel['emotion_b']}"
-    
+
     return analysis
 ```
 
@@ -234,25 +234,25 @@ def _generate_pattern_analysis(relationships):
 def _generate_intervention_prioritization(emotions, relationships):
     primary = [e for e in emotions if e['prominence'] == 'primary'][0]
     secondary = [e for e in emotions if e['prominence'] == 'secondary']
-    
+
     priority = f"Address {primary['emotion_name']} first "
-    
+
     # Check prominence scores
     if primary.get('prominence_score', 1.0) > 0.7:
         priority += "(high prominence; most accessible to patient), "
     else:
         priority += "(moderate prominence; patient awareness present), "
-    
+
     # Check for masking
     masking = [r for r in relationships if r['type'] == 'masking']
     if masking:
         masked = masking[0]['emotion_b']
         priority += f"then gently explore underlying {masked} (masking pattern detected). "
-    
+
     # Add complexity note
     if len(emotions) > 2:
         priority += "Monitor for additional emotions emerging as primary is addressed."
-    
+
     return priority
 ```
 
@@ -267,36 +267,36 @@ def _generate_intervention_prioritization(emotions, relationships):
   "mode": "warm",
   "structured": true,
   "emotion": "Anxiety",
-  
+
   "opening": "I sense you're experiencing something complex right now. The most prominent feeling is anxiety, but there's more beneath the surface.",
-  
+
   "multi_emotion_narrative": "I'm sensing a blend of anxiety, sadness, and frustration. This is what I call emotional complexity - you're not just feeling one thing, you're experiencing multiple valid emotions at once. This is actually a sign of emotional depth and self-awareness.",
-  
+
   "voice_observations": [
     "Your voice has tension and energy from the anxiety",
     "There's also a heaviness that suggests sadness",
     "You're speaking quickly, as if trying to outrun the feelings"
   ],
-  
+
   "relationship_insights": [
     "Anxiety might be protecting you from fully feeling the sadness underneath",
     "The frustration seems to be directed at yourself for feeling anxious",
     "These emotions are actually trying to work together, even though it feels chaotic"
   ],
-  
+
   "primary_emotion_focus": {
     "name": "Anxiety",
     "reason": "This is the most accessible emotion right now - the one you're most aware of"
   },
-  
+
   "emotion_understanding": "Anxiety is your mind's protective response, but when it's layered with sadness and frustration, it becomes more complex. Each emotion is valid and telling you something important.",
-  
+
   "vac_interpretation": {
     "energy_state": "You're in a high-activation state, though the sadness is pulling you toward lower energy",
     "emotional_tone": "This blend feels difficult - the anxiety is intense and the sadness is heavy",
     "connection_quality": "You might feel quite alone with all of this"
   },
-  
+
   "gentle_invitations": [
     {
       "type": "reflection",
@@ -307,7 +307,7 @@ def _generate_intervention_prioritization(emotions, relationships):
       "text": "You might try naming each emotion out loud: 'I'm feeling anxiety... and sadness... and frustration...'"
     }
   ],
-  
+
   "integrated_guidance": "Given this complexity, I'd suggest starting with the anxiety - it's the most accessible right now. As you work with that, you might notice the sadness that's beneath it. That's okay - emotions often reveal themselves in layers."
 }
 ```
@@ -318,13 +318,13 @@ def _generate_intervention_prioritization(emotions, relationships):
 {
   "mode": "clinical",
   "structured": true,
-  
+
   "assessment_summary": "Patient presents with multi-emotion state: Anxiety (primary, 87% confidence), Sadness (secondary, 72%), Frustration (underlying, 58%)",
-  
+
   "complexity_assessment": "Multi-emotion presentation with high complexity score (0.78) suggests concurrent emotional activation. Low emotional clarity (0.45) indicates conflicted/ambivalent state.",
-  
+
   "pattern_analysis": "Anxiety-masking-Sadness pattern detected (common avoidance/defensive mechanism; strength: 0.82). Clinical significance: Patient may be aware of anxiety but not underlying sadness.",
-  
+
   "multi_emotion_summary": {
     "primary": {"name": "Anxiety", "prominence": 0.72},
     "secondary": [
@@ -346,9 +346,9 @@ def _generate_intervention_prioritization(emotions, relationships):
       }
     ]
   },
-  
+
   "intervention_prioritization": "Address Anxiety first (high prominence; most accessible to patient), then gently explore underlying Sadness (masking pattern detected). Monitor for Frustration escalation.",
-  
+
   "recommended_interventions": [
     {
       "priority": 1,
@@ -387,9 +387,9 @@ def _generate_intervention_prioritization(emotions, relationships):
 ```python
 MULTI_EMOTION_OPENINGS = {
     2: "I'm sensing a blend of {primary} and {secondary}. This makes sense - they're both responding to what you're experiencing.",
-    
+
     3: "I'm sensing something complex here - primarily {primary}, but also {sec1} and {sec2}. You're experiencing multiple emotions at once, which shows emotional depth.",
-    
+
     "4+": "You're experiencing a rich emotional landscape right now. {primary} is most prominent, with several other emotions present. This complexity is meaningful - you're processing something important."
 }
 ```
@@ -401,12 +401,12 @@ Already defined in previous section, but here's the warm tone framing:
 ```python
 def _generate_relationship_insights_warm(relationships):
     insights = []
-    
+
     for rel in relationships[:3]:
         emotion_a = rel['emotion_a'].lower()
         emotion_b = rel['emotion_b'].lower()
         rel_type = rel['type']
-        
+
         if rel_type == 'masking':
             insight = f"{emotion_a.capitalize()} might be protecting you from fully feeling the {emotion_b}"
         elif rel_type == 'complementary':
@@ -417,9 +417,9 @@ def _generate_relationship_insights_warm(relationships):
             insight = f"{emotion_a.capitalize()} is intensifying the {emotion_b} - they're feeding each other"
         elif rel_type == 'sequential':
             insight = f"{emotion_a.capitalize()} seems to be leading toward {emotion_b} - one following the other"
-        
+
         insights.append(insight)
-    
+
     return insights
 ```
 
@@ -458,7 +458,7 @@ CLINICAL_RELATIONSHIP_PATTERNS = {
 def _generate_multi_emotion_summary_clinical(emotions, relationships):
     primary = [e for e in emotions if e['prominence'] == 'primary'][0]
     secondary = [e for e in emotions if e['prominence'] == 'secondary']
-    
+
     summary = {
         "primary": {
             "name": primary['emotion_name'],
@@ -473,7 +473,7 @@ def _generate_multi_emotion_summary_clinical(emotions, relationships):
         ],
         "relationships": []
     }
-    
+
     # Add relationship clinical significance
     for rel in relationships:
         pattern_info = CLINICAL_RELATIONSHIP_PATTERNS.get(rel['type'], {})
@@ -483,7 +483,7 @@ def _generate_multi_emotion_summary_clinical(emotions, relationships):
             "strength": rel['strength'],
             "clinical_sig": pattern_info.get('clinical_significance', 'Relationship detected')
         })
-    
+
     return summary
 ```
 

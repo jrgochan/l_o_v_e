@@ -234,10 +234,8 @@ References:
 """
 
 import logging
-from datetime import datetime
 
 from fastapi import APIRouter, Depends, HTTPException, Request
-from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.api.deps import get_current_user
@@ -245,42 +243,25 @@ from app.api.schemas.common import EmotionInfo, MetricsInfo, QuaternionModel
 from app.api.schemas.state import StateInput, StateResponse
 from app.database import get_db
 from app.models.user import User
-from app.models.user_trajectory import UserTrajectory
-from app.services import (
-    EmotionMapper,
-    MetricsCalculator,
-    get_embedding_service,
-    get_quaternion_builder,
-)
-from app.websocket.connection_manager import manager
+from app.services.observer.pipeline import StateProcessingPipeline
 
 logger = logging.getLogger(__name__)
+
 
 router = APIRouter()
 
 
 @router.post("/observer/state", response_model=StateResponse, tags=["State"])
 async def record_state(
-    request: Request,
+    _request: Request,
     input_data: StateInput,
     db: AsyncSession = Depends(get_db),
     current_user: User = Depends(get_current_user),
-) -> StateResponse:
+) -> StateResponse:  # pylint: disable=too-many-locals, too-many-statements
     """Record a new emotional state.
 
-    DEBUG: Logging incoming payload for troubleshooting
-
-
-    This is the primary ingestion endpoint called by the Listener
-    after processing user input.
-
-    Process:
-    1. Generate semantic embedding for input text
-    2. Find nearest emotion from Atlas (weighted fusion)
-    3. Convert VAC to quaternion via Versor
-    4. Calculate temporal metrics (elasticity, rigidity)
-    5. Persist to database
-    6. Return complete state information
+    This is the primary ingestion endpoint called by the Listener.
+    Delegates processing to StateProcessingPipeline.
 
     Args:
         input_data: State recording request
@@ -296,154 +277,36 @@ async def record_state(
         )
 
     try:
-        logger.info(f"Recording state for user {input_data.user_id}")
+        pipeline = StateProcessingPipeline(db)
+        result = await pipeline.process_state(input_data.user_id, input_data)
 
-        # Use provided timestamp or default to now (timezone-aware)
-        from datetime import timezone
-
-        timestamp = input_data.timestamp or datetime.now(timezone.utc)
-
-        # 1. Generate semantic embedding
-        embedding_service = get_embedding_service()
-        text_embedding = await embedding_service.generate_embedding(input_data.input_text)
-        word_count = len(input_data.input_text.split())
-
-        logger.debug(f"Generated embedding: {len(text_embedding)} dimensions")
-
-        # 2. Find nearest emotion
-        emotion_mapper = EmotionMapper(db)
-        vac_list = [
-            input_data.vac_scalars.valence,
-            input_data.vac_scalars.arousal,
-            input_data.vac_scalars.connection,
-        ]
-
-        nearest_emotion = await emotion_mapper.find_nearest(
-            vac_values=vac_list, text_embedding=text_embedding, word_count=word_count
-        )
-
-        logger.info(f"Nearest emotion: {nearest_emotion.emotion_name}")
-
-        # 3. Convert VAC to quaternion
-        quaternion_builder = get_quaternion_builder()
-        quaternion_list = await quaternion_builder.from_vac(vac_list)
-
-        logger.debug(f"Quaternion: {quaternion_list}")
-
-        # 4. Get previous state for metrics
-        stmt = (
-            select(UserTrajectory)
-            .where(UserTrajectory.user_id == input_data.user_id)
-            .order_by(UserTrajectory.timestamp.desc())
-            .limit(1)
-        )
-        result = await db.execute(stmt)
-        previous_state = result.scalar_one_or_none()
-
-        # 5. Calculate metrics
-        metrics_calculator = MetricsCalculator(db)
-
-        if previous_state:
-            delta_time = (timestamp - previous_state.timestamp).total_seconds()
-            previous_quat_list = list(previous_state.quaternion_state)
-
-            elasticity = metrics_calculator.calculate_elasticity(
-                quaternion_list, previous_quat_list, delta_time
-            )
-
-            angular_distance = metrics_calculator._angular_distance(
-                quaternion_list, previous_quat_list
-            )
-        else:
-            elasticity = 0.0
-            angular_distance = 0.0
-            previous_quat_list = None
-
-        # Calculate rigidity (rolling window)
-        rigidity = await metrics_calculator.calculate_rigidity(
-            str(input_data.user_id), window_size=10
-        )
-
-        # Detect alerts
-        alerts = []
-        if metrics_calculator.detect_flooding(elasticity):
-            alerts.append("flooding")
-        if metrics_calculator.detect_stuckness(rigidity, vac_list[0]):
-            alerts.append("stuckness")
-
-        logger.info(f"Metrics: E={elasticity:.2f}, R={rigidity:.2f}, alerts={alerts}")
-
-        # 6. Persist new state
-        new_state = UserTrajectory(
-            user_id=input_data.user_id,
-            session_id=input_data.session_id,
-            timestamp=timestamp,
-            input_transcription=input_data.input_text,
-            input_embedding=text_embedding,
-            vac_values=vac_list,
-            quaternion_state=quaternion_list,
-            dominant_emotion_id=nearest_emotion.id,
-            elasticity_metric=elasticity,
-            rigidity_score=rigidity,
-            context_metadata={},
-        )
-
-        db.add(new_state)
-        await db.commit()
-        await db.refresh(new_state)
-
-        logger.info(f"State persisted: {new_state.id}")
-
-        # 7. Build response
+        # Build response
         response = StateResponse(
-            state_id=str(new_state.id),
+            state_id=str(result.persisted_state.id),
             dominant_emotion=EmotionInfo(
-                id=str(nearest_emotion.id),
-                name=nearest_emotion.emotion_name,
-                category=nearest_emotion.category,
-                vac=list(nearest_emotion.vac_vector),
+                id=str(result.nearest_emotion.id),
+                name=result.nearest_emotion.emotion_name,
+                category=result.nearest_emotion.category,
+                vac=list(result.nearest_emotion.vac_vector),
             ),
-            quaternion=QuaternionModel.from_list(quaternion_list),
+            quaternion=QuaternionModel.from_list(result.quaternion_list),
             previous_quaternion=(
-                QuaternionModel.from_list(previous_quat_list) if previous_quat_list else None
+                QuaternionModel.from_list(result.metrics.previous_quat_list)
+                if result.metrics.previous_quat_list
+                else None
             ),
             metrics=MetricsInfo(
-                elasticity=elasticity,
-                rigidity=rigidity,
-                angular_distance=angular_distance,
-                alerts=alerts,
+                elasticity=result.metrics.elasticity,
+                rigidity=result.metrics.rigidity,
+                angular_distance=result.metrics.angular_distance,
+                alerts=result.metrics.alerts,
             ),
-            timestamp=timestamp,
+            timestamp=result.timestamp,
         )
-
-        # 8. Broadcast to WebSocket clients (non-blocking)
-        try:
-            await manager.send_state_update(
-                user_id=str(input_data.user_id),
-                state_data={
-                    "state_id": str(new_state.id),
-                    "emotion": {
-                        "name": nearest_emotion.emotion_name,
-                        "category": nearest_emotion.category,
-                        "vac": vac_list,
-                    },
-                    "quaternion": quaternion_list,
-                    "metrics": {
-                        "elasticity": elasticity,
-                        "rigidity": rigidity,
-                        "angular_distance": angular_distance,
-                        "alerts": alerts,
-                    },
-                },
-            )
-            logger.info(f"Broadcast state update via WebSocket for user {input_data.user_id}")
-        except Exception as ws_error:
-            logger.warning(f"Failed to broadcast WebSocket update: {ws_error}")
-            # Don't fail the request if WebSocket broadcast fails
 
         return response
 
-    except Exception as e:
-        logger.error(f"Failed to record state: {e}", exc_info=True)
+    except Exception as e:  # pylint: disable=broad-exception-caught
+        logger.error("Failed to record state: %s", e, exc_info=True)
         await db.rollback()
-        raise HTTPException(status_code=500, detail=f"Failed to record state: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Failed to record state: {str(e)}") from e

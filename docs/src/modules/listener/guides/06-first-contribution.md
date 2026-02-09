@@ -1,8 +1,8 @@
 # Your First Contribution
 
-**Reading Time:** ~20 minutes  
-**Audience:** New developers ready to contribute  
-**Prerequisites:** [Testing Guide](05-testing-guide.md) complete  
+**Reading Time:** ~20 minutes
+**Audience:** New developers ready to contribute
+**Prerequisites:** [Testing Guide](05-testing-guide.md) complete
 **Goal:** Make your first successful pull request
 
 ---
@@ -118,9 +118,9 @@ pytest tests/semantic/test_emotion.py -v
 def test_your_new_feature():
     """Test your new feature works correctly"""
     analyzer = get_semantic_analyzer()
-    
+
     result = analyzer.analyze_sync("Your test input")
-    
+
     assert result.primary_emotion == "Expected Emotion"
     assert result.vac.connection > 0.5
 ```
@@ -314,14 +314,14 @@ Assign reviewers and wait for feedback!
 **✅ Good response:**
 
 ```text
-Great catch! I've updated the test to check connection > 0.5 
+Great catch! I've updated the test to check connection > 0.5
 instead of just > 0. Pushed in commit abc123.
 ```
 
 **✅ Good response:**
 
 ```text
-Good point about the edge case. I've added a test for empty 
+Good point about the edge case. I've added a test for empty
 input and it now raises ValueError as expected.
 ```
 
@@ -392,35 +392,35 @@ from app.services.semantic_analyzer import get_semantic_analyzer
 def test_hope_detection():
     """
     Test that Hope is correctly detected.
-    
+
     Hope should have:
     - Positive valence (optimistic feeling)
     - Low to moderate arousal (calm but forward-looking)
     - Positive connection (connected to positive future)
     """
     analyzer = get_semantic_analyzer()
-    
+
     # Test cases for Hope
     hope_texts = [
         "I'm hopeful things will get better",
         "There's still hope for a good outcome",
         "I have hope for the future"
     ]
-    
+
     for text in hope_texts:
         result = analyzer.analyze_sync(text)
-        
+
         # Check emotion
         assert result.primary_emotion in ["Hope", "Optimism"], \
             f"Expected Hope, got {result.primary_emotion}"
-        
+
         # Check VAC values
         assert result.vac.valence > 0, \
             f"Hope should be positive! Got {result.vac.valence}"
-        
+
         assert result.vac.connection > 0, \
             f"Hope involves positive connection to future"
-        
+
         print(f"✅ '{text}' → {result.primary_emotion}")
         print(f"   VAC: ({result.vac.valence:.2f}, {result.vac.arousal:.2f}, {result.vac.connection:.2f})")
 
@@ -428,14 +428,14 @@ def test_hope_detection():
 def test_hope_vs_despair():
     """Test that Hope and Despair are distinguished"""
     analyzer = get_semantic_analyzer()
-    
+
     hope_result = analyzer.analyze_sync("I'm hopeful")
     despair_result = analyzer.analyze_sync("I'm hopeless")
-    
+
     # Valence should be opposite
     assert hope_result.vac.valence > 0
     assert despair_result.vac.valence < 0
-    
+
     print(f"✅ Hope valence: {hope_result.vac.valence:.2f}")
     print(f"✅ Despair valence: {despair_result.vac.valence:.2f}")
 ```

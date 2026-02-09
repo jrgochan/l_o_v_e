@@ -187,6 +187,6 @@ def cleanup_temp_files(*file_paths: str) -> None:
         try:
             if file_path and os.path.exists(file_path):
                 os.remove(file_path)
-                logger.debug(f"Deleted temp file: {file_path}")
+                logger.debug("Deleted temp file: %s", file_path)
         except Exception as e:  # pylint: disable=broad-exception-caught
             logger.warning("Could not delete temp file %s: %s", file_path, e)

@@ -85,7 +85,7 @@ Output: {
   "reasoning": "Deep resonance, feeling WITH..."
 }
 
-POST /listener/transcribe  
+POST /listener/transcribe
 Input: { "audio_file": <binary> }
 Output: { "text": "...", "duration_ms": 450 }
 
@@ -158,7 +158,7 @@ CREATE TABLE strategies (
 );
 
 -- HNSW index for fast nearest-neighbor search
-CREATE INDEX ON user_trajectory 
+CREATE INDEX ON user_trajectory
   USING hnsw (vac_values vector_cosine_ops);
 ```
 
@@ -396,8 +396,8 @@ services:
 - **Observer**: Read replicas for PostgreSQL, Redis cache for frequent queries
 - **Experience**: CDN for static assets, server-side rendering
 
-**Current Capacity**: ~100 concurrent users per instance  
-**Bottleneck**: Ollama LLM inference (CPU-bound)  
+**Current Capacity**: ~100 concurrent users per instance
+**Bottleneck**: Ollama LLM inference (CPU-bound)
 **Future**: GPU deployment, model quantization, caching common queries
 
 ---

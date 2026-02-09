@@ -19,7 +19,7 @@ from pgvector.sqlalchemy import Vector
 from sqlalchemy import Boolean, ForeignKey, String, Text, UniqueConstraint, func
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
-from app.config import settings
+from app.core.settings import settings
 from app.database import Base
 
 

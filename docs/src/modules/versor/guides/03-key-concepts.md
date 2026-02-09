@@ -53,7 +53,7 @@ Imagine a 3D coordinate system:
   (Negative)         |         (Positive)
                      |
               -Arousal (Calm)
-             
+
                      ⊙ Connection axis
                    (out/in of page)
 ```
@@ -89,7 +89,7 @@ q = Quaternion(w=0.707, x=0.0, y=0.707, z=0.0)
 Imagine three nested rings (gimbals):
 
 1. Outer ring rotates around Z-axis
-2. Middle ring rotates around X-axis  
+2. Middle ring rotates around X-axis
 3. Inner ring rotates around Y-axis
 
 **What happens:**
@@ -186,27 +186,27 @@ q = [cos(angle/2), sin(angle/2)*axis_x, sin(angle/2)*axis_y, sin(angle/2)*axis_z
 def vac_to_quaternion(valence, arousal, connection):
     # 1. Magnitude
     r = sqrt(valence**2 + arousal**2 + connection**2)
-    
+
     if r < EPSILON:  # Zero vector
         return Quaternion(1, 0, 0, 0)  # Identity
-    
+
     # 2. Normalized axis
     axis_x = valence / r
     axis_y = arousal / r
     axis_z = connection / r
-    
+
     # 3. Angle (scaled by magnitude)
     angle = r * π  # Maps [-√3, √3] to [-π√3, π√3]
-    
+
     # 4. Quaternion from axis-angle
     half_angle = angle / 2
     sin_half = sin(half_angle)
-    
+
     w = cos(half_angle)
     x = sin_half * axis_x
     y = sin_half * axis_y
     z = sin_half * axis_z
-    
+
     return Quaternion(w, x, y, z)
 ```
 
@@ -408,9 +408,9 @@ def detect_dominant_axis(q_transition):
     abs_x = abs(q_transition.x)
     abs_y = abs(q_transition.y)
     abs_z = abs(q_transition.z)
-    
+
     max_val = max(abs_x, abs_y, abs_z)
-    
+
     if abs_x == max_val:
         return "VALENCE_SHIFT"
     elif abs_y == max_val:
@@ -681,5 +681,5 @@ Now that you understand the concepts:
 
 ---
 
-**Previous:** [← Codebase Tour](02-codebase-tour.md)  
+**Previous:** [← Codebase Tour](02-codebase-tour.md)
 **Next:** [Common Tasks →](04-common-tasks.md)

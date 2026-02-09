@@ -8,8 +8,8 @@
 
 The Experience module visualizes emotional states as a living 3D "Soul Sphere" using the VAC (Valence-Arousal-Connection) model. The sphere's color, geometry, and glow dynamically respond to emotional data from the Observer API.
 
-**Current Implementation:** Next.js Web Application  
-**Architecture:** Monorepo with shared code foundation  
+**Current Implementation:** Next.js Web Application
+**Architecture:** Monorepo with shared code foundation
 **Status:** ✅ Production Ready
 
 ---

@@ -39,6 +39,7 @@ See Also:
 """
 
 import logging
+import time
 from typing import Any, Dict, Optional, cast
 
 import httpx
@@ -168,8 +169,6 @@ class ModelFetcher:
             - Observer API: observer/app/api/routes/ai_assignments.py
             - Usage: app/services/semantic_analyzer.py::__init__()
         """
-        import time
-
         # Check cache first
         if use_cache and function in self._cache:
             cache_age = time.time() - self._cache_time.get(function, 0)
@@ -194,7 +193,7 @@ class ModelFetcher:
                 logger.info("Fetched model assignment for %s: %s", function, model)
                 return model
 
-        except Exception as e:
+        except Exception as e:  # pylint: disable=broad-exception-caught
             logger.warning(
                 "Failed to fetch model assignment for %s: %s. Using default: %s",
                 function,
@@ -223,8 +222,6 @@ class ModelFetcher:
             Dict containing 'template_content', 'input_variables', etc.
             Returns None if no active prompt found.
         """
-        import time
-
         # Check cache
         if use_cache and function in self._prompt_cache:
             cache_age = time.time() - self._prompt_cache_time.get(function, 0)

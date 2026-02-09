@@ -1,8 +1,8 @@
 # Business Value Analysis
 
-**Reading Time:** ~7 minutes  
-**Audience:** C-level, VPs, Business Leaders  
-**Prerequisites:** [Executive Overview](01-executive-summary.md)  
+**Reading Time:** ~7 minutes
+**Audience:** C-level, VPs, Business Leaders
+**Prerequisites:** [Executive Overview](01-executive-summary.md)
 **Goal:** Understand ROI, market position, and strategic value
 
 ---
@@ -62,9 +62,9 @@
 
 ```text
 Free Tier: Basic emotion tracking
-└─> Premium ($9.99/month): 
+└─> Premium ($9.99/month):
     └─> Advanced features + history
-    
+
 Annual Revenue per User: $120
 Target: 10,000 paying users by end of 2026
 Revenue: $1.2M/year
@@ -299,11 +299,11 @@ At $2M ARR × 10-15x multiple = **$20M-30M**
 
 ## Key Takeaways
 
-✅ **Strong ROI:** 71% margin at scale  
-✅ **Large TAM:** $540M addressable market  
-✅ **Defensible:** Privacy + IP + network effects  
-✅ **Patent-worthy:** Connection axis is novel  
-✅ **Clear path:** To $2M ARR and $20-30M valuation  
+✅ **Strong ROI:** 71% margin at scale
+✅ **Large TAM:** $540M addressable market
+✅ **Defensible:** Privacy + IP + network effects
+✅ **Patent-worthy:** Connection axis is novel
+✅ **Clear path:** To $2M ARR and $20-30M valuation
 
 ---
 

@@ -1,8 +1,8 @@
 # Architecture Decision Records (ADRs)
 
-**Reading Time:** ~25 minutes  
-**Audience:** Senior developers, architects  
-**Prerequisites:** [Troubleshooting Guide](06-troubleshooting.md)  
+**Reading Time:** ~25 minutes
+**Audience:** Senior developers, architects
+**Prerequisites:** [Troubleshooting Guide](06-troubleshooting.md)
 **Goal:** Understand why key architectural decisions were made
 
 ---
@@ -15,8 +15,8 @@
 
 ## ADR-001: Use Ollama Instead of OpenAI API
 
-**Date:** November 2025  
-**Status:** ✅ Accepted  
+**Date:** November 2025
+**Status:** ✅ Accepted
 **Decision Makers:** Core team
 
 ### Context
@@ -77,7 +77,7 @@ Tested on 100 examples:
 
 ## ADR-002: Use FastAPI Instead of Flask
 
-**Date:** November 2025  
+**Date:** November 2025
 **Status:** ✅ Accepted
 
 ### Context
@@ -118,7 +118,7 @@ Use **FastAPI** instead of Flask or Django.
 
 ## ADR-003: Use Pydantic for Validation
 
-**Date:** November 2025  
+**Date:** November 2025
 **Status:** ✅ Accepted
 
 ### Context
@@ -160,7 +160,7 @@ class VACVector(BaseModel):
 
 ## ADR-004: Use Arq (Not Celery) for Async Jobs
 
-**Date:** November 2025  
+**Date:** November 2025
 **Status:** ✅ Accepted
 
 ### Context
@@ -203,7 +203,7 @@ Use **Arq** with Redis for async job queue.
 
 ## ADR-005: Store Only Sanitized Text (Not Audio)
 
-**Date:** November 2025  
+**Date:** November 2025
 **Status:** ✅ Accepted
 
 ### Context
@@ -223,16 +223,16 @@ async def process_audio(ctx, audio_path, ...):
     try:
         # 1. Transcribe
         transcription = transcribe(audio_path)
-        
+
         # 2. Analyze
         emotion = await analyze(transcription.text)
-        
+
         # 3. Scrub PII
         sanitized = pii_scrubber.scrub(transcription.text)
-        
+
         # 4. Store ONLY sanitized text
         await observer.record_state(sanitized_text=sanitized, ...)
-        
+
     finally:
         # 5. DELETE audio file
         os.remove(audio_path)
@@ -255,7 +255,7 @@ async def process_audio(ctx, audio_path, ...):
 
 ## ADR-006: Temperature = 0.0 for Determinism
 
-**Date:** November 2025  
+**Date:** November 2025
 **Status:** ✅ Accepted
 
 ### Context
@@ -304,7 +304,7 @@ avg_connection = np.mean([r.vac.connection for r in results])
 
 ## ADR-007: Use Few-Shot Prompting (Not Fine-Tuning)
 
-**Date:** November 2025  
+**Date:** November 2025
 **Status:** ✅ Accepted
 
 ### Context
@@ -361,7 +361,7 @@ Use **few-shot prompting** with 6 carefully chosen examples.
 
 ## ADR-008: Single-Emotion vs. Multi-Emotion Analysis
 
-**Date:** December 2025  
+**Date:** December 2025
 **Status:** ✅ Both Supported
 
 ### Context
@@ -393,7 +393,7 @@ Support **both** modes:
 
 ```python
 # Default endpoint (single)
-POST /listener/analyze  
+POST /listener/analyze
 
 # Multi-emotion endpoint (opt-in)
 POST /listener/analyze-multi-emotion
@@ -405,7 +405,7 @@ POST /listener/analyze-multi-emotion
 
 ## ADR-009: PII Scrubbing with Spacy (Not LLM)
 
-**Date:** November 2025  
+**Date:** November 2025
 **Status:** ✅ Accepted
 
 ### Context
@@ -464,7 +464,7 @@ prompt = "Remove all PII from this text: {text}"
 
 ## ADR-010: Stateless Microservice Design
 
-**Date:** November 2025  
+**Date:** November 2025
 **Status:** ✅ Accepted
 
 ### Context
@@ -506,8 +506,8 @@ Experience (stateful - client-side)
 
 ## ADR-011: Connection Axis as Core Innovation
 
-**Date:** November 2025  
-**Status:** ✅ Accepted  
+**Date:** November 2025
+**Status:** ✅ Accepted
 **Impact:** CRITICAL
 
 ### Context
@@ -545,7 +545,7 @@ def test_pity_vs_compassion():
     """If this fails, the innovation is broken"""
     pity = analyze("I feel sorry for them")
     assert pity.vac.connection < 0
-    
+
     compassion = analyze("I feel with them")
     assert compassion.vac.connection > 0.5
 ```
@@ -562,7 +562,7 @@ def test_pity_vs_compassion():
 
 ## ADR-012: Six Few-Shot Examples (Not More)
 
-**Date:** December 2025  
+**Date:** December 2025
 **Status:** ✅ Accepted
 
 ### Context
@@ -608,7 +608,7 @@ Could add dynamic example selection (retrieve most relevant examples based on in
 
 ## ADR-013: Sync and Async Endpoints
 
-**Date:** December 2025  
+**Date:** December 2025
 **Status:** ✅ Accepted
 
 ### Context
@@ -691,11 +691,11 @@ As the system evolves, document:
 
 ## Key Takeaways
 
-✅ **Document decisions** while context is fresh  
-✅ **Include rationale:** WHY not just WHAT  
-✅ **Show alternatives:** What was considered  
-✅ **Note consequences:** Trade-offs made  
-✅ **Update when revisited:** ADRs can be superseded  
+✅ **Document decisions** while context is fresh
+✅ **Include rationale:** WHY not just WHAT
+✅ **Show alternatives:** What was considered
+✅ **Note consequences:** Trade-offs made
+✅ **Update when revisited:** ADRs can be superseded
 
 ---
 

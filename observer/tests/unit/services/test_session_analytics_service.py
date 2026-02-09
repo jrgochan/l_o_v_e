@@ -1,11 +1,12 @@
-from datetime import datetime
+from datetime import datetime, timezone
 from unittest.mock import AsyncMock, MagicMock
 
 import pytest
 
 from app.models.clinical_alert import AlertLevel, ClinicalAlert
 from app.models.session_analytics import SessionAnalytics
-from app.services.session_analytics_service import SessionAnalyticsService
+from app.services.analytics.session import SessionAnalyticsService
+from app.types.emotions import EmotionAnalysisResult
 
 
 @pytest.fixture
@@ -42,11 +43,13 @@ async def test_update_metrics_new_session(service, mock_db):
 
     analytics = await service.update_metrics(
         session_id="sess_new",
-        _emotion_name="Joy",
-        category="Positive",
-        vac_data={"valence": 0.8, "arousal": 0.5, "connection": 0.6},
-        confidence=0.9,
-        alerts=[alert],
+        analysis_result=EmotionAnalysisResult(
+            emotion_name="Joy",
+            category="Positive",
+            vac_data={"valence": 0.8, "arousal": 0.5, "connection": 0.6},
+            confidence=0.9,
+            alerts=[alert],
+        ),
     )
 
     # Verify creation
@@ -66,7 +69,7 @@ async def test_update_metrics_existing_session(service, mock_db):
     """Test updating existing stats."""
     existing = SessionAnalytics(
         session_id="sess_exist",
-        start_time=datetime.utcnow(),
+        start_time=datetime.now(timezone.utc),
         emotion_count=10,
         average_confidence=0.8,
         vac_stats={"valence_avg": 0.5},
@@ -83,11 +86,13 @@ async def test_update_metrics_existing_session(service, mock_db):
     # Update with new data
     analytics = await service.update_metrics(
         session_id="sess_exist",
-        _emotion_name="Anger",
-        category="Negative",
-        vac_data={"valence": -0.5},
-        confidence=0.6,
-        alerts=[],
+        analysis_result=EmotionAnalysisResult(
+            emotion_name="Anger",
+            category="Negative",
+            vac_data={"valence": -0.5, "arousal": 0.0, "connection": 0.0},
+            confidence=0.6,
+            alerts=[],
+        ),
     )
 
     # Verify running average update
@@ -117,11 +122,13 @@ async def test_update_metrics_all_alerts(service, mock_db):
 
     analytics = await service.update_metrics(
         session_id="sess_alerts",
-        _emotion_name="Fear",
-        category="Negative",
-        vac_data={},
-        confidence=0.9,
-        alerts=alerts,
+        analysis_result=EmotionAnalysisResult(
+            emotion_name="Fear",
+            category="Negative",
+            vac_data={"valence": 0.0, "arousal": 0.0, "connection": 0.0},
+            confidence=0.9,
+            alerts=alerts,
+        ),
     )
 
     assert analytics.critical_alert_count == 1
@@ -196,7 +203,11 @@ async def test_session_status_logic(service):
             return_value={
                 "average_confidence": 0.8,
                 "emotion_count": count,
-                "alert_counts": {"critical": critical, "warning": warning, "attention": 0},
+                "alert_counts": {
+                    "critical": critical,
+                    "warning": warning,
+                    "attention": 0,
+                },
             }
         )
         s = await service.get_session_summary("test")

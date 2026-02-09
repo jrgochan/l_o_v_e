@@ -27,7 +27,7 @@ In Warm Mode, insights should help users:
   "category": "Negative High-Energy",
   "vac": {"valence": -0.45, "arousal": 0.72, "connection": -0.23},
   "confidence": 0.87,
-  
+
   # Structured sections
   "opening": str,  # Empathetic validation (2-3 sentences)
   "voice_observations": [str],  # 2-4 natural language observations
@@ -49,7 +49,7 @@ In Warm Mode, insights should help users:
   "paths_forward": [  # Optional: curated journeys
     {"from": str, "to": str, "description": str}
   ],
-  
+
   # Legacy fields (for backwards compatibility)
   "summary": str,  # Generated from structured data if frontend doesn't support
   "guidance": str,
@@ -92,7 +92,7 @@ In Warm Mode, insights should help users:
 ```python
 def _generate_warm_opening(emotion_name, valence, vac_data):
     emotion_lower = emotion_name.lower()
-    
+
     # Validation phrase
     if valence < -0.3:
         validation = "and I want you to know that's completely valid"
@@ -100,7 +100,7 @@ def _generate_warm_opening(emotion_name, valence, vac_data):
         validation = "and that's wonderful"
     else:
         validation = "and that's meaningful"
-    
+
     # Purpose/context
     if emotion_lower in ['anxiety', 'fear', 'worry']:
         context = "This is your system trying to protect you."
@@ -110,7 +110,7 @@ def _generate_warm_opening(emotion_name, valence, vac_data):
         context = "You're experiencing something that lights you up."
     else:
         context = "This emotion is telling you something important."
-    
+
     return f"I sense you're experiencing {emotion_lower} right now, {validation}. {context}"
 ```
 
@@ -130,25 +130,25 @@ VOICE_OBSERVATIONS = {
     "high_energy_low_pitch": "There's power and intensity in your voice",
     "low_energy_high_pitch": "Your voice sounds soft, almost fragile",
     "low_energy_low_pitch": "There's a heaviness in your voice",
-    
+
     "fast_rate": "You're speaking quickly, which often happens when thoughts are racing",
     "slow_rate": "You're speaking slowly and deliberately, taking your time with words",
-    
+
     "high_variability": "Your voice is animated with lots of expression",
     "low_variability": "Your voice sounds flat or monotone, which can happen when we're overwhelmed",
-    
+
     "voice_tension": "There's a tightness in your voice that suggests your body is on alert",
     "voice_breathiness": "Your voice sounds breathy, like you're having trouble catching your breath"
 }
 
 def _generate_voice_observations(prosody_data, vac_data):
     observations = []
-    
+
     energy = prosody_data.get('energy', 0.5)
     pitch = prosody_data.get('pitch_mean', 150)
     rate = prosody_data.get('rate', 4.0)
     variability = prosody_data.get('pitch_std', 20)
-    
+
     # Energy + Pitch combo
     if energy > 0.7 and pitch > 170:
         observations.append(VOICE_OBSERVATIONS["high_energy_high_pitch"])
@@ -158,23 +158,23 @@ def _generate_voice_observations(prosody_data, vac_data):
         observations.append(VOICE_OBSERVATIONS["low_energy_high_pitch"])
     elif energy < 0.3:
         observations.append(VOICE_OBSERVATIONS["low_energy_low_pitch"])
-    
+
     # Speech rate
     if rate > 5.0:
         observations.append(VOICE_OBSERVATIONS["fast_rate"])
     elif rate < 3.0:
         observations.append(VOICE_OBSERVATIONS["slow_rate"])
-    
+
     # Variability
     if variability > 40:
         observations.append(VOICE_OBSERVATIONS["high_variability"])
     elif variability < 15:
         observations.append(VOICE_OBSERVATIONS["low_variability"])
-    
+
     # Voice quality
     if prosody_data.get('jitter', 0) > 0.02:
         observations.append(VOICE_OBSERVATIONS["voice_tension"])
-    
+
     return observations[:4]  # Max 4 observations
 ```
 
@@ -189,17 +189,17 @@ def _generate_voice_observations(prosody_data, vac_data):
 ```python
 EMOTION_UNDERSTANDING = {
     "Anxiety": "Anxiety is your mind's way of trying to protect you by preparing for potential challenges. It's exhausting, but it means you care deeply.",
-    
+
     "Sadness": "Sadness is how your heart processes loss and honors what mattered. It's painful, but it's also how we integrate change.",
-    
+
     "Joy": "Joy is your being's celebration of alignment - when what's happening matches what you value. It reminds you what's possible.",
-    
+
     "Anger": "Anger is energy for change - it signals when boundaries are crossed or values are violated. It's trying to protect what matters to you.",
-    
+
     "Fear": "Fear is your survival system activating to keep you safe. It's uncomfortable, but it shows how much you value your wellbeing.",
-    
+
     "Confusion": "Confusion is your mind saying 'I need more information to make sense of this.' It's uncomfortable but it's the beginning of clarity.",
-    
+
     # Default template
     "DEFAULT": f"{{emotion}} is your emotional system responding to what's happening. It's giving you important information about your needs and values."
 }
@@ -275,12 +275,12 @@ def _interpret_connection_warm(connection):
 def _generate_gentle_invitations(self, emotion, vac_data, message_count):
     """Generate 2-3 invitations, alternating reflections and suggestions."""
     invitations = []
-    
+
     # Use message count from session analytics to alternate
     # Odd messages (1, 3, 5...) = start with reflection
     # Even messages (2, 4, 6...) = start with suggestion
     start_with_reflection = (message_count % 2 == 1)
-    
+
     if start_with_reflection:
         invitations.append({
             "type": "reflection",
@@ -299,14 +299,14 @@ def _generate_gentle_invitations(self, emotion, vac_data, message_count):
             "type": "reflection",
             "text": self._generate_reflection_question(emotion, vac_data)
         })
-    
+
     # Optional third invitation
     if vac_data.get('arousal', 0) > 0.7:  # High arousal = add grounding
         invitations.append({
             "type": "suggestion",
             "text": "You might try placing a hand on your heart and taking three slow breaths"
         })
-    
+
     return invitations
 ```
 
@@ -438,21 +438,21 @@ max-w-2xl
   "mode": "warm",
   "structured": true,
   "opening": "I sense you're experiencing anxiety right now, and I want you to know that's completely valid. This is your system trying to protect you.",
-  
+
   "voice_observations": [
     "Your voice has a lot of energy and tension",
     "You're speaking quickly, which often happens when thoughts are racing",
     "There's a tightness in your voice that suggests your body is on alert"
   ],
-  
+
   "emotion_understanding": "Anxiety is your mind's way of trying to protect you by preparing for potential challenges. It's exhausting, but it means you care deeply.",
-  
+
   "vac_interpretation": {
     "energy_state": "You're in a high-activation state - your system is revved up",
     "emotional_tone": "This energy doesn't feel good - there's distress present",
     "connection_quality": "You might feel alone in this, or worried about burdening others"
   },
-  
+
   "gentle_invitations": [
     {
       "type": "reflection",
@@ -463,7 +463,7 @@ max-w-2xl
       "text": "You might try placing a hand on your heart and noticing the physical sensations of this anxiety"
     }
   ],
-  
+
   "similar_emotions": [
     {"name": "Worry", "category": "Negative High-Energy"},
     {"name": "Fear", "category": "Negative High-Energy"},
@@ -479,21 +479,21 @@ max-w-2xl
   "mode": "warm",
   "structured": true,
   "opening": "I'm sensing a lovely contentment in your expression. This is a precious state - you're at ease.",
-  
+
   "voice_observations": [
     "Your voice is calm and steady",
     "You're speaking at a relaxed pace",
     "There's a warmth and softness in your tone"
   ],
-  
+
   "emotion_understanding": "Contentment is your being's way of saying 'this is enough.' It's peace without needing anything to be different.",
-  
+
   "vac_interpretation": {
     "energy_state": "You're in a low-activation state - calm and settled",
     "emotional_tone": "This feels good - there's ease and wellbeing here",
     "connection_quality": "You feel connected and aligned with yourself"
   },
-  
+
   "gentle_invitations": [
     {
       "type": "suggestion",
@@ -504,7 +504,7 @@ max-w-2xl
       "text": "What's contributing to this sense of peace right now?"
     }
   ],
-  
+
   "similar_emotions": [
     {"name": "Peace", "category": "Positive Low-Energy"},
     {"name": "Gratitude", "category": "Positive Low-Energy"},
@@ -527,7 +527,7 @@ try:
     message_count = session_analytics.emotion_count
 except:
     message_count = 1  # Default to reflection-first
-    
+
 # Pass to invitation generator
 insights["gentle_invitations"] = self._generate_gentle_invitations(
     emotion, vac_data, message_count

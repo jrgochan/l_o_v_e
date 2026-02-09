@@ -2,8 +2,8 @@
 
 ## Comprehensive System Analysis & Future Planning
 
-**Date**: December 7, 2025  
-**Purpose**: Deep architectural review, containerization readiness, UX analysis  
+**Date**: December 7, 2025
+**Purpose**: Deep architectural review, containerization readiness, UX analysis
 **Scope**: All modules (L, O, V, E) + infrastructure
 
 ---
@@ -302,7 +302,7 @@ User Input → Listener (analyze) → Observer (store) → Experience (visualize
 
 ### **Experience Module: Needs Containerization**
 
-**Current**: Next.js runs natively  
+**Current**: Next.js runs natively
 **Needed**: Containerfile for Experience web
 
 ```dockerfile
@@ -490,12 +490,12 @@ interface SettingsState {
   emotionDisplayMode: EmotionDisplayMode; // Future: 'simple' | 'data'
   showMotionIndicators: boolean;
   colorScheme: ColorScheme;
-  
+
   // Behavior
   autoComputePaths: boolean;
   focusMode: boolean;
   enableAnimations: boolean;
-  
+
   // Network
   networkMode: 'local' | 'network';
   apiEndpoints: {
@@ -503,11 +503,11 @@ interface SettingsState {
     listener: string;
     versor: string;
   };
-  
+
   // Preferences
   toneMode: 'warm' | 'clinical';
   deepFeelingDefault: boolean;
-  
+
   // Persistence
   saveSettings: () => void;
   loadSettings: () => void;
@@ -613,23 +613,23 @@ export function getApiConfig(): ApiConfig {
 // experience/web/lib/apiClient.ts
 class ApiClient {
   private config: ApiConfig;
-  
+
   constructor() {
     this.config = getApiConfig();
   }
-  
+
   updateMode(mode: 'local' | 'network') {
     this.config = mode === 'local' ? LOCAL_CONFIG : NETWORK_CONFIG;
     localStorage.setItem('networkMode', mode);
   }
-  
+
   async fetchObserver(path: string, options?: RequestInit) {
     const url = `${this.config.endpoints.observer}${path}`;
     return fetch(url, options);
   }
-  
+
   // Similar for listener, versor
-  
+
   async testConnection(): Promise<{
     observer: boolean;
     listener: boolean;
@@ -659,13 +659,13 @@ export const api = new ApiClient();
     leftLabel="🏠 Local (Privacy)"
     rightLabel="🌐 Network (Cloud)"
   />
-  
+
   {networkMode === 'local' && (
     <p className="text-sm text-gray-400">
       ✅ All data stays on your device (HIPAA compliant)
     </p>
   )}
-  
+
   {networkMode === 'network' && (
     <div className="mt-4">
       <ConnectionStatus />
@@ -840,7 +840,7 @@ build:
 
 ### **Recommendation 1: API Gateway Pattern**
 
-**Problem**: Frontend knows about 3 different backend URLs  
+**Problem**: Frontend knows about 3 different backend URLs
 **Solution**: Single API gateway
 
 ```text
@@ -876,7 +876,7 @@ Frontend → API Gateway :8080 → Routes to:
 
 ### **Recommendation 3: GraphQL (Future Consider)**
 
-**Current**: Multiple REST endpoints  
+**Current**: Multiple REST endpoints
 **Future Option**: Single GraphQL endpoint
 
 **Pros:**
@@ -938,15 +938,15 @@ Frontend → API Gateway :8080 → Routes to:
 
 The architecture should support:
 
-**Default**: Fully local (privacy, offline, HIPAA)  
-**Optional**: Network mode (collaboration, sync, research)  
+**Default**: Fully local (privacy, offline, HIPAA)
+**Optional**: Network mode (collaboration, sync, research)
 **Hybrid**: Local analysis, optional cloud backup
 
 **Key principle**: User owns their emotional data. Network is convenience, not requirement.
 
 ---
 
-**Status**: Architecture is solid, ready for next phase  
-**Readiness**: Containerization 80% complete  
-**UX**: Exceptional and getting better  
+**Status**: Architecture is solid, ready for next phase
+**Readiness**: Containerization 80% complete
+**UX**: Exceptional and getting better
 **Next**: Settings page + full containerization

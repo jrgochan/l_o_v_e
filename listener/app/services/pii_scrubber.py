@@ -44,6 +44,7 @@ See Also:
 
 import logging
 import os
+import re
 from typing import Any, List, Optional, Tuple
 
 import spacy
@@ -107,8 +108,6 @@ class PIIScrubber:
         self._nlp_spacy: Optional[Any] = None
 
         # Pre-compile regexes
-        import re
-
         self._compiled_patterns = {}
         for label, patterns in self.REGEX_PATTERNS.items():
             self._compiled_patterns[label] = [re.compile(p, re.IGNORECASE) for p in patterns]
@@ -138,7 +137,7 @@ class PIIScrubber:
             try:
                 self._nlp_spacy = spacy.load("en_core_web_sm")
                 logger.info("Spacy model loaded: en_core_web_sm")
-            except Exception as e:
+            except Exception as e:  # pylint: disable=broad-exception-caught
                 logger.error("Failed to load Spacy model: %s", e)
                 # Fallback to just BERT if Spacy fails (though strictly we want both
                 # per user request)
@@ -156,9 +155,54 @@ class PIIScrubber:
                     entities.append((match.start(), match.end(), f"[{label}]", match.group()))
         return entities
 
-    def scrub(
-        self, text: str, keep_structure: bool = True
-    ) -> str:  # pylint: disable=too-many-locals
+    def _find_all_entities(self, text: str) -> List[Tuple[int, int, str, str, str]]:
+        """Find all PII entities using Hybrid (BERT + Spacy) and Regex detection."""
+        # 1. Hybrid Detection (BERT + Spacy)
+        nlp_bert, nlp_spacy = self._load_models()
+
+        found_entities = []
+        covered_ranges = set()
+
+        def add_entity(start: int, end: int, label: str, word: str, source: str) -> None:
+            # Simple overlap check
+            is_new = True
+            for i in range(start, end):
+                if i in covered_ranges:
+                    is_new = False
+                    break
+
+            if is_new:
+                found_entities.append((start, end, label, word, source))
+                for i in range(start, end):
+                    covered_ranges.add(i)
+
+        # Run BERT
+        for ent in nlp_bert(text):
+            label = ent.get("entity_group", ent.get("entity"))
+            add_entity(ent["start"], ent["end"], label, ent.get("word", ""), "BERT")
+
+        # Run Spacy (if loaded)
+        if nlp_spacy:
+            for ent in nlp_spacy(text).ents:
+                add_entity(ent.start_char, ent.end_char, ent.label_, ent.text, "Spacy")
+
+        # 2. Regex Detection
+        for start, end, label, word in self._detect_regex_entities(text):
+            # Check overlap against covered_ranges
+            is_overlap = False
+            for i in range(start, end):
+                if i in covered_ranges:
+                    is_overlap = True
+                    break
+
+            if not is_overlap:
+                found_entities.append((start, end, label, word, "Regex"))
+                for i in range(start, end):
+                    covered_ranges.add(i)
+
+        return found_entities
+
+    def scrub(self, text: str, keep_structure: bool = True) -> str:
         """Remove personally identifiable information from text using NER + Regex.
 
         Args:
@@ -171,49 +215,22 @@ class PIIScrubber:
         if not text or len(text.strip()) == 0:
             return text
 
-        # 1. Hybrid Detection (BERT + Spacy)
-        nlp_bert, nlp_spacy = self._load_models()
+        all_entities = self._find_all_entities(text)
 
-        # Collect entities to scrub: (start, end, replacement, original_text)
+        # Filter for scrubbable entities and determine replacements
         entities_to_scrub = []
-        covered_ranges = set()
+        for start, end, label, word, _source in all_entities:
+            # Check if this is a PII entity or a Regex entity (which is definitely PII)
+            replacement = None
 
-        # Helper to add entity if no overlap
-        def add_entity(start: int, end: int, label: str, word: str, _source: str = "BERT") -> None:
-            # Simple overlap check: if any index in range is already covered
-            is_new = True
-            for i in range(start, end):
-                if i in covered_ranges:
-                    is_new = False
-                    break
+            if label in self.PII_ENTITIES:
+                replacement = self.PII_ENTITIES.get(label, "[REDACTED]")
+            elif label.startswith("[") and label.endswith("]"):
+                # Regex labels like [DATE], [EMAIL]
+                replacement = label
 
-            if is_new:
-                if label in self.PII_ENTITIES:
-                    replacement = self.PII_ENTITIES.get(label, "[REDACTED]")
-                    entities_to_scrub.append((start, end, replacement, word))
-                    for i in range(start, end):
-                        covered_ranges.add(i)
-
-        # Run BERT
-        bert_entities = nlp_bert(text)
-        for ent in bert_entities:
-            label = ent.get("entity_group", ent.get("entity"))
-            add_entity(ent["start"], ent["end"], label, ent.get("word", ""), "BERT")
-
-        # Run Spacy (if loaded)
-        if nlp_spacy:
-            doc = nlp_spacy(text)
-            for ent in doc.ents:
-                # Spacy labels: PERSON, ORG, GPE, etc.
-                add_entity(ent.start_char, ent.end_char, ent.label_, ent.text, "Spacy")
-
-        # 2. Regex Detection (Fallback for Dates, Emails, etc.)
-        regex_matches = self._detect_regex_entities(text)
-        for start, end, label, word in regex_matches:
-            # Check overlap
-            is_overlap = any((start < e[1] and end > e[0]) for e in entities_to_scrub)
-            if not is_overlap:
-                entities_to_scrub.append((start, end, label, word))
+            if replacement:
+                entities_to_scrub.append((start, end, replacement, word))
 
         # Sort by start position in reverse order (to replace safely)
         entities_to_scrub.sort(key=lambda x: x[0], reverse=True)
@@ -222,9 +239,6 @@ class PIIScrubber:
         for start, end, replacement, _ in entities_to_scrub:
             if not keep_structure:
                 replacement = ""
-
-            # Replace slice
-            # Ensure we don't mess up if overlap logic failed slightly (though masked above)
             scrubbed = scrubbed[:start] + replacement + scrubbed[end:]
 
         if entities_to_scrub:
@@ -241,55 +255,19 @@ class PIIScrubber:
         if not text or len(text.strip()) == 0:
             return []
 
-        # 1. Hybrid Detection
-        nlp_bert, nlp_spacy = self._load_models()
+        all_entities = self._find_all_entities(text)
 
         pii_found = []
-        covered_ranges = set()
-
-        def add_finding(word: str, label: str, start: int, end: int, _source: str) -> None:
-            # Check overlap
-            is_new = True
-            for i in range(start, end):
-                if i in covered_ranges:
-                    is_new = False
-                    break
-
-            if is_new:
-                if label in self.PII_ENTITIES:
-                    pii_found.append((word, label, start, end))
-                    for i in range(start, end):
-                        covered_ranges.add(i)
-
-        # BERT
-        bert_entities = nlp_bert(text)
-        for ent in bert_entities:
-            label = ent.get("entity_group", ent.get("entity"))
-            add_finding(ent.get("word", ""), label, ent["start"], ent["end"], "BERT")
-
-        # Spacy
-        if nlp_spacy:
-            doc = nlp_spacy(text)
-            for ent in doc.ents:
-                add_finding(ent.text, ent.label_, ent.start_char, ent.end_char, "Spacy")
-
-        # 2. Regex
-        regex_matches = self._detect_regex_entities(text)
-        for start, end, label, word in regex_matches:
-            # Check overlap logic compatible with set
-            is_overlap = False
-            for i in range(start, end):
-                if i in covered_ranges:
-                    is_overlap = True
-                    break
-            if not is_overlap:
-                # Strip brackets for consistent type string if needed, or keep as is
-                # label is like '[DATE]', BERT is like 'PER'.
-                # Let's clean the label to 'DATE' for consistency with type return?
-                # Actually detect_pii returns (word, type, start, end).
-                # PII_ENTITIES maps 'PER' -> '[NAME]'.
-                # Here regex label is '[DATE]'.
+        for start, end, label, word, _source in all_entities:
+            # Logic to filter and clean type
+            clean_type = None
+            if label in self.PII_ENTITIES:
+                clean_type = label
+            elif label.startswith("[") and label.endswith("]"):
+                # Regex labels
                 clean_type = label.strip("[]")
+
+            if clean_type:
                 pii_found.append((word, clean_type, start, end))
 
         return pii_found

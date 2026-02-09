@@ -1,3 +1,9 @@
+"""Transition Analytics API.
+
+Provides endpoints for analyzing user journey history and strategy effectiveness.
+Used to adaptively improve recommendations based on past performance.
+"""
+
 import logging
 from typing import Annotated, Any, Dict
 from uuid import UUID
@@ -6,7 +12,10 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.api.schemas.transition import EffectiveStrategiesResponse, JourneyHistoryResponse
+from app.api.schemas.transition import (
+    EffectiveStrategiesResponse,
+    JourneyHistoryResponse,
+)
 from app.database import get_db
 from app.models.transition_strategy import StrategyAttempt, UserJourney
 
@@ -19,7 +28,18 @@ router = APIRouter()
 async def get_user_journey_history(
     user_id: UUID, db: Annotated[AsyncSession, Depends(get_db)]
 ) -> JourneyHistoryResponse:
-    """Get user journey history with analytics."""
+    """Retrieve the complete history of a user's emotional journeys.
+
+    Aggregates statistics on completed, abandoned, and in-progress journeys
+    to provide a high-level overview of user engagement and success.
+
+    Args:
+        user_id: The UUID of the user.
+        db: Database session.
+
+    Returns:
+        JourneyHistoryResponse: Aggregated stats and list of journeys.
+    """
     try:
         stmt = select(UserJourney).where(UserJourney.user_id == user_id)
         result = await db.execute(stmt)
@@ -44,15 +64,28 @@ async def get_user_journey_history(
         )
 
     except Exception as e:
-        logger.error(f"Failed to get journey history: {e}", exc_info=True)
-        raise HTTPException(status_code=500, detail=str(e))
+        logger.error("Failed to get journey history: %s", e, exc_info=True)
+        raise HTTPException(status_code=500, detail=str(e)) from e
 
 
 @router.get("/user/{user_id}/effective-strategies", response_model=EffectiveStrategiesResponse)
 async def get_user_effective_strategies(
     user_id: UUID, db: Annotated[AsyncSession, Depends(get_db)], limit: int = 5
 ) -> EffectiveStrategiesResponse:
-    """Get strategies that have been most effective for this user."""
+    """Identify the most effective therapeutic strategies for a specific user.
+
+    Analyzes `StrategyAttempt` records to calculate average helpfulness ratings
+    per strategy. Filters for strategies tried at least twice to ensure statistical
+    relevance.
+
+    Args:
+        user_id: The UUID of the user.
+        db: Database session.
+        limit: Maximum number of strategies to return (default: 5).
+
+    Returns:
+        EffectiveStrategiesResponse: List of top strategies with usage stats.
+    """
     try:
         # Query strategy attempts for this user
         stmt = (
@@ -102,5 +135,5 @@ async def get_user_effective_strategies(
         )
 
     except Exception as e:
-        logger.error(f"Failed to get effective strategies: {e}", exc_info=True)
-        raise HTTPException(status_code=500, detail=str(e))
+        logger.error("Failed to get effective strategies: %s", e, exc_info=True)
+        raise HTTPException(status_code=500, detail=str(e)) from e

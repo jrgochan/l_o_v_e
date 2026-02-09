@@ -302,6 +302,6 @@ Before final submission:
 
 ---
 
-**Last Updated:** December 30, 2025  
-**Status:** Master plan complete, ready for section writing  
+**Last Updated:** December 30, 2025
+**Status:** Master plan complete, ready for section writing
 **Next Step:** Write 01-abstract.md

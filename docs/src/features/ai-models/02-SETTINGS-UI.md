@@ -2,8 +2,8 @@
 
 ## User Interface Design for Model Management**
 
-**Created**: December 7, 2025  
-**Purpose**: Design intuitive UI for managing AI models  
+**Created**: December 7, 2025
+**Purpose**: Design intuitive UI for managing AI models
 **Scope**: Experience frontend (Settings page)
 
 ---
@@ -56,7 +56,7 @@
           {model.tags.map(tag => <Badge>{tag}</Badge>)}
         </ModelBadges>
       </ModelHeader>
-      
+
       <ModelStats>
         <Stat label="Size" value={formatGB(model.size)} />
         <Stat label="Params" value={model.parameter_size} />
@@ -64,11 +64,11 @@
         <Stat label="Quality" value={renderStars(model.quality_rating)} />
         <Stat label="RAM" value={`${model.ram_gb}GB`} />
       </ModelStats>
-      
+
       <ModelDescription>
         {model.description}
       </ModelDescription>
-      
+
       <ModelUsage>
         <strong>Currently assigned to:</strong>
         {getAssignedFunctions(model).map(fn => (
@@ -78,16 +78,16 @@
           <span className="text-gray-400">Not assigned</span>
         )}
       </ModelUsage>
-      
+
       <ModelActions>
-        <Button 
-          variant="outline" 
+        <Button
+          variant="outline"
           onClick={() => openAssignDialog(model)}
           disabled={!isAssigned(model)}
         >
           Assign to Function
         </Button>
-        <Button 
+        <Button
           variant="destructive"
           onClick={() => confirmDelete(model)}
         >
@@ -114,7 +114,7 @@
           )}
         </ModelBadges>
       </ModelHeader>
-      
+
       <ModelStats>
         <Stat label="Download Size" value={`${model.size_gb}GB`} />
         <Stat label="Params" value={model.parameter_size} />
@@ -122,26 +122,26 @@
         <Stat label="Est. Quality" value={renderStars(model.quality_rating)} />
         <Stat label="Requires RAM" value={`${model.ram_gb}GB`} />
       </ModelStats>
-      
+
       <ModelDescription>
         {model.description}
       </ModelDescription>
-      
+
       <ModelRecommendation>
         <strong>Good for:</strong>
         {model.recommended_for.map(fn => (
           <span key={fn}>{formatFunctionName(fn)}</span>
         ))}
       </ModelRecommendation>
-      
+
       {hasInsufficientResources(model) && (
         <Alert variant="warning">
           ⚠️ This model requires {model.ram_gb}GB RAM but you have {systemRAM}GB available
         </Alert>
       )}
-      
+
       <ModelActions>
-        <Button 
+        <Button
           variant="primary"
           onClick={() => startPull(model)}
           disabled={hasInsufficientResources(model) || isPulling}
@@ -165,13 +165,13 @@
   <DialogHeader>
     <h3>Downloading {pullingModel.name}</h3>
   </DialogHeader>
-  
+
   <DialogBody>
-    <ProgressBar 
+    <ProgressBar
       percent={pullProgress.percent || 0}
       variant="animated"
     />
-    
+
     <ProgressStats>
       <Stat label="Downloaded">
         {formatGB(pullProgress.completed)} / {formatGB(pullProgress.total)}
@@ -183,7 +183,7 @@
         {formatDuration(pullProgress.eta)}
       </Stat>
     </ProgressStats>
-    
+
     <ProgressLayers>
       {pullProgress.layers.map(layer => (
         <Layer key={layer.digest}>
@@ -198,7 +198,7 @@
       ))}
     </ProgressLayers>
   </DialogBody>
-  
+
   <DialogFooter>
     <Button variant="outline" onClick={cancelPull}>
       Cancel Download
@@ -222,7 +222,7 @@
         <FunctionName>{fn.display_name}</FunctionName>
         <FunctionTag>{fn.category}</FunctionTag>
       </FunctionHeader>
-      
+
       <CurrentAssignment>
         <Label>Current Model:</Label>
         <ModelSelector
@@ -236,8 +236,8 @@
                 <OptionContent>
                   <ModelName>{model.name}</ModelName>
                   <ModelMeta>
-                    {model.parameter_size} | 
-                    Speed: {renderStars(model.speed_rating)} | 
+                    {model.parameter_size} |
+                    Speed: {renderStars(model.speed_rating)} |
                     Quality: {renderStars(model.quality_rating)}
                   </ModelMeta>
                 </OptionContent>
@@ -245,24 +245,24 @@
             ))}
         </ModelSelector>
       </CurrentAssignment>
-      
+
       <PerformanceMetrics>
         <Metric label="Avg Latency" value={`${metrics[fn.id].avg_latency_ms}ms`} />
         <Metric label="Success Rate" value={`${metrics[fn.id].success_rate}%`} />
         <Metric label="Last Used" value={formatRelativeTime(metrics[fn.id].last_used)} />
       </PerformanceMetrics>
-      
+
       <FunctionDescription>
         {fn.description}
       </FunctionDescription>
-      
+
       <Recommendation>
         💡 <strong>Recommended:</strong> {getRecommendation(fn.id)}
       </Recommendation>
-      
+
       <Actions>
-        <Button 
-          variant="outline" 
+        <Button
+          variant="outline"
           onClick={() => testFunction(fn.id)}
         >
           Test with Sample
@@ -284,7 +284,7 @@
   <TesterHeader>
     <h3>Test: Semantic VAC with phi-3:mini</h3>
   </TesterHeader>
-  
+
   <TesterInput>
     <Label>Sample Text:</Label>
     <TextArea
@@ -297,25 +297,25 @@
       Run Analysis
     </Button>
   </TesterInput>
-  
+
   {testResult && (
     <TesterResults>
       <ResultHeader>
         <span>Results</span>
         <span className="text-gray-400">Completed in {testResult.latency}ms</span>
       </ResultHeader>
-      
+
       <ResultData>
         <h4>Extracted VAC:</h4>
         <VACDisplay vac={testResult.vac} />
-        
+
         <h4>Detected Emotion:</h4>
-        <EmotionBadge 
+        <EmotionBadge
           emotion={testResult.emotion}
           confidence={testResult.confidence}
         />
       </ResultData>
-      
+
       <ResultComparison>
         <h4>vs Current Model (llama3.1:8b):</h4>
         <ComparisonTable>
@@ -329,7 +329,7 @@
           </Row>
         </ComparisonTable>
       </ResultComparison>
-      
+
       <ResultActions>
         <Button onClick={() => assignModel(fn, model)}>
           Looks Good - Assign this Model
@@ -364,7 +364,7 @@
       </ResourceDetail>
     )}
   </ResourceCard>
-  
+
   <ResourceCard>
     <ResourceIcon type="disk" />
     <ResourceInfo>
@@ -376,7 +376,7 @@
       {totalModelSize}GB used by {localModels.length} models
     </ResourceDetail>
   </ResourceCard>
-  
+
   <ResourceCard>
     <ResourceIcon type="ollama" />
     <ResourceInfo>
@@ -481,7 +481,7 @@
       <Badge>Best Quality</Badge>
     </BadgeGroup>
   </Header>
-  
+
   <StatsGrid>
     <Stat label="Size" value="40GB" />
     <Stat label="Parameters" value="70B" />
@@ -490,17 +490,17 @@
     <Stat label="RAM Required" value="48GB" />
     <Stat label="Est. Speed" value="3 tok/s" />
   </StatsGrid>
-  
+
   <Description>
     Highest quality model for therapeutic insights...
   </Description>
-  
+
   <RecommendedFor>
     ✅ Insight Generation<br/>
     ✅ Multi-Emotion Detection<br/>
     ⚠️ Not for: Real-time VAC (too slow)
   </RecommendedFor>
-  
+
   <PerformanceData>
     <h4>Real-World Performance</h4>
     <Chart data={modelMetrics} />
@@ -510,7 +510,7 @@
       <li>User Rating: 4.8/5</li>
     </ul>
   </PerformanceData>
-  
+
   <Actions>
     <Button variant="primary">Download Model</Button>
     <Button variant="outline">View Details</Button>
@@ -535,7 +535,7 @@
       </p>
     </div>
   </FunctionInfo>
-  
+
   <CurrentModel>
     <Label>Current Model:</Label>
     <ModelDropdown
@@ -549,8 +549,8 @@
           <OptionText>
             <OptionName>{model.name}</OptionName>
             <OptionMeta>
-              {model.parameter_size} • 
-              {model.speed_rating}⭐ speed • 
+              {model.parameter_size} •
+              {model.speed_rating}⭐ speed •
               {model.quality_rating}⭐ quality
             </OptionMeta>
           </OptionText>
@@ -562,25 +562,25 @@
       ))}
     </ModelDropdown>
   </CurrentModel>
-  
+
   <PerformanceDisplay>
     <MetricCard>
       <MetricValue>{metrics.avg_latency}ms</MetricValue>
       <MetricLabel>Avg Latency</MetricLabel>
       <MetricTrend trend={metrics.latency_trend} />
     </MetricCard>
-    
+
     <MetricCard>
       <MetricValue>{metrics.success_rate}%</MetricValue>
       <MetricLabel>Success Rate</MetricLabel>
     </MetricCard>
-    
+
     <MetricCard>
       <MetricValue>{metrics.total_invocations}</MetricValue>
       <MetricLabel>Total Uses</MetricLabel>
     </MetricCard>
   </PerformanceDisplay>
-  
+
   <RecommendationBox>
     💡 For real-time VAC extraction, we recommend:
     <ul>
@@ -651,7 +651,7 @@ export function useOllamaModels() {
   const [availableModels, setAvailableModels] = useState<ModelInfo[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  
+
   const fetchLocalModels = async () => {
     setLoading(true);
     try {
@@ -664,24 +664,24 @@ export function useOllamaModels() {
       setLoading(false);
     }
   };
-  
+
   const pullModel = async (modelName: string) => {
     // Connect to WebSocket for progress
     const ws = new WebSocket(`ws://localhost:8002/listener/ai/models/pull/${taskId}`);
-    
+
     ws.onmessage = (event) => {
       const progress = JSON.parse(event.data);
       setPullProgress(progress);
     };
-    
+
     // ... etc
   };
-  
+
   const deleteModel = async (modelName: string) => {
     await fetch(`/listener/ai/models/${modelName}`, { method: 'DELETE' });
     await fetchLocalModels(); // Refresh
   };
-  
+
   return {
     localModels,
     availableModels,
@@ -700,25 +700,25 @@ export function useOllamaModels() {
 export function useModelAssignments() {
   const [assignments, setAssignments] = useState<Record<string, string>>({});
   const [metrics, setMetrics] = useState<Record<string, FunctionMetrics>>({});
-  
+
   const fetchAssignments = async () => {
     const response = await fetch('/observer/ai/assignments');
     const data = await response.json();
     setAssignments(data.assignments);
   };
-  
+
   const assignModel = async (function: string, modelName: string) => {
     await fetch('/observer/ai/assignments', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ function, model_name: modelName })
     });
-    
+
     await fetchAssignments(); // Refresh
-    
+
     toast.success(`${function} now uses ${modelName}`);
   };
-  
+
   return {
     assignments,
     metrics,

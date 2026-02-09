@@ -113,17 +113,17 @@ from queue import Queue
 
 class QuaternionPool:
     """Reuse quaternion objects"""
-    
+
     def __init__(self, size: int = 100):
         self.pool = Queue(maxsize=size)
         for _ in range(size):
             self.pool.put(Quaternion(1, 0, 0, 0))
-    
+
     def acquire(self) -> Quaternion:
         if self.pool.empty():
             return Quaternion(1, 0, 0, 0)
         return self.pool.get()
-    
+
     def release(self, q: Quaternion):
         if not self.pool.full():
             self.pool.put(q)
@@ -165,13 +165,13 @@ app.add_middleware(GZipMiddleware, minimum_size=1000)
 @router.post("/calculate/batch")
 async def calculate_batch(requests: List[StateRequest]):
     """Process multiple requests in one call"""
-    
+
     # Vectorized processing
     results = await asyncio.gather(*[
         engine.process_state_async(req)
         for req in requests
     ])
-    
+
     return results
 ```
 
@@ -185,12 +185,12 @@ from fastapi.responses import StreamingResponse
 @router.post("/slerp/stream")
 async def stream_path(request: SLERPRequest):
     """Stream SLERP frames instead of sending all at once"""
-    
+
     async def generate():
         path = generate_slerp_path(...)
         for q in path:
             yield json.dumps(q.dict()) + "\n"
-    
+
     return StreamingResponse(generate(), media_type="application/x-ndjson")
 ```
 
@@ -237,14 +237,14 @@ lp.print_stats()
 ```python
 def test_benchmark_pipeline(benchmark):
     """Benchmark complete pipeline"""
-    
+
     vac = VACVector(0.9, 0.7, 0.8)
     prev = Quaternion.identity()
-    
+
     result = benchmark(
         lambda: VersorEngine().process_state(vac, prev, 1.0)
     )
-    
+
     # Verify P99 < 50ms
     assert benchmark.stats['max'] < 0.05
 ```

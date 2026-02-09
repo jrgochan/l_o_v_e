@@ -21,7 +21,7 @@ if command -v podman >/dev/null 2>&1; then
     # Podman Login to Artifact Registry
     echo "Logging into Artifact Registry with Podman..."
     gcloud auth print-access-token | podman login -u oauth2accesstoken --password-stdin "https://${REGION}-docker.pkg.dev"
-    
+
     # Podman default build flags
     BUILD_FLAGS="--format docker"
 elif command -v docker >/dev/null 2>&1; then
@@ -43,7 +43,7 @@ build_and_push() {
     local use_root_context=$4 # Optional: "true" to use root context
 
     echo "Building $service using $CONTAINER_CMD..."
-    
+
     local build_context="."
     local dockerfile="Containerfile"
 
@@ -52,7 +52,7 @@ build_and_push() {
         build_context="."
         dockerfile="$dir/Containerfile"
         echo "  Using Root Context"
-    else 
+    else
         # Check context
         if [ ! -d "$ROOT_DIR/$dir" ]; then
             echo "Error: Directory $dir not found"
@@ -60,22 +60,22 @@ build_and_push() {
         fi
         cd "$ROOT_DIR/$dir"
     fi
-    
+
     # Construct build command
     local cmd="$CONTAINER_CMD build $BUILD_FLAGS --platform linux/amd64 -t $image_name -f $dockerfile"
-    
+
     # Add any build arguments
     if [ -n "$build_args_str" ]; then
         cmd="$cmd $build_args_str"
     fi
-    
+
     # Execute build
     echo "Executing: $cmd $build_context"
     $cmd $build_context
-    
+
     echo "Pushing $service..."
     $CONTAINER_CMD push "$image_name"
-    
+
     # Return to script dir (approximate, since we cd'd around)
     cd "$DIR" >/dev/null
 }

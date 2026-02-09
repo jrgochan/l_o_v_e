@@ -1,8 +1,8 @@
 # Experience Module - Platform Migration Plan
 
-**Status:** PROPOSED  
-**Date:** December 4, 2025  
-**Objective:** Migrate from React Native to platform-specific applications  
+**Status:** PROPOSED
+**Date:** December 4, 2025
+**Objective:** Migrate from React Native to platform-specific applications
 **Timeline:** 8-12 weeks for complete migration
 
 ---
@@ -34,7 +34,7 @@ This plan proposes splitting the Experience module from a single React Native co
 ```
 experience/
 ├── shared/                      # Shared TypeScript code (~40% reuse)
-│   ├── core/                   
+│   ├── core/
 │   │   ├── vac.ts              # VAC model, CANONICAL_EMOTIONS
 │   │   ├── quaternion.ts       # Math utilities (slerp, angular distance)
 │   │   └── easing.ts           # Animation easing functions
@@ -153,17 +153,17 @@ import fragmentShader from '../shaders/fragment.glsl';
 export function SoulSphere() {
   const meshRef = useRef<THREE.Mesh>(null);
   const materialRef = useRef<THREE.ShaderMaterial>(null);
-  
+
   const targetVAC = useVACStore(state => state.targetVAC);
-  
+
   useFrame((state, delta) => {
     if (!materialRef.current) return;
-    
+
     // Your existing animation logic
     materialRef.current.uniforms.uTime.value += delta;
     // ... lerp uniforms toward targetVAC
   });
-  
+
   return (
     <mesh ref={meshRef}>
       <icosahedronGeometry args={[1.5, 20]} />
@@ -275,7 +275,7 @@ struct VACVector: Codable {
     let valence: Double    // -1.0 to 1.0
     let arousal: Double    // -1.0 to 1.0
     let connection: Double // -1.0 to 1.0
-    
+
     static let neutral = VACVector(valence: 0, arousal: 0, connection: 0)
     static let joy = VACVector(valence: 0.9, arousal: 0.7, connection: 0.8)
 }
@@ -283,7 +283,7 @@ struct VACVector: Codable {
 // Quaternion utilities
 struct Quaternion {
     let w, x, y, z: Double
-    
+
     func slerp(to target: Quaternion, t: Double) -> Quaternion {
         // SLERP implementation
     }
@@ -297,7 +297,7 @@ import RealityKit
 
 struct SoulSphereView: View {
     @State private var vac = VACVector.joy
-    
+
     var body: some View {
         RealityView { content in
             // Create sphere entity
@@ -305,7 +305,7 @@ struct SoulSphereView: View {
                 mesh: .generateSphere(radius: 1.5),
                 materials: [CustomMaterial(vac: vac)]
             )
-            
+
             content.add(sphere)
         } update: { content in
             // Update when VAC changes
@@ -330,11 +330,11 @@ vertex float4 soulSphereVertex(
     constant float& uTime [[buffer(2)]]
 ) {
     float3 pos = positions[vertexID];
-    
+
     // Simplex noise displacement (port from GLSL)
     float noise = simplexNoise3D(pos * (1.5 + abs(uArousal) * 2.0));
     float3 displaced = pos + normalize(pos) * noise * 0.2 * abs(uArousal);
-    
+
     return float4(displaced, 1.0);
 }
 
@@ -347,10 +347,10 @@ fragment float4 soulSphereFragment(
     float3 crimson = float3(0.545, 0.0, 0.0);
     float3 cyan = float3(0.0, 1.0, 1.0);
     float3 color = mix(crimson, cyan, (uValence + 1.0) * 0.5);
-    
+
     // Fresnel glow based on connection
     // ... (port from GLSL)
-    
+
     return float4(color, 1.0);
 }
 ```
@@ -425,7 +425,7 @@ dependencies {
     implementation("androidx.compose.material3:material3:1.3.0")
     implementation("com.google.android.filament:filament-android:1.51.5")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.8.0")
-    
+
     // Testing
     testImplementation("junit:junit:5.10.0")
     androidTestImplementation("androidx.compose.ui:ui-test-junit4:1.7.0")
@@ -492,7 +492,7 @@ class SoulSphereRenderer(context: Context) : SurfaceView(context) {
     private val engine: Engine
     private val scene: Scene
     private val camera: Camera
-    
+
     init {
         // Initialize Filament
         engine = Engine.create()
@@ -506,16 +506,16 @@ class SoulSphereRenderer(context: Context) : SurfaceView(context) {
                     up = doubleArrayOf(0.0, 1.0, 0.0)
                 )
             }
-        
+
         createSoulSphere()
     }
-    
+
     private fun createSoulSphere() {
         // Create icosahedron mesh
         // Apply custom material with shaders
         // Add to scene
     }
-    
+
     fun updateVAC(vac: VACVector) {
         // Update material uniforms
     }
@@ -765,28 +765,28 @@ fragment {
 ## ⚠️ Risks & Mitigations
 
 ### Risk 1: Feature Divergence
-**Problem:** Each platform drifts apart over time  
+**Problem:** Each platform drifts apart over time
 **Mitigation:**
 - Strict visual parity tests (screenshot comparison)
 - Shared test cases (same VAC inputs = same visual output)
 - Regular cross-platform reviews
 
 ### Risk 2: Maintenance Overhead
-**Problem:** 3x the work for updates  
+**Problem:** 3x the work for updates
 **Mitigation:**
 - Maximize shared code (40%+)
 - Automated testing on all platforms
 - Consider hiring platform specialists
 
 ### Risk 3: Team Expertise
-**Problem:** Need Swift, Kotlin, TypeScript knowledge  
+**Problem:** Need Swift, Kotlin, TypeScript knowledge
 **Mitigation:**
 - Start with web (easiest)
 - Hire specialists for iOS/Android
 - Cross-training sessions
 
 ### Risk 4: Deployment Complexity
-**Problem:** 3 different release processes  
+**Problem:** 3 different release processes
 **Mitigation:**
 - CI/CD automation (GitHub Actions)
 - Coordinated release calendar
@@ -801,7 +801,7 @@ fragment {
 2. **Month 3-4**: Build iOS version if web succeeds
 3. **Month 5-6**: Build Android version
 
-**Pros:** Validate concept before full investment  
+**Pros:** Validate concept before full investment
 **Cons:** Slower time to mobile
 
 ### Option B: Parallel (Higher Risk, Faster)
@@ -809,7 +809,7 @@ fragment {
 2. **Month 2-4**: Build all three in parallel (requires team)
 3. **Month 5-6**: Polish and release all
 
-**Pros:** Faster to market  
+**Pros:** Faster to market
 **Cons:** Higher upfront investment
 
 ---

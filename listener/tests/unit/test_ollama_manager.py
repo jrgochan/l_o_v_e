@@ -1,4 +1,6 @@
+# pylint: disable=redefined-outer-name, unused-argument
 import json
+from typing import Any, AsyncGenerator
 from unittest.mock import AsyncMock, MagicMock, patch
 
 import httpx
@@ -7,12 +9,13 @@ import pytest
 from app.services.ollama_manager import (
     OllamaManager,
     estimate_ram_requirement,
+    estimate_speed,
     recommend_for_functions,
 )
 
 
 @pytest.fixture
-def mock_httpx():
+def mock_httpx() -> Any:
     with patch("app.services.ollama_manager.httpx.AsyncClient") as mock:
         client_instance = AsyncMock()
         # stream is a context manager, not an awaitable coroutine
@@ -22,7 +25,7 @@ def mock_httpx():
 
 
 @pytest.mark.asyncio
-async def test_health_check_success(mock_httpx):
+async def test_health_check_success(mock_httpx: Any) -> None:
     mock_httpx.get.return_value = MagicMock(status_code=200)
 
     manager = OllamaManager()
@@ -30,7 +33,7 @@ async def test_health_check_success(mock_httpx):
 
 
 @pytest.mark.asyncio
-async def test_health_check_failure(mock_httpx):
+async def test_health_check_failure(mock_httpx: Any) -> None:
     mock_httpx.get.side_effect = Exception("Down")
 
     manager = OllamaManager()
@@ -38,7 +41,7 @@ async def test_health_check_failure(mock_httpx):
 
 
 @pytest.mark.asyncio
-async def test_list_local_models(mock_httpx):
+async def test_list_local_models(mock_httpx: Any) -> None:
     mock_response = MagicMock()
     mock_response.status_code = 200
     mock_response.raise_for_status = MagicMock()
@@ -68,7 +71,7 @@ async def test_list_local_models(mock_httpx):
 
 
 @pytest.mark.asyncio
-async def test_list_local_models_error(mock_httpx):
+async def test_list_local_models_error(mock_httpx: Any) -> None:
     mock_httpx.get.side_effect = httpx.RequestError("Failed")
 
     manager = OllamaManager()
@@ -77,7 +80,7 @@ async def test_list_local_models_error(mock_httpx):
 
 
 @pytest.mark.asyncio
-async def test_delete_model(mock_httpx):
+async def test_delete_model(mock_httpx: Any) -> None:
     mock_httpx.request.return_value = MagicMock(status_code=200, json=lambda: {"status": "success"})
 
     manager = OllamaManager()
@@ -86,7 +89,7 @@ async def test_delete_model(mock_httpx):
 
 
 @pytest.mark.asyncio
-async def test_get_model_details(mock_httpx):
+async def test_get_model_details(mock_httpx: Any) -> None:
     mock_response = MagicMock()
     mock_response.status_code = 200
     mock_response.json.return_value = {
@@ -111,7 +114,7 @@ async def test_get_model_details(mock_httpx):
 
 
 @pytest.mark.asyncio
-async def test_pull_model_stream(mock_httpx):
+async def test_pull_model_stream(mock_httpx: Any) -> None:
     # Mock streaming response
     stream_context = AsyncMock()
     mock_response = AsyncMock()
@@ -125,7 +128,7 @@ async def test_pull_model_stream(mock_httpx):
     ]
 
     # Async iterator for lines
-    async def line_gen():
+    async def line_gen() -> AsyncGenerator[str, None]:
         for line in lines:
             yield line
 
@@ -144,7 +147,7 @@ async def test_pull_model_stream(mock_httpx):
     assert progress_updates[2].status == "success"
 
 
-def test_helpers():
+def test_helpers() -> None:
     assert estimate_ram_requirement("70B") >= 40.0
     recommendations = recommend_for_functions("8B", "llama")
     assert "semantic_vac" in recommendations
@@ -156,16 +159,14 @@ def test_helpers():
     assert "atlas_mapping" in recommendations_phi
 
 
-def test_estimate_speed():
-    from app.services.ollama_manager import estimate_speed
-
+def test_estimate_speed() -> None:
     assert estimate_speed("3B", "Q4_0") == 50.0
     assert estimate_speed("70B", "F16") == 3.0 * 0.7
     assert estimate_speed("Unknown", "F16") == 20.0 * 0.7
 
 
 @pytest.mark.asyncio
-async def test_pull_model_exception(mock_httpx):
+async def test_pull_model_exception(mock_httpx: Any) -> None:
     mock_httpx.stream.side_effect = Exception("Connect Fail")
     manager = OllamaManager()
 
@@ -176,7 +177,7 @@ async def test_pull_model_exception(mock_httpx):
 
 
 @pytest.mark.asyncio
-async def test_delete_model_error(mock_httpx):
+async def test_delete_model_error(mock_httpx: Any) -> None:
     mock_httpx.request.side_effect = Exception("Delete Fail")
     manager = OllamaManager()
     with pytest.raises(RuntimeError, match="Failed to delete model"):
@@ -184,7 +185,7 @@ async def test_delete_model_error(mock_httpx):
 
 
 @pytest.mark.asyncio
-async def test_get_model_details_error(mock_httpx):
+async def test_get_model_details_error(mock_httpx: Any) -> None:
     mock_httpx.post.side_effect = Exception("Details Fail")
     manager = OllamaManager()
     with pytest.raises(RuntimeError, match="Failed to get details"):
@@ -192,14 +193,16 @@ async def test_get_model_details_error(mock_httpx):
 
 
 @pytest.mark.asyncio
-async def test_close(mock_httpx):
+async def test_close(mock_httpx: Any) -> None:
     manager = OllamaManager()
     await manager.close()
-    manager.client.aclose.assert_called_once()
+    # Cast to Any or Mock to avoid no-member error on assert_called_once
+    # pylint: disable=no-member
+    manager.client.aclose.assert_called_once()  # type: ignore[attr-defined]
 
 
 @pytest.mark.asyncio
-async def test_pull_model_empty_line(mock_httpx):
+async def test_pull_model_empty_line(mock_httpx: Any) -> None:
     """Test skipping empty lines in stream."""
     stream_context = AsyncMock()
     mock_response = AsyncMock()
@@ -208,7 +211,7 @@ async def test_pull_model_empty_line(mock_httpx):
     # Empty line then success
     lines = ["", json.dumps({"status": "success"})]
 
-    async def line_gen():
+    async def line_gen() -> AsyncGenerator[str, None]:
         for line in lines:
             yield line
 
@@ -226,16 +229,16 @@ async def test_pull_model_empty_line(mock_httpx):
 
 
 @pytest.mark.asyncio
-async def test_pull_model_empty_stream(mock_httpx):
+async def test_pull_model_empty_stream(mock_httpx: Any) -> None:
     """Test completely empty stream (natural loop exit)."""
     stream_context = AsyncMock()
     mock_response = AsyncMock()
     mock_response.raise_for_status = MagicMock()
 
     # Empty generator
-    async def line_gen():
-        if False:
-            yield  # make it a generator
+    async def line_gen() -> AsyncGenerator[str, None]:
+        for _ in []:
+            yield "dummy"
 
     mock_response.aiter_lines = MagicMock(return_value=line_gen())
     stream_context.__aenter__.return_value = mock_response

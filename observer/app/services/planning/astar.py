@@ -1,12 +1,16 @@
+"""Module documentation."""
+
 import logging
 import time
 from queue import PriorityQueue
 from typing import Any, Dict, List, Optional, Tuple
+from uuid import UUID
 
 import numpy as np
 
 from app.models.emotion_definition import EmotionDefinition
 from app.services.planning.graph import TransitionGraph
+from app.services.planning.types import PathFindingContext
 
 logger = logging.getLogger(__name__)
 
@@ -15,15 +19,14 @@ class AStarSearcher:
     """Implements A* search algorithm over the TransitionGraph."""
 
     def __init__(self, graph: TransitionGraph):
+        """Docstring."""
         self.graph = graph
 
     async def find_path(
         self,
         start: EmotionDefinition,
         goal: EmotionDefinition,
-        max_waypoints: int,
-        user_history: Optional[Dict[str, Any]],
-        collection_id: Optional[str] = None,
+        context: PathFindingContext,
     ) -> Tuple[List[List[EmotionDefinition]], Dict[str, Any]]:
         """Run A* pathfinding."""
         # Priority queue structure: (f_cost, counter, emotion, path)
@@ -69,26 +72,45 @@ class AStarSearcher:
                 continue
 
             # Pruning
-            if len(path) > max_waypoints + 1:
+            if len(path) > context.max_waypoints + 1:
                 metrics["pruned_paths"] += 1
                 continue
 
             # Expansion
-            neighbors = await self.graph.get_valid_neighbors(current, goal, collection_id)
-
-            for neighbor in neighbors:
-                if neighbor.id not in visited:
-                    g_cost = self._calculate_g_cost(path, neighbor, user_history)
-                    h_cost = self._heuristic_cost(neighbor, goal)
-                    f_cost = g_cost + h_cost
-
-                    new_path = path + [neighbor]
-                    open_set.put((f_cost, counter, neighbor, new_path))
-                    counter += 1
+            counter = await self._expand_neighbors(
+                current, goal, context, (path, visited, open_set, counter)
+            )
 
         metrics["execution_time_ms"] = round((time.perf_counter() - start_time) * 1000, 2)
 
         return best_paths, metrics
+
+    async def _expand_neighbors(
+        self,
+        current: EmotionDefinition,
+        goal: EmotionDefinition,
+        context: PathFindingContext,
+        search_state: Tuple[
+            List[EmotionDefinition],
+            set[UUID],
+            PriorityQueue[Tuple[float, int, EmotionDefinition, List[EmotionDefinition]]],
+            int,
+        ],
+    ) -> int:
+        """Expand neighbors and add to open set."""
+        path, visited, open_set, counter = search_state
+        neighbors = await self.graph.get_valid_neighbors(current, goal, context.collection_id)
+
+        for neighbor in neighbors:
+            if neighbor.id not in visited:
+                g_cost = self._calculate_g_cost(path, neighbor, context.user_history)
+                h_cost = self._heuristic_cost(neighbor, goal)
+                f_cost = g_cost + h_cost
+
+                new_path = path + [neighbor]
+                open_set.put((f_cost, counter, neighbor, new_path))
+                counter += 1
+        return counter
 
     def _calculate_g_cost(
         self,

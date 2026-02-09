@@ -24,7 +24,7 @@ final class ExploreTabTests: XCTestCase {
         // Verify List Exists
         XCTAssertNoThrow(try sut.inspect().list())
 
-        // Verify Searchable exists (ViewInspector support for searchable is limited, 
+        // Verify Searchable exists (ViewInspector support for searchable is limited,
         // but we can check if the view hierarchy constructs without crash)
     }
 }

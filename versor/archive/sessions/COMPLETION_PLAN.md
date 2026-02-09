@@ -2,7 +2,7 @@
 
 **Goal:** Fix remaining bugs and implement missing endpoints to achieve 100% functionality
 
-**Current Status:** 33/36 tests passing (92%)  
+**Current Status:** 33/36 tests passing (92%)
 **Target:** 36/36 tests passing (100%)
 
 ---
@@ -20,14 +20,14 @@
 **Current Issue:** 3 tests failing due to bugs
 
 ### Bug A: Timezone Datetime Mismatch ✅ FIXED
-**Error:** `can't subtract offset-naive and offset-aware datetimes`  
-**Location:** `state.py` line 103  
-**Fix Applied:** Use `datetime.now(timezone.utc)` instead of `datetime.utcnow()`  
+**Error:** `can't subtract offset-naive and offset-aware datetimes`
+**Location:** `state.py` line 103
+**Fix Applied:** Use `datetime.now(timezone.utc)` instead of `datetime.utcnow()`
 **Status:** Fixed, needs validation
 
 ### Bug B: Test Parsing (Suspected)
-**Issue:** Critical test shows empty emotion names  
-**Possible Cause:** Response parsing in test script  
+**Issue:** Critical test shows empty emotion names
+**Possible Cause:** Response parsing in test script
 **Fix:** Verify timezone fix resolves the cascade
 
 ### Steps:
@@ -50,7 +50,7 @@ GET /observer/history/{user_id}
 
 Query Parameters:
 - start_date (optional): ISO datetime
-- end_date (optional): ISO datetime  
+- end_date (optional): ISO datetime
 - limit (optional): max results (default 100)
 
 Response:
@@ -174,11 +174,11 @@ Response:
 
 ## 🎯 Success Criteria
 
-✅ **State recording works** (no errors)  
-✅ **Historical trajectory returns data**  
-✅ **Current state returns latest entry**  
-✅ **All 36 automated tests pass**  
-✅ **Swagger docs show all endpoints**  
+✅ **State recording works** (no errors)
+✅ **Historical trajectory returns data**
+✅ **Current state returns latest entry**
+✅ **All 36 automated tests pass**
+✅ **Swagger docs show all endpoints**
 ✅ **THE CRITICAL TEST passes** (Compassion ≠ Pity)
 
 ---

@@ -10,18 +10,18 @@ CREATE TABLE clinical_alerts (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     session_id UUID NOT NULL REFERENCES chat_sessions(id) ON DELETE CASCADE,
     timestamp TIMESTAMP NOT NULL DEFAULT NOW(),
-    
+
     -- Alert details
     level alert_level NOT NULL,
     type alert_type NOT NULL,
     message TEXT NOT NULL,
     suggestion TEXT,
-    
+
     -- Audit information
     triggered_by JSONB NOT NULL,
     threshold_used JSONB NOT NULL,
     version VARCHAR(20) NOT NULL DEFAULT '1.0',
-    
+
     created_at TIMESTAMP NOT NULL DEFAULT NOW()
 );
 

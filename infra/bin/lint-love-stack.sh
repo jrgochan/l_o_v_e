@@ -97,7 +97,8 @@ if [ -n "$TARGET_MODULE" ]; then
     RUN_INFRA=false
     RUN_PYTHON=false
     RUN_TYPESCRIPT=false
-    
+    RUN_SWIFT=false
+
     case "$TARGET_MODULE" in
         infra|infrastructure|shell)
             RUN_INFRA=true
@@ -137,23 +138,23 @@ GLOBAL_EXIT_CODE=0
 # --- 1. Infrastructure (Shell) ---
 if [ "$RUN_INFRA" = true ]; then
     print_header "Checking Infrastructure (Shell Scripts)"
-    
+
     if command -v shellcheck >/dev/null 2>&1; then
         print_info "Running shellcheck..."
-        
+
         # Find all shell scripts in infra/
         # Exclude node_modules, venv, and hidden files
         SHELL_SCRIPTS=$(find "$PROJECT_ROOT/infra" -name "*.sh" -not -path "*/node_modules/*" -not -path "*/venv/*" -not -path "*/.venv*/*")
-        
+
         FAILED_SCRIPTS=0
-        
+
         for script in $SHELL_SCRIPTS; do
             # Compute relative path for nicer output
             REL_PATH="${script#"$PROJECT_ROOT"/}"
-            
+
             # Check for exclusions (using ignore file or inline comments is better, but basic exclusion here)
             # e.g., if we want to skip legacy scripts
-            
+
             if ! shellcheck "$script" --format=tty --color=always --exclude=SC1091; then
                 print_error "Use shellcheck on $REL_PATH"
                 FAILED_SCRIPTS=$((FAILED_SCRIPTS + 1))
@@ -161,7 +162,7 @@ if [ "$RUN_INFRA" = true ]; then
                 [ "$CI_MODE" != true ] && print_success "$REL_PATH"
             fi
         done
-        
+
         if [ "$FAILED_SCRIPTS" -eq 0 ]; then
             print_success "Shell scripts look good!"
         else
@@ -179,20 +180,20 @@ if [ "$RUN_PYTHON" = true ]; then
     echo ""
     # Call the existing python quality script
     # We pass --fix if requested
-    
+
     PYTHON_ARGS=()
     [ "$FIX_MODE" = true ] && PYTHON_ARGS+=("--fix")
-    
+
     # Pass module filter if specific python module is targeted
     if [[ "$TARGET_MODULE" == "observer" || "$TARGET_MODULE" == "listener" || "$TARGET_MODULE" == "versor" ]]; then
         PYTHON_ARGS+=("--module=$TARGET_MODULE")
     fi
-    
-    # Run from project root as it expects or from its dir? 
-    # check-python-quality.sh expects to be run? It resolves its own dir. 
+
+    # Run from project root as it expects or from its dir?
+    # check-python-quality.sh expects to be run? It resolves its own dir.
     # So we can call it by absolute path.
-    
-    
+
+
     if "$PROJECT_ROOT/infra/scripts/check-python-quality.sh" "${PYTHON_ARGS[@]+"${PYTHON_ARGS[@]}"}"; then
         # Script prints its own success message
         :
@@ -205,10 +206,10 @@ fi
 if [ "$RUN_TYPESCRIPT" = true ]; then
     echo ""
     # Call the existing typescript quality script
-    
+
     TS_ARGS=()
     [ "$FIX_MODE" = true ] && TS_ARGS+=("--fix")
-    
+
     if "$PROJECT_ROOT/infra/scripts/check-typescript-quality.sh" "${TS_ARGS[@]+"${TS_ARGS[@]}"}"; then
         # Script prints its own success message
         :
@@ -220,9 +221,12 @@ fi
 # --- 4. Swift (Native) ---
 if [ "$RUN_SWIFT" = true ]; then
     echo ""
-    
+
+    SWIFT_ARGS=()
+    [ "$FIX_MODE" = true ] && SWIFT_ARGS+=("--fix")
+
     # Call the new swift quality script
-    if "$PROJECT_ROOT/infra/scripts/check-swift-quality.sh"; then
+    if "$PROJECT_ROOT/infra/scripts/check-swift-quality.sh" "${SWIFT_ARGS[@]+"${SWIFT_ARGS[@]}"}"; then
         :
     else
         GLOBAL_EXIT_CODE=1

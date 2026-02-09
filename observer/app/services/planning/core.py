@@ -1,26 +1,36 @@
+"""Module documentation."""
+
 import logging
 from typing import Any, Dict, List, Optional, Tuple
 from uuid import UUID
 
-from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.models.emotion_definition import EmotionDefinition
-from app.models.transition_strategy import UserJourney
-from app.services.emotion_mapper import EmotionMapper
+from app.repositories.emotions import EmotionRepository
+from app.repositories.journeys import JourneyRepository
+from app.services.emotions.mapper import EmotionMapper
 from app.services.planning.astar import AStarSearcher
 from app.services.planning.definitions import TransitionPath
 from app.services.planning.graph import TransitionGraph
 from app.services.planning.harmonics import PathHarmonizer
+from app.services.planning.types import PathFindingContext
+from app.services.planning.waypoint_explainer import WaypointExplainer
 
 logger = logging.getLogger(__name__)
 
 
-class PathPlanner:
+class PathPlanner:  # pylint: disable=too-many-instance-attributes
     """Category-aware emotional transition path planning (Modular Version)."""
 
     def __init__(self, session: AsyncSession):
+        """Initialize PathPlanner with required services and repositories."""
         self.session = session
+        self.emotion_repo = EmotionRepository(session)
+        self.journey_repo = JourneyRepository(session)
+        self.explainer = WaypointExplainer(session)
+
+        # Legacy services (to be refactored later if needed)
         self.emotion_mapper = EmotionMapper(session)
         self.graph = TransitionGraph(session)
         self.searcher = AStarSearcher(self.graph)
@@ -28,27 +38,28 @@ class PathPlanner:
 
     async def find_transition_path(
         self,
-        current_vac: List[float],
-        goal_vac: List[float],
-        max_waypoints: int = 3,
-        user_id: Optional[str] = None,
-        collection_id: Optional[str] = None,
+        context: PathFindingContext,
     ) -> TransitionPath:
         """Find optimal path from current to goal emotional state."""
-        if collection_id:
-            logger.info("Finding path %s -> %s (col: %s)", current_vac, goal_vac, collection_id)
+        if context.collection_id:
+            logger.info(
+                "Finding path %s -> %s (col: %s)",
+                context.current_vac,
+                context.goal_vac,
+                context.collection_id,
+            )
         else:
-            logger.info("Finding path %s -> %s", current_vac, goal_vac)
+            logger.info("Finding path %s -> %s", context.current_vac, context.goal_vac)
 
         # 1. Load data
         await self.graph.load_category_transitions()
 
         # 2. Map emotions
         current_emotion = await self.emotion_mapper.find_nearest_by_vac_only(
-            current_vac, collection_id=collection_id
+            context.current_vac, collection_id=context.collection_id
         )
         goal_emotion = await self.emotion_mapper.find_nearest_by_vac_only(
-            goal_vac, collection_id=collection_id
+            context.goal_vac, collection_id=context.collection_id
         )
 
         logger.info(
@@ -63,12 +74,11 @@ class PathPlanner:
             return await self.graph.create_direct_path(current_emotion, goal_emotion)
 
         # 4. User history
-        user_history = await self._get_user_history(user_id) if user_id else None
+        if context.user_id and not context.user_history:
+            context.user_history = await self._get_user_history(context.user_id)
 
         # 5. A* Search
-        all_paths, metrics = await self.searcher.find_path(
-            current_emotion, goal_emotion, max_waypoints, user_history, collection_id
-        )
+        all_paths, metrics = await self.searcher.find_path(current_emotion, goal_emotion, context)
 
         # Select best path (shortest)
         if all_paths:
@@ -83,26 +93,28 @@ class PathPlanner:
         )
 
         # 7. Build result
-        return await self._build_transition_path(path_emotions, user_history, metrics)
+        return await self._build_transition_path(path_emotions, context.user_history, metrics)
 
     async def find_alternative_paths(
         self,
-        current_vac: List[float],
-        goal_vac: List[float],
-        max_waypoints: int = 3,
-        user_id: Optional[str] = None,
+        context: PathFindingContext,
         max_alternatives: int = 3,
     ) -> List[TransitionPath]:
         """Find multiple alternative paths options."""
         await self.graph.load_category_transitions()
 
-        current_emotion = await self.emotion_mapper.find_nearest_by_vac_only(current_vac)
-        goal_emotion = await self.emotion_mapper.find_nearest_by_vac_only(goal_vac)
+        current_emotion = await self.emotion_mapper.find_nearest_by_vac_only(
+            context.current_vac, collection_id=context.collection_id
+        )
+        goal_emotion = await self.emotion_mapper.find_nearest_by_vac_only(
+            context.goal_vac, collection_id=context.collection_id
+        )
 
         if not current_emotion or not goal_emotion:
             raise ValueError("Invalid VAC coordinates")
 
-        user_history = await self._get_user_history(user_id) if user_id else None
+        if context.user_id and not context.user_history:
+            context.user_history = await self._get_user_history(context.user_id)
 
         # Check direct
         if (
@@ -112,16 +124,16 @@ class PathPlanner:
             return [await self.graph.create_direct_path(current_emotion, goal_emotion)]
 
         # Search
-        raw_paths, metrics = await self.searcher.find_path(
-            current_emotion, goal_emotion, max_waypoints, user_history
-        )
+        raw_paths, metrics = await self.searcher.find_path(current_emotion, goal_emotion, context)
 
         results = []
         for path_emotions in raw_paths[:max_alternatives]:
             enhanced_path = await self.harmonizer.validate_and_enhance_path(
                 path_emotions, current_emotion, goal_emotion
             )
-            built_path = await self._build_transition_path(enhanced_path, user_history, metrics)
+            built_path = await self._build_transition_path(
+                enhanced_path, context.user_history, metrics
+            )
             results.append(built_path)
 
         return results
@@ -132,8 +144,8 @@ class PathPlanner:
         """Get valid next steps."""
         await self.graph.load_category_transitions()
 
-        current = await self.session.get(EmotionDefinition, UUID(current_emotion_id))
-        goal = await self.session.get(EmotionDefinition, UUID(goal_emotion_id))
+        current = await self.emotion_repo.get(UUID(current_emotion_id))
+        goal = await self.emotion_repo.get(UUID(goal_emotion_id))
 
         if not current or not goal:
             return []
@@ -171,7 +183,7 @@ class PathPlanner:
     async def _build_transition_path(
         self,
         path_emotions: List[EmotionDefinition],
-        user_history: Optional[Dict[str, Any]],
+        _user_history: Optional[Dict[str, Any]],
         metrics: Optional[Dict[str, Any]] = None,
     ) -> TransitionPath:
         """Build complete TransitionPath object."""
@@ -212,17 +224,15 @@ class PathPlanner:
         )
 
     async def _get_user_history(self, user_id: str) -> Dict[str, Any]:
-        """Get user's transition history."""
-        stmt = (
-            select(UserJourney)
-            .where(UserJourney.user_id == user_id, UserJourney.status == "completed")
-            .limit(50)
-        )
-        result = await self.session.execute(stmt)
-        journeys = result.scalars().all()
+        """Get user's transition history using JourneyRepository."""
+        journeys = await self.journey_repo.get_journey_history(UUID(user_id), limit=50)
 
         successful_transitions: Dict[Tuple[str, str], float] = {}
         for journey in journeys:
+            # Check for completed status
+            if journey.status != "completed":
+                continue
+
             waypoints = journey.waypoints
             if isinstance(waypoints, dict) and "waypoints" in waypoints:
                 waypoint_emotions = waypoints["waypoints"]
@@ -243,9 +253,9 @@ class PathPlanner:
         }
 
     async def explain_path(
-        self, transition_path: TransitionPath, user_id: Optional[str] = None
+        self, transition_path: TransitionPath, _user_id: Optional[str] = None
     ) -> List[Dict[str, Any]]:
-        """Generate detailed therapeutic explanation."""
+        """Generate detailed therapeutic explanation using WaypointExplainer."""
         explanations = []
 
         if not transition_path.waypoints:
@@ -260,35 +270,78 @@ class PathPlanner:
                 + [transition_path.goal_emotion]
             )
 
+        # Load graph data for context if needed
         await self.graph.load_category_transitions()
 
         for i in range(len(full_path_emotions) - 1):
             current = full_path_emotions[i]
             next_emotion = full_path_emotions[i + 1]
 
-            vac_dist = self.graph.vac_distance(
-                list(current.vac_vector), list(next_emotion.vac_vector)
+            # Note: WaypointExplainer typically explains the 'waypoint' in the
+            # context of previous -> next
+            # Here we are explaining the STEP from current to next.
+            # If i > 0, 'current' is a waypoint.
+
+            # Use WaypointExplainer to generate explanation
+            # We map the inputs:
+            # waypoint_emotion -> The target of the step (next_emotion) or the current one?
+            # WaypointExplainer signature: explain_waypoint(waypoint, previous, next)
+            # This loop structure iterates pairs.
+
+            # Let's adjust logic:
+            # We want to explain each TRANSITION STEP.
+            # Or we want to explain each WAYPOINT.
+
+            # The original code generated an explanation for 'next_emotion' effectively,
+            # or the transition itself.
+
+            # Let's use WaypointExplainer to explain 'next_emotion' as a step from 'current'.
+            # If next_emotion is the Goal, we explain reaching the goal.
+
+            # However, the explainer needs (prev, waypoint, next).
+            # For a path A -> B -> C -> D
+            # We want to explain B (from A->B->C) and C (from B->C->D).
+
+            # Current loop gives: (A, B), (B, C), (C, D).
+            # Iteration 0: current=A, next=B. Analysis of A->B.
+
+            # If we simply use the WaypointExplainer's logic, it expects a triplet.
+            # But we can also just use it to analyze the "shift" (A->B).
+
+            # Let's use the explicit logic from the explainer if possible, or build a context.
+            # Actually, WaypointExplainer has _analyze_vac_shifts(prev, current).
+            # We can use that if public, or use explain_waypoint if we have a triplet.
+
+            # If we don't have a triplet (e.g. A->B), we can fake it or just
+            # explain B relative to A.
+            # Let's treat 'next_emotion' as the 'waypoint' and 'current' as 'previous'.
+            # 'next_next' would be the one after.
+
+            next_next = (
+                full_path_emotions[i + 2] if i + 2 < len(full_path_emotions) else next_emotion
             )
+
+            explanation_data = await self.explainer.explain_waypoint(
+                waypoint_emotion=next_emotion,
+                previous_emotion=current,
+                next_emotion=next_next,
+            )
+
+            # Transform to match expected output format of explain_path
+            # The expected output schema in planning.py suggests:
+            # summary, vac_change, category_transition, is_bridge, clinical_rationale
+
+            vac_analysis = explanation_data["vac_analysis"]
+
+            # Extract category transition info using graph
             cat_difficulty = self.graph.get_category_difficulty(
                 current.category, next_emotion.category
             )
             is_bridge = self.graph.is_bridge_category(next_emotion.category)
 
-            v_delta = next_emotion.vac_vector[0] - current.vac_vector[0]
-            a_delta = next_emotion.vac_vector[1] - current.vac_vector[1]
-            c_delta = next_emotion.vac_vector[2] - current.vac_vector[2]
-
-            summary = self._generate_step_summary(
-                current, next_emotion, v_delta, a_delta, c_delta, is_bridge
-            )
-
-            rationale = None
-            if current.vac_vector[1] > 0.6 and a_delta < -0.3:
-                rationale = "High arousal requires regulation before cognitive work."
-            elif is_bridge:
-                rationale = f"{next_emotion.category} unlocks difficult transitions."
-            elif cat_difficulty > 0.6:
-                rationale = "Advanced category transition safely managed."
+            # Construct summary from explanation_data
+            # WaypointExplainer provides "psychological_purpose"
+            summary = explanation_data.get("psychological_purpose", "Therapeutic progression")
 
             explanations.append(
                 {
@@ -297,10 +350,12 @@ class PathPlanner:
                     "to_emotion": next_emotion.emotion_name,
                     "summary": summary,
                     "vac_change": {
-                        "distance": round(vac_dist, 2),
-                        "valence_delta": round(v_delta, 2),
-                        "arousal_delta": round(a_delta, 2),
-                        "connection_delta": round(c_delta, 2),
+                        "distance": self.explainer.get_vac_distance(
+                            list(current.vac_vector), list(next_emotion.vac_vector)
+                        ),
+                        "valence_delta": vac_analysis["valence_shift"]["delta"],
+                        "arousal_delta": vac_analysis["arousal_shift"]["delta"],
+                        "connection_delta": vac_analysis["connection_shift"]["delta"],
                     },
                     "category_transition": {
                         "from_category": current.category,
@@ -308,35 +363,13 @@ class PathPlanner:
                         "difficulty": cat_difficulty,
                     },
                     "is_bridge": is_bridge,
-                    "clinical_rationale": rationale,
+                    "clinical_rationale": explanation_data.get("previous_context", {}).get(
+                        "why_necessary"
+                    ),
+                    # Add rich data from explainer for frontend if needed
+                    "readiness_signs": explanation_data.get("readiness_signs", []),
+                    "warning_signs": explanation_data.get("warning_signs", []),
                 }
             )
 
         return explanations
-
-    def _generate_step_summary(self, current, next_emotion, v, a, c, is_bridge) -> str:
-        """Generate a therapeutic sentence explaining the transition."""
-        parts = []
-
-        if is_bridge:
-            parts.append(
-                f"We use **{next_emotion.emotion_name}** as a bridge to open up new possibilities."
-            )
-
-        if current.vac_vector[1] > 0.5 and a < -0.2:
-            parts.append("This step helps **lower your intensity** to create safety.")
-        elif a > 0.3:
-            parts.append("This brings a bit more **energy** to help you move forward.")
-
-        if c > 0.3:
-            parts.append("It helps you feel **more connected** to yourself or others.")
-        elif c < -0.3 and current.vac_vector[2] > 0.5:
-            parts.append("This allows for some necessary **solitude**.")
-
-        if v > 0.3:
-            parts.append("This naturally **lifts your mood**.")
-
-        if not parts:
-            parts.append(f"Moving to **{next_emotion.emotion_name}** is a natural, steady step.")
-
-        return " ".join(parts)

@@ -1,7 +1,7 @@
 # Experience Module - Remaining Issues Analysis
 
-**Date:** January 4, 2026  
-**Current Status:** 263 issues remaining (57 fixed from baseline of 320)  
+**Date:** January 4, 2026
+**Current Status:** 263 issues remaining (57 fixed from baseline of 320)
 **Progress:** 17.8% complete
 
 ---
@@ -23,7 +23,7 @@
 ## 🎯 Issues by Category
 
 ### Category 1: Test Files (Low Priority)
-**Count:** ~40 issues (30 errors, 10 warnings)  
+**Count:** ~40 issues (30 errors, 10 warnings)
 **Decision:** Many `as any` in tests are acceptable for mocking
 
 **Files:**
@@ -41,7 +41,7 @@
 **Recommendation:** Fix if time allows, but not critical for production quality
 
 ### Category 2: Production `any` Types (HIGH PRIORITY)
-**Count:** ~145 errors  
+**Count:** ~145 errors
 **Impact:** High - defeats TypeScript benefits
 
 **Files by `any` count:**
@@ -64,7 +64,7 @@
 **Estimated Time:** 4-6 hours to fix all production `any` types
 
 ### Category 3: Hook Dependencies (MEDIUM PRIORITY)
-**Count:** ~20 warnings  
+**Count:** ~20 warnings
 **Impact:** Medium - potential bugs from stale closures
 
 **Files:**
@@ -84,7 +84,7 @@
 **Estimated Time:** 2-3 hours to review and fix properly
 
 ### Category 4: Unused Variables (LOW PRIORITY)
-**Count:** ~58 warnings  
+**Count:** ~58 warnings
 **Impact:** Low - code cleanliness issue
 
 **Common Patterns:**
@@ -102,13 +102,13 @@
 **Estimated Time:** 1-2 hours
 
 ### Category 5: Unescaped Entities (EASY FIXES)
-**Count:** ~15 errors  
+**Count:** ~15 errors
 **Impact:** Low - React best practice
 
 **Remaining Files:**
 - `components/JourneyProgress.tsx` - 1 apostrophe (in "You've")
 - `components/admin/modals/HelpModal/index.tsx` - Multiple quotes
-- `components/admin/panels/InfoPanel/PathComparison.tsx` - Multiple quotes  
+- `components/admin/panels/InfoPanel/PathComparison.tsx` - Multiple quotes
 - `components/admin/panels/StatisticsPanel.tsx` - Multiple quotes
 - `components/admin/settings/BehaviorSettings.tsx` - Multiple quotes
 - `components/admin/settings/ChatSettings.tsx` - Multiple quotes
@@ -120,7 +120,7 @@
 - `components/admin/shared/VoiceRecorder.tsx` - Quotes
 - `components/admin/shared/WaypointDetailModal.tsx` - Quotes
 
-**Strategy:** 
+**Strategy:**
 - Replace `"` with `&quot;`
 - Replace `'` with `&apos;`
 - Simple search and replace
@@ -128,7 +128,7 @@
 **Estimated Time:** 30-45 minutes
 
 ### Category 6: React Purity Issues (CRITICAL)
-**Count:** ~3 errors  
+**Count:** ~3 errors
 **Impact:** High - can cause bugs
 
 **Issues:**
@@ -137,7 +137,7 @@
    - **Fix:** Move ref access to useEffect or event handler
 
 2. `components/admin/ChatPanel.tsx` - 2 errors
-   - Calling `Date.now()` during render  
+   - Calling `Date.now()` during render
    - **Fix:** Move to useRef or useState initializer
 
 **Estimated Time:** 30 minutes
@@ -203,7 +203,7 @@
 4. ✅ `components/CommandPalette.tsx` - 7 unescaped entities
 5. ✅ `stores/useAtlasAdminStore.ts` - 1 unsafe cast
 6. ✅ `hooks/useComputeAllPaths.ts` - 9 `any` types
-7. ✅ `hooks/useWebSocketChat.ts` - 7 `any` types  
+7. ✅ `hooks/useWebSocketChat.ts` - 7 `any` types
 8. ✅ `hooks/useKeyboardShortcuts.ts` - 8 `any` types
 9. ✅ `hooks/chat/useAnalysisState.ts` - 8 `any` types
 10. ✅ `components/admin/shared/ExportControls.tsx` - 2 casts
@@ -216,10 +216,10 @@
 
 ## 🚀 Estimated Time to Zero Issues
 
-**Remaining:** 263 issues  
+**Remaining:** 263 issues
 **Breakdown:**
 - Session 1 (critical + easy): 2-3 hours → ~210 issues
-- Session 2 (production any types): 3-4 hours → ~150 issues  
+- Session 2 (production any types): 3-4 hours → ~150 issues
 - Session 3 (final cleanup): 3-4 hours → 0 issues
 
 **Total Estimate:** 8-11 hours to complete Phase 3
@@ -238,7 +238,7 @@
 **Strengths:**
 - ✅ Zero TypeScript errors (complete type safety)
 - ✅ Clean production builds
-- ✅ 17.8% linting improvement  
+- ✅ 17.8% linting improvement
 - ✅ Critical infrastructure type-safe
 - ✅ Comprehensive documentation
 

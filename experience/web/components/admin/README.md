@@ -2,7 +2,7 @@
 
 A comprehensive visualization and analysis tool for exploring the 87 emotions in VAC space, with automatic path computation and interactive 3D exploration.
 
-**Status:** ✅ Production-Ready (Post-Refactoring Phases 1-6)  
+**Status:** ✅ Production-Ready (Post-Refactoring Phases 1-6)
 **Architecture:** See [ARCHITECTURE.md](./ARCHITECTURE.md) for detailed structure
 
 ## 🎯 Quick Links

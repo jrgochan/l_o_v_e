@@ -42,20 +42,20 @@ psql -U postgres -d observer_db -f migrations/versions/add_transition_system_tab
 ```python
 class PathPlanner:
     """Category-aware A* pathfinding for emotional transitions."""
-    
+
     async def find_transition_path(
-        current_vac, 
-        goal_vac, 
-        max_waypoints=3, 
+        current_vac,
+        goal_vac,
+        max_waypoints=3,
         user_id=None
     ) -> TransitionPath
-    
+
     async def _astar_search(...) -> List[AtlasDefinition]
-    
+
     def _calculate_g_cost(...) -> float
-    
+
     def _heuristic_cost(...) -> float
-    
+
     async def _get_valid_neighbors(...) -> List[AtlasDefinition]
 ```
 
@@ -80,13 +80,13 @@ class PathPlanner:
 ```python
 class StrategyRecommender:
     """Recommends strategies based on transition patterns."""
-    
+
     async def get_strategies_for_transition(
         from_emotion,
         to_emotion,
         user_id=None
     ) -> List[Strategy]
-    
+
     async def get_personalized_strategies(
         user_id,
         pattern_name
@@ -259,7 +259,7 @@ class StrategyRecommender:
 
 **Visual States**:
 ```typescript
-type WaypointState = 
+type WaypointState =
   | 'locked'      // Gray, small, can't reach yet
   | 'available'   // Yellow, medium, can view info
   | 'active'      // Bright, large, pulsing (current)

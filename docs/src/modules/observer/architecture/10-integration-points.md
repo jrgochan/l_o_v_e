@@ -1,8 +1,8 @@
 # Integration Points
 
-**Reading Time:** ~20 minutes  
-**Audience:** Engineering managers, integration leads  
-**Prerequisites:** [Architecture Overview](00-high-level-overview.md)  
+**Reading Time:** ~20 minutes
+**Audience:** Engineering managers, integration leads
+**Prerequisites:** [Architecture Overview](00-high-level-overview.md)
 **Goal:** Understand how Observer integrates with other L.O.V.E. modules
 
 ---
@@ -142,7 +142,7 @@ class QuaternionBuilder:
     def __init__(self, versor_url: str = None, use_http: bool = True):
         self.versor_url = versor_url
         self.use_http = use_http
-    
+
     async def from_vac(self, vac: List[float]) -> List[float]:
         if self.use_http and self.versor_url:
             try:
@@ -251,7 +251,7 @@ const ws = new WebSocket('ws://observer:8000/ws/session-123');
 
 ws.onmessage = (event) => {
   const data = JSON.parse(event.data);
-  
+
   if (data.type === 'state_update') {
     // Update 3D visualization
     updateSoulSphere(data.quaternion);
@@ -304,10 +304,10 @@ async def test_listener_to_observer_flow():
             "vac": [-0.3, 0.7, -0.2],
             "transcription": "I'm anxious"
         })
-    
+
     assert response.status_code == 201
     data = response.json()
-    
+
     assert "emotion" in data
     assert "quaternion" in data
     assert len(data["quaternion"]) == 4
@@ -317,14 +317,14 @@ async def test_observer_to_experience_flow():
     """Test Observer providing data to Experience"""
     # Store some states
     await store_test_trajectory()
-    
+
     # Experience queries history
     async with AsyncClient(app=observer_app) as client:
         response = await client.get("/history/test-user?limit=10")
-    
+
     assert response.status_code == 200
     data = response.json()
-    
+
     assert "trajectory" in data
     assert len(data["trajectory"]) > 0
 ```
@@ -335,26 +335,26 @@ async def test_observer_to_experience_flow():
 
 ### Listener Unavailable
 
-**Impact:** Observer can't receive new states  
-**Mitigation:** N/A (Observer is passive receiver)  
+**Impact:** Observer can't receive new states
+**Mitigation:** N/A (Observer is passive receiver)
 **Recovery:** Automatic when Listener returns
 
 ### Observer Unavailable
 
-**Impact:** Listener can't store states  
-**Mitigation:** Listener caches locally, replays when Observer returns  
+**Impact:** Listener can't store states
+**Mitigation:** Listener caches locally, replays when Observer returns
 **Recovery:** Observer processes backlog on startup
 
 ### Versor Unavailable
 
-**Impact:** Can't generate quaternions  
-**Mitigation:** Observer uses local computation (slightly less accurate)  
+**Impact:** Can't generate quaternions
+**Mitigation:** Observer uses local computation (slightly less accurate)
 **Recovery:** Automatic fallback, no user impact
 
 ### Experience Unavailable
 
-**Impact:** Can't visualize data  
-**Mitigation:** Observer continues storing (data preserved)  
+**Impact:** Can't visualize data
+**Mitigation:** Observer continues storing (data preserved)
 **Recovery:** Experience re-syncs from Observer on startup
 
 ---
@@ -411,10 +411,10 @@ async def health_check():
         db_status = "healthy"
     except:
         db_status = "unhealthy"
-    
+
     # Check atlas loaded
     atlas_count = await get_atlas_count()
-    
+
     return {
         "status": "healthy" if db_status == "healthy" else "degraded",
         "database": db_status,
@@ -459,15 +459,15 @@ tracer = trace.get_tracer(__name__)
 async def store_state(request: StateCreate):
     with tracer.start_as_current_span("observer.store_state") as span:
         span.set_attribute("user_id", request.user_id)
-        
+
         # Emotion matching
         with tracer.start_as_current_span("emotion_matching"):
             emotion = await mapper.find_nearest(...)
-        
+
         # Database write
         with tracer.start_as_current_span("database_write"):
             await db.commit()
-        
+
         return response
 ```
 

@@ -89,7 +89,7 @@ extension SoulRenderer {
         // Encode VAC into props for shader animation
         // x: Selection, y: Hover, z: Normalized Valence, w: Normalized Arousal
         let props = SIMD4<Float>(isSelected, isHovered, valence, arousal)
-        
+
         // Pass Connection in quaternion.w if needed, or just rely on color
         // Actually, let's pack Connection into quaternion.w since it's free real estate
         var quat = SoulMath.VACVector(
@@ -97,7 +97,7 @@ extension SoulRenderer {
             arousal: Float(node.vibe.arousal),
             connection: Float(node.vibe.connection)
         ).toQuaternion().vector
-        
+
         quat.w = connection // Hijack W for Connection data
 
         return PointInstance(position: pos, color: color, props: props, quaternion: quat)
@@ -108,13 +108,13 @@ extension SoulRenderer {
         let chroma = (1.0 - abs(2.0 * lightness - 1.0)) * saturation
         let intermediate = chroma * (1.0 - abs(fmod(hue * 6.0, 2.0) - 1.0))
         let match = lightness - chroma / 2.0
-        
+
         var red: Float = 0
         var green: Float = 0
         var blue: Float = 0
-        
+
         if hue < 1.0/6.0 { red=chroma; green=intermediate; blue=0 } else if hue < 2.0/6.0 { red=intermediate; green=chroma; blue=0 } else if hue < 3.0/6.0 { red=0; green=chroma; blue=intermediate } else if hue < 4.0/6.0 { red=0; green=intermediate; blue=chroma } else if hue < 5.0/6.0 { red=intermediate; green=0; blue=chroma } else { red=chroma; green=0; blue=intermediate }
-        
+
         return SIMD3<Float>(red+match, green+match, blue+match)
     }
 

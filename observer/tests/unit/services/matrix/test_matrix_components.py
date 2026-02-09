@@ -215,7 +215,16 @@ async def test_get_all_cached_paths(cache_manager, mock_session):
     mock_res = MagicMock()
     # row = (from_id, to_id, path_data, distance, diff, wpc, bridge, time)
     mock_res.fetchall.return_value = [
-        (uuid.uuid4(), uuid.uuid4(), json.dumps({"foo": "bar"}), 1.0, "easy", 0, False, "5m")
+        (
+            uuid.uuid4(),
+            uuid.uuid4(),
+            json.dumps({"foo": "bar"}),
+            1.0,
+            "easy",
+            0,
+            False,
+            "5m",
+        )
     ]
     mock_session.execute.return_value = mock_res
 
@@ -333,7 +342,7 @@ async def test_compute_all_paths_batch_delegation(matrix_service):
 async def test_get_all_cached_paths_delegation(matrix_service):
     """Test get_all_cached_paths delegates to cache_manager."""
     await matrix_service.get_all_cached_paths("easy", True, 10)
-    matrix_service.cache_manager.get_all_cached_paths.assert_called_with("easy", True, 10)
+    matrix_service.cache_manager.get_all_cached_paths.assert_called_with("easy", True, 10, 0)
 
 
 @pytest.mark.asyncio
@@ -341,3 +350,42 @@ async def test_get_cache_statistics_delegation(matrix_service):
     """Test get_cache_statistics delegates to cache_manager."""
     await matrix_service.get_cache_statistics()
     matrix_service.cache_manager.get_cache_statistics.assert_called_once()
+
+
+@pytest.mark.asyncio
+async def test_clear_cache_delegation(matrix_service):
+    """Test clear_cache delegates to cache_manager."""
+    await matrix_service.clear_cache()
+    matrix_service.cache_manager.clear_cache.assert_called_once()
+
+
+@pytest.mark.asyncio
+async def test_get_all_cached_paths_offset(cache_manager, mock_session):
+    """Test retrieving cached paths with offset."""
+    mock_res = MagicMock()
+    mock_res.fetchall.return_value = []
+    mock_session.execute.return_value = mock_res
+
+    await cache_manager.get_all_cached_paths(limit=10, offset=5)
+
+    call_args = mock_session.execute.call_args
+    assert call_args
+    query_text = str(call_args[0][0])
+    params = call_args[0][1]
+
+    assert "OFFSET :offset" in query_text
+    assert params["offset"] == 5
+
+
+@pytest.mark.asyncio
+async def test_clear_cache(cache_manager, mock_session):
+    """Test clearing the cache."""
+    mock_res = MagicMock()
+    mock_res.rowcount = 10
+    mock_session.execute.return_value = mock_res
+
+    deleted_count = await cache_manager.clear_cache()
+
+    assert deleted_count == 10
+    assert "DELETE FROM path_matrix_cache" in str(mock_session.execute.call_args[0][0])
+    mock_session.commit.assert_awaited_once()

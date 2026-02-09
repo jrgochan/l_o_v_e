@@ -55,7 +55,7 @@ public class SpeechEngine: NSObject, ObservableObject, @unchecked Sendable {
             recognitionTask?.cancel()
             recognitionTask = nil
         }
-        
+
         // ... (Audio Session setup if iOS) ...
         #if os(iOS)
         let audioSession = AVAudioSession.sharedInstance()
@@ -94,7 +94,7 @@ public class SpeechEngine: NSObject, ObservableObject, @unchecked Sendable {
         if !usingExternalSource {
             let inputNode = audioEngine.inputNode
             let recordingFormat = inputNode.outputFormat(forBus: 0)
-            
+
             // Note: installTap callback runs on a background audio thread.
             // We capture 'recognitionRequest' locally to avoid racing on 'self.recognitionRequest' property access if possible,
             // OR we just assume 'self.recognitionRequest' read is atomic enough (pointer).
@@ -112,7 +112,7 @@ public class SpeechEngine: NSObject, ObservableObject, @unchecked Sendable {
         self.isRecording = true
         self.resetSilenceTimer() // Start timer immediately
     }
-    
+
     // ...
 
     /// External Audio Ingestion
@@ -120,7 +120,7 @@ public class SpeechEngine: NSObject, ObservableObject, @unchecked Sendable {
         // Essential: Copy the buffer because passing it to an async Task is unsafe.
         // The Audio Engine may reuse the backing memory of 'buffer' by the time the Main thread runs.
         guard let copy = buffer.deepCopy() else { return }
-        
+
         // Wrap in Sendable container to verify we know what we are doing (transferring ownership of a fresh copy)
         let safeBuffer = SafeAudioBuffer(buffer: copy)
 
@@ -139,7 +139,7 @@ public class SpeechEngine: NSObject, ObservableObject, @unchecked Sendable {
         // 2. Publish on main thread
         Task { @MainActor in
             self.prosody = features
-            self.audioLevel = features.energy * 5.0 
+            self.audioLevel = features.energy * 5.0
         }
     }
 
@@ -147,16 +147,16 @@ public class SpeechEngine: NSObject, ObservableObject, @unchecked Sendable {
     public func stopRecording() {
         SoulLog.voice.info("🛑 SpeechEngine: Stopping...")
         audioEngine.stop()
-        
+
         // End the audio stream
         recognitionRequest?.endAudio()
         recognitionRequest = nil // Release and prevent further appends
-        
+
         // Cancel task if running? No, let it finish naturally via result handler (isFinal)
         // But we should null it if we are forcing stop?
         // SFSpeechRecognizer docs say: "To stop recording... call endAudio(). The recognition task will essentially finish."
         // We nil out task in startRecording or on completion.
-        
+
         // Remove tap (safely)
         // Note: inputNode accessor might throw if engine is deallocated, but engine is local val.
         audioEngine.inputNode.removeTap(onBus: 0)
@@ -193,7 +193,7 @@ extension AVAudioPCMBuffer {
     func deepCopy() -> AVAudioPCMBuffer? {
         guard let copy = AVAudioPCMBuffer(pcmFormat: format, frameCapacity: frameLength) else { return nil }
         copy.frameLength = frameLength
-        
+
         // Copy Int16 or Float32 data
         if let src = self.floatChannelData, let dst = copy.floatChannelData {
             let bytesPerChannel = Int(frameLength) * MemoryLayout<Float>.size
@@ -206,7 +206,7 @@ extension AVAudioPCMBuffer {
                  memcpy(dst[channel], src[channel], bytesPerChannel)
             }
         }
-        
+
         return copy
     }
 }

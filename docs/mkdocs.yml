@@ -75,12 +75,12 @@ markdown_extensions:
 nav:
   - Home: index.md
   - Project Status: project-status.md
-  
+
   - Getting Started:
     - getting-started/index.md
     - Installation: getting-started/installation.md
     - Quick Start: getting-started/quick-start.md
-  
+
   - Architecture:
     - architecture/index.md
     - System Overview: architecture/01-system-overview.md
@@ -93,7 +93,7 @@ nav:
     - Deployment & Ops: architecture/10-deployment-operations.md
     - Development Guide: architecture/11-development-guide.md
     - Known Issues: architecture/12-known-issues.md
-  
+
   - Modules:
     - modules/index.md
     - Listener:
@@ -199,7 +199,7 @@ nav:
     - Experience:
       - modules/experience/index.md
       - Soul Sphere Spec: modules/experience/04-soul-sphere-specification.md
-  
+
   - Features:
     - features/index.md
     - AI Models:
@@ -207,13 +207,13 @@ nav:
       - Ollama Integration: features/ai-models/01-OLLAMA-INTEGRATION.md
       - Settings UI: features/ai-models/02-SETTINGS-UI.md
       - Roadmap: features/ai-models/03-IMPLEMENTATION-ROADMAP.md
-    - Beautiful Insights: 
+    - Beautiful Insights:
         - Overview: features/beautiful-insights/00-OVERVIEW.md
         - Warm Mode Spec: features/beautiful-insights/01-WARM-MODE-SPEC.md
         - Clinical Mode Spec: features/beautiful-insights/02-CLINICAL-MODE-SPEC.md
         - Deep Feeling Specs: features/beautiful-insights/03-DEEP-FEELING-ENHANCEMENTS.md
         - Implementation Guide: features/beautiful-insights/04-IMPLEMENTATION-GUIDE.md
-    - Clinical Tools: 
+    - Clinical Tools:
         - Dashboard: features/clinical-tools/DASHBOARD.md
         - Alerts System: features/clinical-tools/ALERTS-SYSTEM.md
         - UI Enhancements: features/clinical-tools/CLINICAL_MODE_UI_ENHANCEMENT.md
@@ -224,10 +224,10 @@ nav:
         - Complex Actions: features/command-palette/COMPLEX_ACTIONS_VISION.md
         - Keyboard Journeys: features/command-palette/KEYBOARD_DRIVEN_JOURNEYS.md
         - Power User Workflows: features/command-palette/POWER_USER_WORKFLOWS.md
-    - Deep Feeling Mode: 
+    - Deep Feeling Mode:
         - Overview: features/deep-feeling/OVERVIEW.md
         - UI/UX Design: features/deep-feeling/UI-UX-DESIGN.md
-    - Heartbeat Analyzer: 
+    - Heartbeat Analyzer:
         - Specification: features/heartbeat-analyzer/SPECIFICATION.md
         - Implementation Guide: features/heartbeat-analyzer/IMPLEMENTATION-GUIDE.md
     - Logging Control: features/logging-control/IMPLEMENTATION_COMPLETE.md
@@ -235,10 +235,10 @@ nav:
         - Architecture: architecture/04-settings-page-architecture.md
         - Import/Export Guide: features/settings-page/IMPORT_EXPORT_GUIDE.md
         - Testing Checklist: features/settings-page/MANUAL_TESTING_CHECKLIST.md
-    - Voice Analysis: 
+    - Voice Analysis:
         - Three-Way Analysis: features/voice-analysis/THREE-WAY-ANALYSIS.md
         - Prosody System: features/voice-analysis/PROSODY-SYSTEM.md
-    - Wibbly Paths: 
+    - Wibbly Paths:
         - Overview: features/wibbly-paths/00-OVERVIEW.md
         - Subtle Mode: features/wibbly-paths/01-SUBTLE-ELEGANT.md
         - Dynamic Mode: features/wibbly-paths/02-DYNAMIC-PLAYFUL.md
@@ -253,13 +253,13 @@ nav:
     - Other Features:
         - Atlas Mapping: features/other-features/ATLAS-MAPPING.md
         - Axis Labels: features/other-features/AXIS_LABELS.md
-  
+
   - Guides:
     - Refactoring: guides/REFACTORING.md
     - Clinical Alerts: guides/CLINICAL_ALERTS_IMPLEMENTATION.md
     - Session Analytics: guides/SESSION_ANALYTICS_IMPLEMENTATION.md
     - Path Helpers: guides/PATH_HELPERS_IMPLEMENTATION.md
-  
+
   - Research:
     - Research Paper:
       - Abstract: paper/01-abstract.md
@@ -283,7 +283,7 @@ nav:
     - Roadmap (Dec 2025): ROADMAP_DECEMBER_2025.md
     - Contributing: contributing.md
     - References: REFERENCES.md
-  
+
   - Reference:
     - reference/index.md
     - Glossary: reference/glossary.md
@@ -296,7 +296,7 @@ extra:
   social:
     - icon: fontawesome/brands/gitlab
       link: https://gitlab.com/l_o_v_e/platform
-  
+
   version:
     provider: mike
 

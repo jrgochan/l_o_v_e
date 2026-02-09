@@ -3,7 +3,7 @@
   "version": "1.0",
   "created": "2025-12-05",
   "purpose": "Testing, development, UX validation, demonstration of journey tracking and strategy recommendations",
-  
+
   "journeys": [
     {
       "user_id": "demo-jordan-active-user",
@@ -80,7 +80,7 @@
         "location": "home"
       }
     },
-    
+
     {
       "user_id": "demo-jordan-active-user",
       "journey_type": "completed",
@@ -140,7 +140,7 @@
         "location": "home"
       }
     },
-    
+
     {
       "user_id": "demo-jordan-active-user",
       "journey_type": "abandoned",
@@ -191,7 +191,7 @@
         "location": "home"
       }
     },
-    
+
     {
       "user_id": "demo-morgan-veteran-user",
       "journey_type": "completed",
@@ -283,7 +283,7 @@
         "location": "home"
       }
     },
-    
+
     {
       "user_id": "demo-morgan-veteran-user",
       "journey_type": "completed",
@@ -343,7 +343,7 @@
         "location": "home"
       }
     },
-    
+
     {
       "user_id": "demo-casey-struggling-user",
       "journey_type": "abandoned",
@@ -402,7 +402,7 @@
         "location": "home"
       }
     },
-    
+
     {
       "user_id": "demo-casey-struggling-user",
       "journey_type": "paused",
@@ -453,7 +453,7 @@
         "location": "home"
       }
     },
-    
+
     {
       "user_id": "demo-riley-diverse-user",
       "journey_type": "completed",
@@ -521,7 +521,7 @@
         "location": "home"
       }
     },
-    
+
     {
       "user_id": "demo-riley-diverse-user",
       "journey_type": "completed",
@@ -589,7 +589,7 @@
         "location": "home"
       }
     },
-    
+
     {
       "user_id": "demo-riley-diverse-user",
       "journey_type": "completed",
@@ -642,7 +642,7 @@
       }
     }
   ],
-  
+
   "meta": {
     "total_journeys": 10,
     "by_status": {

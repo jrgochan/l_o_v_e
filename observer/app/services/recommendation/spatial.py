@@ -1,3 +1,5 @@
+"""Module documentation."""
+
 import logging
 from typing import Any, Dict, List
 from uuid import UUID
@@ -12,6 +14,7 @@ class SpatialAnalyzer:
     """Handles VAC spatial analysis."""
 
     def __init__(self, session: AsyncSession):
+        """Docstring."""
         self.session = session
 
     async def get_similar_emotions(self, emotion_id: UUID, limit: int = 5) -> List[Dict[str, Any]]:

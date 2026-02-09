@@ -167,7 +167,7 @@ sudo apt install -y nodejs
 *(Documented for future reference - not current implementation)*
 
 ### Phase A: Services-Only Docker Compose
-**Timeline:** 1 day  
+**Timeline:** 1 day
 **Priority:** Medium
 
 Run PostgreSQL, Redis, and Ollama in containers while keeping APIs local for fast iteration.
@@ -182,12 +182,12 @@ services:
       POSTGRES_PASSWORD: love_dev
     ports: ["5432:5432"]
     volumes: ["postgres-data:/var/lib/postgresql/data"]
-    
+
   redis:
     image: redis:7-alpine
     ports: ["6379:6379"]
     volumes: ["redis-data:/data"]
-    
+
   ollama:
     image: ollama/ollama:latest
     ports: ["11434:11434"]
@@ -216,7 +216,7 @@ cd versor && source venv/bin/activate && uvicorn app.main:app --port 8001
 ```
 
 ### Phase B: Full Stack Containerization
-**Timeline:** 2-3 days  
+**Timeline:** 2-3 days
 **Priority:** Low (future)
 
 Complete containerization of all modules.
@@ -234,22 +234,22 @@ services:
   postgres: { ... }
   redis: { ... }
   ollama: { ... }
-  
+
   versor:
     build: ./versor
     depends_on: [postgres, redis]
     ports: ["8001:8001"]
-    
+
   observer:
     build: ./observer
     depends_on: [postgres, redis]
     ports: ["8000:8000"]
-    
+
   listener:
     build: ./listener
     depends_on: [redis, ollama]
     ports: ["8002:8002"]
-    
+
   experience:
     build: ./experience/web
     depends_on: [versor, observer, listener]
@@ -257,7 +257,7 @@ services:
 ```
 
 ### Phase C: Development Workflow Scripts
-**Timeline:** 1 day  
+**Timeline:** 1 day
 **Priority:** Low (future)
 
 Provide flexible development options:
@@ -283,7 +283,7 @@ docker compose -f docker-compose.services.yml up -d
 ```
 
 ### Phase D: CI/CD Integration
-**Timeline:** 1 day  
+**Timeline:** 1 day
 **Priority:** Medium (when ready)
 
 GitHub Actions / GitLab CI integration:
@@ -298,20 +298,20 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      
+
       - name: Start services
         run: docker compose up -d
-      
+
       - name: Wait for services
         run: |
           timeout 30 bash -c 'until docker compose exec postgres pg_isready; do sleep 1; done'
-      
+
       - name: Run Versor tests
         run: docker compose run versor pytest
-      
+
       - name: Run Observer tests
         run: docker compose run observer pytest
-      
+
       - name: Run Listener tests
         run: docker compose run listener pytest -m "not slow"
 ```
@@ -384,16 +384,16 @@ jobs:
 
 ## Questions & Decisions
 
-**Q: Why not start with Docker?**  
+**Q: Why not start with Docker?**
 A: Local development is faster for iteration. Docker adds value for team consistency and deployment, which will be needed later.
 
-**Q: Why keep bash instead of pure POSIX sh?**  
+**Q: Why keep bash instead of pure POSIX sh?**
 A: Bash is universally available (macOS, WSL, Linux). We'll use POSIX-compliant bash syntax to maximize portability.
 
-**Q: How to handle Python 3.11 on older Ubuntu?**  
+**Q: How to handle Python 3.11 on older Ubuntu?**
 A: Use deadsnakes PPA for easy installation on Ubuntu 20.04+.
 
-**Q: What about Windows native (non-WSL)?**  
+**Q: What about Windows native (non-WSL)?**
 A: Not currently planned. WSL is the recommended Windows development environment. Docker would be the path for Windows native support.
 
 ## References
@@ -405,5 +405,5 @@ A: Not currently planned. WSL is the recommended Windows development environment
 
 ---
 
-**Last Updated:** December 8, 2025  
+**Last Updated:** December 8, 2025
 **Status:** Phase 1 Implementation In Progress

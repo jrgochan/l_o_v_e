@@ -10,8 +10,8 @@
 
 Dynamic Playful mode embodies **energetic exploration** - vibrant, engaging, and alive. Like a flowing river or dancing flames, it shows transformation as an active, dynamic process full of life and possibility.
 
-**Emotional Resonance**: Energy, curiosity, possibility  
-**Use Case**: Exploration, creativity, demos, energizing sessions  
+**Emotional Resonance**: Energy, curiosity, possibility
+**Use Case**: Exploration, creativity, demos, energizing sessions
 **Feeling**: 😊 Engaging, 🌈 Dynamic, 💃 Alive
 
 ---
@@ -67,47 +67,47 @@ function DynamicPlayfulPath({ path, isSelected, opacity }: PathProps) {
   const meshRef = useRef<THREE.Mesh>(null);
   const materialRef = useRef<THREE.MeshStandardMaterial>(null);
   const initialY = useRef(0);
-  
+
   // Store initial position
   useEffect(() => {
     if (meshRef.current) {
       initialY.current = meshRef.current.position.y;
     }
   }, []);
-  
+
   useFrame((state) => {
     if (!meshRef.current || !materialRef.current) return;
-    
+
     const time = state.clock.elapsedTime;
-    
+
     // 1. Energetic breathing (1.8s cycle)
     const breathe = 1.0 + Math.sin(time * (Math.PI * 2 / 1.8)) * 0.15;
     meshRef.current.scale.set(breathe, 1.0, breathe);
-    
+
     // 2. Pronounced undulation (traveling wave)
     // Multiple frequencies for organic movement
     const wave1 = Math.sin(time * 0.8 * Math.PI * 2) * 0.015;
     const wave2 = Math.sin(time * 1.2 * Math.PI * 2 + 0.5) * 0.010;
     const wobble = wave1 + wave2;
     meshRef.current.position.y = initialY.current + wobble;
-    
+
     // 3. Dynamic opacity (2s cycle with harmonics)
     const shimmer1 = Math.sin(time * (Math.PI * 2 / 2.0)) * 0.2;
     const shimmer2 = Math.sin(time * (Math.PI * 2 / 2.0) * 2.0) * 0.05;
     materialRef.current.opacity = (0.7 + shimmer1 + shimmer2) * opacity;
-    
+
     // 4. Color brightness variation (3s cycle)
     const colorPulse = 1.0 + Math.sin(time * (Math.PI * 2 / 3.0)) * 0.15;
     const brighterColor = pathColor.clone().multiplyScalar(colorPulse);
     materialRef.current.color.copy(brighterColor);
     materialRef.current.emissive.copy(brighterColor);
-    
+
     // 5. Energetic glow (selected paths pulse faster)
     const glowCycle = isSelected ? 1.5 : 3.0;
     const glow = 1.2 + Math.sin(time * (Math.PI * 2 / glowCycle)) * 0.3;
     materialRef.current.emissiveIntensity = glow * (isSelected ? 2.5 : 1.2);
   });
-  
+
   return (
     <mesh ref={meshRef} geometry={tubeGeometry}>
       <meshStandardMaterial
@@ -235,9 +235,9 @@ Same but:
 
 ## 🧪 Performance Profile
 
-**GPU Load**: Low-Medium  
-**CPU Load**: Low  
-**Frame Impact**: 1-2ms  
+**GPU Load**: Low-Medium
+**CPU Load**: Low
+**Frame Impact**: 1-2ms
 **Recommended For**: Most devices (not low-end mobile)
 
 **Why It's Still Fast:**

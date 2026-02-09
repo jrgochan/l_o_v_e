@@ -32,7 +32,7 @@ CREATE TABLE IF NOT EXISTS model_performance_metrics (
     success BOOLEAN NOT NULL,
     timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
     error_message TEXT,
-    
+
     -- Indexes for querying
     CONSTRAINT fk_function FOREIGN KEY (function) REFERENCES model_assignments(function) ON DELETE CASCADE
 );

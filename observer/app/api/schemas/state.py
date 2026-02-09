@@ -98,7 +98,9 @@ class StateResponse(BaseModel):
     """Response from recording emotional state."""
 
     state_id: str = Field(description="UUID of created state")
-    dominant_emotion: EmotionInfo = Field(description="Nearest emotion from active collection")
+    dominant_emotion: Optional[EmotionInfo] = Field(
+        default=None, description="Nearest emotion from active collection"
+    )
     quaternion: QuaternionModel = Field(description="Quaternion representation")
     previous_quaternion: Optional[QuaternionModel] = Field(
         default=None, description="Previous quaternion state (if exists)"

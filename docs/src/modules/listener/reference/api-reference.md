@@ -1,7 +1,7 @@
 # API Reference
 
-**Last Updated:** January 2, 2026  
-**Audience:** All developers  
+**Last Updated:** January 2, 2026
+**Audience:** All developers
 **Goal:** Complete reference for all Listener API endpoints
 
 ---
@@ -17,7 +17,7 @@ Production: https://api.love-platform.dev/listener
 
 ## Authentication
 
-**Current:** No authentication (development)  
+**Current:** No authentication (development)
 **Future:** JWT tokens for production
 
 ---
@@ -186,7 +186,7 @@ curl -X POST http://localhost:8002/listener/analyze-audio \
 - MP3
 - AAC
 
-**Max Size:** 25MB  
+**Max Size:** 25MB
 **Max Duration:** 5 minutes
 
 **Response:**
@@ -481,11 +481,11 @@ http://localhost:8002/openapi.json
 
 ## Key Takeaways
 
-✅ **5 main endpoints** for various use cases  
-✅ **Sync and async** options available  
-✅ **Well-documented** with examples  
-✅ **Error handling** with clear codes  
-✅ **Future-ready** with webhooks/SDKs planned  
+✅ **5 main endpoints** for various use cases
+✅ **Sync and async** options available
+✅ **Well-documented** with examples
+✅ **Error handling** with clear codes
+✅ **Future-ready** with webhooks/SDKs planned
 
 ---
 

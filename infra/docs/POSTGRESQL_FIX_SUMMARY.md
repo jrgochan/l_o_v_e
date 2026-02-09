@@ -33,7 +33,7 @@ check_service_running() {
             fi
             ;;
     esac
-    
+
     # Fall back to service manager status check
     # ... brew services list, systemctl, etc.
 }

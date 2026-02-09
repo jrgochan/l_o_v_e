@@ -7,11 +7,11 @@ public struct MLXConfiguration {
         #if os(macOS)
         // Attempt to find default.metallib in the SoulBrain bundle
         var path: String?
-        
+
         // 1. Check Bundle.module
         if let p = Bundle.module.path(forResource: "default", ofType: "metallib") {
             path = p
-        } 
+        }
         // 2. Check main bundle (sometimes needed in tests)
         else if let p = Bundle.main.path(forResource: "default", ofType: "metallib") {
             path = p
@@ -29,11 +29,11 @@ public struct MLXConfiguration {
 
         if let validPath = path {
             SoulLog.metal.info("✅ [SoulBrain] Found default.metallib at: \(validPath)")
-            
+
             // Try /tmp/default.metallib (file path)
             SoulLog.metal.debug("Set MLX_METAL_PATH to /tmp/default.metallib")
             setenv("MLX_METAL_PATH", "/tmp/default.metallib", 1)
-            
+
             // Verify
             if let val = getenv("MLX_METAL_PATH") {
                 let s = String(cString: val)

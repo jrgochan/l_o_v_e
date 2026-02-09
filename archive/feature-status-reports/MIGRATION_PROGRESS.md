@@ -1,7 +1,7 @@
 # Logging Control - Console.* Migration Progress
 
-**Last Updated**: December 7, 2025  
-**Status**: 40% Complete (65/163 calls migrated)  
+**Last Updated**: December 7, 2025
+**Status**: 40% Complete (65/163 calls migrated)
 **Time Invested**: 1.5 hours of migration
 
 ---
@@ -327,6 +327,6 @@ logger.error(category, message, ...args)
 
 ---
 
-**Migration Status**: 🟢 On Track  
-**Next Milestone**: 50% (82/163 calls)  
+**Migration Status**: 🟢 On Track
+**Next Milestone**: 50% (82/163 calls)
 **Target Completion**: Next session

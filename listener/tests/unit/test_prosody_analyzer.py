@@ -1,3 +1,6 @@
+# pylint: disable=protected-access, redefined-outer-name, unused-argument
+# pylint: disable=import-outside-toplevel, line-too-long
+from typing import Any
 from unittest.mock import MagicMock, patch
 
 import numpy as np
@@ -8,7 +11,7 @@ from app.services.prosody_analyzer import ProsodyAnalyzer, get_prosody_analyzer
 
 # Setup Mocks
 @pytest.fixture
-def mock_librosa():
+def mock_librosa() -> Any:
     with patch("app.services.prosody_analyzer.librosa") as mock:
         # Defaults
         mock.load.return_value = (np.array([0.1, 0.2]), 16000.0)
@@ -18,31 +21,31 @@ def mock_librosa():
 
 
 @pytest.fixture
-def mock_parselmouth():
+def mock_parselmouth() -> Any:
     with patch("app.services.prosody_analyzer.parselmouth") as mock:
         yield mock
 
 
 @pytest.fixture
-def mock_praat_call():
+def mock_praat_call() -> Any:
     with patch("app.services.prosody_analyzer.call") as mock:
         yield mock
 
 
 class TestProsodyAnalyzer:
-    def test_singleton(self):
+    def test_singleton(self) -> None:
         with patch("app.services.prosody_analyzer.ProsodyAnalyzer") as mock_cls:
             # Reset global
             import app.services.prosody_analyzer
 
-            app.services.prosody_analyzer._prosody_analyzer_instance = None
+            app.services.prosody_analyzer._prosody_analyzer_instance = None  # type: ignore
 
             p1 = get_prosody_analyzer()
             p2 = get_prosody_analyzer()
             assert p1 is p2
             mock_cls.assert_called_once()
 
-    def test_init_missing_librosa(self):
+    def test_init_missing_librosa(self) -> None:
         with patch("app.services.prosody_analyzer.LIBROSA_AVAILABLE", False):
             with patch("app.services.prosody_analyzer.logger") as mock_logger:
                 ProsodyAnalyzer()
@@ -51,7 +54,7 @@ class TestProsodyAnalyzer:
                     "install with: pip install librosa soundfile"
                 )
 
-    def test_analyze_no_librosa(self):
+    def test_analyze_no_librosa(self) -> None:
         with patch("app.services.prosody_analyzer.LIBROSA_AVAILABLE", False):
             analyzer = ProsodyAnalyzer()
             analyzer.librosa_available = False  # Ensure instance state
@@ -59,7 +62,9 @@ class TestProsodyAnalyzer:
             assert result["pitch_mean"] == 150.0
             assert result["interpretation"]["pitch"] == "Mock data - install librosa"
 
-    def test_analyze_happy_path(self, mock_librosa, mock_parselmouth, mock_praat_call):
+    def test_analyze_happy_path(
+        self, mock_librosa: Any, mock_parselmouth: Any, mock_praat_call: Any
+    ) -> None:
         """Test full analysis flow with all dependencies."""
         analyzer = ProsodyAnalyzer()
         analyzer.librosa_available = True
@@ -94,7 +99,7 @@ class TestProsodyAnalyzer:
         assert result["hnr"] == 12.0
         assert "interpretation" in result
 
-    def test_analyze_exception_top(self, mock_librosa):
+    def test_analyze_exception_top(self, mock_librosa: Any) -> None:
         """Test top-level exception handler."""
         mock_librosa.load.side_effect = Exception("Load fail")
         analyzer = ProsodyAnalyzer()
@@ -103,7 +108,7 @@ class TestProsodyAnalyzer:
         result = analyzer.analyze("file.wav")
         assert result["pitch_mean"] == 150.0  # Mock fallback
 
-    def test_extract_pitch_no_voiced(self, mock_librosa):
+    def test_extract_pitch_no_voiced(self, mock_librosa: Any) -> None:
         analyzer = ProsodyAnalyzer()
         # All NaNs
         mock_librosa.pyin.return_value = (np.array([np.nan, np.nan]), None, None)
@@ -111,30 +116,30 @@ class TestProsodyAnalyzer:
         features = analyzer._extract_pitch(np.array([]), 16000)
         assert features["pitch_mean"] == 0.0
 
-    def test_extract_pitch_exception(self, mock_librosa):
+    def test_extract_pitch_exception(self, mock_librosa: Any) -> None:
         analyzer = ProsodyAnalyzer()
         mock_librosa.pyin.side_effect = Exception("Fail")
         features = analyzer._extract_pitch(np.array([]), 16000)
-        assert features == {}
+        assert not features
 
-    def test_extract_energy_exception(self, mock_librosa):
+    def test_extract_energy_exception(self, mock_librosa: Any) -> None:
         analyzer = ProsodyAnalyzer()
         mock_librosa.feature.rms.side_effect = Exception("Fail")
         features = analyzer._extract_energy(np.array([]))
-        assert features == {}
+        assert not features
 
-    def test_estimate_speech_rate_zero_duration(self, mock_librosa):
+    def test_estimate_speech_rate_zero_duration(self, mock_librosa: Any) -> None:
         analyzer = ProsodyAnalyzer()
         rate = analyzer._estimate_speech_rate(np.array([]), 16000, 0.0)
         assert rate == 0.0
 
-    def test_estimate_speech_rate_exception(self, mock_librosa):
+    def test_estimate_speech_rate_exception(self, mock_librosa: Any) -> None:
         analyzer = ProsodyAnalyzer()
         mock_librosa.onset.onset_strength.side_effect = Exception("Fail")
         rate = analyzer._estimate_speech_rate(np.array([]), 16000, 10.0)
         assert rate == 0.0
 
-    def test_extract_voice_quality_no_parselmouth(self):
+    def test_extract_voice_quality_no_parselmouth(self) -> None:
         analyzer = ProsodyAnalyzer()
         # Explicitly set false even if imported
         analyzer.parselmouth_available = False
@@ -146,15 +151,14 @@ class TestProsodyAnalyzer:
         # But we patch at module level for usage.
 
         # If we call it directly, we expect it to fail if not mocked
-        pass
 
-    def test_extract_voice_quality_exception(self, mock_parselmouth):
+    def test_extract_voice_quality_exception(self, mock_parselmouth: Any) -> None:
         analyzer = ProsodyAnalyzer()
         mock_parselmouth.Sound.side_effect = Exception("Fail")
         features = analyzer._extract_voice_quality("file.wav")
-        assert features == {}
+        assert not features
 
-    def test_interpret_prosody_branches(self):
+    def test_interpret_prosody_branches(self) -> None:
         analyzer = ProsodyAnalyzer()
 
         # Test 1: Low stats
@@ -187,7 +191,7 @@ class TestProsodyAnalyzer:
         assert "Moderate vocal" in i4["energy"]
         assert "Good" in i4["quality"]
 
-    def test_analyze_parselmouth_unavailable(self, mock_librosa):
+    def test_analyze_parselmouth_unavailable(self, mock_librosa: Any) -> None:
         """Test analysis when parselmouth is disabled."""
         analyzer = ProsodyAnalyzer()
         analyzer.librosa_available = True
@@ -202,7 +206,7 @@ class TestProsodyAnalyzer:
         assert "jitter" not in result
         assert "hnr" not in result
 
-    def test_interpret_prosody_no_hnr(self):
+    def test_interpret_prosody_no_hnr(self) -> None:
         """Test interpretation without HNR."""
         analyzer = ProsodyAnalyzer()
         prosody = {"pitch_mean": 100}  # No hnr

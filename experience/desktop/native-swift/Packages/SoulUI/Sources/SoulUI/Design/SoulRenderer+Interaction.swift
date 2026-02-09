@@ -44,14 +44,13 @@ extension SoulRenderer {
         self.flightStartTime = Date().timeIntervalSinceReferenceDate
         self.flightDuration = 3.0
         self.flightProgress = 0.0
-        
+
         // Reset flight target interpolation
         self.flightTargetStart = camera.target
         self.flightTargetEnd = targetPos // Look at the emotion
     }
 
     // MARK: - Flight Internal State (Properties moved to main Class)
-
 
     internal func updateCamera(deltaTime: Double) {
         if isFlying {
@@ -70,7 +69,7 @@ extension SoulRenderer {
                 }
             } else {
                 camera.position = SoulBrain.SplineMath.getPointOnPath(points: flightPath, progress: easeT)
-                
+
                 // Interpolate Target for Cinematic Focus
                 camera.target = mix(flightTargetStart, flightTargetEnd, t: easeT)
             }
@@ -83,12 +82,12 @@ extension SoulRenderer {
                 let hasMomentum = abs(rotationVelocity.x) > 0.0001 || abs(rotationVelocity.y) > 0.0001
                 if hasMomentum {
                     applyRotation(delta: rotationVelocity)
-                    
+
                     // Frame-Independent Damping
                     // Damping factor 0.92 at 60fps (16ms) matches original feel
                     // Formula: new = old * pow(damping, dt * targetFPS)
                     let damping = pow(0.92, Float(deltaTime * 60.0))
-                    
+
                     rotationVelocity.x *= CGFloat(damping)
                     rotationVelocity.y *= CGFloat(damping)
                     updateFPS(120)
@@ -129,7 +128,7 @@ extension SoulRenderer {
         self.isFlying = true
         self.flightStartTime = Date().timeIntervalSinceReferenceDate
         self.flightProgress = 0.0
-        
+
         // Reset Focus
         self.flightTargetStart = camera.target
         self.flightTargetEnd = SIMD3<Float>(0, 0, 0)

@@ -85,19 +85,19 @@ def detect_flooding(elasticity: float) -> bool:
 def detect_dominant_axis(q_trans: Quaternion) -> str:
     """
     Analyze transition quaternion to find dominant change.
-    
+
     Returns:
         "VALENCE_SHIFT" | "AROUSAL_SHIFT" | "CONNECTION_SHIFT" | "NEUTRAL"
     """
     abs_x = abs(q_trans.x)
     abs_y = abs(q_trans.y)
     abs_z = abs(q_trans.z)
-    
+
     max_component = max(abs_x, abs_y, abs_z)
-    
+
     if max_component < 0.1:
         return "NEUTRAL"
-    
+
     if abs_x == max_component:
         return "VALENCE_SHIFT"
     elif abs_y == max_component:
@@ -136,10 +136,10 @@ def generate_insight(
     previous_vac: VACVector
 ) -> str:
     """Generate contextual insight message"""
-    
+
     if axis_code == "NEUTRAL":
         return INSIGHT_MESSAGES["NEUTRAL"]
-    
+
     # Determine direction
     if axis_code == "VALENCE_SHIFT":
         delta = current_vac.valence - previous_vac.valence
@@ -147,11 +147,11 @@ def generate_insight(
         delta = current_vac.arousal - previous_vac.arousal
     else:  # CONNECTION_SHIFT
         delta = current_vac.connection - previous_vac.connection
-    
+
     direction = "positive" if delta > 0.1 else \
                 "negative" if delta < -0.1 else \
                 "neutral"
-    
+
     return INSIGHT_MESSAGES[axis_code][direction]
 ```
 
@@ -168,16 +168,16 @@ class VersorEngine:
         time_delta: float
     ):
         # ... (conversion, transition calculation)
-        
+
         # Metrics
         phi = angular_distance(transition_quat)
         elasticity = calculate_elasticity(phi, time_delta)
         is_flooding = detect_flooding(elasticity)
-        
+
         # Insights
         axis_code = detect_dominant_axis(transition_quat)
         insight_text = generate_insight(axis_code, current_vac, previous_vac)
-        
+
         return TrajectoryResult(
             current_state=current_quat,
             transition_quaternion=transition_quat,
@@ -200,23 +200,23 @@ def test_valence_shift_detected():
     """Pure valence change should detect VALENCE_SHIFT"""
     # Start: Sadness [-0.6, -0.4, 0.0]
     # Target: Joy [0.9, -0.4, 0.0]  (only valence changed)
-    
+
     q_start = VACVector(-0.6, -0.4, 0.0).to_quaternion()
     q_target = VACVector(0.9, -0.4, 0.0).to_quaternion()
-    
+
     q_trans = calculate_transition(q_start, q_target)
     axis = detect_dominant_axis(q_trans)
-    
+
     assert axis == "VALENCE_SHIFT"
 
 def test_connection_shift_pity_to_compassion():
     """Critical: Pity → Compassion must show CONNECTION_SHIFT"""
     q_pity = VACVector(-0.3, -0.2, -0.6).to_quaternion()
     q_compassion = VACVector(-0.3, -0.2, 0.8).to_quaternion()
-    
+
     q_trans = calculate_transition(q_pity, q_compassion)
     axis = detect_dominant_axis(q_trans)
-    
+
     assert axis == "CONNECTION_SHIFT", \
         "Pity→Compassion is a pure connection shift"
 ```
@@ -225,5 +225,5 @@ def test_connection_shift_pity_to_compassion():
 
 Now that you understand metrics and insights:
 - **09-setup-and-installation.md** - Development environment
-- **10-deployment.md** - Production deployment  
+- **10-deployment.md** - Production deployment
 - **11-testing-strategy.md** - Comprehensive testing

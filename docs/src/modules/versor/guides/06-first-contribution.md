@@ -107,14 +107,14 @@ Let's add a function to detect rapid valence shifts.
 def detect_valence_spike(q_transition: Quaternion, threshold: float = 0.7) -> bool:
     """
     Detect rapid valence shifts that may indicate mood swings.
-    
+
     Args:
         q_transition: Transition quaternion between states
         threshold: Minimum x-component to detect (default: 0.7)
-    
+
     Returns:
         True if rapid valence shift detected
-    
+
     Example:
         >>> from app.core.vac_model import VACVector
         >>> vac1 = VACVector(-0.8, 0.0, 0.0)
@@ -161,48 +161,48 @@ def test_detect_valence_spike_positive():
     """Test that large positive valence shift is detected."""
     vac1 = VACVector(valence=-0.8, arousal=0.0, connection=0.0)
     vac2 = VACVector(valence=0.8, arousal=0.0, connection=0.0)
-    
+
     q_trans = calculate_transition(
         vac1.to_quaternion(),
         vac2.to_quaternion()
     )
-    
+
     assert detect_valence_spike(q_trans) is True
 
 def test_detect_valence_spike_negative():
     """Test that large negative valence shift is detected."""
     vac1 = VACVector(valence=0.8, arousal=0.0, connection=0.0)
     vac2 = VACVector(valence=-0.8, arousal=0.0, connection=0.0)
-    
+
     q_trans = calculate_transition(
         vac1.to_quaternion(),
         vac2.to_quaternion()
     )
-    
+
     assert detect_valence_spike(q_trans) is True
 
 def test_detect_valence_spike_none():
     """Test that small valence shift is not detected."""
     vac1 = VACVector(valence=0.3, arousal=0.0, connection=0.0)
     vac2 = VACVector(valence=0.4, arousal=0.0, connection=0.0)
-    
+
     q_trans = calculate_transition(
         vac1.to_quaternion(),
         vac2.to_quaternion()
     )
-    
+
     assert detect_valence_spike(q_trans) is False
 
 def test_detect_valence_spike_custom_threshold():
     """Test valence spike detection with custom threshold."""
     vac1 = VACVector(valence=-0.5, arousal=0.0, connection=0.0)
     vac2 = VACVector(valence=0.5, arousal=0.0, connection=0.0)
-    
+
     q_trans = calculate_transition(
         vac1.to_quaternion(),
         vac2.to_quaternion()
     )
-    
+
     assert detect_valence_spike(q_trans, threshold=0.3) is True
     assert detect_valence_spike(q_trans, threshold=0.9) is False
 ```
@@ -459,7 +459,7 @@ git push origin feature/improve-flooding-detection
    # Before
    def my_function(x):
        return x * 2
-   
+
    # After
    def my_function(x: float) -> float:
        return x * 2
@@ -471,13 +471,13 @@ git push origin feature/improve-flooding-detection
    def my_function(x: float) -> float:
        """
        Double the input value.
-       
+
        Args:
            x: The number to double
-       
+
        Returns:
            The doubled value
-       
+
        Example:
            >>> my_function(5.0)
            10.0
@@ -504,7 +504,7 @@ Once approved, a maintainer will merge your PR.
 **You'll see:**
 
 ```text
-✅ Merged by @maintainer 
+✅ Merged by @maintainer
 ```
 
 ### Celebrate! 🎉
@@ -766,5 +766,5 @@ Remember:
 
 ---
 
-**Previous:** [← Testing Guide](05-testing-guide.md)  
+**Previous:** [← Testing Guide](05-testing-guide.md)
 **Next:** [Senior Developer Deep Dive →](../architecture/01-deep-dive.md)

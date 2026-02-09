@@ -1,3 +1,12 @@
+"""Transitions Framework API.
+
+This package implements the Emotional Transition Framework, allowing users to:
+- Plan emotional journeys from current state to desired state (`planning.py`).
+- Execute and track progress along these journeys (`execution.py`).
+- Access a library of therapeutic strategies (`library.py`).
+- Analyze journey history and strategy effectiveness (`analysis.py`).
+"""
+
 from app.api.routes.transitions.analysis import (
     get_user_effective_strategies,
     get_user_journey_history,
@@ -47,4 +56,4 @@ from app.models.transition_strategy import UserJourney
 
 # Expose classes for tests that import them from here
 from app.services.planning.core import PathPlanner
-from app.services.strategy_recommender import StrategyRecommender
+from app.services.recommendation.strategies import StrategyRecommender

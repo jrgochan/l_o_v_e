@@ -1,8 +1,8 @@
 # Architecture Overview (For Managers)
 
-**Reading Time:** ~20 minutes  
-**Audience:** Engineering managers, technical leads  
-**Prerequisites:** General understanding of microservices  
+**Reading Time:** ~20 minutes
+**Audience:** Engineering managers, technical leads
+**Prerequisites:** General understanding of microservices
 **Goal:** Understand the Listener's role in L.O.V.E. and its operational characteristics
 
 ---
@@ -29,10 +29,10 @@ graph LR
     B --> C[OBSERVER<br/>Port 8000]
     C --> D[VERSOR<br/>Port 8001]
     D --> E[EXPERIENCE<br/>Port 3000]
-    
+
     B -.->|Uses| F[Ollama<br/>LLM]
     B -.->|Uses| G[Redis<br/>Queue]
-    
+
     style B fill:#4f46e5,color:#fff
     style F fill:#6366f1,color:#fff
     style G fill:#818cf8,color:#fff

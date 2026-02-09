@@ -1,3 +1,5 @@
+# pylint: disable=redefined-outer-name, unused-argument
+from typing import Any
 from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
@@ -11,7 +13,7 @@ client = TestClient(app)
 
 
 @pytest.fixture
-def mock_ollama_manager():
+def mock_ollama_manager() -> Any:
     with (
         patch("app.api.routes.ai_models.OllamaManager") as mock,
         patch("app.api.routes.ai_models.asyncio.sleep") as mock_sleep,
@@ -55,27 +57,27 @@ def mock_ollama_manager():
         yield instance
 
 
-def test_list_local_models(mock_ollama_manager):
+def test_list_local_models(mock_ollama_manager: Any) -> None:
     response = client.get("/listener/ai/models/local")
     assert response.status_code == 200
     assert len(response.json()) == 1
     assert response.json()[0]["name"] == "test-model"
 
 
-def test_start_model_pull(mock_ollama_manager):
+def test_start_model_pull(mock_ollama_manager: Any) -> None:
     response = client.post("/listener/ai/models/pull", json={"name": "new-model"})
     assert response.status_code == 200
     assert "task_id" in response.json()
     assert response.json()["status"] == "started"
 
 
-def test_stream_pull_progress(mock_ollama_manager):
+def test_stream_pull_progress(mock_ollama_manager: Any) -> None:
     # Manually seed task
     task_id = "test-task"
     active_pulls[task_id] = {"ai_model_name": "new-model", "status": "starting"}
 
     # Mock pull_model generator
-    async def progress_gen(model_name):
+    async def progress_gen(model_name: Any) -> Any:
         progress = MagicMock()
         progress.status = "downloading"
         progress.digest = "sha256:123"
@@ -116,37 +118,37 @@ def test_stream_pull_progress(mock_ollama_manager):
         assert data2["status"] == "success", f"Expected success, got {data2}"
 
 
-def test_stream_pull_not_found():
+def test_stream_pull_not_found() -> None:
     with client.websocket_connect("/listener/ai/models/pull/missing-task") as websocket:
         data = websocket.receive_json()
         assert "error" in data
 
 
-def test_delete_model(mock_ollama_manager):
+def test_delete_model(mock_ollama_manager: Any) -> None:
     response = client.delete("/listener/ai/models/test-model")
     assert response.status_code == 200
     assert response.json()["result"]["status"] == "success"
 
 
-def test_get_model_details(mock_ollama_manager):
+def test_get_model_details(mock_ollama_manager: Any) -> None:
     response = client.get("/listener/ai/models/test-model/details")
     assert response.status_code == 200
     assert response.json()["name"] == "test-model"
 
 
-def test_get_model_details_404(mock_ollama_manager):
+def test_get_model_details_404(mock_ollama_manager: Any) -> None:
     mock_ollama_manager.get_model_details.side_effect = Exception("Not found")
     response = client.get("/listener/ai/models/missing/details")
     assert response.status_code == 404
 
 
-def test_health_check_ok(mock_ollama_manager):
+def test_health_check_ok(mock_ollama_manager: Any) -> None:
     response = client.get("/listener/ai/models/health")
     assert response.status_code == 200
     assert response.json()["status"] == "ok"
 
 
-def test_health_check_fail(mock_ollama_manager):
+def test_health_check_fail(mock_ollama_manager: Any) -> None:
     mock_ollama_manager.health_check.return_value = False
     response = client.get("/listener/ai/models/health")
     assert response.status_code == 200

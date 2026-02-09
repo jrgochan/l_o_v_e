@@ -9,7 +9,7 @@ export interface TransitionPathRequest {
   current_vac: number[];
   goal_vac: number[];
   max_waypoints?: number;
-  context?: Record<string, any>;
+  context?: Record<string, unknown>;
 }
 
 export interface StrategyFilters {
@@ -20,6 +20,21 @@ export interface StrategyFilters {
   search?: string | null;
   limit?: number;
   offset?: number;
+}
+
+export interface StepAlternative {
+  id: string;
+  name: string;
+  category: string;
+  vac: [number, number, number];
+  description: string;
+  reasoning: string;
+}
+
+export interface StrategyStep {
+  description: string;
+  order?: number;
+  duration?: string;
 }
 
 export const therapeuticService = {
@@ -99,8 +114,10 @@ export const therapeuticService = {
       const params = new URLSearchParams();
       if (filters.type) params.append("strategy_type", filters.type);
       if (filters.evidence) params.append("evidence_level", filters.evidence);
-      if (filters.difficulty_min) params.append("difficulty_min", filters.difficulty_min.toString());
-      if (filters.difficulty_max) params.append("difficulty_max", filters.difficulty_max.toString());
+      if (filters.difficulty_min)
+        params.append("difficulty_min", filters.difficulty_min.toString());
+      if (filters.difficulty_max)
+        params.append("difficulty_max", filters.difficulty_max.toString());
       if (filters.search) params.append("search", filters.search);
       if (filters.limit) params.append("limit", filters.limit.toString());
       if (filters.offset) params.append("offset", filters.offset.toString());
@@ -121,9 +138,14 @@ export const therapeuticService = {
   /**
    * Get alternate options for a specific step
    */
-  getStepAlternatives: async (currentEmotionId: string, goalEmotionId: string) => {
+  getStepAlternatives: async (
+    currentEmotionId: string,
+    goalEmotionId: string
+  ): Promise<{ alternatives: StepAlternative[] }> => {
     try {
-      const response = await fetch(`${SERVICE_URL}/transition-path/alternatives/${currentEmotionId}?goal_emotion_id=${goalEmotionId}&limit=5`);
+      const response = await fetch(
+        `${SERVICE_URL}/transition-path/alternatives/${currentEmotionId}?goal_emotion_id=${goalEmotionId}&limit=5`
+      );
 
       if (!response.ok) {
         throw new Error(`Failed to get step alternatives: ${response.statusText}`);
@@ -134,5 +156,5 @@ export const therapeuticService = {
       logger.error("api", "Error getting step alternatives", err);
       throw err;
     }
-  }
+  },
 };

@@ -300,124 +300,126 @@ export function ChatDrawer({ isOpen, onToggle, sessionId }: ChatDrawerProps) {
         <>
           {/* Messages Area */}
           <div className="flex-1 overflow-y-auto px-4 py-4 space-y-3">
-        {messages.length === 0 && (
-          <div className="text-center text-gray-400 py-8">
-            <p className="text-lg mb-2">👋 How are you feeling?</p>
-            <p className="text-sm">Type a message or record your voice to start</p>
-          </div>
-        )}
+            {messages.length === 0 && (
+              <div className="text-center text-gray-400 py-8">
+                <p className="text-lg mb-2">👋 How are you feeling?</p>
+                <p className="text-sm">Type a message or record your voice to start</p>
+              </div>
+            )}
 
-        {messages.map((msg) => (
-          <div
-            key={msg.id}
-            className={`flex ${msg.type === "user" ? "justify-end" : "justify-start"}`}
-          >
-            <div
-              className={`max-w-[70%] rounded-lg px-4 py-3 ${
-                msg.type === "user"
-                  ? "bg-cyan-600 text-white"
-                  : msg.type === "analysis"
-                    ? "bg-purple-900/50 border border-purple-500/30 text-white"
-                    : msg.type === "insight"
-                      ? "bg-gray-800 border border-gray-600 text-white"
-                      : "bg-gray-700 text-gray-200"
-              }`}
-            >
-              {/* Message Content */}
-              <div className="text-sm whitespace-pre-wrap">{msg.content}</div>
+            {messages.map((msg) => (
+              <div
+                key={msg.id}
+                className={`flex ${msg.type === "user" ? "justify-end" : "justify-start"}`}
+              >
+                <div
+                  className={`max-w-[70%] rounded-lg px-4 py-3 ${
+                    msg.type === "user"
+                      ? "bg-cyan-600 text-white"
+                      : msg.type === "analysis"
+                        ? "bg-purple-900/50 border border-purple-500/30 text-white"
+                        : msg.type === "insight"
+                          ? "bg-gray-800 border border-gray-600 text-white"
+                          : "bg-gray-700 text-gray-200"
+                  }`}
+                >
+                  {/* Message Content */}
+                  <div className="text-sm whitespace-pre-wrap">{msg.content}</div>
 
-              {/* Analysis Details */}
-              {msg.type === "analysis" && msg.vac && (
-                <div className="mt-2 pt-2 border-t border-purple-500/30 text-xs space-y-1">
-                  <div className="flex justify-between">
-                    <span className="text-purple-300">Valence:</span>
-                    <span className="font-mono">{msg.vac.valence.toFixed(2)}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-purple-300">Arousal:</span>
-                    <span className="font-mono">{msg.vac.arousal.toFixed(2)}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-purple-300">Connection:</span>
-                    <span className="font-mono">{msg.vac.connection.toFixed(2)}</span>
-                  </div>
-                  {msg.confidence && (
-                    <div className="flex justify-between mt-1 pt-1 border-t border-purple-500/20">
-                      <span className="text-purple-300">Confidence:</span>
-                      <span className="font-mono">{(msg.confidence * 100).toFixed(0)}%</span>
+                  {/* Analysis Details */}
+                  {msg.type === "analysis" && msg.vac && (
+                    <div className="mt-2 pt-2 border-t border-purple-500/30 text-xs space-y-1">
+                      <div className="flex justify-between">
+                        <span className="text-purple-300">Valence:</span>
+                        <span className="font-mono">{msg.vac.valence.toFixed(2)}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-purple-300">Arousal:</span>
+                        <span className="font-mono">{msg.vac.arousal.toFixed(2)}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-purple-300">Connection:</span>
+                        <span className="font-mono">{msg.vac.connection.toFixed(2)}</span>
+                      </div>
+                      {msg.confidence && (
+                        <div className="flex justify-between mt-1 pt-1 border-t border-purple-500/20">
+                          <span className="text-purple-300">Confidence:</span>
+                          <span className="font-mono">{(msg.confidence * 100).toFixed(0)}%</span>
+                        </div>
+                      )}
+                      {msg.matchMethod && msg.matchMethod !== "exact" && (
+                        <div className="flex justify-between text-purple-400/80 italic">
+                          <span>Mapping:</span>
+                          <span>
+                            {msg.matchMethod} ({((msg.matchConfidence || 0) * 100).toFixed(0)}%)
+                          </span>
+                        </div>
+                      )}
                     </div>
                   )}
-                  {msg.matchMethod && msg.matchMethod !== "exact" && (
-                    <div className="flex justify-between text-purple-400/80 italic">
-                      <span>Mapping:</span>
-                      <span>
-                        {msg.matchMethod} ({((msg.matchConfidence || 0) * 100).toFixed(0)}%)
-                      </span>
+
+                  {/* Timestamp */}
+                  <div className="text-xs opacity-70 mt-2">
+                    {msg.timestamp.toLocaleTimeString()}
+                  </div>
+
+                  {/* Auto-Linking Indicator */}
+                  {msg.relationships && msg.relationships.length > 0 && (
+                    <div className="mt-2 pt-2 border-t border-cyan-500/20">
+                      <AutoLinkIndicator
+                        relationships={msg.relationships}
+                        onRelationshipClick={(rel) => setActiveThreadId(rel.target_message_id)}
+                      />
                     </div>
                   )}
                 </div>
-              )}
+              </div>
+            ))}
 
-              {/* Timestamp */}
-              <div className="text-xs opacity-70 mt-2">{msg.timestamp.toLocaleTimeString()}</div>
-
-              {/* Auto-Linking Indicator */}
-              {msg.relationships && msg.relationships.length > 0 && (
-                <div className="mt-2 pt-2 border-t border-cyan-500/20">
-                  <AutoLinkIndicator
-                    relationships={msg.relationships}
-                    onRelationshipClick={(rel) => setActiveThreadId(rel.target_message_id)}
-                  />
+            {isProcessing && (
+              <div className="flex justify-start">
+                <div className="bg-gray-800 rounded-lg px-4 py-3 flex items-center gap-2">
+                  <div className="animate-spin h-4 w-4 border-2 border-cyan-400 border-t-transparent rounded-full" />
+                  <span className="text-sm text-gray-300">Analyzing...</span>
                 </div>
-              )}
+              </div>
+            )}
+
+            <div ref={messagesEndRef} />
+          </div>
+
+          {/* Input Area */}
+          <div className="border-t border-gray-700 p-4">
+            <div className="flex items-center gap-2">
+              <input
+                type="text"
+                value={inputText}
+                onChange={(e) => setInputText(e.target.value)}
+                onKeyPress={(e) => e.key === "Enter" && handleSend()}
+                placeholder="How are you feeling?"
+                disabled={!isConnected}
+                className="flex-1 px-4 py-3 bg-gray-800 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-cyan-500 disabled:opacity-50"
+              />
+
+              <button
+                className="px-4 py-3 bg-gray-700 hover:bg-gray-600 text-white rounded-lg transition disabled:opacity-50"
+                disabled={!isConnected}
+                title="Voice recording (coming soon)"
+              >
+                🎤
+              </button>
+
+              <button
+                onClick={handleSend}
+                disabled={!inputText.trim() || !isConnected}
+                className="px-6 py-3 bg-cyan-600 hover:bg-cyan-500 text-white rounded-lg transition disabled:opacity-50 disabled:cursor-not-allowed font-medium"
+              >
+                Send
+              </button>
             </div>
           </div>
-        ))}
-
-        {isProcessing && (
-          <div className="flex justify-start">
-            <div className="bg-gray-800 rounded-lg px-4 py-3 flex items-center gap-2">
-              <div className="animate-spin h-4 w-4 border-2 border-cyan-400 border-t-transparent rounded-full" />
-              <span className="text-sm text-gray-300">Analyzing...</span>
-            </div>
-          </div>
-        )}
-
-        <div ref={messagesEndRef} />
-      </div>
-
-      {/* Input Area */}
-      <div className="border-t border-gray-700 p-4">
-        <div className="flex items-center gap-2">
-          <input
-            type="text"
-            value={inputText}
-            onChange={(e) => setInputText(e.target.value)}
-            onKeyPress={(e) => e.key === "Enter" && handleSend()}
-            placeholder="How are you feeling?"
-            disabled={!isConnected}
-            className="flex-1 px-4 py-3 bg-gray-800 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-cyan-500 disabled:opacity-50"
-          />
-
-          <button
-            className="px-4 py-3 bg-gray-700 hover:bg-gray-600 text-white rounded-lg transition disabled:opacity-50"
-            disabled={!isConnected}
-            title="Voice recording (coming soon)"
-          >
-            🎤
-          </button>
-
-          <button
-            onClick={handleSend}
-            disabled={!inputText.trim() || !isConnected}
-            className="px-6 py-3 bg-cyan-600 hover:bg-cyan-500 text-white rounded-lg transition disabled:opacity-50 disabled:cursor-not-allowed font-medium"
-          >
-            Send
-          </button>
-        </div>
-      </div>
         </>
-       )}
+      )}
       {/* Thread View Overlay */}
       {activeThreadId && (
         <ThreadView

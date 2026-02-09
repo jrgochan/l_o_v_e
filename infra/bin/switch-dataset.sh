@@ -43,17 +43,17 @@ print_usage() {
 
 list_datasets() {
     print_header "📊 Available Datasets"
-    
+
     # 1. Get datasets from DB
     print_info "Checking database state..."
     if ! command -v psql &> /dev/null; then
         print_error "psql not found. Cannot query database."
         exit 1
     fi
-    
+
     # Get ID, Name, IsActive from DB
     db_datasets=$(PGPASSWORD="$DB_PASSWORD" psql -h "$DB_HOST" -p "$DB_PORT" -U "$DB_USER" -d "$DB_NAME" -t -c "SELECT name, is_active::text, is_default::text FROM emotion_collections ORDER BY name;" 2>/dev/null)
-    
+
     # 2. Get datasets from File System
     print_info "Checking available data files..."
     fs_datasets=()
@@ -76,7 +76,7 @@ list_datasets() {
             name=$(echo "$name" | xargs)
             active=$(echo "$active" | xargs)
             default=$(echo "$default" | xargs)
-            
+
             if [ -n "$name" ]; then
                 status=""
                 if [ "$active" == "true" ]; then
@@ -84,37 +84,37 @@ list_datasets() {
                 else
                     status="${YELLOW}[INACTIVE]${NC}"
                 fi
-                
+
                 if [ "$default" == "true" ]; then
                     status="$status ${BLUE}[DEFAULT]${NC}"
                 fi
-                
+
                 echo -e "  • $name $status"
             fi
         done <<< "$db_datasets"
     fi
-    
+
     echo ""
     echo -e "${BOLD}Available on Disk:${NC}"
     for ds in "${fs_datasets[@]}"; do
         echo "  • $ds"
     done
-    
+
     echo ""
     print_info "To switch: ./switch-dataset.sh <name>"
 }
 
 switch_dataset() {
     target="$1"
-    
+
     print_header "🔄 Switching Dataset to: $target"
-    
+
     # Check if target exists in DB (partial match)
     match=$(PGPASSWORD="$DB_PASSWORD" psql -h "$DB_HOST" -p "$DB_PORT" -U "$DB_USER" -d "$DB_NAME" -t -c "SELECT name FROM emotion_collections WHERE name ILIKE '%$target%' LIMIT 1;" 2>/dev/null | xargs)
-    
+
     if [ -z "$match" ]; then
         print_error "Dataset matching '$target' not found in database."
-        
+
         # Check if it exists on disk
         if [ -d "$PROJECT_ROOT/observer/data/$target" ]; then
             print_warning "Dataset '$target' exists on disk but is not seeded."
@@ -125,15 +125,15 @@ switch_dataset() {
         fi
         exit 1
     fi
-    
+
     print_info "Found collection: $match"
-    
+
     # Perform the switch in a transaction
     # 1. Set all to inactive/non-default
     # 2. Set target to active/default
-    
+
     print_info "Updating database..."
-    
+
     if PGPASSWORD="$DB_PASSWORD" psql -h "$DB_HOST" -p "$DB_PORT" -U "$DB_USER" -d "$DB_NAME" -c "
         BEGIN;
         UPDATE emotion_collections SET is_active = false, is_default = false;
@@ -144,7 +144,7 @@ switch_dataset() {
         echo ""
         echo -e "  ${GREEN}Active:${NC}  $match"
         echo -e "  ${YELLOW}Others:${NC}  Inactive"
-        
+
         # Invalidate cache if needed (restarting services might be needed if they cache heavily)
         print_info "Note: You may need to restart services if they cache emotion definitions."
     else

@@ -84,8 +84,8 @@ interface MacroStep {
     { type: 'command', action: 'zen:start' },
     { type: 'delay', action: '2000' },
     { type: 'command', action: 'voice:start-recording' },
-    { type: 'input', action: 'prompt-user', parameters: { 
-      message: 'How are you feeling this morning?' 
+    { type: 'input', action: 'prompt-user', parameters: {
+      message: 'How are you feeling this morning?'
     }},
     { type: 'command', action: 'analysis:generate-insights' },
     { type: 'command', action: 'view:timeline', parameters: { range: 'week' }}
@@ -587,9 +587,9 @@ This vision honors the immediate utility while dreaming of transformative possib
 
 ---
 
-**Status**: 🌟 Vision Document  
-**Created**: December 7, 2025  
-**Next Steps**: Review, prioritize, roadmap selected features  
+**Status**: 🌟 Vision Document
+**Created**: December 7, 2025
+**Next Steps**: Review, prioritize, roadmap selected features
 
 **Related Documents**:
 

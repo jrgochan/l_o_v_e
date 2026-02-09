@@ -24,12 +24,12 @@ print_header "Step 1: Creating Root-Level Symlinks"
 create_symlink() {
     target="$1"
     link_name="$2"
-    
+
     # Remove existing file/link
     if [ -e "$link_name" ] || [ -L "$link_name" ]; then
         rm -f "$link_name"
     fi
-    
+
     # Create symlink
     ln -s "$target" "$link_name"
     print_success "Symlink created: $link_name -> $target"
@@ -50,21 +50,21 @@ for module in $PYTHON_MODULES; do
         print_warning "Skipping $module (directory not found)"
         continue
     fi
-    
+
     print_info "Syncing to $module..."
-    
+
     # Copy pyproject.toml
     if [ -f "infra/configs/pyproject.toml" ]; then
         cp "infra/configs/pyproject.toml" "$module/pyproject.toml"
         print_success "$module/pyproject.toml synced"
     fi
-    
+
     # Copy .flake8
     if [ -f "infra/configs/.flake8" ]; then
         cp "infra/configs/.flake8" "$module/.flake8"
         print_success "$module/.flake8 synced"
     fi
-    
+
     # Update PYTHON_VERSION file if it exists
     python_min=$(grep "^PYTHON_MIN_VERSION=" infra/TOOL_VERSIONS | cut -d= -f2)
     if [ -n "$python_min" ]; then
@@ -78,15 +78,15 @@ print_header "Step 3: Syncing to Experience Module"
 
 if [ -d "experience" ]; then
     print_info "Syncing TypeScript configs to experience..."
-    
+
     # Create Experience config files if they don't exist
     # These would be created from templates in infra/configs/ if they exist
-    
+
     if [ -f "infra/configs/.prettierrc.json" ]; then
         cp "infra/configs/.prettierrc.json" "experience/.prettierrc.json"
         print_success "experience/.prettierrc.json synced"
     fi
-    
+
     if [ -f "infra/configs/.eslintrc.json" ]; then
         cp "infra/configs/.eslintrc.json" "experience/.eslintrc.json"
         print_success "experience/.eslintrc.json synced"

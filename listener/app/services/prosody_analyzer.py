@@ -71,7 +71,7 @@ except ImportError:
     logger.warning("parselmouth not installed - advanced voice quality metrics unavailable")
 
 
-class ProsodyAnalyzer:
+class ProsodyAnalyzer:  # pylint: disable=too-few-public-methods
     """Extract prosodic features from audio for emotional voice analysis.
 
     Analyzes acoustic properties of speech beyond words:
@@ -451,7 +451,7 @@ class ProsodyAnalyzer:
         """
         try:
             # Load audio with parselmouth
-            snd = parselmouth.Sound(audio_path)
+            snd = parselmouth.Sound(audio_path)  # pylint: disable=c-extension-no-member
 
             # Create pitch object for jitter/shimmer analysis
             # Parameters: time_step=0.0 (auto), pitch_floor=75Hz, pitch_ceiling=600Hz

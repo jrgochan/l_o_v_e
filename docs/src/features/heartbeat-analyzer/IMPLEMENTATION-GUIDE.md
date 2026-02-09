@@ -1,8 +1,8 @@
 # Heartbeat Analyzer - Implementation Guide
 
-**For Implementation Session**  
-**Estimated Time**: 3.5-4.5 hours  
-**Difficulty**: Medium  
+**For Implementation Session**
+**Estimated Time**: 3.5-4.5 hours
+**Difficulty**: Medium
 **Priority**: HIGH (UX Enhancement)
 
 ---
@@ -73,7 +73,7 @@ async def process_audio_message(
 ```python
     # Track overall start time
     overall_start = time.time()
-    
+
     # Send initial progress
     await send_progress(session_id, "started", "started", 0)
 ```
@@ -83,7 +83,7 @@ async def process_audio_message(
 ```python
     transcription = transcription_service.transcribe(audio_path)
     input_text = transcription.text
-    
+
     logger.info(f"Transcription: {input_text}")
 ```
 
@@ -105,7 +105,7 @@ async def process_audio_message(
             "type": "transcription",
             "text": transcription
         })
-    
+
     # Stream prosody data
     prosody_data = result.get('prosody')
 ```
@@ -125,7 +125,7 @@ async def process_audio_message(
             "type": "prosody",
             "data": prosody_data
         })
-        
+
         # Progress: Prosody complete
         prosody_time = int((time.time() - overall_start) * 1000)
         await send_progress(session_id, "prosody", "complete", 35, prosody_time)
@@ -186,14 +186,14 @@ async def process_audio_message(
 ```python
     # Progress updates for Deep Feeling stages
     await send_progress(session_id, "emotions", "complete", 70)
-    
+
     if relationships:
         await send_progress(session_id, "relationships", "in_progress", 75)
         # (relationships already streamed above)
         await send_progress(session_id, "relationships", "complete", 80)
-    
+
     await send_progress(session_id, "aggregate", "complete", 85)
-    
+
     # Check for 3-way analysis
     if three_way_data:
         await send_progress(session_id, "three_way", "complete", 90)
@@ -344,8 +344,8 @@ const getAdaptiveMessage = (stage: string, status: string, tone: ToneMode, deepF
       clinical: "Analyzing prosody features..."
     },
     emotions: {
-      warm: deepFeeling 
-        ? "Exploring the layers of what you're feeling..." 
+      warm: deepFeeling
+        ? "Exploring the layers of what you're feeling..."
         : "Identifying your emotional state...",
       clinical: deepFeeling
         ? "Executing multi-emotion detection..."
@@ -353,7 +353,7 @@ const getAdaptiveMessage = (stage: string, status: string, tone: ToneMode, deepF
     },
     // ... etc
   };
-  
+
   return messages[stage]?.[tone] || "Processing...";
 };
 ```
@@ -364,8 +364,8 @@ const getAdaptiveMessage = (stage: string, status: string, tone: ToneMode, deepF
 onProgressUpdate: (stage, status, message, percentage, elapsed_ms) => {
   setProgressState(prev => ({
     ...prev,
-    stages: prev.stages.map(s => 
-      s.id === stage 
+    stages: prev.stages.map(s =>
+      s.id === stage
         ? { ...s, status, percentage, elapsed_ms }
         : s
     ),
@@ -373,7 +373,7 @@ onProgressUpdate: (stage, status, message, percentage, elapsed_ms) => {
     overallPercentage: percentage,
     currentMessage: getAdaptiveMessage(stage, status, toneMode, deepFeelingMode)
   }));
-  
+
   if (status === 'started') {
     setShowProgress(true);
     setProgressState(prev => ({
@@ -541,27 +541,27 @@ Only render when `showProgress` is true to avoid unnecessary renders.
 
 ### **Functional Requirements:**
 
-✅ Progress updates stream from backend in real-time  
-✅ All 6-7 stages tracked correctly  
-✅ Percentage reflects actual progress (0-100%)  
-✅ Messages adapt to tone mode (warm vs clinical)  
-✅ Elapsed times display for completed stages  
+✅ Progress updates stream from backend in real-time
+✅ All 6-7 stages tracked correctly
+✅ Percentage reflects actual progress (0-100%)
+✅ Messages adapt to tone mode (warm vs clinical)
+✅ Elapsed times display for completed stages
 
 ### **UX Requirements:**
 
-✅ Orb pulses smoothly with gradient evolution  
-✅ Progress bar animates fluidly  
-✅ Checkmarks appear with satisfying animation  
-✅ Messages are contextual and reassuring  
-✅ Overall experience feels delightful  
+✅ Orb pulses smoothly with gradient evolution
+✅ Progress bar animates fluidly
+✅ Checkmarks appear with satisfying animation
+✅ Messages are contextual and reassuring
+✅ Overall experience feels delightful
 
 ### **Technical Requirements:**
 
-✅ No performance degradation  
-✅ Accessible (ARIA labels, screen reader support)  
-✅ Works in all modes (single, deep feeling, 3-way)  
-✅ Handles errors gracefully  
-✅ Mobile responsive  
+✅ No performance degradation
+✅ Accessible (ARIA labels, screen reader support)
+✅ Works in all modes (single, deep feeling, 3-way)
+✅ Handles errors gracefully
+✅ Mobile responsive
 
 ---
 
@@ -582,13 +582,13 @@ Before marking complete:
 
 ## 📚 Reference Files
 
-**Specification**: `HEARTBEAT_ANALYZER_SPECIFICATION.md`  
-**Backend**: `observer/app/api/routes/chat_websocket.py`  
-**Component**: `experience/web/components/admin/AnalysisProgressIndicator.tsx` (to be created)  
-**Integration**: `experience/web/components/admin/ChatPanel.tsx`  
-**WebSocket**: `experience/web/hooks/useWebSocketChat.ts`  
-**Types**: `experience/web/types/chat.ts`  
-**Styles**: `experience/web/app/globals.css`  
+**Specification**: `HEARTBEAT_ANALYZER_SPECIFICATION.md`
+**Backend**: `observer/app/api/routes/chat_websocket.py`
+**Component**: `experience/web/components/admin/AnalysisProgressIndicator.tsx` (to be created)
+**Integration**: `experience/web/components/admin/ChatPanel.tsx`
+**WebSocket**: `experience/web/hooks/useWebSocketChat.ts`
+**Types**: `experience/web/types/chat.ts`
+**Styles**: `experience/web/app/globals.css`
 
 ---
 
@@ -603,7 +603,7 @@ Before marking complete:
 
 ---
 
-**Created**: December 6, 2025, 9:47 PM MDT  
-**Ready for**: Fresh implementation session  
-**Estimated Duration**: One focused 4-hour session  
+**Created**: December 6, 2025, 9:47 PM MDT
+**Ready for**: Fresh implementation session
+**Estimated Duration**: One focused 4-hour session
 **Expected Result**: Delightful, therapeutic progress experience

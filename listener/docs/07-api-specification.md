@@ -58,10 +58,10 @@ async def ingest(
     timestamp: str = Form(...)
 ):
     """Ingest audio or text for processing"""
-    
+
     if audio is None and text is None:
         raise HTTPException(400, "Either audio or text required")
-    
+
     # Save audio temporarily
     if audio:
         audio_path = f"/tmp/{audio.filename}"
@@ -69,7 +69,7 @@ async def ingest(
             f.write(await audio.read())
     else:
         audio_path = None
-    
+
     # Enqueue job
     redis = await create_pool()
     job = await redis.enqueue_job(
@@ -80,7 +80,7 @@ async def ingest(
         session_id=session_id,
         timestamp=timestamp
     )
-    
+
     return {
         "status": "queued",
         "job_id": job.job_id

@@ -8,7 +8,7 @@ This guide explains the algorithm that converts 3D emotional vectors (VAC) into 
 
 The conversion from VAC to quaternion is the **core transformation** that enables the L.O.V.E. platform to represent emotions as geometric rotations.
 
-**Input:** `VAC[valence, arousal, connection]` - 3D emotional vector  
+**Input:** `VAC[valence, arousal, connection]` - 3D emotional vector
 **Output:** `Quaternion[w, x, y, z]` - 4D unit quaternion
 
 ---
@@ -33,7 +33,7 @@ The conversion from VAC to quaternion is the **core transformation** that enable
 def to_quaternion(self) -> Quaternion:
     """
     Convert VAC vector to unit quaternion.
-    
+
     Algorithm:
         1. Validate/clamp components
         2. magnitude = √(v² + a² + c²)
@@ -41,39 +41,39 @@ def to_quaternion(self) -> Quaternion:
         4. axis = [v, a, c] / magnitude
         5. angle = π · (magnitude / √3)
         6. q = [cos(θ/2), sin(θ/2)·axis]
-    
+
     Returns:
         Unit quaternion representing emotional state as rotation
     """
     # Step 1: Validate and clamp to valid range
     v = self._validate_and_clamp()  # Returns [valence, arousal, connection]
-    
+
     # Step 2: Calculate magnitude (emotional intensity)
     magnitude = math.sqrt(v[0]**2 + v[1]**2 + v[2]**2)
-    
+
     # Step 3: Handle zero vector (neutral/no emotion)
     if magnitude < EPSILON:
         return Quaternion.identity()  # [1, 0, 0, 0]
-    
+
     # Step 4: Normalize axis (direction in VAC space)
     axis = [component / magnitude for component in v]
-    
+
     # Step 5: Calculate rotation angle
     max_magnitude = math.sqrt(3)  # Maximum possible magnitude
     angle = math.pi * (magnitude / max_magnitude)
-    
+
     # Step 6: Apply axis-angle formula
     half_angle = angle / 2
     sin_half = math.sin(half_angle)
     cos_half = math.cos(half_angle)
-    
+
     quaternion = Quaternion(
         w=cos_half,
         x=axis[0] * sin_half,
         y=axis[1] * sin_half,
         z=axis[2] * sin_half
     )
-    
+
     return quaternion
 ```
 
@@ -96,12 +96,12 @@ Actual:   1.0000000000000002  # Floating point precision
 def _validate_and_clamp(self) -> List[float]:
     """
     Ensure all components are in valid range [-1.0, 1.0].
-    
+
     Handles:
     - Floating-point precision issues
     - LLM outputs slightly out of range
     - Numerical drift
-    
+
     Returns:
         Clamped [valence, arousal, connection]
     """
@@ -569,7 +569,7 @@ angle = magnitude
 def quaternion_to_vac(q: Quaternion) -> VACVector:
     """
     Convert quaternion back to VAC (inverse operation).
-    
+
     Algorithm:
         1. Extract axis and angle from quaternion
         2. Calculate magnitude from angle
@@ -578,14 +578,14 @@ def quaternion_to_vac(q: Quaternion) -> VACVector:
     """
     # Extract axis-angle representation
     axis, angle = q.to_axis_angle()
-    
+
     # Calculate magnitude from angle
     max_magnitude = math.sqrt(3)
     magnitude = (angle / math.pi) * max_magnitude
-    
+
     # Scale axis by magnitude
     vac_vector = axis * magnitude
-    
+
     return VACVector(
         valence=vac_vector[0],
         arousal=vac_vector[1],
@@ -640,17 +640,17 @@ assert abs(vac_original.connection - vac_recovered.connection) < EPSILON
 ```python
 def test_vac_conversion_numerical_stability():
     """Test that conversion remains stable for extreme values."""
-    
+
     # Maximum magnitude
     vac_max = VACVector(1.0, 1.0, 1.0)
     q_max = vac_max.to_quaternion()
     assert q_max.is_unit()
-    
+
     # Near-zero magnitude
     vac_tiny = VACVector(1e-7, 1e-7, 1e-7)
     q_tiny = vac_tiny.to_quaternion()
     assert q_tiny == Quaternion.identity()
-    
+
     # Large negative values
     vac_neg = VACVector(-0.999, -0.999, -0.999)
     q_neg = vac_neg.to_quaternion()
@@ -663,7 +663,7 @@ def test_vac_conversion_numerical_stability():
 
 ### Current Performance
 
-**Time complexity:** O(1) - constant time  
+**Time complexity:** O(1) - constant time
 **Space complexity:** O(1) - fixed memory
 
 **Timing:**
@@ -726,7 +726,7 @@ def batch_to_quaternion(vacs: List[VACVector]) -> List[Quaternion]:
 (Negative)    │
               │
              -A (Low arousal)
-             
+
              ⊙ C (Connection)
            (in/out of page)
 ```
@@ -800,10 +800,10 @@ def test_vac_pure_valence():
     """Pure valence should rotate around X-axis."""
     vac = VACVector(1.0, 0.0, 0.0)
     q = vac.to_quaternion()
-    
+
     # Extract axis
     axis, angle = q.to_axis_angle()
-    
+
     # Should be X-axis
     assert abs(axis[0] - 1.0) < EPSILON
     assert abs(axis[1]) < EPSILON
@@ -829,5 +829,5 @@ def test_vac_pure_valence():
 
 ---
 
-**Previous:** [← Quaternion Mathematics](02-quaternion-mathematics.md)  
+**Previous:** [← Quaternion Mathematics](02-quaternion-mathematics.md)
 **Next:** [SLERP Interpolation →](04-slerp-interpolation.md)

@@ -1,8 +1,8 @@
 # Codebase Tour
 
-**Reading Time:** ~20 minutes  
-**Audience:** New developers  
-**Prerequisites:** [Getting Started](01-getting-started.md) complete  
+**Reading Time:** ~20 minutes
+**Audience:** New developers
+**Prerequisites:** [Getting Started](01-getting-started.md) complete
 **Goal:** Understand the Listener's file structure and where to find things
 
 ---
@@ -63,7 +63,7 @@ async def health_check():
 **`routes/ingest.py`** - The main endpoints:
 
 - `POST /listener/analyze` - Analyze text synchronously
-- `POST /listener/analyze-audio` - Analyze audio synchronously  
+- `POST /listener/analyze-audio` - Analyze audio synchronously
 - `POST /listener/analyze-multi-emotion` - Multi-emotion analysis
 - `POST /listener/ingest` - Queue audio for async processing
 
@@ -95,11 +95,11 @@ This is **THE HEART** of the Listener. It's where the magic happens!
 ```python
 class SemanticAnalyzer:
     """Extract VAC from text using LLM"""
-    
+
     def __init__(self):
         self.llm = Ollama(model="llama3.1:8b-instruct-q4_0")
         self.prompt = self._create_prompt()  # The critical prompt!
-    
+
     async def analyze(self, text: str) -> EmotionalClassification:
         """Transform text → VAC coordinates"""
         # This is where natural language becomes math!
@@ -215,18 +215,18 @@ async def shutdown_event():
 ```python
 class Settings(BaseSettings):
     """Application configuration from .env file"""
-    
+
     ENVIRONMENT: str = "development"
     LOG_LEVEL: str = "INFO"
-    
+
     # Ollama
     OLLAMA_BASE_URL: str = "http://localhost:11434"
     OLLAMA_MODEL: str = "llama3.1:8b-instruct-q4_0"
-    
+
     # Redis
     REDIS_HOST: str = "localhost"
     REDIS_PORT: int = 6379
-    
+
     class Config:
         env_file = ".env"
 
@@ -271,16 +271,16 @@ This test validates the entire VAC model innovation:
 def test_pity_vs_compassion():
     """
     THE CRITICAL TEST
-    
+
     If this fails, the Connection axis doesn't work,
     and the entire innovation is broken!
     """
     analyzer = get_semantic_analyzer()
-    
+
     # Test Pity (separation)
     pity = analyzer.analyze_sync("I feel sorry for them")
     assert pity.vac.connection < 0, "Pity should have negative Connection!"
-    
+
     # Test Compassion (alignment)
     compassion = analyzer.analyze_sync("I feel their pain with them")
     assert compassion.vac.connection > 0.5, "Compassion should have high Connection!"
@@ -356,7 +356,7 @@ graph TD
     E --> F[app/services/pii_scrubber.py<br/>scrub method]
     F --> G[app/services/observer_client.py<br/>record_state optional]
     G --> H[HTTP Response<br/>back to user]
-    
+
     style C fill:#4f46e5,color:#fff
     style D fill:#6366f1,color:#fff
     style F fill:#818cf8,color:#fff

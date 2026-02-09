@@ -1,6 +1,6 @@
 # Voice Recording + Prosody Analysis - Implementation Plan
 
-**Date:** 2025-12-05  
+**Date:** 2025-12-05
 **Feature:** Add microphone support with full prosody analysis to emotional chat
 
 ---
@@ -61,7 +61,7 @@ Add voice recording capability to the emotional chat interface with advanced pro
 
 ```python
 librosa==0.10.1          # Audio analysis library
-parselmouth-praat==0.4.3 # Praat phonetics toolkit  
+parselmouth-praat==0.4.3 # Praat phonetics toolkit
 soundfile==0.12.1        # Audio I/O
 ```
 
@@ -191,7 +191,7 @@ tempo = librosa.beat.tempo(onset_envelope=onset_env, sr=sr)
 ```python
 import parselmouth
 
-# Load audio  
+# Load audio
 snd = parselmouth.Sound(audio_path)
 
 # Pitch

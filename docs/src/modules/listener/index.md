@@ -18,7 +18,7 @@ graph TD
     E --> F[VAC Extraction]
     F --> G[PII Scrubber<br/>Spacy NER]
     G --> H[Output:<br/>VAC Coordinates<br/>+ Emotion<br/>+ Reasoning]
-    
+
     style E fill:#4f46e5,color:#fff
 ```mermaid
 graph TD
@@ -28,7 +28,7 @@ graph TD
     D --> E[VAC Extraction]
     D --> F[Atlas Mapping]
     E --> G[Visual Output]
-    
+
     style A fill:#f3f4f6,stroke:#333,stroke-width:2px
     style G fill:#f3f4f6,stroke:#333,stroke-width:2px
     style C fill:#818cf8,color:#fff
@@ -95,7 +95,7 @@ But they **cannot distinguish**:
     - Valence: -0.3 (slightly negative)
     - Arousal: -0.1 (low energy, reflective)
     - **Connection: -0.7 (separation, condescension)**
-    
+
     **Compassion:**
     ```
     "I understand their pain. I'm here for them."

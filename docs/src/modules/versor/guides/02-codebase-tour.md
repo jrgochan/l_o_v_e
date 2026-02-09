@@ -83,16 +83,16 @@ This is the **heart of Versor**—pure mathematical functions with no side effec
 ```python
 class Quaternion:
     """4D number representing rotation: [w, x, y, z]"""
-    
+
     def __init__(self, w: float, x: float, y: float, z: float)
     def normalize(self) -> "Quaternion"
     def conjugate(self) -> "Quaternion"
     def multiply(self, other: "Quaternion") -> "Quaternion"
     def dot(self, other: "Quaternion") -> float
-    
+
     @classmethod
     def identity(cls) -> "Quaternion"
-    
+
     @classmethod
     def from_axis_angle(cls, axis, angle) -> "Quaternion"
 ```
@@ -133,7 +133,7 @@ q3 = q1.multiply(q2)
 ```python
 class VACVector:
     """3D emotional vector: [valence, arousal, connection]"""
-    
+
     def __init__(self, valence: float, arousal: float, connection: float)
     def magnitude(self) -> float
     def is_zero(self, epsilon: float = 1e-6) -> bool
@@ -209,7 +209,7 @@ E = calculate_elasticity(phi, time_delta=1.0)  # rad/s
 is_flooding = detect_flooding(E)  # True if E > 2.0
 
 # Identify dominant axis
-axis = detect_dominant_axis(q_transition)  
+axis = detect_dominant_axis(q_transition)
 # Returns: "VALENCE_SHIFT", "AROUSAL_SHIFT", or "CONNECTION_SHIFT"
 ```
 
@@ -334,7 +334,7 @@ class CalculateResponse(BaseModel):
 async def calculate_quaternion(request: CalculateRequest):
     """
     Convert VAC to quaternion and calculate transition metrics.
-    
+
     This is the main Versor endpoint called by Observer.
     """
     # 1. Convert current VAC to quaternion
@@ -394,20 +394,20 @@ def from_scipy_format(arr: np.ndarray) -> Quaternion:
 ```python
 class Settings(BaseSettings):
     """Application configuration"""
-    
+
     # Server
     HOST: str = "0.0.0.0"
     PORT: int = 8001
-    
+
     # Thresholds
     FLOODING_THRESHOLD: float = 2.0  # rad/s
     EPSILON: float = 1e-6            # Numerical tolerance
-    
+
     # SLERP
     DEFAULT_NUM_FRAMES: int = 60
     MIN_NUM_FRAMES: int = 10
     MAX_NUM_FRAMES: int = 120
-    
+
     class Config:
         env_file = ".env"
 ```
@@ -476,7 +476,7 @@ def test_quaternion_normalization():
     """Test that normalize() produces unit quaternion"""
     q = Quaternion(1.0, 2.0, 3.0, 4.0)
     q_norm = q.normalize()
-    
+
     # Check magnitude is 1.0
     assert abs(q_norm.magnitude() - 1.0) < 1e-6
 ```
@@ -499,7 +499,7 @@ def test_calculate_endpoint(client):
         "previous_state": null,
         "time_delta_seconds": 1.0
     })
-    
+
     assert response.status_code == 200
     data = response.json()
     assert "current_state" in data
@@ -520,13 +520,13 @@ def test_pity_to_compassion_is_connection_shift():
     """
     pity = VACVector(valence=-0.3, arousal=-0.2, connection=-0.6)
     compassion = VACVector(valence=-0.3, arousal=-0.2, connection=0.8)
-    
+
     q_pity = pity.to_quaternion()
     q_compassion = compassion.to_quaternion()
     q_transition = calculate_transition(q_pity, q_compassion)
-    
+
     axis = detect_dominant_axis(q_transition)
-    
+
     assert axis == "CONNECTION_SHIFT"  # ✅ This must pass!
 ```
 
@@ -735,5 +735,5 @@ find app/ -name "*.py" | xargs wc -l
 
 ---
 
-**Previous:** [← Getting Started](01-getting-started.md)  
+**Previous:** [← Getting Started](01-getting-started.md)
 **Next:** [Key Concepts →](03-key-concepts.md)

@@ -1,8 +1,8 @@
 # Semantic Analysis Internals
 
-**Reading Time:** ~40 minutes  
-**Audience:** Senior developers, ML engineers  
-**Prerequisites:** [Deep Dive Architecture](01-deep-dive.md)  
+**Reading Time:** ~40 minutes
+**Audience:** Senior developers, ML engineers
+**Prerequisites:** [Deep Dive Architecture](01-deep-dive.md)
 **Goal:** Master the semantic analysis pipeline and LLM integration
 
 ---
@@ -23,7 +23,7 @@ Traditional sentiment analysis outputs **Valence** and **Arousal** using statist
 class SemanticAnalyzer:
     """
     Extract VAC coordinates from text using local LLM.
-    
+
     Pipeline:
     1. Initialize LLM (Ollama)
     2. Create few-shot prompt with examples
@@ -68,15 +68,15 @@ self.llm = Ollama(
 def select_model_for_task(task: str, constraints: dict) -> str:
     """
     Choose appropriate model based on task and constraints.
-    
+
     Args:
         task: "semantic_vac", "multi_emotion", "atlas_mapping"
         constraints: {"latency": float, "accuracy": float, "cost": float}
-    
+
     Returns:
         Model identifier (e.g., "llama3.1:8b-instruct-q4_0")
     """
-    
+
     if task == "semantic_vac":
         # VAC extraction needs accuracy for Connection axis
         if constraints.get("latency", 3.0) < 1.0:
@@ -85,11 +85,11 @@ def select_model_for_task(task: str, constraints: dict) -> str:
             return "llama3.1:70b"  # Slow but very accurate
         else:
             return "llama3.1:8b-instruct-q4_0"  # Balanced (default)
-    
+
     elif task == "multi_emotion":
         # Multi-emotion needs reasoning capability
         return "llama3.1:8b-instruct-q8_0"  # Higher precision
-    
+
     else:
         return "llama3.1:8b-instruct-q4_0"  # Default
 ```
@@ -117,7 +117,7 @@ temperature = 0.0  # Deterministic output
 ```python
 system_message = """
 [1] Role Definition
-[2] Task Description  
+[2] Task Description
 [3] VAC Model Specification
 [4] Few-Shot Examples (CRITICAL)
 [5] Output Format
@@ -129,7 +129,7 @@ system_message = """
 
 ```python
 """
-You are the Listener, an expert psychometrician trained in 
+You are the Listener, an expert psychometrician trained in
 Dr. Brené Brown's Atlas of the Heart.
 """
 ```
@@ -239,7 +239,7 @@ You must respond with valid JSON matching this schema:
 """
 Follow this analysis process:
 1. Analyze Valence: Look for hedonic keywords
-2. Analyze Arousal: Look for energy markers  
+2. Analyze Arousal: Look for energy markers
 3. Analyze Connection: THIS IS THE HARDEST STEP
 4. Select Category: Which of the 13 Atlas categories?
 5. Select Emotion: Which specific emotion from the 87?
@@ -259,13 +259,13 @@ async def analyze(self, text: str) -> EmotionalClassification:
     # Format prompt
     formatted_prompt = self.prompt.format_messages(input_text=text)
     prompt_str = "\n\n".join([msg.content for msg in formatted_prompt])
-    
+
     # Call LLM (THE MAGIC HAPPENS HERE)
     response = await self.llm.ainvoke(prompt_str)
-    
+
     # Parse response
     result_dict = json.loads(cleaned_response)
-    
+
     # Validate
     return EmotionalClassification(**result_dict)
 ```
@@ -279,7 +279,7 @@ graph LR
     C --> D[Token Generation]
     D --> E[JSON Parser]
     E --> F[Response]
-    
+
     style C fill:#4f46e5,color:#fff
 ```
 
@@ -311,12 +311,12 @@ graph LR
 def clean_llm_response(response: str) -> str:
     """
     LLMs sometimes wrap JSON in markdown code blocks.
-    
+
     Input:  "```json\n{...}\n```"
     Output: "{...}"
     """
     cleaned = response.strip()
-    
+
     # Remove markdown code blocks
     if cleaned.startswith("```json"):
         cleaned = cleaned.split("```json")[1]
@@ -324,7 +324,7 @@ def clean_llm_response(response: str) -> str:
         cleaned = cleaned.split("```")[1]
     if cleaned.endswith("```"):
         cleaned = cleaned.rsplit("```", 1)[0]
-    
+
     return cleaned.strip()
 ```
 
@@ -335,7 +335,7 @@ try:
     result_dict = json.loads(cleaned_response)
 except json.JSONDecodeError as e:
     logger.error(f"Invalid JSON from LLM: {response}")
-    
+
     # Fallback strategy
     return EmotionalClassification(
         primary_emotion="Uncertainty",
@@ -357,15 +357,15 @@ except json.JSONDecodeError as e:
 ```python
 def validate_and_clamp(result_dict: dict) -> dict:
     """Ensure VAC values are within valid range"""
-    
+
     def clamp(value: float, min_val=-1.0, max_val=1.0) -> float:
         return max(min_val, min(max_val, value))
-    
+
     if "vac" in result_dict:
         result_dict["vac"]["valence"] = clamp(result_dict["vac"]["valence"])
         result_dict["vac"]["arousal"] = clamp(result_dict["vac"]["arousal"])
         result_dict["vac"]["connection"] = clamp(result_dict["vac"]["connection"])
-    
+
     return result_dict
 ```
 
@@ -401,11 +401,11 @@ except ValidationError as e:
 ```python
 class AdaptiveSemanticAnalyzer(SemanticAnalyzer):
     """Dynamically selects model based on input complexity"""
-    
+
     async def analyze(self, text: str) -> EmotionalClassification:
         # Analyze input complexity
         complexity = self._analyze_complexity(text)
-        
+
         # Select appropriate model
         if complexity > 0.8:
             self.model = "llama3.1:70b"  # Complex input needs powerful model
@@ -413,17 +413,17 @@ class AdaptiveSemanticAnalyzer(SemanticAnalyzer):
             self.model = "phi-3:mini"  # Simple input, use fast model
         else:
             self.model = "llama3.1:8b-instruct-q4_0"  # Default
-        
+
         # Reinitialize LLM with new model
         self.llm = self._create_llm()
-        
+
         # Proceed with analysis
         return await super().analyze(text)
-    
+
     def _analyze_complexity(self, text: str) -> float:
         """
         Estimate input complexity.
-        
+
         Factors:
         - Length (longer = more complex)
         - Vocabulary richness (unique words / total words)
@@ -432,7 +432,7 @@ class AdaptiveSemanticAnalyzer(SemanticAnalyzer):
         """
         length_score = min(len(text) / 1000, 1.0)
         vocab_score = len(set(text.split())) / len(text.split())
-        
+
         return (length_score + vocab_score) / 2
 ```
 
@@ -446,27 +446,27 @@ def calibrate_confidence(
 ) -> float:
     """
     Adjust LLM's self-reported confidence based on heuristics.
-    
+
     Args:
         raw_confidence: LLM's reported confidence (0-1)
         text_length: Length of input text (characters)
         vac_variance: Variance across VAC dimensions
-    
+
     Returns:
         Calibrated confidence (0-1)
     """
     # Penalty for very short text
     if text_length < 10:
         raw_confidence *= 0.7
-    
+
     # Penalty for high VAC variance (ambiguous emotions)
     if vac_variance > 0.5:
         raw_confidence *= 0.8
-    
+
     # Bonus for moderate length (sweet spot)
     if 50 <= text_length <= 500:
         raw_confidence *= 1.1
-    
+
     return min(raw_confidence, 1.0)
 ```
 
@@ -475,35 +475,35 @@ def calibrate_confidence(
 ```python
 class EnsembleSemanticAnalyzer:
     """Run multiple models and aggregate results"""
-    
+
     def __init__(self):
         self.analyzers = [
             SemanticAnalyzer(model="llama3.1:8b"),
             SemanticAnalyzer(model="phi-3:medium"),
             SemanticAnalyzer(model="mistral:7b")
         ]
-    
+
     async def analyze(self, text: str) -> EmotionalClassification:
         # Run all models in parallel
         results = await asyncio.gather(*[
-            analyzer.analyze(text) 
+            analyzer.analyze(text)
             for analyzer in self.analyzers
         ])
-        
+
         # Aggregate VAC values (median is robust to outliers)
         aggregated_vac = VACVector(
             valence=np.median([r.vac.valence for r in results]),
             arousal=np.median([r.vac.arousal for r in results]),
             connection=np.median([r.vac.connection for r in results])
         )
-        
+
         # Most common emotion (voting)
         emotions = [r.primary_emotion for r in results]
         primary_emotion = max(set(emotions), key=emotions.count)
-        
+
         # Average confidence
         confidence = np.mean([r.confidence for r in results])
-        
+
         return EmotionalClassification(
             primary_emotion=primary_emotion,
             category=results[0].category,
@@ -532,15 +532,15 @@ def compare_analyses(text1: str, text2: str):
     """Compare VAC values for similar inputs"""
     r1 = analyzer.analyze_sync(text1)
     r2 = analyzer.analyze_sync(text2)
-    
+
     print(f"\nInput 1: {text1}")
     print(f"VAC: {r1.vac}")
     print(f"Reasoning: {r1.reasoning}\n")
-    
+
     print(f"Input 2: {text2}")
     print(f"VAC: {r2.vac}")
     print(f"Reasoning: {r2.reasoning}\n")
-    
+
     # Calculate distance
     distance = np.linalg.norm([
         r1.vac.valence - r2.vac.valence,
@@ -561,19 +561,19 @@ compare_analyses(
 ```python
 def test_prompt_variations():
     """Test how prompt changes affect output"""
-    
+
     base_analyzer = SemanticAnalyzer()
-    
+
     # Remove Connection explanation
     no_connection_prompt = create_prompt_without_connection_explanation()
     test_analyzer = SemanticAnalyzer(prompt=no_connection_prompt)
-    
+
     # Test on critical input
     text = "I feel sorry for them"
-    
+
     base_result = base_analyzer.analyze_sync(text)
     test_result = test_analyzer.analyze_sync(text)
-    
+
     print(f"With Connection explanation: {base_result.vac.connection}")
     print(f"Without: {test_result.vac.connection}")
 ```
@@ -604,17 +604,17 @@ detailed_examples = 12  # ~2000 tokens
 ```python
 async def analyze_batch(texts: List[str]) -> List[EmotionalClassification]:
     """Process multiple texts concurrently"""
-    
+
     # Create tasks
     tasks = [self.analyze(text) for text in texts]
-    
+
     # Run concurrently (limited by semaphore)
     semaphore = asyncio.Semaphore(5)  # Max 5 concurrent
-    
+
     async def bounded_analyze(text):
         async with semaphore:
             return await self.analyze(text)
-    
+
     return await asyncio.gather(*[bounded_analyze(t) for t in texts])
 ```
 
@@ -632,19 +632,19 @@ def get_cached_analysis(text_hash: str) -> Optional[EmotionalClassification]:
 async def analyze_with_cache(self, text: str) -> EmotionalClassification:
     # Hash input
     text_hash = hashlib.md5(text.encode()).hexdigest()
-    
+
     # Check cache
     cached = get_cached_analysis(text_hash)
     if cached:
         logger.info("Cache hit!")
         return cached
-    
+
     # Analyze
     result = await self.analyze(text)
-    
+
     # Store in cache
     cache[text_hash] = result
-    
+
     return result
 ```
 
@@ -652,13 +652,13 @@ async def analyze_with_cache(self, text: str) -> EmotionalClassification:
 
 ## Key Takeaways
 
-✅ **Few-shot prompting** teaches the Connection axis  
-✅ **Contrastive examples** (pity vs. compassion) are critical  
-✅ **Temperature 0.0** ensures deterministic output  
-✅ **Pydantic validation** catches LLM errors  
-✅ **Graceful degradation** handles failures  
-✅ **Performance:** ~1.5s per analysis (acceptable)  
-✅ **Optimization:** Caching, batching, adaptive models  
+✅ **Few-shot prompting** teaches the Connection axis
+✅ **Contrastive examples** (pity vs. compassion) are critical
+✅ **Temperature 0.0** ensures deterministic output
+✅ **Pydantic validation** catches LLM errors
+✅ **Graceful degradation** handles failures
+✅ **Performance:** ~1.5s per analysis (acceptable)
+✅ **Optimization:** Caching, batching, adaptive models
 
 ---
 

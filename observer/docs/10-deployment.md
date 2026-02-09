@@ -112,7 +112,7 @@ services:
     networks:
       - love_network
     restart: unless-stopped
-  
+
   observer:
     build:
       context: .
@@ -307,7 +307,7 @@ Monitor and scale PostgreSQL instance:
 
 ```sql
 -- Monitor query performance
-SELECT 
+SELECT
     query,
     mean_exec_time,
     calls
@@ -316,7 +316,7 @@ ORDER BY mean_exec_time DESC
 LIMIT 10;
 
 -- Monitor index usage
-SELECT 
+SELECT
     schemaname,
     tablename,
     indexname,
@@ -382,7 +382,7 @@ async def metrics():
 SELECT count(*) FROM pg_stat_activity;
 
 -- Slow queries
-SELECT 
+SELECT
     query,
     mean_exec_time,
     calls
@@ -391,7 +391,7 @@ WHERE mean_exec_time > 100  -- Over 100ms
 ORDER BY mean_exec_time DESC;
 
 -- Table bloat
-SELECT 
+SELECT
     schemaname,
     tablename,
     pg_size_pretty(pg_total_relation_size(schemaname||'.'||tablename))

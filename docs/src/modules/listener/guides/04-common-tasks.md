@@ -1,8 +1,8 @@
 # Common Tasks
 
-**Reading Time:** ~30 minutes  
-**Audience:** New developers  
-**Prerequisites:** [Key Concepts](03-key-concepts.md) complete  
+**Reading Time:** ~30 minutes
+**Audience:** New developers
+**Prerequisites:** [Key Concepts](03-key-concepts.md) complete
 **Goal:** Learn recipes for common development tasks
 
 ---
@@ -39,7 +39,7 @@ async def health_check():
 async def health_check_detailed():
     """
     Detailed health check with system metrics.
-    
+
     Returns:
         dict: Health status with CPU, memory, and service info
     """
@@ -67,7 +67,7 @@ Restart the server:
 
 ```bash
 # Stop: Ctrl+C
-# Start: 
+# Start:
 uvicorn app.main:app --reload --port 8002
 ```
 
@@ -112,10 +112,10 @@ client = TestClient(app)
 def test_health_detailed():
     """Test detailed health endpoint"""
     response = client.get("/health-detailed")
-    
+
     assert response.status_code == 200
     data = response.json()
-    
+
     assert data["status"] == "healthy"
     assert data["service"] == "listener"
     assert "system" in data
@@ -248,27 +248,27 @@ In `app/services/semantic_analyzer.py`, add logs:
 ```python
 async def analyze(self, text: str) -> EmotionalClassification:
     """Extract VAC and emotion classification from text."""
-    
+
     # ADD: Log input
     logger.info(f"🔍 Analyzing text: {text[:100]}...")
-    
+
     # ... existing code ...
-    
+
     # ADD: Log LLM call
     logger.debug("Calling Ollama LLM...")
     response = await self.llm.ainvoke(prompt_str)
-    
+
     # ADD: Log response
     logger.debug(f"LLM response: {response[:200]}...")
-    
+
     # ... existing code ...
-    
+
     # ADD: Log result
     logger.info(
         f"✅ Analysis complete: {result.primary_emotion} "
         f"(VAC: {result.vac.valence:.2f}, {result.vac.arousal:.2f}, {result.vac.connection:.2f})"
     )
-    
+
     return result
 ```
 
@@ -328,7 +328,7 @@ if "vac" in result_dict:
     result_dict["vac"]["valence"] = clamp(result_dict["vac"]["valence"])
     result_dict["vac"]["arousal"] = clamp(result_dict["vac"]["arousal"])
     result_dict["vac"]["connection"] = clamp(result_dict["vac"]["connection"])
-    
+
 # Now validate with Pydantic
 result = EmotionalClassification(**result_dict)
 ```
@@ -456,23 +456,23 @@ import time
 
 async def analyze(self, text: str) -> EmotionalClassification:
     start_time = time.time()
-    
+
     # ... existing code ...
-    
+
     # ADD: Time each step
     t1 = time.time()
     response = await self.llm.ainvoke(prompt_str)
     llm_time = time.time() - t1
     logger.info(f"⏱️  LLM took {llm_time:.2f}s")
-    
+
     t2 = time.time()
     result_dict = json.loads(cleaned_response)
     parse_time = time.time() - t2
     logger.info(f"⏱️  JSON parsing took {parse_time:.3f}s")
-    
+
     total_time = time.time() - start_time
     logger.info(f"⏱️  Total analysis: {total_time:.2f}s")
-    
+
     return result
 ```
 

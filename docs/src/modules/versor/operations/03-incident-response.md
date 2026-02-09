@@ -106,7 +106,7 @@ This guide provides procedures for responding to production incidents in the Ver
    ```bash
    # Request rate
    kubectl top pods -l app=versor
-   
+
    # If CPU > 90%, scale up immediately
    kubectl scale deployment versor --replicas=6
    ```
@@ -116,7 +116,7 @@ This guide provides procedures for responding to production incidents in the Ver
    ```bash
    # When was last deployment?
    kubectl rollout history deployment/versor
-   
+
    # If recent, rollback
    kubectl rollout undo deployment/versor
    ```
@@ -366,9 +366,9 @@ CTO
 
 ### Incident Post-Mortem
 
-**Date:** YYYY-MM-DD  
-**Duration:** X hours  
-**Severity:** PX  
+**Date:** YYYY-MM-DD
+**Duration:** X hours
+**Severity:** PX
 **Impact:** X users affected
 
 **Timeline:**
@@ -515,5 +515,5 @@ After incident resolved:
 
 ---
 
-**Previous:** [← Team Structure](02-team-structure.md)  
+**Previous:** [← Team Structure](02-team-structure.md)
 **Next:** [Executive Overview →](../overview/01-executive-summary.md)

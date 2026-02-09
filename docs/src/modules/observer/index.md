@@ -146,14 +146,14 @@ graph TB
     Observer -->|Store State| DB[(PostgreSQL + pgvector)]
     Observer -->|Quaternion| Versor[Versor Module]
     Observer -->|History| Experience[Experience Module]
-    
+
     subgraph Observer Core
         Observer --> Atlas[87 Emotions Atlas]
         Observer --> Vector[Vector Search]
         Observer --> Path[A* Pathfinding]
         Observer --> Strat[107 Strategies]
     end
-    
+
     DB --> Vector
     Atlas --> Vector
     Path --> Strat

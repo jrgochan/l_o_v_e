@@ -8,7 +8,7 @@ This guide documents the key architectural decisions made in the Versor module, 
 
 ### The Decision
 
-**Chosen:** Quaternions for rotation representation  
+**Chosen:** Quaternions for rotation representation
 **Rejected:** Euler angles (pitch, yaw, roll)
 
 ### Rationale
@@ -46,7 +46,7 @@ This guide documents the key architectural decisions made in the Versor module, 
 
 ### The Decision
 
-**Chosen:** Pure stateless microservice (no database)  
+**Chosen:** Pure stateless microservice (no database)
 **Rejected:** Stateful service with trajectory storage
 
 ### Rationale
@@ -97,7 +97,7 @@ Request → Check Redis → Calculate → Update Redis → Response
 
 ### The Decision
 
-**Chosen:** `[w, x, y, z]` (scalar-first)  
+**Chosen:** `[w, x, y, z]` (scalar-first)
 **Rejected:** `[x, y, z, w]` (scalar-last, like SciPy)
 
 ### Rationale
@@ -138,7 +138,7 @@ Scalar (a) comes first in the definition.
 
 ### The Decision
 
-**Chosen:** SciPy's `spatial.transform.Slerp`  
+**Chosen:** SciPy's `spatial.transform.Slerp`
 **Rejected:** Custom pure-Python SLERP
 
 ### Rationale
@@ -175,7 +175,7 @@ Scalar (a) comes first in the definition.
 
 ### The Decision
 
-**Chosen:** FastAPI  
+**Chosen:** FastAPI
 **Rejected:** Flask, Django REST Framework
 
 ### Rationale
@@ -207,7 +207,7 @@ Scalar (a) comes first in the definition.
 
 ### The Decision
 
-**Chosen:** VAC (Valence-Arousal-Connection)  
+**Chosen:** VAC (Valence-Arousal-Connection)
 **Rejected:** VAD (Valence-Arousal-Dominance)
 
 ### Rationale
@@ -248,7 +248,7 @@ compassion = VAC[-0.3, -0.2, 0.8]   # Positive connection
 
 ### The Decision
 
-**Chosen:** `angle = π · (magnitude / √3)`  
+**Chosen:** `angle = π · (magnitude / √3)`
 **Rejected:** Non-linear mappings (quadratic, logarithmic)
 
 ### Rationale
@@ -288,7 +288,7 @@ angle = π · log(1 + magnitude) / log(1 + √3)
 
 ### The Decision
 
-**Chosen:** Maintain 100% test coverage  
+**Chosen:** Maintain 100% test coverage
 **Rejected:** Lower thresholds (80%, 90%)
 
 ### Rationale
@@ -325,7 +325,7 @@ if something_impossible:
 
 ### The Decision
 
-**Chosen:** No caching layer  
+**Chosen:** No caching layer
 **Rejected:** Redis cache, LRU cache
 
 ### Rationale
@@ -356,7 +356,7 @@ if something_impossible:
 
 ### The Decision
 
-**Chosen:** Python 3.11+ with NumPy/SciPy  
+**Chosen:** Python 3.11+ with NumPy/SciPy
 **Rejected:** C/C++/Rust implementation
 
 ### Rationale
@@ -389,7 +389,7 @@ if something_impossible:
 
 ### The Decision
 
-**Chosen:** Separate `/versor/slerp` endpoint  
+**Chosen:** Separate `/versor/slerp` endpoint
 **Alternative:** Only `/versor/calculate` with all features
 
 ### Rationale
@@ -420,7 +420,7 @@ if something_impossible:
 
 ### The Decision
 
-**Chosen:** P99 latency must be < 50ms  
+**Chosen:** P99 latency must be < 50ms
 **Alternatives:** P95 < 100ms, P90 < 30ms
 
 ### Rationale
@@ -451,7 +451,7 @@ if something_impossible:
 
 ### The Decision
 
-**Chosen:** REST API only  
+**Chosen:** REST API only
 **Rejected:** WebSocket for real-time updates
 
 ### Rationale
@@ -482,7 +482,7 @@ if something_impossible:
 
 ### The Decision
 
-**Chosen:** Google-style docstrings  
+**Chosen:** Google-style docstrings
 **Rejected:** NumPy-style, reStructuredText
 
 ### Rationale
@@ -500,14 +500,14 @@ if something_impossible:
 def calculate_transition(q1: Quaternion, q2: Quaternion) -> Quaternion:
     """
     Calculate transition quaternion between two states.
-    
+
     Args:
         q1: Starting quaternion
         q2: Target quaternion
-    
+
     Returns:
         Transition quaternion representing the rotation
-    
+
     Example:
         >>> q1 = Quaternion.identity()
         >>> q2 = Quaternion(0.707, 0, 0.707, 0)
@@ -521,7 +521,7 @@ def calculate_transition(q1: Quaternion, q2: Quaternion) -> Quaternion:
 
 ### The Decision
 
-**Chosen:** Recalculate quaternion each time from VAC  
+**Chosen:** Recalculate quaternion each time from VAC
 **Rejected:** Cache quaternion in VACVector object
 
 ### Rationale
@@ -543,7 +543,7 @@ class VACVector:
         self.arousal = a
         self.connection = c
         self._cached_quaternion = None  # Cache
-    
+
     def to_quaternion(self):
         if self._cached_quaternion is None:
             self._cached_quaternion = self._calculate_quaternion()
@@ -563,7 +563,7 @@ class VACVector:
 
 ### The Decision
 
-**Chosen:** Single-process Uvicorn server  
+**Chosen:** Single-process Uvicorn server
 **Rejected:** Gunicorn with multiple workers
 
 ### Rationale
@@ -602,7 +602,7 @@ Instead: 4 servers with 1 worker each
 
 ### The Decision
 
-**Chosen:** No request ID generation  
+**Chosen:** No request ID generation
 **Rejected:** Generate and track request IDs
 
 ### Rationale
@@ -641,7 +641,7 @@ async def add_request_id(request: Request, call_next):
 
 ### The Decision
 
-**Chosen:** Log only errors and warnings  
+**Chosen:** Log only errors and warnings
 **Rejected:** Verbose debug logging
 
 ### Rationale
@@ -685,7 +685,7 @@ logging.basicConfig(level=logging.DEBUG)
 
 ### The Decision
 
-**Chosen:** Pydantic Settings with .env file  
+**Chosen:** Pydantic Settings with .env file
 **Rejected:** YAML/JSON config files
 
 ### Rationale
@@ -702,7 +702,7 @@ logging.basicConfig(level=logging.DEBUG)
 ```python
 class Settings(BaseSettings):
     FLOODING_THRESHOLD: float = 2.0
-    
+
     class Config:
         env_file = ".env"
 ```
@@ -720,7 +720,7 @@ export FLOODING_THRESHOLD=2.5
 
 ### The Decision
 
-**Chosen:** No auth in Versor  
+**Chosen:** No auth in Versor
 **Rejected:** JWT tokens, API keys
 
 ### Rationale
@@ -817,5 +817,5 @@ Now that you understand the architecture:
 
 ---
 
-**Previous:** [← Troubleshooting](08-troubleshooting.md)  
+**Previous:** [← Troubleshooting](08-troubleshooting.md)
 **Next:** [Manager Architecture Overview →](../architecture/00-high-level-overview.md)

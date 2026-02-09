@@ -3,12 +3,30 @@
 from pathlib import Path
 
 fixes = {
-    "app/services/chat_service.py": ("from typing import Any, cast, Dict, List, Optional", "from typing import Any, Dict, List, Optional"),
-    "app/services/emotion_mapper.py": ("from typing import cast, List, Optional, Tuple", "from typing import List, Optional, Tuple"),
-    "app/services/session_analytics_service.py": ("from typing import Any, cast, Dict, List, Optional", "from typing import Any, Dict, List, Optional"),
-    "app/api/schemas/state.py": ("from typing import Any, Dict, List, Optional", "from typing import List, Optional"),
-    "app/services/quaternion_builder.py": ("from typing import Any, Dict, List, Optional", "from typing import Any, List, Optional"),
-    "app/websocket/routes.py": ("from typing import Any, Dict, List, Optional", "from typing import Optional"),
+    "app/services/chat_service.py": (
+        "from typing import Any, cast, Dict, List, Optional",
+        "from typing import Any, Dict, List, Optional",
+    ),
+    "app/services/emotion_mapper.py": (
+        "from typing import cast, List, Optional, Tuple",
+        "from typing import List, Optional, Tuple",
+    ),
+    "app/services/session_analytics_service.py": (
+        "from typing import Any, cast, Dict, List, Optional",
+        "from typing import Any, Dict, List, Optional",
+    ),
+    "app/api/schemas/state.py": (
+        "from typing import Any, Dict, List, Optional",
+        "from typing import List, Optional",
+    ),
+    "app/services/quaternion_builder.py": (
+        "from typing import Any, Dict, List, Optional",
+        "from typing import Any, List, Optional",
+    ),
+    "app/websocket/routes.py": (
+        "from typing import Any, Dict, List, Optional",
+        "from typing import Optional",
+    ),
 }
 
 print("Final unused import cleanup...")

@@ -1,8 +1,8 @@
 # Database Architecture
 
-**Reading Time:** ~50 minutes  
-**Audience:** Senior developers, DBAs, architects  
-**Prerequisites:** PostgreSQL knowledge, understanding of vector databases  
+**Reading Time:** ~50 minutes
+**Audience:** Senior developers, DBAs, architects
+**Prerequisites:** PostgreSQL knowledge, understanding of vector databases
 **Goal:** Master Observer's database design, pgvector integration, and optimization strategies
 
 ---
@@ -38,7 +38,7 @@ CREATE TABLE atlas_definitions (
     citations JSONB,
     created_at TIMESTAMP DEFAULT NOW(),
     updated_at TIMESTAMP DEFAULT NOW(),
-    
+
     -- Constraints
     CONSTRAINT valid_vac CHECK (
         array_length(vac, 1) = 3 AND
@@ -62,9 +62,9 @@ CREATE TABLE user_trajectory (
     rigidity FLOAT,    -- Resistance to change
     timestamp TIMESTAMP DEFAULT NOW(),
     metadata JSONB,
-    
+
     -- Indexes for common queries
-    CONSTRAINT fk_emotion FOREIGN KEY (emotion_id) 
+    CONSTRAINT fk_emotion FOREIGN KEY (emotion_id)
         REFERENCES atlas_definitions(id) ON DELETE SET NULL
 );
 
@@ -152,7 +152,7 @@ CREATE TABLE path_matrix_cache (
     computation_time_ms INT,
     vac_hash VARCHAR(64),  -- Hash for cache invalidation
     created_at TIMESTAMP DEFAULT NOW(),
-    
+
     UNIQUE(from_emotion_id, to_emotion_id)
 );
 ```
@@ -192,17 +192,17 @@ CREATE INDEX idx_message_timestamp ON chat_messages(session_id, timestamp DESC);
 
 ```sql
 -- Atlas emotion embeddings
-CREATE INDEX idx_atlas_embedding ON atlas_definitions 
+CREATE INDEX idx_atlas_embedding ON atlas_definitions
 USING hnsw (embedding vector_cosine_ops)
 WITH (m = 16, ef_construction = 64);
 
 -- Trajectory embeddings
-CREATE INDEX idx_trajectory_embedding ON user_trajectory 
+CREATE INDEX idx_trajectory_embedding ON user_trajectory
 USING hnsw (embedding vector_cosine_ops)
 WITH (m = 16, ef_construction = 64);
 
 -- Strategy embeddings
-CREATE INDEX idx_strategy_embedding ON transition_strategies 
+CREATE INDEX idx_strategy_embedding ON transition_strategies
 USING hnsw (embedding vector_cosine_ops)
 WITH (m = 16, ef_construction = 64);
 ```
@@ -351,7 +351,7 @@ CREATE TABLE user_trajectory_2026_02 PARTITION OF user_trajectory
 
 -- Indexes on each partition
 CREATE INDEX idx_traj_2026_01_user ON user_trajectory_2026_01(user_id);
-CREATE INDEX idx_traj_2026_01_emb ON user_trajectory_2026_01 
+CREATE INDEX idx_traj_2026_01_emb ON user_trajectory_2026_01
     USING hnsw (embedding vector_cosine_ops);
 ```
 
@@ -403,7 +403,7 @@ CREATE POLICY chat_message_isolation ON chat_messages
     FOR ALL
     USING (
         session_id IN (
-            SELECT id FROM chat_sessions 
+            SELECT id FROM chat_sessions
             WHERE user_id = current_setting('app.current_user_id', TRUE)
         )
     );
@@ -438,14 +438,14 @@ from sqlalchemy.ext.asyncio import create_async_engine
 
 engine = create_async_engine(
     DATABASE_URL,
-    
+
     # Pool configuration
     pool_size=20,              # Normal connections
     max_overflow=10,           # Additional under load
     pool_timeout=30,           # Wait for connection (seconds)
     pool_recycle=3600,         # Recycle after 1 hour
     pool_pre_ping=True,        # Test connections before use
-    
+
     # Connection arguments
     connect_args={
         "server_settings": {
@@ -454,10 +454,10 @@ engine = create_async_engine(
         },
         "command_timeout": 60,  # Query timeout
     },
-    
+
     # Async pool
     poolclass=AsyncAdaptedQueuePool,
-    
+
     # Logging
     echo=False,  # Set True for SQL logging
     echo_pool=False  # Set True for pool logging
@@ -536,8 +536,8 @@ def upgrade():
     """
     # Create index concurrently (doesn't block writes)
     op.execute("""
-        CREATE INDEX CONCURRENTLY idx_trajectory_embedding 
-        ON user_trajectory 
+        CREATE INDEX CONCURRENTLY idx_trajectory_embedding
+        ON user_trajectory
         USING hnsw (embedding vector_cosine_ops)
         WITH (m = 16, ef_construction = 64)
     """)
@@ -551,23 +551,23 @@ def downgrade():
 def upgrade():
     """Migrate old emotion names to new names"""
     conn = op.get_bind()
-    
+
     # Update in batches to avoid long locks
     conn.execute("""
         UPDATE atlas_definitions
         SET name = 'Anticipation'
         WHERE name = 'Expectation'
     """)
-    
+
     # Cascade to foreign keys
     conn.execute("""
         UPDATE user_trajectory ut
         SET emotion_id = (
-            SELECT id FROM atlas_definitions 
+            SELECT id FROM atlas_definitions
             WHERE name = 'Anticipation'
         )
         WHERE emotion_id IN (
-            SELECT id FROM atlas_definitions 
+            SELECT id FROM atlas_definitions
             WHERE name = 'Expectation'
         )
     """)
@@ -619,7 +619,7 @@ pg_dump --extension=vector observer_prod > observer_with_vector.sql
 
 ```sql
 -- Connection stats
-SELECT 
+SELECT
     count(*) FILTER (WHERE state = 'active') as active,
     count(*) FILTER (WHERE state = 'idle') as idle,
     count(*) FILTER (WHERE state = 'idle in transaction') as idle_in_txn
@@ -627,7 +627,7 @@ FROM pg_stat_activity
 WHERE datname = 'observer_prod';
 
 -- Table sizes
-SELECT 
+SELECT
     schemaname,
     tablename,
     pg_size_pretty(pg_total_relation_size(schemaname||'.'||tablename)) AS size
@@ -636,7 +636,7 @@ WHERE schemaname = 'public'
 ORDER BY pg_total_relation_size(schemaname||'.'||tablename) DESC;
 
 -- Index usage
-SELECT 
+SELECT
     schemaname,
     tablename,
     indexname,
@@ -647,7 +647,7 @@ WHERE schemaname = 'public'
 ORDER BY idx_scan DESC;
 
 -- Slow queries (enable pg_stat_statements)
-SELECT 
+SELECT
     query,
     calls,
     total_exec_time,
@@ -659,7 +659,7 @@ ORDER BY mean_exec_time DESC
 LIMIT 10;
 
 -- Cache hit ratio (should be > 99%)
-SELECT 
+SELECT
     sum(heap_blks_hit) / (sum(heap_blks_hit) + sum(heap_blks_read)) as cache_hit_ratio
 FROM pg_statio_user_tables;
 ```
@@ -668,10 +668,10 @@ FROM pg_statio_user_tables;
 
 ```sql
 -- Analyze query performance
-EXPLAIN (ANALYZE, BUFFERS, VERBOSE) 
-SELECT * FROM user_trajectory 
-WHERE user_id = 'user123' 
-ORDER BY timestamp DESC 
+EXPLAIN (ANALYZE, BUFFERS, VERBOSE)
+SELECT * FROM user_trajectory
+WHERE user_id = 'user123'
+ORDER BY timestamp DESC
 LIMIT 100;
 
 -- Look for:
@@ -710,16 +710,16 @@ VACUUM FULL user_trajectory;
 
 ```sql
 -- ❌ BAD: Full table scan
-SELECT * FROM user_trajectory 
+SELECT * FROM user_trajectory
 WHERE EXTRACT(MONTH FROM timestamp) = 1;
 
 -- ✅ GOOD: Index-friendly
-SELECT * FROM user_trajectory 
-WHERE timestamp >= '2026-01-01' 
+SELECT * FROM user_trajectory
+WHERE timestamp >= '2026-01-01'
   AND timestamp < '2026-02-01';
 
 -- ❌ BAD: Function prevents index use
-SELECT * FROM atlas_definitions 
+SELECT * FROM atlas_definitions
 WHERE LOWER(name) = 'joy';
 
 -- ✅ GOOD: Functional index or case-insensitive comparison

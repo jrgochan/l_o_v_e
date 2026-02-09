@@ -40,22 +40,22 @@ class EmotionalClassification(BaseModel):
 
 class SemanticAnalyzer:
     """Extract VAC vectors using LLM"""
-    
+
     def __init__(self):
         self.llm = ChatOpenAI(
             model="gpt-4o",  # or "llama-3-70b" via Groq
             temperature=0.0  # Deterministic
         )
-        
+
         self.parser = PydanticOutputParser(
             pydantic_object=EmotionalClassification
         )
-        
+
         self.prompt = self._create_prompt()
-    
+
     def _create_prompt(self) -> ChatPromptTemplate:
         """Create psychometric prompt with few-shot examples"""
-        
+
         system_message = """You are the Listener, an expert psychometrician trained in Dr. Brené Brown's Atlas of the Heart.
 
 Your task is to analyze text and map it to the 3-dimensional VAC Model:
@@ -76,7 +76,7 @@ Follow this analysis process:
 5. Select Emotion: Which specific emotion from the 87?
 
 {format_instructions}"""
-        
+
         few_shot_examples = """
 Examples:
 
@@ -100,19 +100,19 @@ Output: {{"primary_emotion": "Joy", "category": "Places We Go When Life Is Good"
 Input: "I feel so alone. Nobody gets me."
 Output: {{"primary_emotion": "Loneliness", "category": "Places We Go When We Search for Connection", "vac": {{"valence": -0.7, "arousal": -0.2, "connection": -0.9}}, "confidence": 0.93, "reasoning": "Deep disconnection is the defining feature of loneliness."}}
 """
-        
+
         return ChatPromptTemplate.from_messages([
             ("system", system_message + "\n\n" + few_shot_examples),
             ("human", "Analyze this input:\n\n{input_text}")
         ])
-    
+
     async def analyze(self, text: str) -> EmotionalClassification:
         """
         Extract VAC and emotion from text.
-        
+
         Args:
             text: Transcribed or direct text input
-        
+
         Returns:
             EmotionalClassification with VAC scalars
         """
@@ -121,13 +121,13 @@ Output: {{"primary_emotion": "Loneliness", "category": "Places We Go When We Sea
             input_text=text,
             format_instructions=self.parser.get_format_instructions()
         )
-        
+
         # Call LLM
         response = await self.llm.ainvoke(formatted_prompt)
-        
+
         # Parse structured output
         result = self.parser.parse(response.content)
-        
+
         return result
 ```
 

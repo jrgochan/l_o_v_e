@@ -1,3 +1,1 @@
-"""
-Listener Module - Semantic Tests Package
-"""
+"""Listener Module - Semantic Tests Package."""

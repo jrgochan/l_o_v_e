@@ -51,15 +51,15 @@ if [ -z "$TARGET_MODULE" ] || [ "$TARGET_MODULE" != "experience" ]; then
     else
         PY_MODULES=(observer listener versor)
     fi
-    
+
     for module in "${PY_MODULES[@]}"; do
         if [ ! -d "$module" ]; then
             print_warning "Skipping $module (directory not found)"
             continue
         fi
-        
+
         print_header "Formatting $module (Python)"
-        
+
         # Black
         print_info "Running black..."
         if run_in_module "$module" "black app/"; then
@@ -68,7 +68,7 @@ if [ -z "$TARGET_MODULE" ] || [ "$TARGET_MODULE" != "experience" ]; then
             print_error "black: Failed"
             total_failures=$((total_failures + 1))
         fi
-        
+
         # isort
         print_info "Running isort..."
         if run_in_module "$module" "isort app/"; then
@@ -77,7 +77,7 @@ if [ -z "$TARGET_MODULE" ] || [ "$TARGET_MODULE" != "experience" ]; then
             print_error "isort: Failed"
             total_failures=$((total_failures + 1))
         fi
-        
+
         # autoflake (remove unused imports)
         if check_command autoflake; then
             print_info "Running autoflake..."
@@ -92,13 +92,13 @@ fi
 if [ -z "$TARGET_MODULE" ] || [ "$TARGET_MODULE" = "experience" ]; then
     if [ -d "experience" ]; then
         print_header "Formatting Experience (TypeScript)"
-        
+
         # Check node_modules
         if [ ! -d "experience/node_modules" ]; then
             print_warning "Node modules not installed, running npm install..."
             run_in_module "experience" "npm install"
         fi
-        
+
         # Prettier
         print_info "Running prettier..."
         if run_in_module "experience" "npm run format 2>/dev/null || prettier --write '**/*.{ts,tsx,js,jsx,json,md}'"; then
@@ -107,7 +107,7 @@ if [ -z "$TARGET_MODULE" ] || [ "$TARGET_MODULE" = "experience" ]; then
             print_error "prettier: Failed"
             total_failures=$((total_failures + 1))
         fi
-        
+
         # ESLint --fix
         print_info "Running eslint --fix..."
         if run_in_module "experience" "npm run lint:fix 2>/dev/null || eslint . --ext .ts,.tsx,.js,.jsx --fix"; then

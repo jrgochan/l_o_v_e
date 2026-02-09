@@ -1,8 +1,13 @@
 """Integration tests for Ingest API routes."""
 
+# pylint: disable=redefined-outer-name, unused-argument
+
+from typing import Any
 from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
+from arq.jobs import JobStatus
+from fastapi import HTTPException
 from fastapi.testclient import TestClient
 
 from app.main import app
@@ -11,7 +16,7 @@ client = TestClient(app)
 
 
 @pytest.fixture
-def mock_redis_pool():
+def mock_redis_pool() -> Any:
     with patch("app.api.routes.ingest.create_pool") as mock_pool:
         pool_instance = AsyncMock()
         mock_pool.return_value = pool_instance
@@ -19,12 +24,12 @@ def mock_redis_pool():
 
 
 @pytest.fixture
-def mock_services():
+def mock_services() -> Any:
     with (
-        patch("app.services.transcription.get_transcription_service") as mock_transcription,
-        patch("app.services.semantic_analyzer.get_semantic_analyzer") as mock_semantic,
-        patch("app.services.pii_scrubber.get_pii_scrubber") as mock_scrubber,
-        patch("app.services.observer_client.get_observer_client") as mock_observer,
+        patch("app.api.routes.ingest.get_transcription_service") as mock_transcription,
+        patch("app.api.routes.ingest.get_semantic_analyzer") as mock_semantic,
+        patch("app.api.routes.ingest.get_pii_scrubber") as mock_scrubber,
+        patch("app.api.routes.ingest.get_observer_client") as mock_observer,
     ):
 
         # Setup Transcription
@@ -61,7 +66,7 @@ def mock_services():
 
 
 @pytest.mark.asyncio
-async def test_ingest_audio_success(mock_redis_pool):
+async def test_ingest_audio_success(mock_redis_pool: Any) -> None:
     """Test /ingest endpoint with audio file."""
     # Mock redis enqueue
     job_mock = MagicMock()
@@ -85,7 +90,7 @@ async def test_ingest_audio_success(mock_redis_pool):
 
 
 @pytest.mark.asyncio
-async def test_ingest_text_success(mock_redis_pool):
+async def test_ingest_text_success(mock_redis_pool: Any) -> None:
     """Test /ingest endpoint with text."""
     job_mock = MagicMock()
     job_mock.job_id = "text-job-id"
@@ -99,7 +104,7 @@ async def test_ingest_text_success(mock_redis_pool):
     assert response.json()["job_id"] == "text-job-id"
 
 
-def test_ingest_validation_error():
+def test_ingest_validation_error() -> None:
     """Test /ingest validation."""
     # No inputs
     response = client.post("/listener/ingest", data={"user_id": "u", "session_id": "s"})
@@ -113,14 +118,12 @@ def test_ingest_validation_error():
 
 
 @pytest.mark.asyncio
-async def test_get_status_success(mock_redis_pool):
+async def test_get_status_success(mock_redis_pool: Any) -> None:
     """Test /status/{job_id}."""
     # Mock Job class
     with patch("app.api.routes.ingest.Job") as mock_job_cls:
         job_instance = AsyncMock()
-        status_mock = MagicMock()
-        status_mock.value = "complete"
-        job_instance.status.return_value = status_mock
+        job_instance.status.return_value = JobStatus.complete
         job_instance.result.return_value = {"result": "data"}
         mock_job_cls.return_value = job_instance
 
@@ -132,7 +135,7 @@ async def test_get_status_success(mock_redis_pool):
 
 
 @pytest.mark.asyncio
-async def test_analyze_text_sync(mock_services):
+async def test_analyze_text_sync(mock_services: Any) -> None:
     """Test /analyze endpoint."""
     data = {"text": "I am happy"}
     response = client.post("/listener/analyze", data=data)
@@ -147,12 +150,12 @@ async def test_analyze_text_sync(mock_services):
 
 
 @pytest.mark.asyncio
-async def test_analyze_audio_multi_emotion(mock_services):
+async def test_analyze_audio_multi_emotion(mock_services: Any) -> None:
     """Test /analyze-audio-multi-emotion endpoint."""
     # Need to mock MultiEmotionAnalyzer and ProsodyAnalyzer too
     with (
-        patch("app.services.multi_emotion_analyzer.get_multi_emotion_analyzer") as mock_multi,
-        patch("app.services.prosody_analyzer.get_prosody_analyzer") as mock_prosody,
+        patch("app.api.routes.ingest.get_multi_emotion_analyzer") as mock_multi,
+        patch("app.api.routes.ingest.get_prosody_analyzer") as mock_prosody,
     ):
 
         # Setup Prosody
@@ -208,7 +211,7 @@ async def test_analyze_audio_multi_emotion(mock_services):
 
 
 @pytest.mark.asyncio
-async def test_ingest_errors(mock_redis_pool):
+async def test_ingest_errors(mock_redis_pool: Any) -> None:
     """Test ingest error handling."""
     # 1. Test audio save error
     with patch("app.api.routes.ingest.aiofiles.open", side_effect=Exception("Save failed")):
@@ -241,7 +244,7 @@ async def test_ingest_errors(mock_redis_pool):
 
 
 @pytest.mark.asyncio
-async def test_status_error(mock_redis_pool):
+async def test_status_error(mock_redis_pool: Any) -> None:
     """Test status error."""
     mock_redis_pool.enqueue_job.side_effect = Exception("Redis fail")
     with patch("app.api.routes.ingest.create_pool", side_effect=Exception("Connection fail")):
@@ -250,7 +253,7 @@ async def test_status_error(mock_redis_pool):
 
 
 @pytest.mark.asyncio
-async def test_analysis_errors(mock_services):
+async def test_analysis_errors(mock_services: Any) -> None:
     """Test analysis error handling."""
     # 1. Analyze text error
     mock_services["semantic"].analyze.side_effect = Exception("Analysis fail")
@@ -258,7 +261,7 @@ async def test_analysis_errors(mock_services):
     assert response.status_code == 500
 
     # 2. Analyze multi error
-    with patch("app.services.multi_emotion_analyzer.get_multi_emotion_analyzer") as mock_multi:
+    with patch("app.api.routes.ingest.get_multi_emotion_analyzer") as mock_multi:
         mock_multi.return_value.analyze.side_effect = Exception("Multi fail")
         response = client.post("/listener/analyze-multi-emotion", data={"text": "t"})
         assert response.status_code == 500
@@ -283,10 +286,10 @@ async def test_analysis_errors(mock_services):
     assert response.status_code == 200  # Should succeed despite observer error
 
 
-def test_status_completed_result_error(mock_services):
+def test_status_completed_result_error(mock_services: Any) -> None:
     job_mock = MagicMock()
     # "complete" status
-    job_mock.status = AsyncMock(return_value=MagicMock(value="complete"))
+    job_mock.status = AsyncMock(return_value=JobStatus.complete)
     # job.result raises Exception
     job_mock.result = AsyncMock(side_effect=Exception("Result fetch failed"))
 
@@ -302,10 +305,8 @@ def test_status_completed_result_error(mock_services):
             assert "result" not in data
 
 
-def test_status_http_exception(mock_redis_pool):
+def test_status_http_exception(mock_redis_pool: Any) -> None:
     """Test HTTPException propagation."""
-    from fastapi import HTTPException
-
     # Mock status to raise HTTPException
     job_mock = MagicMock()
     job_mock.status = AsyncMock(side_effect=HTTPException(status_code=403, detail="Forbidden"))
@@ -317,16 +318,13 @@ def test_status_http_exception(mock_redis_pool):
             assert "Forbidden" in response.json()["detail"]
 
 
-def test_status_queued(mock_redis_pool):
+def test_status_queued(mock_redis_pool: Any) -> None:
     """Test getting status for queued/in-progress job (not complete)."""
     # from app.services.job_manager import JobStatus # Not needed and module might not exist
 
     # Mock return value to have .value "queued"
-    mock_status_enum = MagicMock()
-    mock_status_enum.value = "queued"
-
     job_mock = MagicMock()
-    job_mock.status = AsyncMock(return_value=mock_status_enum)
+    job_mock.status = AsyncMock(return_value=JobStatus.queued)
 
     with patch("app.api.routes.ingest.Job", return_value=job_mock):
         with patch("app.api.routes.ingest.create_pool", new=AsyncMock()):
@@ -337,14 +335,11 @@ def test_status_queued(mock_redis_pool):
             assert "result" not in data
 
 
-def test_status_not_found(mock_redis_pool):
+def test_status_not_found(mock_redis_pool: Any) -> None:
     """Test getting status for non-existent job."""
 
-    mock_status_enum = MagicMock()
-    mock_status_enum.value = "not_found"
-
     job_mock = MagicMock()
-    job_mock.status = AsyncMock(return_value=mock_status_enum)
+    job_mock.status = AsyncMock(return_value=JobStatus.not_found)
 
     with patch("app.api.routes.ingest.Job", return_value=job_mock):
         with patch("app.api.routes.ingest.create_pool", new=AsyncMock()):

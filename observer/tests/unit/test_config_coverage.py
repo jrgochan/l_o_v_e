@@ -1,7 +1,7 @@
 import pytest
 from pydantic import ValidationError
 
-from app.config import Settings
+from app.core.settings import Settings
 
 
 def test_settings_db_url_override():
@@ -41,7 +41,9 @@ def test_embedding_dimension_property():
 
 def test_get_settings_helper():
     """Test get_settings helper."""
-    from app.config import get_settings
+    from app.core.settings import (  # pylint: disable=import-outside-toplevel
+        get_settings,
+    )
 
     s = get_settings()
     assert isinstance(s, Settings)

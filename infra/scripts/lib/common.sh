@@ -65,7 +65,7 @@ check_command() {
 check_command_verbose() {
     command_name="$1"
     friendly_name="${2:-$command_name}"
-    
+
     if check_command "$command_name"; then
         print_success "$friendly_name found"
         return 0
@@ -80,12 +80,12 @@ run_in_module() {
     module_path="$1"
     shift
     command_to_run="$*"
-    
+
     if [ ! -d "$module_path" ]; then
         print_error "Module directory not found: $module_path"
         return 1
     fi
-    
+
     # shellcheck disable=SC2164
     (cd "$module_path" && eval "$command_to_run")
 }
@@ -97,25 +97,25 @@ get_python_cmd() {
         echo "python3.11"
         return 0
     fi
-    
+
     # Try python3 and check version
     if check_command python3; then
         version=$(python3 --version 2>&1 | awk '{print $2}')
         major=$(echo "$version" | cut -d. -f1)
         minor=$(echo "$version" | cut -d. -f2)
-        
+
         if [ "$major" -eq 3 ] && [ "$minor" -ge 11 ]; then
             echo "python3"
             return 0
         fi
     fi
-    
+
     # Try brew python (macOS)
     if check_command "/usr/local/bin/python3.11"; then
         echo "/usr/local/bin/python3.11"
         return 0
     fi
-    
+
     # Try pyenv
     if check_command pyenv; then
         if pyenv versions --bare 2>/dev/null | grep -q "3.11"; then
@@ -123,7 +123,7 @@ get_python_cmd() {
             return 0
         fi
     fi
-    
+
     print_error "Python 3.11+ not found"
     print_info "Install options:"
     print_info "  macOS:  brew install python@3.11"
@@ -135,15 +135,15 @@ get_python_cmd() {
 # Get or create DX tools venv
 get_dx_venv() {
     dx_venv="$PROJECT_ROOT/infra/.venv-dx"
-    
+
     if [ -d "$dx_venv" ] && [ -f "$dx_venv/bin/python" ]; then
         echo "$dx_venv"
         return 0
     fi
-    
+
     # Create venv
     python_cmd=$(get_python_cmd) || return 1
-    
+
     print_info "Creating DX tools venv at infra/.venv-dx..."
     if $python_cmd -m venv "$dx_venv"; then
         print_success "DX venv created"
@@ -159,11 +159,11 @@ get_dx_venv() {
 # Activate DX venv and return pip command
 activate_dx_venv() {
     dx_venv=$(get_dx_venv) || return 1
-    
+
     # Export venv paths
     export VIRTUAL_ENV="$dx_venv"
     export PATH="$dx_venv/bin:$PATH"
-    
+
     return 0
 }
 
@@ -189,16 +189,16 @@ get_pip_cmd() {
 check_python_version() {
     min_version="$1"
     python_cmd=$(get_python_cmd) || return 1
-    
+
     version=$($python_cmd --version 2>&1 | awk '{print $2}')
-    
+
     # Simple version comparison (assumes 3.x format)
     major=$(echo "$version" | cut -d. -f1)
     minor=$(echo "$version" | cut -d. -f2)
-    
+
     min_major=$(echo "$min_version" | cut -d. -f1)
     min_minor=$(echo "$min_version" | cut -d. -f2)
-    
+
     if [ "$major" -gt "$min_major" ]; then
         return 0
     elif [ "$major" -eq "$min_major" ] && [ "$minor" -ge "$min_minor" ]; then
@@ -212,25 +212,25 @@ check_python_version() {
 # Load tool versions from TOOL_VERSIONS file
 load_versions() {
     versions_file="${1:-$PROJECT_ROOT/infra/TOOL_VERSIONS}"
-    
+
     if [ ! -f "$versions_file" ]; then
         print_warning "TOOL_VERSIONS file not found: $versions_file"
         return 1
     fi
-    
+
     # Parse and export all version variables
     while IFS='=' read -r key value; do
         # Skip comments and empty lines
         case "$key" in
             \#*|'') continue ;;
         esac
-        
+
         # Export the variable (trim whitespace)
         key=$(echo "$key" | tr -d ' ')
         value=$(echo "$value" | tr -d ' ')
         eval "export $key='$value'"
     done < "$versions_file"
-    
+
     return 0
 }
 
@@ -238,11 +238,11 @@ load_versions() {
 get_version() {
     key="$1"
     versions_file="${2:-$PROJECT_ROOT/infra/TOOL_VERSIONS}"
-    
+
     if [ ! -f "$versions_file" ]; then
         return 1
     fi
-    
+
     value=$(grep "^${key}=" "$versions_file" | cut -d= -f2 | tr -d ' ')
     echo "$value"
 }

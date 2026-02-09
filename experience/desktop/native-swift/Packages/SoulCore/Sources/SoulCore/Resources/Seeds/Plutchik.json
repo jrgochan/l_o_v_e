@@ -12,88 +12,56 @@
             "emotion_name": "Joy",
             "category": "Plutchik Primary",
             "definition": "A feeling of great pleasure and happiness.",
-            "vac": [
-                0.8,
-                0.4,
-                0.7
-            ],
+            "vac": [0.8, 0.4, 0.7],
             "color_hint": "#FFFF44"
         },
         {
             "emotion_name": "Trust",
             "category": "Plutchik Primary",
             "definition": "Firm belief in the reliability, truth, ability, or strength of someone or something.",
-            "vac": [
-                0.6,
-                0.1,
-                0.8
-            ],
+            "vac": [0.6, 0.1, 0.8],
             "color_hint": "#88FF44"
         },
         {
             "emotion_name": "Fear",
             "category": "Plutchik Primary",
             "definition": "An unpleasant emotion caused by the belief that someone or something is dangerous.",
-            "vac": [
-                -0.6,
-                0.8,
-                -0.4
-            ],
+            "vac": [-0.6, 0.8, -0.4],
             "color_hint": "#228B22"
         },
         {
             "emotion_name": "Surprise",
             "category": "Plutchik Primary",
             "definition": "The feeling caused by something unexpected or unusual.",
-            "vac": [
-                0.2,
-                0.9,
-                0.0
-            ],
+            "vac": [0.2, 0.9, 0.0],
             "color_hint": "#32CD32"
         },
         {
             "emotion_name": "Sadness",
             "category": "Plutchik Primary",
             "definition": "Emotional pain associated with, or characterized by, feelings of disadvantage, loss, despair, grief.",
-            "vac": [
-                -0.7,
-                -0.4,
-                -0.6
-            ],
+            "vac": [-0.7, -0.4, -0.6],
             "color_hint": "#4488FF"
         },
         {
             "emotion_name": "Disgust",
             "category": "Plutchik Primary",
             "definition": "A feeling of revulsion or strong disapproval aroused by something unpleasant or offensive.",
-            "vac": [
-                -0.6,
-                0.4,
-                -0.5
-            ],
+            "vac": [-0.6, 0.4, -0.5],
             "color_hint": "#8844FF"
         },
         {
             "emotion_name": "Anger",
             "category": "Plutchik Primary",
             "definition": "A strong feeling of annoyance, displeasure, or hostility.",
-            "vac": [
-                -0.6,
-                0.8,
-                -0.2
-            ],
+            "vac": [-0.6, 0.8, -0.2],
             "color_hint": "#FF4444"
         },
         {
             "emotion_name": "Anticipation",
             "category": "Plutchik Primary",
             "definition": "The action of anticipating something; expectation or prediction.",
-            "vac": [
-                0.4,
-                0.5,
-                0.2
-            ],
+            "vac": [0.4, 0.5, 0.2],
             "color_hint": "#FF8844"
         }
     ]

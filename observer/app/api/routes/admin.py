@@ -5,12 +5,13 @@ Protected by admin role requirement.
 """
 
 import logging
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Annotated, Any, Dict, List, Optional
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy import select
+from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.api.deps import get_current_admin
@@ -23,7 +24,11 @@ from app.models.transition_strategy import TransitionStrategy
 from app.models.user import User
 from app.models.user_trajectory import UserTrajectory
 from app.schemas.ai_models import ModelAssignmentResponse, ModelAssignmentUpdate
-from app.schemas.bootstrap import BootstrapDataCreate, BootstrapDataResponse, BootstrapDataUpdate
+from app.schemas.bootstrap import (
+    BootstrapDataCreate,
+    BootstrapDataResponse,
+    BootstrapDataUpdate,
+)
 from app.schemas.emotions import EmotionResponse, EmotionUpdate
 from app.schemas.prompts import (
     PromptTemplateCreate,
@@ -33,7 +38,9 @@ from app.schemas.prompts import (
 )
 from app.schemas.strategies import StrategyResponse, StrategyUpdate
 from app.schemas.user import UserResponse, UserUpdate
-from app.services.prompt_service import PromptService, get_prompt_service
+from app.services.admin.service import AdminService
+from app.services.ai.prompts import PromptService, get_prompt_service
+from app.types.insights import PromptCreateContext
 
 logger = logging.getLogger(__name__)
 
@@ -43,11 +50,21 @@ router = APIRouter()
 @router.get("/users", response_model=List[UserResponse])
 async def list_users(
     db: Annotated[AsyncSession, Depends(get_db)],
-    current_admin: Annotated[User, Depends(get_current_admin)],
+    _current_admin: Annotated[User, Depends(get_current_admin)],
     skip: int = 0,
     limit: int = 100,
 ) -> Any:
-    """List all users (paginated)."""
+    """List all registered users with pagination.
+
+    Args:
+        db: Database session.
+        current_admin: Authenticated admin user (dependency).
+        skip: Number of records to skip.
+        limit: Maximum number of records to return.
+
+    Returns:
+        List[UserResponse]: List of user profiles.
+    """
     stmt = select(User).offset(skip).limit(limit)
     result = await db.execute(stmt)
     return result.scalars().all()
@@ -57,9 +74,21 @@ async def list_users(
 async def get_user(
     user_id: UUID,
     db: Annotated[AsyncSession, Depends(get_db)],
-    current_admin: Annotated[User, Depends(get_current_admin)],
+    _current_admin: Annotated[User, Depends(get_current_admin)],
 ) -> Any:
-    """Get user by ID."""
+    """Retrieve a specific user profile by ID.
+
+    Args:
+        user_id: UUID of the user to retrieve.
+        db: Database session.
+        current_admin: Authenticated admin user.
+
+    Returns:
+        UserResponse: The requested user profile.
+
+    Raises:
+        HTTPException: If user is not found.
+    """
     stmt = select(User).where(User.id == user_id)
     result = await db.execute(stmt)
     user = result.scalars().first()
@@ -75,9 +104,22 @@ async def update_user(
     user_id: UUID,
     user_in: UserUpdate,
     db: Annotated[AsyncSession, Depends(get_db)],
-    current_admin: Annotated[User, Depends(get_current_admin)],
+    _current_admin: Annotated[User, Depends(get_current_admin)],
 ) -> Any:
-    """Update user (role, status, etc)."""
+    """Update user account details (role, status, etc.).
+
+    Args:
+        user_id: UUID of the user to update.
+        user_in: Update data payload.
+        db: Database session.
+        current_admin: Authenticated admin user.
+
+    Returns:
+        UserResponse: The updated user profile.
+
+    Raises:
+        HTTPException: If user is not found.
+    """
     stmt = select(User).where(User.id == user_id)
     result = await db.execute(stmt)
     user = result.scalars().first()
@@ -92,7 +134,9 @@ async def update_user(
     # but for admin helper we might want to reset password.
     # For now, excluding password update from this generic update for safety
     if "password" in update_data:
-        from app.core.security import get_password_hash  # pylint: disable=import-outside-toplevel
+        from app.core.security import (  # pylint: disable=import-outside-toplevel
+            get_password_hash,
+        )
 
         update_data["password_hash"] = get_password_hash(update_data.pop("password"))
 
@@ -109,10 +153,20 @@ async def update_user(
 async def get_user_sessions(
     user_id: UUID,
     db: Annotated[AsyncSession, Depends(get_db)],
-    current_admin: Annotated[User, Depends(get_current_admin)],
+    _current_admin: Annotated[User, Depends(get_current_admin)],
     limit: int = 20,
 ) -> Any:
-    """Get recent sessions for a user."""
+    """Retrieve recent chat sessions for a specific user.
+
+    Args:
+        user_id: Target user UUID.
+        db: Database session.
+        current_admin: Authenticated admin user.
+        limit: Max sessions to return.
+
+    Returns:
+        List[Dict]: List of session dictionaries.
+    """
     # Note: user might have sessions linked via user_id (string) OR auth_user_id (UUID)
     # We should query using the relationship if possible, or support both.
     # The relationship User.sessions is back_populating on auth_user_id.
@@ -138,10 +192,20 @@ async def get_user_sessions(
 async def get_user_trajectory(
     user_id: UUID,
     db: Annotated[AsyncSession, Depends(get_db)],
-    current_admin: Annotated[User, Depends(get_current_admin)],
+    _current_admin: Annotated[User, Depends(get_current_admin)],
     limit: int = 100,
 ) -> Any:
-    """Get trajectory points for a user."""
+    """Retrieve emotional trajectory data points for a user.
+
+    Args:
+        user_id: Target user UUID.
+        db: Database session.
+        current_admin: Authenticated admin user.
+        limit: Max points to return.
+
+    Returns:
+        List[Dict]: List of trajectory point dictionaries.
+    """
     stmt = (
         select(UserTrajectory)
         .where(UserTrajectory.user_id == user_id)
@@ -158,12 +222,21 @@ async def get_user_trajectory(
 @router.get("/sessions")
 async def list_sessions(
     db: Annotated[AsyncSession, Depends(get_db)],
-    current_admin: Annotated[User, Depends(get_current_admin)],
+    _current_admin: Annotated[User, Depends(get_current_admin)],
     skip: int = 0,
     limit: int = 50,
 ) -> Any:
-    """List all chat sessions (paginated)."""
-    # Get total count
+    """List all chat sessions system-wide (paginated).
+
+    Args:
+        db: Database session.
+        current_admin: Authenticated admin user.
+        skip: Pagination offset.
+        limit: Pagination limit.
+
+    Returns:
+        Dict: Paginated session list with total count.
+    """
     # Get total count
     from sqlalchemy import func  # pylint: disable=import-outside-toplevel
 
@@ -171,7 +244,6 @@ async def list_sessions(
     count_res = await db.execute(count_stmt)
     total = count_res.scalar()
 
-    # Get sessions with user info
     # Get sessions with user info
     # We want to eager load the user if possible, but user relationship is optional
     from sqlalchemy.orm import selectinload  # pylint: disable=import-outside-toplevel
@@ -199,10 +271,21 @@ async def list_sessions(
 async def get_session_details(
     session_id: UUID,
     db: Annotated[AsyncSession, Depends(get_db)],
-    current_admin: Annotated[User, Depends(get_current_admin)],
+    _current_admin: Annotated[User, Depends(get_current_admin)],
 ) -> Any:
-    """Get full details of a session including messages."""
-    """Get full details of a session including messages."""
+    """Get full details of a specific chat session, including messages.
+
+    Args:
+        session_id: Session UUID.
+        db: Database session.
+        current_admin: Authenticated admin user.
+
+    Returns:
+        Dict: Session data including message history.
+
+    Raises:
+        HTTPException: If session is not found.
+    """
     from sqlalchemy.orm import selectinload  # pylint: disable=import-outside-toplevel
 
     stmt = (
@@ -238,7 +321,7 @@ async def get_session_details(
 @router.get("/atlas/emotions", response_model=List[EmotionResponse])
 async def list_atlas_emotions(
     db: Annotated[AsyncSession, Depends(get_db)],
-    current_admin: Annotated[User, Depends(get_current_admin)],
+    _current_admin: Annotated[User, Depends(get_current_admin)],
 ) -> Any:
     """List all 87 atlas emotions."""
     # Simply list all - no pagination needed for 87 items
@@ -247,12 +330,55 @@ async def list_atlas_emotions(
     return result.scalars().all()
 
 
+async def _update_emotion_quaternion(update_data: Dict[str, Any], emotion: Any) -> None:
+    """Recalculate quaternion if VAC changed."""
+    if "vac_vector" in update_data:
+        from app.services import (  # pylint: disable=import-outside-toplevel
+            get_quaternion_builder,
+        )
+
+        try:
+            qb = get_quaternion_builder()
+            # This is async
+            new_quat = await qb.from_vac(update_data["vac_vector"])
+            emotion.q_constant = new_quat
+            emotion.vac_vector = update_data["vac_vector"]
+            # Remove from update_data so we don't double set
+            del update_data["vac_vector"]
+        except Exception as e:
+            raise HTTPException(
+                status_code=400, detail=f"Failed to calculate quaternion: {str(e)}"
+            ) from e
+
+
+async def _update_emotion_embedding(update_data: Dict[str, Any], emotion: Any) -> None:
+    """Recalculate embedding if definition changed."""
+    if "definition" in update_data:
+        from app.services import (  # pylint: disable=import-outside-toplevel
+            get_embedding_service,
+        )
+
+        try:
+            es = get_embedding_service()
+            # Combine name + new definition
+            embedding_text = f"{emotion.emotion_name}: {update_data['definition']}"
+            new_embedding = await es.generate_embedding(embedding_text)
+            emotion.semantic_embedding = new_embedding
+            emotion.definition = update_data["definition"]
+            # Remove from update_data
+            del update_data["definition"]
+        except Exception as e:
+            raise HTTPException(
+                status_code=400, detail=f"Failed to generate embedding: {str(e)}"
+            ) from e
+
+
 @router.put("/atlas/emotions/{emotion_id}", response_model=EmotionResponse)
 async def update_atlas_emotion(
     emotion_id: UUID,
     emotion_in: EmotionUpdate,
     db: Annotated[AsyncSession, Depends(get_db)],
-    current_admin: Annotated[User, Depends(get_current_admin)],
+    _current_admin: Annotated[User, Depends(get_current_admin)],
 ) -> Any:
     """Update an emotion definition.
 
@@ -270,38 +396,12 @@ async def update_atlas_emotion(
     update_data = emotion_in.model_dump(exclude_unset=True)
 
     # 1. Handle VAC Change -> Recalculate Quaternion
-    # 1. Handle VAC Change -> Recalculate Quaternion
-    if "vac_vector" in update_data:
-        from app.services import get_quaternion_builder  # pylint: disable=import-outside-toplevel
-
-        try:
-            qb = get_quaternion_builder()
-            # This is async
-            new_quat = await qb.from_vac(update_data["vac_vector"])
-            emotion.q_constant = new_quat
-            emotion.vac_vector = update_data["vac_vector"]
-            # Remove from update_data so we don't double set
-            del update_data["vac_vector"]
-        except Exception as e:
-            raise HTTPException(status_code=400, detail=f"Failed to calculate quaternion: {str(e)}")
+    await _update_emotion_quaternion(update_data, emotion)
 
     # 2. Handle Definition Change -> Recalculate Embedding
     # Note: If name changed, we'd need that too, but name is not in Update schema currently
     # (immutable identity)
-    if "definition" in update_data:
-        from app.services import get_embedding_service  # pylint: disable=import-outside-toplevel
-
-        try:
-            es = get_embedding_service()
-            # Combine name + new definition
-            text = f"{emotion.emotion_name}: {update_data['definition']}"
-            new_embedding = await es.generate_embedding(text)
-            emotion.semantic_embedding = new_embedding
-            emotion.definition = update_data["definition"]
-            # Remove from update_data
-            del update_data["definition"]
-        except Exception as e:
-            raise HTTPException(status_code=400, detail=f"Failed to generate embedding: {str(e)}")
+    await _update_emotion_embedding(update_data, emotion)
 
     # 3. Update remaining fields (category, haptic, etc)
     for field, value in update_data.items():
@@ -316,111 +416,31 @@ async def update_atlas_emotion(
 @router.get("/atlas/export")
 async def export_atlas_data(
     db: Annotated[AsyncSession, Depends(get_db)],
-    current_admin: Annotated[User, Depends(get_current_admin)],
+    _current_admin: Annotated[User, Depends(get_current_admin)],
 ) -> Any:
     """Export current state as JSON matching the canonical emotions.json format."""
-    stmt = select(EmotionDefinition).order_by(EmotionDefinition.id)
-    result = await db.execute(stmt)
-    emotions = result.scalars().all()
-
-    # Reconstruct the canonical format
-    export_data: Dict[str, Any] = {
-        "version": "1.1 (Exported)",
-        "source": "L.O.V.E. Observer Database Export",
-        "metadata": {
-            "total_emotions": len(emotions),
-            "generated_at": datetime.now().isoformat(),
-        },
-        "emotions": [],
-    }
-
-    for e in emotions:
-        item = {
-            "emotion_name": e.emotion_name,
-            "category": e.category,
-            "definition": e.definition,
-            "vac": list(e.vac_vector) if e.vac_vector is not None else [0, 0, 0],
-            "haptic_pattern_id": e.haptic_pattern_id,
-        }
-        export_data["emotions"].append(item)
-
-    return export_data
+    service = AdminService(db)
+    return await service.export_atlas_emotions()
 
 
 @router.post("/atlas/import")
 async def import_atlas_data(
     import_data: Dict[str, Any],  # Receive raw JSON body
     db: Annotated[AsyncSession, Depends(get_db)],
-    current_admin: Annotated[User, Depends(get_current_admin)],
+    _current_admin: Annotated[User, Depends(get_current_admin)],
 ) -> Any:
     """Import emotions.json data.
 
     Updates existing emotions by name. Does NOT delete missing ones (safe update).
     """
-    if "emotions" not in import_data or not isinstance(import_data["emotions"], list):
-        raise HTTPException(status_code=400, detail="Invalid format: missing 'emotions' list")
-
-    from app.services import get_embedding_service  # pylint: disable=import-outside-toplevel
-    from app.services import get_quaternion_builder
-
-    es = get_embedding_service()
-    qb = get_quaternion_builder()
-
-    updated_count = 0
-    errors = []
-
-    for item in import_data["emotions"]:
-        name = item.get("emotion_name")
-        if not name:
-            continue
-
-        # Find existing
-        stmt = select(EmotionDefinition).where(EmotionDefinition.emotion_name == name)
-        result = await db.execute(stmt)
-        emotion = result.scalars().first()
-
-        if emotion:
-            # Update fields
-            needs_embed_update = False
-            needs_quat_update = False
-
-            # Check definition change
-            if "definition" in item and item["definition"] != emotion.definition:
-                emotion.definition = item["definition"]
-                needs_embed_update = True
-
-            # Check VAC change
-            if "vac" in item:
-                new_vac = item["vac"]
-                # simple equality check
-                current_vac = list(emotion.vac_vector) if emotion.vac_vector is not None else []
-                if new_vac != current_vac:
-                    emotion.vac_vector = new_vac
-                    needs_quat_update = True
-
-            # Update others
-            if "category" in item:
-                emotion.category = item["category"]
-            if "haptic_pattern_id" in item:
-                emotion.haptic_pattern_id = item.get("haptic_pattern_id")
-
-            # Perform calculations if needed
-            try:
-                if needs_embed_update:
-                    text = f"{name}: {emotion.definition}"
-                    emotion.semantic_embedding = await es.generate_embedding(text)
-
-                if needs_quat_update:
-                    emotion.q_constant = await qb.from_vac(emotion.vac_vector)
-
-                db.add(emotion)
-                updated_count += 1
-            except Exception as e:
-                errors.append(f"Failed to update {name}: {str(e)}")
-
-    await db.commit()
-
-    return {"status": "success", "updated": updated_count, "errors": errors}
+    service = AdminService(db)
+    try:
+        return await service.import_atlas_emotions(import_data)
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e)) from e
+    except Exception as e:
+        logger.error("Import failed: %s", e)
+        raise HTTPException(status_code=500, detail="Import process failed") from e
 
 
 # -----------------------------------------------------------------------------
@@ -431,7 +451,7 @@ async def import_atlas_data(
 @router.get("/strategies", response_model=List[StrategyResponse])
 async def list_strategies(
     db: Annotated[AsyncSession, Depends(get_db)],
-    current_admin: Annotated[User, Depends(get_current_admin)],
+    _current_admin: Annotated[User, Depends(get_current_admin)],
 ) -> Any:
     """List all therapeutic strategies."""
     stmt = select(TransitionStrategy).order_by(TransitionStrategy.strategy_name)
@@ -444,7 +464,7 @@ async def update_strategy(
     strategy_id: UUID,
     strategy_in: StrategyUpdate,
     db: Annotated[AsyncSession, Depends(get_db)],
-    current_admin: Annotated[User, Depends(get_current_admin)],
+    _current_admin: Annotated[User, Depends(get_current_admin)],
 ) -> Any:
     """Update a therapeutic strategy."""
     stmt = select(TransitionStrategy).where(TransitionStrategy.id == strategy_id)
@@ -468,121 +488,17 @@ async def update_strategy(
 @router.get("/strategies/export")
 async def export_strategies(
     db: Annotated[AsyncSession, Depends(get_db)],
-    current_admin: Annotated[User, Depends(get_current_admin)],
+    _current_admin: Annotated[User, Depends(get_current_admin)],
 ) -> Any:
     """Export strategies as JSON."""
-    stmt = select(TransitionStrategy).order_by(TransitionStrategy.strategy_name)
-    result = await db.execute(stmt)
-    strategies = result.scalars().all()
-
-    export_data: Dict[str, Any] = {
-        "version": "1.0",
-        "source": "L.O.V.E. Observer Database Export",
-        "metadata": {
-            "total_strategies": len(strategies),
-            "generated_at": datetime.now().isoformat(),
-        },
-        "strategies": [],
-    }
-
-    for s in strategies:
-        item = {
-            "name": s.strategy_name,
-            "type": s.strategy_type,
-            "description": s.description,
-            "steps": s.detailed_steps,
-            "time_required": s.time_required,
-            "difficulty": s.difficulty_level,
-            "evidence": s.evidence_level,
-            "citations": s.research_citations,
-            "contraindications": s.contraindications,
-        }
-        export_data["strategies"].append(item)
-
-    return export_data
-
-
-@router.post("/strategies/import", response_model=dict)
-async def import_strategies(
-    data: Dict[str, Any],
-    db: Annotated[AsyncSession, Depends(get_db)],
-    current_user: Annotated[User, Depends(get_current_admin)],
-) -> Dict[str, Any]:
-    """Import strategies from JSON."""
-    if "strategies" not in data:
-        raise HTTPException(status_code=400, detail="Invalid format: 'strategies' key missing")
-
-    strategies_list = data["strategies"]
-    updated_count = 0
-    created_count = 0
-    errors = []
-
-    for item in strategies_list:
-        try:
-            # Check if strategy exists by name (unique constraint usually on name)
-            # or we use it as key
-            strategy_name = item.get("name") or item.get("strategy_name")
-            if not strategy_name:
-                continue
-
-            stmt = select(TransitionStrategy).where(
-                TransitionStrategy.strategy_name == strategy_name
-            )
-            result = await db.execute(stmt)
-            strategy = result.scalar_one_or_none()
-
-            if strategy:
-                # Update existing
-                for key, value in item.items():
-                    if hasattr(strategy, key):
-                        setattr(strategy, key, value)
-                updated_count += 1
-            else:
-                # Create new
-                strategy = TransitionStrategy(
-                    strategy_name=item.get("name"),
-                    strategy_type=item.get("type", "general"),
-                    description=item.get("description", ""),
-                    detailed_steps=item.get("steps", []),
-                    time_required=item.get("time_required"),
-                    difficulty_level=item.get("difficulty"),
-                    evidence_level=item.get("evidence", "anecdotal"),
-                    research_citations=item.get("citations", []),
-                    contraindications=item.get("contraindications"),
-                )
-                db.add(strategy)
-                created_count += 1
-
-        except Exception as e:
-            # errors.append(f"Failed to process {item.get('name', 'unknown')}: {str(e)}")
-            # safer to just log or append generic error
-            errors.append(f"Error: {str(e)}")
-
-    try:
-        await db.commit()
-    except Exception as e:
-        logger.error("Commit failed for strategies: %s", e)
-        # If commit fails, we might have partial state or rollback needed
-        # For this bulk op, just reporting it is safest fallback
-        errors.append(f"Commit failed: {str(e)}")
-
-    return {
-        "status": "success",
-        "updated": updated_count,
-        "created": created_count,
-        "errors": errors,
-    }
-
-
-# -----------------------------------------------------------------------------
-# AI Model Assignments
-# -----------------------------------------------------------------------------
+    service = AdminService(db)
+    return await service.export_strategies()
 
 
 @router.get("/ai-models", response_model=List[ModelAssignmentResponse])
 async def list_ai_models(
     db: Annotated[AsyncSession, Depends(get_db)],
-    current_admin: Annotated[User, Depends(get_current_admin)],
+    _current_admin: Annotated[User, Depends(get_current_admin)],
 ) -> Any:
     """List all AI function model assignments."""
     result = await db.execute(select(ModelAssignment))
@@ -613,7 +529,7 @@ async def update_ai_model(
     else:
         assignment.ai_model_name = update_data.ai_model_name
         assignment.assigned_by = str(current_admin.id)
-        assignment.assigned_at = datetime.utcnow()
+        assignment.assigned_at = datetime.now(timezone.utc)
 
     await db.commit()
     await db.refresh(assignment)
@@ -628,7 +544,7 @@ async def update_ai_model(
 @router.get("/alerts", response_model=Dict[str, Any])
 async def list_clinical_alerts(
     db: Annotated[AsyncSession, Depends(get_db)],
-    current_admin: Annotated[User, Depends(get_current_admin)],
+    _current_admin: Annotated[User, Depends(get_current_admin)],
     skip: int = 0,
     limit: int = 50,
     level: Optional[str] = None,
@@ -637,7 +553,6 @@ async def list_clinical_alerts(
 
     Optional filter by severity level.
     """
-
     from sqlalchemy import func  # pylint: disable=import-outside-toplevel
 
     # Base query
@@ -673,11 +588,13 @@ async def list_clinical_alerts(
 @router.get("/bootstrap", response_model=List[BootstrapDataResponse])
 async def list_bootstrap_data(
     db: Annotated[AsyncSession, Depends(get_db)],
-    current_admin: Annotated[User, Depends(get_current_admin)],
+    _current_admin: Annotated[User, Depends(get_current_admin)],
     data_type: Optional[str] = None,
 ) -> Any:
     """List bootstrap data items (optional filter by type)."""
-    from app.models.bootstrap_data import BootstrapData  # pylint: disable=import-outside-toplevel
+    from app.models.bootstrap_data import (  # pylint: disable=import-outside-toplevel
+        BootstrapData,
+    )
 
     stmt = select(BootstrapData)
     if data_type:
@@ -692,10 +609,12 @@ async def list_bootstrap_data(
 async def create_bootstrap_data(
     data_in: BootstrapDataCreate,
     db: Annotated[AsyncSession, Depends(get_db)],
-    current_admin: Annotated[User, Depends(get_current_admin)],
+    _current_admin: Annotated[User, Depends(get_current_admin)],
 ) -> Any:
     """Create new bootstrap data item."""
-    from app.models.bootstrap_data import BootstrapData  # pylint: disable=import-outside-toplevel
+    from app.models.bootstrap_data import (  # pylint: disable=import-outside-toplevel
+        BootstrapData,
+    )
 
     item = BootstrapData(
         data_type=data_in.data_type,
@@ -713,10 +632,12 @@ async def update_bootstrap_data(
     item_id: UUID,
     data_in: BootstrapDataUpdate,
     db: Annotated[AsyncSession, Depends(get_db)],
-    current_admin: Annotated[User, Depends(get_current_admin)],
+    _current_admin: Annotated[User, Depends(get_current_admin)],
 ) -> Any:
     """Update bootstrap data item."""
-    from app.models.bootstrap_data import BootstrapData  # pylint: disable=import-outside-toplevel
+    from app.models.bootstrap_data import (  # pylint: disable=import-outside-toplevel
+        BootstrapData,
+    )
 
     stmt = select(BootstrapData).where(BootstrapData.id == item_id)
     result = await db.execute(stmt)
@@ -739,10 +660,12 @@ async def update_bootstrap_data(
 async def delete_bootstrap_data(
     item_id: UUID,
     db: Annotated[AsyncSession, Depends(get_db)],
-    current_admin: Annotated[User, Depends(get_current_admin)],
+    _current_admin: Annotated[User, Depends(get_current_admin)],
 ) -> Any:
     """Delete bootstrap data item."""
-    from app.models.bootstrap_data import BootstrapData  # pylint: disable=import-outside-toplevel
+    from app.models.bootstrap_data import (  # pylint: disable=import-outside-toplevel
+        BootstrapData,
+    )
 
     stmt = select(BootstrapData).where(BootstrapData.id == item_id)
     result = await db.execute(stmt)
@@ -751,7 +674,7 @@ async def delete_bootstrap_data(
     if not item:
         raise HTTPException(status_code=404, detail="Item not found")
 
-    db.delete(item)  # type: ignore[unused-coroutine]
+    db.delete(item)  # type: ignore
     await db.commit()
     return {"status": "success", "id": str(item_id)}
 
@@ -764,7 +687,7 @@ async def delete_bootstrap_data(
 @router.get("/prompts", response_model=List[PromptTemplateResponse])
 async def list_prompts(
     prompt_service: Annotated[PromptService, Depends(get_prompt_service)],
-    current_admin: Annotated[User, Depends(get_current_admin)],
+    _current_admin: Annotated[User, Depends(get_current_admin)],
     function_name: Optional[str] = None,
 ) -> Any:
     """List prompt templates."""
@@ -778,7 +701,7 @@ async def create_prompt(
     current_admin: Annotated[User, Depends(get_current_admin)],
 ) -> Any:
     """Create a new prompt template version."""
-    return await prompt_service.create_prompt(
+    ctx = PromptCreateContext(
         function_name=prompt_in.function_name,
         version=prompt_in.version,
         template_content=prompt_in.template_content,
@@ -787,6 +710,7 @@ async def create_prompt(
         is_active=prompt_in.is_active,
         created_by=str(current_admin.id),
     )
+    return await prompt_service.create_prompt(ctx)
 
 
 @router.put("/prompts/{prompt_id}", response_model=PromptTemplateResponse)
@@ -794,7 +718,7 @@ async def update_prompt(
     prompt_id: UUID,
     prompt_in: PromptTemplateUpdate,
     prompt_service: Annotated[PromptService, Depends(get_prompt_service)],
-    current_admin: Annotated[User, Depends(get_current_admin)],
+    _current_admin: Annotated[User, Depends(get_current_admin)],
 ) -> Any:
     """Update a prompt template."""
     updated = await prompt_service.update_prompt(
@@ -807,16 +731,105 @@ async def update_prompt(
     return updated
 
 
+# -----------------------------------------------------------------------------
+# Transition Strategy Routes
+# -----------------------------------------------------------------------------
+
+
+@router.post("/strategies/import", response_model=Dict[str, Any])
+async def import_strategies(
+    data: Dict[str, Any],
+    db: Annotated[AsyncSession, Depends(get_db)],
+    _current_admin: Annotated[User, Depends(get_current_admin)],
+) -> Dict[str, Any]:
+    """Import strategies from JSON."""
+    if "strategies" not in data:
+        raise HTTPException(status_code=400, detail="Invalid format: 'strategies' key missing")
+
+    strategies_list = data["strategies"]
+    updated_count = 0
+    created_count = 0
+    errors = []
+
+    for item in strategies_list:
+        try:
+            # Check if strategy exists by name (unique constraint usually on name)
+            # or we use it as key
+            strategy_name = item.get("name") or item.get("strategy_name")
+            if not strategy_name:
+                continue
+
+            # Normalize data for helper
+            strategy_data = item.copy()
+            if "name" not in strategy_data and "strategy_name" in strategy_data:
+                strategy_data["name"] = strategy_data["strategy_name"]
+
+            is_updated = await _process_strategy_import(db, strategy_data)
+            if is_updated:
+                updated_count += 1
+            else:
+                created_count += 1
+
+        except Exception as e:  # pylint: disable=broad-exception-caught
+            errors.append(f"Error processing {item.get('name', 'unknown')}: {str(e)}")
+
+    try:
+        await db.commit()
+    except SQLAlchemyError as e:
+        logger.error("Commit failed for strategies: %s", e)
+        errors.append(f"Commit failed: {str(e)}")
+
+    return {
+        "status": "success",
+        "updated": updated_count,
+        "created": created_count,
+        "errors": errors,
+    }
+
+
+async def _process_strategy_import(db: AsyncSession, strategy_data: Dict[str, Any]) -> bool:
+    """Process a single strategy for import."""
+    stmt = select(TransitionStrategy).where(
+        TransitionStrategy.strategy_name == strategy_data["name"]
+    )
+    existing = (await db.execute(stmt)).scalar_one_or_none()
+    is_updated = False
+
+    if existing:
+        existing.strategy_type = strategy_data["type"]
+        existing.description = strategy_data["description"]
+        existing.difficulty_level = strategy_data["difficulty"]
+        existing.evidence_level = strategy_data["evidence"]
+        existing.detailed_steps = strategy_data.get("steps", [])
+        existing.contraindications = strategy_data.get("contraindications", [])
+        is_updated = True
+    else:
+        new_strategy = TransitionStrategy(
+            strategy_name=strategy_data["name"],
+            strategy_type=strategy_data["type"],
+            description=strategy_data["description"],
+            difficulty_level=strategy_data["difficulty"],
+            evidence_level=strategy_data["evidence"],
+            detailed_steps=strategy_data.get("steps", []),
+            contraindications=strategy_data.get("contraindications"),
+        )
+        db.add(new_strategy)
+        is_updated = False
+
+    return is_updated
+
+
 @router.post("/prompts/test")
 async def test_prompt_render(
     request: PromptTestRequest,
-    current_admin: Annotated[User, Depends(get_current_admin)],
+    _current_admin: Annotated[User, Depends(get_current_admin)],
 ) -> Any:
+    """Test rendering a prompt with variables."""
     try:
         # Simple implementation using python formatting
         rendered = request.template_content.format(**request.input_variables)
         return {"rendered_content": rendered}
     except KeyError as e:
-        raise HTTPException(status_code=400, detail=f"Missing variable in input: {e}")
+        raise HTTPException(status_code=400, detail=f"Missing variable in input: {e}") from e
     except Exception as e:
-        raise HTTPException(status_code=400, detail=f"Render failed: {str(e)}")
+        raise HTTPException(status_code=400, detail=f"Render failed: {str(e)}") from e

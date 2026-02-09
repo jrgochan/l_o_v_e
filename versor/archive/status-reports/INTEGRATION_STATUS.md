@@ -183,10 +183,10 @@ curl -X POST http://localhost:8002/listener/analyze \
    ```bash
    # Connect to PostgreSQL
    psql -U postgres love_observer_dev
-   
+
    # Install pgvector extension
    CREATE EXTENSION IF NOT EXISTS vector;
-   
+
    # Run Observer migrations
    cd observer
    alembic upgrade head
@@ -206,10 +206,10 @@ curl -X POST http://localhost:8002/listener/analyze \
      -F 'text=I feel happy and excited' \
      -F 'user_id=test-user-123' \
      -F 'session_id=test-session-456'
-   
+
    # Check Observer logs for successful state recording
    tail -f infra/logs/Observer.log
-   
+
    # Query Observer for recorded state
    curl "http://localhost:8000/observer/states?user_id=test-user-123&limit=5"
    ```
@@ -260,7 +260,7 @@ OBSERVER_API_URL=http://localhost:8000
 
 ## Summary
 
-✅ **Listener is ready for Experience integration** - Response format matches expectations  
-⚠️ **Observer integration code is complete** - Needs database setup to activate  
-✅ **Non-blocking design** - Listener works independently if Observer is down  
+✅ **Listener is ready for Experience integration** - Response format matches expectations
+⚠️ **Observer integration code is complete** - Needs database setup to activate
+✅ **Non-blocking design** - Listener works independently if Observer is down
 🎯 **Next action:** Fix Observer pgvector issue to enable full end-to-end flow

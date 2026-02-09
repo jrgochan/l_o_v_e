@@ -20,7 +20,7 @@
 
 ### **Phase 2: API Integration** (COMPLETE)
 1. ✅ Created `/observer/atlas/emotions` endpoint
-2. ✅ Created `/observer/atlas/categories` endpoint  
+2. ✅ Created `/observer/atlas/categories` endpoint
 3. ✅ Created `/observer/atlas/search` endpoint
 4. ✅ Registered atlas routes in Observer main.py
 5. ✅ Extended Observer API client with:
@@ -45,7 +45,7 @@
 ✅ PathPlanner: A* pathfinding with psychological constraints
 ✅ StrategyRecommender: 19 evidence-based strategies mapped to 5 patterns
 ✅ Database: 507 transitions, 57 strategies, 5 patterns, 21 mappings
-✅ Endpoints: 
+✅ Endpoints:
    - POST /observer/transition-path (generates paths)
    - GET /observer/atlas/emotions (returns all 87 emotions)
    - GET /observer/atlas/categories (returns 13 categories)
@@ -54,7 +54,7 @@
 
 ### Frontend (Experience Web)
 ```
-✅ GoalSetting Component: 
+✅ GoalSetting Component:
    - Loads 87 real emotions from API
    - Searchable emotion list
    - Generates paths with real A* algorithm
@@ -96,7 +96,7 @@ npm run dev
 5. Expand strategies to see steps
 6. Click "Start Journey" (placeholder for now)
 
-**Expected Result**: 
+**Expected Result**:
 - See all 87 emotions loaded
 - Path generated with 2-3 waypoints
 - Each waypoint shows 5 strategies

@@ -1,5 +1,7 @@
+"""Module documentation."""
+
 import logging
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Any, Dict, List, Optional
 from uuid import UUID
 
@@ -13,7 +15,8 @@ from app.models.multi_emotion_analysis import (
     MultiEmotionAnalysis,
 )
 from app.services.chat.session import SessionManager
-from app.services.emotion_resolver import EmotionResolver
+from app.services.chat.types import AnalysisMessageContext, MultiEmotionAnalysisContext
+from app.services.emotions.resolver import EmotionResolver
 
 logger = logging.getLogger(__name__)
 
@@ -22,62 +25,57 @@ class AnalysisManager:
     """Manages emotional analysis storage and relationships."""
 
     def __init__(self, db: AsyncSession):
+        """Docstring."""
         self.db = db
         self.session_manager = SessionManager(db)
 
     async def save_analysis_message(
         self,
-        session_id: UUID,
-        emotion_name: str,
-        vac_coordinates: List[float],
-        confidence: float,
-        content: str,
-        tone_mode: str,
-        prosody_data: Optional[Dict[str, Any]] = None,
+        context: AnalysisMessageContext,
     ) -> ChatMessage:
         """Save an analysis message with emotion detection results."""
         # Find emotion ID from emotion name
-        mapping = await self._resolve_emotion(emotion_name)
+        mapping = await self._resolve_emotion(context.emotion_name)
 
         emotion_id = None
         if mapping.emotion_id:
             emotion_id = UUID(mapping.emotion_id)
         else:
-            logger.warning("Emotion not found: %s", emotion_name)
+            logger.warning("Emotion not found: %s", context.emotion_name)
 
         message = ChatMessage(
-            session_id=session_id,
+            session_id=context.session_id,
             message_type="system_analysis",
-            content=content,
+            content=context.content,
             emotion_id=emotion_id,
             original_emotion_name=mapping.original_name,
             match_method=mapping.match_method,
             match_confidence=mapping.match_confidence,
-            vac_coordinates=vac_coordinates,
-            confidence=confidence,
-            tone_mode=tone_mode,
-            timestamp=datetime.utcnow(),
+            vac_coordinates=context.vac_coordinates,
+            confidence=context.confidence,
+            tone_mode=context.tone_mode,
+            timestamp=datetime.now(timezone.utc).replace(tzinfo=None),
         )
 
         # Add prosody data if provided
-        if prosody_data:
-            message.prosody_pitch_mean = prosody_data.get("pitch_mean")
-            message.prosody_pitch_std = prosody_data.get("pitch_std")
-            message.prosody_energy = prosody_data.get("energy")
-            message.prosody_rate = prosody_data.get("rate")
-            message.prosody_features = prosody_data.get("features", {})
+        if context.prosody_data:
+            message.prosody_pitch_mean = context.prosody_data.get("pitch_mean")
+            message.prosody_pitch_std = context.prosody_data.get("pitch_std")
+            message.prosody_energy = context.prosody_data.get("energy")
+            message.prosody_rate = context.prosody_data.get("rate")
+            message.prosody_features = context.prosody_data.get("features", {})
 
         self.db.add(message)
 
         # Update session message count
-        session = await self.session_manager.get_session(session_id)
+        session = await self.session_manager.get_session(context.session_id)
         if session:
             session.message_count += 1
 
         await self.db.commit()
         await self.db.refresh(message)
 
-        logger.info("Saved analysis message %s to session %s", message.id, session_id)
+        logger.info("Saved analysis message %s to session %s", message.id, context.session_id)
         return message
 
     async def save_insight_message(
@@ -90,7 +88,7 @@ class AnalysisManager:
             content=content,
             insights=insights,
             tone_mode=tone_mode,
-            timestamp=datetime.utcnow(),
+            timestamp=datetime.now(timezone.utc).replace(tzinfo=None),
         )
 
         self.db.add(message)
@@ -108,38 +106,30 @@ class AnalysisManager:
 
     async def save_multi_emotion_analysis(
         self,
-        message_id: UUID,
-        session_id: UUID,
-        emotions: List[Dict[str, Any]],
-        relationships: List[Dict[str, Any]],
-        aggregate_vac: List[float],
-        complexity_score: float,
-        emotional_clarity: float,
-        temporal_pattern: str,
-        three_way_data: Optional[Dict[str, Any]] = None,
+        context: MultiEmotionAnalysisContext,
     ) -> MultiEmotionAnalysis:
         """Save a multi-emotion analysis (Deep Feeling Mode)."""
         # STEP 1: Create parent analysis record
         analysis = MultiEmotionAnalysis(
-            message_id=message_id,
-            session_id=session_id,
+            message_id=context.message_id,
+            session_id=context.session_id,
             deep_feeling_enabled=True,
-            aggregate_vac=aggregate_vac,
-            complexity_score=complexity_score,
-            emotional_clarity=emotional_clarity,
-            temporal_pattern=temporal_pattern,
-            created_at=datetime.utcnow(),
+            aggregate_vac=context.aggregate_vac,
+            complexity_score=context.complexity_score,
+            emotional_clarity=context.emotional_clarity,
+            temporal_pattern=context.temporal_pattern,
+            created_at=datetime.now(timezone.utc).replace(tzinfo=None),
         )
 
         # STEP 2: Add 3-way analysis data
-        if three_way_data:
+        if context.three_way_data:
             analysis.three_way_enabled = True
-            analysis.content_only_data = three_way_data.get("content_only")
-            analysis.voice_only_data = three_way_data.get("voice_only")
-            analysis.discrepancy_metrics = three_way_data.get("discrepancy")
+            analysis.content_only_data = context.three_way_data.get("content_only")
+            analysis.voice_only_data = context.three_way_data.get("voice_only")
+            analysis.discrepancy_metrics = context.three_way_data.get("discrepancy")
             logger.info(
                 "Saving 3-way analysis data discrepancy=%.3f",
-                three_way_data.get("discrepancy", {}).get("content_voice_distance", 0.0),
+                context.three_way_data.get("discrepancy", {}).get("content_voice_distance", 0.0),
             )
 
         self.db.add(analysis)
@@ -148,7 +138,7 @@ class AnalysisManager:
         # STEP 3: Save detected emotions
         detected_emotions_map = {}
 
-        for emotion_data in emotions:
+        for emotion_data in context.emotions:
             mapping = await self._resolve_emotion(emotion_data["emotion_name"])
             emotion_id = None
             if mapping.emotion_id:
@@ -168,7 +158,7 @@ class AnalysisManager:
                     emotion_data["vac"]["connection"],
                 ],
                 voice_alignment=emotion_data.get("voice_alignment"),
-                created_at=datetime.utcnow(),
+                created_at=datetime.now(timezone.utc).replace(tzinfo=None),
             )
 
             self.db.add(detected_emotion)
@@ -177,7 +167,7 @@ class AnalysisManager:
         await self.db.flush()
 
         # STEP 4: Save emotion relationships
-        for rel_data in relationships:
+        for rel_data in context.relationships:
             detected_a = detected_emotions_map.get(rel_data["emotion_a"])
             detected_b = detected_emotions_map.get(rel_data["emotion_b"])
 
@@ -189,7 +179,7 @@ class AnalysisManager:
                     relationship_type=rel_data.get("type"),
                     strength=rel_data.get("strength", 0.5),
                     description=rel_data.get("description", ""),
-                    created_at=datetime.utcnow(),
+                    created_at=datetime.now(timezone.utc).replace(tzinfo=None),
                 )
 
                 self.db.add(relationship)
@@ -228,7 +218,7 @@ class AnalysisManager:
             for analysis in analyses
         ]
 
-    async def _resolve_emotion(self, emotion_name: str):
+    async def _resolve_emotion(self, emotion_name: str) -> Any:
         """Resolve emotion name to EmotionResolver."""
         resolver = EmotionResolver(self.db)
         return await resolver.resolve_emotion(emotion_name)

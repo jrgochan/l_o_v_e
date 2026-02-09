@@ -1,8 +1,8 @@
 # Clinical Alerts Backend Implementation
 
-**Priority:** 🔴 HIGH  
-**Target Module:** Observer  
-**Estimated Effort:** 2-3 days  
+**Priority:** 🔴 HIGH
+**Target Module:** Observer
+**Estimated Effort:** 2-3 days
 **Status:** 📋 Ready for Implementation
 
 ---
@@ -92,7 +92,7 @@ observer/app/models/clinical_alert.py
 
 async def generate_insights(...) -> Dict[str, Any]:
     # ... existing code ...
-    
+
     # NEW: Evaluate clinical alerts
     alert_service = ClinicalAlertService(self.db)
     alerts = await alert_service.evaluate_alerts(
@@ -100,10 +100,10 @@ async def generate_insights(...) -> Dict[str, Any]:
         prosody_data=prosody_data,
         confidence=confidence
     )
-    
+
     insights["clinical_alerts"] = [alert.to_dict() for alert in alerts]
     insights["overall_status"] = alert_service.determine_overall_status(alerts)
-    
+
     return insights
 ```
 
@@ -152,31 +152,31 @@ class AlertType(str, enum.Enum):
 class ClinicalAlert(Base):
     """
     Clinical alert record.
-    
+
     Stores alerts generated during emotional analysis sessions
     for audit trail, analysis, and clinical review.
     """
-    
+
     __tablename__ = "clinical_alerts"
-    
+
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     session_id = Column(UUID(as_uuid=True), ForeignKey("chat_sessions.id"), nullable=False, index=True)
     timestamp = Column(DateTime, nullable=False, default=datetime.utcnow, index=True)
-    
+
     # Alert details
     level = Column(Enum(AlertLevel), nullable=False, index=True)
     type = Column(Enum(AlertType), nullable=False, index=True)
     message = Column(String, nullable=False)
     suggestion = Column(String, nullable=True)
-    
+
     # Audit information
     triggered_by = Column(JSONB, nullable=False)  # VAC/prosody values
     threshold_used = Column(JSONB, nullable=False)  # Thresholds applied
     version = Column(String, nullable=False, default="1.0")  # Alert rule version
-    
+
     # Relationships
     session = relationship("ChatSession", back_populates="alerts")
-    
+
     def to_dict(self):
         """Convert to dictionary for API responses."""
         return {
@@ -207,18 +207,18 @@ CREATE TABLE clinical_alerts (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     session_id UUID NOT NULL REFERENCES chat_sessions(id) ON DELETE CASCADE,
     timestamp TIMESTAMP NOT NULL DEFAULT NOW(),
-    
+
     -- Alert details
     level alert_level NOT NULL,
     type alert_type NOT NULL,
     message TEXT NOT NULL,
     suggestion TEXT,
-    
+
     -- Audit information
     triggered_by JSONB NOT NULL,
     threshold_used JSONB NOT NULL,
     version VARCHAR(20) NOT NULL DEFAULT '1.0',
-    
+
     created_at TIMESTAMP NOT NULL DEFAULT NOW()
 );
 
@@ -256,10 +256,10 @@ logger = logging.getLogger(__name__)
 class ClinicalAlertService:
     """
     Evaluate clinical alerts based on emotional analysis data.
-    
+
     Thresholds are configurable and versioned for clinical validation.
     """
-    
+
     # Clinical thresholds (configurable via config/database)
     THRESHOLDS = {
         "version": "1.0",
@@ -290,10 +290,10 @@ class ClinicalAlertService:
             "warning": 0.5
         }
     }
-    
+
     def __init__(self, db: AsyncSession):
         self.db = db
-    
+
     async def evaluate_alerts(
         self,
         session_id: str,
@@ -304,37 +304,37 @@ class ClinicalAlertService:
     ) -> List[ClinicalAlert]:
         """
         Evaluate all clinical alerts for given analysis data.
-        
+
         Args:
             session_id: Chat session ID
             vac_data: VAC coordinates {valence, arousal, connection}
             prosody_data: Voice prosody features
             confidence: Confidence score (0-1)
             insights: Optional insight data (for voice-content correlation)
-            
+
         Returns:
             List of clinical alerts (may be empty)
         """
         alerts = []
-        
+
         # Check distress level
         distress_alert = self._check_distress_level(session_id, vac_data)
         if distress_alert:
             alerts.append(distress_alert)
-        
+
         # Check prosody-related alerts
         if prosody_data:
             voice_quality_alert = self._check_voice_quality(session_id, prosody_data)
             if voice_quality_alert:
                 alerts.append(voice_quality_alert)
-            
+
             vocal_stability_alerts = self._check_vocal_stability(session_id, prosody_data)
             alerts.extend(vocal_stability_alerts)
-            
+
             pitch_alert = self._check_pitch_range(session_id, prosody_data)
             if pitch_alert:
                 alerts.append(pitch_alert)
-        
+
         # Check voice-content correlation
         if insights and 'voice_content_correlation' in insights:
             correlation_alert = self._check_voice_content_correlation(
@@ -342,28 +342,28 @@ class ClinicalAlertService:
             )
             if correlation_alert:
                 alerts.append(correlation_alert)
-        
+
         # Check confidence level
         confidence_alert = self._check_confidence_level(session_id, confidence)
         if confidence_alert:
             alerts.append(confidence_alert)
-        
+
         # Persist alerts to database
         if alerts:
             self.db.add_all(alerts)
             await self.db.commit()
             logger.info(f"Generated {len(alerts)} clinical alerts for session {session_id}")
-        
+
         return alerts
-    
+
     def _check_distress_level(self, session_id: str, vac_data: Dict[str, float]) -> Optional[ClinicalAlert]:
         """Check for high distress (high negative arousal)."""
         arousal = vac_data.get('arousal', 0.0)
         valence = vac_data.get('valence', 0.0)
-        
+
         threshold_arousal = self.THRESHOLDS['distress']['arousal']
         threshold_valence = self.THRESHOLDS['distress']['valence']
-        
+
         if arousal > threshold_arousal and valence < threshold_valence:
             return ClinicalAlert(
                 session_id=session_id,
@@ -381,17 +381,17 @@ class ClinicalAlertService:
                 },
                 version=self.THRESHOLDS['version']
             )
-        
+
         return None
-    
+
     def _check_voice_quality(self, session_id: str, prosody: Dict[str, Any]) -> Optional[ClinicalAlert]:
         """Check voice quality (HNR)."""
         hnr = prosody.get('hnr')
         if hnr is None:
             return None
-        
+
         threshold_poor = self.THRESHOLDS['voice_quality']['hnr_poor']
-        
+
         if hnr < threshold_poor:
             return ClinicalAlert(
                 session_id=session_id,
@@ -403,19 +403,19 @@ class ClinicalAlertService:
                 threshold_used={"hnr_poor": threshold_poor},
                 version=self.THRESHOLDS['version']
             )
-        
+
         return None
-    
+
     def _check_vocal_stability(self, session_id: str, prosody: Dict[str, Any]) -> List[ClinicalAlert]:
         """Check vocal stability (jitter, shimmer)."""
         alerts = []
-        
+
         # Check jitter
         jitter = prosody.get('jitter')
         if jitter is not None:
             threshold_attention = self.THRESHOLDS['vocal_stability']['jitter_attention']
             threshold_warning = self.THRESHOLDS['vocal_stability']['jitter_warning']
-            
+
             if jitter > threshold_warning:
                 alerts.append(ClinicalAlert(
                     session_id=session_id,
@@ -438,13 +438,13 @@ class ClinicalAlertService:
                     threshold_used={"jitter_attention": threshold_attention},
                     version=self.THRESHOLDS['version']
                 ))
-        
+
         # Check shimmer
         shimmer = prosody.get('shimmer')
         if shimmer is not None:
             threshold_attention = self.THRESHOLDS['vocal_stability']['shimmer_attention']
             threshold_warning = self.THRESHOLDS['vocal_stability']['shimmer_warning']
-            
+
             if shimmer > threshold_warning:
                 alerts.append(ClinicalAlert(
                     session_id=session_id,
@@ -467,18 +467,18 @@ class ClinicalAlertService:
                     threshold_used={"shimmer_attention": threshold_attention},
                     version=self.THRESHOLDS['version']
                 ))
-        
+
         return alerts
-    
+
     def _check_pitch_range(self, session_id: str, prosody: Dict[str, Any]) -> Optional[ClinicalAlert]:
         """Check pitch range (flat affect indicator)."""
         pitch_range = prosody.get('pitch_range')
         if pitch_range is None:
             return None
-        
+
         threshold_narrow = self.THRESHOLDS['pitch_range']['narrow']
         threshold_very_narrow = self.THRESHOLDS['pitch_range']['very_narrow']
-        
+
         if pitch_range < threshold_very_narrow:
             return ClinicalAlert(
                 session_id=session_id,
@@ -501,20 +501,20 @@ class ClinicalAlertService:
                 threshold_used={"pitch_range_narrow": threshold_narrow},
                 version=self.THRESHOLDS['version']
             )
-        
+
         return None
-    
+
     def _check_voice_content_correlation(
-        self, 
-        session_id: str, 
+        self,
+        session_id: str,
         correlation: Dict[str, Any]
     ) -> Optional[ClinicalAlert]:
         """Check voice-content discrepancy."""
         discrepancy = correlation.get('discrepancy', 0.0)
-        
+
         threshold_attention = self.THRESHOLDS['voice_content_discrepancy']['attention']
         threshold_warning = self.THRESHOLDS['voice_content_discrepancy']['warning']
-        
+
         if discrepancy > threshold_warning:
             return ClinicalAlert(
                 session_id=session_id,
@@ -537,14 +537,14 @@ class ClinicalAlertService:
                 threshold_used={"discrepancy_attention": threshold_attention},
                 version=self.THRESHOLDS['version']
             )
-        
+
         return None
-    
+
     def _check_confidence_level(self, session_id: str, confidence: float) -> Optional[ClinicalAlert]:
         """Check analysis confidence level."""
         threshold_low = self.THRESHOLDS['confidence']['low']
         threshold_very_low = self.THRESHOLDS['confidence']['very_low']
-        
+
         if confidence < threshold_very_low:
             return ClinicalAlert(
                 session_id=session_id,
@@ -567,23 +567,23 @@ class ClinicalAlertService:
                 threshold_used={"confidence_low": threshold_low},
                 version=self.THRESHOLDS['version']
             )
-        
+
         return None
-    
+
     def determine_overall_status(self, alerts: List[ClinicalAlert]) -> str:
         """Determine overall clinical status from alerts."""
         if not alerts:
             return "stable"
-        
+
         if any(a.level == AlertLevel.CRITICAL for a in alerts):
             return "critical"
-        
+
         if any(a.level == AlertLevel.WARNING for a in alerts):
             return "warning"
-        
+
         if any(a.level == AlertLevel.ATTENTION for a in alerts):
             return "attention"
-        
+
         return "stable"
 ```
 
@@ -608,7 +608,7 @@ async def generate_insights(
     session_id: Optional[str] = None  # NEW parameter
 ) -> Dict[str, Any]:
     # ... existing code ...
-    
+
     # NEW: Evaluate clinical alerts
     if session_id:
         alert_service = ClinicalAlertService(self.db)
@@ -619,10 +619,10 @@ async def generate_insights(
             confidence=confidence,
             insights=insights
         )
-        
+
         insights["clinical_alerts"] = [alert.to_dict() for alert in alerts]
         insights["overall_status"] = alert_service.determine_overall_status(alerts)
-    
+
     return insights
 ```
 
@@ -686,7 +686,7 @@ export function ClinicalDashboard({
 async def test_distress_detection():
     """Test high distress alert detection."""
     service = ClinicalAlertService(db)
-    
+
     vac_data = {"valence": -0.6, "arousal": 0.8, "connection": 0.0}
     alerts = await service.evaluate_alerts(
         session_id="test-session",
@@ -694,7 +694,7 @@ async def test_distress_detection():
         prosody_data=None,
         confidence=0.9
     )
-    
+
     assert len(alerts) == 1
     assert alerts[0].level == AlertLevel.CRITICAL
     assert alerts[0].type == AlertType.HIGH_AROUSAL
@@ -744,6 +744,6 @@ async def test_websocket_sends_alerts():
 
 ---
 
-**Implementation Ready:** ✅  
-**Dependencies:** None  
+**Implementation Ready:** ✅
+**Dependencies:** None
 **Risk Level:** Low (can be feature-flagged)

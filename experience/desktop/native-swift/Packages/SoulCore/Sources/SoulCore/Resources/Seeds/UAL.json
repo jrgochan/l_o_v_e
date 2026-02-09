@@ -12,1121 +12,649 @@
             "emotion_name": "Fear",
             "category": "Fear",
             "definition": "A primal reaction to immediate threat or danger.",
-            "vac": [
-                -0.75,
-                0.625,
-                -0.7
-            ],
+            "vac": [-0.75, 0.625, -0.7],
             "color_hint": "#FF4444",
             "metadata": {
                 "domain": "Threat",
-                "source_vad": [
-                    2.0,
-                    7.5,
-                    3.0
-                ]
+                "source_vad": [2.0, 7.5, 3.0]
             }
         },
         {
             "emotion_name": "Anxiety",
             "category": "Fear",
             "definition": "Unease about an imminent event or uncertain outcome.",
-            "vac": [
-                -0.625,
-                0.375,
-                -0.7
-            ],
+            "vac": [-0.625, 0.375, -0.7],
             "color_hint": "#FF4444",
             "metadata": {
                 "domain": "Threat",
-                "source_vad": [
-                    2.5,
-                    6.5,
-                    3.5
-                ]
+                "source_vad": [2.5, 6.5, 3.5]
             }
         },
         {
             "emotion_name": "Terror",
             "category": "Fear",
             "definition": "Extreme fear characterized by imminent destruction.",
-            "vac": [
-                -0.875,
-                0.95,
-                -0.7
-            ],
+            "vac": [-0.875, 0.95, -0.7],
             "color_hint": "#FF4444",
             "metadata": {
                 "domain": "Threat",
-                "source_vad": [
-                    1.5,
-                    8.8,
-                    1.5
-                ]
+                "source_vad": [1.5, 8.8, 1.5]
             }
         },
         {
             "emotion_name": "Dread",
             "category": "Fear",
             "definition": "Anticipated fear with a heavy, sinking feeling.",
-            "vac": [
-                -0.8,
-                0.125,
-                -0.7
-            ],
+            "vac": [-0.8, 0.125, -0.7],
             "color_hint": "#FF4444",
             "metadata": {
                 "domain": "Threat",
-                "source_vad": [
-                    1.8,
-                    5.5,
-                    2.5
-                ]
+                "source_vad": [1.8, 5.5, 2.5]
             }
         },
         {
             "emotion_name": "Panic",
             "category": "Fear",
             "definition": "Sudden, uncontrollable fear causing unthinking behavior.",
-            "vac": [
-                -0.7,
-                0.875,
-                -0.7
-            ],
+            "vac": [-0.7, 0.875, -0.7],
             "color_hint": "#FF4444",
             "metadata": {
                 "domain": "Threat",
-                "source_vad": [
-                    2.2,
-                    8.5,
-                    2.0
-                ]
+                "source_vad": [2.2, 8.5, 2.0]
             }
         },
         {
             "emotion_name": "Vulnerability",
             "category": "Fear",
             "definition": "The emotion of exposure, uncertainty, and risk.",
-            "vac": [
-                -0.25,
-                0.0,
-                0.2
-            ],
+            "vac": [-0.25, 0.0, 0.2],
             "color_hint": "#FF4444",
             "metadata": {
                 "domain": "Threat",
-                "source_vad": [
-                    4.0,
-                    5.0,
-                    3.5
-                ]
+                "source_vad": [4.0, 5.0, 3.5]
             }
         },
         {
             "emotion_name": "Horror",
             "category": "Fear",
             "definition": "Fear mixed with repulsion or shock.",
-            "vac": [
-                -0.8,
-                0.7,
-                -0.7
-            ],
+            "vac": [-0.8, 0.7, -0.7],
             "color_hint": "#FF4444",
             "metadata": {
                 "domain": "Threat",
-                "source_vad": [
-                    1.8,
-                    7.8,
-                    2.0
-                ]
+                "source_vad": [1.8, 7.8, 2.0]
             }
         },
         {
             "emotion_name": "Nervousness",
             "category": "Fear",
             "definition": "High-frequency agitation regarding performance or social judgment.",
-            "vac": [
-                -0.35,
-                0.375,
-                -0.7
-            ],
+            "vac": [-0.35, 0.375, -0.7],
             "color_hint": "#FF4444",
             "metadata": {
                 "domain": "Threat",
-                "source_vad": [
-                    3.6,
-                    6.5,
-                    3.4
-                ]
+                "source_vad": [3.6, 6.5, 3.4]
             }
         },
         {
             "emotion_name": "Anger",
             "category": "Anger",
             "definition": "A strong feeling of annoyance, displeasure, or hostility.",
-            "vac": [
-                -0.625,
-                0.5,
-                -0.7
-            ],
+            "vac": [-0.625, 0.5, -0.7],
             "color_hint": "#FF4444",
             "metadata": {
                 "domain": "Threat",
-                "source_vad": [
-                    2.5,
-                    7.0,
-                    6.5
-                ]
+                "source_vad": [2.5, 7.0, 6.5]
             }
         },
         {
             "emotion_name": "Rage",
             "category": "Anger",
             "definition": "Violent, uncontrollable anger; often physical.",
-            "vac": [
-                -0.8,
-                0.875,
-                -0.7
-            ],
+            "vac": [-0.8, 0.875, -0.7],
             "color_hint": "#FF4444",
             "metadata": {
                 "domain": "Threat",
-                "source_vad": [
-                    1.8,
-                    8.5,
-                    7.5
-                ]
+                "source_vad": [1.8, 8.5, 7.5]
             }
         },
         {
             "emotion_name": "Frustration",
             "category": "Anger",
             "definition": "Annoyance resulting from a blocked goal or inability to change.",
-            "vac": [
-                -0.55,
-                0.25,
-                -0.7
-            ],
+            "vac": [-0.55, 0.25, -0.7],
             "color_hint": "#FF4444",
             "metadata": {
                 "domain": "Threat",
-                "source_vad": [
-                    2.8,
-                    6.0,
-                    5.0
-                ]
+                "source_vad": [2.8, 6.0, 5.0]
             }
         },
         {
             "emotion_name": "Resentment",
             "category": "Anger",
             "definition": "Bitter, enduring indignation at unfair treatment.",
-            "vac": [
-                -0.5,
-                -0.125,
-                -0.7
-            ],
+            "vac": [-0.5, -0.125, -0.7],
             "color_hint": "#FF4444",
             "metadata": {
                 "domain": "Threat",
-                "source_vad": [
-                    3.0,
-                    4.5,
-                    4.5
-                ]
+                "source_vad": [3.0, 4.5, 4.5]
             }
         },
         {
             "emotion_name": "Contempt",
             "category": "Anger",
             "definition": "The feeling that a person/thing is beneath consideration.",
-            "vac": [
-                -0.375,
-                0.0,
-                -0.7
-            ],
+            "vac": [-0.375, 0.0, -0.7],
             "color_hint": "#FF4444",
             "metadata": {
                 "domain": "Threat",
-                "source_vad": [
-                    3.5,
-                    5.0,
-                    7.0
-                ]
+                "source_vad": [3.5, 5.0, 7.0]
             }
         },
         {
             "emotion_name": "Indignation",
             "category": "Anger",
             "definition": "Righteous anger provoked by perceived injustice.",
-            "vac": [
-                -0.45,
-                0.375,
-                -0.7
-            ],
+            "vac": [-0.45, 0.375, -0.7],
             "color_hint": "#FF4444",
             "metadata": {
                 "domain": "Threat",
-                "source_vad": [
-                    3.2,
-                    6.5,
-                    6.0
-                ]
+                "source_vad": [3.2, 6.5, 6.0]
             }
         },
         {
             "emotion_name": "Flooding",
             "category": "Anger",
             "definition": "Systemic nervous system overwhelm; inability to process input.",
-            "vac": [
-                -0.875,
-                1.0,
-                -0.9
-            ],
+            "vac": [-0.875, 1.0, -0.9],
             "color_hint": "#FF4444",
             "metadata": {
                 "domain": "Threat",
-                "source_vad": [
-                    1.5,
-                    9.0,
-                    1.0
-                ]
+                "source_vad": [1.5, 9.0, 1.0]
             }
         },
         {
             "emotion_name": "Jealousy",
             "category": "Anger",
             "definition": "Threat-oriented fear of losing a valued relationship to a rival.",
-            "vac": [
-                -0.75,
-                0.5,
-                -0.7
-            ],
+            "vac": [-0.75, 0.5, -0.7],
             "color_hint": "#FF4444",
             "metadata": {
                 "domain": "Threat",
-                "source_vad": [
-                    2.0,
-                    7.0,
-                    4.5
-                ]
+                "source_vad": [2.0, 7.0, 4.5]
             }
         },
         {
             "emotion_name": "Sadness",
             "category": "Sadness",
             "definition": "Emotional pain associated with loss or disadvantage.",
-            "vac": [
-                -0.625,
-                -0.375,
-                -0.6
-            ],
+            "vac": [-0.625, -0.375, -0.6],
             "color_hint": "#4488FF",
             "metadata": {
                 "domain": "Loss",
-                "source_vad": [
-                    2.5,
-                    3.5,
-                    3.0
-                ]
+                "source_vad": [2.5, 3.5, 3.0]
             }
         },
         {
             "emotion_name": "Grief",
             "category": "Sadness",
             "definition": "Deep sorrow, specifically caused by death or major loss.",
-            "vac": [
-                -0.8,
-                -0.125,
-                -0.6
-            ],
+            "vac": [-0.8, -0.125, -0.6],
             "color_hint": "#4488FF",
             "metadata": {
                 "domain": "Loss",
-                "source_vad": [
-                    1.8,
-                    4.5,
-                    2.5
-                ]
+                "source_vad": [1.8, 4.5, 2.5]
             }
         },
         {
             "emotion_name": "Despair",
             "category": "Sadness",
             "definition": "The complete loss or absence of hope; resignation.",
-            "vac": [
-                -0.875,
-                -0.5,
-                -0.6
-            ],
+            "vac": [-0.875, -0.5, -0.6],
             "color_hint": "#4488FF",
             "metadata": {
                 "domain": "Loss",
-                "source_vad": [
-                    1.5,
-                    3.0,
-                    1.5
-                ]
+                "source_vad": [1.5, 3.0, 1.5]
             }
         },
         {
             "emotion_name": "Anguish",
             "category": "Sadness",
             "definition": "Severe mental or physical pain; active suffering.",
-            "vac": [
-                -0.875,
-                0.5,
-                -0.6
-            ],
+            "vac": [-0.875, 0.5, -0.6],
             "color_hint": "#4488FF",
             "metadata": {
                 "domain": "Loss",
-                "source_vad": [
-                    1.5,
-                    7.0,
-                    2.0
-                ]
+                "source_vad": [1.5, 7.0, 2.0]
             }
         },
         {
             "emotion_name": "Disappointment",
             "category": "Sadness",
             "definition": "Displeasure caused by nonfulfillment of expectations.",
-            "vac": [
-                -0.5,
-                -0.25,
-                -0.6
-            ],
+            "vac": [-0.5, -0.25, -0.6],
             "color_hint": "#4488FF",
             "metadata": {
                 "domain": "Loss",
-                "source_vad": [
-                    3.0,
-                    4.0,
-                    3.5
-                ]
+                "source_vad": [3.0, 4.0, 3.5]
             }
         },
         {
             "emotion_name": "Loneliness",
             "category": "Sadness",
             "definition": "Sadness resulting from a lack of connection.",
-            "vac": [
-                -0.75,
-                -0.375,
-                -0.6
-            ],
+            "vac": [-0.75, -0.375, -0.6],
             "color_hint": "#4488FF",
             "metadata": {
                 "domain": "Loss",
-                "source_vad": [
-                    2.0,
-                    3.5,
-                    2.5
-                ]
+                "source_vad": [2.0, 3.5, 2.5]
             }
         },
         {
             "emotion_name": "Melancholy",
             "category": "Sadness",
             "definition": "A deep, pensive, and long-lasting sadness; often aesthetic.",
-            "vac": [
-                -0.375,
-                -0.625,
-                -0.6
-            ],
+            "vac": [-0.375, -0.625, -0.6],
             "color_hint": "#4488FF",
             "metadata": {
                 "domain": "Loss",
-                "source_vad": [
-                    3.5,
-                    2.5,
-                    3.0
-                ]
+                "source_vad": [3.5, 2.5, 3.0]
             }
         },
         {
             "emotion_name": "Nostalgia",
             "category": "Bittersweet",
             "definition": "Sentimental longing for the past (Bittersweet).",
-            "vac": [
-                0.375,
-                -0.125,
-                -0.6
-            ],
+            "vac": [0.375, -0.125, -0.6],
             "color_hint": "#4488FF",
             "metadata": {
                 "domain": "Loss",
-                "source_vad": [
-                    6.5,
-                    4.5,
-                    4.0
-                ]
+                "source_vad": [6.5, 4.5, 4.0]
             }
         },
         {
             "emotion_name": "Joy",
             "category": "Joy",
             "definition": "A feeling of great pleasure and happiness; episodic.",
-            "vac": [
-                0.875,
-                0.625,
-                0.9
-            ],
+            "vac": [0.875, 0.625, 0.9],
             "color_hint": "#FF44CC",
             "metadata": {
                 "domain": "Love",
-                "source_vad": [
-                    8.5,
-                    7.5,
-                    7.0
-                ]
+                "source_vad": [8.5, 7.5, 7.0]
             }
         },
         {
             "emotion_name": "Contentment",
             "category": "Joy",
             "definition": "A state of satisfaction and ease; enough-ness.",
-            "vac": [
-                0.75,
-                -0.75,
-                0.9
-            ],
+            "vac": [0.75, -0.75, 0.9],
             "color_hint": "#FF44CC",
             "metadata": {
                 "domain": "Love",
-                "source_vad": [
-                    8.0,
-                    2.0,
-                    6.0
-                ]
+                "source_vad": [8.0, 2.0, 6.0]
             }
         },
         {
             "emotion_name": "Love",
             "category": "Love",
             "definition": "An intense feeling of deep affection and attachment.",
-            "vac": [
-                0.95,
-                0.375,
-                0.9
-            ],
+            "vac": [0.95, 0.375, 0.9],
             "color_hint": "#FF44CC",
             "metadata": {
                 "domain": "Love",
-                "source_vad": [
-                    8.8,
-                    6.5,
-                    6.5
-                ]
+                "source_vad": [8.8, 6.5, 6.5]
             }
         },
         {
             "emotion_name": "Trust",
             "category": "Love",
             "definition": "Firm belief in the reliability/truth of another.",
-            "vac": [
-                0.625,
-                0.0,
-                0.9
-            ],
+            "vac": [0.625, 0.0, 0.9],
             "color_hint": "#FF44CC",
             "metadata": {
                 "domain": "Love",
-                "source_vad": [
-                    7.5,
-                    5.0,
-                    6.0
-                ]
+                "source_vad": [7.5, 5.0, 6.0]
             }
         },
         {
             "emotion_name": "Gratitude",
             "category": "Appreciation",
             "definition": "Readiness to show appreciation for kindness.",
-            "vac": [
-                0.75,
-                0.125,
-                0.9
-            ],
+            "vac": [0.75, 0.125, 0.9],
             "color_hint": "#FF44CC",
             "metadata": {
                 "domain": "Love",
-                "source_vad": [
-                    8.0,
-                    5.5,
-                    5.0
-                ]
+                "source_vad": [8.0, 5.5, 5.0]
             }
         },
         {
             "emotion_name": "Admiration",
             "category": "Appreciation",
             "definition": "Respect and warm approval; upward social comparison.",
-            "vac": [
-                0.625,
-                0.25,
-                0.9
-            ],
+            "vac": [0.625, 0.25, 0.9],
             "color_hint": "#FF44CC",
             "metadata": {
                 "domain": "Love",
-                "source_vad": [
-                    7.5,
-                    6.0,
-                    4.0
-                ]
+                "source_vad": [7.5, 6.0, 4.0]
             }
         },
         {
             "emotion_name": "Relief",
             "category": "Relief",
             "definition": "Reassurance and relaxation following release from anxiety.",
-            "vac": [
-                0.625,
-                -0.25,
-                0.9
-            ],
+            "vac": [0.625, -0.25, 0.9],
             "color_hint": "#FF44CC",
             "metadata": {
                 "domain": "Love",
-                "source_vad": [
-                    7.5,
-                    4.0,
-                    5.0
-                ]
+                "source_vad": [7.5, 4.0, 5.0]
             }
         },
         {
             "emotion_name": "Excitement",
             "category": "Joy",
             "definition": "A feeling of great enthusiasm and eagerness.",
-            "vac": [
-                0.875,
-                0.875,
-                0.9
-            ],
+            "vac": [0.875, 0.875, 0.9],
             "color_hint": "#FF44CC",
             "metadata": {
                 "domain": "Love",
-                "source_vad": [
-                    8.5,
-                    8.5,
-                    7.0
-                ]
+                "source_vad": [8.5, 8.5, 7.0]
             }
         },
         {
             "emotion_name": "Awe",
             "category": "Knowledge",
             "definition": "Reverential respect mixed with fear or wonder at vastness.",
-            "vac": [
-                0.625,
-                0.25,
-                0.4
-            ],
+            "vac": [0.625, 0.25, 0.4],
             "color_hint": "#FF8844",
             "metadata": {
                 "domain": "Epistemic",
-                "source_vad": [
-                    7.5,
-                    6.0,
-                    3.0
-                ]
+                "source_vad": [7.5, 6.0, 3.0]
             }
         },
         {
             "emotion_name": "Wonder",
             "category": "Knowledge",
             "definition": "Surprise mingled with admiration; curious appreciation.",
-            "vac": [
-                0.75,
-                0.125,
-                0.4
-            ],
+            "vac": [0.75, 0.125, 0.4],
             "color_hint": "#FF8844",
             "metadata": {
                 "domain": "Epistemic",
-                "source_vad": [
-                    8.0,
-                    5.5,
-                    4.0
-                ]
+                "source_vad": [8.0, 5.5, 4.0]
             }
         },
         {
             "emotion_name": "Confusion",
             "category": "Knowledge",
             "definition": "Uncertainty about meaning; failure of mental models.",
-            "vac": [
-                -0.25,
-                0.125,
-                0.4
-            ],
+            "vac": [-0.25, 0.125, 0.4],
             "color_hint": "#FF8844",
             "metadata": {
                 "domain": "Epistemic",
-                "source_vad": [
-                    4.0,
-                    5.5,
-                    3.0
-                ]
+                "source_vad": [4.0, 5.5, 3.0]
             }
         },
         {
             "emotion_name": "Curiosity",
             "category": "Knowledge",
             "definition": "A strong desire to know or learn; approach motivation.",
-            "vac": [
-                0.5,
-                0.375,
-                0.4
-            ],
+            "vac": [0.5, 0.375, 0.4],
             "color_hint": "#FF8844",
             "metadata": {
                 "domain": "Epistemic",
-                "source_vad": [
-                    7.0,
-                    6.5,
-                    6.5
-                ]
+                "source_vad": [7.0, 6.5, 6.5]
             }
         },
         {
             "emotion_name": "Surprise",
             "category": "Surprise",
             "definition": "Reaction to an unexpected event; brief and resetting.",
-            "vac": [
-                0.0,
-                0.75,
-                0.4
-            ],
+            "vac": [0.0, 0.75, 0.4],
             "color_hint": "#FF8844",
             "metadata": {
                 "domain": "Epistemic",
-                "source_vad": [
-                    5.0,
-                    8.0,
-                    4.0
-                ]
+                "source_vad": [5.0, 8.0, 4.0]
             }
         },
         {
             "emotion_name": "Interest",
             "category": "Knowledge",
             "definition": "Sustained attention and desire to engage.",
-            "vac": [
-                0.375,
-                0.0,
-                0.4
-            ],
+            "vac": [0.375, 0.0, 0.4],
             "color_hint": "#FF8844",
             "metadata": {
                 "domain": "Epistemic",
-                "source_vad": [
-                    6.5,
-                    5.0,
-                    5.5
-                ]
+                "source_vad": [6.5, 5.0, 5.5]
             }
         },
         {
             "emotion_name": "Schadenfreude",
             "category": "Social",
             "definition": "Pleasure derived from another person's misfortune.",
-            "vac": [
-                0.375,
-                0.0,
-                0.7
-            ],
+            "vac": [0.375, 0.0, 0.7],
             "color_hint": "#44CCFF",
             "metadata": {
                 "domain": "Social Comparison",
-                "source_vad": [
-                    6.5,
-                    5.0,
-                    6.0
-                ]
+                "source_vad": [6.5, 5.0, 6.0]
             }
         },
         {
             "emotion_name": "Freudenfreude",
             "category": "Social",
             "definition": "Pleasure derived from another person's success.",
-            "vac": [
-                0.75,
-                0.25,
-                0.7
-            ],
+            "vac": [0.75, 0.25, 0.7],
             "color_hint": "#44CCFF",
             "metadata": {
                 "domain": "Social Comparison",
-                "source_vad": [
-                    8.0,
-                    6.0,
-                    6.0
-                ]
+                "source_vad": [8.0, 6.0, 6.0]
             }
         },
         {
             "emotion_name": "Envy",
             "category": "Social",
             "definition": "Discontented longing for another's advantages.",
-            "vac": [
-                -0.625,
-                0.25,
-                -0.5
-            ],
+            "vac": [-0.625, 0.25, -0.5],
             "color_hint": "#44CCFF",
             "metadata": {
                 "domain": "Social Comparison",
-                "source_vad": [
-                    2.5,
-                    6.0,
-                    4.0
-                ]
+                "source_vad": [2.5, 6.0, 4.0]
             }
         },
         {
             "emotion_name": "Pity",
             "category": "Social",
             "definition": "Sorrow for another's suffering (often with superiority).",
-            "vac": [
-                -0.375,
-                -0.25,
-                -0.5
-            ],
+            "vac": [-0.375, -0.25, -0.5],
             "color_hint": "#44CCFF",
             "metadata": {
                 "domain": "Social Comparison",
-                "source_vad": [
-                    3.5,
-                    4.0,
-                    6.0
-                ]
+                "source_vad": [3.5, 4.0, 6.0]
             }
         },
         {
             "emotion_name": "Compassion",
             "category": "Social",
             "definition": "Sympathetic concern for another's suffering (with action).",
-            "vac": [
-                0.5,
-                0.0,
-                0.7
-            ],
+            "vac": [0.5, 0.0, 0.7],
             "color_hint": "#44CCFF",
             "metadata": {
                 "domain": "Social Comparison",
-                "source_vad": [
-                    7.0,
-                    5.0,
-                    5.0
-                ]
+                "source_vad": [7.0, 5.0, 5.0]
             }
         },
         {
             "emotion_name": "Gl\u00fcckschmerz",
             "category": "Social",
             "definition": "Pain or displeasure at another's good fortune.",
-            "vac": [
-                -0.5,
-                0.0,
-                -0.5
-            ],
+            "vac": [-0.5, 0.0, -0.5],
             "color_hint": "#44CCFF",
             "metadata": {
                 "domain": "Social Comparison",
-                "source_vad": [
-                    3.0,
-                    5.0,
-                    4.0
-                ]
+                "source_vad": [3.0, 5.0, 4.0]
             }
         },
         {
             "emotion_name": "Toska",
             "category": "Existential",
             "definition": "Spiritual anguish; yearning for the unattainable.",
-            "vac": [
-                -0.625,
-                0.25,
-                -0.2
-            ],
+            "vac": [-0.625, 0.25, -0.2],
             "color_hint": "#FFCC44",
             "metadata": {
                 "domain": "Cultural",
-                "source_vad": [
-                    2.5,
-                    6.0,
-                    2.0
-                ]
+                "source_vad": [2.5, 6.0, 2.0]
             }
         },
         {
             "emotion_name": "Saudade",
             "category": "Bittersweet",
             "definition": "Melancholic longing for the absent loved one/place.",
-            "vac": [
-                -0.125,
-                -0.25,
-                -0.2
-            ],
+            "vac": [-0.125, -0.25, -0.2],
             "color_hint": "#FFCC44",
             "metadata": {
                 "domain": "Cultural",
-                "source_vad": [
-                    4.5,
-                    4.0,
-                    3.5
-                ]
+                "source_vad": [4.5, 4.0, 3.5]
             }
         },
         {
             "emotion_name": "Hiraeth",
             "category": "Nostalgia",
             "definition": "Grief for a lost home or era.",
-            "vac": [
-                -0.5,
-                -0.125,
-                -0.2
-            ],
+            "vac": [-0.5, -0.125, -0.2],
             "color_hint": "#FFCC44",
             "metadata": {
                 "domain": "Cultural",
-                "source_vad": [
-                    3.0,
-                    4.5,
-                    2.5
-                ]
+                "source_vad": [3.0, 4.5, 2.5]
             }
         },
         {
             "emotion_name": "Sisu",
             "category": "Resilience",
             "definition": "Grim, stoic determination in hopeless situations.",
-            "vac": [
-                0.25,
-                0.625,
-                0.6
-            ],
+            "vac": [0.25, 0.625, 0.6],
             "color_hint": "#FFCC44",
             "metadata": {
                 "domain": "Cultural",
-                "source_vad": [
-                    6.0,
-                    7.5,
-                    8.5
-                ]
+                "source_vad": [6.0, 7.5, 8.5]
             }
         },
         {
             "emotion_name": "Amae",
             "category": "Dependency",
             "definition": "Sweet dependence; desire to be cared for.",
-            "vac": [
-                0.5,
-                -0.5,
-                0.6
-            ],
+            "vac": [0.5, -0.5, 0.6],
             "color_hint": "#FFCC44",
             "metadata": {
                 "domain": "Cultural",
-                "source_vad": [
-                    7.0,
-                    3.0,
-                    2.0
-                ]
+                "source_vad": [7.0, 3.0, 2.0]
             }
         },
         {
             "emotion_name": "Gezellig",
             "category": "Social",
             "definition": "Social coziness and belonging.",
-            "vac": [
-                0.75,
-                -0.375,
-                0.6
-            ],
+            "vac": [0.75, -0.375, 0.6],
             "color_hint": "#FFCC44",
             "metadata": {
                 "domain": "Cultural",
-                "source_vad": [
-                    8.0,
-                    3.5,
-                    5.0
-                ]
+                "source_vad": [8.0, 3.5, 5.0]
             }
         },
         {
             "emotion_name": "Litost",
             "category": "Shame",
             "definition": "Agony at the sudden sight of one's own misery.",
-            "vac": [
-                -0.75,
-                0.5,
-                -0.2
-            ],
+            "vac": [-0.75, 0.5, -0.2],
             "color_hint": "#FFCC44",
             "metadata": {
                 "domain": "Cultural",
-                "source_vad": [
-                    2.0,
-                    7.0,
-                    2.0
-                ]
+                "source_vad": [2.0, 7.0, 2.0]
             }
         },
         {
             "emotion_name": "Awumbuk",
             "category": "Social",
             "definition": "Lethargy/heaviness after guests leave.",
-            "vac": [
-                -0.375,
-                -0.75,
-                -0.4
-            ],
+            "vac": [-0.375, -0.75, -0.4],
             "color_hint": "#FFCC44",
             "metadata": {
                 "domain": "Cultural",
-                "source_vad": [
-                    3.5,
-                    2.0,
-                    2.0
-                ]
+                "source_vad": [3.5, 2.0, 2.0]
             }
         },
         {
             "emotion_name": "Sonder",
             "category": "Epiphany",
             "definition": "Realization of the depth of others' lives.",
-            "vac": [
-                0.5,
-                0.125,
-                0.6
-            ],
+            "vac": [0.5, 0.125, 0.6],
             "color_hint": "#FFCC44",
             "metadata": {
                 "domain": "Cultural",
-                "source_vad": [
-                    7.0,
-                    5.5,
-                    4.0
-                ]
+                "source_vad": [7.0, 5.5, 4.0]
             }
         },
         {
             "emotion_name": "Hygge",
             "category": "Joy",
             "definition": "A mood of coziness and comfortable conviviality with feelings of wellness and contentment.",
-            "vac": [
-                0.75,
-                -0.75,
-                0.8
-            ],
+            "vac": [0.75, -0.75, 0.8],
             "color_hint": "#FF44CC",
             "metadata": {
                 "domain": "Cultural",
-                "source_vad": [
-                    8.0,
-                    2.0,
-                    4.0
-                ]
+                "source_vad": [8.0, 2.0, 4.0]
             }
         },
         {
             "emotion_name": "Fernweh",
             "category": "Nostalgia",
             "definition": "Far-sickness; a longing for far-off places.",
-            "vac": [
-                0.125,
-                0.25,
-                0.4
-            ],
+            "vac": [0.125, 0.25, 0.4],
             "color_hint": "#FFCC44",
             "metadata": {
                 "domain": "Cultural",
-                "source_vad": [
-                    5.5,
-                    6.0,
-                    5.0
-                ]
+                "source_vad": [5.5, 6.0, 5.0]
             }
         },
         {
             "emotion_name": "Mono no aware",
             "category": "Appreciation",
             "definition": "The pathos of things; a gentle sadness at the impermanence of everything.",
-            "vac": [
-                0.0,
-                -0.5,
-                0.7
-            ],
+            "vac": [0.0, -0.5, 0.7],
             "color_hint": "#FF44CC",
             "metadata": {
                 "domain": "Cultural",
-                "source_vad": [
-                    5.0,
-                    3.0,
-                    2.0
-                ]
+                "source_vad": [5.0, 3.0, 2.0]
             }
         },
         {
             "emotion_name": "Fiero",
             "category": "Joy",
             "definition": "The specific rush of pride felt after a personal triumph over adversity.",
-            "vac": [
-                0.875,
-                0.75,
-                0.9
-            ],
+            "vac": [0.875, 0.75, 0.9],
             "color_hint": "#FF44CC",
             "metadata": {
                 "domain": "Cultural",
-                "source_vad": [
-                    8.5,
-                    8.0,
-                    8.5
-                ]
+                "source_vad": [8.5, 8.0, 8.5]
             }
         },
         {
             "emotion_name": "Yūgen",
             "category": "Knowledge",
             "definition": "An awareness of the universe that triggers emotional responses too deep and mysterious for words.",
-            "vac": [
-                0.5,
-                -0.25,
-                0.4
-            ],
+            "vac": [0.5, -0.25, 0.4],
             "color_hint": "#FF8844",
             "metadata": {
                 "domain": "Cultural",
-                "source_vad": [
-                    7.0,
-                    4.0,
-                    2.0
-                ]
+                "source_vad": [7.0, 4.0, 2.0]
             }
         },
         {
             "emotion_name": "L'appel du vide",
             "category": "Fear",
             "definition": "The call of the void; the inexplicable urge to jump from a high place.",
-            "vac": [
-                -0.75,
-                0.625,
-                -0.5
-            ],
+            "vac": [-0.75, 0.625, -0.5],
             "color_hint": "#FF4444",
             "metadata": {
                 "domain": "Cultural",
-                "source_vad": [
-                    2.0,
-                    7.5,
-                    1.0
-                ]
+                "source_vad": [2.0, 7.5, 1.0]
             }
         }
     ]

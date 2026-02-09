@@ -1,8 +1,8 @@
 # Vector Search Deep Dive
 
-**Reading Time:** ~35 minutes  
-**Audience:** Senior developers, ML engineers  
-**Prerequisites:** [Database Architecture](02-database-architecture.md), understanding of embeddings  
+**Reading Time:** ~35 minutes
+**Audience:** Senior developers, ML engineers
+**Prerequisites:** [Database Architecture](02-database-architecture.md), understanding of embeddings
 **Goal:** Master vector similarity search, HNSW algorithm, and optimization techniques
 
 ---
@@ -71,7 +71,7 @@ emb3 = model.encode(text3)  # [384 dimensions]
 def l2_distance(a: np.array, b: np.array) -> float:
     """
     Euclidean (L2) distance
-    
+
     Formula: sqrt(sum((a_i - b_i)²))
     """
     return np.linalg.norm(a - b)
@@ -107,7 +107,7 @@ LIMIT 5;
 def cosine_distance(a: np.array, b: np.array) -> float:
     """
     Cosine distance = 1 - cosine similarity
-    
+
     Formula: 1 - (a · b) / (||a|| × ||b||)
     """
     similarity = np.dot(a, b) / (np.linalg.norm(a) * np.linalg.norm(b))
@@ -144,7 +144,7 @@ LIMIT 5;
 def inner_product(a: np.array, b: np.array) -> float:
     """
     Inner product (dot product)
-    
+
     Formula: sum(a_i × b_i)
     """
     return np.dot(a, b)
@@ -191,24 +191,24 @@ Layer 0: •─•─•─•─•─•─•─•─•─•  (all points)
 def build_hnsw(points, m=16, ef_construction=64):
     """
     Build HNSW index
-    
+
     Args:
         points: List of vectors
         m: Max connections per node (default 16)
         ef_construction: Exploration during build (default 64)
     """
     graph = MultiLayerGraph()
-    
+
     for point in points:
         # Assign layer (exponential decay)
         layer = assign_layer()  # Most points in layer 0
-        
+
         # Find ef_construction nearest neighbors
         neighbors = search_layer(point, ef_construction)
-        
+
         # Connect to m nearest neighbors
         connect(point, neighbors[:m])
-        
+
         # Prune connections if needed
         prune_connections(point, m)
 ```
@@ -219,7 +219,7 @@ def build_hnsw(points, m=16, ef_construction=64):
 def search_hnsw(query, k=5, ef_search=40):
     """
     Search HNSW index
-    
+
     Args:
         query: Query vector
         k: Number of results
@@ -227,15 +227,15 @@ def search_hnsw(query, k=5, ef_search=40):
     """
     # Start from entry point (top layer)
     current = entry_point
-    
+
     # Navigate down layers
     for layer in reversed(range(num_layers)):
         # Greedy search in current layer
         current = greedy_search(query, current, layer)
-    
+
     # Final layer: explore ef_search candidates
     candidates = beam_search(query, current, ef_search)
-    
+
     # Return k nearest
     return sorted(candidates)[:k]
 ```
@@ -305,16 +305,16 @@ class EmotionMapper:
     ) -> List[EmotionMatch]:
         """
         Weighted fusion of VAC distance and semantic distance.
-        
+
         Short text: Trust VAC more (LLM gave clear signal)
         Long text: Trust semantics more (rich context)
         """
         # Generate embedding
         text_embedding = self.embedding_service.generate_embedding(text)
-        
+
         # Get all emotions
         emotions = await self._load_atlas()
-        
+
         # Calculate both distances
         results = []
         for emotion in emotions:
@@ -322,13 +322,13 @@ class EmotionMapper:
             vac_dist = np.linalg.norm(
                 np.array(vac) - np.array(emotion.vac)
             )
-            
+
             # Semantic distance (cosine in 384D space)
             sem_dist = 1 - np.dot(text_embedding, emotion.embedding) / (
-                np.linalg.norm(text_embedding) * 
+                np.linalg.norm(text_embedding) *
                 np.linalg.norm(emotion.embedding)
             )
-            
+
             # Adaptive weighting
             word_count = len(text.split())
             if word_count < 10:
@@ -343,17 +343,17 @@ class EmotionMapper:
                 # Long: Trust semantics
                 vac_weight = 0.4
                 sem_weight = 0.6
-            
+
             # Final distance
             final_dist = (vac_weight * vac_dist) + (sem_weight * sem_dist)
-            
+
             results.append(EmotionMatch(
                 emotion=emotion,
                 vac_distance=vac_dist,
                 semantic_distance=sem_dist,
                 final_distance=final_dist
             ))
-        
+
         # Sort and return top k
         results.sort(key=lambda x: x.final_distance)
         return results[:k]
@@ -446,13 +446,13 @@ similarity_cache = TTLCache(maxsize=1000, ttl=3600)
 async def find_similar_cached(vac: List[float], text: str):
     # Create cache key
     cache_key = f"{tuple(vac)}:{hash(text)}"
-    
+
     if cache_key in similarity_cache:
         return similarity_cache[cache_key]
-    
+
     # Not cached: compute
     results = await find_similar(vac, text)
-    
+
     # Cache for 1 hour
     similarity_cache[cache_key] = results
     return results
@@ -474,14 +474,14 @@ async def benchmark_vector_search(
 ):
     """Benchmark vector search performance"""
     times = []
-    
+
     for _ in range(num_queries):
         # Random query vector
         query = np.random.rand(384).astype(np.float32)
         query = query / np.linalg.norm(query)  # Normalize
-        
+
         start = time.time()
-        
+
         # Query
         result = await db.execute(
             select(AtlasDefinition)
@@ -489,10 +489,10 @@ async def benchmark_vector_search(
             .limit(10)
         )
         _ = result.scalars().all()
-        
+
         elapsed = (time.time() - start) * 1000  # milliseconds
         times.append(elapsed)
-    
+
     # Statistics
     print(f"Mean query time: {np.mean(times):.2f}ms")
     print(f"Median query time: {np.median(times):.2f}ms")
@@ -524,23 +524,23 @@ def measure_recall(
 ):
     """
     Compare HNSW results vs exact search.
-    
+
     Recall = |HNSW ∩ Exact| / |Exact|
     """
     recalls = []
-    
+
     for query in test_queries:
         # Exact search (no index)
         exact_ids = exact_search(query, k)
-        
+
         # HNSW search
         hnsw_ids = hnsw_search(query, k)
-        
+
         # Calculate recall
         overlap = len(set(exact_ids) & set(hnsw_ids))
         recall = overlap / k
         recalls.append(recall)
-    
+
     avg_recall = np.mean(recalls)
     print(f"Average recall@{k}: {avg_recall:.2%}")
     return avg_recall
@@ -571,8 +571,8 @@ SET hnsw.ef_search = 20;   -- ~90% recall
 
 ```sql
 -- Check index exists
-SELECT indexname, indexdef 
-FROM pg_indexes 
+SELECT indexname, indexdef
+FROM pg_indexes
 WHERE tablename = 'atlas_definitions';
 
 -- Check ef_search setting
@@ -654,13 +654,13 @@ CREATE INDEX ...;
 
 ```sql
 -- Create tsvector column
-ALTER TABLE atlas_definitions 
+ALTER TABLE atlas_definitions
 ADD COLUMN description_tsv tsvector;
 
 UPDATE atlas_definitions
 SET description_tsv = to_tsvector('english', description);
 
-CREATE INDEX idx_atlas_fts ON atlas_definitions 
+CREATE INDEX idx_atlas_fts ON atlas_definitions
 USING gin(description_tsv);
 
 -- Hybrid query
@@ -677,7 +677,7 @@ text_results AS (
     ORDER BY rank DESC
     LIMIT 20
 )
-SELECT 
+SELECT
     a.*,
     COALESCE(v.distance, 999) as vec_score,
     COALESCE(t.rank, 0) as text_score,
@@ -701,12 +701,12 @@ LIMIT 10;
 async def search_with_reranking(query: str, k: int = 10):
     # Stage 1: Fast vector search
     candidates = await fast_search(query, k=100)
-    
+
     # Stage 2: Re-rank with cross-encoder
     reranker = CrossEncoder('cross-encoder/ms-marco-MiniLM-L-6-v2')
     pairs = [[query, cand.text] for cand in candidates]
     scores = reranker.predict(pairs)
-    
+
     # Sort by re-ranking score
     ranked = sorted(zip(candidates, scores), key=lambda x: x[1], reverse=True)
     return [cand for cand, score in ranked[:k]]

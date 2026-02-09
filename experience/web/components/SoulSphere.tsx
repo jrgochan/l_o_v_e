@@ -78,11 +78,11 @@ float snoise(vec3 v) {
 void main() {
   vNormal = normalize(normalMatrix * normal);
   vPosition = position;
-  
+
   float arousalAbs = abs(uArousal);
   float noiseFreq = 1.5 + (arousalAbs * 2.5);
   float noiseAmp = 0.25 * arousalAbs;
-  
+
   vec3 displaced = position;
   float noiseVal = 0.0;
 
@@ -94,10 +94,10 @@ void main() {
       float stepVal = floor(n * 5.0) / 5.0; // Faceting
       displaced += normal * (stepVal * (0.1 + noiseAmp));
       noiseVal = stepVal;
-  } 
+  }
   else if (uMode == 5) { // Liquid - Smooth flowing sine waves
       // Flowing wave motion
-      float wave = sin(position.y * 4.0 + uTime * 2.0) * 0.5 + 
+      float wave = sin(position.y * 4.0 + uTime * 2.0) * 0.5 +
                    cos(position.x * 4.0 + uTime * 1.5) * 0.5;
       displaced += normal * (wave * (0.05 + noiseAmp * 0.5));
       noiseVal = wave;
@@ -113,10 +113,10 @@ void main() {
   else { // Standard Noise Modes (Subtle, Dynamic, Mystical, Luminous)
       vec3 noisePos = position * noiseFreq + vec3(uTime * 0.15);
       float n1 = snoise(noisePos);
-      
+
       vec3 noisePos2 = position * noiseFreq * 2.0 + vec3(uTime * 0.1);
       float n2 = snoise(noisePos2) * 0.5;
-      
+
       float combined = n1 + n2;
       displaced += normal * (combined * noiseAmp);
       noiseVal = combined;
@@ -124,7 +124,7 @@ void main() {
 
   // Pass noise value for coloring
   vNoise = noiseVal;
-  
+
   vec4 worldPos = modelMatrix * vec4(displaced, 1.0);
   vWorldPosition = worldPos.xyz;
   gl_Position = projectionMatrix * modelViewMatrix * vec4(displaced, 1.0);
@@ -154,12 +154,12 @@ void main() {
   float mixFactor = (uValence + 1.0) * 0.5;
   float smoothMix = smoothstep(-1.0, 1.0, uValence);
   vec3 baseColor = mix(uColorNeg, uColorPos, smoothMix);
-  
+
   vec3 viewDir = normalize(uCameraPosition - vWorldPosition);
   float fresnel = dot(viewDir, normalize(vNormal));
   fresnel = 1.0 - abs(fresnel);
   fresnel = pow(fresnel, 2.5);
-  
+
   float glowIntensity = fresnel * max(0.0, uConnection + 0.5);
   vec3 glowColor = vec3(1.0, 1.0, 1.0);
   vec3 finalColor = baseColor;
@@ -170,11 +170,11 @@ void main() {
   if (uMode == 3) { // Crystalline
        // Refractive / glassy look
        float sparkle = step(0.9, fract(vNoise * 10.0 + uTime));
-       glowIntensity += sparkle * 2.0; 
+       glowIntensity += sparkle * 2.0;
        finalColor = mix(baseColor, vec3(0.8, 0.9, 1.0), fresnel * 0.8);
        finalColor += glowColor * glowIntensity * 0.5;
        alpha = 0.2 + (fresnel * 0.8); // Very transparent center, opaque edges
-  } 
+  }
   else if (uMode == 4) { // Luminous
       // High energy glow
       finalColor = baseColor * 2.0; // Brighter base
@@ -216,7 +216,7 @@ void main() {
   float diffuse = max(dot(normalize(vNormal), viewDir), 0.0);
   vec3 diffuseColor = finalColor * diffuse * 0.7;
   vec3 litColor = ambient + diffuseColor;
-  
+
   gl_FragColor = vec4(litColor, alpha);
 }
 `;

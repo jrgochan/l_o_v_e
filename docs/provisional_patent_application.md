@@ -10,10 +10,10 @@ A system and method for processing, analyzing, and visualizing emotional states 
 
 ## BACKGROUND OF THE INVENTION
 
-**1. Field of the Invention**  
+**1. Field of the Invention**
 The present invention relates generally to affective computing and human-computer interaction, and more specifically to systems and methods for mathematically representing and visualizing complex emotional states in a three-dimensional geometric space.
 
-**2. Description of Related Art**  
+**2. Description of Related Art**
 Traditional emotion AI systems typically rely on the Circumplex Model of Affect, which maps emotions onto a two-dimensional plane defined by Valence (positivity/negativity) and Arousal (energy/activation). While useful for basic sentiment analysis, this model often fails to distinguish between complex social emotions. For example, "pity" and "compassion" may share similar negative valence and moderate arousal, yet they represent fundamentally different relational stances (separation vs. connection). Furthermore, existing systems often struggle with the "gimbal lock" problem or singularities when attempting to model continuous emotional transitions in 3D space using Euler angles. There is a need for a more robust mathematical framework that can accurately capture the relational dimension of emotion and model smooth, continuous transitions between states.
 
 ## SUMMARY OF THE INVENTION
@@ -146,4 +146,4 @@ While the preferred embodiment describes a personal emotional intelligence tool,
 
 5. The method of Claim 4, further comprising calculating an angular velocity of the transition and triggering a user alert if said angular velocity exceeds a predetermined flooding threshold.
 
-6. The system of Claim 1, wherein the processor comprises a local computing device configured to perform ingestion, transcription, and semantic analysis on-device, ensuring that the natural language input, in the form of raw user audio or text data, is not transmitted to a remote server. 
+6. The system of Claim 1, wherein the processor comprises a local computing device configured to perform ingestion, transcription, and semantic analysis on-device, ensuring that the natural language input, in the form of raw user audio or text data, is not transmitted to a remote server.

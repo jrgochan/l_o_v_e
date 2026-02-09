@@ -94,8 +94,8 @@ psql -U love_user -d love_db
 SELECT COUNT(*) FROM atlas_definitions;
 
 # See transition strategies
-SELECT strategy_name, strategy_type, difficulty_level 
-FROM transition_strategies 
+SELECT strategy_name, strategy_type, difficulty_level
+FROM transition_strategies
 ORDER BY difficulty_level;
 ```
 

@@ -1,7 +1,7 @@
 # Glossary of Terms
 
-**Last Updated:** January 2, 2026  
-**Audience:** All users  
+**Last Updated:** January 2, 2026
+**Audience:** All users
 **Goal:** Definitions of key terms and concepts
 
 ---
@@ -298,11 +298,11 @@ Reducing model precision to save memory/increase speed. q4_0 = 4-bit quantizatio
 
 ## Key Takeaways
 
-✅ **VAC = Valence + Arousal + Connection**  
-✅ **Connection axis = L.O.V.E.'s innovation**  
-✅ **Sacred test = Pity vs. Compassion validation**  
-✅ **Few-shot learning = Teaching through examples**  
-✅ **Local AI = Privacy-first architecture**  
+✅ **VAC = Valence + Arousal + Connection**
+✅ **Connection axis = L.O.V.E.'s innovation**
+✅ **Sacred test = Pity vs. Compassion validation**
+✅ **Few-shot learning = Teaching through examples**
+✅ **Local AI = Privacy-first architecture**
 
 ---
 

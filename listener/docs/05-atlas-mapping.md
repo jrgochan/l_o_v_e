@@ -118,5 +118,5 @@ The Listener must map user input to one of **87 distinct emotions** from Dr. Bre
 
 Now that you understand the Atlas:
 - **06-pii-sanitization.md** - Privacy protection
-- **07-api-specification.md** - FastAPI endpoints  
+- **07-api-specification.md** - FastAPI endpoints
 - **08-async-queue.md** - Arq + Redis integration

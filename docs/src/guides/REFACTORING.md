@@ -1,7 +1,7 @@
 # Backend Refactoring Recommendations
 
-**Created:** December 6, 2025  
-**Purpose:** Document frontend logic that should be moved to backend APIs  
+**Created:** December 6, 2025
+**Purpose:** Document frontend logic that should be moved to backend APIs
 **Status:** 📋 Recommendations for Future Implementation
 
 ---
@@ -40,8 +40,8 @@ This document identifies frontend logic in the admin web application that should
 
 ### 1. Clinical Alert Detection & Classification
 
-**Priority:** 🔴 HIGH  
-**Target Module:** Observer  
+**Priority:** 🔴 HIGH
+**Target Module:** Observer
 **Current Location:** `experience/web/components/admin/ClinicalDashboard.tsx` (lines 49-101)
 
 **Problem:**
@@ -68,8 +68,8 @@ Move to `observer/app/services/clinical_alert_service.py`
 
 ### 2. Clinical Prosody Interpretations
 
-**Priority:** 🔴 HIGH  
-**Target Module:** Observer  
+**Priority:** 🔴 HIGH
+**Target Module:** Observer
 **Current Location:** `experience/web/components/admin/clinical/ProsodyVisualization.tsx` (lines 219-253)
 
 **Problem:**
@@ -93,8 +93,8 @@ Move to enhanced `observer/app/services/insight_generator.py`
 
 ### 3. Session Metrics Calculation
 
-**Priority:** 🟡 MEDIUM  
-**Target Module:** Observer  
+**Priority:** 🟡 MEDIUM
+**Target Module:** Observer
 **Current Location:** `experience/web/components/admin/ChatPanel.tsx` (lines 219-242)
 
 **Problem:**
@@ -119,8 +119,8 @@ Create `observer/app/services/session_analytics_service.py`
 
 ### 4. Path Analysis Helper Functions
 
-**Priority:** 🟢 LOW  
-**Target Module:** Observer  
+**Priority:** 🟢 LOW
+**Target Module:** Observer
 **Current Location:** `experience/web/hooks/usePathCalculator.ts` (lines 145-170)
 
 **Problem:**
@@ -143,8 +143,8 @@ Move to `observer/app/services/path_matrix_service.py`
 
 ### 5. Audio Waveform Processing
 
-**Priority:** 🟢 LOW  
-**Target Module:** Listener  
+**Priority:** 🟢 LOW
+**Target Module:** Listener
 **Current Location:** `experience/web/components/admin/clinical/ProsodyVisualization.tsx` (lines 24-60)
 
 **Problem:**
@@ -305,6 +305,6 @@ See separate detailed implementation documents:
 
 ---
 
-**Document Status:** 📋 Ready for Review  
-**Last Updated:** December 6, 2025  
+**Document Status:** 📋 Ready for Review
+**Last Updated:** December 6, 2025
 **Author:** Cline (AI Assistant)

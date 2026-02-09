@@ -1,3 +1,5 @@
+"""Module documentation."""
+
 import logging
 from typing import Dict, List, Optional, Tuple
 from uuid import UUID
@@ -25,6 +27,7 @@ class TransitionGraph:
     PROHIBITED_DIFFICULTY = 0.9
 
     def __init__(self, session: AsyncSession):
+        """Docstring."""
         self.session = session
         self._category_transitions: Dict[Tuple[str, str], float] = {}
 

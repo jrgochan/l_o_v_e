@@ -35,7 +35,7 @@ We successfully implemented a **production-ready emotional navigation system** w
 ```
 POST /observer/transition-path - Generate optimal paths
 GET /observer/atlas/emotions - Return all 87 emotions
-GET /observer/atlas/categories - Return 13 categories  
+GET /observer/atlas/categories - Return 13 categories
 GET /observer/atlas/search - Search emotions
 POST /observer/journey/start - Begin tracking
 POST /observer/journey/{id}/waypoint-reached - Mark progress
@@ -198,7 +198,7 @@ npm run dev
 ### **3D Path Visualization**:
 - **Glowing Curve**: CatmullRomCurve3 creates smooth path through VAC space
 - **Color Gradient**: Red (challenging start) → Yellow (progress) → Green (goal)
-- **Waypoint Markers**: 
+- **Waypoint Markers**:
   - Blue sphere = starting point
   - Purple spheres = intermediate waypoints (pulsing animation)
   - Green sphere = goal destination
@@ -285,7 +285,7 @@ RESTful JSON API
 3. **Polish Visuals**: Adjust colors, sizes, animations if needed
 
 ### **Near-Term Enhancements**:
-1. **Camera Animation**: 
+1. **Camera Animation**:
    - "Preview Path" button
    - Camera follows curve with smooth animation
    - Automated flythrough
@@ -403,7 +403,7 @@ When you generate a path, you should see:
             /
            /  (glowing yellow-green path)
           /
-         🟣 Waypoint 2 (Stress) 
+         🟣 Waypoint 2 (Stress)
         /
        /  (glowing yellow path)
       /

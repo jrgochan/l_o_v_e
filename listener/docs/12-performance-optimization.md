@@ -36,12 +36,12 @@ const POSITIVE_SET = new Set(['happy', 'great', 'wonderful', ...]);
 function fastSentiment(text: string): number {
   const words = text.toLowerCase().split(/\s+/);
   let score = 0;
-  
+
   for (const word of words) {
     if (NEGATIVE_SET.has(word)) score -= 1;
     if (POSITIVE_SET.has(word)) score += 1;
   }
-  
+
   return Math.max(-1, Math.min(1, score / 3));
 }
 ```

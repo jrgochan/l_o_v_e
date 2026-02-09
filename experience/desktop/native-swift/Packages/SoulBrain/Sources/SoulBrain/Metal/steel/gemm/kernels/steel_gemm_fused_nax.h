@@ -22,7 +22,7 @@ void gemm_epilogue(
     const device T* C,
     const constant GEMMParams* params,
     const constant GEMMAddMMParams* addmm_params,
-    const short sgp_sm, 
+    const short sgp_sm,
     const short sgp_sn) { // clang-format on
 
   (void)params;

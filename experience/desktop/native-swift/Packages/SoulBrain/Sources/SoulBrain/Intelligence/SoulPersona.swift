@@ -34,7 +34,7 @@ public struct SoulPersona {
         public let name: String
         public let definition: String
         public let detailedSteps: [String]
-        
+
         public init(name: String, definition: String, detailedSteps: [String]) {
             self.name = name
             self.definition = definition

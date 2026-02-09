@@ -1,3 +1,8 @@
+"""WebSocket Router.
+
+Defines the endpoints for real-time communication.
+"""
+
 import logging
 from typing import Annotated, List
 from uuid import UUID
@@ -7,14 +12,14 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.api.deps import get_current_user, get_current_user_ws, get_db
 from app.api.schemas.chat import DisplayMessage
-from app.api.sockets.connection import manager
 from app.api.sockets.handlers import (
     handle_deep_feeling_update,
     handle_tone_update,
     handle_user_message,
 )
+from app.api.sockets.manager import manager
 from app.models.user import User
-from app.services.chat_service import ChatService
+from app.services.chat.service import ChatService
 
 logger = logging.getLogger(__name__)
 router = APIRouter()
@@ -26,8 +31,28 @@ async def chat_websocket(
     session_id: str,
     current_user: Annotated[User, Depends(get_current_user_ws)],
 ) -> None:
-    """Websocket endpoint for real-time emotional analysis chat."""
-    await manager.connect(session_id, websocket)
+    """Establish a real-time WebSocket connection for emotional analysis.
+
+    Handles the main event loop for the chat session, dispatching incoming
+    messages to appropriate handlers based on `message_type`. Manage connection
+    lifecycle, authentication, and error handling.
+
+    Args:
+        websocket: The WebSocket connection instance.
+        session_id: Client-generated unique session identifier.
+        current_user: Authenticated user (from query param token).
+
+    Protocol:
+        Expects JSON messages with a "type" field:
+        - "user_message": Text or audio content.
+        - "update_tone": Change response tone (warm/clinical).
+        - "update_deep_feeling": Toggle multi-emotion analysis.
+        - "ping": Heartbeat.
+
+    Raises:
+        WebSocketDisconnect: Client closed connection.
+    """
+    await manager.connect(session_id, websocket, user_id=current_user.id)
 
     auth_user_id = current_user.id
     user_identifier = str(current_user.id)
@@ -65,7 +90,7 @@ async def chat_websocket(
         manager.disconnect(session_id)
         logger.info("Client disconnected from session %s", session_id)
 
-    except Exception as e:
+    except Exception as e:  # pylint: disable=broad-exception-caught
         logger.error("WebSocket error for session %s: %s", session_id, e, exc_info=True)
         await manager.send_message(session_id, {"type": "error", "message": str(e)})
         manager.disconnect(session_id)

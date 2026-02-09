@@ -261,5 +261,5 @@ Before paper submission:
 
 ---
 
-**Last Updated**: December 30, 2025  
+**Last Updated**: December 30, 2025
 **Status**: Specifications complete, awaiting generation

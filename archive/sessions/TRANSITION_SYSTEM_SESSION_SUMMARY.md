@@ -318,7 +318,7 @@ This system is built on:
 
 ## 💡 Key Insights from Design Process
 
-1. **Vulnerability is Central**: 
+1. **Vulnerability is Central**:
    - System automatically detects when Vulnerability is needed
    - Required bridge for Shame → any positive connection
    - Brené Brown: "Birthplace of love, belonging, joy"
@@ -370,7 +370,7 @@ This system is built on:
 1. **Database** (5 min): Run migration + seed
 2. **Observer** (15 min): Register routes, export models
 3. **Versor** (2-3 days): Multi-waypoint SLERP endpoint
-4. **Experience** (3-4 days): 
+4. **Experience** (3-4 days):
    - Soul Sphere path visualization
    - Strategy detail UI
    - Journey tracking

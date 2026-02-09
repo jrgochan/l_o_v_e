@@ -37,7 +37,7 @@ logger = logging.getLogger(__name__)
 
 class TranscriptionService:
     """High-fidelity cloud transcription using faster-whisper"""
-    
+
     def __init__(
         self,
         model_size: str = "large-v3",
@@ -50,7 +50,7 @@ class TranscriptionService:
             compute_type=compute_type
         )
         logger.info(f"Whisper model loaded: {model_size} on {device}")
-    
+
     def transcribe(
         self,
         audio_path: str,
@@ -58,11 +58,11 @@ class TranscriptionService:
     ) -> TranscriptionResult:
         """
         Transcribe audio file to text.
-        
+
         Args:
             audio_path: Path to audio file
             language: Language code (default: en)
-        
+
         Returns:
             TranscriptionResult with text and metadata
         """
@@ -80,11 +80,11 @@ class TranscriptionService:
             best_of=5,
             temperature=0.0        # Deterministic output
         )
-        
+
         # Collect all segments
         full_text = []
         timestamps = []
-        
+
         for segment in segments:
             full_text.append(segment.text)
             timestamps.append({
@@ -92,9 +92,9 @@ class TranscriptionService:
                 "end": segment.end,
                 "text": segment.text
             })
-        
+
         combined_text = " ".join(full_text).strip()
-        
+
         return TranscriptionResult(
             text=combined_text,
             language=info.language,
@@ -117,21 +117,21 @@ import os
 
 class AudioNormalizer:
     """Normalize audio to Whisper's expected format"""
-    
+
     @staticmethod
     def normalize(input_path: str) -> str:
         """
         Convert audio to 16kHz mono WAV.
-        
+
         Args:
             input_path: Original audio file (.m4a, .aac, .opus, etc.)
-        
+
         Returns:
             Path to normalized WAV file
         """
         # Create temp output file
         output_path = tempfile.mktemp(suffix=".wav")
-        
+
         # ffmpeg command
         command = [
             'ffmpeg',
@@ -142,17 +142,17 @@ class AudioNormalizer:
             '-y',                  # Overwrite
             output_path
         ]
-        
+
         # Execute
         result = subprocess.run(
             command,
             capture_output=True,
             text=True
         )
-        
+
         if result.returncode != 0:
             raise Exception(f"ffmpeg failed: {result.stderr}")
-        
+
         return output_path
 ```
 
@@ -179,7 +179,7 @@ async def process_audio(
 ) -> dict:
     """
     Main worker task for audio processing.
-    
+
     Steps:
     1. Normalize audio
     2. Transcribe (faster-whisper)
@@ -188,28 +188,28 @@ async def process_audio(
     5. Store in Observer
     6. Return result
     """
-    
+
     # Initialize services
     normalizer = AudioNormalizer()
     transcription_service = TranscriptionService()
     semantic_analyzer = SemanticAnalyzer()
     pii_scrubber = PIIScrubber()
     observer_client = ObserverClient()
-    
+
     try:
         # Step 1: Normalize audio
         normalized_path = normalizer.normalize(audio_path)
-        
+
         # Step 2: Transcribe
         transcription = transcription_service.transcribe(normalized_path)
         raw_text = transcription.text
-        
+
         # Step 3: Semantic analysis (VAC extraction)
         emotion_result = await semantic_analyzer.analyze(raw_text)
-        
+
         # Step 4: Scrub PII
         sanitized_text = pii_scrubber.scrub(raw_text)
-        
+
         # Step 5: Store in Observer
         observer_result = await observer_client.record_state(
             user_id=user_id,
@@ -218,11 +218,11 @@ async def process_audio(
             vac_scalars=emotion_result.vac.dict(),
             timestamp=timestamp
         )
-        
+
         # Cleanup
         os.remove(audio_path)
         os.remove(normalized_path)
-        
+
         return {
             "status": "success",
             "transcription": raw_text,
@@ -230,7 +230,7 @@ async def process_audio(
             "emotion": emotion_result.dict(),
             "observer_state_id": observer_result.state_id
         }
-        
+
     except Exception as e:
         logger.error(f"Audio processing failed: {e}")
         return {

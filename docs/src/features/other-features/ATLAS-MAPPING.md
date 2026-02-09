@@ -1,6 +1,6 @@
 # Atlas Emotion Mapping - Implementation Plan
 
-**Created**: December 6, 2025, 6:50 PM MDT  
+**Created**: December 6, 2025, 6:50 PM MDT
 **Purpose**: Map AI/LLM emotion names to Brené Brown's 87 Atlas emotions with user notification
 
 ---
@@ -276,12 +276,12 @@ import difflib
 def fuzzy_match(ai_name: str, atlas_emotions: List[str], threshold: float = 0.8) -> Optional[dict]:
     # Get close matches
     matches = difflib.get_close_matches(
-        ai_name, 
-        atlas_emotions, 
+        ai_name,
+        atlas_emotions,
         n=1,  # Return best match only
         cutoff=threshold  # 80% similarity minimum
     )
-    
+
     if matches:
         match = matches[0]
         # Calculate exact similarity score
@@ -290,7 +290,7 @@ def fuzzy_match(ai_name: str, atlas_emotions: List[str], threshold: float = 0.8)
             "name": match,
             "confidence": ratio
         }
-    
+
     return None
 ```
 

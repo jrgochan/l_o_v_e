@@ -57,5 +57,5 @@ ws.onerror = (e) => console.error('❌ WebSocket Error:', e);
 ws.onclose = (e) => console.log('WebSocket Closed:', e.code, e.reason);
 ```
 
-If this works, the issue is in the React hook's connection logic.  
+If this works, the issue is in the React hook's connection logic.
 If this fails, the issue is in the Observer WebSocket implementation.

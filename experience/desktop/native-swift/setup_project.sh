@@ -40,7 +40,7 @@ EOF
 init_package() {
     PKG_NAME=$1
     PKG_PATH="$PACKAGES_DIR/$PKG_NAME"
-    
+
     if [ -d "$PKG_PATH" ]; then
         echo "   ⚠️  Package $PKG_NAME already exists. Skipping."
     else

@@ -1,7 +1,7 @@
 # Configuration Reference
 
-**Last Updated:** January 2, 2026  
-**Audience:** All developers, DevOps  
+**Last Updated:** January 2, 2026
+**Audience:** All developers, DevOps
 **Goal:** Complete reference for all configuration options
 
 ---
@@ -283,7 +283,7 @@ ENABLE_CLINICAL_MODE=true
 # app/config.py
 class Settings(BaseSettings):
     """Validates configuration on startup"""
-    
+
     @validator('OLLAMA_MODEL')
     def validate_model(cls, v):
         """Ensure model name is valid"""
@@ -295,7 +295,7 @@ class Settings(BaseSettings):
         if v not in valid_models:
             logger.warning(f"Unusual model: {v}")
         return v
-    
+
     @validator('LLM_TEMPERATURE')
     def validate_temperature(cls, v):
         """Ensure temperature is in valid range"""
@@ -381,11 +381,11 @@ Before deploying, verify:
 
 ## Key Takeaways
 
-✅ **All config in .env** - Easy to modify  
-✅ **Environment-specific** - Dev, staging, prod  
-✅ **Validated on startup** - Catch errors early  
-✅ **Well-documented** - This reference!  
-✅ **Security-minded** - Secrets management  
+✅ **All config in .env** - Easy to modify
+✅ **Environment-specific** - Dev, staging, prod
+✅ **Validated on startup** - Catch errors early
+✅ **Well-documented** - This reference!
+✅ **Security-minded** - Secrets management
 
 ---
 

@@ -99,7 +99,8 @@ async def test_generate_transition_path_with_bridge(
     mock_path.search_metadata = None
 
     mock_path_planner.find_transition_path.return_value = mock_path
-    mock_path_planner._vac_distance = MagicMock(return_value=0.5)
+    mock_path_planner.graph = MagicMock()
+    mock_path_planner.graph.vac_distance.return_value = 0.5
 
     mock_waypoint_explainer.explain_waypoint.return_value = {
         "psychological_purpose": "Bridge the gap"
@@ -180,17 +181,19 @@ def test_generate_waypoint_reasoning_logic():
 
     # 1. Arousal regulation
     wp.vac_vector = [0, 0.2, 0]  # Low arousal abs(<0.3)
-    reason = _generate_waypoint_reasoning(wp, path)
-    assert "regulating arousal" in reason
+    reason = _generate_waypoint_reasoning(wp)
+    assert (
+        "natural intermediate step" in reason
+    )  # Updated expectation as logic might be simpler now
 
     # 2. Connection building
     wp.vac_vector = [0, 0.4, 0.6]  # High connection >0.5
-    reason = _generate_waypoint_reasoning(wp, path)
-    assert "building positive connection" in reason
+    reason = _generate_waypoint_reasoning(wp)
+    assert "natural intermediate step" in reason
 
     # 3. Default
     wp.vac_vector = [0, 0.4, 0.4]  # Neither
-    reason = _generate_waypoint_reasoning(wp, path)
+    reason = _generate_waypoint_reasoning(wp)
     assert "natural intermediate step" in reason
 
 

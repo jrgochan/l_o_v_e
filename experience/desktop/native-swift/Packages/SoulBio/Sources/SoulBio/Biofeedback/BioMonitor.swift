@@ -68,5 +68,4 @@ public class BioMonitor {
         self.hrv = hrv
     }
 
-
 }

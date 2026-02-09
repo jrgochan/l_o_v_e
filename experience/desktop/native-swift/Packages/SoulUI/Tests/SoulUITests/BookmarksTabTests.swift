@@ -25,7 +25,7 @@ final class BookmarksTabTests: XCTestCase {
         // If not, we look for the Text directly.
         XCTAssertNoThrow(try sut.inspect().find(text: "No Bookmarks"))
 
-        // Use ViewInspector specific find approach for ContentUnavailable if needed, 
+        // Use ViewInspector specific find approach for ContentUnavailable if needed,
         // but text search is robust.
     }
 }

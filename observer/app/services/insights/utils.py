@@ -1,3 +1,5 @@
+"""Module documentation."""
+
 from typing import Any, Dict
 
 
@@ -5,42 +7,39 @@ def interpret_valence(value: float) -> str:
     """Interpret valence value."""
     if value > 0.5:
         return "Very positive"
-    elif value > 0.1:
+    if value > 0.1:
         return "Somewhat positive"
-    elif value > -0.1:
+    if value > -0.1:
         return "Neutral"
-    elif value > -0.5:
+    if value > -0.5:
         return "Somewhat negative"
-    else:
-        return "Very negative"
+    return "Very negative"
 
 
 def interpret_arousal(value: float) -> str:
     """Interpret arousal value."""
     if value > 0.5:
         return "Very high energy"
-    elif value > 0.1:
+    if value > 0.1:
         return "Somewhat high energy"
-    elif value > -0.1:
+    if value > -0.1:
         return "Moderate energy"
-    elif value > -0.5:
+    if value > -0.5:
         return "Somewhat low energy"
-    else:
-        return "Very low energy"
+    return "Very low energy"
 
 
 def interpret_connection(value: float) -> str:
     """Interpret connection value."""
     if value > 0.5:
         return "Strong connection/alignment"
-    elif value > 0.1:
+    if value > 0.1:
         return "Somewhat connected"
-    elif value > -0.1:
+    if value > -0.1:
         return "Neutral connection"
-    elif value > -0.5:
+    if value > -0.5:
         return "Somewhat disconnected"
-    else:
-        return "Strongly disconnected/separated"
+    return "Strongly disconnected/separated"
 
 
 def value_to_percentile(value: float) -> int:
@@ -73,11 +72,11 @@ def analyze_vac_coordinates(vac_data: Dict[str, float]) -> Dict[str, Any]:
     }
 
     # Add quadrant analysis
-    if valence > 0 and arousal > 0:
+    if valence > 0 < arousal:
         analysis["quadrant"] = "High positive energy (excited, joyful)"
-    elif valence > 0 and arousal < 0:
+    elif valence > 0 > arousal:
         analysis["quadrant"] = "Low positive energy (calm, content)"
-    elif valence < 0 and arousal > 0:
+    elif valence < 0 < arousal:
         analysis["quadrant"] = "High negative energy (anxious, angry)"
     else:
         analysis["quadrant"] = "Low negative energy (sad, depressed)"

@@ -1,7 +1,7 @@
 # Zen Experience Feature
 
-**Status:** 📋 Planned - Ready for Implementation  
-**Estimated Effort:** 3-4 hours  
+**Status:** 📋 Planned - Ready for Implementation
+**Estimated Effort:** 3-4 hours
 **Priority:** High - Beautiful UX improvement
 
 ---
@@ -30,19 +30,19 @@ Transform the main page (`/`) into a **pure, contemplative viewer** that display
 
 ## Quick Links
 
-📖 **[00-OVERVIEW.md](./00-OVERVIEW.md)** - Vision, use cases, architecture  
-🛠️ **[01-IMPLEMENTATION.md](./01-IMPLEMENTATION.md)** - Step-by-step code guide  
+📖 **[00-OVERVIEW.md](./00-OVERVIEW.md)** - Vision, use cases, architecture
+🛠️ **[01-IMPLEMENTATION.md](./01-IMPLEMENTATION.md)** - Step-by-step code guide
 🗺️ **[02-ROADMAP.md](./02-ROADMAP.md)** - Phase-by-phase plan with timelines
 
 ---
 
 ## Key Features
 
-✨ **Real-Time Sync** - BroadcastChannel for instant updates  
-✨ **Pure UI** - Just the sphere, nothing else  
-✨ **Session Awareness** - Know which admin session you're following  
-✨ **Keyboard Control** - 'I' to toggle indicator  
-✨ **Future-Proof** - Easy migration to WebSocket for network deployment  
+✨ **Real-Time Sync** - BroadcastChannel for instant updates
+✨ **Pure UI** - Just the sphere, nothing else
+✨ **Session Awareness** - Know which admin session you're following
+✨ **Keyboard Control** - 'I' to toggle indicator
+✨ **Future-Proof** - Easy migration to WebSocket for network deployment
 
 ---
 
@@ -132,11 +132,11 @@ Solo user: Admin in background, zen for contemplation
 
 ## Why This Is Awesome
 
-🎨 **Beautiful** - Pure, uncluttered emotional visualization  
-⚡ **Real-Time** - Instant updates across tabs  
-🔮 **Therapeutic** - Perfect for client-facing displays  
-🚀 **Scalable** - Foundation for network deployment  
-💙 **Delightful** - Separation of control and contemplation  
+🎨 **Beautiful** - Pure, uncluttered emotional visualization
+⚡ **Real-Time** - Instant updates across tabs
+🔮 **Therapeutic** - Perfect for client-facing displays
+🚀 **Scalable** - Foundation for network deployment
+💙 **Delightful** - Separation of control and contemplation
 
 ---
 
@@ -160,12 +160,12 @@ Solo user: Admin in background, zen for contemplation
 
 ## Success Criteria
 
-✅ Open admin in tab 1, zen in tab 2  
-✅ Select emotion in admin → sphere changes in zen (<100ms)  
-✅ Compute path in admin → path appears in zen  
-✅ Clean, beautiful zen page with zero clutter  
-✅ Session indicator shows connection status  
-✅ Keyboard shortcuts work (A for axes, I for indicator)  
+✅ Open admin in tab 1, zen in tab 2
+✅ Select emotion in admin → sphere changes in zen (<100ms)
+✅ Compute path in admin → path appears in zen
+✅ Clean, beautiful zen page with zero clutter
+✅ Session indicator shows connection status
+✅ Keyboard shortcuts work (A for axes, I for indicator)
 
 ---
 

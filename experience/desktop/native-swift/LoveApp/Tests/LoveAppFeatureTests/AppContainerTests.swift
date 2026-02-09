@@ -34,7 +34,7 @@ final class AppContainerTests: XCTestCase {
 
         // Hosting is required for Environment injection to work correctly with @Observable in some contexts
         ViewHosting.host(view: sut)
-        
+
         // Structure: ZStack -> (AdminDashboardView, VStack)
         // Note: With ViewHosting, inspection logic changes slightly but find() should work.
         XCTAssertNoThrow(try sut.inspect().find(ViewType.ZStack.self))

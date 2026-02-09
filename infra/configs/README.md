@@ -240,7 +240,7 @@ ls -la infra/configs/
 
 # Check Python modules have all configs
 for module in observer listener versor; do
-  echo "=== $module ===" 
+  echo "=== $module ==="
   ls -la $module/.flake8 $module/pyproject.toml $module/.editorconfig
 done
 
@@ -364,7 +364,7 @@ cp infra/configs/.flake8 versor/.flake8
 
 # 3. Verify changes work
 ./infra/scripts/check-python-quality.sh --module=observer
-./infra/scripts/check-python-quality.sh --module=listener  
+./infra/scripts/check-python-quality.sh --module=listener
 ./infra/scripts/check-python-quality.sh --module=versor
 
 # 4. Commit all changes together
@@ -410,6 +410,6 @@ For issues with configurations:
 
 ---
 
-**Last Updated**: January 3, 2026  
-**Maintained By**: Infrastructure Team  
+**Last Updated**: January 3, 2026
+**Maintained By**: Infrastructure Team
 **Status**: ✅ Complete - All tools configured

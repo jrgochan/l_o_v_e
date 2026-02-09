@@ -4,6 +4,8 @@ Listener Module - VAC Model Tests
 Unit tests for VAC response Pydantic models.
 """
 
+# pylint: disable=no-member, empty-docstring
+
 import pytest
 from pydantic import ValidationError
 
@@ -18,7 +20,7 @@ from app.models.vac_response import (
 class TestVACVector:
     """Test VACVector model"""
 
-    def test_valid_vac_vector(self):
+    def test_valid_vac_vector(self) -> None:
         """Test creating valid VAC vector"""
         vac = VACVector(valence=0.5, arousal=-0.3, connection=0.8)
 
@@ -26,7 +28,7 @@ class TestVACVector:
         assert vac.arousal == -0.3
         assert vac.connection == 0.8
 
-    def test_vac_validation_rejects_out_of_range(self):
+    def test_vac_validation_rejects_out_of_range(self) -> None:
         """Test that Pydantic rejects values outside [-1, 1]"""
         # Values > 1 should be rejected
         with pytest.raises(ValidationError):
@@ -36,7 +38,7 @@ class TestVACVector:
         with pytest.raises(ValidationError):
             VACVector(valence=-1.5, arousal=-0.5, connection=-0.5)
 
-    def test_vac_field_validator_clamping(self):
+    def test_vac_field_validator_clamping(self) -> None:
         """Test that validator clamps values at the boundary"""
         # This tests the field_validator logic
         # For values slightly outside range, validator will clamp
@@ -45,7 +47,7 @@ class TestVACVector:
         assert -1.0 <= vac.arousal <= 1.0
         assert -1.0 <= vac.connection <= 1.0
 
-    def test_vac_boundary_values(self):
+    def test_vac_boundary_values(self) -> None:
         """Test boundary values"""
         vac = VACVector(valence=-1.0, arousal=1.0, connection=0.0)
 
@@ -53,7 +55,7 @@ class TestVACVector:
         assert vac.arousal == 1.0
         assert vac.connection == 0.0
 
-    def test_vac_serialization(self):
+    def test_vac_serialization(self) -> None:
         """Test VAC vector serialization"""
         vac = VACVector(valence=0.9, arousal=0.7, connection=0.8)
         data = vac.model_dump()
@@ -66,7 +68,7 @@ class TestVACVector:
 class TestEmotionalClassification:
     """Test EmotionalClassification model"""
 
-    def test_valid_classification(self):
+    def test_valid_classification(self) -> None:
         """Test creating valid emotional classification"""
         emotion = EmotionalClassification(
             primary_emotion="Joy",
@@ -81,7 +83,7 @@ class TestEmotionalClassification:
         assert emotion.vac.valence == 0.9
         assert emotion.confidence == 0.92
 
-    def test_confidence_validation(self):
+    def test_confidence_validation(self) -> None:
         """Test confidence must be [0, 1]"""
         # Valid confidence
         emotion = EmotionalClassification(
@@ -103,7 +105,7 @@ class TestEmotionalClassification:
                 reasoning="Test",
             )
 
-    def test_classification_serialization(self):
+    def test_classification_serialization(self) -> None:
         """Test serialization to JSON"""
         emotion = EmotionalClassification(
             primary_emotion="Grief",
@@ -123,7 +125,7 @@ class TestEmotionalClassification:
 class TestTranscriptionResult:
     """Test TranscriptionResult model"""
 
-    def test_valid_transcription(self):
+    def test_valid_transcription(self) -> None:
         """Test creating valid transcription result"""
         result = TranscriptionResult(
             text="Hello world", language="en", duration_seconds=5.0, transcription_time_seconds=0.5
@@ -134,7 +136,7 @@ class TestTranscriptionResult:
         assert result.duration_seconds == 5.0
         assert result.transcription_time_seconds == 0.5
 
-    def test_transcription_serialization(self):
+    def test_transcription_serialization(self) -> None:
         """Test serialization"""
         result = TranscriptionResult(
             text="Test", language="en", duration_seconds=1.0, transcription_time_seconds=0.1
@@ -148,7 +150,7 @@ class TestTranscriptionResult:
 class TestProcessingResult:
     """Test ProcessingResult model"""
 
-    def test_valid_processing_result(self):
+    def test_valid_processing_result(self) -> None:
         """Test creating complete processing result"""
         transcription = TranscriptionResult(
             text="I feel great", language="en", duration_seconds=2.0, transcription_time_seconds=0.3
@@ -174,7 +176,7 @@ class TestProcessingResult:
         assert result.sanitized_text == "I feel great"
         assert result.processing_time_seconds == 2.5
 
-    def test_processing_result_serialization(self):
+    def test_processing_result_serialization(self) -> None:
         """Test full serialization"""
         transcription = TranscriptionResult(
             text="Test", language="en", duration_seconds=1.0, transcription_time_seconds=0.1

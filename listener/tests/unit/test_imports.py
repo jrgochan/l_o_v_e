@@ -1,13 +1,15 @@
 import importlib
 import sys
+from typing import Any, List
 from unittest.mock import MagicMock, patch
 
 
+# pylint: disable=import-outside-toplevel
 # Helper to reload module with patched sys.modules
-def reload_with_missing_modules(module_name, missing_modules):
+def reload_with_missing_modules(module_name: str, missing_modules: List[str]) -> Any:
     with patch.dict(sys.modules):
         for mod in missing_modules:
-            sys.modules[mod] = None
+            sys.modules[mod] = None  # type: ignore[assignment]
 
         # We need to ensure the module is re-imported from scratch
         if module_name in sys.modules:
@@ -20,7 +22,7 @@ def reload_with_missing_modules(module_name, missing_modules):
 
 class TestImportFailures:
 
-    def test_transcription_whisper_missing(self):
+    def test_transcription_whisper_missing(self) -> None:
         """Test TranscriptionService when whisper is not installed."""
         # 1. Force reload app.services.transcription with whisper=None
         with patch.dict(sys.modules, {"whisper": None}):
@@ -33,9 +35,9 @@ class TestImportFailures:
             importlib.reload(app.services.transcription)
 
             assert app.services.transcription.WHISPER_AVAILABLE is False
-            assert app.services.transcription.whisper is None
+            assert app.services.transcription.whisper is None  # type: ignore[attr-defined]
 
-    def test_prosody_librosa_missing(self):
+    def test_prosody_librosa_missing(self) -> None:
         """Test ProsodyAnalyzer when librosa is missing."""
         with patch.dict(sys.modules, {"librosa": None}):
             if "app.services.prosody_analyzer" in sys.modules:
@@ -47,7 +49,7 @@ class TestImportFailures:
 
             assert app.services.prosody_analyzer.LIBROSA_AVAILABLE is False
 
-    def test_prosody_parselmouth_missing(self):
+    def test_prosody_parselmouth_missing(self) -> None:
         """Test ProsodyAnalyzer when parselmouth is missing."""
         # librosa present, parselmouth missing
         mock_librosa = MagicMock()
@@ -64,7 +66,7 @@ class TestImportFailures:
             assert app.services.prosody_analyzer.PARSELMOUTH_AVAILABLE is False
             assert app.services.prosody_analyzer.LIBROSA_AVAILABLE is True
 
-    def test_audio_utils_ffmpeg_missing(self):
+    def test_audio_utils_ffmpeg_missing(self) -> None:
         """Test AudioUtils when ffmpeg is missing."""
         with patch.dict(sys.modules, {"ffmpeg": None}):
             if "app.utils.audio_utils" in sys.modules:

@@ -39,7 +39,7 @@ This guide outlines current capabilities, planned enhancements, and future resea
 - Historical trajectory analysis
 - Reduced HTTP overhead
 
-**Technical effort:** 2 weeks  
+**Technical effort:** 2 weeks
 **Investment:** $10k
 
 **Timeline:** Q2 2026
@@ -58,7 +58,7 @@ This guide outlines current capabilities, planned enhancements, and future resea
 - More nuanced alerts
 - Research opportunities
 
-**Technical effort:** 3 weeks  
+**Technical effort:** 3 weeks
 **Investment:** $15k
 
 **Timeline:** Q2 2026
@@ -77,7 +77,7 @@ This guide outlines current capabilities, planned enhancements, and future resea
 - Better user experience
 - Higher capacity
 
-**Technical effort:** 2 weeks  
+**Technical effort:** 2 weeks
 **Investment:** $10k
 
 **Timeline:** Q3 2026
@@ -98,7 +98,7 @@ This guide outlines current capabilities, planned enhancements, and future resea
 - Lower latency for Experience
 - Better UX for real-time sessions
 
-**Technical effort:** 4 weeks  
+**Technical effort:** 4 weeks
 **Investment:** $20k
 
 **Timeline:** Q4 2026
@@ -119,7 +119,7 @@ This guide outlines current capabilities, planned enhancements, and future resea
 - Artistic control
 - Differentiated visualizations
 
-**Technical effort:** 3 weeks  
+**Technical effort:** 3 weeks
 **Investment:** $15k
 
 **Timeline:** Q4 2026
@@ -138,7 +138,7 @@ This guide outlines current capabilities, planned enhancements, and future resea
 - Predictive capabilities
 - Research enablement
 
-**Technical effort:** 4 weeks  
+**Technical effort:** 4 weeks
 **Investment:** $20k
 
 **Timeline:** Q1 2027
@@ -165,7 +165,7 @@ This guide outlines current capabilities, planned enhancements, and future resea
 - Differentiated offering
 - Research opportunities
 
-**Technical effort:** 12 weeks  
+**Technical effort:** 12 weeks
 **Investment:** $60k
 
 **Timeline:** Q2-Q3 2027
@@ -184,7 +184,7 @@ This guide outlines current capabilities, planned enhancements, and future resea
 - Research institution sales
 - Batch processing services
 
-**Technical effort:** 8 weeks  
+**Technical effort:** 8 weeks
 **Investment:** $40k
 
 **Timeline:** Q3 2027
@@ -207,7 +207,7 @@ This guide outlines current capabilities, planned enhancements, and future resea
 - Academic partnerships
 - Comparative studies
 
-**Technical effort:** 6 weeks  
+**Technical effort:** 6 weeks
 **Investment:** $30k
 
 **Timeline:** Q4 2027
@@ -228,7 +228,7 @@ This guide outlines current capabilities, planned enhancements, and future resea
 - Connection axis research
 - Therapeutic efficacy trials
 
-**Investment:** $20k/year (co-authorship, data sharing)  
+**Investment:** $20k/year (co-authorship, data sharing)
 **Return:** Publications, credibility, funding
 
 #### 2. Computer Science Departments
@@ -237,7 +237,7 @@ This guide outlines current capabilities, planned enhancements, and future resea
 - Novel interpolation methods
 - Performance optimization
 
-**Investment:** $10k/year (student projects)  
+**Investment:** $10k/year (student projects)
 **Return:** Talent pipeline, publications
 
 #### 3. Medical Schools
@@ -246,7 +246,7 @@ This guide outlines current capabilities, planned enhancements, and future resea
 - FDA approval pathway
 - Efficacy studies
 
-**Investment:** $50k/year (trials, compliance)  
+**Investment:** $50k/year (trials, compliance)
 **Return:** Clinical adoption, regulatory approval
 
 ---
@@ -261,8 +261,8 @@ This guide outlines current capabilities, planned enhancements, and future resea
 - VAC model with Connection axis
 - SLERP for emotional transitions
 
-**Investment:** $20k (filing)  
-**Timeline:** 12-18 months to grant  
+**Investment:** $20k (filing)
+**Timeline:** 12-18 months to grant
 **Value:** $200-500k defensive/offensive
 
 ### Phase 2: Enhancement Patents (2027-2028)
@@ -273,8 +273,8 @@ This guide outlines current capabilities, planned enhancements, and future resea
 - Multi-model quaternion mapping
 - Predictive emotional modeling
 
-**Investment:** $10k each  
-**Timeline:** Ongoing  
+**Investment:** $10k each
+**Timeline:** Ongoing
 **Value:** Portfolio strengthening
 
 ---
@@ -303,8 +303,8 @@ This guide outlines current capabilities, planned enhancements, and future resea
 
 ### Geographic Expansion
 
-**Phase 1:** US market (current)  
-**Phase 2:** English-speaking countries  
+**Phase 1:** US market (current)
+**Phase 2:** English-speaking countries
 **Phase 3:** Internationalization
 
 **Versor impact:**
@@ -343,22 +343,22 @@ This guide outlines current capabilities, planned enhancements, and future resea
 
 ### Technical Risks
 
-**Risk:** SciPy discontinues Slerp support  
-**Mitigation:** Have pure-Python fallback  
+**Risk:** SciPy discontinues Slerp support
+**Mitigation:** Have pure-Python fallback
 **Likelihood:** Very low
 
-**Risk:** Quaternions proven inadequate for emotions  
-**Mitigation:** Architecture supports alternate representations  
+**Risk:** Quaternions proven inadequate for emotions
+**Mitigation:** Architecture supports alternate representations
 **Likelihood:** Very low (math is proven)
 
 ### Market Risks
 
-**Risk:** Premium tier doesn't convert  
-**Mitigation:** Versor still valuable for clinical/enterprise  
+**Risk:** Premium tier doesn't convert
+**Mitigation:** Versor still valuable for clinical/enterprise
 **Impact:** Reduces ROI but still positive
 
-**Risk:** Competitor patents quaternion emotions first  
-**Mitigation:** File patent ASAP  
+**Risk:** Competitor patents quaternion emotions first
+**Mitigation:** File patent ASAP
 **Likelihood:** Low (novel application)
 
 ---
@@ -367,27 +367,27 @@ This guide outlines current capabilities, planned enhancements, and future resea
 
 ### Scenario A: Maintain (Recommended)
 
-**Investment:** $60k/year  
-**Focus:** Stability, incremental improvements  
-**Return:** Steady revenue from premium tier  
+**Investment:** $60k/year
+**Focus:** Stability, incremental improvements
+**Return:** Steady revenue from premium tier
 **Risk:** Low
 
 **Best for:** Stable growth, proven market
 
 ### Scenario B: Expand
 
-**Investment:** $150k/year  
-**Focus:** New features, research, patents  
-**Return:** Higher potential, market leadership  
+**Investment:** $150k/year
+**Focus:** New features, research, patents
+**Return:** Higher potential, market leadership
 **Risk:** Medium
 
 **Best for:** Aggressive growth, market capture
 
 ### Scenario C: Harvest
 
-**Investment:** $30k/year (minimal maintenance)  
-**Focus:** Keep lights on, no new features  
-**Return:** Declining over time  
+**Investment:** $30k/year (minimal maintenance)
+**Focus:** Keep lights on, no new features
+**Return:** Declining over time
 **Risk:** Low but declining value
 
 **Best for:** Cash preservation (not recommended)
@@ -493,15 +493,15 @@ This guide outlines current capabilities, planned enhancements, and future resea
 
 ## Conclusion
 
-**Current status:** Production-ready, exceeding targets ✅  
-**Recommended investment:** Maintain + Patent (~$135k/year)  
-**Expected return:** $324k profit over 3 years  
-**Risk level:** Low-Medium  
+**Current status:** Production-ready, exceeding targets ✅
+**Recommended investment:** Maintain + Patent (~$135k/year)
+**Expected return:** $324k profit over 3 years
+**Risk level:** Low-Medium
 **Strategic importance:** Critical (enables premium tier)
 
 **Next decision point:** Q2 2026 (review premium tier adoption)
 
 ---
 
-**Previous:** [← Business Value](02-business-value.md)  
+**Previous:** [← Business Value](02-business-value.md)
 **Next:** [API Reference →](../reference/api-reference.md)

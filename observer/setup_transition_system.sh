@@ -1,7 +1,7 @@
 #!/bin/bash
 #
 # Quick-Start Script for Emotional State Transition System
-# 
+#
 # This script sets up the transition system database and seeds initial data.
 #
 

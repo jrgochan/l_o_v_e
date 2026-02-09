@@ -17,7 +17,7 @@ public actor MLXEmbedder: Embedder {
 
     public func load() async throws {
         SoulLog.brain.info("🧠 MLXEmbedder: Loading BERT model...")
-        
+
         // Initialize Config
         let config = BertConfig()
         self.model = Bert(config)

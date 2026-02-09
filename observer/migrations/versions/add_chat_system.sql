@@ -24,23 +24,23 @@ CREATE TABLE IF NOT EXISTS chat_messages (
     content TEXT,
     audio_url TEXT,
     transcription TEXT,
-    
+
     -- Analysis data
     emotion_id UUID REFERENCES atlas_definition(id),
     vac_coordinates FLOAT[3],
     confidence FLOAT,
-    
+
     -- Prosody data (voice characteristics)
     prosody_pitch_mean FLOAT,
     prosody_pitch_std FLOAT,
     prosody_energy FLOAT,
     prosody_rate FLOAT,
     prosody_features JSONB,
-    
+
     -- Insights and reasoning
     insights JSONB,
     tone_mode VARCHAR(20),
-    
+
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 

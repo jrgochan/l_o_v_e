@@ -3,7 +3,7 @@ from fastapi.testclient import TestClient
 from app.main import app
 
 
-def test_listener_app_loads():
+def test_listener_app_loads() -> None:
     """Verify listener app instantiates and root endpoint works."""
     with TestClient(app) as client:
         response = client.get("/")

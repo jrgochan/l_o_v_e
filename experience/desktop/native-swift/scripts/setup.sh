@@ -36,7 +36,7 @@ if command -v brew &> /dev/null; then
     else
         echo "✅ SwiftLint installed."
     fi
-    
+
     if ! command -v swift-format &> /dev/null; then
         echo "⚠️ swift-format not found. Installing..."
         brew install swift-format

@@ -32,5 +32,5 @@ async def get_current_user(token: Annotated[str, Depends(oauth2_scheme)]) -> dic
             raise credentials_exception
 
         return payload  # type: ignore[no-any-return]
-    except JWTError:
-        raise credentials_exception
+    except JWTError as exc:
+        raise credentials_exception from exc

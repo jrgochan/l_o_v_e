@@ -1,971 +1,623 @@
 {
-  "version": "1.0",
-  "source": "Bren\u00e9 Brown - Atlas of the Heart (2021)",
-  "metadata": {
-    "total_emotions": 87,
-    "categories": 13,
-    "coordinate_system": "VAC (Valence, Arousal, Connection)",
-    "vac_range": "[-1.0, 1.0] for each dimension",
-    "created": "2026-01-03",
-    "last_updated": "2026-01-03"
-  },
-  "emotions": [
-    {
-      "emotion_name": "Stress",
-      "category": "When Things Are Uncertain or Too Much",
-      "definition": "Physical and emotional tension from demands exceeding resources.",
-      "vac": [
-        -0.4,
-        0.6,
-        -0.2
-      ],
-      "haptic_pattern_id": "TENSE_PULSE"
-    },
-    {
-      "emotion_name": "Overwhelm",
-      "category": "When Things Are Uncertain or Too Much",
-      "definition": "Extreme stress where demands completely exceed capacity.",
-      "vac": [
-        -0.6,
-        0.9,
-        -0.3
-      ],
-      "haptic_pattern_id": "HEAVY_THROB"
-    },
-    {
-      "emotion_name": "Anxiety",
-      "category": "When Things Are Uncertain or Too Much",
-      "definition": "Future-focused fear and apprehension about potential threats.",
-      "vac": [
-        -0.5,
-        0.7,
-        -0.4
-      ],
-      "haptic_pattern_id": "RAPID_PULSE"
-    },
-    {
-      "emotion_name": "Fear",
-      "category": "When Things Are Uncertain or Too Much",
-      "definition": "Immediate response to perceived threat or danger.",
-      "vac": [
-        -0.6,
-        0.8,
-        -0.5
-      ],
-      "haptic_pattern_id": "SHARP_STRIKE"
-    },
-    {
-      "emotion_name": "Vulnerability",
-      "category": "When Things Are Uncertain or Too Much",
-      "definition": "The gateway to connection; risk exposure with uncertain outcome.",
-      "vac": [
-        0.0,
-        0.3,
-        0.6
-      ],
-      "haptic_pattern_id": "GENTLE_PULSE"
-    },
-    {
-      "emotion_name": "Worry",
-      "category": "When Things Are Uncertain or Too Much",
-      "definition": "Cognitive anxiety and rumination about potential problems.",
-      "vac": [
-        -0.4,
-        0.5,
-        -0.3
-      ],
-      "haptic_pattern_id": "TENSE_PULSE"
-    },
-    {
-      "emotion_name": "Avoidance",
-      "category": "When Things Are Uncertain or Too Much",
-      "definition": "Evasion of discomfort or difficult situations.",
-      "vac": [
-        -0.3,
-        -0.2,
-        -0.4
-      ],
-      "haptic_pattern_id": "TENSE_PULSE"
-    },
-    {
-      "emotion_name": "Excitement",
-      "category": "When Things Are Uncertain or Too Much",
-      "definition": "Positive anticipation with high energy.",
-      "vac": [
-        0.7,
-        0.8,
-        0.4
-      ],
-      "haptic_pattern_id": "LIGHT_PULSE"
-    },
-    {
-      "emotion_name": "Dread",
-      "category": "When Things Are Uncertain or Too Much",
-      "definition": "Intense anxiety about an anticipated future event.",
-      "vac": [
-        -0.7,
-        0.6,
-        -0.5
-      ],
-      "haptic_pattern_id": "HEAVY_THROB"
-    },
-    {
-      "emotion_name": "Admiration",
-      "category": "When We Compare",
-      "definition": "Respect and approval of someone without envy.",
-      "vac": [
-        0.6,
-        0.3,
-        0.5
-      ],
-      "haptic_pattern_id": "WARM_PULSE"
-    },
-    {
-      "emotion_name": "Envy",
-      "category": "When We Compare",
-      "definition": "Wanting what others have; longing for their advantages.",
-      "vac": [
-        -0.5,
-        0.4,
-        -0.6
-      ],
-      "haptic_pattern_id": "TENSE_PULSE"
-    },
-    {
-      "emotion_name": "Jealousy",
-      "category": "When We Compare",
-      "definition": "Fear of losing what's yours to another person.",
-      "vac": [
-        -0.6,
-        0.7,
-        -0.7
-      ],
-      "haptic_pattern_id": "SHARP_STRIKE"
-    },
-    {
-      "emotion_name": "Resentment",
-      "category": "When We Compare",
-      "definition": "Stored anger from perceived injustice or unfairness.",
-      "vac": [
-        -0.7,
-        0.5,
-        -0.8
-      ],
-      "haptic_pattern_id": "HEAVY_THROB"
-    },
-    {
-      "emotion_name": "Schadenfreude",
-      "category": "When We Compare",
-      "definition": "Pleasure derived from another's misfortune.",
-      "vac": [
-        0.3,
-        0.4,
-        -0.7
-      ],
-      "haptic_pattern_id": "SHARP_STRIKE"
-    },
-    {
-      "emotion_name": "Freudenfreude",
-      "category": "When We Compare",
-      "definition": "Joy at another person's success or happiness.",
-      "vac": [
-        0.8,
-        0.5,
-        0.9
-      ],
-      "haptic_pattern_id": "LIGHT_PULSE"
-    },
-    {
-      "emotion_name": "Reverence",
-      "category": "When We Compare",
-      "definition": "Deep respect and awe for someone or something.",
-      "vac": [
-        0.7,
-        0.2,
-        0.8
-      ],
-      "haptic_pattern_id": "GENTLE_PULSE"
-    },
-    {
-      "emotion_name": "Disappointment",
-      "category": "When Things Don't Go As Planned",
-      "definition": "Sadness or displeasure caused by unmet expectations.",
-      "vac": [
-        -0.5,
-        -0.3,
-        0.0
-      ],
-      "haptic_pattern_id": "HEAVY_THROB"
-    },
-    {
-      "emotion_name": "Regret",
-      "category": "When Things Don't Go As Planned",
-      "definition": "Sorrow about past actions or decisions.",
-      "vac": [
-        -0.6,
-        -0.2,
-        -0.3
-      ],
-      "haptic_pattern_id": "HEAVY_THROB"
-    },
-    {
-      "emotion_name": "Frustration",
-      "category": "When Things Don't Go As Planned",
-      "definition": "High energy response to blocked goals.",
-      "vac": [
-        -0.5,
-        0.7,
-        -0.2
-      ],
-      "haptic_pattern_id": "SHARP_STRIKE"
-    },
-    {
-      "emotion_name": "Boredom",
-      "category": "When Things Don't Go As Planned",
-      "definition": "Lack of stimulation or interest.",
-      "vac": [
-        -0.2,
-        -0.8,
-        -0.2
-      ],
-      "haptic_pattern_id": "HEAVY_THROB"
-    },
-    {
-      "emotion_name": "Discouragement",
-      "category": "When Things Don't Go As Planned",
-      "definition": "Loss of confidence or enthusiasm.",
-      "vac": [
-        -0.5,
-        -0.4,
-        -0.2
-      ],
-      "haptic_pattern_id": "HEAVY_THROB"
-    },
-    {
-      "emotion_name": "Resignation",
-      "category": "When Things Don't Go As Planned",
-      "definition": "Acceptance of an undesired outcome without resistance.",
-      "vac": [
-        -0.6,
-        -0.6,
-        -0.5
-      ],
-      "haptic_pattern_id": "HEAVY_THROB"
-    },
-    {
-      "emotion_name": "Awe",
-      "category": "When It's Beyond Us",
-      "definition": "Overwhelmed by greatness or beauty; sense of vastness.",
-      "vac": [
-        0.7,
-        0.5,
-        0.8
-      ],
-      "haptic_pattern_id": "GENTLE_PULSE"
-    },
-    {
-      "emotion_name": "Wonder",
-      "category": "When It's Beyond Us",
-      "definition": "Curiosity and amazement at something extraordinary.",
-      "vac": [
-        0.6,
-        0.4,
-        0.7
-      ],
-      "haptic_pattern_id": "LIGHT_PULSE"
-    },
-    {
-      "emotion_name": "Confusion",
-      "category": "When It's Beyond Us",
-      "definition": "Lack of understanding or clarity.",
-      "vac": [
-        -0.2,
-        0.3,
-        -0.2
-      ],
-      "haptic_pattern_id": "RAPID_PULSE"
-    },
-    {
-      "emotion_name": "Curiosity",
-      "category": "When It's Beyond Us",
-      "definition": "Drive to explore, learn, and understand.",
-      "vac": [
-        0.5,
-        0.6,
-        0.3
-      ],
-      "haptic_pattern_id": "LIGHT_PULSE"
-    },
-    {
-      "emotion_name": "Surprise",
-      "category": "When It's Beyond Us",
-      "definition": "Unexpected occurrence that interrupts normal flow.",
-      "vac": [
-        0.0,
-        0.8,
-        0.0
-      ],
-      "haptic_pattern_id": "SHARP_STRIKE"
-    },
-    {
-      "emotion_name": "Interest",
-      "category": "When It's Beyond Us",
-      "definition": "Attention and engagement with something novel.",
-      "vac": [
-        0.4,
-        0.5,
-        0.2
-      ],
-      "haptic_pattern_id": "LIGHT_PULSE"
-    },
-    {
-      "emotion_name": "Bittersweetness",
-      "category": "When Things Aren't What They Seem",
-      "definition": "Simultaneous happiness and sadness in the same moment.",
-      "vac": [
-        0.0,
-        -0.2,
-        0.5
-      ],
-      "haptic_pattern_id": "GENTLE_PULSE"
-    },
-    {
-      "emotion_name": "Nostalgia",
-      "category": "When Things Aren't What They Seem",
-      "definition": "Sentimental longing for the past.",
-      "vac": [
-        0.3,
-        -0.2,
-        0.4
-      ],
-      "haptic_pattern_id": "WARM_PULSE"
-    },
-    {
-      "emotion_name": "Amusement",
-      "category": "When Things Aren't What They Seem",
-      "definition": "Light-hearted enjoyment and entertainment.",
-      "vac": [
-        0.6,
-        0.4,
-        0.3
-      ],
-      "haptic_pattern_id": "LIGHT_PULSE"
-    },
-    {
-      "emotion_name": "Cognitive Dissonance",
-      "category": "When Things Aren't What They Seem",
-      "definition": "Mental discomfort from holding conflicting beliefs.",
-      "vac": [
-        -0.4,
-        0.5,
-        -0.3
-      ],
-      "haptic_pattern_id": "TENSE_PULSE"
-    },
-    {
-      "emotion_name": "Irony",
-      "category": "When Things Aren't What They Seem",
-      "definition": "Incongruity between expectation and reality.",
-      "vac": [
-        0.2,
-        0.2,
-        0.0
-      ],
-      "haptic_pattern_id": "LIGHT_PULSE"
-    },
-    {
-      "emotion_name": "Sarcasm",
-      "category": "When Things Aren't What They Seem",
-      "definition": "Mocking or contemptuous irony.",
-      "vac": [
-        0.0,
-        0.3,
-        -0.2
-      ],
-      "haptic_pattern_id": "SHARP_STRIKE"
-    },
-    {
-      "emotion_name": "Anguish",
-      "category": "When We're Hurting",
-      "definition": "Severe mental or physical pain and suffering.",
-      "vac": [
-        -0.9,
-        0.4,
-        -0.5
-      ],
-      "haptic_pattern_id": "HEAVY_THROB"
-    },
-    {
-      "emotion_name": "Hopelessness",
-      "category": "When We're Hurting",
-      "definition": "Belief that nothing will improve; loss of hope.",
-      "vac": [
-        -0.8,
-        -0.5,
-        -0.6
-      ],
-      "haptic_pattern_id": "HEAVY_THROB"
-    },
-    {
-      "emotion_name": "Despair",
-      "category": "When We're Hurting",
-      "definition": "Complete loss of hope; utter hopelessness.",
-      "vac": [
-        -0.9,
-        -0.6,
-        -0.7
-      ],
-      "haptic_pattern_id": "HEAVY_THROB"
-    },
-    {
-      "emotion_name": "Sadness",
-      "category": "When We're Hurting",
-      "definition": "General unhappiness or low mood.",
-      "vac": [
-        -0.6,
-        -0.4,
-        0.0
-      ],
-      "haptic_pattern_id": "HEAVY_THROB"
-    },
-    {
-      "emotion_name": "Grief",
-      "category": "When We're Hurting",
-      "definition": "Deep loss with paradoxical connection to love.",
-      "vac": [
-        -0.9,
-        -0.4,
-        0.5
-      ],
-      "haptic_pattern_id": "HEARTBEAT"
-    },
-    {
-      "emotion_name": "Sorrow",
-      "category": "When We're Hurting",
-      "definition": "Deep distress caused by loss or disappointment.",
-      "vac": [
-        -0.7,
-        -0.3,
-        0.2
-      ],
-      "haptic_pattern_id": "HEAVY_THROB"
-    },
-    {
-      "emotion_name": "Melancholy",
-      "category": "When We're Hurting",
-      "definition": "Pensive sadness with reflective quality.",
-      "vac": [
-        -0.5,
-        -0.6,
-        0.3
-      ],
-      "haptic_pattern_id": "GENTLE_PULSE"
-    },
-    {
-      "emotion_name": "Compassion",
-      "category": "Places We Go With Others",
-      "definition": "Feeling with another; motivated to help; shared humanity.",
-      "vac": [
-        0.5,
-        0.2,
-        0.9
-      ],
-      "haptic_pattern_id": "HEARTBEAT"
-    },
-    {
-      "emotion_name": "Pity",
-      "category": "Places We Go With Others",
-      "definition": "Feeling for another from a place of separation; condescension.",
-      "vac": [
-        -0.3,
-        -0.1,
-        -0.7
-      ],
-      "haptic_pattern_id": "HEAVY_THROB"
-    },
-    {
-      "emotion_name": "Empathy",
-      "category": "Places We Go With Others",
-      "definition": "Feeling with someone; understanding their perspective.",
-      "vac": [
-        0.4,
-        0.1,
-        0.8
-      ],
-      "haptic_pattern_id": "HEARTBEAT"
-    },
-    {
-      "emotion_name": "Sympathy",
-      "category": "Places We Go With Others",
-      "definition": "Feeling for someone; acknowledging their pain.",
-      "vac": [
-        0.2,
-        0.0,
-        0.3
-      ],
-      "haptic_pattern_id": "WARM_PULSE"
-    },
-    {
-      "emotion_name": "Boundaries",
-      "category": "Places We Go With Others",
-      "definition": "Healthy limits that protect connection and integrity.",
-      "vac": [
-        0.5,
-        0.2,
-        0.7
-      ],
-      "haptic_pattern_id": "GENTLE_PULSE"
-    },
-    {
-      "emotion_name": "Comparative Suffering",
-      "category": "Places We Go With Others",
-      "definition": "Ranking pain as better or worse than others'.",
-      "vac": [
-        -0.4,
-        0.3,
-        -0.6
-      ],
-      "haptic_pattern_id": "TENSE_PULSE"
-    },
-    {
-      "emotion_name": "Shame",
-      "category": "When We Fall Short",
-      "definition": "I am bad; identity-level negative self-judgment.",
-      "vac": [
-        -0.9,
-        -0.1,
-        -1.0
-      ],
-      "haptic_pattern_id": "HEAVY_THROB"
-    },
-    {
-      "emotion_name": "Self-Compassion",
-      "category": "When We Fall Short",
-      "definition": "Kindness toward self; treating yourself as you would a friend.",
-      "vac": [
-        0.6,
-        -0.2,
-        0.9
-      ],
-      "haptic_pattern_id": "HEARTBEAT"
-    },
-    {
-      "emotion_name": "Guilt",
-      "category": "When We Fall Short",
-      "definition": "I did something bad; behavior-level judgment.",
-      "vac": [
-        -0.6,
-        0.2,
-        -0.3
-      ],
-      "haptic_pattern_id": "TENSE_PULSE"
-    },
-    {
-      "emotion_name": "Embarrassment",
-      "category": "When We Fall Short",
-      "definition": "Mild social discomfort; fleeting shame.",
-      "vac": [
-        -0.4,
-        0.5,
-        -0.2
-      ],
-      "haptic_pattern_id": "RAPID_PULSE"
-    },
-    {
-      "emotion_name": "Humiliation",
-      "category": "When We Fall Short",
-      "definition": "Public shame; degradation in front of others.",
-      "vac": [
-        -0.8,
-        0.4,
-        -0.9
-      ],
-      "haptic_pattern_id": "HEAVY_THROB"
-    },
-    {
-      "emotion_name": "Perfectionism",
-      "category": "When We Fall Short",
-      "definition": "Rigid, unattainable standards; fear of being flawed.",
-      "vac": [
-        -0.3,
-        0.5,
-        -0.6
-      ],
-      "haptic_pattern_id": "TENSE_PULSE"
-    },
-    {
-      "emotion_name": "Belonging",
-      "category": "When We Search for Connection",
-      "definition": "Authentic acceptance for who you truly are.",
-      "vac": [
-        0.8,
-        0.4,
-        1.0
-      ],
-      "haptic_pattern_id": "HEARTBEAT"
-    },
-    {
-      "emotion_name": "Fitting In",
-      "category": "When We Search for Connection",
-      "definition": "Changing yourself to be accepted; disconnection from self.",
-      "vac": [
-        0.3,
-        0.3,
-        -0.3
-      ],
-      "haptic_pattern_id": "TENSE_PULSE"
-    },
-    {
-      "emotion_name": "Disconnection",
-      "category": "When We Search for Connection",
-      "definition": "Lack of meaningful connection; isolation.",
-      "vac": [
-        -0.5,
-        -0.3,
-        -0.7
-      ],
-      "haptic_pattern_id": "HEAVY_THROB"
-    },
-    {
-      "emotion_name": "Loneliness",
-      "category": "When We Search for Connection",
-      "definition": "Painful feeling of isolation and disconnection.",
-      "vac": [
-        -0.7,
-        -0.2,
-        -0.9
-      ],
-      "haptic_pattern_id": "HEAVY_THROB"
-    },
-    {
-      "emotion_name": "Insecurity",
-      "category": "When We Search for Connection",
-      "definition": "Uncertainty about one's worth and belonging.",
-      "vac": [
-        -0.4,
-        0.4,
-        -0.5
-      ],
-      "haptic_pattern_id": "TENSE_PULSE"
-    },
-    {
-      "emotion_name": "Invisibility",
-      "category": "When We Search for Connection",
-      "definition": "Feeling unseen and unacknowledged by others.",
-      "vac": [
-        -0.6,
-        -0.3,
-        -0.8
-      ],
-      "haptic_pattern_id": "HEAVY_THROB"
-    },
-    {
-      "emotion_name": "Love",
-      "category": "When the Heart Is Open",
-      "definition": "Deep affection, care, and connection.",
-      "vac": [
-        0.9,
-        0.3,
-        1.0
-      ],
-      "haptic_pattern_id": "HEARTBEAT"
-    },
-    {
-      "emotion_name": "Heartbreak",
-      "category": "When the Heart Is Open",
-      "definition": "Loss of love with residual connection.",
-      "vac": [
-        -0.8,
-        0.4,
-        0.3
-      ],
-      "haptic_pattern_id": "HEARTBEAT"
-    },
-    {
-      "emotion_name": "Trust",
-      "category": "When the Heart Is Open",
-      "definition": "Belief in reliability and integrity of another.",
-      "vac": [
-        0.6,
-        0.1,
-        0.9
-      ],
-      "haptic_pattern_id": "GENTLE_PULSE"
-    },
-    {
-      "emotion_name": "Betrayal",
-      "category": "When the Heart Is Open",
-      "definition": "Violation of trust; breach of relational contract.",
-      "vac": [
-        -0.8,
-        0.6,
-        -0.9
-      ],
-      "haptic_pattern_id": "SHARP_STRIKE"
-    },
-    {
-      "emotion_name": "Flooding",
-      "category": "When the Heart Is Open",
-      "definition": "Emotional overwhelm leading to shutdown.",
-      "vac": [
-        -0.6,
-        0.9,
-        -0.7
-      ],
-      "haptic_pattern_id": "RAPID_PULSE"
-    },
-    {
-      "emotion_name": "Lovelessness",
-      "category": "When the Heart Is Open",
-      "definition": "Absence or lack of love in one's life.",
-      "vac": [
-        -0.7,
-        -0.4,
-        -0.8
-      ],
-      "haptic_pattern_id": "HEAVY_THROB"
-    },
-    {
-      "emotion_name": "Self-Trust",
-      "category": "When the Heart Is Open",
-      "definition": "Confidence in one's own judgment and decisions.",
-      "vac": [
-        0.7,
-        0.1,
-        0.8
-      ],
-      "haptic_pattern_id": "GENTLE_PULSE"
-    },
-    {
-      "emotion_name": "Defensiveness",
-      "category": "When the Heart Is Open",
-      "definition": "Self-protective response to perceived criticism.",
-      "vac": [
-        -0.3,
-        0.6,
-        -0.4
-      ],
-      "haptic_pattern_id": "SHARP_STRIKE"
-    },
-    {
-      "emotion_name": "Hurt",
-      "category": "When the Heart Is Open",
-      "definition": "Emotional pain from words or actions of others.",
-      "vac": [
-        -0.6,
-        0.2,
-        -0.3
-      ],
-      "haptic_pattern_id": "HEAVY_THROB"
-    },
-    {
-      "emotion_name": "Tenderness",
-      "category": "When the Heart Is Open",
-      "definition": "Gentle caring and affection.",
-      "vac": [
-        0.7,
-        0.1,
-        0.8
-      ],
-      "haptic_pattern_id": "HEARTBEAT"
-    },
-    {
-      "emotion_name": "Warmth",
-      "category": "When the Heart Is Open",
-      "definition": "Comfortable affection and friendliness.",
-      "vac": [
-        0.6,
-        0.2,
-        0.7
-      ],
-      "haptic_pattern_id": "WARM_PULSE"
-    },
-    {
-      "emotion_name": "Joy",
-      "category": "When Life Is Good",
-      "definition": "Intense, brief feeling of positive emotion and delight.",
-      "vac": [
-        0.9,
-        0.7,
-        0.8
-      ],
-      "haptic_pattern_id": "LIGHT_PULSE"
-    },
-    {
-      "emotion_name": "Happiness",
-      "category": "When Life Is Good",
-      "definition": "Stable positive well-being and life satisfaction.",
-      "vac": [
-        0.7,
-        0.5,
-        0.5
-      ],
-      "haptic_pattern_id": "WARM_PULSE"
-    },
-    {
-      "emotion_name": "Calm",
-      "category": "When Life Is Good",
-      "definition": "Peaceful, tranquil state of low arousal.",
-      "vac": [
-        0.5,
-        -0.7,
-        0.4
-      ],
-      "haptic_pattern_id": "GENTLE_PULSE"
-    },
-    {
-      "emotion_name": "Contentment",
-      "category": "When Life Is Good",
-      "definition": "Satisfied and at ease; peaceful acceptance.",
-      "vac": [
-        0.6,
-        -0.5,
-        0.5
-      ],
-      "haptic_pattern_id": "GENTLE_PULSE"
-    },
-    {
-      "emotion_name": "Gratitude",
-      "category": "When Life Is Good",
-      "definition": "Appreciation for gifts, blessings, and kindness received.",
-      "vac": [
-        0.8,
-        0.3,
-        0.9
-      ],
-      "haptic_pattern_id": "HEARTBEAT"
-    },
-    {
-      "emotion_name": "Foreboding Joy",
-      "category": "When Life Is Good",
-      "definition": "Joy tinged with fear of losing it; waiting for the other shoe to drop.",
-      "vac": [
-        0.5,
-        0.6,
-        -0.2
-      ],
-      "haptic_pattern_id": "TENSE_PULSE"
-    },
-    {
-      "emotion_name": "Relief",
-      "category": "When Life Is Good",
-      "definition": "Release from distress or discomfort.",
-      "vac": [
-        0.6,
-        -0.3,
-        0.3
-      ],
-      "haptic_pattern_id": "GENTLE_PULSE"
-    },
-    {
-      "emotion_name": "Tranquility",
-      "category": "When Life Is Good",
-      "definition": "Deep peace and serenity.",
-      "vac": [
-        0.7,
-        -0.8,
-        0.6
-      ],
-      "haptic_pattern_id": "GENTLE_PULSE"
-    },
-    {
-      "emotion_name": "Anger",
-      "category": "When We Feel Wronged",
-      "definition": "Action emotion; response to injustice or boundary violation.",
-      "vac": [
-        -0.5,
-        0.8,
-        -0.2
-      ],
-      "haptic_pattern_id": "SHARP_STRIKE"
-    },
-    {
-      "emotion_name": "Contempt",
-      "category": "When We Feel Wronged",
-      "definition": "You are beneath me; superiority and disdain.",
-      "vac": [
-        -0.6,
-        0.3,
-        -0.8
-      ],
-      "haptic_pattern_id": "SHARP_STRIKE"
-    },
-    {
-      "emotion_name": "Disgust",
-      "category": "When We Feel Wronged",
-      "definition": "Revulsion and aversion; strong rejection.",
-      "vac": [
-        -0.7,
-        0.5,
-        -0.6
-      ],
-      "haptic_pattern_id": "SHARP_STRIKE"
-    },
-    {
-      "emotion_name": "Hate",
-      "category": "When We Feel Wronged",
-      "definition": "Sustained intense negativity and hostility.",
-      "vac": [
-        -0.9,
-        0.6,
-        -1.0
-      ],
-      "haptic_pattern_id": "HEAVY_THROB"
-    },
-    {
-      "emotion_name": "Self-Righteousness",
-      "category": "When We Feel Wronged",
-      "definition": "False moral superiority; disconnected from empathy.",
-      "vac": [
-        0.3,
-        0.4,
-        -0.7
-      ],
-      "haptic_pattern_id": "SHARP_STRIKE"
-    },
-    {
-      "emotion_name": "Dehumanization",
-      "category": "When We Feel Wronged",
-      "definition": "Complete severing of connection; denying someone's humanity.",
-      "vac": [
-        -0.9,
-        0.4,
-        -1.0
-      ],
-      "haptic_pattern_id": "HEAVY_THROB"
-    },
-    {
-      "emotion_name": "Pride",
-      "category": "When We Self-Assess",
-      "definition": "Healthy self-esteem and satisfaction in achievement.",
-      "vac": [
-        0.7,
-        0.6,
-        0.6
-      ],
-      "haptic_pattern_id": "WARM_PULSE"
-    },
-    {
-      "emotion_name": "Hubris",
-      "category": "When We Self-Assess",
-      "definition": "Inflated ego; disconnected from reality and others.",
-      "vac": [
-        0.7,
-        0.6,
-        -0.8
-      ],
-      "haptic_pattern_id": "SHARP_STRIKE"
-    },
-    {
-      "emotion_name": "Humility",
-      "category": "When We Self-Assess",
-      "definition": "Grounded confidence; accurate self-assessment.",
-      "vac": [
-        0.6,
-        -0.2,
-        0.8
-      ],
-      "haptic_pattern_id": "GENTLE_PULSE"
-    }
-  ]
+    "version": "1.0",
+    "source": "Bren\u00e9 Brown - Atlas of the Heart (2021)",
+    "metadata": {
+        "total_emotions": 87,
+        "categories": 13,
+        "coordinate_system": "VAC (Valence, Arousal, Connection)",
+        "vac_range": "[-1.0, 1.0] for each dimension",
+        "created": "2026-01-03",
+        "last_updated": "2026-01-03"
+    },
+    "emotions": [
+        {
+            "emotion_name": "Stress",
+            "category": "When Things Are Uncertain or Too Much",
+            "definition": "Physical and emotional tension from demands exceeding resources.",
+            "vac": [-0.4, 0.6, -0.2],
+            "haptic_pattern_id": "TENSE_PULSE"
+        },
+        {
+            "emotion_name": "Overwhelm",
+            "category": "When Things Are Uncertain or Too Much",
+            "definition": "Extreme stress where demands completely exceed capacity.",
+            "vac": [-0.6, 0.9, -0.3],
+            "haptic_pattern_id": "HEAVY_THROB"
+        },
+        {
+            "emotion_name": "Anxiety",
+            "category": "When Things Are Uncertain or Too Much",
+            "definition": "Future-focused fear and apprehension about potential threats.",
+            "vac": [-0.5, 0.7, -0.4],
+            "haptic_pattern_id": "RAPID_PULSE"
+        },
+        {
+            "emotion_name": "Fear",
+            "category": "When Things Are Uncertain or Too Much",
+            "definition": "Immediate response to perceived threat or danger.",
+            "vac": [-0.6, 0.8, -0.5],
+            "haptic_pattern_id": "SHARP_STRIKE"
+        },
+        {
+            "emotion_name": "Vulnerability",
+            "category": "When Things Are Uncertain or Too Much",
+            "definition": "The gateway to connection; risk exposure with uncertain outcome.",
+            "vac": [0.0, 0.3, 0.6],
+            "haptic_pattern_id": "GENTLE_PULSE"
+        },
+        {
+            "emotion_name": "Worry",
+            "category": "When Things Are Uncertain or Too Much",
+            "definition": "Cognitive anxiety and rumination about potential problems.",
+            "vac": [-0.4, 0.5, -0.3],
+            "haptic_pattern_id": "TENSE_PULSE"
+        },
+        {
+            "emotion_name": "Avoidance",
+            "category": "When Things Are Uncertain or Too Much",
+            "definition": "Evasion of discomfort or difficult situations.",
+            "vac": [-0.3, -0.2, -0.4],
+            "haptic_pattern_id": "TENSE_PULSE"
+        },
+        {
+            "emotion_name": "Excitement",
+            "category": "When Things Are Uncertain or Too Much",
+            "definition": "Positive anticipation with high energy.",
+            "vac": [0.7, 0.8, 0.4],
+            "haptic_pattern_id": "LIGHT_PULSE"
+        },
+        {
+            "emotion_name": "Dread",
+            "category": "When Things Are Uncertain or Too Much",
+            "definition": "Intense anxiety about an anticipated future event.",
+            "vac": [-0.7, 0.6, -0.5],
+            "haptic_pattern_id": "HEAVY_THROB"
+        },
+        {
+            "emotion_name": "Admiration",
+            "category": "When We Compare",
+            "definition": "Respect and approval of someone without envy.",
+            "vac": [0.6, 0.3, 0.5],
+            "haptic_pattern_id": "WARM_PULSE"
+        },
+        {
+            "emotion_name": "Envy",
+            "category": "When We Compare",
+            "definition": "Wanting what others have; longing for their advantages.",
+            "vac": [-0.5, 0.4, -0.6],
+            "haptic_pattern_id": "TENSE_PULSE"
+        },
+        {
+            "emotion_name": "Jealousy",
+            "category": "When We Compare",
+            "definition": "Fear of losing what's yours to another person.",
+            "vac": [-0.6, 0.7, -0.7],
+            "haptic_pattern_id": "SHARP_STRIKE"
+        },
+        {
+            "emotion_name": "Resentment",
+            "category": "When We Compare",
+            "definition": "Stored anger from perceived injustice or unfairness.",
+            "vac": [-0.7, 0.5, -0.8],
+            "haptic_pattern_id": "HEAVY_THROB"
+        },
+        {
+            "emotion_name": "Schadenfreude",
+            "category": "When We Compare",
+            "definition": "Pleasure derived from another's misfortune.",
+            "vac": [0.3, 0.4, -0.7],
+            "haptic_pattern_id": "SHARP_STRIKE"
+        },
+        {
+            "emotion_name": "Freudenfreude",
+            "category": "When We Compare",
+            "definition": "Joy at another person's success or happiness.",
+            "vac": [0.8, 0.5, 0.9],
+            "haptic_pattern_id": "LIGHT_PULSE"
+        },
+        {
+            "emotion_name": "Reverence",
+            "category": "When We Compare",
+            "definition": "Deep respect and awe for someone or something.",
+            "vac": [0.7, 0.2, 0.8],
+            "haptic_pattern_id": "GENTLE_PULSE"
+        },
+        {
+            "emotion_name": "Disappointment",
+            "category": "When Things Don't Go As Planned",
+            "definition": "Sadness or displeasure caused by unmet expectations.",
+            "vac": [-0.5, -0.3, 0.0],
+            "haptic_pattern_id": "HEAVY_THROB"
+        },
+        {
+            "emotion_name": "Regret",
+            "category": "When Things Don't Go As Planned",
+            "definition": "Sorrow about past actions or decisions.",
+            "vac": [-0.6, -0.2, -0.3],
+            "haptic_pattern_id": "HEAVY_THROB"
+        },
+        {
+            "emotion_name": "Frustration",
+            "category": "When Things Don't Go As Planned",
+            "definition": "High energy response to blocked goals.",
+            "vac": [-0.5, 0.7, -0.2],
+            "haptic_pattern_id": "SHARP_STRIKE"
+        },
+        {
+            "emotion_name": "Boredom",
+            "category": "When Things Don't Go As Planned",
+            "definition": "Lack of stimulation or interest.",
+            "vac": [-0.2, -0.8, -0.2],
+            "haptic_pattern_id": "HEAVY_THROB"
+        },
+        {
+            "emotion_name": "Discouragement",
+            "category": "When Things Don't Go As Planned",
+            "definition": "Loss of confidence or enthusiasm.",
+            "vac": [-0.5, -0.4, -0.2],
+            "haptic_pattern_id": "HEAVY_THROB"
+        },
+        {
+            "emotion_name": "Resignation",
+            "category": "When Things Don't Go As Planned",
+            "definition": "Acceptance of an undesired outcome without resistance.",
+            "vac": [-0.6, -0.6, -0.5],
+            "haptic_pattern_id": "HEAVY_THROB"
+        },
+        {
+            "emotion_name": "Awe",
+            "category": "When It's Beyond Us",
+            "definition": "Overwhelmed by greatness or beauty; sense of vastness.",
+            "vac": [0.7, 0.5, 0.8],
+            "haptic_pattern_id": "GENTLE_PULSE"
+        },
+        {
+            "emotion_name": "Wonder",
+            "category": "When It's Beyond Us",
+            "definition": "Curiosity and amazement at something extraordinary.",
+            "vac": [0.6, 0.4, 0.7],
+            "haptic_pattern_id": "LIGHT_PULSE"
+        },
+        {
+            "emotion_name": "Confusion",
+            "category": "When It's Beyond Us",
+            "definition": "Lack of understanding or clarity.",
+            "vac": [-0.2, 0.3, -0.2],
+            "haptic_pattern_id": "RAPID_PULSE"
+        },
+        {
+            "emotion_name": "Curiosity",
+            "category": "When It's Beyond Us",
+            "definition": "Drive to explore, learn, and understand.",
+            "vac": [0.5, 0.6, 0.3],
+            "haptic_pattern_id": "LIGHT_PULSE"
+        },
+        {
+            "emotion_name": "Surprise",
+            "category": "When It's Beyond Us",
+            "definition": "Unexpected occurrence that interrupts normal flow.",
+            "vac": [0.0, 0.8, 0.0],
+            "haptic_pattern_id": "SHARP_STRIKE"
+        },
+        {
+            "emotion_name": "Interest",
+            "category": "When It's Beyond Us",
+            "definition": "Attention and engagement with something novel.",
+            "vac": [0.4, 0.5, 0.2],
+            "haptic_pattern_id": "LIGHT_PULSE"
+        },
+        {
+            "emotion_name": "Bittersweetness",
+            "category": "When Things Aren't What They Seem",
+            "definition": "Simultaneous happiness and sadness in the same moment.",
+            "vac": [0.0, -0.2, 0.5],
+            "haptic_pattern_id": "GENTLE_PULSE"
+        },
+        {
+            "emotion_name": "Nostalgia",
+            "category": "When Things Aren't What They Seem",
+            "definition": "Sentimental longing for the past.",
+            "vac": [0.3, -0.2, 0.4],
+            "haptic_pattern_id": "WARM_PULSE"
+        },
+        {
+            "emotion_name": "Amusement",
+            "category": "When Things Aren't What They Seem",
+            "definition": "Light-hearted enjoyment and entertainment.",
+            "vac": [0.6, 0.4, 0.3],
+            "haptic_pattern_id": "LIGHT_PULSE"
+        },
+        {
+            "emotion_name": "Cognitive Dissonance",
+            "category": "When Things Aren't What They Seem",
+            "definition": "Mental discomfort from holding conflicting beliefs.",
+            "vac": [-0.4, 0.5, -0.3],
+            "haptic_pattern_id": "TENSE_PULSE"
+        },
+        {
+            "emotion_name": "Irony",
+            "category": "When Things Aren't What They Seem",
+            "definition": "Incongruity between expectation and reality.",
+            "vac": [0.2, 0.2, 0.0],
+            "haptic_pattern_id": "LIGHT_PULSE"
+        },
+        {
+            "emotion_name": "Sarcasm",
+            "category": "When Things Aren't What They Seem",
+            "definition": "Mocking or contemptuous irony.",
+            "vac": [0.0, 0.3, -0.2],
+            "haptic_pattern_id": "SHARP_STRIKE"
+        },
+        {
+            "emotion_name": "Anguish",
+            "category": "When We're Hurting",
+            "definition": "Severe mental or physical pain and suffering.",
+            "vac": [-0.9, 0.4, -0.5],
+            "haptic_pattern_id": "HEAVY_THROB"
+        },
+        {
+            "emotion_name": "Hopelessness",
+            "category": "When We're Hurting",
+            "definition": "Belief that nothing will improve; loss of hope.",
+            "vac": [-0.8, -0.5, -0.6],
+            "haptic_pattern_id": "HEAVY_THROB"
+        },
+        {
+            "emotion_name": "Despair",
+            "category": "When We're Hurting",
+            "definition": "Complete loss of hope; utter hopelessness.",
+            "vac": [-0.9, -0.6, -0.7],
+            "haptic_pattern_id": "HEAVY_THROB"
+        },
+        {
+            "emotion_name": "Sadness",
+            "category": "When We're Hurting",
+            "definition": "General unhappiness or low mood.",
+            "vac": [-0.6, -0.4, 0.0],
+            "haptic_pattern_id": "HEAVY_THROB"
+        },
+        {
+            "emotion_name": "Grief",
+            "category": "When We're Hurting",
+            "definition": "Deep loss with paradoxical connection to love.",
+            "vac": [-0.9, -0.4, 0.5],
+            "haptic_pattern_id": "HEARTBEAT"
+        },
+        {
+            "emotion_name": "Sorrow",
+            "category": "When We're Hurting",
+            "definition": "Deep distress caused by loss or disappointment.",
+            "vac": [-0.7, -0.3, 0.2],
+            "haptic_pattern_id": "HEAVY_THROB"
+        },
+        {
+            "emotion_name": "Melancholy",
+            "category": "When We're Hurting",
+            "definition": "Pensive sadness with reflective quality.",
+            "vac": [-0.5, -0.6, 0.3],
+            "haptic_pattern_id": "GENTLE_PULSE"
+        },
+        {
+            "emotion_name": "Compassion",
+            "category": "Places We Go With Others",
+            "definition": "Feeling with another; motivated to help; shared humanity.",
+            "vac": [0.5, 0.2, 0.9],
+            "haptic_pattern_id": "HEARTBEAT"
+        },
+        {
+            "emotion_name": "Pity",
+            "category": "Places We Go With Others",
+            "definition": "Feeling for another from a place of separation; condescension.",
+            "vac": [-0.3, -0.1, -0.7],
+            "haptic_pattern_id": "HEAVY_THROB"
+        },
+        {
+            "emotion_name": "Empathy",
+            "category": "Places We Go With Others",
+            "definition": "Feeling with someone; understanding their perspective.",
+            "vac": [0.4, 0.1, 0.8],
+            "haptic_pattern_id": "HEARTBEAT"
+        },
+        {
+            "emotion_name": "Sympathy",
+            "category": "Places We Go With Others",
+            "definition": "Feeling for someone; acknowledging their pain.",
+            "vac": [0.2, 0.0, 0.3],
+            "haptic_pattern_id": "WARM_PULSE"
+        },
+        {
+            "emotion_name": "Boundaries",
+            "category": "Places We Go With Others",
+            "definition": "Healthy limits that protect connection and integrity.",
+            "vac": [0.5, 0.2, 0.7],
+            "haptic_pattern_id": "GENTLE_PULSE"
+        },
+        {
+            "emotion_name": "Comparative Suffering",
+            "category": "Places We Go With Others",
+            "definition": "Ranking pain as better or worse than others'.",
+            "vac": [-0.4, 0.3, -0.6],
+            "haptic_pattern_id": "TENSE_PULSE"
+        },
+        {
+            "emotion_name": "Shame",
+            "category": "When We Fall Short",
+            "definition": "I am bad; identity-level negative self-judgment.",
+            "vac": [-0.9, -0.1, -1.0],
+            "haptic_pattern_id": "HEAVY_THROB"
+        },
+        {
+            "emotion_name": "Self-Compassion",
+            "category": "When We Fall Short",
+            "definition": "Kindness toward self; treating yourself as you would a friend.",
+            "vac": [0.6, -0.2, 0.9],
+            "haptic_pattern_id": "HEARTBEAT"
+        },
+        {
+            "emotion_name": "Guilt",
+            "category": "When We Fall Short",
+            "definition": "I did something bad; behavior-level judgment.",
+            "vac": [-0.6, 0.2, -0.3],
+            "haptic_pattern_id": "TENSE_PULSE"
+        },
+        {
+            "emotion_name": "Embarrassment",
+            "category": "When We Fall Short",
+            "definition": "Mild social discomfort; fleeting shame.",
+            "vac": [-0.4, 0.5, -0.2],
+            "haptic_pattern_id": "RAPID_PULSE"
+        },
+        {
+            "emotion_name": "Humiliation",
+            "category": "When We Fall Short",
+            "definition": "Public shame; degradation in front of others.",
+            "vac": [-0.8, 0.4, -0.9],
+            "haptic_pattern_id": "HEAVY_THROB"
+        },
+        {
+            "emotion_name": "Perfectionism",
+            "category": "When We Fall Short",
+            "definition": "Rigid, unattainable standards; fear of being flawed.",
+            "vac": [-0.3, 0.5, -0.6],
+            "haptic_pattern_id": "TENSE_PULSE"
+        },
+        {
+            "emotion_name": "Belonging",
+            "category": "When We Search for Connection",
+            "definition": "Authentic acceptance for who you truly are.",
+            "vac": [0.8, 0.4, 1.0],
+            "haptic_pattern_id": "HEARTBEAT"
+        },
+        {
+            "emotion_name": "Fitting In",
+            "category": "When We Search for Connection",
+            "definition": "Changing yourself to be accepted; disconnection from self.",
+            "vac": [0.3, 0.3, -0.3],
+            "haptic_pattern_id": "TENSE_PULSE"
+        },
+        {
+            "emotion_name": "Disconnection",
+            "category": "When We Search for Connection",
+            "definition": "Lack of meaningful connection; isolation.",
+            "vac": [-0.5, -0.3, -0.7],
+            "haptic_pattern_id": "HEAVY_THROB"
+        },
+        {
+            "emotion_name": "Loneliness",
+            "category": "When We Search for Connection",
+            "definition": "Painful feeling of isolation and disconnection.",
+            "vac": [-0.7, -0.2, -0.9],
+            "haptic_pattern_id": "HEAVY_THROB"
+        },
+        {
+            "emotion_name": "Insecurity",
+            "category": "When We Search for Connection",
+            "definition": "Uncertainty about one's worth and belonging.",
+            "vac": [-0.4, 0.4, -0.5],
+            "haptic_pattern_id": "TENSE_PULSE"
+        },
+        {
+            "emotion_name": "Invisibility",
+            "category": "When We Search for Connection",
+            "definition": "Feeling unseen and unacknowledged by others.",
+            "vac": [-0.6, -0.3, -0.8],
+            "haptic_pattern_id": "HEAVY_THROB"
+        },
+        {
+            "emotion_name": "Love",
+            "category": "When the Heart Is Open",
+            "definition": "Deep affection, care, and connection.",
+            "vac": [0.9, 0.3, 1.0],
+            "haptic_pattern_id": "HEARTBEAT"
+        },
+        {
+            "emotion_name": "Heartbreak",
+            "category": "When the Heart Is Open",
+            "definition": "Loss of love with residual connection.",
+            "vac": [-0.8, 0.4, 0.3],
+            "haptic_pattern_id": "HEARTBEAT"
+        },
+        {
+            "emotion_name": "Trust",
+            "category": "When the Heart Is Open",
+            "definition": "Belief in reliability and integrity of another.",
+            "vac": [0.6, 0.1, 0.9],
+            "haptic_pattern_id": "GENTLE_PULSE"
+        },
+        {
+            "emotion_name": "Betrayal",
+            "category": "When the Heart Is Open",
+            "definition": "Violation of trust; breach of relational contract.",
+            "vac": [-0.8, 0.6, -0.9],
+            "haptic_pattern_id": "SHARP_STRIKE"
+        },
+        {
+            "emotion_name": "Flooding",
+            "category": "When the Heart Is Open",
+            "definition": "Emotional overwhelm leading to shutdown.",
+            "vac": [-0.6, 0.9, -0.7],
+            "haptic_pattern_id": "RAPID_PULSE"
+        },
+        {
+            "emotion_name": "Lovelessness",
+            "category": "When the Heart Is Open",
+            "definition": "Absence or lack of love in one's life.",
+            "vac": [-0.7, -0.4, -0.8],
+            "haptic_pattern_id": "HEAVY_THROB"
+        },
+        {
+            "emotion_name": "Self-Trust",
+            "category": "When the Heart Is Open",
+            "definition": "Confidence in one's own judgment and decisions.",
+            "vac": [0.7, 0.1, 0.8],
+            "haptic_pattern_id": "GENTLE_PULSE"
+        },
+        {
+            "emotion_name": "Defensiveness",
+            "category": "When the Heart Is Open",
+            "definition": "Self-protective response to perceived criticism.",
+            "vac": [-0.3, 0.6, -0.4],
+            "haptic_pattern_id": "SHARP_STRIKE"
+        },
+        {
+            "emotion_name": "Hurt",
+            "category": "When the Heart Is Open",
+            "definition": "Emotional pain from words or actions of others.",
+            "vac": [-0.6, 0.2, -0.3],
+            "haptic_pattern_id": "HEAVY_THROB"
+        },
+        {
+            "emotion_name": "Tenderness",
+            "category": "When the Heart Is Open",
+            "definition": "Gentle caring and affection.",
+            "vac": [0.7, 0.1, 0.8],
+            "haptic_pattern_id": "HEARTBEAT"
+        },
+        {
+            "emotion_name": "Warmth",
+            "category": "When the Heart Is Open",
+            "definition": "Comfortable affection and friendliness.",
+            "vac": [0.6, 0.2, 0.7],
+            "haptic_pattern_id": "WARM_PULSE"
+        },
+        {
+            "emotion_name": "Joy",
+            "category": "When Life Is Good",
+            "definition": "Intense, brief feeling of positive emotion and delight.",
+            "vac": [0.9, 0.7, 0.8],
+            "haptic_pattern_id": "LIGHT_PULSE"
+        },
+        {
+            "emotion_name": "Happiness",
+            "category": "When Life Is Good",
+            "definition": "Stable positive well-being and life satisfaction.",
+            "vac": [0.7, 0.5, 0.5],
+            "haptic_pattern_id": "WARM_PULSE"
+        },
+        {
+            "emotion_name": "Calm",
+            "category": "When Life Is Good",
+            "definition": "Peaceful, tranquil state of low arousal.",
+            "vac": [0.5, -0.7, 0.4],
+            "haptic_pattern_id": "GENTLE_PULSE"
+        },
+        {
+            "emotion_name": "Contentment",
+            "category": "When Life Is Good",
+            "definition": "Satisfied and at ease; peaceful acceptance.",
+            "vac": [0.6, -0.5, 0.5],
+            "haptic_pattern_id": "GENTLE_PULSE"
+        },
+        {
+            "emotion_name": "Gratitude",
+            "category": "When Life Is Good",
+            "definition": "Appreciation for gifts, blessings, and kindness received.",
+            "vac": [0.8, 0.3, 0.9],
+            "haptic_pattern_id": "HEARTBEAT"
+        },
+        {
+            "emotion_name": "Foreboding Joy",
+            "category": "When Life Is Good",
+            "definition": "Joy tinged with fear of losing it; waiting for the other shoe to drop.",
+            "vac": [0.5, 0.6, -0.2],
+            "haptic_pattern_id": "TENSE_PULSE"
+        },
+        {
+            "emotion_name": "Relief",
+            "category": "When Life Is Good",
+            "definition": "Release from distress or discomfort.",
+            "vac": [0.6, -0.3, 0.3],
+            "haptic_pattern_id": "GENTLE_PULSE"
+        },
+        {
+            "emotion_name": "Tranquility",
+            "category": "When Life Is Good",
+            "definition": "Deep peace and serenity.",
+            "vac": [0.7, -0.8, 0.6],
+            "haptic_pattern_id": "GENTLE_PULSE"
+        },
+        {
+            "emotion_name": "Anger",
+            "category": "When We Feel Wronged",
+            "definition": "Action emotion; response to injustice or boundary violation.",
+            "vac": [-0.5, 0.8, -0.2],
+            "haptic_pattern_id": "SHARP_STRIKE"
+        },
+        {
+            "emotion_name": "Contempt",
+            "category": "When We Feel Wronged",
+            "definition": "You are beneath me; superiority and disdain.",
+            "vac": [-0.6, 0.3, -0.8],
+            "haptic_pattern_id": "SHARP_STRIKE"
+        },
+        {
+            "emotion_name": "Disgust",
+            "category": "When We Feel Wronged",
+            "definition": "Revulsion and aversion; strong rejection.",
+            "vac": [-0.7, 0.5, -0.6],
+            "haptic_pattern_id": "SHARP_STRIKE"
+        },
+        {
+            "emotion_name": "Hate",
+            "category": "When We Feel Wronged",
+            "definition": "Sustained intense negativity and hostility.",
+            "vac": [-0.9, 0.6, -1.0],
+            "haptic_pattern_id": "HEAVY_THROB"
+        },
+        {
+            "emotion_name": "Self-Righteousness",
+            "category": "When We Feel Wronged",
+            "definition": "False moral superiority; disconnected from empathy.",
+            "vac": [0.3, 0.4, -0.7],
+            "haptic_pattern_id": "SHARP_STRIKE"
+        },
+        {
+            "emotion_name": "Dehumanization",
+            "category": "When We Feel Wronged",
+            "definition": "Complete severing of connection; denying someone's humanity.",
+            "vac": [-0.9, 0.4, -1.0],
+            "haptic_pattern_id": "HEAVY_THROB"
+        },
+        {
+            "emotion_name": "Pride",
+            "category": "When We Self-Assess",
+            "definition": "Healthy self-esteem and satisfaction in achievement.",
+            "vac": [0.7, 0.6, 0.6],
+            "haptic_pattern_id": "WARM_PULSE"
+        },
+        {
+            "emotion_name": "Hubris",
+            "category": "When We Self-Assess",
+            "definition": "Inflated ego; disconnected from reality and others.",
+            "vac": [0.7, 0.6, -0.8],
+            "haptic_pattern_id": "SHARP_STRIKE"
+        },
+        {
+            "emotion_name": "Humility",
+            "category": "When We Self-Assess",
+            "definition": "Grounded confidence; accurate self-assessment.",
+            "vac": [0.6, -0.2, 0.8],
+            "haptic_pattern_id": "GENTLE_PULSE"
+        }
+    ]
 }

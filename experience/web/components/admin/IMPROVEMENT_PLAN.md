@@ -10,7 +10,7 @@ This document outlines potential enhancements to the Atlas Admin Interface to im
 
 ### 1. HTML Label Overlay System ⭐ MOST IMPACTFUL
 
-**Problem**: 3D Text labels cause WebGL crashes  
+**Problem**: 3D Text labels cause WebGL crashes
 **Solution**: HTML overlays that track 3D positions
 
 - Project 3D positions to 2D screen space

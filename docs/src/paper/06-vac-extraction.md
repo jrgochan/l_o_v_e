@@ -27,7 +27,7 @@ The primary technical challenge is extracting the Connection dimension from natu
 We use a carefully structured system prompt that defines each VAC dimension with clear examples:
 
 ```text
-You are an emotion analyst specializing in the VAC model 
+You are an emotion analyst specializing in the VAC model
 (Valence-Arousal-Connection).
 
 Your task: Extract VAC coordinates from emotional expressions.
@@ -44,17 +44,17 @@ AROUSAL (A): Activation level [-1 to +1]
 
 CONNECTION (C): Interpersonal alignment [-1 to +1]
   *** THIS IS CRITICAL ***
-  
-  +1.0: "Feeling WITH" 
+
+  +1.0: "Feeling WITH"
     - Shared experience
     - "I'm with you in this"
     - "I feel their pain as my own"
     - Deep empathy, compassion
-    
+
    0.0: No relational component
     - "I'm happy" (internal state)
     - "I'm anxious about the test" (no other-focus)
-    
+
   -1.0: "Feeling FOR/AT"
     - Hierarchical distance
     - "I feel sorry FOR them"
@@ -157,7 +157,7 @@ test_cases = [
   ("I feel so sorry for them, they're struggling", "pity"),
   ("Poor thing, I hope they get better", "pity"),
   ("I'm fortunate not to be in their position", "pity"),
-  
+
   ("I feel their pain with them", "compassion"),
   ("I'm here with you in this difficult moment", "compassion"),
   ("We're in this together", "compassion"),
@@ -181,7 +181,7 @@ accuracy = sum(results) / len(results)
 ```python
 shame_phrases = [
   "I'm ashamed of who I am",
-  "I feel like such a failure", 
+  "I feel like such a failure",
   "I'm fundamentally flawed"
 ]
 
@@ -229,7 +229,7 @@ def scrub_pii(text):
     doc = nlp(text)
     scrubbed = text
     for ent in doc.ents:
-        if ent.label_ in ["PERSON", "GPE", "ORG", "DATE", 
+        if ent.label_ in ["PERSON", "GPE", "ORG", "DATE",
                           "TIME", "PHONE", "EMAIL", "ADDRESS"]:
             scrubbed = scrubbed.replace(ent.text, f"[{ent.label_}]")
     return scrubbed
@@ -255,7 +255,7 @@ def scrub_pii(text):
 | PII Scrubbing | 50ms | 100ms |
 | **Total Pipeline** | **1.7s** | **3.2s** |
 
-**Bottleneck**: LLM inference (Ollama on CPU)  
+**Bottleneck**: LLM inference (Ollama on CPU)
 **Optimization**: GPU acceleration reduces LLM latency to ~200ms
 
 ### 6.8 Future Work: Prosodic Feature Integration
@@ -284,10 +284,10 @@ Extract prosodic features:
 - Speech rate, pauses
 - Formant frequencies (voice quality)
 
-Hypothesis: Supervised ML (e.g., SVM) can predict Connection 
+Hypothesis: Supervised ML (e.g., SVM) can predict Connection
 scores from prosody with moderate accuracy (r > 0.4)
 
-If confirmed, integrate acoustic + semantic channels for 
+If confirmed, integrate acoustic + semantic channels for
 enhanced Connection detection.
 ```
 

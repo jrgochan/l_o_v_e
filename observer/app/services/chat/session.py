@@ -1,5 +1,7 @@
+"""Module documentation."""
+
 import logging
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import List, Optional
 from uuid import UUID
 
@@ -15,6 +17,7 @@ class SessionManager:
     """Manages chat session lifecycle."""
 
     def __init__(self, db: AsyncSession):
+        """Docstring."""
         self.db = db
 
     async def create_session(
@@ -28,7 +31,7 @@ class SessionManager:
             user_id=user_id,
             tone_preference=tone_preference,
             auth_user_id=auth_user_id,
-            started_at=datetime.utcnow(),
+            started_at=datetime.now(timezone.utc).replace(tzinfo=None),
             deep_feeling_mode=False,
         )
 
@@ -69,7 +72,7 @@ class SessionManager:
         """End a chat session by setting ended_at timestamp."""
         session = await self.get_session(session_id)
         if session:
-            session.ended_at = datetime.utcnow()
+            session.ended_at = datetime.now(timezone.utc).replace(tzinfo=None)
             await self.db.commit()
             await self.db.refresh(session)
             logger.info("Ended chat session %s", session_id)
@@ -107,7 +110,7 @@ class SessionManager:
         """Delete a session and all its messages (cascade)."""
         session = await self.get_session(session_id)
         if session:
-            self.db.delete(session)
+            self.db.delete(session)  # type: ignore
             await self.db.commit()
             logger.info("Deleted chat session %s", session_id)
             return True

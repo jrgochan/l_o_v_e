@@ -1,8 +1,8 @@
 # Getting Started with the Listener
 
-**Reading Time:** ~30 minutes  
-**Audience:** New developers, interns, bootcamp graduates  
-**Prerequisites:** Basic Python, understanding of APIs  
+**Reading Time:** ~30 minutes
+**Audience:** New developers, interns, bootcamp graduates
+**Prerequisites:** Basic Python, understanding of APIs
 **Goal:** Set up Listener locally and run your first emotion analysis
 
 ---
@@ -15,7 +15,7 @@ Imagine you're having a conversation with someone about their feelings. The **Li
 2. 🤔 **Thinks** about the emotions in your words
 3. 📊 **Measures** those emotions using three numbers:
    - **Valence:** Are you feeling good or bad? (-1 to +1)
-   - **Arousal:** Are you energized or calm? (-1 to +1)  
+   - **Arousal:** Are you energized or calm? (-1 to +1)
    - **Connection:** Do you feel connected or isolated? (-1 to +1)
 
 That third number (**Connection**) is special—it's something L.O.V.E. invented! 🎉
@@ -60,10 +60,10 @@ Before we start, make sure you have these installed:
   ```bash
   # macOS
   brew install ollama
-  
+
   # Linux
   curl https://ollama.ai/install.sh | sh
-  
+
   # Check installation
   ollama --version
   ```
@@ -74,11 +74,11 @@ Before we start, make sure you have these installed:
   # macOS
   brew install redis
   brew services start redis
-  
+
   # Linux
   sudo apt install redis-server
   sudo systemctl start redis
-  
+
   # Check it's running
   redis-cli ping
   # Should return: PONG
@@ -91,7 +91,7 @@ Before we start, make sure you have these installed:
   ```bash
   # macOS
   brew install ffmpeg
-  
+
   # Linux
   sudo apt install ffmpeg
   ```
@@ -369,7 +369,7 @@ text: I feel so connected to everyone around me. Life is beautiful!
 
 Expected: Joy or Gratitude (positive valence, high connection)
 
-### Low Valence, Low Connection  
+### Low Valence, Low Connection
 
 ```text
 text: I feel so alone. Nobody understands me.

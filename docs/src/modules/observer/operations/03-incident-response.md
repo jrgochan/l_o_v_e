@@ -1,8 +1,8 @@
 # Incident Response
 
-**Reading Time:** ~20 minutes  
-**Audience:** Engineering managers, on-call engineers  
-**Prerequisites:** [Monitoring & Operations](01-monitoring.md)  
+**Reading Time:** ~20 minutes
+**Audience:** Engineering managers, on-call engineers
+**Prerequisites:** [Monitoring & Operations](01-monitoring.md)
 **Goal:** Respond effectively to Observer incidents
 
 ---
@@ -37,10 +37,10 @@ This guide provides **runbooks** for common Observer incidents, organized by sev
    ```bash
    # Kubernetes
    kubectl get pods -l app=observer
-   
+
    # Docker
    docker ps -a | grep observer
-   
+
    # Systemd
    systemctl status observer
    ```
@@ -50,7 +50,7 @@ This guide provides **runbooks** for common Observer incidents, organized by sev
    ```bash
    # Recent errors
    kubectl logs observer-pod --tail=100
-   
+
    # Or
    journalctl -u observer -n 100
    ```
@@ -60,10 +60,10 @@ This guide provides **runbooks** for common Observer incidents, organized by sev
    ```bash
    # Kubernetes
    kubectl rollout restart deployment/observer
-   
+
    # Docker
    docker-compose restart observer
-   
+
    # Systemd
    systemctl restart observer
    ```
@@ -112,7 +112,7 @@ This guide provides **runbooks** for common Observer incidents, organized by sev
 
    ```bash
    systemctl start postgresql
-   
+
    # Verify
    psql -c "SELECT version()"
    ```
@@ -151,7 +151,7 @@ Workaround: Listener caching locally
 
    ```python
    # Group errors by endpoint
-   SELECT 
+   SELECT
        endpoint,
        error_type,
        COUNT(*) as count
@@ -174,7 +174,7 @@ Workaround: Listener caching locally
 
 ```sql
 -- Check active connections
-SELECT count(*) FROM pg_stat_activity 
+SELECT count(*) FROM pg_stat_activity
 WHERE application_name = 'observer';
 
 -- If at limit (20), increase pool or kill stuck connections
@@ -221,7 +221,7 @@ grep "ValidationError" /var/log/observer/app.log
 
    ```python
    # Check Prometheus
-   topk(5, histogram_quantile(0.95, 
+   topk(5, histogram_quantile(0.95,
      observer_http_request_duration_seconds{bucket}
    ))
    ```
@@ -229,7 +229,7 @@ grep "ValidationError" /var/log/observer/app.log
 2. **Check database queries:**
 
    ```sql
-   SELECT 
+   SELECT
        query,
        calls,
        mean_exec_time
@@ -251,7 +251,7 @@ WHERE user_id = 'problem-user'
 ORDER BY timestamp DESC;
 
 -- If "Seq Scan", create index
-CREATE INDEX CONCURRENTLY idx_problem 
+CREATE INDEX CONCURRENTLY idx_problem
 ON user_trajectory(user_id, timestamp DESC);
 ```
 
@@ -263,7 +263,7 @@ ON user_trajectory(user_id, timestamp DESC);
 
 -- If missing, create
 CREATE INDEX CONCURRENTLY idx_trajectory_embedding
-ON user_trajectory 
+ON user_trajectory
 USING hnsw (embedding vector_cosine_ops);
 ```
 
@@ -271,8 +271,8 @@ USING hnsw (embedding vector_cosine_ops);
 
 ```sql
 -- Check cache hit ratio
-SELECT 
-  sum(heap_blks_hit) / (sum(heap_blks_hit) + sum(heap_blks_read)) 
+SELECT
+  sum(heap_blks_hit) / (sum(heap_blks_hit) + sum(heap_blks_read))
   as cache_hit_ratio
 FROM pg_statio_user_tables;
 
@@ -304,7 +304,7 @@ FROM pg_statio_user_tables;
 
    ```sql
    -- Long-running queries
-   SELECT 
+   SELECT
        pid,
        now() - query_start as duration,
        state,

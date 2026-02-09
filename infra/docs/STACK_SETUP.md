@@ -265,7 +265,7 @@ npm start
 # Versor
 cd versor && source venv/bin/activate && pytest tests/unit/ -v
 
-# Observer  
+# Observer
 cd observer && source venv/bin/activate && pytest tests/ -v
 
 # Listener
@@ -467,11 +467,11 @@ pytest tests/semantic/test_connection_axis.py -v
 
 You'll know setup is complete when:
 
-✅ `./test-love-stack.sh` shows 🟢 HEALTHY  
-✅ All three modules use Python 3.12+  
-✅ PostgreSQL, Redis, and Ollama are running  
-✅ All fast tests pass  
-✅ Critical semantic test validates Connection axis  
+✅ `./test-love-stack.sh` shows 🟢 HEALTHY
+✅ All three modules use Python 3.12+
+✅ PostgreSQL, Redis, and Ollama are running
+✅ All fast tests pass
+✅ Critical semantic test validates Connection axis
 
 ---
 

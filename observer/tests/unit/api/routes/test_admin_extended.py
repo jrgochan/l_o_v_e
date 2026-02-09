@@ -82,13 +82,20 @@ async def test_import_atlas_data_service_failure(mock_db, mock_admin):
     """Test partial failure handling during atlas import when services fail."""
     import_data = {
         "emotions": [
-            {"emotion_name": "TestJoy", "definition": "A new definition", "vac": [0.8, 0.8, 0.8]}
+            {
+                "emotion_name": "TestJoy",
+                "definition": "A new definition",
+                "vac": [0.8, 0.8, 0.8],
+            }
         ]
     }
 
     # Mock existing emotion to trigger update logic
     existing_emotion = EmotionDefinition(
-        id=uuid4(), emotion_name="TestJoy", definition="Old def", vac_vector=[0.1, 0.1, 0.1]
+        id=uuid4(),
+        emotion_name="TestJoy",
+        definition="Old def",
+        vac_vector=[0.1, 0.1, 0.1],
     )
 
     result = MagicMock()
@@ -97,8 +104,8 @@ async def test_import_atlas_data_service_failure(mock_db, mock_admin):
 
     # Patch app.services because local import in admin uses that source
     with (
-        patch("app.services.get_embedding_service") as mock_get_es,
-        patch("app.services.get_quaternion_builder") as mock_get_qb,
+        patch("app.services.admin.service.get_embedding_service") as mock_get_es,
+        patch("app.services.admin.service.get_quaternion_builder") as mock_get_qb,
     ):
 
         es = AsyncMock()

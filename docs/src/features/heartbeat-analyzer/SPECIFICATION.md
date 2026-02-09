@@ -1,8 +1,8 @@
 # The Heartbeat Analyzer - Complete Specification
 
-**Created**: December 6, 2025, 9:45 PM MDT  
-**Purpose**: Transform static spinner into delightful, adaptive progress indicator  
-**Estimated Implementation**: 3-4 hours  
+**Created**: December 6, 2025, 9:45 PM MDT
+**Purpose**: Transform static spinner into delightful, adaptive progress indicator
+**Estimated Implementation**: 3-4 hours
 **Priority**: HIGH (UX Enhancement)
 
 ---
@@ -274,7 +274,7 @@ await manager.send_message(session_id, {
 - "Analyzing voice-only interpretation..."
 - "Synthesizing blended interpretation..."
 
-#### **Relationships (70-80%)**  
+#### **Relationships (70-80%)**
 
 #### Deep Feeling only (Aggregate)
 
@@ -292,7 +292,7 @@ await manager.send_message(session_id, {
 - "Calculating relationship strength metrics..."
 - "Analyzing emotional interaction dynamics..."
 
-#### **Aggregate (80-90%)**  
+#### **Aggregate (80-90%)**
 
 #### Deep Feeling only (Aggregate Phase)
 
@@ -309,7 +309,7 @@ await manager.send_message(session_id, {
 - "Determining temporal pattern classification..."
 - "Synthesizing weighted VAC coordinates..."
 
-#### **3-Way Analysis (80-90%)**  
+#### **3-Way Analysis (80-90%)**
 
 #### When 3-way enabled
 
@@ -411,7 +411,7 @@ export function AnalysisProgressIndicator({
 }: AnalysisProgressIndicatorProps) {
   return (
     <div className={`
-      bg-gradient-to-br from-gray-800 to-gray-900 
+      bg-gradient-to-br from-gray-800 to-gray-900
       rounded-xl p-6 border border-cyan-500/30 shadow-2xl
       ${className}
     `}>
@@ -468,19 +468,19 @@ function PulsingOrb({ percentage }: { percentage: number }) {
       <div className="relative w-24 h-24">
         {/* Main pulsing orb */}
         <div className={`
-          absolute inset-0 rounded-full 
+          absolute inset-0 rounded-full
           bg-gradient-to-br ${getGradientColors()}
           ${getPulseSpeed()}
           shadow-lg
         `} />
-        
+
         {/* Ping ring */}
         <div className={`
-          absolute inset-0 rounded-full 
+          absolute inset-0 rounded-full
           bg-gradient-to-br ${getGradientColors()}
           opacity-50 animate-ping-slow
         `} />
-        
+
         {/* Percentage overlay */}
         <div className="absolute inset-0 flex items-center justify-center">
           <span className="text-white font-bold text-xl drop-shadow-lg">
@@ -504,10 +504,10 @@ function ProgressBar({ percentage }: { percentage: number }) {
         <span className="font-mono text-cyan-400">{percentage}%</span>
       </div>
       <div className="h-2 bg-gray-700 rounded-full overflow-hidden relative">
-        <div 
+        <div
           className="
-            h-full 
-            bg-gradient-to-r from-cyan-500 via-purple-500 to-pink-500 
+            h-full
+            bg-gradient-to-r from-cyan-500 via-purple-500 to-pink-500
             transition-all duration-500 ease-out
             shadow-[0_0_10px_rgba(6,182,212,0.5)]
           "
@@ -547,7 +547,7 @@ function StageChecklist({ stages }: { stages: ProgressStage[] }) {
   return (
     <div className="space-y-2 mb-6 max-h-48 overflow-y-auto">
       {stages.map(stage => (
-        <div 
+        <div
           key={stage.id}
           className={`
             flex items-center gap-3 px-3 py-2 rounded
@@ -597,19 +597,19 @@ function StageChecklist({ stages }: { stages: ProgressStage[] }) {
 ### **Component 6: AdaptiveMessage**
 
 ```tsx
-function AdaptiveMessage({ 
-  message, 
-  toneMode 
-}: { 
-  message: string; 
-  toneMode: 'warm' | 'clinical' 
+function AdaptiveMessage({
+  message,
+  toneMode
+}: {
+  message: string;
+  toneMode: 'warm' | 'clinical'
 }) {
   return (
     <div className={`
       text-center text-sm italic px-4 py-3 rounded-lg
       transition-all duration-500
-      ${toneMode === 'warm' 
-        ? 'text-cyan-300 bg-cyan-500/10 border border-cyan-500/20' 
+      ${toneMode === 'warm'
+        ? 'text-cyan-300 bg-cyan-500/10 border border-cyan-500/20'
         : 'text-blue-300 bg-blue-500/10 border border-blue-500/20'}
     `}>
       <p className="leading-relaxed">{message}</p>
@@ -707,8 +707,8 @@ const initializeProgressStages = (deepFeeling: boolean): ProgressStage[] => {
 onProgressUpdate: (stage, status, message, percentage, elapsed_ms) => {
   setProgressState(prev => ({
     ...prev,
-    stages: prev.stages.map(s => 
-      s.id === stage 
+    stages: prev.stages.map(s =>
+      s.id === stage
         ? { ...s, status, percentage, elapsed_ms }
         : s
     ),
@@ -716,7 +716,7 @@ onProgressUpdate: (stage, status, message, percentage, elapsed_ms) => {
     overallPercentage: percentage,
     currentMessage: getAdaptiveMessage(stage, status, toneMode, deepFeelingMode)
   }));
-  
+
   if (status === 'started') {
     setShowProgress(true);
   } else if (status === 'complete' && percentage === 100) {
@@ -926,13 +926,13 @@ onProgressUpdate: (stage, status, message, percentage, elapsed_ms) => {
 
 ## 🎯 Success Metrics
 
-✅ Users understand what's happening at each stage  
-✅ Perceived wait time feels shorter  
-✅ Animations are smooth and delightful  
-✅ Messages adapt to tone mode correctly  
-✅ Progress percentage accurately reflects actual progress  
-✅ Component is accessible (ARIA, reduced motion)  
-✅ Fits L.O.V.E. emotional design language  
+✅ Users understand what's happening at each stage
+✅ Perceived wait time feels shorter
+✅ Animations are smooth and delightful
+✅ Messages adapt to tone mode correctly
+✅ Progress percentage accurately reflects actual progress
+✅ Component is accessible (ARIA, reduced motion)
+✅ Fits L.O.V.E. emotional design language
 
 ---
 
@@ -950,7 +950,7 @@ onProgressUpdate: (stage, status, message, percentage, elapsed_ms) => {
 
 ---
 
-**Created**: December 6, 2025, 9:45 PM MDT  
-**Status**: Specification Complete  
-**Ready for**: Implementation in fresh session  
+**Created**: December 6, 2025, 9:45 PM MDT
+**Status**: Specification Complete
+**Ready for**: Implementation in fresh session
 **Next Step**: Toggle to Act Mode when ready to build

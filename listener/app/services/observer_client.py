@@ -201,7 +201,7 @@ class ObserverClient:  # pylint: disable=too-many-instance-attributes
 
         logger.info("ObserverClient initialized: %s", self.base_url)
 
-    async def record_state(
+    async def record_state(  # pylint: disable=too-many-arguments,too-many-positional-arguments
         self,
         user_id: str,
         session_id: str,

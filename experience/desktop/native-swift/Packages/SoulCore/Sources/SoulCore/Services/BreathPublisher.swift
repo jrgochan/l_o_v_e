@@ -2,7 +2,6 @@ import Combine
 import QuartzCore
 import OSLog
 
-
 /// A global heartbeat for the UI, emitting a rhythmic "breath" signal.
 /// Designed to emulate a meditative breath cycle (approx 6 cycles/minute).
 public class BreathPublisher: ObservableObject, @unchecked Sendable {

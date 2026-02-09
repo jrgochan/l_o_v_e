@@ -31,7 +31,7 @@ This directory contains the **single source of truth** for emotional data from B
 
 **VAC Coordinates:**
 - **Valence:** -1.0 (negative) to +1.0 (positive)
-- **Arousal:** -1.0 (low activation) to +1.0 (high activation)  
+- **Arousal:** -1.0 (low activation) to +1.0 (high activation)
 - **Connection:** -1.0 (disconnection) to +1.0 (deep connection)
 
 **Used By:** `scripts/seed_atlas.py`
@@ -79,7 +79,7 @@ Available patterns for emotional feedback:
 - `HEARTBEAT` - Rhythmic, connective
 - `GENTLE_PULSE` - Soft, calming
 - `WARM_PULSE` - Comforting
-- `LIGHT_PULSE` - Uplifting  
+- `LIGHT_PULSE` - Uplifting
 - `TENSE_PULSE` - Uncomfortable tension
 - `RAPID_PULSE` - Anxious, quick
 - `SHARP_STRIKE` - Sudden, jarring

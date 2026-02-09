@@ -193,19 +193,19 @@ if any(math.isnan(x) for x in [q.w, q.x, q.y, q.z]):
 def validate_vac(vac: VACVector) -> bool:
     """Check VAC is valid."""
     values = [vac.valence, vac.arousal, vac.connection]
-    
+
     # Check for NaN
     if any(math.isnan(v) for v in values):
         raise ValueError("VAC contains NaN")
-    
+
     # Check for infinity
     if any(math.isinf(v) for v in values):
         raise ValueError("VAC contains infinity")
-    
+
     # Check range
     if any(abs(v) > 1.0 for v in values):
         raise ValueError("VAC values must be in [-1, 1]")
-    
+
     return True
 ```
 
@@ -548,13 +548,13 @@ docker-compose up --scale versor=3
 def calculate_transition(q1, q2):
     print(f"Q1: {q1}")
     print(f"Q2: {q2}")
-    
+
     q1_conj = q1.conjugate()
     print(f"Q1 conjugate: {q1_conj}")
-    
+
     result = q1_conj.multiply(q2)
     print(f"Result: {result}")
-    
+
     return result
 ```
 
@@ -564,9 +564,9 @@ def calculate_transition(q1, q2):
 # Add breakpoint
 def to_quaternion(self):
     magnitude = self.magnitude()
-    
+
     breakpoint()  # Execution pauses here
-    
+
     if magnitude < EPSILON:
         return Quaternion.identity()
 ```
@@ -595,13 +595,13 @@ logger = logging.getLogger(__name__)
 
 def calculate_state(request):
     logger.debug(f"Request: {request}")
-    
+
     vac = VACVector(...)
     logger.debug(f"VAC magnitude: {vac.magnitude()}")
-    
+
     q = vac.to_quaternion()
     logger.debug(f"Quaternion: {q}, magnitude: {q.magnitude()}")
-    
+
     return response
 ```
 
@@ -1022,5 +1022,5 @@ assert -1.0 <= vac.valence <= 1.0
 
 ---
 
-**Previous:** [← Extending Versor](07-extending-versor.md)  
+**Previous:** [← Extending Versor](07-extending-versor.md)
 **Next:** [Architecture Decisions →](09-architecture-decisions.md)

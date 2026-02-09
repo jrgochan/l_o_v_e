@@ -199,7 +199,7 @@ class ObserverService:
     Core business logic for state processing.
     This is the "Subject" in the Observer pattern.
     """
-    
+
     def __init__(
         self,
         session: AsyncSession,
@@ -215,7 +215,7 @@ class ObserverService:
         self.metrics_calculator = metrics_calculator
         self.embedding_service = embedding_service
         self.event_publisher = event_publisher
-    
+
     async def process_state(
         self,
         user_id: UUID,
@@ -233,23 +233,23 @@ class ObserverService:
         5. Persist to DB
         6. Publish event
         """
-        
+
         # 1. Generate embedding (1536-dim vector)
         embedding = await self.embedding_service.generate_embedding(input_text)
-        
+
         # 2. Find nearest emotion from Atlas
         dominant_emotion = await self.emotion_mapper.find_nearest(
             vac_scalars=vac_scalars,
             text_embedding=embedding,
             word_count=len(input_text.split())
         )
-        
+
         # 3. Convert VAC to quaternion
         quaternion = self.quaternion_builder.from_vac(vac_scalars)
-        
+
         # 4. Fetch previous state for metrics
         previous_state = await self._get_latest_state(user_id)
-        
+
         # 5. Calculate elasticity
         elasticity = 0.0
         if previous_state:
@@ -258,13 +258,13 @@ class ObserverService:
                 previous_quat=previous_state.quaternion_state,
                 delta_time=(timestamp - previous_state.timestamp).total_seconds()
             )
-        
+
         # 6. Calculate rigidity (rolling window)
         rigidity = await self.metrics_calculator.calculate_rigidity(
             user_id=user_id,
             window_size=10
         )
-        
+
         # 7. Persist new state
         new_state = UserTrajectory(
             user_id=user_id,
@@ -278,11 +278,11 @@ class ObserverService:
             elasticity_metric=elasticity,
             rigidity_score=rigidity
         )
-        
+
         self.session.add(new_state)
         await self.session.commit()
         await self.session.refresh(new_state)
-        
+
         # 8. Publish event to Versor/Experience
         await self.event_publisher.publish_state_change(
             user_id=user_id,
@@ -290,7 +290,7 @@ class ObserverService:
             previous_quaternion=previous_state.quaternion_state if previous_state else None,
             elasticity=elasticity
         )
-        
+
         return ProcessedState(
             state_id=new_state.id,
             quaternion=quaternion,
@@ -305,7 +305,7 @@ class ObserverService:
 ```python
 class EmotionMapper:
     """Finds the nearest emotion using weighted distance fusion"""
-    
+
     async def find_nearest(
         self,
         vac_scalars: VACVector,
@@ -317,13 +317,13 @@ class EmotionMapper:
         Short text (< 10 words): Trust VAC more (80/20).
         Long text (> 10 words): Trust semantic more (40/60).
         """
-        
+
         # Calculate VAC distance to all Atlas emotions
         vac_distances = await self._calculate_vac_distances(vac_scalars)
-        
+
         # Calculate semantic distance to all Atlas emotions
         semantic_distances = await self._calculate_semantic_distances(text_embedding)
-        
+
         # Weighted fusion
         if word_count < 10:
             vac_weight = 0.8
@@ -331,7 +331,7 @@ class EmotionMapper:
         else:
             vac_weight = 0.4
             semantic_weight = 0.6
-        
+
         # Combine distances
         combined_distances = {}
         for emotion_id in vac_distances:
@@ -339,15 +339,15 @@ class EmotionMapper:
                 vac_weight * vac_distances[emotion_id] +
                 semantic_weight * semantic_distances[emotion_id]
             )
-        
+
         # Find minimum distance
         nearest_id = min(combined_distances, key=combined_distances.get)
-        
+
         # Fetch the emotion definition
         result = await self.session.execute(
             select(AtlasDefinition).where(AtlasDefinition.id == nearest_id)
         )
-        
+
         return result.scalar_one()
 ```
 
@@ -362,7 +362,7 @@ class EventPublisher:
     - Redis Pub/Sub (simple, requires Redis)
     - HTTP webhooks (simple, higher latency)
     """
-    
+
     async def publish_state_change(
         self,
         user_id: UUID,
@@ -378,14 +378,14 @@ class EventPublisher:
             "elasticity": elasticity,
             "timestamp": datetime.utcnow().isoformat()
         }
-        
+
         # Option 1: Direct HTTP to Versor
         async with httpx.AsyncClient() as client:
             await client.post(
                 f"{settings.VERSOR_URL}/versor/compute",
                 json=event
             )
-        
+
         # Option 2: Publish to message queue (future)
         # await self.redis.publish("love.state_changes", json.dumps(event))
 ```
@@ -484,30 +484,30 @@ class Settings(BaseSettings):
     POSTGRES_DB: str
     POSTGRES_HOST: str = "localhost"
     POSTGRES_PORT: int = 5432
-    
+
     @property
     def DATABASE_URL(self) -> str:
         return f"postgresql+asyncpg://{self.POSTGRES_USER}:{self.POSTGRES_PASSWORD}@{self.POSTGRES_HOST}:{self.POSTGRES_PORT}/{self.POSTGRES_DB}"
-    
+
     # Vector Search
     HNSW_EF_SEARCH: int = 40
-    
+
     # Embedding
     OPENAI_API_KEY: str
     EMBEDDING_MODEL: str = "text-embedding-3-small"
-    
+
     # External Services
     VERSOR_URL: str
     LISTENER_URL: str
-    
+
     # Security
     SECRET_KEY: str
     ALLOWED_ORIGINS: List[str]
-    
+
     # Performance
     DEBUG: bool = False
     LOG_LEVEL: str = "INFO"
-    
+
     class Config:
         env_file = ".env"
 

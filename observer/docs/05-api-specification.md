@@ -110,7 +110,7 @@ async def record_state(
 ):
     """
     Record a new emotional state.
-    
+
     This is the primary ingestion endpoint called by the Listener
     after processing user input.
     """
@@ -126,9 +126,9 @@ async def record_state(
             ],
             timestamp=input_data.timestamp
         )
-        
+
         return StateResponse(**result.dict())
-        
+
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 ```
@@ -195,17 +195,17 @@ async def get_insight(
 ):
     """
     Find similar past emotional moments.
-    
+
     Uses semantic vector similarity to identify patterns
     in the user's emotional history.
     """
-    
+
     result = await observer_service.find_similar_moments(
         user_id=request.user_id,
         current_text=request.current_text,
         limit=request.limit
     )
-    
+
     return InsightResponse(**result)
 ```
 
@@ -279,10 +279,10 @@ async def get_history(
 ):
     """
     Retrieve emotional trajectory for visualization.
-    
+
     Returns time-series data with optional decimation based on resolution.
     """
-    
+
     result = await observer_service.get_trajectory(
         user_id=user_id,
         start_date=start_date,
@@ -290,7 +290,7 @@ async def get_history(
         resolution=resolution,
         limit=limit
     )
-    
+
     return HistoryResponse(**result)
 ```
 
@@ -323,20 +323,20 @@ async def get_current_state(
     session: AsyncSession = Depends(get_db)
 ):
     """Get most recent state for user"""
-    
+
     stmt = (
         select(UserTrajectory)
         .where(UserTrajectory.user_id == user_id)
         .order_by(UserTrajectory.timestamp.desc())
         .limit(1)
     )
-    
+
     result = await session.execute(stmt)
     state = result.scalar_one_or_none()
-    
+
     if not state:
         raise HTTPException(status_code=404, detail="No states found for user")
-    
+
     return CurrentStateResponse.from_orm(state)
 ```
 
@@ -364,23 +364,23 @@ async def get_current_state(
 @router.get("/health")
 async def health_check(session: AsyncSession = Depends(get_db)):
     """Health check endpoint"""
-    
+
     try:
         # Test DB connection
         await session.execute(text("SELECT 1"))
-        
+
         # Check pgvector
         result = await session.execute(
             text("SELECT extversion FROM pg_extension WHERE extname = 'vector'")
         )
         pgvector_version = result.scalar()
-        
+
         # Count Atlas emotions
         result = await session.execute(
             select(func.count(AtlasDefinition.id))
         )
         emotion_count = result.scalar()
-        
+
         return {
             "status": "healthy",
             "database": "connected",
@@ -531,7 +531,7 @@ def test_record_state():
         },
         headers={"Authorization": f"Bearer {test_token}"}
     )
-    
+
     assert response.status_code == 200
     assert "state_id" in response.json()
     assert response.json()["dominant_emotion"]["name"] in VALID_EMOTIONS

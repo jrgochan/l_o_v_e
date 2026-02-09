@@ -8,10 +8,10 @@ A computational system for modeling emotional states using a novel three-dimensi
 
 **Word Count:** 164 words
 
-**Technical Classification:**  
+**Technical Classification:**
 
 - G06N 5/04 (Inference or reasoning methods)
-- G06F 17/18 (Complex mathematical operations)  
+- G06F 17/18 (Complex mathematical operations)
 - A61B 5/16 (Psycho-physical patient monitoring)
 - G09B 19/00 (Teaching/training methods for mental health)
 

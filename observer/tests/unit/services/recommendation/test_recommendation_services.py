@@ -24,7 +24,18 @@ async def test_get_problematic_transitions(mock_session):
 
     # Mock row data: from_id, to_id, distance, difficulty, count, bridge,
     # f_name, f_cat, t_name, t_cat
-    row_data = (uuid4(), uuid4(), 2.5, "difficult", 5, True, "Shame", "Sadness", "Joy", "Happiness")
+    row_data = (
+        uuid4(),
+        uuid4(),
+        2.5,
+        "difficult",
+        5,
+        True,
+        "Shame",
+        "Sadness",
+        "Joy",
+        "Happiness",
+    )
     mock_result = MagicMock()
     mock_result.fetchall.return_value = [row_data]
     mock_session.execute.return_value = mock_result

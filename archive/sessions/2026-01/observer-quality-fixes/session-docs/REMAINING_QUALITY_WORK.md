@@ -116,7 +116,7 @@ app/websocket/connection_manager.py:218: D107: Missing docstring in __init__
 # Current (incorrect):
 def function():
     """Summary line.
-    
+
     Description here.
     """
 
@@ -124,7 +124,7 @@ def function():
 def function():
     """
     Summary line.
-    
+
     Description here.
     """
 ```

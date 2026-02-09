@@ -354,7 +354,8 @@ References:
     - Threshold research: docs/modules/observer/senior-developers/06-performance-optimization.md
     - Clinical workflows: docs/modules/observer/managers/05-incident-response.md
     - Dashboard display: docs/features/clinical-tools/README.md
-    - SQLAlchemy enums: https://docs.sqlalchemy.org/en/14/core/type_basics.html#sqlalchemy.types.Enum
+    - SQLAlchemy enums: https://docs.sqlalchemy.org/en/14/core/type_basics.html#
+      sqlalchemy.types.Enum
 """
 
 # pylint: disable=not-callable

@@ -1,8 +1,8 @@
 # Getting Started with the Observer
 
-**Reading Time:** ~30 minutes  
-**Audience:** New developers, interns, bootcamp graduates  
-**Prerequisites:** Basic Python, SQL knowledge, understanding of APIs  
+**Reading Time:** ~30 minutes
+**Audience:** New developers, interns, bootcamp graduates
+**Prerequisites:** Basic Python, SQL knowledge, understanding of APIs
 **Goal:** Set up Observer locally and run your first emotion query
 
 ---
@@ -60,11 +60,11 @@ Before we start, make sure you have these installed:
   # macOS
   brew install postgresql@16
   brew services start postgresql@16
-  
+
   # Linux
   sudo apt install postgresql-16
   sudo systemctl start postgresql
-  
+
   # Check version
   psql --version
   # Should show: psql (PostgreSQL) 16.x
@@ -75,7 +75,7 @@ Before we start, make sure you have these installed:
   ```bash
   # macOS
   brew install pgvector
-  
+
   # Linux (from source)
   cd /tmp
   git clone --branch v0.6.0 https://github.com/pgvector/pgvector.git

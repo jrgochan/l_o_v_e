@@ -28,16 +28,17 @@ depends_on = None
 
 def upgrade() -> None:
     """Create multi-emotion analysis tables with proper CASCADE constraints."""
-    
+
     # Drop auto-created tables if they exist (from SQLAlchemy auto-creation)
     # Order matters: drop children before parents
     op.execute("DROP TABLE IF EXISTS emotion_goals CASCADE")
     op.execute("DROP TABLE IF EXISTS emotion_relationships CASCADE")
     op.execute("DROP TABLE IF EXISTS detected_emotions CASCADE")
     op.execute("DROP TABLE IF EXISTS multi_emotion_analyses CASCADE")
-    
+
     # Create multi_emotion_analyses table
-    op.execute("""
+    op.execute(
+        """
         CREATE TABLE IF NOT EXISTS multi_emotion_analyses (
             id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
             message_id UUID REFERENCES chat_messages(id) ON DELETE CASCADE,
@@ -53,31 +54,33 @@ def upgrade() -> None:
             discrepancy_metrics JSONB,
             created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
         )
-    """)
-    
+    """
+    )
+
     # Indexes for multi_emotion_analyses
     op.execute(
         "CREATE INDEX idx_multi_emotion_message "
         "ON multi_emotion_analyses(message_id)"
     )
-    
+
     op.execute(
         "CREATE INDEX idx_multi_emotion_session "
         "ON multi_emotion_analyses(session_id)"
     )
-    
+
     op.execute(
         "CREATE INDEX idx_multi_emotion_three_way "
         "ON multi_emotion_analyses(three_way_enabled)"
     )
-    
+
     op.execute(
         "CREATE INDEX idx_multi_emotion_created "
         "ON multi_emotion_analyses(created_at)"
     )
-    
+
     # Create detected_emotions table WITH CASCADE on atlas_definitions
-    op.execute("""
+    op.execute(
+        """
         CREATE TABLE IF NOT EXISTS detected_emotions (
             id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
             analysis_id UUID NOT NULL REFERENCES multi_emotion_analyses(id) ON DELETE CASCADE,
@@ -89,26 +92,27 @@ def upgrade() -> None:
             voice_interpretation_vac FLOAT[],
             created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
         )
-    """)
-    
+    """
+    )
+
     # Indexes for detected_emotions
     op.execute(
         "CREATE INDEX idx_detected_emotions_analysis "
         "ON detected_emotions(analysis_id)"
     )
-    
+
     op.execute(
-        "CREATE INDEX idx_detected_emotions_emotion "
-        "ON detected_emotions(emotion_id)"
+        "CREATE INDEX idx_detected_emotions_emotion " "ON detected_emotions(emotion_id)"
     )
-    
+
     op.execute(
         "CREATE INDEX idx_detected_emotions_prominence "
         "ON detected_emotions(prominence)"
     )
-    
+
     # Create emotion_relationships table
-    op.execute("""
+    op.execute(
+        """
         CREATE TABLE IF NOT EXISTS emotion_relationships (
             id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
             analysis_id UUID NOT NULL REFERENCES multi_emotion_analyses(id) ON DELETE CASCADE,
@@ -119,21 +123,22 @@ def upgrade() -> None:
             description TEXT,
             created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
         )
-    """)
-    
+    """
+    )
+
     # Indexes for emotion_relationships
     op.execute(
-        "CREATE INDEX idx_emotion_rel_analysis "
-        "ON emotion_relationships(analysis_id)"
+        "CREATE INDEX idx_emotion_rel_analysis " "ON emotion_relationships(analysis_id)"
     )
-    
+
     op.execute(
         "CREATE INDEX idx_emotion_rel_type "
         "ON emotion_relationships(relationship_type)"
     )
-    
+
     # Create emotion_goals table WITH CASCADE on atlas_definitions
-    op.execute("""
+    op.execute(
+        """
         CREATE TABLE IF NOT EXISTS emotion_goals (
             id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
             session_id UUID NOT NULL REFERENCES chat_sessions(id) ON DELETE CASCADE,
@@ -145,45 +150,37 @@ def upgrade() -> None:
             created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
             updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
         )
-    """)
-    
+    """
+    )
+
     # Indexes for emotion_goals
-    op.execute(
-        "CREATE INDEX idx_emotion_goals_session "
-        "ON emotion_goals(session_id)"
-    )
-    
-    op.execute(
-        "CREATE INDEX idx_emotion_goals_user "
-        "ON emotion_goals(user_id)"
-    )
-    
-    op.execute(
-        "CREATE INDEX idx_emotion_goals_status "
-        "ON emotion_goals(status)"
-    )
-    
+    op.execute("CREATE INDEX idx_emotion_goals_session " "ON emotion_goals(session_id)")
+
+    op.execute("CREATE INDEX idx_emotion_goals_user " "ON emotion_goals(user_id)")
+
+    op.execute("CREATE INDEX idx_emotion_goals_status " "ON emotion_goals(status)")
+
     # Add table comments
     op.execute(
         "COMMENT ON TABLE multi_emotion_analyses IS "
         "'Deep Feeling Mode: Multi-emotion analysis with complexity metrics'"
     )
-    
+
     op.execute(
         "COMMENT ON TABLE detected_emotions IS "
         "'Individual emotions (1-3) detected in multi-emotion analysis'"
     )
-    
+
     op.execute(
         "COMMENT ON COLUMN detected_emotions.emotion_id IS "
         "'Foreign key with CASCADE to allow atlas re-seeding'"
     )
-    
+
     op.execute(
         "COMMENT ON TABLE emotion_relationships IS "
         "'Pairwise relationships: complementary, contradictory, masking, etc.'"
     )
-    
+
     op.execute(
         "COMMENT ON TABLE emotion_goals IS "
         "'User-defined emotion goals for transition pathfinding'"

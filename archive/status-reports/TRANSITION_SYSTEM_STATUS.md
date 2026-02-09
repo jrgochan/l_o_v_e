@@ -145,7 +145,7 @@ npm run dev
 **Successfully Seeded**:
 - ✅ 169 category transitions
 - ✅ 19 strategies
-- ✅ 5 patterns  
+- ✅ 5 patterns
 - ✅ 24 pattern-strategy mappings
 
 **Location**: PostgreSQL database `love_db`, user `love_user`

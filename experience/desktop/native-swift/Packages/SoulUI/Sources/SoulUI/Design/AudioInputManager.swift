@@ -108,7 +108,7 @@ public final class AudioInputManager: ObservableObject, @unchecked Sendable {
     private func processAudio(buffer: AVAudioPCMBuffer) {
         // Broadcast
         onAudioBuffer?(buffer)
-        
+
         let shouldLog = Int.random(in: 0...50) == 0
         if shouldLog { SoulLog.voice.debug("🎤 AudioInputManager: Emitting buffer") }
 
@@ -126,7 +126,7 @@ public final class AudioInputManager: ObservableObject, @unchecked Sendable {
         // Normalize (Empirical adjustment)
         var level = rms * 5.0
         level = max(0.0, min(1.0, level))
-        
+
         if shouldLog {
             SoulLog.voice.debug("🎤 AudioInputManager: RMS: \(rms) (Level: \(level))")
         }

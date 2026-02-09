@@ -1,8 +1,8 @@
 # Architecture Decisions
 
-**Reading Time:** ~35 minutes  
-**Audience:** Senior developers, architects  
-**Prerequisites:** All previous senior guides  
+**Reading Time:** ~35 minutes
+**Audience:** Senior developers, architects
+**Prerequisites:** All previous senior guides
 **Goal:** Understand the rationale behind Observer's key architectural decisions
 
 ---
@@ -290,7 +290,7 @@ else:
 ```text
 Test Set: 500 emotion labels
 - VAC only: 78% accuracy
-- Semantic only: 82% accuracy  
+- Semantic only: 82% accuracy
 - Weighted fusion: 91% accuracy ✅
 ```
 
@@ -538,13 +538,13 @@ Connection = Relational alignment
 
 Compassion: High connection (+0.7) ✅
   → Shared humanity, "with them"
-  
+
 Pity: Low connection (-0.5) ✅
   → Separation, "above them"
-  
+
 Loneliness: Low connection (-0.8) ✅
   → Isolated, disconnected
-  
+
 Belonging: High connection (+0.8) ✅
   → Part of community
 ```
@@ -627,7 +627,7 @@ Need database schema version control.
 def upgrade():
     # Schema change
     op.add_column('emotions', sa.Column('new_field', sa.String))
-    
+
     # Data migration (requires code!)
     conn = op.get_bind()
     for row in conn.execute("SELECT id, old_data FROM emotions"):
@@ -829,7 +829,7 @@ Need quaternions for each emotion for Versor integration.
 for emotion in emotions:
     # Call Versor once
     quaternion = await versor_client.from_vac(emotion.vac)
-    
+
     # Store in DB
     emotion.quaternion = quaternion
     db.add(emotion)

@@ -282,7 +282,7 @@ response = requests.post(url, json=payload)
 # Parse response
 if response.status_code == 200:
     data = response.json()
-    
+
     print(f"Current state: {data['current_state']}")
     print(f"Angular distance: {data['angular_distance_radians']:.3f} rad")
     print(f"Elasticity: {data['elasticity_metric']:.3f} rad/s")
@@ -363,10 +363,10 @@ def test_quaternion_multiplication():
     # Arrange
     q1 = Quaternion(1, 0, 0, 0)  # Identity
     q2 = Quaternion(0.707, 0, 0.707, 0)  # 90° around Y
-    
+
     # Act
     result = q1.multiply(q2)
-    
+
     # Assert
     assert result.w == pytest.approx(0.707, abs=1e-3)
     assert result.x == pytest.approx(0.0, abs=1e-6)
@@ -377,10 +377,10 @@ def test_quaternion_edge_case():
     """Test quaternion handles zero vector."""
     # Arrange
     q = Quaternion(0, 0, 0, 0)
-    
+
     # Act
     normalized = q.normalize()
-    
+
     # Assert
     assert normalized.w == 1.0  # Identity for zero
 ```
@@ -457,7 +457,7 @@ Change a configuration value like the flooding threshold.
 class Settings(BaseSettings):
     # Modify threshold
     FLOODING_THRESHOLD: float = 2.5  # Was 2.0
-    
+
     # Or add new setting
     MAX_ANGULAR_DISTANCE: float = 3.14159  # π radians
 ```
@@ -521,10 +521,10 @@ async def custom_calculation(request: CustomRequest):
         request.vac.arousal,
         request.vac.connection
     )
-    
+
     magnitude = vac.magnitude()
     result = magnitude * request.multiplier
-    
+
     return CustomResponse(
         result=result,
         message=f"Calculated with multiplier {request.multiplier}"
@@ -780,5 +780,5 @@ Practice these tasks, then move on to:
 
 ---
 
-**Previous:** [← Key Concepts](03-key-concepts.md)  
+**Previous:** [← Key Concepts](03-key-concepts.md)
 **Next:** [Testing Guide →](05-testing-guide.md)

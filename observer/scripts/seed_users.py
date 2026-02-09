@@ -11,20 +11,21 @@ Usage:
 """
 
 import asyncio
-import sys
 import logging
+import sys
 from pathlib import Path
 
 # Add parent directory to path for imports
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-from app.database import AsyncSessionLocal
-from app.models.user import User, UserRole
-from app.core.security import get_password_hash
-from sqlalchemy import select
+from app.core.security import get_password_hash  # noqa: E402
+from app.database import AsyncSessionLocal  # noqa: E402
+from app.models.user import User, UserRole  # noqa: E402
+from sqlalchemy import select  # noqa: E402
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
+
 
 async def seed_users():
     """Seed initial users."""
@@ -37,20 +38,20 @@ async def seed_users():
             "email": "admin@admin.com",
             "password": "lovelove",
             "full_name": "System Admin",
-            "role": UserRole.ADMIN
+            "role": UserRole.ADMIN,
         },
         {
             "email": "user@user.com",
             "password": "lovelove",
             "full_name": "Demo User",
-            "role": UserRole.USER
-        }
+            "role": UserRole.USER,
+        },
     ]
 
     async with AsyncSessionLocal() as session:
         try:
             seeded_count = 0
-            
+
             for user_data in users_to_seed:
                 # Check if user exists
                 stmt = select(User).where(User.email == user_data["email"])
@@ -59,7 +60,9 @@ async def seed_users():
 
                 if existing_user:
                     logger.info(f"User {user_data['email']} exists - updating password")
-                    existing_user.password_hash = get_password_hash(user_data["password"])
+                    existing_user.password_hash = get_password_hash(
+                        user_data["password"]
+                    )
                     seeded_count += 1
                     continue
 
@@ -70,23 +73,24 @@ async def seed_users():
                     password_hash=get_password_hash(user_data["password"]),
                     full_name=user_data["full_name"],
                     role=user_data["role"],
-                    is_active=True
+                    is_active=True,
                 )
                 session.add(new_user)
                 seeded_count += 1
-            
+
             if seeded_count > 0:
                 await session.commit()
                 logger.info(f"✓ Successfully seeded {seeded_count} users")
             else:
                 logger.info("No new users created")
-                
+
             return True
 
         except Exception as e:
             logger.error(f"✗ User seeding failed: {e}")
             await session.rollback()
             return False
+
 
 if __name__ == "__main__":
     success = asyncio.run(seed_users())

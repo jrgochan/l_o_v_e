@@ -324,6 +324,6 @@ Edit `.pre-commit-config.yaml` and update `rev:` tags
 
 ---
 
-**Created:** January 3, 2026  
-**Maintained by:** L.O.V.E. Platform Team  
+**Created:** January 3, 2026
+**Maintained by:** L.O.V.E. Platform Team
 **Questions?** See project documentation in `docs/`

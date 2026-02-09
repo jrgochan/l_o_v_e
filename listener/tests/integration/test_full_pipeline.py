@@ -4,6 +4,7 @@ Listener Module - Full Pipeline Integration Tests
 Tests the complete pipeline from input to Observer storage.
 """
 
+from typing import Any
 from unittest.mock import AsyncMock, Mock, patch
 
 import pytest
@@ -12,13 +13,15 @@ from app.services.observer_client import ObserverClient
 from app.services.pii_scrubber import PIIScrubber
 from app.services.semantic_analyzer import SemanticAnalyzer
 
+# pylint: disable=redefined-outer-name, unused-argument, import-outside-toplevel
+
 
 @pytest.mark.integration
 class TestFullPipeline:
     """Test complete processing pipeline"""
 
     @pytest.mark.asyncio
-    async def test_text_to_vac_pipeline(self, sample_text):
+    async def test_text_to_vac_pipeline(self, sample_text: Any) -> None:
         """
         Test complete pipeline with text input.
 
@@ -76,7 +79,7 @@ class TestFullPipeline:
         )
         print(f"   Sanitized: {sanitized}")
 
-    def test_pii_detection_and_scrubbing(self):
+    def test_pii_detection_and_scrubbing(self) -> None:
         """Test PII detection and removal"""
         scrubber = PIIScrubber()
 
@@ -106,7 +109,7 @@ class TestFullPipeline:
         print(f"   Sanitized: {sanitized}")
 
     @pytest.mark.asyncio
-    async def test_observer_client_mock(self, sample_text):
+    async def test_observer_client_mock(self, sample_text: Any) -> None:
         """Test Observer client integration (mocked)"""
         analyzer = SemanticAnalyzer()
         emotion = await analyzer.analyze(sample_text)
@@ -141,7 +144,7 @@ class TestFullPipeline:
 class TestComponentIntegration:
     """Test integration between components"""
 
-    def test_transcription_service_initialization(self):
+    def test_transcription_service_initialization(self) -> None:
         """Test that transcription service initializes correctly"""
         from app.services.transcription import get_transcription_service
 
@@ -153,7 +156,7 @@ class TestComponentIntegration:
         service2 = get_transcription_service()
         assert service is service2
 
-    def test_semantic_analyzer_initialization(self):
+    def test_semantic_analyzer_initialization(self) -> None:
         """Test that semantic analyzer initializes correctly"""
         from app.services.semantic_analyzer import get_semantic_analyzer
 
@@ -166,7 +169,7 @@ class TestComponentIntegration:
         analyzer2 = get_semantic_analyzer()
         assert analyzer is analyzer2
 
-    def test_pii_scrubber_initialization(self):
+    def test_pii_scrubber_initialization(self) -> None:
         """Test that PII scrubber initializes correctly"""
         from app.services.pii_scrubber import get_pii_scrubber
 

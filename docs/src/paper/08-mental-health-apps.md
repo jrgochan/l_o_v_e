@@ -80,15 +80,15 @@ Difficulty: 0.95 (very high—Connection jump of 1.65)
 1. Shame (-0.7, -0.2, -0.8)
    Strategy: "Name your feelings without judgment"
    Evidence: Linehan (2015) - DBT emotion regulation
-   
+
 2. Vulnerability (0.0, 0.3, 0.6)
    Strategy: "Practice sharing your experience with a trusted person"
    Evidence: Brown (2012) - Vulnerability as courage
-   
+
 3. Self-Compassion (0.6, 0.1, 0.85)
    Strategy: "Treat yourself as you would a good friend"
    Evidence: Neff & Germer (2013) - MSC-RCT
-   
+
 Total Distance: 2.56 (longer path)
 Difficulty: 0.68 (lower—smaller individual steps)
 Estimated Time: 3-6 weeks with consistent practice
@@ -120,7 +120,7 @@ The system flags transitions as potentially toxic positive if:
 
 $$\text{difficulty} = \frac{|V_{\text{target}} - V_{\text{current}}| + |C_{\text{target}} - C_{\text{current}}|}{2} > 0.8$$
 
-AND $V_{\text{target}} > 0.5$ (target is positive)  
+AND $V_{\text{target}} > 0.5$ (target is positive)
 AND $V_{\text{current}} < -0.5$ (current is negative)
 
 **Example Detection**:
@@ -189,23 +189,23 @@ Given current emotional state and target, select strategies that:
 ```python
 def select_strategies(current_vac, target_vac, user_context):
     candidates = []
-    
+
     # Find strategies applicable to current emotion
     current_emotion = nearest_emotion(current_vac)
     for strategy in strategy_db:
         if current_emotion in strategy.applicable_emotions:
             candidates.append(strategy)
-    
+
     # Filter by contraindications
-    candidates = [s for s in candidates 
+    candidates = [s for s in candidates
                   if not has_contraindications(s, user_context)]
-    
+
     # Sort by evidence level
-    evidence_rank = {"Meta-analysis": 4, "RCT": 3, 
+    evidence_rank = {"Meta-analysis": 4, "RCT": 3,
                      "Clinical": 2, "Theoretical": 1}
-    candidates.sort(key=lambda s: evidence_rank[s.evidence_level], 
+    candidates.sort(key=lambda s: evidence_rank[s.evidence_level],
                     reverse=True)
-    
+
     # Return top 3
     return candidates[:3]
 ```
@@ -217,26 +217,26 @@ Top 3 Strategies:
 
 1. Mindful Self-Compassion (Evidence: Meta-analysis)
    "Treat yourself with the kindness you'd offer a friend in pain."
-   
-   Why this helps: Shame involves harsh self-judgment. Self-compassion 
+
+   Why this helps: Shame involves harsh self-judgment. Self-compassion
    counters this by cultivating a warm, understanding inner voice.
-   
-   Research: Ferrari et al. (2019) meta-analysis found large effect 
+
+   Research: Ferrari et al. (2019) meta-analysis found large effect
    sizes (d=0.71) for self-compassion on shame reduction.
-   
+
 2. Shame Resilience (Evidence: RCT)
    "Share your story with someone who's earned the right to hear it."
-   
+
    Why this helps: Shame thrives in secrecy. Speaking shame breaks its power.
-   
+
    Research: Brown (2006) showed that shame resilience involves reaching out.
-   
+
 3. Cognitive Reframing (Evidence: Meta-analysis)
-   "Challenge the belief that you ARE your mistake (you DID something, 
+   "Challenge the belief that you ARE your mistake (you DID something,
    you're not something)."
-   
+
    Why this helps: Shifts from identity-level shame to behavior-level guilt.
-   
+
    Research: Hofmann et al. (2012) meta-analysis of CBT for self-criticism.
 ```
 
@@ -330,8 +330,8 @@ Top 3 Strategies:
 **Example Disclaimer**:
 
 ```text
-⚠️ IMPORTANT: This system provides educational information based on 
-research, not professional mental health treatment. If you're experiencing 
+⚠️ IMPORTANT: This system provides educational information based on
+research, not professional mental health treatment. If you're experiencing
 severe distress, suicidal thoughts, or a mental health crisis, please:
 
 • Call 988 (US National Suicide Prevention Lifeline)

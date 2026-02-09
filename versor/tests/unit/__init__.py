@@ -1,3 +1,1 @@
-"""
-Unit tests for Versor core mathematics.
-"""
+"""Unit tests for Versor core mathematics."""

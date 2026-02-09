@@ -9,8 +9,8 @@
    - Extensions: Uses pgvector for vector similarity search
    - Status: ✅ Active
 
-2. **`4a8b9c2d3e4f_add_transition_system_tables.py`** 
-   - Tables: `transition_strategies`, `transition_patterns`, `category_transitions`, 
+2. **`4a8b9c2d3e4f_add_transition_system_tables.py`**
+   - Tables: `transition_strategies`, `transition_patterns`, `category_transitions`,
      `pattern_strategies`, `user_journeys`, `journey_waypoints`, `strategy_attempts`
    - Views: User success rates, strategy effectiveness analytics
    - Functions: Success probability calculation, top strategies lookup

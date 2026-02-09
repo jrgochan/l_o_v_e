@@ -4,14 +4,14 @@
 
 Successfully migrated the L.O.V.E. Stack from hardcoded PostgreSQL 16 to a **version-agnostic approach** that automatically detects and uses the installed PostgreSQL version.
 
-**Date**: January 3, 2026  
+**Date**: January 3, 2026
 **Migration Path**: PostgreSQL 16 → PostgreSQL 17 (with version-agnostic scripts)
 
 ## What Changed
 
 ### 1. Setup Scripts Updated
 
-**Before**: Hardcoded `postgresql@16` everywhere  
+**Before**: Hardcoded `postgresql@16` everywhere
 **After**: Dynamic detection of installed PostgreSQL version
 
 **Modified Files:**
@@ -144,12 +144,12 @@ cd infra && ./init-database.sh
 
 All functionality verified on PostgreSQL 17:
 
-✅ Database creation  
-✅ Extension installation (vector, uuid-ossp, pg_trgm)  
-✅ Alembic migrations  
-✅ Table creation with VECTOR columns  
-✅ Setup scripts detect version correctly  
-✅ Service management works automatically  
+✅ Database creation
+✅ Extension installation (vector, uuid-ossp, pg_trgm)
+✅ Alembic migrations
+✅ Table creation with VECTOR columns
+✅ Setup scripts detect version correctly
+✅ Service management works automatically
 
 ## Backward Compatibility
 
@@ -232,7 +232,7 @@ This ensures consistency with the existing version management philosophy used fo
 
 ```
 infra/lib/package-manager.sh              - Dynamic PostgreSQL detection
-infra/lib/service-manager.sh              - Dynamic service mapping  
+infra/lib/service-manager.sh              - Dynamic service mapping
 infra/TOOL_VERSIONS                       - Added database/infrastructure section
 infra/setup-love-stack.sh                 - Reads from TOOL_VERSIONS, validates versions
 infra/PGVECTOR_SETUP.md                   - Version-agnostic documentation

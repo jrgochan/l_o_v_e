@@ -214,6 +214,7 @@ References:
 
 import json
 import logging
+from dataclasses import dataclass
 from typing import Annotated, Any, Dict, List, Optional
 
 from fastapi import APIRouter, Depends, HTTPException, Query
@@ -267,8 +268,8 @@ async def get_strategy_effectiveness(
     except HTTPException:
         raise
     except Exception as e:
-        logger.error(f"Failed to get strategy effectiveness: {e}", exc_info=True)
-        raise HTTPException(status_code=500, detail=str(e))
+        logger.error("Failed to get strategy effectiveness: %s", e, exc_info=True)
+        raise HTTPException(status_code=500, detail=str(e)) from e
 
 
 @router.get("/path-templates", tags=["Bootstrap"])
@@ -279,7 +280,7 @@ async def get_path_templates(
     max_difficulty: Annotated[
         Optional[float], Query(description="Maximum difficulty (0-1)")
     ] = None,
-) -> Dict[str, Any]:
+) -> Dict[str, Any]:  # pylint: disable=too-many-positional-arguments
     """Get pre-computed optimal path templates for common emotional transitions.
 
     These templates provide starting points for path planning based on
@@ -335,8 +336,8 @@ async def get_path_templates(
     except HTTPException:
         raise
     except Exception as e:
-        logger.error(f"Failed to get path templates: {e}", exc_info=True)
-        raise HTTPException(status_code=500, detail=str(e))
+        logger.error("Failed to get path templates: %s", e, exc_info=True)
+        raise HTTPException(status_code=500, detail=str(e)) from e
 
 
 def _apply_context_filter(
@@ -401,21 +402,29 @@ def _build_recommendations_dict(
     }
 
 
-@router.get("/context-recommendations", tags=["Bootstrap"])
-async def get_context_recommendations(
-    db: Annotated[AsyncSession, Depends(get_db)],
+@dataclass
+class ContextRecommendationsParams:
+    """Dependency class for context recommendation parameters."""
+
     time_of_day: Annotated[
-        Optional[str], Query(description="Time: morning, afternoon, evening, late_night")
-    ] = None,
-    energy_level: Annotated[Optional[str], Query(description="Energy: high, moderate, low")] = None,
-    location: Annotated[Optional[str], Query(description="Location: home, work, public")] = None,
+        Optional[str],
+        Query(description="Time: morning, afternoon, evening, late_night"),
+    ] = None
+    energy_level: Annotated[Optional[str], Query(description="Energy: high, moderate, low")] = None
+    location: Annotated[Optional[str], Query(description="Location: home, work, public")] = None
     available_time: Annotated[
         Optional[str],
         Query(description="Time: 5_minutes, 15_minutes, 30_minutes, 60_plus_minutes"),
-    ] = None,
+    ] = None
     experience_level: Annotated[
         Optional[str], Query(description="Level: beginner, intermediate, advanced")
-    ] = None,
+    ] = None
+
+
+@router.get("/context-recommendations", tags=["Bootstrap"])
+async def get_context_recommendations(
+    db: Annotated[AsyncSession, Depends(get_db)],
+    params: Annotated[ContextRecommendationsParams, Depends()],
 ) -> Dict[str, Any]:
     """Get context-aware strategy recommendations based on situational factors.
 
@@ -442,16 +451,24 @@ async def get_context_recommendations(
 
         # Build recommendations structure
         recommendations = _build_recommendations_dict(
-            time_of_day, energy_level, location, available_time, experience_level
+            params.time_of_day,
+            params.energy_level,
+            params.location,
+            params.available_time,
+            params.experience_level,
         )
 
         # Apply each context filter
         for modifier in modifiers:
-            _apply_context_filter(modifier, "time_of_day", time_of_day, recommendations)
-            _apply_context_filter(modifier, "energy_level", energy_level, recommendations)
-            _apply_context_filter(modifier, "location", location, recommendations)
-            _apply_context_filter(modifier, "available_time", available_time, recommendations)
-            _apply_context_filter(modifier, "experience_level", experience_level, recommendations)
+            _apply_context_filter(modifier, "time_of_day", params.time_of_day, recommendations)
+            _apply_context_filter(modifier, "energy_level", params.energy_level, recommendations)
+            _apply_context_filter(modifier, "location", params.location, recommendations)
+            _apply_context_filter(
+                modifier, "available_time", params.available_time, recommendations
+            )
+            _apply_context_filter(
+                modifier, "experience_level", params.experience_level, recommendations
+            )
 
         # Deduplicate
         recommendations["recommended_strategies"] = list(
@@ -468,8 +485,8 @@ async def get_context_recommendations(
     except HTTPException:
         raise
     except Exception as e:
-        logger.error(f"Failed to get context recommendations: {e}", exc_info=True)
-        raise HTTPException(status_code=500, detail=str(e))
+        logger.error("Failed to get context recommendations: %s", e, exc_info=True)
+        raise HTTPException(status_code=500, detail=str(e)) from e
 
 
 @router.get("/challenge-patterns", tags=["Bootstrap"])
@@ -523,8 +540,8 @@ async def get_challenge_patterns(
     except HTTPException:
         raise
     except Exception as e:
-        logger.error(f"Failed to get challenge patterns: {e}", exc_info=True)
-        raise HTTPException(status_code=500, detail=str(e))
+        logger.error("Failed to get challenge patterns: %s", e, exc_info=True)
+        raise HTTPException(status_code=500, detail=str(e)) from e
 
 
 @router.get("/all", tags=["Bootstrap"])
@@ -582,5 +599,5 @@ async def get_all_bootstrap_data(db: Annotated[AsyncSession, Depends(get_db)]) -
     except HTTPException:
         raise
     except Exception as e:
-        logger.error(f"Failed to get all bootstrap data: {e}", exc_info=True)
-        raise HTTPException(status_code=500, detail=str(e))
+        logger.error("Failed to get all bootstrap data: %s", e, exc_info=True)
+        raise HTTPException(status_code=500, detail=str(e)) from e

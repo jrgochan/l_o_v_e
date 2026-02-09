@@ -1,52 +1,53 @@
+"""Module documentation."""
+
 import random
 from typing import Any, Dict, List, Optional
 
-from app.services.insights.prosody import generate_voice_observations_warm
+from app.services.insights.prosody import (
+    generate_voice_observations_legacy,
+    generate_voice_observations_warm,
+)
 
 
 def interpret_arousal_warm(arousal: float) -> str:
     """Interpret arousal in relatable terms."""
     if arousal > 0.7:
         return "You're in a high-activation state - your system is revved up"
-    elif arousal > 0.3:
+    if arousal > 0.3:
         return "There's moderate energy moving through you - you're engaged and alert"
-    elif arousal > -0.3:
+    if arousal > -0.3:
         return "You're in a balanced energy state - not too activated, not too flat"
-    elif arousal > -0.7:
+    if arousal > -0.7:
         return "Your energy is quite low right now - you might feel tired or depleted"
-    else:
-        return (
-            "You're in a very low-energy state - your system might be shutting down "
-            "to protect you"
-        )
+    return (
+        "You're in a very low-energy state - your system might be shutting down " "to protect you"
+    )
 
 
 def interpret_valence_warm(valence: float) -> str:
     """Interpret valence in relatable terms."""
     if valence > 0.7:
         return "This energy feels really good - there's pleasure and positivity here"
-    elif valence > 0.3:
+    if valence > 0.3:
         return "This has a somewhat positive quality - things feel okay"
-    elif valence > -0.3:
+    if valence > -0.3:
         return "This feels neutral or mixed - neither clearly good nor bad"
-    elif valence > -0.7:
+    if valence > -0.7:
         return "This energy doesn't feel good - there's some distress or discomfort"
-    else:
-        return "This feels quite painful or difficult - the distress is significant"
+    return "This feels quite painful or difficult - the distress is significant"
 
 
 def interpret_connection_warm(connection: float) -> str:
     """Interpret connection in relatable terms."""
     if connection > 0.7:
         return "You feel deeply connected - to yourself, others, or your values"
-    elif connection > 0.3:
+    if connection > 0.3:
         return "There's a sense of connection present - you're not entirely alone in this"
-    elif connection > -0.3:
+    if connection > -0.3:
         return "Connection feels neutral right now"
-    elif connection > -0.7:
+    if connection > -0.7:
         return "You might feel somewhat alone or disconnected in this experience"
-    else:
-        return "There's significant disconnection - you might feel very alone or cut of"
+    return "There's significant disconnection - you might feel very alone or cut of"
 
 
 def generate_warm_opening(emotion_name: str, valence: float) -> str:
@@ -76,7 +77,7 @@ def generate_warm_opening(emotion_name: str, valence: float) -> str:
 
 def get_emotion_understanding_warm(emotion_name: str) -> str:
     """Get accessible explanation of emotion."""
-    EMOTION_UNDERSTANDING = {
+    emotion_understanding = {
         "Anxiety": (
             "Anxiety is your mind's way of trying to protect you by preparing for potential "
             "challenges. It's exhausting, but it means you care deeply."
@@ -115,16 +116,17 @@ def get_emotion_understanding_warm(emotion_name: str) -> str:
         ),
     }
 
-    return EMOTION_UNDERSTANDING.get(
+    return emotion_understanding.get(
         emotion_name,
         f"{emotion_name} is your emotional system responding to what's happening. "
         "It's giving you important information about your needs and values.",
     )
 
 
-def generate_reflection_question(emotion_name: str, vac_data: Dict[str, float]) -> str:
+def generate_reflection_question(
+    emotion_name: str, vac_data: Dict[str, float]  # pylint: disable=unused-argument
+) -> str:
     """Generate a reflective question based on VAC state."""
-
     arousal = vac_data.get("arousal", 0)
     valence = vac_data.get("valence", 0)
     connection = vac_data.get("connection", 0)
@@ -176,9 +178,10 @@ def generate_reflection_question(emotion_name: str, vac_data: Dict[str, float]) 
     return random.choice(questions)
 
 
-def generate_gentle_suggestion(emotion_name: str, vac_data: Dict[str, float]) -> str:
+def generate_gentle_suggestion(
+    emotion_name: str, vac_data: Dict[str, float]  # pylint: disable=unused-argument
+) -> str:
     """Generate a gentle suggestion based on VAC state."""
-
     arousal = vac_data.get("arousal", 0)
     valence = vac_data.get("valence", 0)
     connection = vac_data.get("connection", 0)
@@ -283,9 +286,7 @@ def generate_gentle_invitations(
 def generate_warm_summary_structured(
     emotion: Dict[str, Any],
     vac_data: Dict[str, float],
-    confidence: float,
     prosody_data: Optional[Dict[str, Any]],
-    reasoning: Optional[str],
     message_count: int = 1,
 ) -> Dict[str, Any]:
     """Generate structured warm mode insights."""
@@ -313,13 +314,11 @@ def generate_warm_summary_structured(
 def generate_warm_summary_legacy(
     emotion: Dict[str, Any],
     vac_data: Dict[str, float],
-    confidence: float,
+    confidence: float,  # pylint: disable=unused-argument
     prosody_data: Optional[Dict[str, Any]],
-    reasoning: Optional[str],
+    reasoning: Optional[str],  # pylint: disable=unused-argument
 ) -> str:
     """Generate warm/conversational summary (legacy format)."""
-    from app.services.insights.prosody import generate_voice_observations_legacy
-
     valence = vac_data.get("valence", 0.0)
     arousal = vac_data.get("arousal", 0.0)
     connection = vac_data.get("connection", 0.0)

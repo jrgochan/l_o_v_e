@@ -100,14 +100,14 @@
   - Bold font weight
   - Full opacity
   - Larger emoji (20px)
-  
+
 - **Secondary Badges**:
   - Font size: 12px
   - Padding: 4px 10px
   - Normal font weight
   - Full opacity
   - Medium emoji (16px)
-  
+
 - **Underlying Badges**:
   - Font size: 11px
   - Padding: 3px 8px

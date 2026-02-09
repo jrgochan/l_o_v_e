@@ -28,15 +28,15 @@ const filesToFix = [
 
 function fixEntitiesInFile(filePath) {
   const fullPath = path.join(__dirname, filePath);
-  
+
   if (!fs.existsSync(fullPath)) {
     console.log(`⚠️  File not found: ${filePath}`);
     return false;
   }
-  
+
   let content = fs.readFileSync(fullPath, 'utf8');
   const originalContent = content;
-  
+
   // Fix unescaped quotes and apostrophes in JSX content
   // This regex looks for text between > and < (JSX text content)
   content = content.replace(/>([^<]*)</g, (match, text) => {
@@ -46,7 +46,7 @@ function fixEntitiesInFile(filePath) {
     fixed = fixed.replace(/'/g, '&apos;');
     return `>${fixed}<`;
   });
-  
+
   if (content !== originalContent) {
     fs.writeFileSync(fullPath, content, 'utf8');
     console.log(`✅ Fixed: ${filePath}`);

@@ -1,7 +1,7 @@
 # Clinical Dashboard Implementation Plan
 
-**Created**: December 5, 2025  
-**Purpose**: Add expandable Clinical Dashboard to Chat Panel for therapists and psychiatrists  
+**Created**: December 5, 2025
+**Purpose**: Add expandable Clinical Dashboard to Chat Panel for therapists and psychiatrists
 **Status**: 🚧 In Progress
 
 ---
@@ -54,7 +54,7 @@ Enhance the Chat Panel's Analysis Panel with:
 
 ```typescript
 // Example usage
-<ClinicalDashboard 
+<ClinicalDashboard
   emotion={currentEmotion}
   vac={vacMetrics}
   prosody={audioAnalysis}

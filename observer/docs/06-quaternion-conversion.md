@@ -78,7 +78,7 @@ max_magnitude = math.sqrt(3)  # Maximum distance in unit cube
 angle = (magnitude / max_magnitude) * math.pi
 ```
 
-**Interpretation**: 
+**Interpretation**:
 - Low intensity → Small rotation from neutral
 - Maximum intensity → 180° rotation (opposite of neutral)
 
@@ -115,55 +115,55 @@ from app.utils.vector_ops import VACVector
 
 class QuaternionBuilder:
     """Converts VAC scalars to unit quaternions"""
-    
+
     def from_vac(self, vac: VACVector) -> List[float]:
         """
         Convert VAC vector to unit quaternion.
-        
+
         Args:
             vac: [valence, arousal, connection] each ∈ [-1, 1]
-        
+
         Returns:
             [w, x, y, z] unit quaternion
         """
         v_x, v_y, v_z = vac
-        
+
         # Step 1: Calculate magnitude
         magnitude = math.sqrt(v_x**2 + v_y**2 + v_z**2)
-        
+
         # Step 2: Handle neutral state
         if magnitude < 0.001:
             return [1.0, 0.0, 0.0, 0.0]
-        
+
         # Step 3: Normalize axis
         axis = [v_x / magnitude, v_y / magnitude, v_z / magnitude]
-        
+
         # Step 4: Calculate angle
         max_magnitude = math.sqrt(3)
         angle = (magnitude / max_magnitude) * math.pi
-        
+
         # Step 5: Construct quaternion
         half_angle = angle / 2
         sin_half = math.sin(half_angle)
         cos_half = math.cos(half_angle)
-        
+
         quaternion = [
             cos_half,
             axis[0] * sin_half,
             axis[1] * sin_half,
             axis[2] * sin_half
         ]
-        
+
         # Step 6: Verify (optional in production, use in tests)
         if __debug__:
             self._validate_unit_quaternion(quaternion)
-        
+
         return quaternion
-    
+
     def _validate_unit_quaternion(self, q: List[float]) -> None:
         """Verify quaternion is unit length"""
         length = math.sqrt(sum(component**2 for component in q))
-        
+
         if abs(length - 1.0) > 1e-6:
             raise ValueError(
                 f"Quaternion not unit length: {length}. "
@@ -181,7 +181,7 @@ class QuaternionBuilder:
 ```python
 magnitude = √(0.9² + 0.7² + 0.8²) = √(0.81 + 0.49 + 0.64) = √1.94 ≈ 1.393
 
-axis = [0.9/1.393, 0.7/1.393, 0.8/1.393] 
+axis = [0.9/1.393, 0.7/1.393, 0.8/1.393]
      = [0.646, 0.502, 0.574]
 
 angle = (1.393 / 1.732) × π = 0.804 × π ≈ 2.525 radians
@@ -285,20 +285,20 @@ def test_neutral_state_identity_quaternion():
     """Neutral VAC should produce identity quaternion"""
     builder = QuaternionBuilder()
     q = builder.from_vac([0.0, 0.0, 0.0])
-    
+
     assert q == [1.0, 0.0, 0.0, 0.0]
 
 def test_unit_length_property():
     """All quaternions must be unit length"""
     builder = QuaternionBuilder()
-    
+
     test_cases = [
         [0.9, 0.7, 0.8],   # Joy
         [-0.9, -0.1, -1.0], # Shame
         [0.5, -0.7, 0.4],   # Calm
         [-0.5, 0.8, -0.2]   # Anger
     ]
-    
+
     for vac in test_cases:
         q = builder.from_vac(vac)
         length = math.sqrt(sum(component**2 for component in q))
@@ -307,10 +307,10 @@ def test_unit_length_property():
 def test_opposite_states_opposite_quaternions():
     """Opposite VAC vectors should produce opposite rotations"""
     builder = QuaternionBuilder()
-    
+
     q1 = builder.from_vac([0.9, 0.7, 0.8])   # Joy
     q2 = builder.from_vac([-0.9, -0.7, -0.8]) # Opposite
-    
+
     # Dot product should be negative (opposite orientations)
     dot = sum(a * b for a, b in zip(q1, q2))
     assert dot < 0, "Opposite VAC should produce opposite quaternions"
@@ -318,10 +318,10 @@ def test_opposite_states_opposite_quaternions():
 def test_compassion_pity_different_quaternions():
     """Compassion and Pity must have different quaternions"""
     builder = QuaternionBuilder()
-    
+
     compassion = builder.from_vac([0.5, 0.2, 0.9])
     pity = builder.from_vac([-0.3, -0.1, -0.7])
-    
+
     # Should be significantly different
     distance = sum((a - b)**2 for a, b in zip(compassion, pity))
     assert distance > 1.0, "Compassion and Pity too similar"
@@ -341,7 +341,7 @@ def test_all_vac_produce_unit_quaternions(valence, arousal, connection):
     """Property: ANY valid VAC must produce unit quaternion"""
     builder = QuaternionBuilder()
     q = builder.from_vac([valence, arousal, connection])
-    
+
     length = math.sqrt(sum(c**2 for c in q))
     assert abs(length - 1.0) < 1e-5
 ```
@@ -356,12 +356,12 @@ Calculate angle between two quaternions:
 def angular_distance(q1: List[float], q2: List[float]) -> float:
     """
     Calculate angular distance between two quaternions.
-    
+
     Returns: Angle in radians [0, π]
     """
     dot = sum(a * b for a, b in zip(q1, q2))
     dot = max(-1.0, min(1.0, dot))  # Clamp for numerical stability
-    
+
     return 2 * math.acos(abs(dot))
 ```
 
@@ -373,26 +373,26 @@ For temporal aggregation (decimation):
 def average_quaternions(quaternions: List[List[float]]) -> List[float]:
     """
     Average multiple quaternions (weighted by time).
-    
+
     Note: This is NOT a simple arithmetic mean!
     Uses eigenvalue decomposition for proper quaternion averaging.
     """
     import numpy as np
-    
+
     # Convert to numpy array
     Q = np.array(quaternions)
-    
+
     # Compute covariance matrix
     M = Q.T @ Q
-    
+
     # Find eigenvector with largest eigenvalue
     eigenvalues, eigenvectors = np.linalg.eigh(M)
     avg_quat = eigenvectors[:, -1]
-    
+
     # Ensure positive w
     if avg_quat[0] < 0:
         avg_quat = -avg_quat
-    
+
     return avg_quat.tolist()
 ```
 

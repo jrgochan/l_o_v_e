@@ -13,9 +13,9 @@ The logic tested is the EmotionMapper's ability to distinguish based on VAC.
 from unittest.mock import AsyncMock, MagicMock
 
 import pytest
+from tests.test_data import COMPASSION_VAC, PITY_VAC
 
 from app.models.emotion_definition import EmotionDefinition
-from tests.test_data import COMPASSION_VAC, PITY_VAC
 
 
 # Helper to create mock emotion objects
@@ -34,18 +34,19 @@ def mock_db_session():
 
 @pytest.mark.semantic
 @pytest.mark.unit
-def test_compassion_positive_connection(mock_db_session):
-    """
-    Compassion should be detected when Connection is positive (+0.9).
-    VAC: [0.5, 0.2, 0.9]
-    """
+def test_compassion_positive_connection(
+    mock_db_session,
+):  # pylint: disable=unused-argument, redefined-outer-name
+    """Verify Compassion correlates with positive connection."""
     compassion_vec = list(COMPASSION_VAC)
     assert compassion_vec[2] > 0.5, "Compassion must have high positive connection"
 
 
 @pytest.mark.semantic
 @pytest.mark.unit
-def test_compassion_pity_logic(mock_db_session):
+def test_compassion_pity_logic(
+    mock_db_session,
+):  # pylint: disable=unused-argument, redefined-outer-name
     """
     Verify Compassion and Pity vectors are distant and distinct on Connection axis.
     """
@@ -76,7 +77,7 @@ def test_emotion_mapper_selection_logic():
     target_compassion = COMPASSION_VAC
 
     # Find nearest by Euclidean distance
-    import math
+    import math  # pylint: disable=import-outside-toplevel
 
     def dist(v1, v2):
         return math.sqrt(sum((x - y) ** 2 for x, y in zip(v1, v2)))

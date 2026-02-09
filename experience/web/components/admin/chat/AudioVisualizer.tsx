@@ -16,7 +16,7 @@ interface AudioVisualizerProps {
 
 export function AudioVisualizer({ audioLevel, isActive, personaColor }: AudioVisualizerProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const animationFrameRef = useRef<number>();
+  const animationFrameRef = useRef<number | null>(null);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -60,7 +60,7 @@ export function AudioVisualizer({ audioLevel, isActive, personaColor }: AudioVis
       for (let i = 0; i < bars; i++) {
         // Simulate waveform based on audio level
         const time = Date.now() / 1000;
-        const frequency = (i / bars) * 8;
+        // const frequency = (i / bars) * 8;
         const baseHeight = Math.sin(time * 4 + i / 4) * 20 + 30;
         const barHeight = baseHeight * (0.5 + audioLevel * 1.5);
 

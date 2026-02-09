@@ -68,7 +68,7 @@ class InteractiveMTKView: MTKView {
 
         let pan = UIPanGestureRecognizer(target: self, action: #selector(handlePan(_:)))
         addGestureRecognizer(pan)
-        
+
         // Pinch interpreted as scroll (zoom)
         let pinch = UIPinchGestureRecognizer(target: self, action: #selector(handlePinch(_:)))
         addGestureRecognizer(pinch)
@@ -84,11 +84,11 @@ class InteractiveMTKView: MTKView {
         // Invert Y for iOS to match drag expectation if needed, or keep consistent
         onDrag?(CGPoint(x: translation.x, y: translation.y))
     }
-    
+
     @objc private func handlePinch(_ g: UIPinchGestureRecognizer) {
         let delta = Float(g.scale - 1.0) * 5.0
         g.scale = 1.0
-        onScroll?(delta) 
+        onScroll?(delta)
     }
 }
 #endif
@@ -162,7 +162,7 @@ public struct SoulView: PlatformViewRepresentable {
     public func makeUIView(context: Context) -> MTKView {
         setupView(context: context)
     }
-    
+
     public func updateUIView(_ uiView: MTKView, context: Context) {
         updateView(uiView, context: context)
     }
@@ -245,9 +245,7 @@ public struct SoulView: PlatformViewRepresentable {
     private func handleNavigation(_ renderer: SoulRenderer) {
         if let target = selectedEmotion { renderer.fly(to: target) }
 
-        if !path.isEmpty { renderer.updatePath(with: path) }
-        else if !splinePoints.isEmpty { renderer.updateSpline(points: splinePoints) }
-        else { renderer.updatePath(with: []) }
+        if !path.isEmpty { renderer.updatePath(with: path) } else if !splinePoints.isEmpty { renderer.updateSpline(points: splinePoints) } else { renderer.updatePath(with: []) }
 
         if playSequence {
             renderer.flyThrough(path: path)

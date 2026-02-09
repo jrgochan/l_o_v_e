@@ -21,8 +21,6 @@ class PromptTemplateBase(BaseModel):
 class PromptTemplateCreate(PromptTemplateBase):
     """Schema for creating prompt templates."""
 
-    pass
-
 
 class PromptTemplateUpdate(BaseModel):
     """Schema for updating prompt templates."""

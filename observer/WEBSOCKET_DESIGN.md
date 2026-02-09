@@ -1,7 +1,7 @@
 # Observer WebSocket Real-Time Updates - Design Document
 
-**Created:** December 5, 2025  
-**Status:** Design Phase  
+**Created:** December 5, 2025
+**Status:** Design Phase
 **Priority:** High (eliminates 5-second polling)
 
 ---
@@ -10,7 +10,7 @@
 
 Replace HTTP polling with WebSocket push notifications for real-time emotional state updates in the Experience app.
 
-**Current:** Experience polls `/observer/state` every 5 seconds  
+**Current:** Experience polls `/observer/state` every 5 seconds
 **Goal:** Observer pushes updates immediately when state changes
 
 ---
@@ -140,44 +140,44 @@ class ConnectionManager:
     def __init__(self):
         # Map of user_id → set of websocket connections
         self.active_connections: Dict[str, Set[WebSocket]] = {}
-    
+
     async def connect(self, websocket: WebSocket, user_id: str):
         """Accept connection and subscribe to user updates."""
         await websocket.accept()
-        
+
         if user_id not in self.active_connections:
             self.active_connections[user_id] = set()
-        
+
         self.active_connections[user_id].add(websocket)
         logger.info(f"WebSocket connected for user {user_id}")
-    
+
     def disconnect(self, websocket: WebSocket, user_id: str):
         """Remove connection."""
         if user_id in self.active_connections:
             self.active_connections[user_id].discard(websocket)
             if not self.active_connections[user_id]:
                 del self.active_connections[user_id]
-        
+
         logger.info(f"WebSocket disconnected for user {user_id}")
-    
+
     async def send_to_user(self, user_id: str, message: dict):
         """Send message to all connections for a user."""
         if user_id not in self.active_connections:
             return
-        
+
         dead_connections = set()
-        
+
         for connection in self.active_connections[user_id]:
             try:
                 await connection.send_json(message)
             except Exception as e:
                 logger.error(f"Failed to send to connection: {e}")
                 dead_connections.add(connection)
-        
+
         # Clean up dead connections
         for conn in dead_connections:
             self.disconnect(conn, user_id)
-    
+
     async def broadcast_to_all(self, message: dict):
         """Broadcast to all connected users."""
         for user_id in list(self.active_connections.keys()):
@@ -218,24 +218,24 @@ export function useWebSocket({
   const reconnectCountRef = useRef(0);
   const [isConnected, setIsConnected] = useState(false);
   const setTarget = useExperienceStore(state => state.setTarget);
-  
+
   useEffect(() => {
     if (!enabled) return;
-    
+
     const wsUrl = baseUrl.replace('http', 'ws') + `/observer/ws/${userId}`;
-    
+
     function connect() {
       const ws = new WebSocket(wsUrl);
-      
+
       ws.onopen = () => {
         console.log('WebSocket connected');
         setIsConnected(true);
         reconnectCountRef.current = 0;
       };
-      
+
       ws.onmessage = (event) => {
         const message = JSON.parse(event.data);
-        
+
         switch (message.type) {
           case 'state_update':
             setTarget(
@@ -244,35 +244,35 @@ export function useWebSocket({
             );
             console.log('State update received:', message.data.emotion.name);
             break;
-            
+
           case 'journey_update':
             // Handle journey updates
             console.log('Journey update:', message.data);
             break;
-            
+
           case 'ping':
             // Respond to heartbeat
             ws.send(JSON.stringify({ type: 'pong', timestamp: new Date().toISOString() }));
             break;
-            
+
           default:
             console.warn('Unknown message type:', message.type);
         }
       };
-      
+
       ws.onerror = (error) => {
         console.error('WebSocket error:', error);
       };
-      
+
       ws.onclose = () => {
         console.log('WebSocket disconnected');
         setIsConnected(false);
-        
+
         // Attempt reconnect with exponential backoff
         if (reconnectCountRef.current < maxReconnectAttempts) {
           const delay = reconnectDelay * Math.pow(2, reconnectCountRef.current);
           console.log(`Reconnecting in ${delay}ms...`);
-          
+
           setTimeout(() => {
             reconnectCountRef.current++;
             connect();
@@ -281,18 +281,18 @@ export function useWebSocket({
           console.error('Max reconnect attempts reached');
         }
       };
-      
+
       wsRef.current = ws;
     }
-    
+
     connect();
-    
+
     return () => {
       wsRef.current?.close();
       wsRef.current = null;
     };
   }, [userId, enabled, baseUrl]);
-  
+
   return {
     isConnected,
     reconnect: () => {
@@ -308,18 +308,18 @@ export function useWebSocket({
 ## Events to Broadcast
 
 ### 1. State Recorded
-**When:** `/observer/state` POST succeeds  
-**Trigger:** After `db.commit()` in state.py  
+**When:** `/observer/state` POST succeeds
+**Trigger:** After `db.commit()` in state.py
 **Broadcast To:** user_id from request
 
 ### 2. Waypoint Reached
-**When:** `/observer/journey/{id}/waypoint-reached` POST succeeds  
-**Trigger:** After waypoint marked as reached  
+**When:** `/observer/journey/{id}/waypoint-reached` POST succeeds
+**Trigger:** After waypoint marked as reached
 **Broadcast To:** user_id associated with journey
 
 ### 3. Journey Started
-**When:** `/observer/journey/start` POST succeeds  
-**Trigger:** After journey created  
+**When:** `/observer/journey/start` POST succeeds
+**Trigger:** After journey created
 **Broadcast To:** user_id from request
 
 ---
@@ -398,10 +398,10 @@ async def test_websocket_state_broadcast():
     async with websocket_connect(f"ws://localhost:8000/observer/ws/{user_id}") as ws:
         # Record state via REST API
         response = await client.post("/observer/state", json={...})
-        
+
         # Expect WebSocket message
         message = await ws.receive_json()
-        
+
         assert message["type"] == "state_update"
         assert message["data"]["emotion"]["name"] == "Joy"
 ```
@@ -452,5 +452,5 @@ If WebSocket causes issues:
 
 ---
 
-**Status:** Design Complete, Ready for Implementation  
+**Status:** Design Complete, Ready for Implementation
 **Estimated Time:** 4-6 hours

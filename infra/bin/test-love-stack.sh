@@ -167,7 +167,7 @@ fi
 check_service() {
     local service_name=$1
     local check_command=$2
-    
+
     if eval "$check_command" >/dev/null 2>&1; then
         print_success "$service_name is running"
         return 0
@@ -225,7 +225,7 @@ check_environments() {
     # Python Envs
     for module in versor observer listener; do
         if [[ "$TARGET_MODULE" != "all" && "$TARGET_MODULE" != "$module" ]]; then continue; fi
-        
+
         if [ -d "$module/.venv" ]; then
             # We assume python check is fast, just check directory existence + bin
             if [ -x "$module/.venv/bin/python" ]; then
@@ -264,16 +264,16 @@ check_environments() {
 check_system() {
     if [[ "$SKIP_DEPS" == "true" ]]; then return 0; fi
     print_header "🏥 System Health"
-    
+
     local services_to_start=()
     local has_err=false
-    
+
     # Postgres
     if ! check_service "PostgreSQL" "pg_isready"; then
         services_to_start+=("postgresql")
         has_err=true
     fi
-    
+
     # Redis
     if check_command redis-cli; then
         if ! check_service "Redis" "redis-cli ping"; then
@@ -281,7 +281,7 @@ check_system() {
              has_err=true
         fi
     fi
-    
+
     # Ollama
     if ! check_service "Ollama" "curl -s http://localhost:11434/api/tags"; then
         services_to_start+=("ollama")
@@ -309,11 +309,11 @@ check_system() {
 run_pytest() {
     local module=$1
     local name=$2
-    
+
     if [[ "$TARGET_MODULE" != "all" && "$TARGET_MODULE" != "$module" ]]; then return 0; fi
-    
+
     print_info "Testing $name..."
-    
+
     if [ ! -d "$module" ]; then
         print_warning "$module directory not found"
         return 0
@@ -325,7 +325,7 @@ run_pytest() {
             print_warning "Skipping $name (no .venv)"
             exit 1
         fi
-        
+
         # Test command
         # Use -v in verbose mode, -q otherwise
         local args=("tests/" "-m" "not slow and not requires_ollama" "--tb=short")
@@ -334,7 +334,7 @@ run_pytest() {
         else
             args+=("-q")
         fi
-        
+
         if ./.venv/bin/pytest "${args[@]}"; then
             exit 0
         else
@@ -350,9 +350,9 @@ run_pytest() {
 
 run_npm_test() {
     if [[ "$TARGET_MODULE" != "all" && "$TARGET_MODULE" != "experience" ]]; then return 0; fi
-    
+
     print_info "Testing Experience (Web)..."
-    
+
     local npm_exit_code=0
     (
         cd "experience/web"
@@ -360,20 +360,20 @@ run_npm_test() {
             print_warning "Skipping Experience (no node_modules)"
             exit 1
         fi
-        
+
         # SC2178/SC2128: Use array for arguments
         local args=("--workspaces" "--" "--passWithNoTests")
         if [[ "$VERBOSE" != "true" ]]; then
             args+=("--silent")
         fi
-        
+
         if [[ "$VERBOSE" == "true" ]]; then
              npm test "${args[@]}"
         else
              npm test "${args[@]}" >/dev/null 2>&1
         fi
     ) || npm_exit_code=$?
-    
+
     if [ $npm_exit_code -eq 0 ]; then
         print_success "Experience tests passed"
     else
@@ -384,26 +384,26 @@ run_npm_test() {
 
 run_native_swift_test() {
     if [[ "$TARGET_MODULE" != "all" && "$TARGET_MODULE" != "native-swift" ]]; then return 0; fi
-    
+
     print_info "Testing Native Swift..."
-    
+
     local swift_exit_code=0
     (
         cd "experience/desktop/native-swift"
-        
+
         # Check if make exists
         if ! command -v make &> /dev/null; then
             print_warning "Skipping Native Swift (make not found)"
             exit 1
         fi
-        
+
         if [[ "$VERBOSE" == "true" ]]; then
              make test
         else
              make test >/dev/null 2>&1
         fi
     ) || swift_exit_code=$?
-    
+
     if [ $swift_exit_code -eq 0 ]; then
         print_success "Native Swift tests passed"
     else
@@ -414,7 +414,7 @@ run_native_swift_test() {
 
 run_all_tests() {
     print_header "🧪 Running Tests"
-    
+
     run_pytest "versor" "Versor"
     run_pytest "observer" "Observer"
     run_pytest "listener" "Listener"
@@ -425,14 +425,14 @@ run_all_tests() {
 check_critical() {
     # Only run critical validation if testing Listener or All
     if [[ "$TARGET_MODULE" != "all" && "$TARGET_MODULE" != "listener" ]]; then return 0; fi
-    
+
     # Check Ollama first
     if ! curl -s http://localhost:11434/api/tags >/dev/null 2>&1; then
         return 0 # Skip cleanly if Ollama down
     fi
 
     print_header "🎯 Critical Validation"
-    
+
     local critical_failed=false
     (
         cd listener
@@ -454,10 +454,10 @@ check_critical() {
 generate_report() {
     END_TIME=$(date +%s)
     DURATION=$((END_TIME - START_TIME))
-    
+
     print_header "📊 Summary"
     echo "Duration: ${DURATION}s"
-    
+
     if [ $EXIT_CODE -eq 0 ]; then
         echo -e "${GREEN}${BOLD}SUCCESS: All checks passed.${NC}"
     else
@@ -472,16 +472,16 @@ main() {
     if [[ "$CI_MODE" == "false" ]]; then
         echo -e "${BLUE}${BOLD}L.O.V.E. Stack${NC} Health & Test Runner"
     fi
-    
+
     check_environments || EXIT_CODE=1
     check_system || EXIT_CODE=1
-    
+
     # Only run tests if environment looks okay-ish, or just try anyway?
     # Let's try anyway, individual tests handle missing venv.
     run_all_tests
-    
+
     check_critical
-    
+
     generate_report
     exit $EXIT_CODE
 }

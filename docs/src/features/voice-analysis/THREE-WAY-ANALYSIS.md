@@ -1,9 +1,9 @@
 # Voice-Content 3-Way Analysis - Technical Specifications
 
-**Date**: December 6, 2025  
-**Phase**: Phase 1, Task 1.2  
-**Priority**: Medium-High (Clinical Enhancement)  
-**Complexity**: High  
+**Date**: December 6, 2025
+**Phase**: Phase 1, Task 1.2
+**Priority**: Medium-High (Clinical Enhancement)
+**Complexity**: High
 **Estimated Effort**: 2-3 days (16-24 hours)
 
 ---
@@ -150,7 +150,7 @@ async def analyze_multi_emotion_three_way(
     content_only = await self._analyze_content_only(text)
     voice_only = await self._analyze_voice_only(prosody_features) if prosody_features else None
     blended = await self._analyze_blended(text, prosody_features)
-    
+
     return ThreeWayAnalysisResponse(
         content_only=content_only,
         voice_only=voice_only,
@@ -221,7 +221,7 @@ graph TD
     A[Text] -->|Valence -0.8| D[Negative]
     B[Audio] -->|Valence +0.2| D
     C[Hume] -->|Anxiety 0.9| E[High Arousal]
-    
+
     D --> F{Conflict?}
     E --> F
     F -->|Yes| G[Detect Irony/Masking]
@@ -244,25 +244,25 @@ async def generate_three_way_insights(
     session_id: Optional[str] = None
 ) -> Dict[str, Any]:
     """Generate insights comparing all 3 interpretations."""
-    
+
     # Map all emotions to Atlas
     content_emotions = await self._map_emotions(content_only.emotions)
     voice_emotions = await self._map_emotions(voice_only.emotions) if voice_only else None
     blended_emotions = await self._map_emotions(blended.emotions)
-    
+
     # Calculate discrepancies
     content_voice_distance = self._calculate_vac_distance(
-        content_emotions[0].vac, 
+        content_emotions[0].vac,
         voice_emotions[0].vac
     ) if voice_emotions else 0
-    
+
     # Generate clinical interpretation
     interpretation = self._interpret_discrepancy(
         content_voice_distance,
         content_emotions,
         voice_emotions
     )
-    
+
     # Flag clinical concerns
     flags = []
     if content_voice_distance > 0.5:
@@ -270,7 +270,7 @@ async def generate_three_way_insights(
     if content_emotions[0].vac.valence > 0 and voice_emotions and voice_emotions[0].vac.valence < 0:
         flags.append("emotional_suppression")
     # ... more rules
-    
+
     return {
         "content_only": content_emotions,
         "voice_only": voice_emotions,
@@ -312,31 +312,31 @@ CREATE TABLE three_way_analyses (
     id UUID PRIMARY KEY,
     message_id UUID REFERENCES chat_messages(id) ON DELETE CASCADE,
     session_id UUID REFERENCES chat_sessions(id) ON DELETE CASCADE,
-    
+
     -- Content-Only Interpretation
     content_emotion_id UUID REFERENCES atlas_definitions(id),
     content_vac FLOAT[3],
     content_confidence FLOAT,
-    
+
     -- Voice-Only Interpretation
     voice_emotion_id UUID REFERENCES atlas_definitions(id),
     voice_vac FLOAT[3],
     voice_confidence FLOAT,
-    
+
     -- Blended Interpretation (current approach)
     blended_emotion_id UUID REFERENCES atlas_definitions(id),
     blended_vac FLOAT[3],
     blended_confidence FLOAT,
-    
+
     -- Discrepancy Metrics
     content_voice_distance FLOAT,  -- Euclidean distance in VAC space
     content_blended_distance FLOAT,
     voice_blended_distance FLOAT,
-    
+
     -- Clinical Flags
     flags TEXT[],  -- ['suppression', 'incongruence', 'masking']
     clinical_interpretation TEXT,
-    
+
     created_at TIMESTAMP DEFAULT NOW()
 );
 
@@ -403,27 +403,27 @@ export function VoiceContentThreeWay({ ... }: ThreeWayAnalysisProps) {
         <p className="text-xs text-gray-400 mb-3">
           From text semantic analysis
         </p>
-        
+
         <div className="text-2xl font-bold text-white mb-2">
           {contentOnly.emotion}
         </div>
         <div className="text-sm text-gray-400 mb-3">
           {contentOnly.category}
         </div>
-        
+
         {/* VAC Coordinates */}
         <div className="space-y-1 text-sm font-mono">
           <div>V: {contentOnly.vac.valence.toFixed(3)}</div>
           <div>A: {contentOnly.vac.arousal.toFixed(3)}</div>
           <div>C: {contentOnly.vac.connection.toFixed(3)}</div>
         </div>
-        
+
         {/* Confidence */}
         <div className="mt-3 text-xs text-gray-400">
           Confidence: {(contentOnly.confidence * 100).toFixed(0)}%
         </div>
       </div>
-      
+
       {/* Column 2: Voice-Only */}
       {voiceOnly && (
         <div className="bg-purple-900/30 border border-purple-500/30 rounded-lg p-4">
@@ -433,12 +433,12 @@ export function VoiceContentThreeWay({ ... }: ThreeWayAnalysisProps) {
           <p className="text-xs text-gray-400 mb-3">
             From vocal prosody features
           </p>
-          
+
           {/* Same structure as content-only */}
           ...
         </div>
       )}
-      
+
       {/* Column 3: Blended */}
       <div className="bg-cyan-900/30 border border-cyan-500/30 rounded-lg p-4">
         <h3 className="text-cyan-300 font-semibold mb-3">
@@ -447,12 +447,12 @@ export function VoiceContentThreeWay({ ... }: ThreeWayAnalysisProps) {
         <p className="text-xs text-gray-400 mb-3">
           Combined interpretation
         </p>
-        
+
         {/* Same structure */}
         ...
       </div>
     </div>
-    
+
     {/* Discrepancy Alert Row */}
     {discrepancy.contentVoiceDistance > 0.5 && (
       <div className="mt-4 p-4 bg-orange-500/10 border border-orange-500/30 rounded-lg">
@@ -636,27 +636,27 @@ interface ClinicalDashboardProps {
 
 ### 1. LLM Consistency
 
-**Risk**: Voice-only prompt may produce less accurate results (no context from words)  
+**Risk**: Voice-only prompt may produce less accurate results (no context from words)
 **Mitigation**: Extensive prompt engineering and testing, may need fine-tuning
 
 ### 2. Performance Impact
 
-**Risk**: 3x API calls = 3x latency and cost  
+**Risk**: 3x API calls = 3x latency and cost
 **Mitigation**: Parallelize calls, make feature optional, add caching
 
 ### 3. Clinical Interpretation Complexity
 
-**Risk**: Discrepancy interpretation rules may be oversimplified  
+**Risk**: Discrepancy interpretation rules may be oversimplified
 **Mitigation**: Collaborate with clinical team, iterative refinement
 
 ### 4. Database Growth
 
-**Risk**: Storing 3x emotion data increases storage needs  
+**Risk**: Storing 3x emotion data increases storage needs
 **Mitigation**: Use JSONB for flexibility, add data retention policies
 
 ### 5. User Experience
 
-**Risk**: 3-column layout may be overwhelming on smaller screens  
+**Risk**: 3-column layout may be overwhelming on smaller screens
 **Mitigation**: Make expandable/collapsible, show simplified view by default
 
 ---
@@ -671,7 +671,7 @@ interface ClinicalDashboardProps {
 - Low pitch + low energy + slow rate = Sadness/Depression
 - Stable pitch + moderate energy = Contentment/Calm
 
-**Pros:** No additional LLM costs, faster  
+**Pros:** No additional LLM costs, faster
 **Cons:** Less nuanced, less accurate
 
 ### Alternative 2: Post-Hoc Separation
@@ -682,7 +682,7 @@ interface ClinicalDashboardProps {
 2. Re-weight VAC coordinates to simulate content-only (discount prosody influence)
 3. Re-weight VAC coordinates to simulate voice-only (discount semantic influence)
 
-**Pros:** No additional API calls, much simpler  
+**Pros:** No additional API calls, much simpler
 **Cons:** Not true separation, less clinically valid
 
 ### Alternative 3: Opt-In "Deep Analysis" Mode
@@ -693,7 +693,7 @@ Only run 3-way when:
 - Cost is tracked and limited
 - Results are cached for 24 hours
 
-**Pros:** Reduces routine costs, maintains clinical value  
+**Pros:** Reduces routine costs, maintains clinical value
 **Cons:** Requires UI for mode switching
 
 ---
@@ -758,6 +758,6 @@ Task 1.2 is complete when:
 
 ---
 
-**Document Created**: December 6, 2025, 7:37 PM MDT  
-**Status**: Specification Complete  
+**Document Created**: December 6, 2025, 7:37 PM MDT
+**Status**: Specification Complete
 **Next Decision**: Defer to Phase 2 or Implement Now?

@@ -13,7 +13,14 @@ from app.models.vac_response import VACVector
 # Valid reusable objects
 VALID_VAC = VACVector(valence=0.5, arousal=0.5, connection=0.5)
 VALID_EMOTION_PRIMARY = DetectedEmotionResponse(
-    emotion_name="Joy", category="Happiness", vac=VALID_VAC, confidence=0.9, prominence="primary"
+    emotion_name="Joy",
+    category="Happiness",
+    vac=VALID_VAC,
+    confidence=0.9,
+    prominence="primary",
+    original_name=None,
+    match_method=None,
+    match_confidence=None,
 )
 VALID_EMOTION_SECONDARY = DetectedEmotionResponse(
     emotion_name="Sadness",
@@ -21,19 +28,29 @@ VALID_EMOTION_SECONDARY = DetectedEmotionResponse(
     vac=VALID_VAC,
     confidence=0.8,
     prominence="secondary",
+    original_name=None,
+    match_method=None,
+    match_confidence=None,
 )
 
 
 class TestDetectedEmotionResponse:
-    def test_valid_prominence(self):
+    def test_valid_prominence(self) -> None:
         """Test valid prominence values."""
         for p in ["primary", "secondary", "underlying"]:
             model = DetectedEmotionResponse(
-                emotion_name="Test", category="Test", vac=VALID_VAC, confidence=1.0, prominence=p
+                emotion_name="Test",
+                category="Test",
+                vac=VALID_VAC,
+                confidence=1.0,
+                prominence=p,
+                original_name=None,
+                match_method=None,
+                match_confidence=None,
             )
             assert model.prominence == p
 
-    def test_invalid_prominence(self):
+    def test_invalid_prominence(self) -> None:
         """Test invalid prominence raises ValueError."""
         with pytest.raises(ValidationError) as exc:
             DetectedEmotionResponse(
@@ -42,12 +59,15 @@ class TestDetectedEmotionResponse:
                 vac=VALID_VAC,
                 confidence=1.0,
                 prominence="invalid",
+                original_name=None,
+                match_method=None,
+                match_confidence=None,
             )
         assert "Prominence must be one of" in str(exc.value)
 
 
 class TestEmotionRelationshipResponse:
-    def test_valid_type(self):
+    def test_valid_type(self) -> None:
         """Test valid relationship types."""
         for t in ["complementary", "contradictory", "masking", "amplifying", "sequential"]:
             model = EmotionRelationshipResponse(
@@ -55,7 +75,7 @@ class TestEmotionRelationshipResponse:
             )
             assert model.type == t
 
-    def test_invalid_type(self):
+    def test_invalid_type(self) -> None:
         """Test invalid relationship type raises ValueError."""
         with pytest.raises(ValidationError) as exc:
             EmotionRelationshipResponse(
@@ -65,7 +85,7 @@ class TestEmotionRelationshipResponse:
 
 
 class TestMultiEmotionAnalysisResponse:
-    def test_valid_temporal_pattern(self):
+    def test_valid_temporal_pattern(self) -> None:
         """Test valid temporal patterns."""
         for p in ["concurrent", "sequential", "emerging"]:
             model = MultiEmotionAnalysisResponse(
@@ -79,7 +99,7 @@ class TestMultiEmotionAnalysisResponse:
             )
             assert model.temporal_pattern == p
 
-    def test_invalid_temporal_pattern(self):
+    def test_invalid_temporal_pattern(self) -> None:
         """Test invalid temporal pattern raises ValueError."""
         with pytest.raises(ValidationError) as exc:
             MultiEmotionAnalysisResponse(
@@ -93,7 +113,7 @@ class TestMultiEmotionAnalysisResponse:
             )
         assert "Temporal pattern must be one of" in str(exc.value)
 
-    def test_validate_one_primary_success(self):
+    def test_validate_one_primary_success(self) -> None:
         """Test valid primary count (exactly 1)."""
         model = MultiEmotionAnalysisResponse(
             emotions=[VALID_EMOTION_PRIMARY, VALID_EMOTION_SECONDARY],
@@ -106,7 +126,7 @@ class TestMultiEmotionAnalysisResponse:
         )
         assert len(model.emotions) == 2
 
-    def test_validate_no_primary_fail(self):
+    def test_validate_no_primary_fail(self) -> None:
         """Test 0 primary emotions raises error."""
         with pytest.raises(ValidationError) as exc:
             MultiEmotionAnalysisResponse(
@@ -120,7 +140,7 @@ class TestMultiEmotionAnalysisResponse:
             )
         assert "Must have exactly 1 primary emotion" in str(exc.value)
 
-    def test_validate_multiple_primary_fail(self):
+    def test_validate_multiple_primary_fail(self) -> None:
         """Test >1 primary emotions raises error."""
         with pytest.raises(ValidationError) as exc:
             MultiEmotionAnalysisResponse(
@@ -134,7 +154,7 @@ class TestMultiEmotionAnalysisResponse:
             )
         assert "Must have exactly 1 primary emotion" in str(exc.value)
 
-    def test_validate_too_many_emotions_fail(self):
+    def test_validate_too_many_emotions_fail(self) -> None:
         """Test >3 emotions raises error."""
         emotions = [VALID_EMOTION_PRIMARY] + [VALID_EMOTION_SECONDARY] * 3
         with pytest.raises(ValidationError) as exc:

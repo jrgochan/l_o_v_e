@@ -1,7 +1,7 @@
 # Zen Experience - Implementation Roadmap
 
-**Document:** 02-ROADMAP.md  
-**Status:** Planning Document  
+**Document:** 02-ROADMAP.md
+**Status:** Planning Document
 **Last Updated:** December 7, 2025
 
 ---
@@ -27,7 +27,7 @@ This roadmap breaks down the Zen Experience implementation into manageable phase
 **File:** `experience/web/hooks/useSphereSync.ts`
 
 - [ ] Implement broadcaster mode
-- [ ] Implement listener mode  
+- [ ] Implement listener mode
 - [ ] Add heartbeat mechanism
 - [ ] Add error handling
 - [ ] Add logging

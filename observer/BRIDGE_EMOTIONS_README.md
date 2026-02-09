@@ -19,7 +19,7 @@ Phase 3 defines the **6 Bridge Emotions** - gateway emotions that enable otherwi
 
 **Recommended Strategies:**
 - Self-Compassion Break (Neff)
-- Shame Resilience: Speak Shame  
+- Shame Resilience: Speak Shame
 - Authentic Relating
 - Asking for Help/Support
 
@@ -55,7 +55,7 @@ Phase 3 defines the **6 Bridge Emotions** - gateway emotions that enable otherwi
 
 **Gateway Function:** Repairs shame, builds connection, transforms pity to genuine connection
 
-**Why Required:** 
+**Why Required:**
 - Self-compassion counters shame's unworthiness message
 - Compassion for others softens anger, builds connection
 - KEY: feeling WITH (C = +0.9) not FOR (pity C = -0.4)
@@ -103,7 +103,7 @@ Phase 3 defines the **6 Bridge Emotions** - gateway emotions that enable otherwi
 
 **Gateway Function:** Enables movement from fighting reality to peace
 
-**Why Required:** 
+**Why Required:**
 - Pain × Resistance = Suffering (DBT)
 - Releasing struggle frees energy for response
 - Prerequisite for peace, forgiveness, letting go
@@ -255,7 +255,7 @@ Contains:
 **Research Sources:**
 - Brené Brown - Shame, vulnerability, connection (20+ years)
 - Kristin Neff - Self-compassion research
-- Dacher Keltner & Jonathan Haidt - Awe research  
+- Dacher Keltner & Jonathan Haidt - Awe research
 - Robert Emmons - Gratitude research
 - Marsha Linehan - Radical Acceptance (DBT)
 - Steven Hayes - Willingness, defusion (ACT)

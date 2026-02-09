@@ -1,3 +1,5 @@
+"""Module documentation."""
+
 from typing import Any, Dict, List, Optional
 from uuid import UUID
 
@@ -38,11 +40,16 @@ class PathMatrixService:
         difficulty_filter: Optional[str] = None,
         requires_bridge_filter: Optional[bool] = None,
         limit: Optional[int] = None,
+        offset: int = 0,
     ) -> List[Dict[str, Any]]:
         """Query cached paths using CacheManager."""
         return await self.cache_manager.get_all_cached_paths(
-            difficulty_filter, requires_bridge_filter, limit
+            difficulty_filter, requires_bridge_filter, limit, offset
         )
+
+    async def clear_cache(self) -> int:
+        """Clear all cached paths."""
+        return await self.cache_manager.clear_cache()
 
     async def get_cache_statistics(self) -> Dict[str, Any]:
         """Get statistics about the path matrix cache."""

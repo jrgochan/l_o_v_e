@@ -110,17 +110,17 @@ router = APIRouter()
 async def calculate_state(request: StateRequest):
     """
     Main calculation endpoint.
-    
+
     Converts VAC to quaternion and computes transition metrics.
     """
     engine = VersorEngine()
-    
+
     result = engine.process_state(
         current_vac=request.current_vac,
         previous_quaternion=request.previous_state,
         time_delta=request.time_delta_seconds
     )
-    
+
     return TrajectoryResponse(**result.dict())
 ```
 
@@ -167,20 +167,20 @@ async def calculate_state(request: StateRequest):
 @router.post("/slerp", response_model=SLERPResponse)
 async def generate_path(request: SLERPRequest):
     """Generate SLERP interpolation path"""
-    
+
     path = generate_slerp_path(
         q_start=request.start_quaternion,
         q_target=request.target_quaternion,
         steps=request.steps
     )
-    
+
     # Calculate angular distance
     q_trans = calculate_transition(
         request.start_quaternion,
         request.target_quaternion
     )
     phi = angular_distance(q_trans)
-    
+
     return SLERPResponse(
         path=path,
         total_frames=len(path),

@@ -1,8 +1,8 @@
 # Common Tasks
 
-**Reading Time:** ~30 minutes  
-**Audience:** New developers  
-**Prerequisites:** [Key Concepts](03-key-concepts.md) understood  
+**Reading Time:** ~30 minutes
+**Audience:** New developers
+**Prerequisites:** [Key Concepts](03-key-concepts.md) understood
 **Goal:** Learn how to perform common development tasks
 
 ---
@@ -113,7 +113,7 @@ Expected output:
 ```bash
 psql observer_dev -U observer_user
 
-SELECT name, category, vac FROM atlas_definitions 
+SELECT name, category, vac FROM atlas_definitions
 WHERE name = 'Anticipation';
 
 # Should show:
@@ -176,7 +176,7 @@ Open `somatic.json`:
       "when_to_use": ["anxiety", "anger", "overwhelm", "panic"],
       "effectiveness": 0.78,
       "duration_minutes": 3,
-      
+
       // Add new field:
       "variations": [
         "Box Breathing (4-4-4-4)",
@@ -403,7 +403,7 @@ psql observer_dev -U observer_user
 
 -- Insert test trajectory point
 INSERT INTO user_trajectory (
-  id, user_id, session_id, vac, quaternion, 
+  id, user_id, session_id, vac, quaternion,
   transcription, embedding, emotion_id
 ) VALUES (
   gen_random_uuid(),
@@ -436,10 +436,10 @@ async def test_similarity():
         emb_service = get_embedding_service()
         query_text = "I'm feeling happy and connected"
         query_emb = await emb_service.generate_embedding(query_text)
-        
+
         # Find similar trajectories
         query = text("""
-            SELECT 
+            SELECT
                 user_id,
                 transcription,
                 vac,
@@ -449,12 +449,12 @@ async def test_similarity():
             ORDER BY embedding <=> :query_emb
             LIMIT 5
         """)
-        
+
         result = await db.execute(
             query,
             {"query_emb": str(query_emb)}
         )
-        
+
         print("Similar moments:")
         for row in result:
             print(f"  - {row.transcription}")
@@ -486,13 +486,13 @@ Similar moments:
 psql observer_dev -U observer_user
 
 -- Check if HNSW index exists
-SELECT indexname, indexdef 
-FROM pg_indexes 
-WHERE tablename = 'user_trajectory' 
+SELECT indexname, indexdef
+FROM pg_indexes
+WHERE tablename = 'user_trajectory'
   AND indexdef LIKE '%hnsw%';
 
 -- If not, create it:
-CREATE INDEX ON user_trajectory 
+CREATE INDEX ON user_trajectory
 USING hnsw (embedding vector_cosine_ops);
 
 \q
@@ -525,7 +525,7 @@ async def get_atlas_statistics(
 ):
     """
     Get statistics about emotions by category.
-    
+
     Returns:
         dict: Count of emotions per category
     """
@@ -534,19 +534,19 @@ async def get_atlas_statistics(
         AtlasDefinition.category,
         func.count(AtlasDefinition.id).label('count')
     ).group_by(AtlasDefinition.category)
-    
+
     result = await db.execute(query)
     rows = result.all()
-    
+
     # Format response
     stats = {
         "total_emotions": sum(row.count for row in rows),
         "by_category": {
-            row.category: row.count 
+            row.category: row.count
             for row in rows
         }
     }
-    
+
     return stats
 ```
 
@@ -611,10 +611,10 @@ async def test_atlas_statistics():
     """Test the atlas statistics endpoint"""
     async with AsyncClient(app=app, base_url="http://test") as client:
         response = await client.get("/atlas/statistics")
-    
+
     assert response.status_code == 200
     data = response.json()
-    
+
     assert "total_emotions" in data
     assert "by_category" in data
     assert data["total_emotions"] > 0

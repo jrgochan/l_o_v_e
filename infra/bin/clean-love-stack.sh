@@ -71,7 +71,7 @@ done
 clean_path() {
     local path="$1"
     local desc="$2"
-    
+
     if [ -e "$path" ]; then
         if [ "$DRY_RUN" = true ]; then
             print_info "[DRY-RUN] Would remove $desc: $path"
@@ -122,16 +122,16 @@ for module in versor observer listener; do
     if [[ "$TARGET_MODULE" == "all" || "$TARGET_MODULE" == "backend" || "$TARGET_MODULE" == "python" || "$TARGET_MODULE" == "$module" ]]; then
         print_info "Cleaning $module..."
         MODULE_DIR="$PROJECT_ROOT/$module"
-        
+
         if [ "$KEEP_ENV" = false ]; then
             clean_path "$MODULE_DIR/venv" "$module venv"
         fi
-        
+
         clean_path "$MODULE_DIR/.pytest_cache" "$module pytest cache"
         clean_path "$MODULE_DIR/.mypy_cache" "$module mypy cache"
         clean_path "$MODULE_DIR/.coverage" "$module coverage"
         clean_path "$MODULE_DIR/htmlcov" "$module coverage report"
-        
+
         # Recursive clean of __pycache__
         if [ "$DRY_RUN" = true ]; then
              print_info "[DRY-RUN] Would remove all __pycache__ and *.pyc in $MODULE_DIR"
@@ -156,4 +156,3 @@ if [[ "$TARGET_MODULE" == "all" || "$TARGET_MODULE" == "infra" || "$TARGET_MODUL
 fi
 
 print_success "Cleanup complete!"
-

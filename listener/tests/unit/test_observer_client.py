@@ -4,17 +4,21 @@ Listener Module - Observer Client Tests
 Unit tests for the ObserverClient (with mocked HTTP requests).
 """
 
+# pylint: disable=redefined-outer-name
+
 from datetime import datetime
+from typing import Any
 from unittest.mock import AsyncMock, Mock, patch
 
+import httpx
 import pytest
 
 from app.models.vac_response import EmotionalClassification, VACVector
-from app.services.observer_client import ObserverClient, get_observer_client
+from app.services.observer_client import ObserverClient, _ensure_uuid, get_observer_client
 
 
 @pytest.fixture
-def mock_emotion():
+def mock_emotion() -> Any:
     """Create a mock emotional classification"""
     return EmotionalClassification(
         primary_emotion="Joy",
@@ -28,20 +32,20 @@ def mock_emotion():
 class TestObserverClient:
     """Test Observer client functionality"""
 
-    def test_client_initialization(self):
+    def test_client_initialization(self) -> None:
         """Test client initializes with correct settings"""
         client = ObserverClient(base_url="http://test:8000", timeout=5.0)
         assert client.base_url == "http://test:8000"
         assert client.timeout == 5.0
 
-    def test_singleton_pattern(self):
+    def test_singleton_pattern(self) -> None:
         """Test that get_observer_client returns same instance"""
         client1 = get_observer_client()
         client2 = get_observer_client()
         assert client1 is client2
 
     @pytest.mark.asyncio
-    async def test_record_state_success(self, mock_emotion):
+    async def test_record_state_success(self, mock_emotion: Any) -> None:
         """Test successful state recording"""
         with patch("app.services.observer_client.httpx.AsyncClient") as mock_client:
             # Setup mock response
@@ -67,7 +71,7 @@ class TestObserverClient:
             assert result["status"] == "success"
 
     @pytest.mark.asyncio
-    async def test_record_state_with_timestamp(self, mock_emotion):
+    async def test_record_state_with_timestamp(self, mock_emotion: Any) -> None:
         """Test recording with explicit timestamp"""
         with patch("app.services.observer_client.httpx.AsyncClient") as mock_client:
             mock_response = Mock()
@@ -93,7 +97,7 @@ class TestObserverClient:
             assert result["state_id"] == "state-123"
 
     @pytest.mark.asyncio
-    async def test_health_check_success(self):
+    async def test_health_check_success(self) -> None:
         """Test successful health check"""
         with patch("app.services.observer_client.httpx.AsyncClient") as mock_client:
             mock_response = Mock()
@@ -109,7 +113,7 @@ class TestObserverClient:
             assert result is True
 
     @pytest.mark.asyncio
-    async def test_health_check_failure(self):
+    async def test_health_check_failure(self) -> None:
         """Test health check when service is down"""
         with patch("app.services.observer_client.httpx.AsyncClient") as mock_client:
             mock_client.return_value.__aenter__.return_value.get = AsyncMock(
@@ -122,7 +126,7 @@ class TestObserverClient:
             assert result is False
 
     @pytest.mark.asyncio
-    async def test_get_insights(self):
+    async def test_get_insights(self) -> None:
         """Test getting insights from Observer"""
         with patch("app.services.observer_client.httpx.AsyncClient") as mock_client:
             mock_response = Mock()
@@ -140,9 +144,8 @@ class TestObserverClient:
             assert "insights" in result
 
     @pytest.mark.asyncio
-    async def test_record_state_failure(self, mock_emotion):
+    async def test_record_state_failure(self, mock_emotion: Any) -> None:
         """Test failure in record_state."""
-        import httpx
 
         with patch("app.services.observer_client.httpx.AsyncClient") as mock_client:
             mock_client.return_value.__aenter__.return_value.post = AsyncMock(
@@ -154,9 +157,8 @@ class TestObserverClient:
                 await client.record_state("u", "s", "t", mock_emotion)
 
     @pytest.mark.asyncio
-    async def test_get_insights_failure(self):
+    async def test_get_insights_failure(self) -> None:
         """Test failure in get_insights."""
-        import httpx
 
         with patch("app.services.observer_client.httpx.AsyncClient") as mock_client:
             mock_client.return_value.__aenter__.return_value.get = AsyncMock(
@@ -167,9 +169,8 @@ class TestObserverClient:
             with pytest.raises(httpx.HTTPError):
                 await client.get_insights("u")
 
-    def test_ensure_uuid_valid(self):
+    def test_ensure_uuid_valid(self) -> None:
         """Test _ensure_uuid with valid UUID."""
-        from app.services.observer_client import _ensure_uuid
 
         valid = "550e8400-e29b-41d4-a716-446655440000"
         assert _ensure_uuid(valid) == valid

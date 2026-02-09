@@ -496,15 +496,15 @@ const VisualizationAdminContent = () => {
 
       {showStrategyLibrary && (
         <div className="fixed inset-0 z-50 bg-black/95 backdrop-blur-xl animate-in fade-in duration-300">
-           <div className="absolute top-6 right-6 z-[60]">
-              <button
-                onClick={() => setShowStrategyLibrary(false)}
-                className="text-white/50 hover:text-white px-4 py-2 rounded-full hover:bg-white/10 transition-colors"
-              >
-                  ✕ Close Library
-              </button>
-           </div>
-           <StrategyLibraryBrowser />
+          <div className="absolute top-6 right-6 z-[60]">
+            <button
+              onClick={() => setShowStrategyLibrary(false)}
+              className="text-white/50 hover:text-white px-4 py-2 rounded-full hover:bg-white/10 transition-colors"
+            >
+              ✕ Close Library
+            </button>
+          </div>
+          <StrategyLibraryBrowser />
         </div>
       )}
 

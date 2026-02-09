@@ -1,8 +1,8 @@
 # Testing Guide
 
-**Reading Time:** ~25 minutes  
-**Audience:** New developers  
-**Prerequisites:** [Common Tasks](04-common-tasks.md) completed  
+**Reading Time:** ~25 minutes
+**Audience:** New developers
+**Prerequisites:** [Common Tasks](04-common-tasks.md) completed
 **Goal:** Learn how to write and run tests for Observer
 
 ---
@@ -107,37 +107,37 @@ from app.services.emotion_mapper import EmotionMapper
 
 class TestEmotionMapper:
     """Unit tests for EmotionMapper service"""
-    
+
     def test_vac_distance_identical(self):
         """Test VAC distance between identical coordinates is 0"""
         vac1 = [0.5, 0.6, 0.7]
         vac2 = [0.5, 0.6, 0.7]
-        
+
         mapper = EmotionMapper(db=None)  # No DB needed for this test
         distance = mapper._calculate_vac_distance(vac1, vac2)
-        
+
         assert distance == 0.0
-    
+
     def test_vac_distance_calculation(self):
         """Test VAC distance calculation is correct"""
         vac1 = [0.0, 0.0, 0.0]
         vac2 = [1.0, 0.0, 0.0]
-        
+
         mapper = EmotionMapper(db=None)
         distance = mapper._calculate_vac_distance(vac1, vac2)
-        
+
         # Distance should be 1.0 (Euclidean distance)
         assert distance == pytest.approx(1.0, rel=1e-6)
-    
+
     def test_vac_distance_3d(self):
         """Test VAC distance in 3D space"""
         # Points at corners of a unit cube
         vac1 = [0.0, 0.0, 0.0]
         vac2 = [1.0, 1.0, 1.0]
-        
+
         mapper = EmotionMapper(db=None)
         distance = mapper._calculate_vac_distance(vac1, vac2)
-        
+
         # Distance should be sqrt(3) ≈ 1.732
         import math
         expected = math.sqrt(3)
@@ -177,10 +177,10 @@ async def test_get_all_emotions():
     """Test getting all emotions from atlas"""
     async with AsyncClient(app=app, base_url="http://test") as client:
         response = await client.get("/atlas/emotions")
-    
+
     assert response.status_code == 200
     data = response.json()
-    
+
     assert "emotions" in data
     assert "total" in data
     assert data["total"] == 87  # Should have 87 emotions
@@ -191,10 +191,10 @@ async def test_get_emotion_by_name():
     """Test getting a specific emotion"""
     async with AsyncClient(app=app, base_url="http://test") as client:
         response = await client.get("/atlas/emotions/Joy")
-    
+
     assert response.status_code == 200
     emotion = response.json()
-    
+
     assert emotion["name"] == "Joy"
     assert emotion["category"] == "When Life Is Good"
     assert len(emotion["vac"]) == 3
@@ -208,13 +208,13 @@ async def test_find_similar_emotions():
             "/atlas/similar",
             json={"valence": 0.8, "arousal": 0.6, "connection": 0.7}
         )
-    
+
     assert response.status_code == 200
     data = response.json()
-    
+
     assert "results" in data
     assert len(data["results"]) > 0
-    
+
     # First result should be close to Joy
     first = data["results"][0]
     assert first["emotion"] in ["Joy", "Happiness", "Gratitude"]
@@ -252,14 +252,14 @@ async def test_compassion_has_positive_connection():
     """
     async with AsyncClient(app=app, base_url="http://test") as client:
         response = await client.get("/atlas/emotions/Compassion")
-    
+
     assert response.status_code == 200
     emotion = response.json()
-    
+
     # Compassion MUST have positive connection
     assert emotion["vac"][2] > 0.3, \
         f"Compassion should have positive connection, got {emotion['vac'][2]}"
-    
+
     print(f"✅ Compassion connection: {emotion['vac'][2]} (positive)")
 
 @pytest.mark.asyncio
@@ -270,14 +270,14 @@ async def test_pity_has_negative_connection():
     """
     async with AsyncClient(app=app, base_url="http://test") as client:
         response = await client.get("/atlas/emotions/Pity")
-    
+
     assert response.status_code == 200
     emotion = response.json()
-    
+
     # Pity MUST have negative connection (separation)
     assert emotion["vac"][2] < 0, \
         f"Pity should have negative connection, got {emotion['vac'][2]}"
-    
+
     print(f"✅ Pity connection: {emotion['vac'][2]} (negative)")
 
 @pytest.mark.asyncio
@@ -290,23 +290,23 @@ async def test_compassion_pity_distinction():
         # Get both emotions
         compassion_resp = await client.get("/atlas/emotions/Compassion")
         pity_resp = await client.get("/atlas/emotions/Pity")
-    
+
     compassion = compassion_resp.json()
     pity = pity_resp.json()
-    
+
     # Extract connection values
     compassion_connection = compassion["vac"][2]
     pity_connection = pity["vac"][2]
-    
+
     # CRITICAL: Connection values must be on opposite sides
     assert compassion_connection > 0, "Compassion must have positive connection"
     assert pity_connection < 0, "Pity must have negative connection"
-    
+
     # They should be sufficiently different
     connection_diff = abs(compassion_connection - pity_connection)
     assert connection_diff > 0.5, \
         f"Compassion and Pity should be clearly distinguished (diff: {connection_diff})"
-    
+
     print(f"\n✅ CRITICAL TEST PASSED!")
     print(f"   Compassion connection: {compassion_connection:+.2f}")
     print(f"   Pity connection: {pity_connection:+.2f}")
@@ -320,7 +320,7 @@ async def test_similar_compassion_returns_compassion():
         compassion_resp = await client.get("/atlas/emotions/Compassion")
         compassion = compassion_resp.json()
         compassion_vac = compassion["vac"]
-        
+
         # Search for similar emotions
         response = await client.post(
             "/atlas/similar",
@@ -330,9 +330,9 @@ async def test_similar_compassion_returns_compassion():
                 "connection": compassion_vac[2]
             }
         )
-    
+
     results = response.json()["results"]
-    
+
     # First result should be Compassion
     assert results[0]["emotion"] == "Compassion"
     assert results[0]["distance"] < 0.1  # Very close
@@ -392,7 +392,7 @@ async def test_db(test_engine):
     async_session = sessionmaker(
         test_engine, class_=AsyncSession, expire_on_commit=False
     )
-    
+
     async with async_session() as session:
         yield session
 
@@ -421,11 +421,11 @@ async def test_create_emotion(test_db):
         vac=[0.5, 0.5, 0.5],
         description="A test emotion"
     )
-    
+
     test_db.add(emotion)
     await test_db.commit()
     await test_db.refresh(emotion)
-    
+
     # Verify it was created
     assert emotion.id is not None
     assert emotion.name == "TestEmotion"
@@ -447,19 +447,19 @@ async def test_find_transition_path(test_db):
     """Test A* pathfinding between emotions"""
     # Get start and goal emotions
     from sqlalchemy import select
-    
+
     anger_query = select(AtlasDefinition).where(
         AtlasDefinition.name == "Anger"
     )
     anger_result = await test_db.execute(anger_query)
     anger = anger_result.scalar_one()
-    
+
     calm_query = select(AtlasDefinition).where(
         AtlasDefinition.name == "Calm"
     )
     calm_result = await test_db.execute(calm_query)
     calm = calm_result.scalar_one()
-    
+
     # Find path
     planner = PathPlanner(test_db)
     path = await planner.find_transition_path(
@@ -467,16 +467,16 @@ async def test_find_transition_path(test_db):
         to_emotion=calm,
         user_id="test-user"
     )
-    
+
     # Verify path
     assert path is not None
     assert len(path.waypoints) > 0
     assert path.waypoints[0].name == "Anger"
     assert path.waypoints[-1].name == "Calm"
-    
+
     # Path should include intermediate emotions
     assert len(path.waypoints) > 2
-    
+
     print(f"Path: {' → '.join(w.name for w in path.waypoints)}")
 ```
 
@@ -623,10 +623,10 @@ def test_vac_distance():
     vac1 = [0.0, 0.0, 0.0]
     vac2 = [1.0, 0.0, 0.0]
     mapper = EmotionMapper(db=None)
-    
+
     # Act: Perform the action
     distance = mapper._calculate_vac_distance(vac1, vac2)
-    
+
     # Assert: Check the result
     assert distance == 1.0
 ```
@@ -661,11 +661,11 @@ async def test_quaternion_builder_with_mock(mock_client):
         "quaternion": [0.8, 0.3, 0.4, 0.3]
     }
     mock_client.return_value.__aenter__.return_value.post.return_value = mock_response
-    
+
     # Test
     builder = QuaternionBuilder(use_http=True)
     q = await builder.from_vac([0.5, 0.6, 0.7])
-    
+
     assert len(q) == 4
     assert q[0] == 0.8  # w component
 ```

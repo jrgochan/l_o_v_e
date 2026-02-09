@@ -46,15 +46,15 @@ See Also:
 from typing import Literal, Optional
 
 from pydantic import Field
-from pydantic_settings import SettingsConfigDict
+from pydantic_settings import BaseSettings, SettingsConfigDict
 
 try:
     from settings import LoveBaseSettings
 except ImportError:
-    from pydantic_settings import BaseSettings as LoveBaseSettings
+    LoveBaseSettings = BaseSettings
 
 
-class Settings(LoveBaseSettings):
+class Settings(LoveBaseSettings):  # type: ignore[misc]
     """Application settings loaded from environment variables with type validation.
 
     This Pydantic Settings class provides:

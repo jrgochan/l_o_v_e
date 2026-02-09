@@ -187,7 +187,7 @@ import { initWhisper } from 'whisper.rn';
 
 class WhisperService {
   private whisper: any;
-  
+
   async initialize() {
     this.whisper = await initWhisper({
       filePath: 'ggml-tiny.en.bin',
@@ -195,14 +195,14 @@ class WhisperService {
       enableNNAPI: Platform.OS === 'android'  // Use DSP
     });
   }
-  
+
   async transcribe(audioPath: string): Promise<string> {
     const result = await this.whisper.transcribe({
       filePath: audioPath,
       language: 'en',
       maxLen: 1  // Streaming mode
     });
-    
+
     return result.text;
   }
 }
@@ -222,7 +222,7 @@ class TranscriptionService:
             device="cuda",
             compute_type="float16"
         )
-    
+
     def transcribe(self, audio_path: str) -> str:
         """High-fidelity transcription"""
         segments, info = self.model.transcribe(
@@ -230,10 +230,10 @@ class TranscriptionService:
             vad_filter=True,  # Voice activity detection
             language="en"
         )
-        
+
         # Combine segments
         text = " ".join(segment.text for segment in segments)
-        
+
         return text.strip()
 ```
 

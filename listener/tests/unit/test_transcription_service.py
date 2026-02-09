@@ -1,3 +1,5 @@
+# pylint: disable=protected-access, redefined-outer-name, unused-argument
+from typing import Any, Generator
 from unittest.mock import MagicMock, patch
 
 import pytest
@@ -6,7 +8,7 @@ from app.services.transcription import TranscriptionService, get_transcription_s
 
 
 @pytest.fixture
-def mock_whisper():
+def mock_whisper() -> Generator[MagicMock, None, None]:
     with patch("app.services.transcription.whisper") as mock:
         mock_model = MagicMock()
         mock.load_model.return_value = mock_model
@@ -18,12 +20,12 @@ def mock_whisper():
 
 
 @pytest.fixture
-def mock_audio_processor():
+def mock_audio_processor() -> Generator[MagicMock, None, None]:
     with patch("app.services.transcription.AudioProcessor") as mock:
         mock.validate_audio_file.return_value = True
         mock.get_audio_duration.return_value = 5.0
         mock.get_audio_info.return_value = {"sample_rate": 16000, "channels": 1}
-        mock.normalize_audio.return_value = "/tmp/normalized.wav"
+        mock.normalize_audio.return_value = "normalized.wav"
         # Set constants to match expected values (avoid MagicMock mismatch)
         mock.TARGET_SAMPLE_RATE = 16000
         mock.TARGET_CHANNELS = 1
@@ -31,20 +33,20 @@ def mock_audio_processor():
 
 
 class TestTranscriptionService:
-    def test_singleton_getter(self):
+    def test_singleton_getter(self) -> None:
         """Test singleton pattern."""
         s1 = get_transcription_service()
         s2 = get_transcription_service()
         assert s1 is s2
         assert isinstance(s1, TranscriptionService)
 
-    def test_init_defaults(self):
+    def test_init_defaults(self) -> None:
         """Test default initialization."""
         service = TranscriptionService()
         assert service._model_loaded is False
         assert service.model_size is not None  # Falls back to settings
 
-    def test_init_mps_detection(self):
+    def test_init_mps_detection(self) -> None:
         """Test MPS detection logic."""
         with patch("app.services.transcription.logging"):
             TranscriptionService(device="mps")
@@ -54,7 +56,7 @@ class TestTranscriptionService:
             # )
             # Checking logic execution is sufficient via coverage
 
-    def test_model_loading_lazy(self, mock_whisper):
+    def test_model_loading_lazy(self, mock_whisper: Any) -> None:
         """Test model is loaded only when needed."""
         # Force WHISPER_AVAILABLE
         with patch("app.services.transcription.WHISPER_AVAILABLE", True):
@@ -65,13 +67,13 @@ class TestTranscriptionService:
             service._load_model()
 
             assert service._model_loaded
-            mock_whisper.load_model.assert_called_once()
+            mock_whisper.load_model.assert_called_once()  # type: ignore[unreachable]
 
             # Second call should return early
             service._load_model()
             mock_whisper.load_model.assert_called_once()  # Count doesn't increase
 
-    def test_transcribe_flow(self, mock_whisper, mock_audio_processor):
+    def test_transcribe_flow(self, mock_whisper: Any, mock_audio_processor: Any) -> None:
         """Test complete transcription flow."""
         with patch("app.services.transcription.WHISPER_AVAILABLE", True):
             service = TranscriptionService()
@@ -87,14 +89,18 @@ class TestTranscriptionService:
             # Verify normalize NOT called because mock returns 16k mono
             mock_audio_processor.normalize_audio.assert_not_called()
 
-    def test_transcribe_flow_detect_language(self, mock_whisper, mock_audio_processor):
+    def test_transcribe_flow_detect_language(
+        self, mock_whisper: Any, mock_audio_processor: Any
+    ) -> None:
         """Test language detection log branch."""
         with patch("app.services.transcription.WHISPER_AVAILABLE", True):
             service = TranscriptionService()
-            result = service.transcribe("/path/to/audio.wav", language=None)
+            result = service.transcribe("/path/to/audio.wav", language="en")
             assert result.text == "Hello world"
 
-    def test_transcribe_normalization_needed(self, mock_whisper, mock_audio_processor):
+    def test_transcribe_normalization_needed(
+        self, mock_whisper: Any, mock_audio_processor: Any
+    ) -> None:
         """Test flow when normalization is required."""
         with patch("app.services.transcription.WHISPER_AVAILABLE", True):
             # Return non-compliant audio info
@@ -109,10 +115,10 @@ class TestTranscriptionService:
             # Need to dig into the mock call args on the model
             model_mock = mock_whisper.load_model.return_value
             model_mock.transcribe.assert_called_with(
-                "/tmp/normalized.wav", language="en", temperature=0.0, fp16=False
+                "normalized.wav", language="en", temperature=0.0, fp16=False
             )
 
-    def test_invalid_audio_file(self, mock_whisper, mock_audio_processor):
+    def test_invalid_audio_file(self, mock_whisper: Any, mock_audio_processor: Any) -> None:
         """Test invalid audio file handling."""
         mock_audio_processor.validate_audio_file.return_value = False
 
@@ -122,7 +128,7 @@ class TestTranscriptionService:
             with pytest.raises(ValueError, match="Invalid audio file"):
                 service.transcribe("bad.wav")
 
-    def test_whisper_import_error(self):
+    def test_whisper_import_error(self) -> None:
         """Test behavior when whisper is missing."""
         with patch("app.services.transcription.WHISPER_AVAILABLE", False):
             service = TranscriptionService()
@@ -131,7 +137,7 @@ class TestTranscriptionService:
                 # accessing private _load_model directly to trigger check
                 service._load_model()
 
-    def test_transcribe_text_mock(self):
+    def test_transcribe_text_mock(self) -> None:
         """Test dummy transcription method."""
         service = TranscriptionService()
         result = service.transcribe_text("Direct text")
@@ -139,7 +145,7 @@ class TestTranscriptionService:
         assert result.text == "Direct text"
         assert result.duration_seconds == 0.0
 
-    def test_get_model_info(self):
+    def test_get_model_info(self) -> None:
         """Test model info string."""
         service = TranscriptionService(model_size="tiny", device="cpu", compute_type="int8")
         info = service.get_model_info()
@@ -149,7 +155,7 @@ class TestTranscriptionService:
         assert info["compute_type"] == "int8"
         assert info["loaded"] is False
 
-    def test_load_model_failure(self, mock_whisper):
+    def test_load_model_failure(self, mock_whisper: Any) -> None:
         """Test failure during model loading."""
         with patch("app.services.transcription.WHISPER_AVAILABLE", True):
             mock_whisper.load_model.side_effect = Exception("Load failed")
@@ -158,7 +164,9 @@ class TestTranscriptionService:
             with pytest.raises(RuntimeError, match="Model loading failed"):
                 service._load_model()
 
-    def test_transcription_runtime_error(self, mock_whisper, mock_audio_processor):
+    def test_transcription_runtime_error(
+        self, mock_whisper: Any, mock_audio_processor: Any
+    ) -> None:
         """Test handling of exceptions during transcription."""
         with patch("app.services.transcription.WHISPER_AVAILABLE", True):
             model_mock = mock_whisper.load_model.return_value

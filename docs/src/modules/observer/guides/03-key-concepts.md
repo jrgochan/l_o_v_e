@@ -1,8 +1,8 @@
 # Key Concepts
 
-**Reading Time:** ~45 minutes  
-**Audience:** New developers  
-**Prerequisites:** [Getting Started](01-getting-started.md) and [Codebase Tour](02-codebase-tour.md)  
+**Reading Time:** ~45 minutes
+**Audience:** New developers
+**Prerequisites:** [Getting Started](01-getting-started.md) and [Codebase Tour](02-codebase-tour.md)
 **Goal:** Understand the core concepts that make Observer work
 
 ---
@@ -251,11 +251,11 @@ Euclidean distance in 3D space:
 def vac_distance(vac1, vac2):
     """
     Calculate Euclidean distance between two VAC coordinates.
-    
+
     Example:
     vac1 = [0.8, 0.6, 0.7]  # Joy
     vac2 = [0.75, 0.55, 0.65]  # Happiness
-    
+
     distance = sqrt((0.8-0.75)² + (0.6-0.55)² + (0.7-0.65)²)
              = sqrt(0.0025 + 0.0025 + 0.0025)
              = sqrt(0.0075)
@@ -278,7 +278,7 @@ Uses 384-dimensional vectors from sentence-transformers:
 def semantic_distance(embedding1, embedding2):
     """
     Cosine distance between semantic embeddings.
-    
+
     Captures meaning:
     "I feel compassionate" vs "I feel pity"
     → Different semantic meanings despite similar words
@@ -296,7 +296,7 @@ Observer combines both approaches:
 def find_nearest_emotion(vac, text):
     # Count words
     word_count = len(text.split())
-    
+
     if word_count < 10:
         # Short text: Trust VAC scalars more
         # (LLM had clear emotional signal)
@@ -307,14 +307,14 @@ def find_nearest_emotion(vac, text):
         # (Richer semantic context)
         vac_weight = 0.4
         semantic_weight = 0.6
-    
+
     # Calculate distances
     vac_dist = calculate_vac_distance(vac, emotion.vac)
     sem_dist = calculate_semantic_distance(text_emb, emotion.emb)
-    
+
     # Weighted fusion
     final_distance = (vac_weight * vac_dist) + (semantic_weight * sem_dist)
-    
+
     # Return emotion with minimum distance
     return min(emotions, key=lambda e: final_distance(e))
 ```
@@ -332,7 +332,7 @@ def find_nearest_emotion(vac, text):
 
 ```sql
 -- Create HNSW index on embedding column
-CREATE INDEX ON user_trajectory 
+CREATE INDEX ON user_trajectory
 USING hnsw (embedding vector_cosine_ops);
 
 -- Now queries are sub-50ms even with 1M+ rows!
@@ -390,15 +390,15 @@ Goal:  Contentment [V:0.6, A:0.1, C:0.5]
 
 Step 1: At Anger
   Neighbors: Frustration, Contempt, Defensiveness
-  
+
   Evaluate Frustration:
   g(Frustration) = distance(Anger → Frustration) = 0.3
   h(Frustration) = distance(Frustration → Contentment) = 1.2
   f(Frustration) = 0.3 + 1.2 = 1.5
-  
+
 Step 2: Move to Frustration (best f-score)
   Neighbors: Disappointment, Resignation, Stress
-  
+
   Evaluate Resignation:
   g(Resignation) = 0.3 + distance(Frustration → Resignation) = 0.6
   h(Resignation) = distance(Resignation → Contentment) = 0.7
@@ -626,23 +626,23 @@ Each strategy includes:
 graph TB
     Start[User inputs emotional state] --> Listener[Listener extracts VAC]
     Listener --> Store[Observer stores state]
-    
+
     Store --> Map[Emotion Mapper finds nearest emotion]
     Map --> Weighted[Weighted fusion: VAC + semantic]
     Weighted --> Match[Match: 'Anger']
-    
+
     Match --> Convert[Convert VAC → Quaternion]
     Convert --> Calc[Calculate Elasticity & Rigidity]
-    
+
     Calc --> Check{High Elasticity?}
     Check -->|Yes| Alert[Generate flooding alert]
     Check -->|No| Path[User requests transition path]
-    
+
     Path --> Astar[A* pathfinding]
     Astar --> Validate[Validate categories]
     Validate --> Enhance[Add bridge emotions if needed]
     Enhance --> Strat[Recommend strategies]
-    
+
     Strat --> Display[Display to user via Experience]
 ```
 
@@ -668,7 +668,7 @@ graph TB
    Anger: vac_dist=0.12, sem_dist=0.08 → final=0.11
    Contempt: vac_dist=0.25, sem_dist=0.15 → final=0.22
    Betrayal: vac_dist=0.35, sem_dist=0.12 → final=0.28
-   
+
    # Match: Anger ✅
    ```
 
@@ -713,7 +713,7 @@ graph TB
    - Deep Breathing (calm arousal)
    - Physical Movement (discharge energy)
    - Journaling (process thoughts)
-   
+
    # For Resignation → Acceptance:
    - ACT: Acceptance practice
    - Mindfulness: Present moment awareness

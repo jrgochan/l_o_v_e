@@ -1,11 +1,13 @@
-
-import pytest
+from datetime import datetime
 from unittest.mock import AsyncMock, MagicMock
 from uuid import uuid4
-from datetime import datetime
+
+import pytest
+
 from app.api.routes import current
-from app.models.user_trajectory import UserTrajectory
 from app.models.emotion_definition import EmotionDefinition
+from app.models.user_trajectory import UserTrajectory
+
 
 @pytest.fixture
 def mock_db():
@@ -15,6 +17,7 @@ def mock_db():
     mock_db.delete = MagicMock()
     mock_db.commit = AsyncMock()
     return mock_db
+
 
 @pytest.fixture
 def mock_state():
@@ -29,6 +32,7 @@ def mock_state():
     state.rigidity_score = 0.2
     return state
 
+
 @pytest.fixture
 def mock_emotion():
     em = MagicMock(spec=EmotionDefinition)
@@ -38,13 +42,14 @@ def mock_emotion():
     em.vac_vector = [0.1, 0.2, 0.3]
     return em
 
+
 @pytest.mark.asyncio
 async def test_get_current_state_success_with_history(mock_db, mock_state, mock_emotion):
     """Test successful retrieval with previous state history."""
     # Mock current state
     mock_res_curr = MagicMock()
     mock_res_curr.scalar_one_or_none.return_value = mock_state
-    
+
     # Mock previous state
     prev_state = MagicMock(spec=UserTrajectory)
     prev_state.quaternion_state = [0.9, 0.1, 0.0, 0.0]
@@ -68,14 +73,15 @@ async def test_get_current_state_success_with_history(mock_db, mock_state, mock_
     assert response.previous_quaternion is not None
     assert response.metrics.angular_distance > 0
 
+
 @pytest.mark.asyncio
 async def test_get_current_state_no_history(mock_db, mock_state, mock_emotion):
     """Test successful retrieval without previous state (first entry)."""
     mock_res_curr = MagicMock()
     mock_res_curr.scalar_one_or_none.return_value = mock_state
-    
+
     mock_res_prev = MagicMock()
-    mock_res_prev.scalar_one_or_none.return_value = None # No previous
+    mock_res_prev.scalar_one_or_none.return_value = None  # No previous
 
     mock_res_em = MagicMock()
     mock_res_em.scalar_one_or_none.return_value = mock_emotion
@@ -87,17 +93,18 @@ async def test_get_current_state_no_history(mock_db, mock_state, mock_emotion):
     assert response.previous_quaternion is None
     assert response.metrics.angular_distance == 0.0
 
+
 @pytest.mark.asyncio
 async def test_get_current_state_unknown_emotion(mock_db, mock_state):
     """Test retrieval when dominant emotion ID is not found in Atlas."""
     mock_res_curr = MagicMock()
     mock_res_curr.scalar_one_or_none.return_value = mock_state
-    
+
     mock_res_prev = MagicMock()
     mock_res_prev.scalar_one_or_none.return_value = None
 
     mock_res_em = MagicMock()
-    mock_res_em.scalar_one_or_none.return_value = None # Emotion not found
+    mock_res_em.scalar_one_or_none.return_value = None  # Emotion not found
 
     mock_db.execute.side_effect = [mock_res_curr, mock_res_prev, mock_res_em]
 
@@ -105,6 +112,7 @@ async def test_get_current_state_unknown_emotion(mock_db, mock_state):
 
     assert response.dominant_emotion.name == "Unknown"
     assert response.dominant_emotion.category == "Unknown"
+
 
 @pytest.mark.asyncio
 async def test_get_current_state_not_found(mock_db):
@@ -114,11 +122,13 @@ async def test_get_current_state_not_found(mock_db):
     mock_db.execute.return_value = mock_res
 
     from fastapi import HTTPException
+
     with pytest.raises(HTTPException) as exc:
         await current.get_current_state(uuid4(), db=mock_db)
-    
+
     assert exc.value.status_code == 404
     assert "No states found" in exc.value.detail
+
 
 @pytest.mark.asyncio
 async def test_get_current_state_db_error(mock_db):
@@ -126,8 +136,9 @@ async def test_get_current_state_db_error(mock_db):
     mock_db.execute.side_effect = Exception("DB Crash")
 
     from fastapi import HTTPException
+
     with pytest.raises(HTTPException) as exc:
         await current.get_current_state(uuid4(), db=mock_db)
-    
+
     assert exc.value.status_code == 500
     assert "Failed to get current state" in exc.value.detail

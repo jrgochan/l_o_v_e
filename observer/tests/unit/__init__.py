@@ -1,1 +1,1 @@
-"""Unit tests"""
+"""Observer unit tests package."""

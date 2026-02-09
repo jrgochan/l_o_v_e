@@ -175,14 +175,14 @@ Podman or Docker
     source .venv/bin/activate
     pip install -r requirements.txt
     uvicorn app.main:app --port 8001
-    
+
     # Observer (Port 8000)
     cd observer
     python3 -m .venv .venv
     source .venv/bin/activate
     pip install -r requirements.txt
     uvicorn app.main:app --port 8000
-    
+
     # Listener (Port 8002)
     cd listener
     python3 -m .venv .venv
@@ -190,7 +190,7 @@ Podman or Docker
     pip install -r requirements.txt
     ollama pull llama3.1:8b-instruct-q4_0
     uvicorn app.main:app --port 8002
-    
+
     # Experience (Port 3000)
     cd experience/web
     npm install

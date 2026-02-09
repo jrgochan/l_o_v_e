@@ -182,7 +182,8 @@ Example Usage:
 
     Get specific date range::
 
-        GET /observer/history/user_abc123?start_date=2026-01-01T00:00:00Z&end_date=2026-01-01T23:59:59Z
+        GET /observer/history/user_abc123?start_date=2026-01-01T00:00:00Z
+        &end_date=2026-01-01T23:59:59Z
 
         Returns: All states from January 1st, 2026
 
@@ -288,7 +289,7 @@ async def get_history(
         HistoryResponse with trajectory data
     """
     try:
-        logger.info(f"Retrieving history for user {user_id}")
+        logger.info("Retrieving history for user %s", user_id)
 
         # Build query
         stmt = select(UserTrajectory).where(UserTrajectory.user_id == user_id)
@@ -307,7 +308,7 @@ async def get_history(
         states = result.scalars().all()
 
         if not states:
-            logger.info(f"No states found for user {user_id}")
+            logger.info("No states found for user %s", user_id)
             return HistoryResponse(
                 user_id=str(user_id),
                 start_date=start_date,
@@ -316,91 +317,18 @@ async def get_history(
                 trajectory=[],
             )
 
-        # Transform to trajectory points
-        trajectory_points = []
-
-        # Pre-fetch messages in this time range to link relationships
-        # We perform a separate query to avoid complex joins and potential Cartesian products
-        # This assumes trajectory points and messages are roughly synchronized
-        message_map: Dict[datetime, List[ChatMessage]] = {}
-
-        min_ts = states[0].timestamp
-        max_ts = states[-1].timestamp
-
-        # Buffer window for timestamp matching (e.g. +/- 1 second)
-        # Messages might be slightly offset from trajectory points
-
-        msg_stmt = (
-            select(ChatMessage)
-            .join(ChatSession)
-            .where(
-                ChatSession.user_id == user_id,
-                ChatMessage.timestamp >= min_ts,
-                ChatMessage.timestamp <= max_ts,
-            )
-            .options(selectinload(ChatMessage.outgoing_relationships))
+        # Pre-fetch messages in this time range
+        message_map = await _fetch_messages_for_range(
+            db, user_id, states[0].timestamp, states[-1].timestamp
         )
 
-        msg_result = await db.execute(msg_stmt)
-        messages = msg_result.scalars().all()
-
-        # Index messages by timestamp (simplified matching for now)
-        # In a real scenario, we might use a dedicated correlation ID if available
-        for msg in messages:
-            # Only care if there are relationships or strict requirements
-            if msg.outgoing_relationships:
-                # We store by session_id + timestamp or just fuzzy timestamp?
-                # Let's simple check: msg timestamp -> msg
-                # We might have duplicates, so we store list
-                ts_key = msg.timestamp.replace(microsecond=0)  # Round to second for matching
-                if ts_key not in message_map:
-                    message_map[ts_key] = []
-                message_map[ts_key].append(msg)
-
+        # Transform to trajectory points
+        trajectory_points = []
         for state in states:
-            # Get emotion name (fetch if needed)
-            emotion_name = "Unknown"
-            if state.dominant_emotion_id:
-                emotion_stmt = select(EmotionDefinition).where(
-                    EmotionDefinition.id == state.dominant_emotion_id
-                )
-                emotion_result = await db.execute(emotion_stmt)
-                emotion = emotion_result.scalar_one_or_none()
-                if emotion:
-                    emotion_name = emotion.emotion_name
-
-            # Check for linked message
-            # Fuzzy match timestamp
-            linked_msg_id = None
-            relationship_data = None
-
-            ts_key = state.timestamp.replace(microsecond=0)
-            if ts_key in message_map:
-                # Take the first matching message for now
-                # Ideally we want exact correlation, but without a shared ID, time is our best proxy
-                linked_msg = message_map[ts_key][0]
-                linked_msg_id = str(linked_msg.id)
-
-                # Just take the first relationship for the marker
-                rel = linked_msg.outgoing_relationships[0]
-                relationship_data = {
-                    "type": rel.relationship_type,
-                    "target_id": str(rel.target_message_id),
-                    "count": len(linked_msg.outgoing_relationships),
-                }
-
-            point = TrajectoryPoint(
-                timestamp=state.timestamp,
-                vac=list(state.vac_values),
-                quaternion=list(state.quaternion_state),
-                emotion=emotion_name,
-                elasticity=state.elasticity_metric,
-                message_id=linked_msg_id,
-                relationship_marker=relationship_data,
-            )
+            point = await _create_trajectory_point(db, state, message_map)
             trajectory_points.append(point)
 
-        logger.info(f"Retrieved {len(trajectory_points)} trajectory points")
+        logger.info("Retrieved %d trajectory points", len(trajectory_points))
 
         return HistoryResponse(
             user_id=str(user_id),
@@ -411,5 +339,75 @@ async def get_history(
         )
 
     except Exception as e:
-        logger.error(f"Failed to retrieve history: {e}", exc_info=True)
-        raise HTTPException(status_code=500, detail=f"Failed to retrieve history: {str(e)}")
+        logger.error("Failed to retrieve history: %s", e, exc_info=True)
+        raise HTTPException(status_code=500, detail=f"Failed to retrieve history: {str(e)}") from e
+
+
+async def _fetch_messages_for_range(
+    db: AsyncSession, user_id: UUID, start_ts: datetime, end_ts: datetime
+) -> Dict[datetime, List[ChatMessage]]:
+    """Fetch messages within a time range and index by timestamp."""
+    msg_stmt = (
+        select(ChatMessage)
+        .join(ChatSession)
+        .where(
+            ChatSession.user_id == user_id,
+            ChatMessage.timestamp >= start_ts,
+            ChatMessage.timestamp <= end_ts,
+        )
+        .options(selectinload(ChatMessage.outgoing_relationships))
+    )
+
+    msg_result = await db.execute(msg_stmt)
+    messages = msg_result.scalars().all()
+
+    message_map: Dict[datetime, List[ChatMessage]] = {}
+    for msg in messages:
+        if msg.outgoing_relationships:
+            ts_key = msg.timestamp.replace(microsecond=0)
+            if ts_key not in message_map:
+                message_map[ts_key] = []
+            message_map[ts_key].append(msg)
+    return message_map
+
+
+async def _create_trajectory_point(
+    db: AsyncSession,
+    state: UserTrajectory,
+    message_map: Dict[datetime, List[ChatMessage]],
+) -> TrajectoryPoint:
+    """Create a single trajectory point from state and message context."""
+    emotion_name = "Unknown"
+    if state.dominant_emotion_id:
+        emotion_stmt = select(EmotionDefinition).where(
+            EmotionDefinition.id == state.dominant_emotion_id
+        )
+        emotion_result = await db.execute(emotion_stmt)
+        emotion = emotion_result.scalar_one_or_none()
+        if emotion:
+            emotion_name = emotion.emotion_name
+
+    linked_msg_id = None
+    relationship_data = None
+
+    ts_key = state.timestamp.replace(microsecond=0)
+    if ts_key in message_map:
+        linked_msg = message_map[ts_key][0]
+        linked_msg_id = str(linked_msg.id)
+
+        rel = linked_msg.outgoing_relationships[0]
+        relationship_data = {
+            "type": rel.relationship_type,
+            "target_id": str(rel.target_message_id),
+            "count": len(linked_msg.outgoing_relationships),
+        }
+
+    return TrajectoryPoint(
+        timestamp=state.timestamp,
+        vac=list(state.vac_values),
+        quaternion=list(state.quaternion_state),
+        emotion=emotion_name,
+        elasticity=state.elasticity_metric,
+        message_id=linked_msg_id,
+        relationship_marker=relationship_data,
+    )

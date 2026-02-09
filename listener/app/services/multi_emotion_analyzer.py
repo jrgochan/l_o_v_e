@@ -44,6 +44,7 @@ See Also:
     - Tests: tests/integration/test_multi_emotion.py
 """
 
+import asyncio
 import json
 import logging
 import time
@@ -310,7 +311,8 @@ DEFAULT_VOICE_ONLY_USER = """Analyze these vocal prosody features:
 Based ONLY on these vocal characteristics, what emotions does this voice express?"""
 
 
-class MultiEmotionAnalyzer:  # pylint: disable=too-many-instance-attributes,duplicate-code
+# pylint: disable=too-many-instance-attributes,duplicate-code,too-many-lines
+class MultiEmotionAnalyzer:
     """Extract multiple concurrent emotions (up to 3) with relationships.
 
     The key innovation is detecting emotional complexity:
@@ -321,7 +323,7 @@ class MultiEmotionAnalyzer:  # pylint: disable=too-many-instance-attributes,dupl
     - Aggregate emotional state
     """
 
-    def __init__(  # pylint: disable=too-many-positional-arguments
+    def __init__(  # pylint: disable=too-many-positional-arguments,too-many-arguments
         self,
         model: Optional[str] = None,
         temperature: Optional[float] = None,
@@ -341,8 +343,6 @@ class MultiEmotionAnalyzer:  # pylint: disable=too-many-instance-attributes,dupl
         # Fetch assigned model if not explicitly provided
         if model is None and fetch_dynamic_model:
             try:
-                import asyncio
-
                 fetcher = get_model_fetcher(settings.OBSERVER_URL)
                 try:
                     loop = asyncio.get_event_loop()
@@ -354,7 +354,7 @@ class MultiEmotionAnalyzer:  # pylint: disable=too-many-instance-attributes,dupl
                     fetcher.get_model_for_function("multi_emotion", settings.OLLAMA_MODEL)
                 )
                 logger.info("Using dynamically assigned model for multi_emotion: %s", self.model)
-            except Exception as e:
+            except Exception as e:  # pylint: disable=broad-exception-caught
                 logger.warning("Failed to fetch dynamic model, using default: %s", e)
                 self.model = settings.OLLAMA_MODEL
         else:
@@ -442,7 +442,7 @@ class MultiEmotionAnalyzer:  # pylint: disable=too-many-instance-attributes,dupl
                         "Updated %s prompt to v%s", function_name, prompt_data.get("version")
                     )
 
-        except Exception as e:
+        except Exception as e:  # pylint: disable=broad-exception-caught
             logger.warning("Failed to refresh multi-emotion prompts: %s", e)
 
         # Old methods removed as replaced by defaults and dynamic fetching
@@ -713,8 +713,6 @@ class MultiEmotionAnalyzer:  # pylint: disable=too-many-instance-attributes,dupl
         try:
             # Run analyses in parallel using asyncio.gather
             if prosody_features:
-                import asyncio
-
                 content_only, voice_only, blended = await asyncio.gather(
                     self._analyze_content_only(text),
                     self._analyze_voice_only(prosody_features),
@@ -722,8 +720,6 @@ class MultiEmotionAnalyzer:  # pylint: disable=too-many-instance-attributes,dupl
                 )
             else:
                 # Text-only session: only content and blended
-                import asyncio
-
                 content_only, blended = await asyncio.gather(
                     self._analyze_content_only(text), self.analyze(text)
                 )
@@ -892,7 +888,7 @@ class MultiEmotionAnalyzer:  # pylint: disable=too-many-instance-attributes,dupl
 
         # Validate and construct Pydantic model
         result = MultiEmotionAnalysisResponse(**result_dict)
-        logger.info(f"{analysis_type} analysis: {len(result.emotions)} emotions detected")
+        logger.info("%s analysis: %d emotions detected", analysis_type, len(result.emotions))
 
         return result
 
@@ -1002,10 +998,12 @@ class MultiEmotionAnalyzer:  # pylint: disable=too-many-instance-attributes,dupl
             """
             if not vac1 or not vac2:  # pragma: no cover
                 return 0.0
-            return np.sqrt(
-                (vac1.valence - vac2.valence) ** 2
-                + (vac1.arousal - vac2.arousal) ** 2
-                + (vac1.connection - vac2.connection) ** 2
+            return float(
+                np.sqrt(
+                    (vac1.valence - vac2.valence) ** 2
+                    + (vac1.arousal - vac2.arousal) ** 2
+                    + (vac1.connection - vac2.connection) ** 2
+                )
             )
 
         content_voice_distance = vac_distance(content_vac, voice_vac) if voice_vac else 0.0
@@ -1171,8 +1169,6 @@ class MultiEmotionAnalyzer:  # pylint: disable=too-many-instance-attributes,dupl
         Returns:
             MultiEmotionAnalysisResponse
         """
-        import asyncio
-
         try:
             loop = asyncio.get_event_loop()
         except RuntimeError:

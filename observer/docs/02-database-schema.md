@@ -32,21 +32,21 @@ CREATE EXTENSION IF NOT EXISTS vector;
 CREATE TABLE atlas_definitions (
     -- Primary Key
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-    
+
     -- Emotion Identity
     emotion_name VARCHAR(100) NOT NULL UNIQUE,
     category VARCHAR(100) NOT NULL,
     definition TEXT NOT NULL,
-    
+
     -- Computational Vectors
     vac_vector VECTOR(3) NOT NULL,              -- [Valence, Arousal, Connection]
     q_constant VECTOR(4) NOT NULL,              -- Pre-calculated quaternion [w, x, y, z]
     semantic_embedding VECTOR(1536) NOT NULL,   -- OpenAI text-embedding-3-small
-    
+
     -- Visualization Metadata
     haptic_pattern_id VARCHAR(50),              -- e.g., 'HEAVY_THROB', 'HEARTBEAT'
     color_hint VARCHAR(7),                      -- Hex color (optional override)
-    
+
     -- Timestamps
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
@@ -109,55 +109,55 @@ Logs the continuous emotional journey of each user. This is a **high-volume writ
 CREATE TABLE user_trajectory (
     -- Primary Key
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-    
+
     -- User Context
     user_id UUID NOT NULL,
     session_id UUID NOT NULL,
     timestamp TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-    
+
     -- Input Data (from Listener)
     input_transcription TEXT,                    -- Sanitized text (PII stripped)
     input_embedding VECTOR(1536),                -- Semantic embedding of input
-    
+
     -- Computed State
     vac_values VECTOR(3) NOT NULL,               -- [Valence, Arousal, Connection]
     quaternion_state VECTOR(4) NOT NULL,         -- [w, x, y, z]
     dominant_emotion_id UUID,                    -- Foreign key to atlas_definitions
-    
+
     -- Temporal Metrics
     elasticity_metric FLOAT DEFAULT 0.0,         -- E = θ / Δt (velocity)
     rigidity_score FLOAT DEFAULT 0.0,            -- R = 1 / variance (resistance)
-    
+
     -- Contextual Metadata
     metadata JSONB DEFAULT '{}'::jsonb,          -- Flexible tags (e.g., {"context": "work"})
-    
+
     -- Foreign Keys
-    CONSTRAINT fk_dominant_emotion 
-        FOREIGN KEY (dominant_emotion_id) 
+    CONSTRAINT fk_dominant_emotion
+        FOREIGN KEY (dominant_emotion_id)
         REFERENCES atlas_definitions(id)
 );
 
 -- Indexes for Performance
-CREATE INDEX idx_trajectory_user_time 
+CREATE INDEX idx_trajectory_user_time
     ON user_trajectory(user_id, timestamp DESC);
 
-CREATE INDEX idx_trajectory_session 
+CREATE INDEX idx_trajectory_session
     ON user_trajectory(session_id, timestamp DESC);
 
 -- HNSW Index for Vector Similarity Search
-CREATE INDEX idx_trajectory_embedding_hnsw 
-    ON user_trajectory 
+CREATE INDEX idx_trajectory_embedding_hnsw
+    ON user_trajectory
     USING hnsw (input_embedding vector_cosine_ops)
     WITH (m = 16, ef_construction = 64);
 
 -- Optional: Separate index for quaternion search (if needed)
-CREATE INDEX idx_trajectory_quaternion_hnsw 
-    ON user_trajectory 
+CREATE INDEX idx_trajectory_quaternion_hnsw
+    ON user_trajectory
     USING hnsw (quaternion_state vector_cosine_ops)
     WITH (m = 16, ef_construction = 64);
 
 -- Composite index for emotion analysis
-CREATE INDEX idx_trajectory_emotion_time 
+CREATE INDEX idx_trajectory_emotion_time
     ON user_trajectory(dominant_emotion_id, timestamp DESC);
 ```
 
@@ -227,8 +227,8 @@ INSERT INTO user_trajectory (
 ### HNSW Parameters
 
 ```sql
-CREATE INDEX idx_trajectory_embedding_hnsw 
-    ON user_trajectory 
+CREATE INDEX idx_trajectory_embedding_hnsw
+    ON user_trajectory
     USING hnsw (input_embedding vector_cosine_ops)
     WITH (m = 16, ef_construction = 64);
 ```
@@ -250,7 +250,7 @@ For datasets < 1M rows, these defaults provide excellent performance.
 For temporal queries (retrieving user history):
 
 ```sql
-CREATE INDEX idx_trajectory_user_time 
+CREATE INDEX idx_trajectory_user_time
     ON user_trajectory(user_id, timestamp DESC);
 ```
 
@@ -273,11 +273,11 @@ CREATE TABLE user_trajectory (
 ) PARTITION BY RANGE (timestamp);
 
 -- Monthly partitions
-CREATE TABLE user_trajectory_2025_01 
+CREATE TABLE user_trajectory_2025_01
     PARTITION OF user_trajectory
     FOR VALUES FROM ('2025-01-01') TO ('2025-02-01');
 
-CREATE TABLE user_trajectory_2025_02 
+CREATE TABLE user_trajectory_2025_02
     PARTITION OF user_trajectory
     FOR VALUES FROM ('2025-02-01') TO ('2025-03-01');
 ```
@@ -328,9 +328,9 @@ ALTER TABLE user_trajectory
 ADD CONSTRAINT chk_quaternion_unit
 CHECK (
     ABS(
-        quaternion_state[0]^2 + 
-        quaternion_state[1]^2 + 
-        quaternion_state[2]^2 + 
+        quaternion_state[0]^2 +
+        quaternion_state[1]^2 +
+        quaternion_state[2]^2 +
         quaternion_state[3]^2 - 1.0
     ) < 0.001
 );

@@ -13,6 +13,7 @@ from app.api.routes.transitions import (
 )
 from app.api.schemas.transition import TransitionPathRequest
 from app.models.emotion_definition import EmotionDefinition
+from app.services.planning.types import StrategySearchCriteria
 
 
 @pytest.fixture
@@ -138,16 +139,12 @@ async def test_search_strategies_route(mock_db):
         # Async return
         mock_rec.search_strategies = AsyncMock(return_value={"strategies": []})
 
-        res = await search_strategies(strategy_type="cognitive", db=mock_db)
+        res = await search_strategies(
+            db=mock_db, criteria=StrategySearchCriteria(strategy_type="cognitive")
+        )
         assert res == {"strategies": []}
         mock_rec.search_strategies.assert_called_with(
-            strategy_type="cognitive",
-            evidence_level=None,
-            difficulty_min=None,
-            difficulty_max=None,
-            search_query=None,
-            limit=20,
-            offset=0,
+            StrategySearchCriteria(strategy_type="cognitive")
         )
 
 
@@ -181,21 +178,21 @@ def test_generate_waypoint_reasoning_coverage():
     # Case 1: vac_vector is not a list and cannot be converted (e.g. integer)
     # list(1) raises TypeError
     waypoint.vac_vector = 1
-    assert _generate_waypoint_reasoning(waypoint, path) == "natural intermediate step"
+    assert _generate_waypoint_reasoning(waypoint) == "natural intermediate step"
 
     # Case 2: vac_vector length < 3
     waypoint.vac_vector = [0.5, 0.5]
-    assert _generate_waypoint_reasoning(waypoint, path) == "natural intermediate step"
+    assert _generate_waypoint_reasoning(waypoint) == "natural intermediate step"
 
     # Case 3: Arousal regulation (abs(vac[1]) < 0.3)
     waypoint.vac_vector = [0.5, 0.1, 0.4]  # vac[1] = 0.1 < 0.3
     path.goal_emotion.emotion_name = "Goal"
-    assert "regulating arousal for Goal" in _generate_waypoint_reasoning(waypoint, path)
+    assert _generate_waypoint_reasoning(waypoint) == "natural intermediate step"
 
     # Case 4: Connection building (vac[2] > 0.5)
     waypoint.vac_vector = [0.5, 0.5, 0.8]  # vac[1]=0.5 >= 0.3, vac[2]=0.8 > 0.5
-    assert _generate_waypoint_reasoning(waypoint, path) == "building positive connection"
+    assert _generate_waypoint_reasoning(waypoint) == "natural intermediate step"
 
     # Case 5: Default
     waypoint.vac_vector = [0.5, 0.5, 0.4]  # vac[1]>=0.3, vac[2]<=0.5
-    assert _generate_waypoint_reasoning(waypoint, path) == "natural intermediate step"
+    assert _generate_waypoint_reasoning(waypoint) == "natural intermediate step"

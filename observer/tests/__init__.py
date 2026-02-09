@@ -1,1 +1,1 @@
-"""Test suite for Observer module"""
+"""Observer tests package."""

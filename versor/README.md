@@ -1,7 +1,7 @@
 # Versor - The Mathematical Heart of L.O.V.E.
 
-**Status**: ✅ Production Ready  
-**Test Coverage**: 56/56 tests passing (100%)  
+**Status**: ✅ Production Ready
+**Test Coverage**: 56/56 tests passing (100%)
 **API**: http://localhost:8001
 
 ---
@@ -12,11 +12,11 @@ The Versor is a **stateless microservice** that performs pure quaternion mathema
 
 ## Features
 
-✅ **VAC to Quaternion Conversion** - Maps emotional states to rotations  
-✅ **Transition Calculations** - Computes "emotional work" (angular distance)  
-✅ **SLERP Interpolation** - Generates 60-frame animation paths  
-✅ **Flooding Detection** - Identifies emotional overwhelm (E > 2.0 rad/s)  
-✅ **Axis Analysis** - Detects which dimension changed (Valence/Arousal/Connection)  
+✅ **VAC to Quaternion Conversion** - Maps emotional states to rotations
+✅ **Transition Calculations** - Computes "emotional work" (angular distance)
+✅ **SLERP Interpolation** - Generates 60-frame animation paths
+✅ **Flooding Detection** - Identifies emotional overwhelm (E > 2.0 rad/s)
+✅ **Axis Analysis** - Detects which dimension changed (Valence/Arousal/Connection)
 ✅ **Scalar Convention Handling** - Adapts between L.O.V.E. (scalar-first) and SciPy (scalar-last)
 
 ## Quick Start

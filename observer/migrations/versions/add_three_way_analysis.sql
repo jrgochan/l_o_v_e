@@ -11,30 +11,30 @@ ADD COLUMN IF NOT EXISTS voice_only_data JSONB,
 ADD COLUMN IF NOT EXISTS discrepancy_metrics JSONB;
 
 -- Create index for querying by 3-way enabled status
-CREATE INDEX IF NOT EXISTS idx_multi_emotion_three_way_enabled 
+CREATE INDEX IF NOT EXISTS idx_multi_emotion_three_way_enabled
 ON multi_emotion_analyses(three_way_enabled) WHERE three_way_enabled = TRUE;
 
 -- Create GIN index for searching within JSONB columns
-CREATE INDEX IF NOT EXISTS idx_multi_emotion_content_only_data 
+CREATE INDEX IF NOT EXISTS idx_multi_emotion_content_only_data
 ON multi_emotion_analyses USING GIN(content_only_data);
 
-CREATE INDEX IF NOT EXISTS idx_multi_emotion_voice_only_data 
+CREATE INDEX IF NOT EXISTS idx_multi_emotion_voice_only_data
 ON multi_emotion_analyses USING GIN(voice_only_data);
 
-CREATE INDEX IF NOT EXISTS idx_multi_emotion_discrepancy_metrics 
+CREATE INDEX IF NOT EXISTS idx_multi_emotion_discrepancy_metrics
 ON multi_emotion_analyses USING GIN(discrepancy_metrics);
 
 -- Add comments explaining the new columns
-COMMENT ON COLUMN multi_emotion_analyses.three_way_enabled IS 
+COMMENT ON COLUMN multi_emotion_analyses.three_way_enabled IS
 'Whether 3-way analysis (content/voice/blended) was performed for this message';
 
-COMMENT ON COLUMN multi_emotion_analyses.content_only_data IS 
+COMMENT ON COLUMN multi_emotion_analyses.content_only_data IS
 'JSONB storing content-only emotion analysis (from text semantic analysis alone)';
 
-COMMENT ON COLUMN multi_emotion_analyses.voice_only_data IS 
+COMMENT ON COLUMN multi_emotion_analyses.voice_only_data IS
 'JSONB storing voice-only emotion analysis (from prosody features alone)';
 
-COMMENT ON COLUMN multi_emotion_analyses.discrepancy_metrics IS 
+COMMENT ON COLUMN multi_emotion_analyses.discrepancy_metrics IS
 'JSONB storing discrepancy calculations, clinical flags, and interpretations';
 
 -- Example JSONB structure for content_only_data and voice_only_data:

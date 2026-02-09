@@ -201,11 +201,11 @@ from app.config import settings
 
 class VersorEngine:
     """Main service orchestrator for Versor operations"""
-    
+
     def __init__(self):
         self.flooding_threshold = settings.FLOODING_THRESHOLD
         self.default_steps = settings.DEFAULT_SLERP_STEPS
-    
+
     def process_state(
         self,
         current_vac: VACVector,
@@ -214,7 +214,7 @@ class VersorEngine:
     ) -> TrajectoryResult:
         """
         Main processing pipeline.
-        
+
         Steps:
         1. Convert VAC to quaternion
         2. Calculate transition (if previous exists)
@@ -223,36 +223,36 @@ class VersorEngine:
         5. Detect dominant axis
         6. Return complete result
         """
-        
+
         # 1. Convert VAC to quaternion
         current_quat = current_vac.to_quaternion()
-        
+
         # 2. Use previous or identity
         if previous_quaternion is None:
             previous_quaternion = Quaternion.identity()
-        
+
         # 3. Calculate transition
         transition_quat = calculate_transition(previous_quaternion, current_quat)
-        
+
         # 4. Compute angular distance
         phi = angular_distance(transition_quat)
-        
+
         # 5. Calculate elasticity
         elasticity = phi / time_delta
-        
+
         # 6. Detect flooding
         is_flooding = elasticity > self.flooding_threshold
-        
+
         # 7. Generate SLERP path
         path = generate_slerp_path(
             previous_quaternion,
             current_quat,
             steps=self.default_steps
         )
-        
+
         # 8. Detect dominant axis
         insight_code = self._detect_dominant_axis(transition_quat)
-        
+
         return TrajectoryResult(
             current_state=current_quat,
             transition_quaternion=transition_quat,
@@ -262,15 +262,15 @@ class VersorEngine:
             insight_code=insight_code,
             interpolation_path=path
         )
-    
+
     def _detect_dominant_axis(self, q_trans: Quaternion) -> str:
         """Identify which axis changed most"""
         abs_x = abs(q_trans.x)
         abs_y = abs(q_trans.y)
         abs_z = abs(q_trans.z)
-        
+
         max_component = max(abs_x, abs_y, abs_z)
-        
+
         if max_component < 0.1:
             return "NEUTRAL"
         elif abs_x == max_component:
@@ -295,7 +295,7 @@ class Quaternion:
     x: float
     y: float
     z: float
-    
+
     def multiply(self, other: 'Quaternion') -> 'Quaternion':
         # Returns NEW quaternion, doesn't mutate
         return Quaternion(...)
@@ -314,7 +314,7 @@ def love_to_scipy(q: Quaternion) -> np.ndarray:
 
 def scipy_to_love(q_array: np.ndarray) -> Quaternion:
     """Convert SciPy [x,y,z,w] to L.O.V.E. [w,x,y,z]"""
-    return Quaternion(w=q_array[3], x=q_array[0], 
+    return Quaternion(w=q_array[3], x=q_array[0],
                       y=q_array[1], z=q_array[2])
 ```
 
@@ -332,7 +332,7 @@ def scipy_to_love(q_array: np.ndarray) -> Quaternion:
 3. Pydantic Validation (VACVector, Quaternion models)
    ↓
 4. VersorEngine.process_state()
-   ├─▶ vac_to_quaternion() 
+   ├─▶ vac_to_quaternion()
    ├─▶ calculate_transition()
    ├─▶ angular_distance()
    ├─▶ calculate_elasticity()

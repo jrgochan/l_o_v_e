@@ -1,8 +1,8 @@
-
-import pytest
 import uuid
-from datetime import datetime
+from datetime import datetime, timezone
+
 from app.models.emotion_definition import EmotionDefinition
+
 
 def test_atlas_definition_to_dict():
     """Test AtlasDefinition serialization."""
@@ -15,9 +15,9 @@ def test_atlas_definition_to_dict():
         q_constant=[1.0, 0.0, 0.0, 0.0],
         haptic_pattern_id="soft_pulse",
         color_hint="#FF0000",
-        created_at=datetime.utcnow(),
-        updated_at=datetime.utcnow()
+        created_at=datetime.now(timezone.utc),
+        updated_at=datetime.now(timezone.utc),
     )
-    
+
     data = emotion.to_dict()
     assert data["emotion_name"] == "Test Joy"

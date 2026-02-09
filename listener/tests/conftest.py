@@ -1,26 +1,27 @@
-"""
-Listener Module - Test Configuration
+"""Listener Module - Test Configuration.
 
 Pytest fixtures and configuration for testing.
 """
 
+import logging
 from pathlib import Path
+from typing import Generator
 
 import pytest
 
-from app.api.deps import get_current_user
+from app.api.deps import get_current_user, get_current_user_ws
 from app.main import app
 
 
 @pytest.fixture(autouse=True)
-def override_auth():
+def override_auth() -> Generator[None, None, None]:
     """Mock authentication for all tests."""
     app.dependency_overrides[get_current_user] = lambda: {
         "sub": "test@example.com",
         "role": "admin",
     }
     # Need to import locally or global import to avoid circular dep issues in conftest?
-    from app.api.deps import get_current_user_ws
+    # get_current_user_ws is imported at top level
 
     app.dependency_overrides[get_current_user_ws] = lambda: {
         "sub": "test@example.com",
@@ -31,13 +32,11 @@ def override_auth():
 
 
 @pytest.fixture(scope="session", autouse=True)
-def suppress_shutdown_logging_errors():
+def suppress_shutdown_logging_errors() -> Generator[None, None, None]:
     """Suppress logging errors during interpreter shutdown.
 
     Fixes 'ValueError: I/O operation on closed file' from huggingface_hub/httpx.
     """
-    import logging
-
     yield
     # Remove handlers to prevent writing to closed streams
     logging.getLogger().handlers = []
@@ -45,31 +44,31 @@ def suppress_shutdown_logging_errors():
 
 @pytest.fixture
 def fixtures_dir() -> Path:
-    """Get path to test fixtures directory"""
+    """Get path to test fixtures directory."""
     return Path(__file__).parent / "fixtures"
 
 
 @pytest.fixture
-def sample_text():
-    """Sample text for testing semantic analysis"""
+def sample_text() -> str:
+    """Sample text for testing semantic analysis."""
     return "I'm feeling overwhelmed by everything today."
 
 
 @pytest.fixture
-def pity_text():
-    """Text expressing pity (negative Connection)"""
+def pity_text() -> str:
+    """Text expressing pity (negative Connection)."""
     return "I feel sorry for them. They're really struggling."
 
 
 @pytest.fixture
-def compassion_text():
-    """Text expressing compassion (positive Connection)"""
+def compassion_text() -> str:
+    """Text expressing compassion (positive Connection)."""
     return "I understand their pain. I'm here with them."
 
 
 @pytest.fixture
-def grief_text():
-    """Text expressing grief (negative Valence, positive Connection)"""
+def grief_text() -> str:
+    """Text expressing grief (negative Valence, positive Connection)."""
     return (
         "I miss them so much. The pain of losing them is overwhelming, "
         "but I still feel connected to the love we shared."
@@ -77,26 +76,26 @@ def grief_text():
 
 
 @pytest.fixture
-def belonging_text():
-    """Text expressing belonging (positive Connection)"""
+def belonging_text() -> str:
+    """Text expressing belonging (positive Connection)."""
     return "I can just be myself here. I'm accepted for who I am."
 
 
 @pytest.fixture
-def fitting_in_text():
-    """Text expressing fitting in (negative Connection)"""
+def fitting_in_text() -> str:
+    """Text expressing fitting in (negative Connection)."""
     return "I have to pretend to be someone I'm not to fit in."
 
 
 @pytest.fixture
-def joy_text():
-    """Text expressing joy"""
+def joy_text() -> str:
+    """Text expressing joy."""
     return "I'm feeling amazing today! Everything is clicking and I feel so alive!"
 
 
 @pytest.fixture
-def anguish_text():
-    """Text expressing anguish (high arousal, negative valence, isolation)"""
+def anguish_text() -> str:
+    """Text expressing anguish (high arousal, negative valence, isolation)."""
     return (
         "I'm in agony and nobody understands what I'm going through. "
         "I'm completely alone in this suffering."

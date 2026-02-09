@@ -278,7 +278,7 @@ This paper was co-created by:
 
 ---
 
-**Last Updated**: December 30, 2025  
-**Version**: 1.0 (First complete draft)  
-**Status**: Content complete, ready for LaTeX conversion  
+**Last Updated**: December 30, 2025
+**Version**: 1.0 (First complete draft)
+**Status**: Content complete, ready for LaTeX conversion
 **Next Milestone**: Generate figures and compile initial PDF

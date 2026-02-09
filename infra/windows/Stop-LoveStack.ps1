@@ -33,10 +33,10 @@ try {
     Write-Host "  L.O.V.E. Stack - Stopping Services" -ForegroundColor Cyan
     Write-Host "═══════════════════════════════════════════════════════════" -ForegroundColor Blue
     Write-Host ""
-    
+
     # Always use Ubuntu-22.04 explicitly
     $distro = "Ubuntu-22.04"
-    
+
     # Check WSL installation
     if (-not (Test-WSLInstalled)) {
         Write-ColoredMessage -Message "WSL is not installed" -Type Error
@@ -44,25 +44,25 @@ try {
         Write-Host "Cannot stop services without WSL." -ForegroundColor Yellow
         exit 1
     }
-    
+
     if (-not (Test-WSLDistributionInstalled)) {
         Write-ColoredMessage -Message "Ubuntu-22.04 distribution not found" -Type Error
         exit 1
     }
-    
+
     # Check if stop script exists
     $stopScript = Join-Path $ScriptDir "stop-love-stack.sh"
-    
+
     if (-not (Test-Path $stopScript)) {
         Write-ColoredMessage -Message "Stop script not found: $stopScript" -Type Error
         exit 1
     }
-    
+
     Write-ColoredMessage -Message "Stopping L.O.V.E. stack APIs..." -Type Info
     Write-Host ""
-    
+
     $wslProjectPath = Convert-WindowsPathToWSL -Path $ProjectRoot
-    
+
     # Run the stop script in WSL with explicit distribution
     $exitCode = 0
     try {
@@ -73,9 +73,9 @@ try {
         Write-ColoredMessage -Message "Stop script execution failed: $_" -Type Error
         exit 1
     }
-    
+
     Write-Host ""
-    
+
     if ($exitCode -eq 0) {
         Write-ColoredMessage -Message "All APIs stopped successfully" -Type Success
         Write-Host ""

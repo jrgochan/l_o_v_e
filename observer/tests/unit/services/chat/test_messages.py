@@ -1,4 +1,4 @@
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from unittest.mock import AsyncMock, MagicMock, patch
 from uuid import uuid4
 
@@ -7,6 +7,7 @@ import pytest
 from app.models.chat_message import ChatMessage
 from app.models.chat_session import ChatSession
 from app.services.chat.messages import MessageManager
+from app.services.chat.types import MessageCreationContext
 
 
 @pytest.fixture
@@ -33,16 +34,18 @@ async def test_save_user_message_with_relationship(manager, mock_db):
     manager.session_manager.get_session.return_value = mock_session
 
     # Mock auto-link engine
-    with patch("app.services.association_engine.get_association_engine") as mock_get_engine:
+    with patch("app.services.memory.association.get_association_engine") as mock_get_engine:
         mock_engine = AsyncMock()
         mock_get_engine.return_value = mock_engine
 
-        msg = await manager.save_user_message(
+        context = MessageCreationContext(
             session_id=session_id,
             content="Reply",
             related_message_id=related_id,
             relationship_type="reply",
+            message_type="user_text",
         )
+        msg = await manager.save_user_message(context)
 
         assert msg.content == "Reply"
         assert manager.session_manager.get_session.called
@@ -59,13 +62,16 @@ async def test_save_user_message_autolink_failure(manager, mock_db):
     session_id = uuid4()
     manager.session_manager.get_session.return_value = ChatSession(id=session_id, message_count=0)
 
-    with patch("app.services.association_engine.get_association_engine") as mock_get_engine:
+    with patch("app.services.memory.association.get_association_engine") as mock_get_engine:
         mock_engine = AsyncMock()
         mock_engine.auto_link.side_effect = Exception("Boom")
         mock_get_engine.return_value = mock_engine
 
         # Should not raise
-        await manager.save_user_message(session_id, "Hello")
+        context = MessageCreationContext(
+            session_id=session_id, content="Hello", message_type="user_text"
+        )
+        await manager.save_user_message(context)
 
 
 @pytest.mark.asyncio
@@ -88,8 +94,8 @@ async def test_get_message_relationships(manager, mock_db):
 @pytest.mark.asyncio
 async def test_get_session_statistics(manager, mock_db):
     sid = uuid4()
-    start = datetime.utcnow() - timedelta(seconds=100)
-    end = datetime.utcnow()
+    start = datetime.now(timezone.utc) - timedelta(seconds=100)
+    end = datetime.now(timezone.utc)
 
     mock_session = ChatSession(id=sid, message_count=10, started_at=start, ended_at=end)
     manager.session_manager.get_session.return_value = mock_session
@@ -182,9 +188,12 @@ async def test_save_user_message_no_relationship(manager, mock_db):
     session_id = uuid4()
     manager.session_manager.get_session.return_value = ChatSession(id=session_id, message_count=0)
 
-    with patch("app.services.association_engine.get_association_engine") as mock_get:
+    with patch("app.services.memory.association.get_association_engine") as mock_get:
         mock_get.return_value = AsyncMock()
-        msg = await manager.save_user_message(session_id, "Hi")
+        context = MessageCreationContext(
+            session_id=session_id, content="Hi", message_type="user_text"
+        )
+        msg = await manager.save_user_message(context)
         assert msg.content == "Hi"
         # Verify NO relationship created
         # mock_db.add called once for message
@@ -196,9 +205,12 @@ async def test_save_user_message_no_session(manager, mock_db):
     session_id = uuid4()
     manager.session_manager.get_session.return_value = None
 
-    with patch("app.services.association_engine.get_association_engine") as mock_get:
+    with patch("app.services.memory.association.get_association_engine") as mock_get:
         mock_get.return_value = AsyncMock()
-        await manager.save_user_message(session_id, "Hi")
+        context = MessageCreationContext(
+            session_id=session_id, content="Hi", message_type="user_text"
+        )
+        await manager.save_user_message(context)
         # Should not crash, just count not incremented
 
 
@@ -251,7 +263,9 @@ async def test_get_session_messages_no_limit(manager, mock_db):
 async def test_get_session_statistics_no_duration(manager, mock_db):
     sid = uuid4()
     # Started but not ended
-    mock_session = ChatSession(id=sid, message_count=0, started_at=datetime.utcnow(), ended_at=None)
+    mock_session = ChatSession(
+        id=sid, message_count=0, started_at=datetime.now(timezone.utc), ended_at=None
+    )
     manager.session_manager.get_session.return_value = mock_session
 
     mock_db.execute.side_effect = [MagicMock(), MagicMock()]  # Empty counts

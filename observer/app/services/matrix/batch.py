@@ -1,3 +1,5 @@
+"""Module documentation."""
+
 import logging
 from datetime import datetime, timezone
 from typing import Any, Dict, Optional
@@ -9,7 +11,8 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.models.emotion_definition import EmotionDefinition
 from app.services.matrix.cache import CacheManager
 from app.services.matrix.jobs import JobManager
-from app.services.path_planner import PathPlanner
+from app.services.planning.core import PathPlanner
+from app.services.planning.types import PathFindingContext
 
 logger = logging.getLogger(__name__)
 
@@ -18,6 +21,7 @@ class BatchProcessor:
     """Handles batch path computation logic."""
 
     def __init__(self, session: AsyncSession):
+        """Docstring."""
         self.session = session
         self.path_planner = PathPlanner(session)
         self.cache_manager = CacheManager(session)
@@ -145,13 +149,14 @@ class BatchProcessor:
         collection_id: Optional[str] = None,
     ) -> Dict[str, Any]:
         """Compute a single path using PathPlanner."""
-        path = await self.path_planner.find_transition_path(
+        path_context = PathFindingContext(
             current_vac=list(from_emotion.vac_vector),
             goal_vac=list(to_emotion.vac_vector),
             max_waypoints=3,
             user_id=user_id,
             collection_id=collection_id,
         )
+        path = await self.path_planner.find_transition_path(path_context)
 
         # Build complete path data
         return {

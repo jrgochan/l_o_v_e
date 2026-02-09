@@ -1,3 +1,6 @@
+# pylint: disable=redefined-outer-name, unused-argument, broad-exception-raised
+# pylint: disable=import-outside-toplevel
+from typing import Any
 from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
@@ -11,7 +14,7 @@ client = TestClient(app)
 
 
 @pytest.fixture
-def mock_ollama():
+def mock_ollama() -> Any:
     with patch.object(ai_models, "OllamaManager", autospec=True) as mock:
         instance = mock.return_value
         # Since autospec creates a mock that matches the class,
@@ -21,7 +24,7 @@ def mock_ollama():
             yield instance
 
 
-def test_list_local_models(mock_ollama):
+def test_list_local_models(mock_ollama: Any) -> None:
     mock_ollama.list_local_models.return_value = [
         ModelInfo(
             name="phi-3:mini",
@@ -41,7 +44,7 @@ def test_list_local_models(mock_ollama):
     assert data[0]["name"] == "phi-3:mini"
 
 
-def test_get_model_details(mock_ollama):
+def test_get_model_details(mock_ollama: Any) -> None:
     mock_ollama.get_model_details.return_value = ModelDetails(
         name="phi-3:mini",
         size=25769803776,
@@ -62,7 +65,7 @@ def test_get_model_details(mock_ollama):
     assert response.json()["estimated_ram_gb"] == 4.0
 
 
-def test_delete_model(mock_ollama):
+def test_delete_model(mock_ollama: Any) -> None:
     mock_ollama.delete_model.return_value = {"status": "success"}
 
     response = client.delete("/listener/ai/models/phi-3:mini")
@@ -70,7 +73,7 @@ def test_delete_model(mock_ollama):
     assert response.json()["result"]["status"] == "success"
 
 
-def test_start_model_pull_error(mock_ollama):
+def test_start_model_pull_error(mock_ollama: Any) -> None:
     # Mocking exceptions: The route calls active_pulls[task_id].
     # We can't easily mock internal dict operations with patch unless we patch the dict.
     # But if we make uuid raise, we catch that.
@@ -81,7 +84,7 @@ def test_start_model_pull_error(mock_ollama):
 
 
 @pytest.mark.asyncio
-async def test_stream_pull_progress_success(mock_ollama):
+async def test_stream_pull_progress_success(mock_ollama: Any) -> None:
     # Use patch.dict on the module attribute directly
     # Note: ai_models was imported from app.api.routes
     task_id = "test-stream-task"
@@ -104,7 +107,7 @@ async def test_stream_pull_progress_success(mock_ollama):
     # success doesn't always have percent, but our code accesses .status
     success_mock.dict.return_value = {"status": "success"}
 
-    async def gen(name):
+    async def gen(name: Any) -> Any:
         yield progress_mock
         yield success_mock
 
@@ -127,14 +130,14 @@ async def test_stream_pull_progress_success(mock_ollama):
 
 
 @pytest.mark.asyncio
-async def test_stream_pull_progress_not_found():
+async def test_stream_pull_progress_not_found() -> None:
     with client.websocket_connect("/listener/ai/models/pull/unknown-task") as websocket:
         data = websocket.receive_json()
         assert "error" in data
 
 
 @pytest.mark.asyncio
-async def test_stream_pull_progress_error(mock_ollama):
+async def test_stream_pull_progress_error(mock_ollama: Any) -> None:
     from app.api.routes.ai_models import active_pulls
 
     task_id = "test-error-task"
@@ -145,9 +148,10 @@ async def test_stream_pull_progress_error(mock_ollama):
     # The code does `async for progress in ollama.pull_model(name):`
     # If pull_model returns a generator, iterating it needs to raise.
 
-    async def error_gen(name):
-        raise Exception("Stream failed")
-        yield  # Unreachable
+    async def error_gen(name: Any) -> Any:
+        if True:  # pylint: disable=using-constant-test
+            raise Exception("Stream failed")
+        yield  # type: ignore[unreachable]
 
     mock_ollama.pull_model = error_gen
 
@@ -158,7 +162,7 @@ async def test_stream_pull_progress_error(mock_ollama):
 
 
 @pytest.mark.asyncio
-async def test_stream_pull_websocket_disconnect_direct(mock_ollama):
+async def test_stream_pull_websocket_disconnect_direct(mock_ollama: Any) -> None:
     """Test disconnect via direct endpoint call."""
     from fastapi import WebSocketDisconnect
 
@@ -187,7 +191,7 @@ async def test_stream_pull_websocket_disconnect_direct(mock_ollama):
 
 
 @pytest.mark.asyncio
-async def test_stream_pull_generic_error_direct(mock_ollama):
+async def test_stream_pull_generic_error_direct(mock_ollama: Any) -> None:
     """Test generic exception in stream_pull_progress."""
     from app.api.routes.ai_models import active_pulls, stream_pull_progress
 
@@ -219,7 +223,7 @@ async def test_stream_pull_generic_error_direct(mock_ollama):
 
 
 @pytest.mark.asyncio
-async def test_stream_pull_disconnect(mock_ollama):
+async def test_stream_pull_disconnect(mock_ollama: Any) -> None:
     """Test WebSocketDisconnect in stream_pull_progress."""
     from fastapi import WebSocketDisconnect
 
@@ -236,7 +240,7 @@ async def test_stream_pull_disconnect(mock_ollama):
 
     # We need pull_model to yield something so it tries to send.
     # Code calls progress.status AND progress.dict().
-    async def mock_pull(model_name):
+    async def mock_pull(model_name: Any) -> Any:
         m = MagicMock()
         m.status = "downloading"
         m.digest = "sha256:123"
@@ -257,7 +261,7 @@ async def test_stream_pull_disconnect(mock_ollama):
 
 
 @pytest.mark.asyncio
-async def test_stream_pull_error_cleanup(mock_ollama):
+async def test_stream_pull_error_cleanup(mock_ollama: Any) -> None:
     """Test cleanup when error occurs after ollama initialization."""
     from app.api.routes.ai_models import active_pulls, stream_pull_progress
 
@@ -288,7 +292,7 @@ async def test_stream_pull_error_cleanup(mock_ollama):
 
 
 @pytest.mark.asyncio
-async def test_stream_pull_accept_error(mock_ollama):
+async def test_stream_pull_accept_error(mock_ollama: Any) -> None:
     """Test generic Exception during websocket.accept."""
     from app.api.routes.ai_models import stream_pull_progress
 
@@ -305,21 +309,21 @@ async def test_stream_pull_accept_error(mock_ollama):
     # Verify cleanup? finally block runs.
 
 
-def test_list_local_models_error(mock_ollama):
+def test_list_local_models_error(mock_ollama: Any) -> None:
     mock_ollama.list_local_models.side_effect = Exception("List failed")
     response = client.get("/listener/ai/models/local")
     assert response.status_code == 500
     assert "List failed" in response.json()["detail"]
 
 
-def test_delete_model_error(mock_ollama):
+def test_delete_model_error(mock_ollama: Any) -> None:
     mock_ollama.delete_model.side_effect = Exception("Delete failed")
     response = client.delete("/listener/ai/models/test-model")
     assert response.status_code == 500
     assert "Delete failed" in response.json()["detail"]
 
 
-def test_check_health_not_running(mock_ollama):
+def test_check_health_not_running(mock_ollama: Any) -> None:
     mock_ollama.health_check.return_value = False
     response = client.get("/listener/ai/models/health")
     assert response.status_code == 200
@@ -327,7 +331,7 @@ def test_check_health_not_running(mock_ollama):
     assert response.json()["ollama"] == "not running"
 
 
-def test_check_health_error(mock_ollama):
+def test_check_health_error(mock_ollama: Any) -> None:
     mock_ollama.health_check.side_effect = Exception("Connection refused")
     response = client.get("/listener/ai/models/health")
     # Health endpoint returns 200 OK with error payload usually, or 500?

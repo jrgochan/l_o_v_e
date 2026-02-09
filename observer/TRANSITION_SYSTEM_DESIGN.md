@@ -135,21 +135,21 @@ Generate an optimal emotional transition path.
 {
   "path_id": "uuid",
   "created_at": "2024-12-04T17:00:00Z",
-  
+
   "current_state": {
     "emotion": "Anxiety",
     "category": "Places We Go When Things Are Uncertain or Too Much",
     "vac": [-0.5, 0.7, -0.4],
     "quaternion": [0.707, -0.353, 0.494, -0.283]
   },
-  
+
   "goal_state": {
     "emotion": "Calm",
     "category": "Places We Go When Life Is Good",
     "vac": [0.5, -0.7, 0.4],
     "quaternion": [0.707, 0.353, -0.494, 0.283]
   },
-  
+
   "waypoints": [
     {
       "order": 1,
@@ -161,7 +161,7 @@ Generate an optimal emotional transition path.
       "estimated_time": "15-30 minutes",
       "difficulty": "moderate",
       "reasoning": "Reducing physiological arousal while maintaining awareness. This is a natural first step for anxiety regulation.",
-      
+
       "strategies": [
         {
           "strategy_id": "uuid",
@@ -214,7 +214,7 @@ Generate an optimal emotional transition path.
       "estimated_time": "30-60 minutes",
       "difficulty": "moderate",
       "reasoning": "Shifting from worry to contentment requires releasing rumination and accepting uncertainty. This is the biggest shift in the path.",
-      
+
       "strategies": [
         {
           "strategy_id": "uuid",
@@ -238,7 +238,7 @@ Generate an optimal emotional transition path.
       ]
     }
   ],
-  
+
   "visualization_data": {
     "full_quaternion_path": [
       [0.707, -0.353, 0.494, -0.283],
@@ -254,7 +254,7 @@ Generate an optimal emotional transition path.
       {"x": 0.5, "y": -0.7, "z": 0.4}
     ]
   },
-  
+
   "path_metrics": {
     "total_distance": 1.89,
     "total_estimated_time": "45-90 minutes",
@@ -262,7 +262,7 @@ Generate an optimal emotional transition path.
     "success_probability": 0.72,
     "requires_external_support": false
   },
-  
+
   "alternatives": [
     {
       "path_id": "uuid",
@@ -272,7 +272,7 @@ Generate an optimal emotional transition path.
       "estimated_time": "60-120 minutes"
     }
   ],
-  
+
   "personalization_notes": [
     "You've successfully completed Anxiety → Calm transitions 3 times before",
     "4-7-8 Breathing has been particularly effective for you",
@@ -498,27 +498,27 @@ class PathPlanner:
     """
     Category-aware emotional transition path planning.
     """
-    
+
     # Category transition difficulty matrix (0-1, higher = harder)
     CATEGORY_TRANSITIONS = {
-        ("Places We Go When Things Are Uncertain or Too Much", 
+        ("Places We Go When Things Are Uncertain or Too Much",
          "Places We Go When Life Is Good"): 0.6,
-        ("Places We Go When We Fall Short", 
+        ("Places We Go When We Fall Short",
          "Places We Go When Life Is Good"): 1.0,
-        ("Places We Go When We Fall Short", 
+        ("Places We Go When We Fall Short",
          "Places We Go With Others"): 0.4,
         # ... complete 13×13 matrix
     }
-    
+
     # Axis importance weights
     VALENCE_WEIGHT = 1.0
     AROUSAL_WEIGHT = 1.2
     CONNECTION_WEIGHT = 1.5
-    
+
     def __init__(self, session: AsyncSession):
         self.session = session
         self.emotion_mapper = EmotionMapper(session)
-    
+
     async def find_transition_path(
         self,
         current_vac: List[float],
@@ -528,22 +528,22 @@ class PathPlanner:
     ) -> "TransitionPath":
         """
         Find optimal path from current to goal emotional state.
-        
+
         Uses category-aware A* search with psychological constraints.
         """
         # 1. Identify current and goal emotions
         current_emotion = await self.emotion_mapper.find_nearest_by_vac_only(current_vac)
         goal_emotion = await self.emotion_mapper.find_nearest_by_vac_only(goal_vac)
-        
+
         # 2. Check if direct transition is valid
         if self._is_direct_transition_valid(current_emotion, goal_emotion):
             return await self._create_direct_path(current_emotion, goal_emotion)
-        
+
         # 3. Get user history for personalization
         user_history = None
         if user_id:
             user_history = await self._get_user_history(user_id)
-        
+
         # 4. Run A* search
         path_emotions = await self._astar_search(
             current_emotion,
@@ -551,10 +551,10 @@ class PathPlanner:
             max_waypoints,
             user_history
         )
-        
+
         # 5. Generate complete path with strategies
         return await self._build_transition_path(path_emotions, user_history)
-    
+
     async def _astar_search(
         self,
         start: AtlasDefinition,
@@ -567,43 +567,43 @@ class PathPlanner:
         """
         open_set = PriorityQueue()
         open_set.put((0, start, [start]))
-        
+
         visited = set()
         best_paths = []
-        
+
         while not open_set.empty() and len(best_paths) < 3:
             current_cost, current, path = open_set.get()
-            
+
             if current.id in visited:
                 continue
-            
+
             visited.add(current.id)
-            
+
             # Goal reached
             if current.category == goal.category:
                 # Refine to exact goal emotion
                 refined_path = await self._refine_to_goal(path, goal)
                 best_paths.append(refined_path)
                 continue
-            
+
             # Pruning: path too long
             if len(path) > max_waypoints + 1:
                 continue
-            
+
             # Expand neighbors
             neighbors = await self._get_valid_neighbors(current, goal)
-            
+
             for neighbor in neighbors:
                 if neighbor.id not in visited:
                     g_cost = self._calculate_g_cost(path, neighbor, user_history)
                     h_cost = self._heuristic_cost(neighbor, goal)
                     f_cost = g_cost + h_cost
-                    
+
                     new_path = path + [neighbor]
                     open_set.put((f_cost, neighbor, new_path))
-        
+
         return best_paths[0] if best_paths else await self._fallback_path(start, goal)
-    
+
     def _calculate_g_cost(
         self,
         path: List[AtlasDefinition],
@@ -614,34 +614,34 @@ class PathPlanner:
         Calculate cost from start to this emotion.
         """
         current = path[-1]
-        
+
         # Base VAC distance
         vac_distance = self._vac_distance(current.vac_vector, next_emotion.vac_vector)
-        
+
         # Category transition difficulty
         category_penalty = self.CATEGORY_TRANSITIONS.get(
             (current.category, next_emotion.category),
             0.5  # default moderate difficulty
         )
-        
+
         # User history bonus
         history_bonus = 0.0
         if user_history:
             transition_key = (current.emotion_name, next_emotion.emotion_name)
             if transition_key in user_history.get('successful_transitions', {}):
                 history_bonus = -0.3  # 30% cost reduction
-        
+
         # Arousal ceiling penalty (don't increase high arousal)
         arousal_penalty = 0.0
         if next_emotion.vac_vector[1] > 0.5 and \
            abs(next_emotion.vac_vector[1]) > abs(current.vac_vector[1]):
             arousal_penalty = 0.5
-        
+
         # Path length penalty (prefer shorter paths)
         length_penalty = len(path) * 0.1
-        
+
         return vac_distance + category_penalty + history_bonus + arousal_penalty + length_penalty
-    
+
     def _heuristic_cost(self, current: AtlasDefinition, goal: AtlasDefinition) -> float:
         """
         Admissible heuristic: Euclidean distance in VAC space.
@@ -649,20 +649,20 @@ class PathPlanner:
         return float(np.linalg.norm(
             np.array(current.vac_vector) - np.array(goal.vac_vector)
         ))
-    
+
     def _vac_distance(self, vac1: List[float], vac2: List[float]) -> float:
         """
         Weighted VAC distance.
         """
         v1, a1, c1 = vac1
         v2, a2, c2 = vac2
-        
+
         return (
             self.VALENCE_WEIGHT * abs(v1 - v2) +
             self.AROUSAL_WEIGHT * abs(a1 - a2) +
             self.CONNECTION_WEIGHT * abs(c1 - c2)
         )
-    
+
     async def _get_valid_neighbors(
         self,
         current: AtlasDefinition,
@@ -670,7 +670,7 @@ class PathPlanner:
     ) -> List[AtlasDefinition]:
         """
         Get emotions that are valid next steps.
-        
+
         Filters by:
         - Category transitions are allowed
         - Not too far in VAC space (< 1.5 units)
@@ -678,21 +678,21 @@ class PathPlanner:
         """
         # Get all emotions in database
         all_emotions = await self._get_all_emotions()
-        
+
         valid_neighbors = []
         for emotion in all_emotions:
             if emotion.id == current.id:
                 continue
-            
+
             # Check category transition is valid
             if not self._is_category_transition_valid(current.category, emotion.category):
                 continue
-            
+
             # Check distance is reasonable
             distance = self._vac_distance(current.vac_vector, emotion.vac_vector)
             if distance > 1.5:
                 continue
-            
+
             # Check we're generally moving toward goal
             current_to_goal = self._vac_distance(current.vac_vector, goal.vac_vector)
             neighbor_to_goal = self._vac_distance(emotion.vac_vector, goal.vac_vector)
@@ -700,9 +700,9 @@ class PathPlanner:
                 # Only allow if this opens a bridge category
                 if not self._is_bridge_category(emotion.category):
                     continue
-            
+
             valid_neighbors.append(emotion)
-        
+
         return valid_neighbors
 ```
 

@@ -16,7 +16,7 @@ export function proxy(request: NextRequest) {
     img-src 'self' blob: data: https:;
     media-src 'self' blob: https:;
     font-src 'self' data: https:;
-    connect-src 'self' ws: wss: http: https:; 
+    connect-src 'self' ws: wss: http: https:;
     object-src 'none';
     base-uri 'self';
     form-action 'self';

@@ -1,8 +1,8 @@
 # Business Value & Competitive Advantages
 
-**Reading Time:** ~15 minutes  
-**Audience:** Executives, investors, business development  
-**Prerequisites:** [Overview](01-executive-summary.md)  
+**Reading Time:** ~15 minutes
+**Audience:** Executives, investors, business development
+**Prerequisites:** [Overview](01-executive-summary.md)
 **Goal:** Understand Observer's business value and market position
 
 ---

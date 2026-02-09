@@ -2,8 +2,8 @@
 
 ## Phased Rollout Plan
 
-**Created**: December 7, 2025  
-**Status**: Planning Phase  
+**Created**: December 7, 2025
+**Status**: Planning Phase
 **Total Estimated Time**: 20-25 hours
 
 ---
@@ -127,7 +127,7 @@
 
 **File**: `observer/app/services/insight_generator.py`
 
-- [ ] Remove hard-coded model  
+- [ ] Remove hard-coded model
 - [ ] Fetch model from assignment service
 - [ ] Add fallback logic
 - [ ] Track performance metrics
@@ -506,5 +506,5 @@ Before full implementation:
 
 ---
 
-**Status**: Detailed plan complete, ready for implementation  
+**Status**: Detailed plan complete, ready for implementation
 **Next**: Create README.md to tie everything together

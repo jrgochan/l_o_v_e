@@ -399,7 +399,7 @@ References:
     - Ambivalence research: Larsen & McGraw (2011). Further evidence for mixed emotions
 """
 
-# pylint: disable=not-callable
+# pylint: disable=not-callable, unsubscriptable-object
 
 from datetime import datetime
 from typing import TYPE_CHECKING, Any, Dict, List, Optional

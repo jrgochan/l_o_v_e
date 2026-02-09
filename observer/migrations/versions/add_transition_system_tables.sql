@@ -190,7 +190,7 @@ CREATE INDEX idx_category_trans_difficulty ON category_transitions(difficulty_sc
 
 -- User success rates by emotion pair
 CREATE OR REPLACE VIEW user_transition_success_rates AS
-SELECT 
+SELECT
     user_id,
     start_emotion_id,
     goal_emotion_id,
@@ -204,7 +204,7 @@ GROUP BY user_id, start_emotion_id, goal_emotion_id;
 
 -- Strategy effectiveness by user
 CREATE OR REPLACE VIEW user_strategy_effectiveness AS
-SELECT 
+SELECT
     sa.strategy_id,
     ts.strategy_name,
     uj.user_id,
@@ -220,7 +220,7 @@ GROUP BY sa.strategy_id, ts.strategy_name, uj.user_id;
 
 -- Overall strategy effectiveness (all users)
 CREATE OR REPLACE VIEW global_strategy_effectiveness AS
-SELECT 
+SELECT
     sa.strategy_id,
     ts.strategy_name,
     ts.strategy_type,
@@ -255,10 +255,10 @@ BEGIN
     WHERE user_id = p_user_id
       AND start_emotion_id = p_start_emotion_id
       AND goal_emotion_id = p_goal_emotion_id;
-    
+
     -- If user has no history, return global average for this transition
     IF v_success_rate IS NULL THEN
-        SELECT 
+        SELECT
             CAST(SUM(CASE WHEN status = 'completed' THEN 1 ELSE 0 END) AS FLOAT) / NULLIF(COUNT(*), 0)
         INTO v_success_rate
         FROM user_journeys
@@ -266,7 +266,7 @@ BEGIN
           AND goal_emotion_id = p_goal_emotion_id
           AND status IN ('completed', 'abandoned');
     END IF;
-    
+
     -- If no one has tried this, return moderate probability
     RETURN COALESCE(v_success_rate, 0.5);
 END;
@@ -284,7 +284,7 @@ CREATE OR REPLACE FUNCTION get_user_top_strategies(
 ) AS $$
 BEGIN
     RETURN QUERY
-    SELECT 
+    SELECT
         use.strategy_id,
         use.strategy_name,
         use.avg_rating,
@@ -328,7 +328,7 @@ BEGIN
     INTO v_total_waypoints, v_reached_waypoints
     FROM journey_waypoints
     WHERE journey_id = NEW.journey_id;
-    
+
     -- If all waypoints reached, mark journey as completed
     IF v_reached_waypoints = v_total_waypoints THEN
         UPDATE user_journeys
@@ -343,7 +343,7 @@ BEGIN
         SET current_waypoint = NEW.waypoint_index
         WHERE id = NEW.journey_id;
     END IF;
-    
+
     RETURN NEW;
 END;
 $$ LANGUAGE plpgsql;

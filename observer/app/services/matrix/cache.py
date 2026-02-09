@@ -1,3 +1,5 @@
+"""Module documentation."""
+
 import hashlib
 import json
 import logging
@@ -16,12 +18,13 @@ class CacheManager:
     """Manages access to the path_matrix_cache."""
 
     def __init__(self, session: AsyncSession):
+        """Docstring."""
         self.session = session
 
     def calculate_vac_hash(self, from_vac: List[float], to_vac: List[float]) -> str:
         """Calculate hash of VAC coordinates for cache invalidation."""
         vac_string = (
-            f"{from_vac[0]},{from_vac[1]},{from_vac[2]}|{to_vac[0]},{to_vac[1]},{to_vac[2]}"
+            f"{from_vac[0]},{from_vac[1]},{from_vac[2]}|" f"{to_vac[0]},{to_vac[1]},{to_vac[2]}"
         )
         return hashlib.sha256(vac_string.encode()).hexdigest()
 
@@ -106,6 +109,7 @@ class CacheManager:
         difficulty_filter: Optional[str] = None,
         requires_bridge_filter: Optional[bool] = None,
         limit: Optional[int] = None,
+        offset: int = 0,
     ) -> List[Dict[str, Any]]:
         """Query cached paths with filtering."""
         query = """
@@ -137,6 +141,10 @@ class CacheManager:
         if limit:
             query += " LIMIT :limit"
             params["limit"] = limit
+
+        if offset:
+            query += " OFFSET :offset"
+            params["offset"] = offset
 
         result = await self.session.execute(text(query), params)
         rows = result.fetchall()
@@ -189,3 +197,10 @@ class CacheManager:
             "bridge_paths": bridges,
             "completion_percentage": 0,  # context dependent (total possible unknown here)
         }
+
+    async def clear_cache(self) -> int:
+        """Clear all cached paths."""
+        stmt = text("DELETE FROM path_matrix_cache")
+        result = await self.session.execute(stmt)
+        await self.session.commit()
+        return int(result.rowcount)  # type: ignore

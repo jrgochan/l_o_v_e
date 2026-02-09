@@ -42,8 +42,8 @@ async def get_collections(db: AsyncSession = Depends(get_db)) -> Dict[str, Any]:
             ],
         }
     except Exception as e:
-        logger.error(f"Failed to fetch collections: {e}", exc_info=True)
-        raise HTTPException(status_code=500, detail=str(e))
+        logger.error("Failed to fetch collections: %s", e, exc_info=True)
+        raise HTTPException(status_code=500, detail=str(e)) from e
 
 
 @router.post("/collections/{collection_id}/activate", tags=["Collections"])
@@ -86,5 +86,5 @@ async def set_active_collection(
         raise
     except Exception as e:
         await db.rollback()
-        logger.error(f"Failed to activate collection: {e}", exc_info=True)
-        raise HTTPException(status_code=500, detail=str(e))
+        logger.error("Failed to activate collection: %s", e, exc_info=True)
+        raise HTTPException(status_code=500, detail=str(e)) from e

@@ -45,7 +45,7 @@ class MyPyFixer:
             True if fix was applied, False if pattern not found
         """
         full_path = self.observer_path / file_path
-        
+
         if not full_path.exists():
             print(f"  ❌ File not found: {file_path}")
             return False
@@ -78,7 +78,7 @@ class MyPyFixer:
                 "app/main.py",
                 "async def root() -> None:",
                 "async def root() -> Dict[str, Any]:",
-                "main.py: Fix root() return type annotation"
+                "main.py: Fix root() return type annotation",
             ),
             # 2. main.py - Remove return from shutdown_event
             (
@@ -94,14 +94,14 @@ class MyPyFixer:
     except Exception as e:
         logger.error(f"Error during shutdown: {e}")
         # No return needed - function is async def -> None""",
-                "main.py: Remove implicit return from shutdown_event"
+                "main.py: Remove implicit return from shutdown_event",
             ),
             # 3. transitions.py - Fix bool assignment
             (
                 "app/api/routes/transitions.py",
                 "        waypoint.reached = 1  # TRUE",
                 "        waypoint.reached = True",
-                "transitions.py: Change int to bool assignment"
+                "transitions.py: Change int to bool assignment",
             ),
         ]
 
@@ -120,13 +120,13 @@ class MyPyFixer:
                 "app/services/embedding_service.py",
                 "from typing import cast, List, Optional, Protocol",
                 "from typing import cast, List, Optional, Protocol, Union",
-                "embedding_service.py: Add Union import"
+                "embedding_service.py: Add Union import",
             ),
             (
                 "app/services/embedding_service.py",
                 "    def __init__(self, provider: Optional[EmbeddingProvider] = None) -> None:",
                 "    def __init__(self, provider: Optional[Union[LocalEmbeddingProvider, OpenAIEmbeddingProvider]] = None) -> None:",
-                "embedding_service.py: Fix provider type annotation"
+                "embedding_service.py: Fix provider type annotation",
             ),
             (
                 "app/services/embedding_service.py",
@@ -150,7 +150,7 @@ class MyPyFixer:
                 self.provider: Union[LocalEmbeddingProvider, OpenAIEmbeddingProvider] = LocalEmbeddingProvider()
         else:
             self.provider = provider""",
-                "embedding_service.py: Add explicit type annotations to provider assignments"
+                "embedding_service.py: Add explicit type annotations to provider assignments",
             ),
         ]
 
@@ -162,7 +162,7 @@ class MyPyFixer:
             "app/api/routes/transitions.py",
             "        # Group by strategy and calculate avg rating\n        strategy_stats = {}",
             "        # Group by strategy and calculate avg rating\n        strategy_stats: Dict[str, Dict[str, Any]] = {}",
-            "transitions.py: Add type annotation to strategy_stats"
+            "transitions.py: Add type annotation to strategy_stats",
         )
 
     def phase_3_variable_reuse(self) -> None:
@@ -188,7 +188,7 @@ class MyPyFixer:
         )
         waypoint_result = await db.execute(waypoint_query_stmt)
         waypoint = waypoint_result.scalar_one_or_none()""",
-            "transitions.py: Rename waypoint_stmt to waypoint_query_stmt"
+            "transitions.py: Rename waypoint_stmt to waypoint_query_stmt",
         )
 
         # transitions.py - Fix stmt reuse at line 557
@@ -202,7 +202,7 @@ class MyPyFixer:
         all_waypoints_stmt = select(JourneyWaypoint).where(JourneyWaypoint.journey_id == journey_id)
         check_result = await db.execute(all_waypoints_stmt)
         all_waypoints = check_result.scalars().all()""",
-            "transitions.py: Rename check_stmt to all_waypoints_stmt"
+            "transitions.py: Rename check_stmt to all_waypoints_stmt",
         )
 
     def phase_4_model_attributes(self) -> None:

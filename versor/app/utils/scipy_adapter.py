@@ -43,7 +43,7 @@ def scipy_to_love(q_array: npt.NDArray[np.float64]) -> "Quaternion":
     Returns:
         Quaternion in L.O.V.E. format
     """
-    from app.core.quaternion import Quaternion
+    from app.core.quaternion import Quaternion  # pylint: disable=import-outside-toplevel
 
     return Quaternion(
         w=float(q_array[3]), x=float(q_array[0]), y=float(q_array[1]), z=float(q_array[2])

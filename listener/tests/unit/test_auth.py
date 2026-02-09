@@ -10,13 +10,13 @@ from app.config import settings
 
 # Disable the autouse fixture for these tests so we hit the real function
 @pytest.fixture(autouse=True)
-def override_auth():
+def override_auth() -> None:
     """No-op override to prevent global mock from interfering."""
     return
 
 
 @pytest.mark.asyncio
-async def test_get_current_user_valid_token():
+async def test_get_current_user_valid_token() -> None:
     """Test get_current_user with valid token."""
     token = jwt.encode(
         {"sub": "test@example.com"}, settings.SECRET_KEY, algorithm=settings.ALGORITHM
@@ -26,7 +26,7 @@ async def test_get_current_user_valid_token():
 
 
 @pytest.mark.asyncio
-async def test_get_current_user_invalid_token():
+async def test_get_current_user_invalid_token() -> None:
     """Test get_current_user with invalid token."""
     with pytest.raises(HTTPException) as exc:
         await get_current_user("invalid.token")
@@ -34,7 +34,7 @@ async def test_get_current_user_invalid_token():
 
 
 @pytest.mark.asyncio
-async def test_get_current_user_expired_token():
+async def test_get_current_user_expired_token() -> None:
     """Test get_current_user with expired token."""
     # Create expired token (future todo: use proper expiry time)
     # For now, just junk signature ensures failure
@@ -43,7 +43,7 @@ async def test_get_current_user_expired_token():
 
 
 @pytest.mark.asyncio
-async def test_get_current_user_missing_sub():
+async def test_get_current_user_missing_sub() -> None:
     """Test get_current_user with token missing 'sub' claim."""
     token = jwt.encode({"other": "claim"}, settings.SECRET_KEY, algorithm=settings.ALGORITHM)
     with pytest.raises(HTTPException) as exc:
@@ -55,7 +55,7 @@ async def test_get_current_user_missing_sub():
 
 
 @pytest.mark.asyncio
-async def test_get_current_user_ws_valid_token():
+async def test_get_current_user_ws_valid_token() -> None:
     """Test get_current_user_ws with valid token."""
     token = jwt.encode(
         {"sub": "test@example.com"}, settings.SECRET_KEY, algorithm=settings.ALGORITHM
@@ -65,7 +65,7 @@ async def test_get_current_user_ws_valid_token():
 
 
 @pytest.mark.asyncio
-async def test_get_current_user_ws_invalid_token():
+async def test_get_current_user_ws_invalid_token() -> None:
     """Test get_current_user_ws with invalid token."""
     with pytest.raises(WebSocketException) as exc:
         await get_current_user_ws("invalid.token")
@@ -73,7 +73,7 @@ async def test_get_current_user_ws_invalid_token():
 
 
 @pytest.mark.asyncio
-async def test_get_current_user_ws_missing_sub():
+async def test_get_current_user_ws_missing_sub() -> None:
     """Test get_current_user_ws with token missing 'sub' claim."""
     token = jwt.encode({"other": "claim"}, settings.SECRET_KEY, algorithm=settings.ALGORITHM)
     with pytest.raises(WebSocketException) as exc:

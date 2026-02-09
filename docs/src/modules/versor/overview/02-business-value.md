@@ -21,8 +21,8 @@ This guide analyzes the business value, ROI, competitive advantages, and strateg
 
 ### Investment Analysis
 
-**Development cost (sunk):** $200k (already complete)  
-**Ongoing cost:** $60k/year (0.3 FTE + infrastructure)  
+**Development cost (sunk):** $200k (already complete)
+**Ongoing cost:** $60k/year (0.3 FTE + infrastructure)
 **3-year total:** $380k
 
 **Value created:**
@@ -50,7 +50,7 @@ This guide analyzes the business value, ROI, competitive advantages, and strateg
 
 **Hypothesis:** Smooth animation justifies 2x pricing.
 
-**Basic tier:** $20/month  
+**Basic tier:** $20/month
 **Premium tier:** $40/month (with Versor-powered visualization)
 
 **Assumptions:**
@@ -95,8 +95,8 @@ This guide analyzes the business value, ROI, competitive advantages, and strateg
 - **Offensive:** $200-500k (licensing potential)
 - **Strategic:** Priceless (market differentiation)
 
-**Filing cost:** $15-25k  
-**Maintenance:** $5k/year  
+**Filing cost:** $15-25k
+**Maintenance:** $5k/year
 **ROI:** 10-20x over patent life
 
 ### Trade Secret Alternative
@@ -212,8 +212,8 @@ This guide analyzes the business value, ROI, competitive advantages, and strateg
 
 **Versor amplifies value of other modules:**
 
-**Listener:** VAC output becomes visualizable  
-**Observer:** Quaternions enable 3D trajectory analysis  
+**Listener:** VAC output becomes visualizable
+**Observer:** Quaternions enable 3D trajectory analysis
 **Experience:** Smooth animation possible
 
 #### Total platform value > sum of parts
@@ -259,8 +259,8 @@ This guide analyzes the business value, ROI, competitive advantages, and strateg
 
 ### Risk Factors
 
-**Technical risks:** Low (well-tested, proven)  
-**Market risks:** Medium (premium tier adoption uncertain)  
+**Technical risks:** Low (well-tested, proven)
+**Market risks:** Medium (premium tier adoption uncertain)
 **Competitive risks:** Low (high barriers to entry)
 
 **Overall risk:** Low-Medium
@@ -301,26 +301,26 @@ This guide analyzes the business value, ROI, competitive advantages, and strateg
 
 ### Alternative 1: No Versor (2D Visualization)
 
-**Cost savings:** $380k over 3 years  
-**Revenue loss:** $500k+ (no premium tier)  
+**Cost savings:** $380k over 3 years
+**Revenue loss:** $500k+ (no premium tier)
 **Net:** -$120k loss
 
 **Conclusion:** Versor pays for itself.
 
 ### Alternative 2: Simpler Math (Euler Angles)
 
-**Cost savings:** $50k (easier to implement)  
-**Quality loss:** Gimbal lock, jerky animation  
-**Revenue loss:** $200k (lower perceived quality)  
+**Cost savings:** $50k (easier to implement)
+**Quality loss:** Gimbal lock, jerky animation
+**Revenue loss:** $200k (lower perceived quality)
 **Net:** -$150k loss
 
 **Conclusion:** Quaternions worth the investment.
 
 ### Alternative 3: External API (e.g., Unity Cloud)
 
-**Cost:** $10k/year licensing  
-**Control loss:** Dependent on third party  
-**Customization loss:** Can't optimize for emotions  
+**Cost:** $10k/year licensing
+**Control loss:** Dependent on third party
+**Customization loss:** Can't optimize for emotions
 **Net:** -$100k+ over 3 years
 
 **Conclusion:** In-house is better.
@@ -393,18 +393,18 @@ This guide analyzes the business value, ROI, competitive advantages, and strateg
 
 **Recommendation:** Yes
 
-**Cost:** $20k  
-**Value:** $200-500k defensive/offensive  
-**Risk:** Low  
+**Cost:** $20k
+**Value:** $200-500k defensive/offensive
+**Risk:** Low
 **Timeline:** 12-18 months
 
 ### Q2: Should we publish research papers?
 
 **Recommendation:** Yes
 
-**Cost:** $10k  
-**Value:** $50-100k indirect (credibility, PR)  
-**Risk:** Minimal  
+**Cost:** $10k
+**Value:** $50-100k indirect (credibility, PR)
+**Risk:** Minimal
 **Timeline:** 6-12 months
 
 ### Q3: Should we expand the Versor team?
@@ -423,12 +423,12 @@ This guide analyzes the business value, ROI, competitive advantages, and strateg
 
 ## Executive Summary
 
-**Investment:** $380k (3 years)  
-**Expected return:** $440k (risk-adjusted)  
-**ROI:** 16% (conservative) to 400% (optimistic)  
-**Risk level:** Low  
-**Strategic value:** High (enables premium tier, clinical use)  
-**Competitive moat:** Strong (quaternions, Connection axis, patents)  
+**Investment:** $380k (3 years)
+**Expected return:** $440k (risk-adjusted)
+**ROI:** 16% (conservative) to 400% (optimistic)
+**Risk level:** Low
+**Strategic value:** High (enables premium tier, clinical use)
+**Competitive moat:** Strong (quaternions, Connection axis, patents)
 
 **Recommendation:** ✅ **Continue current investment, add patent filing**
 
@@ -441,5 +441,5 @@ This guide analyzes the business value, ROI, competitive advantages, and strateg
 
 ---
 
-**Previous:** [← Overview](01-executive-summary.md)  
+**Previous:** [← Overview](01-executive-summary.md)
 **Next:** [Roadmap →](03-roadmap.md)

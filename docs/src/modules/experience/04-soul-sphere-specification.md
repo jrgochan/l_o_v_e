@@ -65,7 +65,7 @@ For devices with weak GPUs, implement a performance check:
 const isLowPowerDevice = () => {
   const gl = GLView.createContextAsync();
   const renderer = gl.getParameter(gl.RENDERER);
-  
+
   // Check for low-end chips
   const lowEndPatterns = ['Adreno 505', 'Mali-T720', 'PowerVR GT7600'];
   return lowEndPatterns.some(pattern => renderer.includes(pattern));
@@ -98,16 +98,16 @@ const material = new ShaderMaterial({
   uniforms: {
     // Time for animation
     uTime: { value: 0.0 },
-    
+
     // VAC Inputs
     uValence: { value: 0.0 },    // -1.0 to 1.0
     uArousal: { value: 0.0 },    // -1.0 to 1.0
     uConnection: { value: 0.0 }, // -1.0 to 1.0
-    
+
     // Color Palette
     uColorNeg: { value: new THREE.Color(0x8B0000) }, // Crimson
     uColorPos: { value: new THREE.Color(0x00FFFF) }, // Cyan
-    
+
     // Camera for Fresnel
     uCameraPosition: { value: new THREE.Vector3() },
   },
@@ -249,16 +249,16 @@ import fragmentShader from '../../shaders/fragment.glsl';
 export const SoulSphere: React.FC = () => {
   const meshRef = useRef<THREE.Mesh>(null);
   const materialRef = useRef<THREE.ShaderMaterial>(null);
-  
+
   // Subscribe to target values from Zustand store
   const targetVAC = useExperienceStore(state => state.targetVAC);
   const targetQuaternion = useExperienceStore(state => state.targetQuaternion);
-  
+
   // Create geometry (memoized to prevent recreation)
   const geometry = useMemo(() => {
     return new THREE.IcosahedronGeometry(1.0, 20);
   }, []);
-  
+
   // Create material
   const material = useMemo(() => {
     return new THREE.ShaderMaterial({
@@ -277,43 +277,43 @@ export const SoulSphere: React.FC = () => {
       side: THREE.DoubleSide,
     });
   }, []);
-  
+
   // Animation loop
   useFrame((state, delta) => {
     if (!meshRef.current || !materialRef.current) return;
-    
+
     // Update time uniform
     materialRef.current.uniforms.uTime.value += delta;
-    
+
     // Update camera position for Fresnel
     materialRef.current.uniforms.uCameraPosition.value.copy(state.camera.position);
-    
+
     // Interpolate VAC values toward target
     const lerpSpeed = delta * 2.0; // Adjust for smoothness
-    
+
     materialRef.current.uniforms.uValence.value = THREE.MathUtils.lerp(
       materialRef.current.uniforms.uValence.value,
       targetVAC[0],
       lerpSpeed
     );
-    
+
     materialRef.current.uniforms.uArousal.value = THREE.MathUtils.lerp(
       materialRef.current.uniforms.uArousal.value,
       targetVAC[1],
       lerpSpeed
     );
-    
+
     materialRef.current.uniforms.uConnection.value = THREE.MathUtils.lerp(
       materialRef.current.uniforms.uConnection.value,
       targetVAC[2],
       lerpSpeed
     );
-    
+
     // SLERP quaternion rotation
     const targetQuat = new THREE.Quaternion(...targetQuaternion);
     meshRef.current.quaternion.slerp(targetQuat, lerpSpeed);
   });
-  
+
   return (
     <mesh ref={meshRef} geometry={geometry} material={material} />
   );
@@ -341,7 +341,7 @@ export default function App() {
       <ambientLight intensity={0.3} />
       <pointLight position={[10, 10, 10]} intensity={0.8} />
       <pointLight position={[-10, -10, -10]} intensity={0.4} color="#8B0000" />
-      
+
       {/* The Soul Sphere */}
       <SoulSphere />
     </Canvas>
@@ -371,14 +371,14 @@ The Soul Sphere requires careful lighting:
 const getDetailLevel = () => {
   const { platform } = Platform;
   const { model } = DeviceInfo;
-  
+
   if (platform === 'ios') {
     // iPhone 11+ can handle high detail
     if (model.includes('iPhone13') || model.includes('iPhone14')) return 20;
     if (model.includes('iPhone11') || model.includes('iPhone12')) return 15;
     return 10; // Older devices
   }
-  
+
   // Android: Conservative defaults
   return 10;
 };

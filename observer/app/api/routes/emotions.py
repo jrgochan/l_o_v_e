@@ -269,14 +269,12 @@ import logging
 from typing import Any, Dict, Optional
 from uuid import UUID
 
-from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, Query
+from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.database import get_db
 from app.models.emotion_definition import EmotionCollection, EmotionDefinition
-from app.services.path_matrix_service import PathMatrixService
-from app.services.recommendation_engine import RecommendationEngine
 
 logger = logging.getLogger(__name__)
 
@@ -349,8 +347,8 @@ async def get_all_emotions(
         }
 
     except Exception as e:
-        logger.error(f"Failed to fetch emotions: {e}", exc_info=True)
-        raise HTTPException(status_code=500, detail=str(e))
+        logger.error("Failed to fetch emotions: %s", e, exc_info=True)
+        raise HTTPException(status_code=500, detail=str(e)) from e
 
 
 @router.get("/categories", tags=["Emotions"])
@@ -379,8 +377,8 @@ async def get_categories(db: AsyncSession = Depends(get_db)) -> Dict[str, Any]:
         }
 
     except Exception as e:
-        logger.error(f"Failed to fetch categories: {e}", exc_info=True)
-        raise HTTPException(status_code=500, detail=str(e))
+        logger.error("Failed to fetch categories: %s", e, exc_info=True)
+        raise HTTPException(status_code=500, detail=str(e)) from e
 
 
 @router.get("/emotions/{emotion_id}", tags=["Emotions"])
@@ -424,8 +422,8 @@ async def get_emotion_by_id(emotion_id: str, db: AsyncSession = Depends(get_db))
     except HTTPException:
         raise
     except Exception as e:
-        logger.error(f"Failed to fetch emotion: {e}", exc_info=True)
-        raise HTTPException(status_code=500, detail=str(e))
+        logger.error("Failed to fetch emotion: %s", e, exc_info=True)
+        raise HTTPException(status_code=500, detail=str(e)) from e
 
 
 @router.get("/search", tags=["Emotions"])
@@ -472,213 +470,5 @@ async def search_emotions(
         }
 
     except Exception as e:
-        logger.error(f"Failed to search emotions: {e}", exc_info=True)
-        raise HTTPException(status_code=500, detail=str(e))
-
-
-@router.post("/compute-all-paths", tags=["Emotions", "Path Matrix"])
-async def compute_all_paths_batch(
-    background_tasks: BackgroundTasks,
-    user_id: Optional[str] = Query(None, description="User ID for personalized paths"),
-    db: AsyncSession = Depends(get_db),
-) -> Dict[str, Any]:
-    """Compute ALL 87×86 = 7,482 emotion-to-emotion transition paths.
-
-    This endpoint starts a background job and returns immediately.
-    Use the returned job_id to poll /observer/computation-status/{job_id} for progress.
-
-    Results are cached in the database for instant retrieval on subsequent requests.
-    """
-    try:
-        service = PathMatrixService(db)
-
-        # Create job record
-        total_paths = 87 * 86  # All possible transitions
-        job_id = await service.create_computation_job(total_paths, created_by=user_id or "admin")
-
-        # Start background computation
-        background_tasks.add_task(service.compute_all_paths_batch, job_id=job_id, user_id=user_id)
-
-        logger.info(f"Started batch path computation job {job_id}")
-
-        return {
-            "job_id": str(job_id),
-            "status": "pending",
-            "total_paths": total_paths,
-            "estimated_time": "8-10 minutes",
-            "message": (
-                "Batch computation started. Poll /observer/computation-status/{job_id} for progress."
-            ),
-        }
-
-    except Exception as e:
-        logger.error(f"Failed to start batch computation: {e}", exc_info=True)
-        raise HTTPException(status_code=500, detail=str(e))
-
-
-@router.get("/computation-status/{job_id}", tags=["Emotions", "Path Matrix"])
-async def get_computation_status(
-    job_id: UUID, db: AsyncSession = Depends(get_db)
-) -> Dict[str, Any]:
-    """Get status of a batch path computation job.
-
-    Returns progress, ETA, and current status.
-    """
-    try:
-        service = PathMatrixService(db)
-        status = await service.get_computation_job_status(job_id)
-
-        if not status:
-            raise HTTPException(status_code=404, detail="Job not found")
-
-        return status
-
-    except HTTPException:
-        raise
-    except Exception as e:
-        logger.error(f"Failed to get job status: {e}", exc_info=True)
-        raise HTTPException(status_code=500, detail=str(e))
-
-
-@router.get("/paths/all", tags=["Emotions", "Path Matrix"])
-async def get_all_cached_paths(
-    difficulty: Optional[str] = Query(
-        None, description="Filter by difficulty: easy, moderate, difficult"
-    ),
-    requires_bridge: Optional[bool] = Query(None, description="Filter by bridge requirement"),
-    limit: Optional[int] = Query(None, description="Maximum results to return"),
-    offset: int = Query(0, description="Pagination offset"),
-    db: AsyncSession = Depends(get_db),
-) -> Dict[str, Any]:
-    """Retrieve all cached paths from the path matrix.
-
-    Returns paths with optional filtering and pagination.
-    First call to /observer/compute-all-paths to populate the cache.
-    """
-    try:
-        service = PathMatrixService(db)
-
-        paths = await service.get_all_cached_paths(
-            difficulty_filter=difficulty,
-            requires_bridge_filter=requires_bridge,
-            limit=limit,
-            offset=offset,
-        )
-
-        # Get cache statistics
-        stats = await service.get_cache_statistics()
-
-        return {
-            "cache_stats": stats,
-            "results": len(paths),
-            "paths": paths,
-            "pagination": {"limit": limit, "offset": offset},
-        }
-
-    except Exception as e:
-        logger.error(f"Failed to retrieve cached paths: {e}", exc_info=True)
-        raise HTTPException(status_code=500, detail=str(e))
-
-
-@router.get("/statistics", tags=["Emotions", "Path Matrix"])
-async def get_path_statistics(db: AsyncSession = Depends(get_db)) -> Dict[str, Any]:
-    """Get comprehensive statistics about the path matrix.
-
-    Returns aggregated metrics including difficulty distribution,
-    distance statistics, bridge usage, and category connectivity.
-    """
-    try:
-        service = PathMatrixService(db)
-        stats = await service.get_cache_statistics()
-
-        return stats
-
-    except Exception as e:
-        logger.error(f"Failed to get statistics: {e}", exc_info=True)
-        raise HTTPException(status_code=500, detail=str(e))
-
-
-@router.delete("/paths/cache", tags=["Emotions", "Path Matrix"])
-async def clear_path_cache(db: AsyncSession = Depends(get_db)) -> Dict[str, Any]:
-    """Clear all cached paths from the path matrix.
-
-    Useful for testing or when VAC coordinates have been updated.
-    """
-    try:
-        service = PathMatrixService(db)
-        deleted_count = await service.clear_cache()
-
-        logger.info(f"Cleared {deleted_count} cached paths")
-
-        return {
-            "success": True,
-            "deleted_count": deleted_count,
-            "message": f"Successfully cleared {deleted_count} cached paths",
-        }
-
-    except Exception as e:
-        logger.error(f"Failed to clear cache: {e}", exc_info=True)
-        raise HTTPException(status_code=500, detail=str(e))
-
-
-@router.get("/recommendations", tags=["Emotions", "Smart Recommendations"])
-async def get_smart_recommendations(
-    context: str = Query("exploration", description="Context: exploration, healing, or growth"),
-    emotion_id: Optional[str] = Query(None, description="Current emotion for similarity search"),
-    selected_ids: Optional[str] = Query(None, description="Comma-separated selected emotion IDs"),
-    limit: int = Query(5, description="Max results per category"),
-    db: AsyncSession = Depends(get_db),
-) -> Dict[str, Any]:
-    """Get intelligent recommendations for emotional exploration.
-
-    Returns:
-    - similar_emotions: Nearest neighbors in VAC space (if emotion_id provided)
-    - curated_journeys: Research-backed therapeutic patterns
-    - problematic_transitions: Hardest paths (exploration context)
-    - complementary_suggestions: Smart suggestions based on selection
-
-    Context options:
-    - exploration: All recommendations including difficult transitions
-    - healing: Focus on therapeutic journeys
-    - growth: Focus on positive development paths
-    """
-    try:
-        engine = RecommendationEngine(db)
-
-        # Parse inputs with better error handling
-        current_emotion_id = None
-        if emotion_id:
-            try:
-                current_emotion_id = UUID(emotion_id)
-            except ValueError:
-                raise HTTPException(
-                    status_code=400, detail=f"Invalid emotion_id UUID: {emotion_id}"
-                )
-
-        selected_emotions = []
-        if selected_ids:
-            try:
-                selected_emotions = [
-                    UUID(sid.strip()) for sid in selected_ids.split(",") if sid.strip()
-                ]
-            except ValueError as e:
-                logger.error(f"Failed to parse selected_ids: {selected_ids}, error: {e}")
-                raise HTTPException(
-                    status_code=400, detail=f"Invalid selected_ids format: {str(e)}"
-                )
-
-        # Get recommendations
-        recommendations = await engine.get_recommendations(
-            context=context,
-            current_emotion_id=current_emotion_id,
-            selected_emotions=selected_emotions,
-            limit=limit,
-        )
-
-        return {"context": context, "recommendations": recommendations}
-
-    except HTTPException:
-        raise
-    except Exception as e:
-        logger.error(f"Failed to get recommendations: {e}", exc_info=True)
-        raise HTTPException(status_code=500, detail=f"Recommendation error: {str(e)}")
+        logger.error("Failed to search emotions: %s", e, exc_info=True)
+        raise HTTPException(status_code=500, detail=str(e)) from e

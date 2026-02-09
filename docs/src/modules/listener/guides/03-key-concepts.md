@@ -1,8 +1,8 @@
 # Key Concepts
 
-**Reading Time:** ~25 minutes  
-**Audience:** New developers  
-**Prerequisites:** [Codebase Tour](02-codebase-tour.md) complete  
+**Reading Time:** ~25 minutes
+**Audience:** New developers
+**Prerequisites:** [Codebase Tour](02-codebase-tour.md) complete
 **Goal:** Understand the VAC model and why it matters
 
 ---
@@ -44,8 +44,8 @@ Consider these two scenarios:
 
 ```python
 # Traditional 2D analysis (WRONG!)
-pity       = {"valence": -0.3, "arousal": -0.1}  
-compassion = {"valence": -0.2, "arousal":  0.0}  
+pity       = {"valence": -0.3, "arousal": -0.1}
+compassion = {"valence": -0.2, "arousal":  0.0}
 
 # Almost identical! 😱
 ```

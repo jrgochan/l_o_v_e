@@ -1,8 +1,8 @@
 # C2: Smart Recommendations Engine - Implementation Plan
 
-**Status:** Starting  
-**Estimated Time:** 4-6 hours (simplified from 6-8)  
-**Priority:** ⭐ HIGH - Discovery and exploration value  
+**Status:** Starting
+**Estimated Time:** 4-6 hours (simplified from 6-8)
+**Priority:** ⭐ HIGH - Discovery and exploration value
 **Date Started:** December 5, 2025
 
 ---
@@ -81,7 +81,7 @@ class RecommendationEngine:
     """
     Intelligent recommendation system for emotional exploration.
     """
-    
+
     async def get_recommendations(
         self,
         context: str = 'exploration',
@@ -90,20 +90,20 @@ class RecommendationEngine:
     ) -> Dict:
         """
         Get personalized recommendations.
-        
+
         Returns:
         - similar_emotions: Nearest neighbors in VAC space
         - complementary_paths: Interesting patterns to explore
         - problematic_transitions: Hardest paths (research opportunities)
         - curated_journeys: Therapeutic patterns (shame healing, etc.)
         """
-        
+
     async def get_similar_emotions(emotion_id, limit=5):
         """
         Find emotions nearest in VAC space.
         Uses database query with euclidean distance.
         """
-        
+
     async def get_complementary_paths(selected_emotions):
         """
         Find paths that form interesting patterns:
@@ -112,13 +112,13 @@ class RecommendationEngine:
         - Bridges (paths using bridge emotions)
         - Contrasts (opposite emotions)
         """
-        
+
     async def get_problematic_transitions():
         """
         Query cached paths, sort by difficulty DESC.
         Return hardest 10 transitions for research.
         """
-        
+
     async def get_curated_journeys():
         """
         Return predefined therapeutic patterns:
@@ -190,7 +190,7 @@ CURATED_JOURNEYS = {
 
 ```sql
 -- Find nearest emotions in VAC space
-SELECT 
+SELECT
     e.id,
     e.emotion_name,
     e.category,
@@ -212,7 +212,7 @@ LIMIT :limit;
 
 ```sql
 -- Find hardest transitions from cache
-SELECT 
+SELECT
     pmc.from_emotion_id,
     pmc.to_emotion_id,
     pmc.distance,
@@ -255,5 +255,5 @@ LIMIT 10;
 
 ---
 
-**Ready to implement!**  
+**Ready to implement!**
 **Starting with:** RecommendationEngine Service

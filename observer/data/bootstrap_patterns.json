@@ -3,11 +3,11 @@
   "version": "1.0",
   "created": "2025-12-05",
   "purpose": "Provide aggregate success patterns, path templates, and contextual recommendations for users without personalized data",
-  
+
   "strategy_effectiveness": {
     "description": "Synthetic aggregate effectiveness ratings based on research and theoretical foundations",
     "note": "These ratings help new users by providing initial recommendations until personalized data accumulates",
-    
+
     "ratings": [
       {
         "strategy_name": "4-7-8 Breathing",
@@ -191,11 +191,11 @@
       }
     ]
   },
-  
+
   "path_templates": {
     "description": "Pre-computed optimal paths for common emotional transitions",
     "note": "These templates provide starting points for path planning until user builds personalized data",
-    
+
     "templates": [
       {
         "from_emotion": "Anxiety",
@@ -380,11 +380,11 @@
       }
     ]
   },
-  
+
   "context_modifiers": {
     "description": "Contextual factors that influence strategy effectiveness",
     "note": "These modifiers adjust recommendations based on situational factors",
-    
+
     "time_of_day": {
       "morning": {
         "energy_boost": 0.2,
@@ -407,7 +407,7 @@
         "avoid_categories": ["High Intensity Somatic", "Social Connection"]
       }
     },
-    
+
     "energy_level": {
       "high": {
         "recommended_categories": ["Somatic/Body-Based", "Creative Expression"],
@@ -423,7 +423,7 @@
         "avoid_strategies": ["Progressive Muscle Relaxation", "Intense Physical Exercise"]
       }
     },
-    
+
     "location": {
       "home": {
         "privacy_level": "high",
@@ -443,7 +443,7 @@
         "avoid_strategies": ["Expressive Writing", "Ecstatic/Expressive Dance"]
       }
     },
-    
+
     "available_time": {
       "5_minutes": {
         "recommended_strategies": ["4-7-8 Breathing", "Box Breathing (4-4-4-4)", "Thank Your Mind", "Self-Soothe with Five Senses"],
@@ -462,7 +462,7 @@
         "note": "Deep work and sustained connection"
       }
     },
-    
+
     "experience_level": {
       "beginner": {
         "difficulty_cap": 2,
@@ -482,10 +482,10 @@
       }
     }
   },
-  
+
   "common_challenges": {
     "description": "Common patterns and their recommended starting points",
-    
+
     "challenges": [
       {
         "challenge_name": "High Anxiety/Stress",
@@ -524,7 +524,7 @@
       }
     ]
   },
-  
+
   "meta": {
     "total_strategy_ratings": 20,
     "total_path_templates": 20,

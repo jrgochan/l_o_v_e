@@ -1,7 +1,7 @@
 # Settings Import/Export Guide
 
-**Created**: December 7, 2025  
-**Feature**: Settings Import/Export & Presets  
+**Created**: December 7, 2025
+**Feature**: Settings Import/Export & Presets
 **Purpose**: Enable settings sharing and configuration management
 
 ---
@@ -204,7 +204,7 @@ The platform includes 4 pre-configured presets:
 
 #### ⚡ **Performance Mode**
 
-**Purpose**: Maximum FPS and battery life  
+**Purpose**: Maximum FPS and battery life
 **Best For**: Low-power devices, extended sessions
 
 **Characteristics:**
@@ -226,7 +226,7 @@ The platform includes 4 pre-configured presets:
 
 #### 🏥 **Clinical Mode**
 
-**Purpose**: Professional therapeutic contexts  
+**Purpose**: Professional therapeutic contexts
 **Best For**: Therapists, clinical researchers
 
 **Characteristics:**
@@ -249,7 +249,7 @@ The platform includes 4 pre-configured presets:
 
 #### ✨ **Demo Mode**
 
-**Purpose**: Presentations and demonstrations  
+**Purpose**: Presentations and demonstrations
 **Best For**: Public demos, marketing, training
 
 **Characteristics:**
@@ -272,7 +272,7 @@ The platform includes 4 pre-configured presets:
 
 #### ♿ **Accessibility Mode**
 
-**Purpose**: Maximum accessibility  
+**Purpose**: Maximum accessibility
 **Best For**: Users with visual or motor impairments
 
 **Characteristics:**
@@ -417,7 +417,7 @@ The system will handle version mismatches gracefully.
 
 #### ❌ "Invalid settings format"
 
-**Cause**: Missing required fields  
+**Cause**: Missing required fields
 **Solution**:
 
 - Ensure file has `version` and `settings` fields
@@ -446,7 +446,7 @@ The system will handle version mismatches gracefully.
 
 #### ❌ "Invalid pathOpacity value"
 
-**Cause**: Value outside 0.0-1.0 range  
+**Cause**: Value outside 0.0-1.0 range
 **Solution**:
 
 - Set between 0.0 (invisible) and 1.0 (opaque)
@@ -464,7 +464,7 @@ The system will handle version mismatches gracefully.
 
 #### ❌ "Invalid emotionSize value"
 
-**Cause**: Value outside 0.5-2.0 range  
+**Cause**: Value outside 0.5-2.0 range
 **Solution**:
 
 - Set between 0.5 (tiny) and 2.0 (huge)
@@ -481,15 +481,15 @@ The system will handle version mismatches gracefully.
 
 #### ⚠️ "Settings version mismatch"
 
-**Cause**: File from different version  
-**Result**: Warning logged, import proceeds  
+**Cause**: File from different version
+**Result**: Warning logged, import proceeds
 **Action**: Usually safe, but review settings afterward
 
 ---
 
 #### ❌ File won't open / No import dialog
 
-**Cause**: Browser security or file type issue  
+**Cause**: Browser security or file type issue
 **Solution**:
 
 - Ensure file has `.json` extension
@@ -646,7 +646,7 @@ const researchPreset = {
 };
 
 // Download
-const blob = new Blob([JSON.stringify(researchPreset, null, 2)], 
+const blob = new Blob([JSON.stringify(researchPreset, null, 2)],
                       { type: 'application/json' });
 const url = URL.createObjectURL(blob);
 const a = document.createElement('a');
@@ -682,28 +682,28 @@ Organizations can distribute settings via:
 
 ## FAQ
 
-**Q: Can I edit the JSON file manually?**  
+**Q: Can I edit the JSON file manually?**
 A: Yes! It's plain JSON. Edit with any text editor, just maintain the schema.
 
-**Q: Are settings encrypted?**  
+**Q: Are settings encrypted?**
 A: No, they're plain JSON. Don't include sensitive data (though current schema has none).
 
-**Q: What happens if I import invalid JSON?**  
+**Q: What happens if I import invalid JSON?**
 A: Import fails gracefully with error message. Current settings unchanged.
 
-**Q: Can I import a file from an older version?**  
+**Q: Can I import a file from an older version?**
 A: Usually yes, with a warning. Future versions aim for backward compatibility.
 
-**Q: Do presets overwrite my custom shortcuts?**  
+**Q: Do presets overwrite my custom shortcuts?**
 A: Yes. Export first if you've customized shortcuts.
 
-**Q: Can I share settings publicly?**  
+**Q: Can I share settings publicly?**
 A: Yes! Network endpoints are configurable, no personal data included.
 
-**Q: What if a setting is missing from imported file?**  
+**Q: What if a setting is missing from imported file?**
 A: Import fails. All settings required for data integrity.
 
-**Q: Can I import during active session?**  
+**Q: Can I import during active session?**
 A: Yes! Atlas updates immediately. 3D scene re-renders with new settings.
 
 ---
@@ -719,6 +719,6 @@ A: Yes! Atlas updates immediately. 3D scene re-renders with new settings.
 
 ---
 
-**Last Updated**: December 7, 2025  
-**Version**: 1.0  
+**Last Updated**: December 7, 2025
+**Version**: 1.0
 **Author**: L.O.V.E. Platform Team

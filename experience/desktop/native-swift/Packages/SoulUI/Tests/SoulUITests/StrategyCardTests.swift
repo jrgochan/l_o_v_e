@@ -5,7 +5,7 @@ import ViewInspector
 @testable import SoulCore
 
 @available(macOS 14, iOS 17, *)
-@MainActor // Fix Concurrency 
+@MainActor // Fix Concurrency
 final class StrategyCardTests: XCTestCase {
 
     func testStrategyCardContent() throws {

@@ -44,7 +44,7 @@ build_service() {
     # Trigger build
     # We must be in the correct directory or pass --from-dir
     # oc start-build expects --from-dir to point to local source
-    
+
     echo "Uploading source from $ROOT_DIR/$dir..."
     # We execute from ROOT_DIR context but specify the subfolder via passing the entire context?
     # Actually, Docker builds expect the build context.
@@ -52,7 +52,7 @@ build_service() {
     # The Containerfile in versor copies `app/` relative to WORKDIR (which is ./).
     # versor/Containerfile says `COPY app/ app/`.
     # So the build context should be `versor/`.
-    
+
     # shellcheck disable=SC2086
     oc start-build "love-$svc_name" --from-dir="$ROOT_DIR/$dir" --follow $oc_build_args
 }

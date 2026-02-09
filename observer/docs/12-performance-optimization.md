@@ -48,8 +48,8 @@ bgwriter_lru_maxpages = 100
 
 ```sql
 -- Build index with optimal parameters
-CREATE INDEX idx_trajectory_embedding_hnsw 
-ON user_trajectory 
+CREATE INDEX idx_trajectory_embedding_hnsw
+ON user_trajectory
 USING hnsw (input_embedding vector_cosine_ops)
 WITH (m = 16, ef_construction = 64);
 
@@ -81,17 +81,17 @@ CREATE TABLE user_trajectory (
 ) PARTITION BY RANGE (timestamp);
 
 -- Monthly partitions
-CREATE TABLE user_trajectory_2025_01 
+CREATE TABLE user_trajectory_2025_01
 PARTITION OF user_trajectory
 FOR VALUES FROM ('2025-01-01') TO ('2025-02-01');
 
-CREATE TABLE user_trajectory_2025_02 
+CREATE TABLE user_trajectory_2025_02
 PARTITION OF user_trajectory
 FOR VALUES FROM ('2025-02-01') TO ('2025-03-01');
 
 -- Indexes on each partition
-CREATE INDEX idx_2025_01_embedding 
-ON user_trajectory_2025_01 
+CREATE INDEX idx_2025_01_embedding
+ON user_trajectory_2025_01
 USING hnsw (input_embedding vector_cosine_ops);
 ```
 
@@ -120,7 +120,7 @@ Look for:
 
 ```sql
 -- Create covering index for history queries
-CREATE INDEX idx_history_covering 
+CREATE INDEX idx_history_covering
 ON user_trajectory(user_id, timestamp DESC)
 INCLUDE (vac_values, quaternion_state);
 
@@ -190,14 +190,14 @@ import aioredis
 async def get_cached_embedding(text: str) -> Optional[List[float]]:
     """Use Redis for distributed caching"""
     key = f"embedding:{hashlib.sha256(text.encode()).hexdigest()}"
-    
+
     cached = await redis.get(key)
     if cached:
         return json.loads(cached)
-    
+
     embedding = await embedding_service.generate_embedding(text)
     await redis.setex(key, 3600, json.dumps(embedding))  # Cache 1 hour
-    
+
     return embedding
 ```
 
@@ -226,7 +226,7 @@ emotion, embedding, previous = await asyncio.gather(
 CREATE EXTENSION pg_stat_statements;
 
 -- View slow queries
-SELECT 
+SELECT
     query,
     calls,
     mean_exec_time,

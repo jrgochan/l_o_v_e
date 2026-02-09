@@ -7,24 +7,24 @@ CREATE TABLE IF NOT EXISTS path_matrix_cache (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     from_emotion_id UUID NOT NULL REFERENCES atlas_definitions(id),
     to_emotion_id UUID NOT NULL REFERENCES atlas_definitions(id),
-    
+
     -- Path data (full JSON response)
     path_data JSONB NOT NULL,
-    
+
     -- Quick-access metrics for querying
     distance FLOAT NOT NULL,
     difficulty VARCHAR(20) NOT NULL CHECK (difficulty IN ('easy', 'moderate', 'difficult')),
     waypoint_count INTEGER NOT NULL DEFAULT 0,
     requires_bridge BOOLEAN NOT NULL DEFAULT FALSE,
     estimated_time VARCHAR(50),
-    
+
     -- Cache management
     computed_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
     vac_hash VARCHAR(64) NOT NULL, -- Hash of VAC coordinates to detect changes
-    
+
     -- Ensure unique paths (each direction stored separately for flexibility)
     UNIQUE (from_emotion_id, to_emotion_id),
-    
+
     -- Prevent self-transitions
     CHECK (from_emotion_id != to_emotion_id)
 );

@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timezone
 from unittest.mock import AsyncMock, MagicMock, patch
 from uuid import uuid4
 
@@ -58,7 +58,7 @@ def test_get_message_thread_success(client, mock_user, mock_chat_service):
         session_id=uuid4(),
         content="Root message",
         message_type="user_text",
-        timestamp=datetime.utcnow(),
+        timestamp=datetime.now(timezone.utc),
     )
     # Mock type property for Pydantic model_validate alias if needed, or rely on mapper
     # Actually, if DisplayMessage expects 'type', and ChatMessage has 'message_type',
@@ -73,7 +73,7 @@ def test_get_message_thread_success(client, mock_user, mock_chat_service):
         session_id=uuid4(),
         content="Reply message",
         message_type="system_insight",
-        timestamp=datetime.utcnow(),
+        timestamp=datetime.now(timezone.utc),
     )
 
     # Mock service return
@@ -86,7 +86,7 @@ def test_get_message_thread_success(client, mock_user, mock_chat_service):
         # We need to ensure authentication works? verify_token dependency?
         # The endpoint depends on get_current_user. We overrode it.
 
-        response = client.get(f"/observer/chat/messages/{message_id}/thread?limit=5")
+        response = client.get(f"/chat/messages/{message_id}/thread?limit=5")
 
         # If schema validation fails due to type vs message_type, status code will be 500
         assert response.status_code == 200
@@ -111,7 +111,7 @@ def test_get_message_thread_empty(client, mock_user, mock_chat_service):
     mock_chat_service.get_message_thread.return_value = []
 
     with patch("app.api.sockets.router.ChatService", return_value=mock_chat_service):
-        response = client.get(f"/observer/chat/messages/{message_id}/thread")
+        response = client.get(f"/chat/messages/{message_id}/thread")
         assert response.status_code == 200
         assert response.json() == []
 

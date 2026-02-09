@@ -383,7 +383,7 @@ alembic current
 - `init-db.sql`: PostgreSQL-level setup (extensions)
   - Run once per database instance
   - Docker entry point for containers
-  
+
 - Alembic migrations: Application schema
   - Version-controlled schema changes
   - Supports rollback and branching

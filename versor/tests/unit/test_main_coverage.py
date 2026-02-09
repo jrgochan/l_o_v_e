@@ -3,7 +3,7 @@ from fastapi.testclient import TestClient
 from app.main import app
 
 
-def test_versor_app_loads():
+def test_versor_app_loads() -> None:
     """Verify versor app instantiates and root endpoint works."""
     with TestClient(app) as client:
         response = client.get("/")
@@ -13,7 +13,7 @@ def test_versor_app_loads():
         assert data["status"] == "operational"
 
 
-def test_versor_health_check():
+def test_versor_health_check() -> None:
     """Verify health endpoint returns dependencies."""
     with TestClient(app) as client:
         response = client.get("/health")

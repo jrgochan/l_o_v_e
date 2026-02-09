@@ -51,8 +51,8 @@ See Also:
 import logging
 from typing import Any, Dict
 
-import structlog
-from asgi_correlation_id import CorrelationIdMiddleware
+import structlog  # pylint: disable=import-error
+from asgi_correlation_id import CorrelationIdMiddleware  # pylint: disable=import-error
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
@@ -70,8 +70,8 @@ try:
     from security import setup_rate_limiting
 except ImportError:
 
-    def setup_rate_limiting(_application):
-        pass
+    def setup_rate_limiting(_application: FastAPI) -> None:
+        """Dummy rate limiting setup for when security module is missing."""
 
 
 # Create FastAPI app

@@ -16,9 +16,9 @@
 
 ## 🎯 Implementation Overview
 
-**Estimated Time**: 5.5-7 hours  
-**Complexity**: Medium-High  
-**Files Modified**: 3-4  
+**Estimated Time**: 5.5-7 hours
+**Complexity**: Medium-High
+**Files Modified**: 3-4
 **Files Created**: 1-2
 
 ### Phases
@@ -46,7 +46,7 @@ Add these new methods to the `InsightGenerator` class:
 def _generate_warm_opening(self, emotion_name: str, valence: float) -> str:
     """Generate empathetic opening with validation."""
     emotion_lower = emotion_name.lower()
-    
+
     # Validation phrase
     if valence < -0.3:
         validation = "and I want you to know that's completely valid"
@@ -54,7 +54,7 @@ def _generate_warm_opening(self, emotion_name: str, valence: float) -> str:
         validation = "and that's wonderful"
     else:
         validation = "and that's meaningful"
-    
+
     # Purpose/context
     if emotion_lower in ['anxiety', 'fear', 'worry']:
         context = "This is your system trying to protect you."
@@ -64,19 +64,19 @@ def _generate_warm_opening(self, emotion_name: str, valence: float) -> str:
         context = "You're experiencing something that lights you up."
     else:
         context = "This emotion is telling you something important."
-    
+
     return f"I sense you're experiencing {emotion_lower} right now, {validation}. {context}"
 
 
 def _generate_voice_observations_warm(self, prosody_data: Dict[str, Any], vac_data: Dict[str, float]) -> List[str]:
     """Generate natural language voice observations."""
     observations = []
-    
+
     energy = prosody_data.get('energy', 0.5)
     pitch = prosody_data.get('pitch_mean', 150)
     rate = prosody_data.get('rate', 4.0)
     variability = prosody_data.get('pitch_std', 20)
-    
+
     # Energy + Pitch combo
     if energy > 0.7 and pitch > 170:
         observations.append("Your voice has a lot of energy and tension")
@@ -86,23 +86,23 @@ def _generate_voice_observations_warm(self, prosody_data: Dict[str, Any], vac_da
         observations.append("Your voice sounds soft, almost fragile")
     elif energy < 0.3:
         observations.append("There's a heaviness in your voice")
-    
+
     # Speech rate
     if rate > 5.0:
         observations.append("You're speaking quickly, which often happens when thoughts are racing")
     elif rate < 3.0:
         observations.append("You're speaking slowly and deliberately, taking your time with words")
-    
+
     # Variability
     if variability > 40:
         observations.append("Your voice is animated with lots of expression")
     elif variability < 15:
         observations.append("Your voice sounds flat or monotone, which can happen when we're overwhelmed")
-    
+
     # Voice quality
     if prosody_data.get('jitter', 0) > 0.02:
         observations.append("There's a tightness in your voice that suggests your body is on alert")
-    
+
     return observations[:4]  # Max 4
 
 
@@ -118,7 +118,7 @@ def _get_emotion_understanding_warm(self, emotion_name: str) -> str:
         "Excitement": "Excitement is your body preparing for something you value - it's anticipation mixed with energy and hope.",
         "Overwhelm": "Overwhelm is your system saying 'this is too much right now.' It's a signal to slow down and simplify."
     }
-    
+
     return EMOTION_UNDERSTANDING.get(
         emotion_name,
         f"{emotion_name} is your emotional system responding to what's happening. It's giving you important information about your needs and values."
@@ -172,7 +172,7 @@ def _generate_reflection_question(self, emotion_name: str, vac_data: Dict[str, f
     arousal = vac_data.get('arousal', 0)
     valence = vac_data.get('valence', 0)
     connection = vac_data.get('connection', 0)
-    
+
     # Pick based on most salient dimension
     if abs(arousal) > max(abs(valence), abs(connection)):
         # Arousal-focused
@@ -216,7 +216,7 @@ def _generate_reflection_question(self, emotion_name: str, vac_data: Dict[str, f
                 "How can you savor this moment?",
                 "What does this tell you about what matters to you?"
             ]
-    
+
     import random
     return random.choice(questions)
 
@@ -226,7 +226,7 @@ def _generate_gentle_suggestion(self, emotion_name: str, vac_data: Dict[str, flo
     arousal = vac_data.get('arousal', 0)
     valence = vac_data.get('valence', 0)
     connection = vac_data.get('connection', 0)
-    
+
     if abs(arousal) > max(abs(valence), abs(connection)):
         # Arousal-focused
         if arousal > 0.5:
@@ -269,7 +269,7 @@ def _generate_gentle_suggestion(self, emotion_name: str, vac_data: Dict[str, flo
                 "Consider what you could do to extend or deepen this positive state",
                 "Try to notice what specifically is creating this"
             ]
-    
+
     import random
     return random.choice(suggestions)
 
@@ -282,11 +282,11 @@ def _generate_gentle_invitations(
 ) -> List[Dict[str, str]]:
     """Generate 2-3 gentle invitations, alternating types."""
     invitations = []
-    
+
     # Odd messages = start with reflection
     # Even messages = start with suggestion
     start_with_reflection = (message_count % 2 == 1)
-    
+
     if start_with_reflection:
         invitations.append({
             "type": "reflection",
@@ -305,14 +305,14 @@ def _generate_gentle_invitations(
             "type": "reflection",
             "text": self._generate_reflection_question(emotion['name'], vac_data)
         })
-    
+
     # Optional third: Add grounding for high arousal
     if vac_data.get('arousal', 0) > 0.7:
         invitations.append({
             "type": "suggestion",
             "text": "You might try placing a hand on your heart and taking three slow breaths"
         })
-    
+
     return invitations
 ```
 
@@ -331,9 +331,9 @@ def _generate_warm_summary(
     message_count: int = 1
 ) -> Dict[str, Any]:
     """Generate structured warm mode insights."""
-    
+
     valence = vac_data.get('valence', 0.0)
-    
+
     # Build structured insights
     structured = {
         "opening": self._generate_warm_opening(emotion['name'], valence),
@@ -345,11 +345,11 @@ def _generate_warm_summary(
         },
         "gentle_invitations": self._generate_gentle_invitations(emotion, vac_data, message_count)
     }
-    
+
     # Add voice observations if available
     if prosody_data:
         structured["voice_observations"] = self._generate_voice_observations_warm(prosody_data, vac_data)
-    
+
     return structured
 ```
 
@@ -369,7 +369,7 @@ def _generate_assessment_summary_clinical(
     """Generate clinical assessment summary."""
     arousal = vac_data['arousal']
     valence = vac_data['valence']
-    
+
     # Arousal state
     if arousal > 0.5:
         arousal_state = "high arousal state"
@@ -377,15 +377,15 @@ def _generate_assessment_summary_clinical(
         arousal_state = "low arousal state"
     else:
         arousal_state = "moderate arousal"
-    
-    # Valence state  
+
+    # Valence state
     if valence > 0.3:
         valence_state = "positive valence"
     elif valence < -0.3:
         valence_state = "negative valence"
     else:
         valence_state = "neutral valence"
-    
+
     return f"Patient presents with {emotion_name} ({confidence:.0%} confidence), {arousal_state} ({arousal:+.2f}), {valence_state} ({valence:+.2f})"
 
 
@@ -396,7 +396,7 @@ def _generate_biomarkers(
 ) -> Dict[str, Any]:
     """Generate structured biomarker data."""
     biomarkers = {"vocal": {}, "emotional": {}}
-    
+
     # Vocal biomarkers
     if prosody_data:
         pitch = prosody_data.get('pitch_mean')
@@ -407,26 +407,26 @@ def _generate_biomarkers(
                 interp, indicator = "Low (depression indicator)", "↓"
             else:
                 interp, indicator = "Normal range", "="
-            
+
             biomarkers["vocal"]["pitch"] = {
                 "value": pitch,
                 "interpretation": interp,
                 "indicator": indicator
             }
-        
+
         # Energy, rate, quality (similar pattern)
         # ... (see spec document for full implementation)
-    
+
     # Emotional biomarkers
     v, a, c = vac_data['valence'], vac_data['arousal'], vac_data['connection']
-    
+
     biomarkers["emotional"]["valence"] = {
         "value": v,
         "clinical_sig": "Significant negative affect" if v < -0.5 else "Mild negative affect" if v < 0 else "Positive affect"
     }
-    
+
     # ... (see spec for full implementation)
-    
+
     return biomarkers
 
 
@@ -440,11 +440,11 @@ def _generate_recommended_interventions(
     """Generate prioritized intervention recommendations."""
     interventions = []
     priority = 1
-    
+
     arousal = vac_data['arousal']
     valence = vac_data['valence']
     emotion_name = emotion['name']
-    
+
     # Priority 1: Address acute distress
     if arousal > 0.7 and valence < -0.3:
         interventions.append({
@@ -456,7 +456,7 @@ def _generate_recommended_interventions(
             "evidence": "Effective for acute anxiety (Bourne, 2015)"
         })
         priority += 1
-    
+
     # Priority 2: Always validate
     interventions.append({
         "priority": priority,
@@ -467,7 +467,7 @@ def _generate_recommended_interventions(
         "evidence": "DBT emotion regulation module (Linehan)"
     })
     priority += 1
-    
+
     # Priority 3: Explore (emotion-specific)
     if emotion_name.lower() in ['anxiety', 'worry', 'fear']:
         interventions.append({
@@ -487,7 +487,7 @@ def _generate_recommended_interventions(
             "script": f"This {emotion_name.lower()} seems to be protecting something important to you. What might that be?",
             "evidence": "ACT values work (Hayes et al.)"
         })
-    
+
     return interventions[:3]  # Max 3
 ```
 
@@ -509,12 +509,12 @@ async def generate_insights(
     multi_emotion_data: Optional[Dict[str, Any]] = None  # NEW
 ) -> Dict[str, Any]:
     """Generate comprehensive insights (now structured)."""
-    
+
     # Get emotion details
     emotion = await self._get_emotion_details(emotion_name, vac_data, use_atlas_mapping)
     if not emotion:
         return self._generate_fallback_insights(emotion_name, vac_data, tone_mode)
-    
+
     # Get message count for alternating logic
     message_count = 1
     if session_id:
@@ -524,7 +524,7 @@ async def generate_insights(
             message_count = session_analytics.emotion_count
         except:
             pass
-    
+
     # Base insights structure
     insights = {
         "mode": tone_mode,
@@ -534,7 +534,7 @@ async def generate_insights(
         "vac": vac_data,
         "confidence": confidence
     }
-    
+
     # Generate mode-specific structured content
     if tone_mode == 'warm':
         warm_structured = self._generate_warm_summary(
@@ -546,17 +546,17 @@ async def generate_insights(
             emotion, vac_data, confidence, prosody_data, reasoning
         )
         insights.update(clinical_structured)
-    
+
     # Get recommendations (already have this)
     # ... existing recommendation code ...
-    
+
     # Add clinical alerts & session analytics (already have this)
     # ... existing code ...
-    
+
     # Generate legacy summary for backwards compatibility
     insights["summary"] = self._generate_legacy_summary(insights, tone_mode)
     insights["guidance"] = insights.get("integrated_guidance") or self._generate_guidance(emotion, vac_data, tone_mode)
-    
+
     return insights
 ```
 
@@ -592,15 +592,15 @@ export function InsightCard({
 }: InsightCardProps) {
   const [isExpanded, setIsExpanded] = useState(true);
   const [showFullContent, setShowFullContent] = useState(false);
-  
+
   // Check if insights are structured
   const isStructured = (insights as any).structured === true;
-  
+
   if (!isStructured) {
     // Fallback for legacy insights
     return <LegacyInsightDisplay insights={insights} toneMode={toneMode} />;
   }
-  
+
   // Render mode-specific card
   if (toneMode === 'warm') {
     return (

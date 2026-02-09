@@ -84,10 +84,10 @@ command_exists() {
 prompt_yes_no() {
     local question="$1"
     local answer
-    
+
     printf "%s (y/n) " "$question"
     read -r answer
-    
+
     case "$answer" in
         [Yy]|[Yy][Ee][Ss])
             return 0
@@ -104,7 +104,7 @@ prompt_yes_no() {
 string_contains() {
     local haystack="$1"
     local needle="$2"
-    
+
     case "$haystack" in
         *"$needle"*)
             return 0
@@ -121,7 +121,7 @@ string_contains() {
 string_starts_with() {
     local string="$1"
     local prefix="$2"
-    
+
     case "$string" in
         "$prefix"*)
             return 0
@@ -138,7 +138,7 @@ string_starts_with() {
 string_ends_with() {
     local string="$1"
     local suffix="$2"
-    
+
     case "$string" in
         *"$suffix")
             return 0
@@ -154,13 +154,13 @@ string_ends_with() {
 # Returns: trimmed string via echo
 trim_string() {
     local string="$1"
-    
+
     # Remove leading whitespace
     string="${string#"${string%%[![:space:]]*}"}"
-    
+
     # Remove trailing whitespace
     string="${string%"${string##*[![:space:]]}"}"
-    
+
     echo "$string"
 }
 
@@ -169,7 +169,7 @@ trim_string() {
 # Returns: absolute path via echo
 get_absolute_path() {
     local path="$1"
-    
+
     if [ -d "$path" ]; then
         (cd "$path" && pwd)
     elif [ -f "$path" ]; then
@@ -194,7 +194,7 @@ is_root() {
 # Returns: 0 if in use, 1 otherwise
 check_port_in_use() {
     local port="$1"
-    
+
     # Try different methods in order of preference
     if command_exists ss; then
         ss -tln | grep -q ":${port} "
@@ -216,14 +216,14 @@ check_port_in_use() {
 kill_process_on_port() {
     local port="$1"
     local sudo_cmd
-    
+
     # Source os-detect if needed
     if command_exists get_sudo; then
         sudo_cmd=$(get_sudo)
     else
         sudo_cmd=""
     fi
-    
+
     if command_exists lsof; then
         local pids
         pids=$(lsof -ti ":${port}" 2>/dev/null)
@@ -249,7 +249,7 @@ wait_for_port() {
     local port="$1"
     local timeout="${2:-30}"
     local count=0
-    
+
     while [ $count -lt "$timeout" ]; do
         if check_port_in_use "$port"; then
             return 0
@@ -257,7 +257,7 @@ wait_for_port() {
         sleep 1
         count=$((count + 1))
     done
-    
+
     return 1
 }
 
@@ -266,7 +266,7 @@ wait_for_port() {
 # Returns: 0 if responding, 1 otherwise
 check_url_responding() {
     local url="$1"
-    
+
     if command_exists curl; then
         curl -s -f "$url" >/dev/null 2>&1
     elif command_exists wget; then
@@ -283,7 +283,7 @@ wait_for_url() {
     local url="$1"
     local timeout="${2:-30}"
     local count=0
-    
+
     while [ $count -lt "$timeout" ]; do
         if check_url_responding "$url"; then
             return 0
@@ -291,7 +291,7 @@ wait_for_url() {
         sleep 1
         count=$((count + 1))
     done
-    
+
     return 1
 }
 
@@ -299,7 +299,7 @@ wait_for_url() {
 # Usage: ensure_directory <path>
 ensure_directory() {
     local dir="$1"
-    
+
     if [ ! -d "$dir" ]; then
         mkdir -p "$dir"
     fi
@@ -309,7 +309,7 @@ ensure_directory() {
 # Usage: backup_file <file>
 backup_file() {
     local file="$1"
-    
+
     if [ -f "$file" ]; then
         local backup
         backup="${file}.backup.$(date +%Y%m%d_%H%M%S)"
@@ -325,26 +325,26 @@ check_python_version() {
     local python_cmd="$1"
     local required_major="$2"
     local required_minor="$3"
-    
+
     if ! command_exists "$python_cmd"; then
         return 1
     fi
-    
+
     local version
     version=$("$python_cmd" --version 2>&1 | grep -oE '[0-9]+\.[0-9]+' | head -1)
-    
+
     if [ -z "$version" ]; then
         return 1
     fi
-    
+
     local major minor
     major=$(echo "$version" | cut -d. -f1)
     minor=$(echo "$version" | cut -d. -f2)
-    
+
     if [ "$major" -eq "$required_major" ] && [ "$minor" -ge "$required_minor" ]; then
         return 0
     fi
-    
+
     return 1
 }
 
@@ -353,14 +353,14 @@ check_python_version() {
 # Returns: python command via echo, or empty if not found
 find_python_312() {
     local python_cmd
-    
+
     for cmd in python3.12 python3 python; do
         if check_python_version "$cmd" 3 12; then
             echo "$cmd"
             return 0
         fi
     done
-    
+
     return 1
 }
 
@@ -369,22 +369,22 @@ find_python_312() {
 # Returns: 0 if version matches, 1 otherwise
 check_node_version() {
     local required_major="$1"
-    
+
     if ! command_exists node; then
         return 1
     fi
-    
+
     local version
     version=$(node --version 2>&1 | grep -oE '[0-9]+' | head -1)
-    
+
     if [ -z "$version" ]; then
         return 1
     fi
-    
+
     if [ "$version" -ge "$required_major" ]; then
         return 0
     fi
-    
+
     return 1
 }
 
@@ -394,7 +394,7 @@ log_message() {
     local message="$1"
     local log_file="${2:-/tmp/love-stack.log}"
     local timestamp
-    
+
     timestamp=$(date '+%Y-%m-%d %H:%M:%S')
     echo "[$timestamp] $message" >> "$log_file"
 }
@@ -412,16 +412,16 @@ is_set() {
 is_file_older_than() {
     local file="$1"
     local days="$2"
-    
+
     if [ ! -f "$file" ]; then
         return 1
     fi
-    
+
     # This is somewhat system-dependent, but works on most Unix-like systems
     local file_age
     local now
     local threshold
-    
+
     if command_exists stat; then
         # Try to get file modification time
         if stat -f %m "$file" >/dev/null 2>&1; then
@@ -431,15 +431,15 @@ is_file_older_than() {
             # GNU stat (Linux)
             file_age=$(stat -c %Y "$file")
         fi
-        
+
         now=$(date +%s)
         threshold=$((days * 86400))
-        
+
         if [ $((now - file_age)) -gt "$threshold" ]; then
             return 0
         fi
     fi
-    
+
     return 1
 }
 
@@ -448,14 +448,14 @@ is_file_older_than() {
 # Returns: script directory via echo
 get_script_dir() {
     local script_path
-    
+
     # Get the directory of the current script
     if [ -n "${BASH_SOURCE[0]}" ]; then
         script_path="${BASH_SOURCE[0]}"
     else
         script_path="$0"
     fi
-    
+
     dirname "$(get_absolute_path "$script_path")"
 }
 
@@ -466,12 +466,12 @@ print_separator() {
     local length="${2:-40}"
     local separator=""
     local i=0
-    
+
     while [ $i -lt "$length" ]; do
         separator="${separator}${char}"
         i=$((i + 1))
     done
-    
+
     echo "$separator"
 }
 
@@ -482,7 +482,7 @@ pluralize() {
     local count="$1"
     local singular="$2"
     local plural="${3:-${singular}s}"
-    
+
     if [ "$count" -eq 1 ]; then
         echo "$singular"
     else

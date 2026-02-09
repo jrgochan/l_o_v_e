@@ -1,8 +1,8 @@
 # Monitoring & Operations
 
-**Reading Time:** ~25 minutes  
-**Audience:** Engineering managers, DevOps, SRE  
-**Prerequisites:** [Architecture Overview](../architecture/00-high-level-overview.md)  
+**Reading Time:** ~25 minutes
+**Audience:** Engineering managers, DevOps, SRE
+**Prerequisites:** [Architecture Overview](../architecture/00-high-level-overview.md)
 **Goal:** Understand how to monitor and operate Observer in production
 
 ---
@@ -139,11 +139,11 @@ paths_computed_total = Counter(
 async def health_check():
     """
     Health check for load balancer.
-    
+
     Returns 200 if healthy, 503 if not.
     """
     health = {"status": "healthy", "checks": {}}
-    
+
     # Database connectivity
     try:
         await db.execute(text("SELECT 1"))
@@ -151,7 +151,7 @@ async def health_check():
     except Exception as e:
         health["checks"]["database"] = "failed"
         health["status"] = "unhealthy"
-    
+
     # Atlas loaded
     try:
         count = await get_atlas_count()
@@ -161,7 +161,7 @@ async def health_check():
     except Exception:
         health["checks"]["atlas"] = "failed"
         health["status"] = "unhealthy"
-    
+
     # Return appropriate status code
     status_code = 200 if health["status"] == "healthy" else 503
     return JSONResponse(content=health, status_code=status_code)
@@ -170,19 +170,19 @@ async def health_check():
 async def readiness_check():
     """
     Readiness check - can accept traffic?
-    
+
     Stricter than health check.
     """
     # All critical components must be ready
     if not await is_database_ready():
         return JSONResponse({"ready": False, "reason": "database"}, 503)
-    
+
     if not await is_atlas_loaded():
         return JSONResponse({"ready": False, "reason": "atlas"}, 503)
-    
+
     if not await is_migration_current():
         return JSONResponse({"ready": False, "reason": "migrations"}, 503)
-    
+
     return {"ready": True}
 ```
 
@@ -190,7 +190,7 @@ async def readiness_check():
 
 ```sql
 -- Connection health
-SELECT 
+SELECT
     count(*) FILTER (WHERE state = 'active') as active,
     count(*) FILTER (WHERE state = 'idle') as idle,
     count(*) FILTER (WHERE state = 'idle in transaction') as idle_in_txn,
@@ -199,7 +199,7 @@ FROM pg_stat_activity
 WHERE datname = 'observer_prod';
 
 -- Replication lag (if using streaming replication)
-SELECT 
+SELECT
     client_addr,
     state,
     pg_wal_lsn_diff(pg_current_wal_lsn(), sent_lsn) AS send_lag,
@@ -207,7 +207,7 @@ SELECT
 FROM pg_stat_replication;
 
 -- Lock monitoring
-SELECT 
+SELECT
     count(*) as lock_count,
     mode
 FROM pg_locks
@@ -309,7 +309,7 @@ import structlog
 logger = structlog.get_logger()
 
 # INFO: Normal operations
-logger.info("state_stored", 
+logger.info("state_stored",
     user_id=user_id,
     emotion=emotion_name,
     elapsed_ms=elapsed
@@ -506,7 +506,7 @@ ANALYZE user_trajectory;
 - Data loss
 - Security breach
 
-**Response time:** Immediate  
+**Response time:** Immediate
 **Escalation:** Page on-call engineer
 
 **P1 (High):**
@@ -515,7 +515,7 @@ ANALYZE user_trajectory;
 - Elevated error rate (> 1%)
 - Single instance down (with redundancy)
 
-**Response time:** 15 minutes  
+**Response time:** 15 minutes
 **Escalation:** Notify team channel
 
 **P2 (Medium):**
@@ -524,7 +524,7 @@ ANALYZE user_trajectory;
 - Connection pool warnings
 - Disk space warnings
 
-**Response time:** 1 hour  
+**Response time:** 1 hour
 **Escalation:** During business hours
 
 ---
@@ -561,15 +561,15 @@ ANALYZE user_trajectory;
 DROP INDEX idx_trajectory_embedding;
 
 -- Rebuild (may take 30+ minutes on large tables)
-CREATE INDEX CONCURRENTLY idx_trajectory_embedding 
-ON user_trajectory 
+CREATE INDEX CONCURRENTLY idx_trajectory_embedding
+ON user_trajectory
 USING hnsw (embedding vector_cosine_ops)
 WITH (m = 16, ef_construction = 64);
 
 -- Verify
 SELECT COUNT(*) FROM user_trajectory;
-EXPLAIN SELECT * FROM user_trajectory 
-ORDER BY embedding <=> '[0.1, ...]'::vector 
+EXPLAIN SELECT * FROM user_trajectory
+ORDER BY embedding <=> '[0.1, ...]'::vector
 LIMIT 10;
 ```
 

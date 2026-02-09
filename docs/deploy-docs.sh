@@ -79,11 +79,11 @@ if [ "$PROVIDER" = "github" ]; then
 elif [ "$PROVIDER" = "gitlab" ]; then
     echo ""
     echo "🚀 Building for GitLab Pages..."
-    
+
     # GitLab Pages expects the site in a 'public' directory
     # Build with custom site_dir
     mkdocs build --clean --site-dir public
-    
+
     echo ""
     echo "✅ Documentation built for GitLab Pages!"
     echo "📁 Output: $SCRIPT_DIR/public/"

@@ -166,7 +166,7 @@ open http://localhost:3000
   "goal_vac": [0.9, 0.7, 0.8]          // Joy
 }
 ```
-**Expected**: 
+**Expected**:
 - System MUST add Vulnerability as waypoint
 - Path through connection-building
 - Self-compassion strategies included
@@ -307,7 +307,7 @@ echo "NEXT_PUBLIC_OBSERVER_URL=http://localhost:8000" > experience/web/.env.loca
 
 ### Weighted Distance Formula
 ```
-distance = 1.0 × |valence1 - valence2| 
+distance = 1.0 × |valence1 - valence2|
          + 1.2 × |arousal1 - arousal2|
          + 1.5 × |connection1 - connection2|
 ```
@@ -343,7 +343,7 @@ distance = 1.0 × |valence1 - valence2|
 This isn't just emotion tracking—it's **guided emotional navigation**:
 
 ✅ **Psychologically Valid** - Respects how emotions actually work
-✅ **Evidence-Based** - Strategies from published research  
+✅ **Evidence-Based** - Strategies from published research
 ✅ **Personalized** - Learns what works for each user
 ✅ **Visual** - See your journey through 3D space
 ✅ **Actionable** - Step-by-step instructions

@@ -221,8 +221,10 @@ Design Decisions:
 
 References:
     - Health check patterns: https://microservices.io/patterns/observability/health-check-api.html
-    - Kubernetes probes: https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/
-    - AWS ALB health: https://docs.aws.amazon.com/elasticloadbalancing/latest/application/target-group-health-checks.html
+    - Kubernetes probes: https://kubernetes.io/docs/tasks/configure-pod-container/
+      configure-liveness-readiness-startup-probes/
+    - AWS ALB health: https://docs.aws.amazon.com/elasticloadbalancing/latest/application/
+      target-group-health-checks.html
     - Atlas model: observer/app/models/atlas_definition.py
 """
 
@@ -316,5 +318,5 @@ async def health_check(db: AsyncSession = Depends(get_db)) -> HealthResponse:
         )
 
     except Exception as e:
-        logger.error(f"Health check failed: {e}")
-        raise HTTPException(status_code=503, detail=f"Service unavailable: {str(e)}")
+        logger.error("Health check failed: %s", e)
+        raise HTTPException(status_code=503, detail=f"Service unavailable: {str(e)}") from e

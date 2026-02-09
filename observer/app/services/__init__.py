@@ -1,14 +1,19 @@
 """Business logic services."""
 
-from app.services.embedding_service import (
+from app.services.ai.embeddings import (
     EmbeddingService,
     LocalEmbeddingProvider,
     OpenAIEmbeddingProvider,
     get_embedding_service,
 )
-from app.services.emotion_mapper import EmotionMapper
-from app.services.metrics_calculator import MetricsCalculator
-from app.services.quaternion_builder import QuaternionBuilder, get_quaternion_builder
+from app.services.analytics.metrics import MetricsCalculator
+from app.services.emotions.mapper import EmotionMapper
+from app.services.math.quaternion_builder import (
+    QuaternionBuilder,
+    get_quaternion_builder,
+)
+from app.services.recommendation.engine import RecommendationEngine
+from app.services.recommendation.strategies import StrategyRecommender
 
 __all__ = [
     # Embedding
@@ -23,4 +28,7 @@ __all__ = [
     "EmotionMapper",
     # Metrics
     "MetricsCalculator",
+    # Recommendation
+    "RecommendationEngine",
+    "StrategyRecommender",
 ]

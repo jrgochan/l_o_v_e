@@ -1,6 +1,6 @@
 # Configuration Reference
 
-**Audience:** DevOps, system administrators, developers  
+**Audience:** DevOps, system administrators, developers
 **Goal:** Complete reference for Observer configuration
 
 ---
@@ -427,7 +427,7 @@ services:
       - ENABLE_WEBSOCKET=true
     depends_on:
       - postgres
-  
+
   postgres:
     image: pgvector/pgvector:pg16
     environment:
@@ -498,14 +498,14 @@ class Settings(BaseSettings):
         if not v.startswith('postgresql'):
             raise ValueError('DATABASE_URL must start with postgresql://')
         return v
-    
+
     # Validate pool size
     @validator('DB_POOL_SIZE')
     def validate_pool_size(cls, v):
         if v < 1 or v > 100:
             raise ValueError('DB_POOL_SIZE must be between 1 and 100')
         return v
-    
+
     # Validate HNSW parameters
     @validator('HNSW_M')
     def validate_hnsw_m(cls, v):

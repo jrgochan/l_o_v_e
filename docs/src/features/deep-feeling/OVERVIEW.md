@@ -33,18 +33,18 @@ CREATE TABLE multi_emotion_analyses (
     message_id UUID REFERENCES chat_messages(id) ON DELETE CASCADE,
     session_id UUID REFERENCES chat_sessions(id) ON DELETE CASCADE,
     deep_feeling_enabled BOOLEAN DEFAULT TRUE,
-    
+
     -- Aggregate state
     aggregate_vac FLOAT[3],  -- weighted VAC blend [valence, arousal, connection]
     complexity_score FLOAT,  -- 0-1, higher = more complex/mixed emotions
     emotional_clarity FLOAT,  -- 0-1, higher = clearer, lower = muddied
-    
+
     -- Temporal pattern
     temporal_pattern VARCHAR(50),  -- 'concurrent', 'sequential', 'emerging'
-    
+
     -- Metadata
     created_at TIMESTAMP DEFAULT NOW(),
-    
+
     -- Indexes
     INDEX idx_multi_emotion_session (session_id),
     INDEX idx_multi_emotion_message (message_id)
@@ -58,19 +58,19 @@ CREATE TABLE detected_emotions (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     analysis_id UUID REFERENCES multi_emotion_analyses(id) ON DELETE CASCADE,
     emotion_id UUID REFERENCES atlas_definitions(id),
-    
+
     -- Detection data
     confidence FLOAT NOT NULL,  -- 0-1
     prominence VARCHAR(20) NOT NULL,  -- 'primary', 'secondary', 'underlying'
     vac FLOAT[3] NOT NULL,  -- VAC coordinates for this emotion
-    
+
     -- Voice-content alignment (from prosody)
     voice_alignment FLOAT,  -- 0-1, how well voice prosody matches this emotion
     voice_interpretation_vac FLOAT[3],  -- VAC from voice-only analysis
-    
+
     -- Metadata
     created_at TIMESTAMP DEFAULT NOW(),
-    
+
     -- Indexes
     INDEX idx_detected_emotion_analysis (analysis_id),
     INDEX idx_detected_emotion_emotion (emotion_id)
@@ -85,18 +85,18 @@ CREATE TABLE emotion_relationships (
     analysis_id UUID REFERENCES multi_emotion_analyses(id) ON DELETE CASCADE,
     emotion_a_id UUID REFERENCES detected_emotions(id) ON DELETE CASCADE,
     emotion_b_id UUID REFERENCES detected_emotions(id) ON DELETE CASCADE,
-    
+
     -- Relationship data
     relationship_type VARCHAR(50) NOT NULL,  -- 'complementary', 'contradictory', 'masking', 'amplifying', 'sequential'
     strength FLOAT,  -- 0-1, relationship strength
     description TEXT,  -- Human-readable explanation
-    
+
     -- Metadata
     created_at TIMESTAMP DEFAULT NOW(),
-    
+
     -- Indexes
     INDEX idx_relationship_analysis (analysis_id),
-    
+
     -- Constraint: can't have relationship with self
     CHECK (emotion_a_id != emotion_b_id)
 );
@@ -109,19 +109,19 @@ CREATE TABLE emotion_goals (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     session_id UUID REFERENCES chat_sessions(id) ON DELETE CASCADE,
     user_id VARCHAR(255) NOT NULL,
-    
+
     -- Goal definition
     goal_emotion_id UUID REFERENCES atlas_definitions(id),
     priority INTEGER DEFAULT 1,  -- if multiple goals, which is most important
     target_date TIMESTAMP,
-    
+
     -- Status
     status VARCHAR(50) DEFAULT 'active',  -- 'active', 'achieved', 'abandoned'
-    
+
     -- Metadata
     created_at TIMESTAMP DEFAULT NOW(),
     updated_at TIMESTAMP DEFAULT NOW(),
-    
+
     -- Indexes
     INDEX idx_emotion_goal_session (session_id),
     INDEX idx_emotion_goal_user (user_id),
@@ -134,7 +134,7 @@ CREATE TABLE emotion_goals (
 #### `chat_sessions` table - add deep_feeling_mode column
 
 ```sql
-ALTER TABLE chat_sessions 
+ALTER TABLE chat_sessions
 ADD COLUMN deep_feeling_mode BOOLEAN DEFAULT FALSE;
 ```
 
@@ -234,11 +234,11 @@ class MultiEmotionAnalysis(BaseModel):
 ```typescript
 export type EmotionProminence = 'primary' | 'secondary' | 'underlying';
 
-export type RelationshipType = 
-  | 'complementary' 
-  | 'contradictory' 
-  | 'masking' 
-  | 'amplifying' 
+export type RelationshipType =
+  | 'complementary'
+  | 'contradictory'
+  | 'masking'
+  | 'amplifying'
   | 'sequential';
 
 export interface DetectedEmotion {

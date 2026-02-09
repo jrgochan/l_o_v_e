@@ -1,8 +1,8 @@
 # Performance Optimization
 
-**Reading Time:** ~30 minutes  
-**Audience:** Senior developers, performance engineers  
-**Prerequisites:** [Prompt Engineering](03-prompt-engineering.md)  
+**Reading Time:** ~30 minutes
+**Audience:** Senior developers, performance engineers
+**Prerequisites:** [Prompt Engineering](03-prompt-engineering.md)
 **Goal:** Optimize Listener performance for production scale
 
 ---
@@ -41,17 +41,17 @@ def timer(name: str):
 
 async def analyze_with_profiling(text: str):
     """Profile each step of the pipeline"""
-    
+
     with timer("Total Pipeline"):
         with timer("Semantic Analysis"):
             emotion = await semantic_analyzer.analyze(text)
-        
+
         with timer("PII Scrubbing"):
             sanitized = pii_scrubber.scrub(text)
-        
+
         with timer("Observer Integration"):
             await observer_client.record_state(...)
-    
+
     return emotion
 ```
 
@@ -120,7 +120,7 @@ nvidia-smi
 ```python
 def optimize_prompt_length():
     """Reduce prompt size while maintaining accuracy"""
-    
+
     # Strategy 1: Consolidate examples
     # From 6 examples → 4 examples (keep critical ones)
     essential_examples = [
@@ -129,11 +129,11 @@ def optimize_prompt_length():
         grief_example,       # Edge case (neg + pos)
         loneliness_example   # Extreme disconnection
     ]
-    
+
     # Strategy 2: Shorten explanations
     # From: "The Connection axis is CRITICAL and novel. It measures..."
     # To: "Connection (+1 to -1): Relational alignment vs. separation"
-    
+
     # Strategy 3: Remove redundancy
     # Combine Role + Task into one section
 ```
@@ -158,38 +158,38 @@ import hashlib
 
 class CachedSemanticAnalyzer(SemanticAnalyzer):
     """Semantic analyzer with result caching"""
-    
+
     def __init__(self, cache_size: int = 256):
         super().__init__()
         self.cache = {}
         self.cache_size = cache_size
         self.hits = 0
         self.misses = 0
-    
+
     async def analyze(self, text: str) -> EmotionalClassification:
         # Generate cache key
         cache_key = hashlib.md5(text.encode()).hexdigest()
-        
+
         # Check cache
         if cache_key in self.cache:
             self.hits += 1
             logger.debug(f"Cache hit! ({self.hits}/{self.hits + self.misses})")
             return self.cache[cache_key]
-        
+
         # Cache miss - perform analysis
         self.misses += 1
         result = await super().analyze(text)
-        
+
         # Store in cache (with size limit)
         if len(self.cache) >= self.cache_size:
             # Evict oldest entry (FIFO)
             oldest_key = next(iter(self.cache))
             del self.cache[oldest_key]
-        
+
         self.cache[cache_key] = result
-        
+
         return result
-    
+
     def get_stats(self):
         """Get cache statistics"""
         total = self.hits + self.misses
@@ -226,25 +226,25 @@ async def analyze_batch(
 ) -> List[EmotionalClassification]:
     """
     Process multiple texts concurrently with controlled parallelism.
-    
+
     Args:
         texts: List of texts to analyze
         max_concurrent: Max number of concurrent LLM calls
-    
+
     Returns:
         List of EmotionalClassification results
     """
     semaphore = asyncio.Semaphore(max_concurrent)
-    
+
     async def bounded_analyze(text: str):
         async with semaphore:
             return await analyzer.analyze(text)
-    
+
     # Execute with bounded concurrency
     results = await asyncio.gather(*[
         bounded_analyze(text) for text in texts
     ])
-    
+
     return results
 
 # Usage
@@ -269,7 +269,7 @@ import httpx
 
 class OptimizedOllamaClient:
     """Ollama client with connection pooling"""
-    
+
     def __init__(self):
         self.client = httpx.AsyncClient(
             base_url="http://localhost:11434",
@@ -280,14 +280,14 @@ class OptimizedOllamaClient:
                 keepalive_expiry=30.0
             )
         )
-    
+
     async def generate(self, prompt: str):
         response = await self.client.post(
             "/api/generate",
             json={"model": "llama3.1:8b", "prompt": prompt}
         )
         return response.json()
-    
+
     async def close(self):
         await self.client.aclose()
 ```
@@ -399,9 +399,9 @@ def check_memory_usage():
     """Monitor memory consumption"""
     process = psutil.Process()
     memory_mb = process.memory_info().rss / 1024 / 1024
-    
+
     logger.info(f"Memory usage: {memory_mb:.1f} MB")
-    
+
     if memory_mb > 4000:  # > 4GB
         logger.warning("High memory usage, triggering garbage collection")
         gc.collect()
@@ -412,15 +412,15 @@ def check_memory_usage():
 ```python
 class LazyTranscriptionService(TranscriptionService):
     """Load Whisper model only when needed"""
-    
+
     def _load_model(self):
         if self._model_loaded:
             return
-        
+
         logger.info("Loading Whisper model...")
         self._model = whisper.load_model(self.model_size)
         self._model_loaded = True
-    
+
     def transcribe(self, audio_path: str):
         self._load_model()  # Lazy loading
         return super().transcribe(audio_path)
@@ -489,13 +489,13 @@ def profile_analysis():
     """Profile semantic analysis"""
     profiler = cProfile.Profile()
     profiler.enable()
-    
+
     # Run analysis
     analyzer = get_semantic_analyzer()
     result = analyzer.analyze_sync("I'm feeling happy!")
-    
+
     profiler.disable()
-    
+
     # Print stats
     stats = pstats.Stats(profiler)
     stats.sort_stats('cumulative')
@@ -514,21 +514,21 @@ def profile_analysis():
 
 ### Vertical Scaling (Bigger Machine)
 
-**Current:** 8-core M1, 16GB RAM  
+**Current:** 8-core M1, 16GB RAM
 **Upgraded:** 16-core, 32GB RAM
 
 **Expected improvement:** ~30-40% (diminishing returns)
 
 ### Horizontal Scaling (More Machines)
 
-**Current:** 1 instance = ~28 req/min  
+**Current:** 1 instance = ~28 req/min
 **Scaled:** 10 instances = ~280 req/min
 
 **Linear scaling!** (stateless service)
 
 ### GPU Scaling
 
-**Current:** CPU inference = ~1.5s  
+**Current:** CPU inference = ~1.5s
 **With GPU:** GPU inference = ~200ms
 
 **7.5x speedup!** (significant)
@@ -605,7 +605,7 @@ from locust import HttpUser, task, between
 
 class ListenerUser(HttpUser):
     wait_time = between(1, 3)
-    
+
     @task(3)  # Weight: 3x more common
     def analyze_text(self):
         self.client.post(
@@ -616,7 +616,7 @@ class ListenerUser(HttpUser):
                 "session_id": "test"
             }
         )
-    
+
     @task(1)  # Weight: 1x
     def analyze_audio(self):
         with open("test_audio.wav", "rb") as f:
@@ -640,12 +640,12 @@ locust -f locustfile.py --host=http://localhost:8002
 
 ## Key Takeaways
 
-✅ **Bottleneck:** LLM inference (~72% of latency)  
-✅ **Quick wins:** Connection pooling, caching, GPU  
-✅ **Scaling:** Horizontal scaling is effective (stateless)  
-✅ **Cost:** $0.000012 per analysis (vs. $0.02 for GPT-4)  
-✅ **GPU impact:** 7.5x speedup  
-✅ **Monitor:** Use Prometheus metrics in production  
+✅ **Bottleneck:** LLM inference (~72% of latency)
+✅ **Quick wins:** Connection pooling, caching, GPU
+✅ **Scaling:** Horizontal scaling is effective (stateless)
+✅ **Cost:** $0.000012 per analysis (vs. $0.02 for GPT-4)
+✅ **GPU impact:** 7.5x speedup
+✅ **Monitor:** Use Prometheus metrics in production
 
 ---
 

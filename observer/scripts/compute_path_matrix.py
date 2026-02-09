@@ -20,16 +20,17 @@ Run after seeding Atlas emotions.
 
 import asyncio
 import sys
-from pathlib import Path
 from datetime import datetime
+from pathlib import Path
 
 # Add parent directory to path
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
+import logging
+import uuid
+
 from app.database import AsyncSessionLocal
 from app.services.path_matrix_service import PathMatrixService
-import uuid
-import logging
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -38,7 +39,7 @@ logger = logging.getLogger(__name__)
 async def compute_matrix(collection_name: str = None):
     """
     Compute all paths in the matrix for the specified collection.
-    
+
     Note: Parallelization is built into PathMatrixService.
     """
     logger.info("=" * 70)
@@ -48,31 +49,35 @@ async def compute_matrix(collection_name: str = None):
     logger.info(f"Computing emotion transition paths")
     logger.info(f"Estimated time: 15-30 minutes")
     logger.info("")
-    
+
     start_time = datetime.now()
-    
+
     async with AsyncSessionLocal() as session:
         # Get collection ID first
         if collection_name:
-            from sqlalchemy import select
             from app.models.emotion_definition import EmotionCollection
-            
-            stmt = select(EmotionCollection).where(EmotionCollection.name == collection_name)
+            from sqlalchemy import select
+
+            stmt = select(EmotionCollection).where(
+                EmotionCollection.name == collection_name
+            )
             result = await session.execute(stmt)
             collection = result.scalar_one_or_none()
-            
+
             if not collection:
                 logger.error(f"Collection '{collection_name}' not found!")
                 return False
-                
+
             collection_id = str(collection.id)
             logger.info(f"Resolved collection ID: {collection_id}")
         else:
             collection_id = None
-            logger.warning("No collection specified - computing for ALL emotions (mixed collections!)")
+            logger.warning(
+                "No collection specified - computing for ALL emotions (mixed collections!)"
+            )
 
         service = PathMatrixService(session)
-        
+
         try:
             # Create a computation job
             job_id = uuid.uuid4()
@@ -80,48 +85,52 @@ async def compute_matrix(collection_name: str = None):
             logger.info("Starting matrix computation...")
             logger.info("Progress will be logged as paths complete")
             logger.info("")
-            
+
             # Start batch computation
             result = await service.compute_all_paths_batch(
-                job_id=job_id,
-                collection_id=collection_id
+                job_id=job_id, collection_id=collection_id
             )
-            
+
             # Report results
             end_time = datetime.now()
             duration = end_time - start_time
-            
+
             logger.info("")
             logger.info("=" * 70)
             logger.info("COMPUTATION COMPLETE")
             logger.info("=" * 70)
-            logger.info(f"Duration: {duration.total_seconds():.1f} seconds ({duration.total_seconds()/60:.1f} min)")
+            logger.info(
+                f"Duration: {duration.total_seconds():.1f} seconds ({duration.total_seconds()/60:.1f} min)"
+            )
             logger.info(f"Paths computed: {result.get('completed_paths', 0)}")
             logger.info(f"Paths failed: {result.get('failed_paths', 0)}")
             logger.info(f"Total paths: {result.get('total_paths', 0)}")
             logger.info("")
-            
-            if result.get('failed_paths', 0) > 0:
+
+            if result.get("failed_paths", 0) > 0:
                 logger.warning(f"Some paths failed - check logs for details")
                 return False
             else:
                 logger.info("✅ All paths computed successfully!")
                 logger.info("API responses will now be milliseconds instead of seconds")
                 return True
-            
+
         except Exception as e:
             logger.error(f"❌ Matrix computation failed: {e}")
             import traceback
+
             traceback.print_exc()
             return False
 
 
 if __name__ == "__main__":
     import argparse
-    
+
     parser = argparse.ArgumentParser(description="Pre-compute path matrix")
-    parser.add_argument('--collection', type=str, help='Name of collection to compute paths for')
-    
+    parser.add_argument(
+        "--collection", type=str, help="Name of collection to compute paths for"
+    )
+
     args = parser.parse_args()
 
     try:

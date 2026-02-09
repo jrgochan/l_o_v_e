@@ -1,8 +1,8 @@
 # Team Structure
 
-**Reading Time:** ~15 minutes  
-**Audience:** Engineering managers, hiring managers  
-**Prerequisites:** [Architecture Overview](../architecture/00-high-level-overview.md)  
+**Reading Time:** ~15 minutes
+**Audience:** Engineering managers, hiring managers
+**Prerequisites:** [Architecture Overview](../architecture/00-high-level-overview.md)
 **Goal:** Understand recommended team structure and skills for Observer
 
 ---

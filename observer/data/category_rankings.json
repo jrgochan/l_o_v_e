@@ -3,7 +3,7 @@
   "version": "1.0",
   "created": "2025-12-05",
   "methodology": "Rankings based on: 1) Psychological appropriateness for category, 2) Evidence-based effectiveness, 3) Time to effect, 4) Accessibility/ease of use, 5) Safety profile. Ratings on 5-point scale.",
-  
+
   "category_rankings": [
     {
       "category": "Places We Go When Things Are Uncertain or Too Much",
@@ -615,7 +615,7 @@
       ]
     }
   ],
-  
+
   "implementation_notes": {
     "how_to_use": "When recommending strategies for a transition, first identify the SOURCE category, then consult category_rankings for that category. Prioritize top-ranked strategies but consider user history and context.",
     "rating_scale": "1-5 scale where 5 is most effective. Based on evidence, clinical experience, accessibility, and time-to-effect.",
@@ -623,7 +623,7 @@
     "context_matters": "Time available, privacy, energy level, support availability all affect which strategy is best in moment.",
     "multiple_strategies": "Often combining strategies works best: breathing (physiological) + cognitive reappraisal (mental) + connection (social)."
   },
-  
+
   "meta": {
     "categories_ranked": 8,
     "categories_remaining": 5,

@@ -1,8 +1,8 @@
 # Deep Dive Architecture
 
-**Reading Time:** ~45 minutes  
-**Audience:** Senior developers, architects  
-**Prerequisites:** Strong Python, FastAPI, LLM experience  
+**Reading Time:** ~45 minutes
+**Audience:** Senior developers, architects
+**Prerequisites:** Strong Python, FastAPI, LLM experience
 **Goal:** Master the Listener's technical architecture
 
 ---
@@ -17,18 +17,18 @@ graph TB
     B --> C{Endpoint Type}
     C -->|Sync| D[Direct Processing]
     C -->|Async| E[Arq Job Queue]
-    
+
     D --> F[Transcription Service]
     E --> G[Arq Worker]
     G --> F
-    
+
     F --> H[Semantic Analyzer]
     H --> I[Ollama LLM]
     I --> J[Pydantic Validation]
     J --> K[PII Scrubber]
     K --> L[Observer Integration]
     L --> M[Response]
-    
+
     style H fill:#4f46e5,color:#fff
     style I fill:#6366f1,color:#fff
     style J fill:#818cf8,color:#fff
@@ -87,7 +87,7 @@ class SemanticAnalyzer:
         self.llm = self._create_llm()
         self.prompt = self._create_prompt()
         self.parser = self._create_parser()
-    
+
     def _create_llm(self) -> Ollama:
         """Factory method for LLM creation"""
         return Ollama(
@@ -96,13 +96,13 @@ class SemanticAnalyzer:
             base_url=self.base_url,
             format="json"  # Critical: Request structured output
         )
-    
+
     def _create_prompt(self) -> ChatPromptTemplate:
         """Template method for prompt engineering"""
         # Few-shot examples teaching Connection axis
         # This is THE critical component
         ...
-    
+
     async def analyze(self, text: str) -> EmotionalClassification:
         """Main pipeline method"""
         # 1. Format prompt with input
@@ -217,7 +217,7 @@ class EmotionalClassification(BaseModel):
     vac: VACVector
     confidence: float = Field(ge=0.0, le=1.0)
     reasoning: str
-    
+
     class Config:
         json_schema_extra = {
             "example": {
@@ -253,9 +253,9 @@ class WorkerSettings:
         port=settings.REDIS_PORT,
         database=settings.REDIS_DB
     )
-    
+
     functions = [process_audio]  # Register async functions
-    
+
     max_jobs = 10  # Concurrent job limit
     job_timeout = 300  # 5 minutes max per job
 
@@ -291,7 +291,7 @@ sequenceDiagram
     participant S as SemanticAnalyzer
     participant O as Ollama
     participant P as PIIScrubber
-    
+
     C->>F: POST /listener/analyze
     F->>S: analyze(text)
     S->>O: LLM inference
@@ -316,18 +316,18 @@ sequenceDiagram
     participant R as Redis
     participant W as Arq Worker
     participant S as Services
-    
+
     C->>F: POST /listener/ingest
     F->>R: enqueue_job()
     R-->>F: job_id
     F-->>C: {"job_id": "abc123"}
-    
+
     Note over W,S: Background processing
     W->>R: dequeue_job()
     W->>S: process_audio()
     S-->>W: result
     W->>R: store_result()
-    
+
     C->>F: GET /listener/status/abc123
     F->>R: get_result()
     R-->>F: result
@@ -385,20 +385,20 @@ async def analyze(self, text: str) -> EmotionalClassification:
         # Attempt analysis
         response = await self.llm.ainvoke(prompt_str)
         result = json.loads(cleaned_response)
-        
+
         # Validate
         return EmotionalClassification(**result)
-        
+
     except json.JSONDecodeError:
         # LLM returned invalid JSON
         logger.error("Invalid JSON from LLM")
         return self._fallback_analysis(text)
-    
+
     except ValidationError:
         # VAC values out of range
         logger.error("Validation failed, clamping values")
         return self._clamp_and_retry(result)
-    
+
     except Exception as e:
         # Unknown error
         logger.exception("Analysis failed")
@@ -430,23 +430,23 @@ async def analyze_with_retry(self, text: str):
 ```python
 class PIIScrubber:
     """Remove personally identifiable information"""
-    
+
     def __init__(self):
         self.nlp = spacy.load("en_core_web_sm")
-    
+
     def scrub(self, text: str) -> str:
         """Replace PII with placeholders"""
         doc = self.nlp(text)
-        
+
         replacements = []
         for ent in doc.ents:
             if ent.label_ in ["PERSON", "ORG", "GPE", "DATE", "PHONE"]:
                 replacements.append((ent.start_char, ent.end_char, f"[{ent.label_}]"))
-        
+
         # Apply replacements in reverse order
         for start, end, placeholder in sorted(replacements, reverse=True):
             text = text[:start] + placeholder + text[end:]
-        
+
         return text
 ```
 
@@ -489,14 +489,14 @@ class PIIScrubber:
 def test_pity_vs_compassion():
     """
     THE TEST THAT VALIDATES THE INNOVATION
-    
+
     If this fails, the Connection axis doesn't work.
     """
     analyzer = get_semantic_analyzer()
-    
+
     pity = analyzer.analyze_sync("I feel sorry for them")
     assert pity.vac.connection < 0, "Pity = separation"
-    
+
     compassion = analyzer.analyze_sync("I feel with them")
     assert compassion.vac.connection > 0.5, "Compassion = connection"
 ```
@@ -522,12 +522,12 @@ services:
     depends_on:
       - redis
       - ollama
-  
+
   redis:
     image: redis:7-alpine
     ports:
       - "6379:6379"
-  
+
   ollama:
     image: ollama/ollama
     ports:
@@ -615,7 +615,7 @@ async def readiness_check():
         "redis": await check_redis(),
         "observer": await check_observer()
     }
-    
+
     if all(checks.values()):
         return {"status": "ready", "checks": checks}
     else:
@@ -634,20 +634,20 @@ async def readiness_check():
 ```python
 class EnsembleAnalyzer:
     """Use multiple models and aggregate results"""
-    
+
     def __init__(self):
         self.models = [
             SemanticAnalyzer(model="llama3.1:8b"),
             SemanticAnalyzer(model="phi-3:medium"),
             SemanticAnalyzer(model="mistral:7b")
         ]
-    
+
     async def analyze(self, text: str):
         # Run all models in parallel
         results = await asyncio.gather(*[
             model.analyze(text) for model in self.models
         ])
-        
+
         # Aggregate (median or weighted average)
         return self._aggregate(results)
 ```
@@ -657,7 +657,7 @@ class EnsembleAnalyzer:
 ```python
 def select_model(text: str, latency_budget: float) -> str:
     """Choose model based on input and constraints"""
-    
+
     if latency_budget < 1.0:
         return "phi-3:mini"  # Fast
     elif len(text) > 1000:
@@ -680,13 +680,13 @@ async def analyze_stream(text: str):
 
 ## Key Takeaways
 
-✅ **Architecture:** Stateless, async-first microservice  
-✅ **LLM Integration:** Local Ollama for privacy + control  
-✅ **Prompt Engineering:** Few-shot learning teaches Connection axis  
-✅ **Validation:** Pydantic ensures type safety  
-✅ **Performance:** ~2s total pipeline (within target)  
-✅ **Testing:** Sacred test validates core innovation  
-✅ **Deployment:** Docker + Kubernetes ready  
+✅ **Architecture:** Stateless, async-first microservice
+✅ **LLM Integration:** Local Ollama for privacy + control
+✅ **Prompt Engineering:** Few-shot learning teaches Connection axis
+✅ **Validation:** Pydantic ensures type safety
+✅ **Performance:** ~2s total pipeline (within target)
+✅ **Testing:** Sacred test validates core innovation
+✅ **Deployment:** Docker + Kubernetes ready
 
 ---
 

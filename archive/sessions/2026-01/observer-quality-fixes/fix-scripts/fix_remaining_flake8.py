@@ -5,7 +5,6 @@ import re
 from pathlib import Path
 from typing import List, Tuple
 
-
 # Map of file -> list of (line_num, variable_name) for undefined names
 UNDEFINED_VARS = {
     "app/api/routes/chat_websocket.py": [
@@ -70,55 +69,55 @@ UNUSED_LOCALS = {
 
 def fix_undefined_vars(filepath: Path, vars_list: List[Tuple[int, str]]) -> int:
     """Fix undefined variable errors by adding exception variable."""
-    with open(filepath, 'r', encoding='utf-8') as f:
+    with open(filepath, "r", encoding="utf-8") as f:
         lines = f.readlines()
-    
+
     # Group by line number
     by_line = {}
     for line_num, var_name in vars_list:
         if line_num not in by_line:
             by_line[line_num] = []
         by_line[line_num].append(var_name)
-    
+
     fixes = 0
-    
+
     # For each line with undefined vars, find the except block above it
     for line_num in by_line:
         var_names = by_line[line_num]
-        
+
         # Search backwards for the except statement
         for i in range(line_num - 2, max(0, line_num - 50), -1):
             line = lines[i]
-            if 'except' in line and ':' in line and ' as ' not in line:
+            if "except" in line and ":" in line and " as " not in line:
                 # Found an except without 'as'
                 # Add the appropriate variable name
                 var_name = var_names[0]  # Use first var name
-                lines[i] = re.sub(r'(except\s+\w+):', rf'\1 as {var_name}:', line)
+                lines[i] = re.sub(r"(except\s+\w+):", rf"\1 as {var_name}:", line)
                 fixes += 1
                 break
-    
+
     if fixes > 0:
-        with open(filepath, 'w', encoding='utf-8') as f:
+        with open(filepath, "w", encoding="utf-8") as f:
             f.writelines(lines)
-    
+
     return fixes
 
 
 def fix_unused_imports(filepath: Path, imports_list: List[Tuple[int, str]]) -> int:
     """Remove unused imports."""
-    with open(filepath, 'r', encoding='utf-8') as f:
+    with open(filepath, "r", encoding="utf-8") as f:
         lines = f.readlines()
-    
+
     fixes = 0
     new_lines = []
-    
+
     # Group by line number
     by_line = {}
     for line_num, import_name in imports_list:
         if line_num not in by_line:
             by_line[line_num] = []
         by_line[line_num].append(import_name)
-    
+
     for i, line in enumerate(lines, start=1):
         if i in by_line:
             # Remove imports from this line
@@ -135,26 +134,26 @@ def fix_unused_imports(filepath: Path, imports_list: List[Tuple[int, str]]) -> i
                     # Entire line is just this import - skip it
                     modified_line = ""
                     fixes += 1
-            
+
             if modified_line:
                 new_lines.append(modified_line)
         else:
             new_lines.append(line)
-    
+
     if fixes > 0:
-        with open(filepath, 'w', encoding='utf-8') as f:
+        with open(filepath, "w", encoding="utf-8") as f:
             f.writelines(new_lines)
-    
+
     return fixes
 
 
 def fix_unused_locals(filepath: Path, locals_list: List[Tuple[int, str]]) -> int:
     """Fix unused local variables by prefixing with _."""
-    with open(filepath, 'r', encoding='utf-8') as f:
+    with open(filepath, "r", encoding="utf-8") as f:
         lines = f.readlines()
-    
+
     fixes = 0
-    
+
     for line_num, var_name in locals_list:
         if line_num <= len(lines):
             line = lines[line_num - 1]
@@ -162,11 +161,11 @@ def fix_unused_locals(filepath: Path, locals_list: List[Tuple[int, str]]) -> int
             if f"{var_name} =" in line:
                 lines[line_num - 1] = line.replace(f"{var_name} =", f"_{var_name} =")
                 fixes += 1
-    
+
     if fixes > 0:
-        with open(filepath, 'w', encoding='utf-8') as f:
+        with open(filepath, "w", encoding="utf-8") as f:
             f.writelines(lines)
-    
+
     return fixes
 
 
@@ -174,9 +173,9 @@ def main():
     """Fix all remaining flake8 issues."""
     print("🔧 Fixing Remaining Flake8 Issues")
     print("=" * 60)
-    
+
     total_fixes = 0
-    
+
     # Fix undefined variables
     print("\n📍 Fixing undefined variables...")
     for filepath_str, vars_list in UNDEFINED_VARS.items():
@@ -186,7 +185,7 @@ def main():
             if fixes > 0:
                 total_fixes += fixes
                 print(f"  ✓ {filepath}: {fixes} exception handlers fixed")
-    
+
     # Fix unused imports
     print("\n📦 Removing unused imports...")
     for filepath_str, imports_list in UNUSED_IMPORTS.items():
@@ -196,7 +195,7 @@ def main():
             if fixes > 0:
                 total_fixes += fixes
                 print(f"  ✓ {filepath}: {fixes} imports removed")
-    
+
     # Fix unused locals
     print("\n🔤 Fixing unused local variables...")
     for filepath_str, locals_list in UNUSED_LOCALS.items():
@@ -206,7 +205,7 @@ def main():
             if fixes > 0:
                 total_fixes += fixes
                 print(f"  ✓ {filepath}: {fixes} variables prefixed with _")
-    
+
     print(f"\n{'=' * 60}")
     print(f"Total fixes: {total_fixes}")
     print(f"{'=' * 60}")
@@ -214,5 +213,5 @@ def main():
     print("   will need manual refactoring (coming next!)")
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

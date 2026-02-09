@@ -71,7 +71,7 @@ Example:
 # Configure structured logging
 import logging
 
-from asgi_correlation_id import CorrelationIdMiddleware
+from asgi_correlation_id import CorrelationIdMiddleware  # pylint: disable=import-error
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
@@ -85,8 +85,8 @@ try:
     from security import setup_rate_limiting
 except ImportError:
 
-    def setup_rate_limiting(app):
-        pass
+    def setup_rate_limiting(_app: FastAPI) -> None:
+        """Dummy rate limiting setup for when security module is missing."""
 
 
 # ═══════════════════════════════════════════════════════════════════════
@@ -224,8 +224,8 @@ async def health() -> dict[str, str | dict[str, str]]:
     #
     # If these imports fail, the endpoint will return 500 Internal Server Error,
     # which correctly indicates the service is unhealthy.
-    import numpy as np
-    import scipy
+    import numpy as np  # pylint: disable=import-outside-toplevel
+    import scipy  # pylint: disable=import-outside-toplevel
 
     # ═══════════════════════════════════════════════════════════════════════
     # HEALTH STATUS RESPONSE

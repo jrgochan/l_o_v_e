@@ -1,7 +1,7 @@
 # Power User Keyboard Workflows
 
-**Date:** December 7, 2025  
-**Status:** 🌟 Vision Document  
+**Date:** December 7, 2025
+**Status:** 🌟 Vision Document
 **Theme:** Complete keyboard-only workflows for expert users
 
 ---
@@ -56,7 +56,7 @@ CMD+K → "/session start"           (Start session)
 Enter                               (Confirm)
 CMD+K → "anxiety"                  (Current state)
 ⌥+Enter                             (Focus camera)
-CMD+K → "calm"                     (Goal state)  
+CMD+K → "calm"                     (Goal state)
 ⌘+Enter                             (Add to selection)
 CMD+K → "bridge"                   (Show bridge emotions)
 Enter                               (View bridges)
@@ -318,12 +318,12 @@ connection>0.8      (Highly connected)
 
 ## Success Metrics
 
-✅ **Speed:** 3-5x faster than mouse  
-✅ **Accuracy:** Fewer mistakes  
-✅ **Flow:** Maintains concentration  
-✅ **Professional:** Looks expert  
-✅ **Accessible:** Works for everyone  
-✅ **Scalable:** Handles complex tasks  
+✅ **Speed:** 3-5x faster than mouse
+✅ **Accuracy:** Fewer mistakes
+✅ **Flow:** Maintains concentration
+✅ **Professional:** Looks expert
+✅ **Accessible:** Works for everyone
+✅ **Scalable:** Handles complex tasks
 
 ---
 

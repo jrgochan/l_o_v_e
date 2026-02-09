@@ -139,7 +139,7 @@ This document defines the valid transitions between the 13 emotional categories 
 **Grief** [Cat 6, -0.9, -0.4, +0.5]: Pain WITH connection
 **Despair** [Cat 6, -0.9, -0.6, -0.7]: Pain PLUS disconnection
 
-**Transition Rule**: 
+**Transition Rule**:
 - Despair → other positive: MUST increase connection first
 - Grief → acceptance: Can proceed naturally (connection already present)
 
@@ -165,7 +165,7 @@ This document defines the valid transitions between the 13 emotional categories 
 
 **Why**: Anger carries unreleased energy + sense of injustice
 
-**Required Intermediate**: 
+**Required Intermediate**:
 - Physical release (Cat 12 → regulated state)
 - OR Cognitive processing (Cat 12 → Cat 3: Acceptance of disappointment)
 - OR Boundary-setting (Cat 12 → Cat 7: Assertiveness)
@@ -222,7 +222,7 @@ These transitions should NEVER be direct; always require intermediate waypoints:
 ### Pattern A: Anxiety → Calm
 **Categories**: 1 → 11
 **Difficulty**: 0.6
-**Path**: 
+**Path**:
 1. Anxiety (Cat 1) [-0.5, 0.7, -0.4]
 2. Worry (Cat 1) [-0.4, 0.5, -0.3] ← Reduce arousal
 3. Contentment (Cat 11) [0.6, -0.5, 0.5] ← Release rumination
@@ -298,11 +298,11 @@ These transitions should NEVER be direct; always require intermediate waypoints:
 def is_category_transition_valid(from_cat: str, to_cat: str) -> bool:
     """Check if direct category transition is allowed."""
     difficulty = CATEGORY_TRANSITIONS.get((from_cat, to_cat), 0.5)
-    
+
     # Block impossible transitions
     if difficulty >= 0.9:
         return False
-    
+
     # Allow difficult but possible transitions
     return True
 
@@ -310,7 +310,7 @@ def requires_bridge_emotion(path: List[Emotion]) -> bool:
     """Check if path requires specific bridge emotion."""
     start = path[0]
     end = path[-1]
-    
+
     # Shame to positive connection REQUIRES vulnerability
     if start.category == "Places We Go When We Fall Short" and \
        end.vac_vector[2] > 0.5:
@@ -322,7 +322,7 @@ def requires_bridge_emotion(path: List[Emotion]) -> bool:
         )
         if not has_vulnerability:
             return True  # Must add vulnerability
-    
+
     return False
 ```
 
@@ -331,19 +331,19 @@ def requires_bridge_emotion(path: List[Emotion]) -> bool:
 ```python
 def get_category_specific_strategies(from_cat: str, to_cat: str) -> List[Strategy]:
     """Get strategies appropriate for this category transition."""
-    
+
     # High arousal source: prioritize physiological regulation
     if from_cat == "Places We Go When Things Are Uncertain or Too Much":
         return [breathing_strategies, grounding_strategies, movement_strategies]
-    
+
     # Shame source: prioritize connection and self-compassion
     if from_cat == "Places We Go When We Fall Short":
         return [self_compassion_strategies, connection_strategies, vulnerability_practices]
-    
+
     # Anger source: prioritize release and reappraisal
     if from_cat == "Places We Go When We Feel Wronged":
         return [physical_release_strategies, cognitive_strategies, boundary_strategies]
-    
+
     # Default: mixed strategies
     return [universal_strategies]
 ```

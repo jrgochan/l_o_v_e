@@ -33,10 +33,10 @@ try {
     Write-Host "  L.O.V.E. Stack - Starting Services" -ForegroundColor Cyan
     Write-Host "═══════════════════════════════════════════════════════════" -ForegroundColor Blue
     Write-Host ""
-    
+
     # Always use Ubuntu-22.04 explicitly
     $distro = "Ubuntu-22.04"
-    
+
     # Check WSL installation
     if (-not (Test-WSLInstalled)) {
         Write-ColoredMessage -Message "WSL is not installed" -Type Error
@@ -44,17 +44,17 @@ try {
         Write-Host "Please run Setup-LoveStack.ps1 first to install WSL and set up the stack." -ForegroundColor Yellow
         exit 1
     }
-    
+
     if (-not (Test-WSLDistributionInstalled)) {
         Write-ColoredMessage -Message "Ubuntu-22.04 distribution not found" -Type Error
         Write-Host ""
         Write-Host "Please run Setup-LoveStack.ps1 first to install Ubuntu and set up the stack." -ForegroundColor Yellow
         exit 1
     }
-    
+
     # Start WSL with Ubuntu-22.04
     Write-ColoredMessage -Message "Starting WSL ($distro)..." -Type Info
-    
+
     $wslStarted = $false
     try {
         $null = wsl.exe -d $distro echo "test" 2>&1
@@ -65,7 +65,7 @@ try {
     catch {
         $wslStarted = $false
     }
-    
+
     if (-not $wslStarted) {
         Write-ColoredMessage -Message "Failed to start WSL" -Type Error
         Write-Host ""
@@ -74,20 +74,20 @@ try {
         Write-Host "Then re-run this script" -ForegroundColor White
         exit 1
     }
-    
+
     Write-ColoredMessage -Message "WSL is running" -Type Success
     Write-Host ""
-    
+
     # Check if setup has been run
     $runScript = Join-Path $ScriptDir "run-love-stack.sh"
-    
+
     if (-not (Test-Path $runScript)) {
         Write-ColoredMessage -Message "Run script not found: $runScript" -Type Error
         exit 1
     }
-    
+
     $wslProjectPath = Convert-WindowsPathToWSL -Path $ProjectRoot
-    
+
     Write-ColoredMessage -Message "Starting L.O.V.E. stack..." -Type Info
     Write-Host ""
     Write-Host "This will start:" -ForegroundColor Cyan
@@ -103,7 +103,7 @@ try {
     Write-Host ""
     Write-ColoredMessage -Message "Press Ctrl+C to stop all services" -Type Warning
     Write-Host ""
-    
+
     # Run the script in WSL with explicit distribution
     # Note: This will keep running until Ctrl+C
     $exitCode = 0
@@ -116,7 +116,7 @@ try {
         Write-ColoredMessage -Message "Stack execution interrupted" -Type Warning
         exit 0
     }
-    
+
     Write-Host ""
     if ($exitCode -eq 0) {
         Write-ColoredMessage -Message "Stack stopped successfully" -Type Success
@@ -131,7 +131,7 @@ catch {
     Write-Host ""
     Write-Host "Stack trace:" -ForegroundColor Yellow
     Write-Host $_.ScriptStackTrace -ForegroundColor Gray
-    
+
     # Try to clean up
     Write-Host ""
     Write-ColoredMessage -Message "Attempting to stop services..." -Type Info
@@ -139,6 +139,6 @@ catch {
     if (Test-Path $stopScript) {
         & $stopScript
     }
-    
+
     exit 1
 }

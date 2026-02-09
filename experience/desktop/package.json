@@ -5,7 +5,8 @@
   "scripts": {
     "tauri": "tauri",
     "dev": "tauri dev",
-    "build": "tauri build"
+    "build": "tauri build",
+    "lint": "echo 'No linting needed for desktop wrapper'"
   },
   "dependencies": {
     "@tauri-apps/api": "^2.2.0",

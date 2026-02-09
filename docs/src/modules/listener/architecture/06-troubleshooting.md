@@ -1,8 +1,8 @@
 # Troubleshooting Guide
 
-**Reading Time:** ~30 minutes  
-**Audience:** Senior developers, DevOps  
-**Prerequisites:** [Extending the Listener](05-extending-listener.md)  
+**Reading Time:** ~30 minutes
+**Audience:** Senior developers, DevOps
+**Prerequisites:** [Extending the Listener](05-extending-listener.md)
 **Goal:** Diagnose and fix common issues
 
 ---
@@ -16,12 +16,12 @@ graph TD
     B -->|Wrong results| D[Semantic Issues]
     B -->|Slow performance| E[Performance Issues]
     B -->|Crashes| F[Runtime Issues]
-    
+
     C --> G[Check Health Endpoints]
     D --> H[Check LLM Reasoning]
     E --> I[Profile Pipeline]
     F --> J[Check Logs]
-    
+
     style C fill:#ef4444,color:#fff
     style D fill:#f59e0b,color:#fff
     style E fill:#eab308,color:#fff
@@ -446,10 +446,10 @@ async def process_audio(ctx, audio_path=None, text=None, **kwargs):
     # Validate inputs
     if not audio_path and not text:
         raise ValueError("Either audio_path or text required")
-    
+
     if audio_path and not os.path.exists(audio_path):
         raise FileNotFoundError(f"Audio file not found: {audio_path}")
-    
+
     # ... rest of processing
 ```
 
@@ -546,14 +546,14 @@ import ipdb; ipdb.set_trace()
 async def log_requests(request: Request, call_next):
     """Log all requests and responses"""
     start = time.time()
-    
+
     logger.info(f"→ {request.method} {request.url}")
-    
+
     response = await call_next(request)
-    
+
     duration = time.time() - start
     logger.info(f"← {response.status_code} ({duration:.3f}s)")
-    
+
     return response
 ```
 
@@ -835,12 +835,12 @@ When asking for help, include:
 
 ## Key Takeaways
 
-✅ **Check services first:** Ollama, Redis, Observer  
-✅ **Sacred test failing:** Critical priority  
-✅ **Read LLM reasoning:** Understand why it chose values  
-✅ **Profile before optimizing:** Find real bottleneck  
-✅ **Enable debug logging:** See what's happening  
-✅ **Check configuration:** Often the culprit  
+✅ **Check services first:** Ollama, Redis, Observer
+✅ **Sacred test failing:** Critical priority
+✅ **Read LLM reasoning:** Understand why it chose values
+✅ **Profile before optimizing:** Find real bottleneck
+✅ **Enable debug logging:** See what's happening
+✅ **Check configuration:** Often the culprit
 
 ---
 

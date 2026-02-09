@@ -105,13 +105,13 @@ fi
 # === Step 2: Python Code Quality ===
 if [ -z "$TARGET_MODULE" ] || [ "$TARGET_MODULE" != "experience" ]; then
     print_header "Step 2/5: Python Code Quality"
-    
+
     if "$SCRIPT_DIR/check-python-quality.sh" "${fix_args[@]}" "${module_args[@]}"; then
         print_success "Python quality check passed"
     else
         print_error "Python quality check failed"
         total_failures=$((total_failures + 1))
-        
+
         if [ $FIX_MODE -eq 0 ]; then
             print_info "Tip: Run with --fix to auto-format"
         fi
@@ -121,13 +121,13 @@ fi
 # === Step 3: TypeScript Code Quality ===
 if [ -z "$TARGET_MODULE" ] || [ "$TARGET_MODULE" = "experience" ]; then
     print_header "Step 3/5: TypeScript Code Quality"
-    
+
     if "$SCRIPT_DIR/check-typescript-quality.sh" "${fix_args[@]}"; then
         print_success "TypeScript quality check passed"
     else
         print_error "TypeScript quality check failed"
         total_failures=$((total_failures + 1))
-        
+
         if [ $FIX_MODE -eq 0 ]; then
             print_info "Tip: Run with --fix to auto-format"
         fi
@@ -137,7 +137,7 @@ fi
 # === Step 4: Test Suites ===
 if [ $QUICK_MODE -eq 0 ]; then
     print_header "Step 4/5: Running Test Suites"
-    
+
     if "$SCRIPT_DIR/run-tests.sh" "${module_args[@]}"; then
         print_success "All tests passed with 100% coverage"
     else
@@ -146,7 +146,7 @@ if [ $QUICK_MODE -eq 0 ]; then
     fi
 else
     print_header "Step 4/5: Running Quick Tests"
-    
+
     if "$SCRIPT_DIR/run-tests.sh" --quick "${module_args[@]}"; then
         print_success "Quick tests passed"
     else

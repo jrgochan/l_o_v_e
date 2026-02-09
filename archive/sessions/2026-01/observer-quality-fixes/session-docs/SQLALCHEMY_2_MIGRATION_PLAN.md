@@ -15,7 +15,7 @@
 | 2 | user_trajectory.py | ~490 | Medium | HIGH - Time-series |
 | 3 | chat_session.py | ~450 | Medium | HIGH - Active use |
 | 4 | chat_message.py | ~560 | High | HIGH - Active use |
-| 5 | session_analytics.py | ~420 | Medium | MEDIUM | 
+| 5 | session_analytics.py | ~420 | Medium | MEDIUM |
 | 6 | clinical_alert.py | ~440 | Medium | MEDIUM |
 | 7 | multi_emotion_analysis.py | ~830 | High | MEDIUM |
 | 8 | transition_strategy.py | ~660 | High | LOW - Less frequently used |
@@ -34,7 +34,7 @@ from sqlalchemy.dialects.postgresql import UUID
 
 class AtlasDefinition(Base):
     __tablename__ = "atlas_definitions"
-    
+
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     emotion_name = Column(String(100), nullable=False, unique=True)
     category = Column(String(100), nullable=False, index=True)
@@ -52,7 +52,7 @@ from sqlalchemy.orm import Mapped, mapped_column
 
 class AtlasDefinition(Base):
     __tablename__ = "atlas_definitions"
-    
+
     id: Mapped[UUID] = mapped_column(primary_key=True, default=uuid4)
     emotion_name: Mapped[str] = mapped_column(String(100), unique=True, index=True)
     category: Mapped[str] = mapped_column(String(100), index=True)
@@ -286,7 +286,7 @@ Mypy Errors: 0 (or <10 with documented exceptions)
 ```
 ✅ Black: Pass
 ✅ isort: Pass
-✅ Flake8: Pass  
+✅ Flake8: Pass
 ✅ Pylint: Pass
 ✅ Bandit: Pass
 ✅ Radon: Pass
@@ -358,12 +358,12 @@ created_at: Mapped[datetime] = mapped_column(server_default=func.now())
   - [ ] user_trajectory.py
   - [ ] chat_session.py
   - [ ] chat_message.py
-  
+
 - [ ] Phase 2: Analytics Models (2 hours)
   - [ ] session_analytics.py
   - [ ] clinical_alert.py
   - [ ] multi_emotion_analysis.py
-  
+
 - [ ] Phase 3: Supporting Models (1 hour)
   - [ ] transition_strategy.py
   - [ ] model_assignment.py

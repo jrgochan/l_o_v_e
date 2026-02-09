@@ -27,9 +27,10 @@ depends_on = None
 
 def upgrade() -> None:
     """Create chat system tables and triggers."""
-    
+
     # Create chat_sessions table
-    op.execute("""
+    op.execute(
+        """
         CREATE TABLE IF NOT EXISTS chat_sessions (
             id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
             user_id VARCHAR(255) NOT NULL,
@@ -40,27 +41,25 @@ def upgrade() -> None:
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
             updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         )
-    """)
-    
+    """
+    )
+
     # Create indexes for chat_sessions
+    op.execute("CREATE INDEX idx_chat_sessions_user_id " "ON chat_sessions(user_id)")
+
     op.execute(
-        "CREATE INDEX idx_chat_sessions_user_id "
-        "ON chat_sessions(user_id)"
+        "CREATE INDEX idx_chat_sessions_started_at " "ON chat_sessions(started_at DESC)"
     )
-    
-    op.execute(
-        "CREATE INDEX idx_chat_sessions_started_at "
-        "ON chat_sessions(started_at DESC)"
-    )
-    
+
     # Add comment
     op.execute(
         "COMMENT ON TABLE chat_sessions IS "
         "'Chat sessions for emotional analysis chat interface'"
     )
-    
+
     # Create chat_messages table
-    op.execute("""
+    op.execute(
+        """
         CREATE TABLE IF NOT EXISTS chat_messages (
             id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
             session_id UUID NOT NULL REFERENCES chat_sessions(id) ON DELETE CASCADE,
@@ -81,42 +80,41 @@ def upgrade() -> None:
             tone_mode VARCHAR(20),
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         )
-    """)
-    
+    """
+    )
+
     # Create indexes for chat_messages
     op.execute(
-        "CREATE INDEX idx_chat_messages_session_id "
-        "ON chat_messages(session_id)"
+        "CREATE INDEX idx_chat_messages_session_id " "ON chat_messages(session_id)"
     )
-    
+
     op.execute(
-        "CREATE INDEX idx_chat_messages_timestamp "
-        "ON chat_messages(timestamp DESC)"
+        "CREATE INDEX idx_chat_messages_timestamp " "ON chat_messages(timestamp DESC)"
     )
-    
+
     op.execute(
-        "CREATE INDEX idx_chat_messages_emotion_id "
-        "ON chat_messages(emotion_id)"
+        "CREATE INDEX idx_chat_messages_emotion_id " "ON chat_messages(emotion_id)"
     )
-    
+
     # Add comments
     op.execute(
         "COMMENT ON TABLE chat_messages IS "
         "'Individual messages within chat sessions with analysis data'"
     )
-    
+
     op.execute(
         "COMMENT ON COLUMN chat_messages.prosody_features IS "
         "'JSONB storage for detailed voice features (jitter, shimmer, HNR, etc.)'"
     )
-    
+
     op.execute(
         "COMMENT ON COLUMN chat_messages.insights IS "
         "'AI-generated insights combining voice and content analysis'"
     )
-    
+
     # Create update function for updated_at
-    op.execute("""
+    op.execute(
+        """
         CREATE OR REPLACE FUNCTION update_chat_session_updated_at()
         RETURNS TRIGGER AS $$
         BEGIN
@@ -124,15 +122,18 @@ def upgrade() -> None:
             RETURN NEW;
         END;
         $$ LANGUAGE plpgsql
-    """)
-    
+    """
+    )
+
     # Create trigger
-    op.execute("""
+    op.execute(
+        """
         CREATE TRIGGER chat_sessions_updated_at
             BEFORE UPDATE ON chat_sessions
             FOR EACH ROW
             EXECUTE FUNCTION update_chat_session_updated_at()
-    """)
+    """
+    )
 
 
 def downgrade() -> None:

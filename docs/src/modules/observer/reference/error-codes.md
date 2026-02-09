@@ -1,6 +1,6 @@
 # Error Codes Reference
 
-**Audience:** Developers, DevOps  
+**Audience:** Developers, DevOps
 **Goal:** Complete catalog of Observer error codes and resolution strategies
 
 ---
@@ -339,7 +339,7 @@ alembic upgrade head
 **Resolution:**
 
 ```sql
-CREATE INDEX idx_trajectory_embedding ON user_trajectory 
+CREATE INDEX idx_trajectory_embedding ON user_trajectory
 USING hnsw (embedding vector_cosine_ops);
 ```
 
@@ -439,7 +439,7 @@ Retry-After: 30
 
 **Cause:** Normal closure
 
-**Code:** 1000  
+**Code:** 1000
 **Reason:** "Normal closure"
 
 ---
@@ -448,7 +448,7 @@ Retry-After: 30
 
 **Cause:** No messages for 5 minutes
 
-**Code:** 1000  
+**Code:** 1000
 **Reason:** "Timeout"
 
 **Resolution:**
@@ -462,7 +462,7 @@ Retry-After: 30
 
 **Cause:** Message rate limit exceeded
 
-**Code:** 1008  
+**Code:** 1008
 **Reason:** "Policy violation - rate limit"
 
 **Resolution:**
@@ -580,7 +580,7 @@ try:
     return response.json()
 except httpx.HTTPStatusError as e:
     error_data = e.response.json()
-    
+
     if error_data["error"] == "emotion_not_found":
         # Handle missing emotion
         pass

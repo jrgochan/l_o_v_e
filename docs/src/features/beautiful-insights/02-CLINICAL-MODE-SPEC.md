@@ -27,11 +27,11 @@ In Clinical Mode, insights should help clinicians:
   "category": "Negative High-Energy",
   "vac": {"valence": -0.45, "arousal": 0.72, "connection": -0.23},
   "confidence": 0.87,
-  
+
   # Structured clinical sections
   "assessment_summary": str,  # 1-2 sentence clinical state
   "quadrant_classification": str,  # VAC quadrant + significance
-  
+
   "biomarkers": {
     "vocal": {
       "pitch": {"value": float, "interpretation": str, "indicator": "↑" | "↓" | "="},
@@ -45,7 +45,7 @@ In Clinical Mode, insights should help clinicians:
       "connection": {"value": float, "clinical_sig": str}
     }
   },
-  
+
   "recommended_interventions": [
     {
       "priority": int,  # 1 = highest
@@ -56,14 +56,14 @@ In Clinical Mode, insights should help clinicians:
       "evidence": str  # Brief citation
     }
   ],
-  
+
   "differential_emotions": [  # For ruling out similar states
     {"name": str, "category": str, "note": str}
   ],
-  
+
   "clinical_alerts": [...],  # Already have from clinical_alert_service
   "session_analytics": {...},  # Already have from session_analytics_service
-  
+
   # Legacy fields
   "summary": str,
   "guidance": str,
@@ -86,7 +86,7 @@ def _generate_assessment_summary(emotion, confidence, vac_data):
     emotion_name = emotion['name']
     valence = vac_data['valence']
     arousal = vac_data['arousal']
-    
+
     # Arousal state
     if arousal > 0.5:
         arousal_state = "high arousal state"
@@ -94,15 +94,15 @@ def _generate_assessment_summary(emotion, confidence, vac_data):
         arousal_state = "low arousal state"
     else:
         arousal_state = "moderate arousal"
-    
-    # Valence state  
+
+    # Valence state
     if valence > 0.3:
         valence_state = "positive valence"
     elif valence < -0.3:
         valence_state = "negative valence"
     else:
         valence_state = "neutral valence"
-    
+
     return f"Patient presents with {emotion_name} ({confidence:.0%} confidence), {arousal_state}, {valence_state}"
 
 # Examples:
@@ -115,7 +115,7 @@ def _generate_assessment_summary(emotion, confidence, vac_data):
 ```python
 def _generate_quadrant_classification(vac_data):
     v, a, c = vac_data['valence'], vac_data['arousal'], vac_data['connection']
-    
+
     # Determine quadrant
     if v > 0 and a > 0:
         quadrant = "Positive high-energy"
@@ -129,13 +129,13 @@ def _generate_quadrant_classification(vac_data):
     else:
         quadrant = "Negative low-energy"
         significance = "Indicates depression/withdrawal (requires attention)"
-    
+
     # Add connection modifier
     if c < -0.5:
         significance += "; significant disconnection present"
     elif c > 0.5:
         significance += "; strong connection (therapeutic resource)"
-    
+
     return f"{quadrant} ({significance})"
 ```
 
@@ -146,7 +146,7 @@ def _generate_quadrant_classification(vac_data):
 ```python
 def _generate_vocal_biomarkers(prosody_data):
     biomarkers = {"vocal": {}}
-    
+
     # Pitch
     pitch = prosody_data.get('pitch_mean')
     if pitch:
@@ -159,13 +159,13 @@ def _generate_vocal_biomarkers(prosody_data):
         else:
             interp = "Normal range"
             indicator = "="
-        
+
         biomarkers["vocal"]["pitch"] = {
             "value": pitch,
             "interpretation": interp,
             "indicator": indicator
         }
-    
+
     # Energy
     energy = prosody_data.get('energy')
     if energy:
@@ -178,13 +178,13 @@ def _generate_vocal_biomarkers(prosody_data):
         else:
             interp = "Moderate"
             indicator = "="
-        
+
         biomarkers["vocal"]["energy"] = {
             "value": energy,
             "interpretation": interp,
             "indicator": indicator
         }
-    
+
     # Rate
     rate = prosody_data.get('rate')
     if rate:
@@ -197,13 +197,13 @@ def _generate_vocal_biomarkers(prosody_data):
         else:
             interp = "Normal rate"
             indicator = "="
-        
+
         biomarkers["vocal"]["rate"] = {
             "value": rate,
             "interpretation": interp,
             "indicator": indicator
         }
-    
+
     # Voice quality
     jitter = prosody_data.get('jitter', 0)
     if jitter > 0.02:
@@ -212,7 +212,7 @@ def _generate_vocal_biomarkers(prosody_data):
         biomarkers["vocal"]["quality"] = "Significant vocal tension"
     else:
         biomarkers["vocal"]["quality"] = "Good voice quality"
-    
+
     return biomarkers
 ```
 
@@ -221,9 +221,9 @@ def _generate_vocal_biomarkers(prosody_data):
 ```python
 def _generate_emotional_biomarkers(vac_data):
     biomarkers = {"emotional": {}}
-    
+
     v, a, c = vac_data['valence'], vac_data['arousal'], vac_data['connection']
-    
+
     # Valence
     if v > 0.5:
         sig = "Strong positive affect"
@@ -233,12 +233,12 @@ def _generate_emotional_biomarkers(vac_data):
         sig = "Mild negative affect"
     else:
         sig = "Significant negative affect"
-    
+
     biomarkers["emotional"]["valence"] = {
         "value": v,
         "clinical_sig": sig
     }
-    
+
     # Arousal
     if a > 0.7:
         sig = "High activation (↑↑ sympathetic)"
@@ -255,13 +255,13 @@ def _generate_emotional_biomarkers(vac_data):
     else:
         sig = "Very low activation (↓↓ shutdown)"
         indicator = "↓↓"
-    
+
     biomarkers["emotional"]["arousal"] = {
         "value": a,
         "clinical_sig": sig,
         "indicator": indicator
     }
-    
+
     # Connection
     if c < -0.5:
         sig = "Significant disconnection (isolation risk)"
@@ -271,12 +271,12 @@ def _generate_emotional_biomarkers(vac_data):
         sig = "Strong connection (therapeutic resource)"
     else:
         sig = "Moderate connection"
-    
+
     biomarkers["emotional"]["connection"] = {
         "value": c,
         "clinical_sig": sig
     }
-    
+
     return biomarkers
 ```
 
@@ -333,11 +333,11 @@ INTERVENTIONS = {
 def _generate_recommended_interventions(emotion, vac_data, prosody_data, alerts):
     interventions = []
     priority = 1
-    
+
     arousal = vac_data['arousal']
     valence = vac_data['valence']
     connection = vac_data['connection']
-    
+
     # Priority 1: Address acute distress (high arousal + negative)
     if arousal > 0.7 and valence < -0.3:
         interventions.append({
@@ -347,7 +347,7 @@ def _generate_recommended_interventions(emotion, vac_data, prosody_data, alerts)
             **INTERVENTIONS["grounding"]["5-4-3-2-1"]
         })
         priority += 1
-    
+
     # Priority 2: Always validate the emotion
     interventions.append({
         "priority": priority,
@@ -356,7 +356,7 @@ def _generate_recommended_interventions(emotion, vac_data, prosody_data, alerts)
         **INTERVENTIONS["validation"]["emotion_validation"]
     })
     priority += 1
-    
+
     # Priority 3: Explore based on emotion type
     if emotion['name'].lower() in ['anxiety', 'worry', 'fear']:
         interventions.append({
@@ -372,7 +372,7 @@ def _generate_recommended_interventions(emotion, vac_data, prosody_data, alerts)
             "technique": "Values Clarification",
             **INTERVENTIONS["exploration"]["values_clarification"]
         })
-    
+
     return interventions[:3]  # Max 3 interventions
 ```
 
@@ -437,11 +437,11 @@ max-w-2xl
   "category": "Negative High-Energy",
   "vac": {"valence": -0.45, "arousal": 0.72, "connection": -0.23},
   "confidence": 0.87,
-  
+
   "assessment_summary": "Patient presents with Anxiety (87% confidence), high arousal state (+0.72), negative valence (-0.45)",
-  
+
   "quadrant_classification": "Negative high-energy (Indicates distress with activation - intervention target)",
-  
+
   "biomarkers": {
     "vocal": {
       "pitch": {
@@ -477,7 +477,7 @@ max-w-2xl
       }
     }
   },
-  
+
   "recommended_interventions": [
     {
       "priority": 1,
@@ -504,13 +504,13 @@ max-w-2xl
       "evidence": "CBT core technique for anxiety disorders"
     }
   ],
-  
+
   "differential_emotions": [
     {"name": "Panic", "category": "Negative High-Energy", "note": "Monitor if arousal increases >0.9"},
     {"name": "Worry", "category": "Negative High-Energy", "note": "Related but more cognitive-focused"},
     {"name": "Fear", "category": "Negative High-Energy", "note": "Consider if specific threat identified"}
   ],
-  
+
   "clinical_alerts": [
     {
       "level": "warning",
@@ -519,7 +519,7 @@ max-w-2xl
       "suggestion": "Consider grounding techniques"
     }
   ],
-  
+
   "session_analytics": {
     "emotion_count": 3,
     "average_confidence": 0.82,
@@ -538,20 +538,20 @@ def _select_interventions_by_priority(emotion, vac_data, prosody_data, alerts):
     Smart intervention selection based on clinical priorities.
     """
     candidates = []
-    
+
     v, a, c = vac_data['valence'], vac_data['arousal'], vac_data['connection']
-    
+
     # ACUTE: High arousal + negative = immediate regulation needed
     if a > 0.7 and v < -0.3:
         candidates.append((1, "grounding", "5-4-3-2-1"))
-    
+
     # SAFETY: Check for critical alerts
     if any(alert['level'] == 'critical' for alert in alerts):
         candidates.append((1, "safety", "risk_assessment"))
-    
+
     # FOUNDATION: Always validate
     candidates.append((2, "validation", "emotion_validation"))
-    
+
     # EXPLORATION: Emotion-specific
     if emotion['name'].lower() in ['anxiety', 'worry', 'fear']:
         candidates.append((3, "exploration", "threat_assessment"))
@@ -561,11 +561,11 @@ def _select_interventions_by_priority(emotion, vac_data, prosody_data, alerts):
         candidates.append((3, "exploration", "boundary_violation"))
     else:
         candidates.append((3, "exploration", "values_clarification"))
-    
+
     # SKILL: If low energy + disconnection
     if a < -0.5 and c < -0.5:
         candidates.append((3, "skill", "behavioral_activation"))
-    
+
     # Sort by priority and return top 3
     candidates.sort(key=lambda x: x[0])
     return [build_intervention(*c) for c in candidates[:3]]

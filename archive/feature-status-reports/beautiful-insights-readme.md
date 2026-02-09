@@ -27,17 +27,17 @@ What this means: Anxiety is characterized by...
 
 Into these beautiful, therapeutic responses:
 
-**Warm Mode** → Compassionate self-understanding mirror  
+**Warm Mode** → Compassionate self-understanding mirror
 **Clinical Mode** → Actionable clinical assessment with interventions
 
 ### **Key Innovations:**
 
-✅ **Structured Data** - Backend returns rich objects, not flat strings  
-✅ **Smart Alternating** - Reflective questions alternate with gentle suggestions  
-✅ **Voice Integration** - Natural language voice observations  
-✅ **Evidence-Based** - Clinical interventions cite research  
-✅ **Deep Feeling Support** - Multi-emotion narratives and pattern analysis  
-✅ **Backwards Compatible** - Detects and handles legacy insights  
+✅ **Structured Data** - Backend returns rich objects, not flat strings
+✅ **Smart Alternating** - Reflective questions alternate with gentle suggestions
+✅ **Voice Integration** - Natural language voice observations
+✅ **Evidence-Based** - Clinical interventions cite research
+✅ **Deep Feeling Support** - Multi-emotion narratives and pattern analysis
+✅ **Backwards Compatible** - Detects and handles legacy insights
 
 ---
 
@@ -252,9 +252,9 @@ When complete, users/clinicians should:
 
 ## 📝 Status
 
-**Created**: December 6, 2025, 10:30 PM MDT  
-**Status**: ✅ Specification Complete  
-**Next Step**: Begin implementation  
+**Created**: December 6, 2025, 10:30 PM MDT
+**Status**: ✅ Specification Complete
+**Next Step**: Begin implementation
 **Estimated Duration**: 5.5-7 hours
 
 ---

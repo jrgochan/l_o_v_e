@@ -47,7 +47,7 @@ sudo make install
 **The L.O.V.E. Stack is version-agnostic** - it works with PostgreSQL 14+ and uses standard SQL features. This means:
 
 ✅ **Use the latest PostgreSQL version** available for your platform
-✅ **Automated setup** detects installed version automatically  
+✅ **Automated setup** detects installed version automatically
 ✅ **Future-proof** - no hardcoded version dependencies
 ✅ **Simpler maintenance** - stay current with security patches
 
@@ -68,12 +68,12 @@ sudo make install
 
 The L.O.V.E. Stack setup scripts handle everything automatically:
 
-1. **`setup-love-stack.sh`**: 
+1. **`setup-love-stack.sh`**:
    - Detects installed PostgreSQL version
    - Checks for pgvector availability
    - Warns if pgvector is missing
 
-2. **`init-database.sh`**: 
+2. **`init-database.sh`**:
    - Creates extensions with proper superuser privileges
    - Verifies pgvector is installed before running migrations
    - Provides helpful error messages if setup is incomplete
@@ -150,10 +150,10 @@ If you were using PostgreSQL 16 or an older version:
    ```bash
    # Stop old version
    brew services stop postgresql@16
-   
+
    # Install latest
    brew install postgresql
-   
+
    # Migrate data (if needed)
    # See: https://www.postgresql.org/docs/current/upgrading.html
    ```

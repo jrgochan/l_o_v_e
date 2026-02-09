@@ -37,7 +37,7 @@
    - Difficult transitions (8): Shame→Self-Compassion, Despair→Hope
    - Complex transitions (7): 5+ waypoints, multiple bridges
    - Failed journeys (5): Abandoned/paused with reasons
-   
+
 2. **Strategy Attempts** (embedded in journeys)
    - ~150 total attempts across journeys
    - Realistic helpfulness ratings (1-5)
@@ -151,22 +151,22 @@ async def seed_all(level, with_demo, with_bootstrap, verify):
     # 1. Strategies (base or enhanced)
     if level == "enhanced":
         await run_seed_script("seed_enhanced_strategies.py")
-    
+
     # 2. Patterns (base or expanded)
     if level == "enhanced":
         await run_seed_script("seed_expanded_patterns.py")
-    
+
     # 3. Category transitions (base)
     await run_seed_script("seed_transition_data.py")
-    
+
     # 4. Demo data (optional)
     if with_demo:
         await run_seed_script("seed_demo_data.py")
-    
+
     # 5. Bootstrap (optional)
     if with_bootstrap:
         await run_seed_script("seed_bootstrap_data.py")
-    
+
     # 6. Verify all
     if verify:
         await verify_all_tables()

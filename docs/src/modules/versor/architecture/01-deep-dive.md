@@ -320,7 +320,7 @@ async def calculate_state(request: StateRequest):
 
 ### Trade-offs
 
-**Advantage:** Extreme simplicity and scalability  
+**Advantage:** Extreme simplicity and scalability
 **Trade-off:** Previous state must be provided by caller (Observer)
 
 ---
@@ -502,11 +502,11 @@ def calculate_state(request: StateRequest):  # No async
 ```python
 class StateRequest(BaseModel):
     """Validated request model."""
-    
+
     current_vac: VACInput  # Validates each field
     previous_state: Optional[QuaternionModel] = None
     time_delta_seconds: float = Field(default=1.0, gt=0.0)
-    
+
     # Pydantic automatically:
     # 1. Checks types
     # 2. Validates constraints (ge, le, gt)
@@ -519,11 +519,11 @@ class StateRequest(BaseModel):
 ```python
 class TrajectoryResponse(BaseModel):
     """Type-safe response model."""
-    
+
     current_state: QuaternionModel
     angular_distance_radians: float
     # ... more fields
-    
+
     class Config:
         json_schema_extra = {
             "example": {
@@ -552,27 +552,27 @@ from pydantic_settings import BaseSettings
 
 class Settings(BaseSettings):
     """Application configuration with environment variable support."""
-    
+
     # API metadata
     API_TITLE: str = "Versor API"
     API_DESCRIPTION: str = "Quaternion mathematics for emotional state"
-    
+
     # Server
     HOST: str = "0.0.0.0"
     PORT: int = 8001
-    
+
     # Thresholds
     FLOODING_THRESHOLD: float = 2.0  # rad/s
     EPSILON: float = 1e-6
-    
+
     # SLERP
     DEFAULT_SLERP_STEPS: int = 60
     MIN_SLERP_STEPS: int = 10
     MAX_SLERP_STEPS: int = 120
-    
+
     # CORS
     CORS_ORIGINS: List[str] = ["http://localhost:8002"]
-    
+
     class Config:
         env_file = ".env"
         env_file_encoding = "utf-8"
@@ -740,9 +740,9 @@ logger = logging.getLogger(__name__)
 @router.post("/calculate")
 async def calculate_state(request: StateRequest):
     logger.info(f"Calculating state for VAC: {request.current_vac}")
-    
+
     # Calculations...
-    
+
     logger.info(f"Completed: φ={phi:.3f}, E={elasticity:.3f}")
     return response
 ```
@@ -803,7 +803,7 @@ async def calculate_state(request: StateRequest):
 
 ### Network I/O
 
-**Inbound:** ~500 bytes (JSON request)  
+**Inbound:** ~500 bytes (JSON request)
 **Outbound:** ~5-10 KB (JSON response with 60-frame path)
 
 **Optimization:**
@@ -995,13 +995,13 @@ Each test is independent:
 def test_quaternion_normalize():
     # Create test data
     q = Quaternion(1, 2, 3, 4)
-    
+
     # Execute
     result = q.normalize()
-    
+
     # Verify
     assert result.magnitude() == pytest.approx(1.0)
-    
+
     # No setup/teardown needed (stateless!)
 ```
 
@@ -1072,5 +1072,5 @@ def test_quaternion_normalize():
 
 ---
 
-**Previous:** [← First Contribution](../guides/06-first-contribution.md)  
+**Previous:** [← First Contribution](../guides/06-first-contribution.md)
 **Next:** [Quaternion Mathematics →](02-quaternion-mathematics.md)

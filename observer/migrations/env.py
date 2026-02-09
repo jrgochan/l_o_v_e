@@ -3,17 +3,17 @@ Alembic environment configuration.
 Handles both offline and online migration modes with async support.
 """
 
-from logging.config import fileConfig
-from sqlalchemy import pool
-from sqlalchemy.engine import Connection
-from sqlalchemy.ext.asyncio import async_engine_from_config
-from alembic import context
 import asyncio
+from logging.config import fileConfig
+
+from alembic import context
 
 # Import the app config and models
 from app.config import settings
 from app.database import Base
-from app import models
+from sqlalchemy import pool
+from sqlalchemy.engine import Connection
+from sqlalchemy.ext.asyncio import async_engine_from_config
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
@@ -35,7 +35,6 @@ target_metadata = Base.metadata
 # can be acquired:
 # my_important_option = config.get_main_option("my_important_option")
 # ... etc.
-
 
 
 def include_object(object, name, type_, reflected, compare_to):

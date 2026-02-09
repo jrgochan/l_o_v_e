@@ -1,6 +1,14 @@
+"""Journey Execution API.
+
+Manages the active lifecycle of an emotional transition journey, including:
+- Starting a new journey (`/journey/start`).
+- Checking in at waypoints (`/waypoint-reached`).
+- Monitoring overall status (`/journey/{id}`).
+"""
+
 import logging
 from datetime import datetime, timezone
-from typing import Annotated
+from typing import Annotated, Any, Dict, List
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, HTTPException
@@ -26,7 +34,18 @@ router = APIRouter()
 async def start_journey(
     request: JourneyStartRequest, db: Annotated[AsyncSession, Depends(get_db)]
 ) -> JourneyStartResponse:
-    """Start tracking an emotional transition journey."""
+    """Initialize a new emotional transition journey.
+
+    Creates a `UserJourney` record and initializes the tracking state.
+    Use this endpoint after a path has been generated via `/transition-path`.
+
+    Args:
+        request: Configuration for the new journey (path_id, user_id).
+        db: Database session.
+
+    Returns:
+        JourneyStartResponse: The created journey ID and initial status.
+    """
     try:
         logger.info("Starting journey for user %s", request.user_id)
 
@@ -67,7 +86,20 @@ async def mark_waypoint_reached(
     request: WaypointReachedRequest,
     db: Annotated[AsyncSession, Depends(get_db)],
 ) -> WaypointReachedResponse:
-    """Mark a waypoint as reached and validate emotional state."""
+    """Record progress at a specific waypoints.
+
+    Updates the `JourneyWaypoint` status, records self-reported assessment,
+    and logs any strategies attempted during this leg of the journey.
+    Automatically marks the journey as 'completed' if all waypoints are reached.
+
+    Args:
+        journey_id: The active journey UUID.
+        request: Data about the waypoint and strategies used.
+        db: Database session.
+
+    Returns:
+        WaypointReachedResponse: Validation status and updated metrics.
+    """
     try:
         logger.info(
             "Marking waypoint %s reached for journey %s",
@@ -102,42 +134,14 @@ async def mark_waypoint_reached(
         waypoint.self_assessment = request.self_assessment
 
         # 4. Record strategy attempts
-        for strategy_attempt in request.strategies_tried:
-            attempt = StrategyAttempt(
-                journey_id=journey_id,
-                waypoint_index=request.waypoint_index,
-                strategy_id=UUID(strategy_attempt["strategy_id"]),
-                strategy_name=strategy_attempt.get("name", "Unknown"),
-                tried=1 if strategy_attempt.get("tried", True) else 0,
-                helpful_rating=strategy_attempt.get("helpful_rating"),
-                time_spent=strategy_attempt.get("time_spent"),
-                user_notes=strategy_attempt.get("notes"),
-                completed=1 if strategy_attempt.get("completed", False) else 0,
-            )
-            db.add(attempt)
-
+        _record_strategy_attempts(db, journey_id, request.waypoint_index, request.strategies_tried)
         await db.commit()
 
         # 5. Check if journey is complete
-        all_waypoints_stmt = select(JourneyWaypoint).where(JourneyWaypoint.journey_id == journey_id)
-        check_result = await db.execute(all_waypoints_stmt)
-        all_waypoints = check_result.scalars().all()
-
-        all_reached = all(bool(wp.reached) for wp in all_waypoints)
-
-        if all_reached:
-            journey.status = "completed"
-            journey.completed_at = datetime.now(timezone.utc).replace(tzinfo=None)
-            await db.commit()
+        all_reached = await _check_journey_completion(db, journey_id, journey)
 
         # 6. Build response
-        return WaypointReachedResponse(
-            validated=True,
-            current_vac=[0, 0, 0],  # Would validate against actual VAC
-            distance_to_waypoint=0.0,  # Would calculate
-            journey_completed=all_reached,
-            message="Waypoint reached!" if not all_reached else "Journey complete! 🎉",
-        )
+        return _build_waypoint_response(all_reached)
 
     except HTTPException:
         raise
@@ -145,6 +149,55 @@ async def mark_waypoint_reached(
         logger.error("Failed to mark waypoint: %s", e, exc_info=True)
         await db.rollback()
         raise HTTPException(status_code=500, detail=f"Waypoint update failed: {str(e)}") from e
+
+
+def _build_waypoint_response(all_reached: bool) -> WaypointReachedResponse:
+    """Build the response object."""
+    return WaypointReachedResponse(
+        validated=True,
+        current_vac=[0, 0, 0],  # Would validate against actual VAC
+        distance_to_waypoint=0.0,  # Would calculate
+        journey_completed=all_reached,
+        message="Waypoint reached!" if not all_reached else "Journey complete! 🎉",
+    )
+
+
+def _record_strategy_attempts(
+    db: AsyncSession,
+    journey_id: UUID,
+    waypoint_index: int,
+    strategies: List[Dict[str, Any]],
+) -> None:
+    """Record strategy attempts for a waypoint."""
+    for strategy_attempt in strategies:
+        attempt = StrategyAttempt(
+            journey_id=journey_id,
+            waypoint_index=waypoint_index,
+            strategy_id=UUID(strategy_attempt["strategy_id"]),
+            strategy_name=strategy_attempt.get("name", "Unknown"),
+            tried=1 if strategy_attempt.get("tried", True) else 0,
+            helpful_rating=strategy_attempt.get("helpful_rating"),
+            time_spent=strategy_attempt.get("time_spent"),
+            user_notes=strategy_attempt.get("notes"),
+            completed=1 if strategy_attempt.get("completed", False) else 0,
+        )
+        db.add(attempt)
+
+
+async def _check_journey_completion(db: AsyncSession, journey_id: UUID, journey: Any) -> bool:
+    """Check if all waypoints are reached and update journey status."""
+    all_waypoints_stmt = select(JourneyWaypoint).where(JourneyWaypoint.journey_id == journey_id)
+    check_result = await db.execute(all_waypoints_stmt)
+    all_waypoints = check_result.scalars().all()
+
+    all_reached = all(bool(wp.reached) for wp in all_waypoints)
+
+    if all_reached:
+        journey.status = "completed"
+        journey.completed_at = datetime.now(timezone.utc).replace(tzinfo=None)
+        await db.commit()
+
+    return all_reached
 
 
 @router.get("/journey/{journey_id}", response_model=JourneyStatusResponse)
@@ -189,5 +242,5 @@ async def get_journey_status(
     except HTTPException:
         raise
     except Exception as e:
-        logger.error(f"Failed to get journey status: {e}", exc_info=True)
-        raise HTTPException(status_code=500, detail=str(e))
+        logger.error("Failed to get journey status: %s", e, exc_info=True)
+        raise HTTPException(status_code=500, detail=str(e)) from e

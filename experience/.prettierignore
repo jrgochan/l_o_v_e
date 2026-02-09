@@ -17,3 +17,9 @@ coverage
 # Generated
 next-env.d.ts
 *.d.ts
+
+# Desktop Build Artifacts
+desktop/native-swift/.build
+desktop/src-tauri/target
+**/target
+**/.build

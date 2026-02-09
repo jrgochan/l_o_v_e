@@ -1,8 +1,8 @@
 # Logging Migration - Remaining Work Plan
 
-**Date**: December 7, 2025  
-**Current Progress**: 102/163 calls migrated (62.5%)  
-**Remaining**: 61 calls across ~15 files  
+**Date**: December 7, 2025
+**Current Progress**: 102/163 calls migrated (62.5%)
+**Remaining**: 61 calls across ~15 files
 **Estimated Time**: 1.5-2 hours
 
 ---
@@ -13,7 +13,7 @@
 
 **Hooks (8 files):**
 - useOllamaModels
-- useWebSocketChat  
+- useWebSocketChat
 - useEmotionAtlas
 - useModelAssignments
 - useVoiceRecording
@@ -49,9 +49,9 @@
 
 ### **Priority 1: Keyboard Shortcuts (20 calls) - 30 minutes**
 
-**File**: `experience/web/hooks/useKeyboardShortcuts.ts`  
-**Calls**: ~20 (mostly console.log for keyboard help)  
-**Category**: `user-interaction`  
+**File**: `experience/web/hooks/useKeyboardShortcuts.ts`
+**Calls**: ~20 (mostly console.log for keyboard help)
+**Category**: `user-interaction`
 **Complexity**: Medium (many console.log calls for help text)
 
 **Pattern:**
@@ -71,8 +71,8 @@ logger.info('user-interaction', '  P: Toggle paths');
 
 ### **Priority 2: GoalSetting Component (6 calls) - 15 minutes**
 
-**File**: `experience/web/components/GoalSetting.tsx`  
-**Calls**: 6  
+**File**: `experience/web/components/GoalSetting.tsx`
+**Calls**: 6
 **Categories**: `api`, `general`
 
 **Console calls:**
@@ -87,20 +87,20 @@ logger.info('user-interaction', '  P: Toggle paths');
 
 ### **Priority 3: Remaining Hooks (5 calls) - 15 minutes**
 
-**File**: `experience/web/hooks/useComputeAllPaths.ts`  
-**Calls**: 2  
+**File**: `experience/web/hooks/useComputeAllPaths.ts`
+**Calls**: 2
 **Category**: `hooks`
 - Start computation logging
 - Error handling
 
-**File**: `experience/web/hooks/useObserverPolling.ts`  
-**Calls**: 2  
+**File**: `experience/web/hooks/useObserverPolling.ts`
+**Calls**: 2
 **Category**: `api`
 - Observer updates
 - Polling errors
 
-**File**: Other utility hooks  
-**Calls**: ~1  
+**File**: Other utility hooks
+**Calls**: ~1
 
 ---
 
@@ -245,7 +245,7 @@ logger.error('category', 'message', errorObject);
 
 ---
 
-**Status**: Ready for completion  
-**Complexity**: Low (straightforward migrations)  
-**Risk**: Minimal (no breaking changes)  
+**Status**: Ready for completion
+**Complexity**: Low (straightforward migrations)
+**Risk**: Minimal (no breaking changes)
 **Reward**: Complete logging control! 🚀

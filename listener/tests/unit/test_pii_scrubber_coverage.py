@@ -7,20 +7,20 @@ from app.services.pii_scrubber import PIIScrubber
 class TestPIIScrubberCoverage:
     """Targeted tests for 100% coverage."""
 
-    def test_detect_pii_empty(self):
+    def test_detect_pii_empty(self) -> None:
         """Test detect_pii with empty input (Line 208)."""
         scrubber = PIIScrubber()
-        assert scrubber.detect_pii("") == []
-        assert scrubber.detect_pii("   ") == []
-        assert scrubber.detect_pii(None) == []
+        assert not scrubber.detect_pii("")
+        assert not scrubber.detect_pii("   ")
+        assert not scrubber.detect_pii(None)  # type: ignore[arg-type]
 
-    def test_env_var_override(self):
+    def test_env_var_override(self) -> None:
         """Test model path override via env var (Line 105)."""
         with patch.dict(os.environ, {"PII_MODEL_PATH": "custom-model-path"}):
             scrubber = PIIScrubber()
             assert scrubber.model_name == "custom-model-path"
 
-    def test_scrub_overlap(self):
+    def test_scrub_overlap(self) -> None:
         """Test regex entity overlapping with BERT entity in scrub (Line 183)."""
         scrubber = PIIScrubber()
 
@@ -50,7 +50,7 @@ class TestPIIScrubberCoverage:
             # Result should be [NAME], not [DATE] or both.
             assert scrubbed == "[NAME]"
 
-    def test_detect_pii_overlap(self):
+    def test_detect_pii_overlap(self) -> None:
         """Test regex entity overlapping with BERT entity in detect_pii (Line 231)."""
         scrubber = PIIScrubber()
         text = "Tuesday"
@@ -70,7 +70,7 @@ class TestPIIScrubberCoverage:
             assert detected[0][1] == "PER"  # Type
             assert detected[0][0] == "Tuesday"  # Word
 
-    def test_regex_no_overlap(self):
+    def test_regex_no_overlap(self) -> None:
         """Test regex entity with NO overlap (Lines 184, 238-239)."""
         scrubber = PIIScrubber()
         text = "Contact test@example.com"

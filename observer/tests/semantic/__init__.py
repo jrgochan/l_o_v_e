@@ -1,1 +1,1 @@
-"""Semantic validation tests (Compassion vs Pity, etc.)"""
+"""Observer semantic tests package."""

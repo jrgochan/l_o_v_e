@@ -1,8 +1,8 @@
 # Incident Response
 
-**Reading Time:** ~20 minutes  
-**Audience:** Engineering managers, DevOps, on-call engineers  
-**Prerequisites:** [Team Structure](02-team-structure.md)  
+**Reading Time:** ~20 minutes
+**Audience:** Engineering managers, DevOps, on-call engineers
+**Prerequisites:** [Team Structure](02-team-structure.md)
 **Goal:** Handle production incidents effectively
 
 ---
@@ -422,12 +422,12 @@ redis-cli DEL "arq:queue:default"
 
 ## Key Takeaways
 
-✅ **P0 incidents:** Immediate response, page on-call  
-✅ **Sacred test failure:** Highest priority (innovation at risk)  
-✅ **Clear runbooks:** Step-by-step procedures  
-✅ **Communication:** Keep stakeholders informed  
-✅ **Post-incident:** Always write RCA, implement prevention  
-✅ **Escalation:** Know who to contact  
+✅ **P0 incidents:** Immediate response, page on-call
+✅ **Sacred test failure:** Highest priority (innovation at risk)
+✅ **Clear runbooks:** Step-by-step procedures
+✅ **Communication:** Keep stakeholders informed
+✅ **Post-incident:** Always write RCA, implement prevention
+✅ **Escalation:** Know who to contact
 
 ---
 

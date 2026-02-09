@@ -5,7 +5,7 @@ from typing import Any, Dict, Optional
 from fastapi import APIRouter, Depends, HTTPException
 
 from app.schemas.prompts import PromptTemplateResponse
-from app.services.prompt_service import PromptService, get_prompt_service
+from app.services.ai.prompts import PromptService, get_prompt_service
 
 router = APIRouter()
 

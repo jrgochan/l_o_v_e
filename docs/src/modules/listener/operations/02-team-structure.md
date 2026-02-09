@@ -1,8 +1,8 @@
 # Team Structure
 
-**Reading Time:** ~15 minutes  
-**Audience:** Engineering managers, hiring managers  
-**Prerequisites:** [Monitoring & Operations](01-monitoring.md)  
+**Reading Time:** ~15 minutes
+**Audience:** Engineering managers, hiring managers
+**Prerequisites:** [Monitoring & Operations](01-monitoring.md)
 **Goal:** Understand recommended team structure and responsibilities
 
 ---
@@ -341,12 +341,12 @@ For active development:
 
 ## Key Takeaways
 
-✅ **Small team:** 2 FTE sufficient for maintenance  
-✅ **Growing team:** 3.5-4 FTE for active development  
-✅ **Critical role:** ML Engineer owns prompt engineering  
-✅ **Prompt changes:** Require 2 reviewers (critical)  
-✅ **Onboarding:** 1-4 weeks depending on level  
-✅ **Bus factor:** 2+ people for critical knowledge  
+✅ **Small team:** 2 FTE sufficient for maintenance
+✅ **Growing team:** 3.5-4 FTE for active development
+✅ **Critical role:** ML Engineer owns prompt engineering
+✅ **Prompt changes:** Require 2 reviewers (critical)
+✅ **Onboarding:** 1-4 weeks depending on level
+✅ **Bus factor:** 2+ people for critical knowledge
 
 ---
 

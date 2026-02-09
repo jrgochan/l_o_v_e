@@ -1,7 +1,7 @@
 # Keyboard-Driven Emotional Journeys
 
-**Date:** December 7, 2025  
-**Status:** 🌟 Vision Document  
+**Date:** December 7, 2025
+**Status:** 🌟 Vision Document
 **Theme:** Complete keyboard navigation for therapeutic emotional journeys
 
 ---
@@ -48,7 +48,7 @@ Begin journey (Enter)
 
 #### `/journey complete` - Mark journey as complete
 
-#### `/journey abandon` - Stop and reset  
+#### `/journey abandon` - Stop and reset
 
 ### Waypoint Navigation
 
@@ -60,7 +60,7 @@ Begin journey (Enter)
 
 #### `/waypoint list` - View all waypoints
 
-#### `/waypoint current` - Current waypoint details  
+#### `/waypoint current` - Current waypoint details
 
 ### Journey Management
 
@@ -70,7 +70,7 @@ Begin journey (Enter)
 
 #### `/journey export` - Export journey data
 
-#### `/journey share` - Share journey with others  
+#### `/journey share` - Share journey with others
 
 ---
 
@@ -271,11 +271,11 @@ Journey begins
 
 ## Success Metrics
 
-✅ **Speed:** Journey setup in <2 minutes  
-✅ **Ease:** No mouse required  
-✅ **Flow:** Continuous keyboard interaction  
-✅ **Accessibility:** Works for everyone  
-✅ **Professional:** Therapist never breaks eye contact  
+✅ **Speed:** Journey setup in <2 minutes
+✅ **Ease:** No mouse required
+✅ **Flow:** Continuous keyboard interaction
+✅ **Accessibility:** Works for everyone
+✅ **Professional:** Therapist never breaks eye contact
 
 ---
 

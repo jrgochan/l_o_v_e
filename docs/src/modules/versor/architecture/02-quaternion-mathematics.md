@@ -187,10 +187,10 @@ q̂ = q / ||q|| = [w/||q||, x/||q||, y/||q||, z/||q||]
 def normalize(self) -> Quaternion:
     """Normalize to unit length."""
     mag = self.magnitude()
-    
+
     if mag < EPSILON:
         return Quaternion.identity()  # Zero → identity
-    
+
     return Quaternion(
         self.w / mag,
         self.x / mag,
@@ -252,10 +252,10 @@ q⁻¹ = q̅
 def inverse(self) -> Quaternion:
     """Multiplicative inverse."""
     mag_sq = self.magnitude() ** 2
-    
+
     if mag_sq < EPSILON:
         raise ValueError("Cannot invert zero quaternion")
-    
+
     conj = self.conjugate()
     return Quaternion(
         conj.w / mag_sq,
@@ -314,24 +314,24 @@ Where:
 def from_axis_angle(cls, axis: np.ndarray, angle: float) -> "Quaternion":
     """
     Create quaternion from axis-angle representation.
-    
+
     Args:
         axis: Unit vector [nx, ny, nz]
         angle: Rotation angle in radians
-    
+
     Returns:
         Unit quaternion representing the rotation
-    
+
     Mathematical formula:
         q = [cos(θ/2), sin(θ/2)·n̂x, sin(θ/2)·n̂y, sin(θ/2)·n̂z]
     """
     # Normalize axis
     axis = axis / np.linalg.norm(axis)
-    
+
     half_angle = angle / 2.0
     sin_half = math.sin(half_angle)
     cos_half = math.cos(half_angle)
-    
+
     return cls(
         w=cos_half,
         x=sin_half * axis[0],
@@ -359,10 +359,10 @@ q = Quaternion.from_axis_angle(axis, angle)
 def to_axis_angle(self) -> Tuple[np.ndarray, float]:
     """
     Extract axis and angle from quaternion.
-    
+
     Returns:
         (axis, angle) where axis is unit vector, angle in radians
-    
+
     Mathematical formulas:
         θ = 2 * arccos(w)
         n̂ = [x, y, z] / sin(θ/2)
@@ -370,19 +370,19 @@ def to_axis_angle(self) -> Tuple[np.ndarray, float]:
     # Handle identity case
     if abs(self.w) > 1.0 - EPSILON:
         return np.array([1, 0, 0]), 0.0  # Arbitrary axis, zero angle
-    
+
     angle = 2.0 * math.acos(np.clip(self.w, -1.0, 1.0))
     sin_half = math.sin(angle / 2.0)
-    
+
     if abs(sin_half) < EPSILON:
         return np.array([1, 0, 0]), 0.0
-    
+
     axis = np.array([
         self.x / sin_half,
         self.y / sin_half,
         self.z / sin_half
     ])
-    
+
     return axis, angle
 ```
 
@@ -428,22 +428,22 @@ Where v is represented as quaternion [0, vx, vy, vz]
 def rotate_vector(self, v: np.ndarray) -> np.ndarray:
     """
     Rotate a 3D vector by this quaternion.
-    
+
     Args:
         v: 3D vector [x, y, z]
-    
+
     Returns:
         Rotated vector v'
-    
+
     Formula:
         v' = q * [0, vx, vy, vz] * q̅
     """
     # Represent vector as quaternion
     v_quat = Quaternion(0, v[0], v[1], v[2])
-    
+
     # Sandwich product
     result = self.multiply(v_quat).multiply(self.conjugate())
-    
+
     return np.array([result.x, result.y, result.z])
 ```
 
@@ -491,13 +491,13 @@ When interpolating, we must choose the shorter path:
 def ensure_shortest_path(q1: Quaternion, q2: Quaternion):
     """
     Ensure SLERP takes shortest path by checking dot product.
-    
+
     If q1 · q2 < 0, they're on opposite hemispheres of S³.
     Negate q2 to choose the shorter arc.
     """
     if q1.dot(q2) < 0:
         q2 = Quaternion(-q2.w, -q2.x, -q2.y, -q2.z)
-    
+
     return q1, q2
 ```
 
@@ -580,7 +580,7 @@ R = ┌                                                    ┐
 def to_rotation_matrix(self) -> np.ndarray:
     """Convert to 3×3 rotation matrix."""
     w, x, y, z = self.w, self.x, self.y, self.z
-    
+
     return np.array([
         [1 - 2*(y**2 + z**2), 2*(x*y - w*z), 2*(x*z + w*y)],
         [2*(x*y + w*z), 1 - 2*(x**2 + z**2), 2*(y*z - w*x)],
@@ -597,11 +597,11 @@ def to_rotation_matrix(self) -> np.ndarray:
 def from_rotation_matrix(cls, R: np.ndarray) -> "Quaternion":
     """
     Convert 3×3 rotation matrix to quaternion.
-    
+
     Uses Shepperd's method for numerical stability.
     """
     trace = np.trace(R)
-    
+
     if trace > 0:
         s = math.sqrt(trace + 1.0) * 2
         w = 0.25 * s
@@ -615,7 +615,7 @@ def from_rotation_matrix(cls, R: np.ndarray) -> "Quaternion":
         y = (R[0,1] + R[1,0]) / s
         z = (R[0,2] + R[2,0]) / s
     # ... more cases
-    
+
     return cls(w, x, y, z)
 ```
 
@@ -682,15 +682,15 @@ Where:
 def slerp(q1: Quaternion, q2: Quaternion, t: float) -> Quaternion:
     """
     Spherical linear interpolation.
-    
+
     Args:
         q1: Start quaternion
         q2: End quaternion
         t: Parameter in [0, 1]
-    
+
     Returns:
         Interpolated quaternion at parameter t
-    
+
     Formula:
         SLERP(q₁, q₂, t) = (sin((1-t)Ω)/sin(Ω))·q₁ + (sin(tΩ)/sin(Ω))·q₂
     """
@@ -699,14 +699,14 @@ def slerp(q1: Quaternion, q2: Quaternion, t: float) -> Quaternion:
     if dot < 0:
         q2 = Quaternion(-q2.w, -q2.x, -q2.y, -q2.z)
         dot = -dot
-    
+
     # Clamp dot product
     dot = np.clip(dot, -1.0, 1.0)
-    
+
     # Calculate angle
     omega = math.acos(dot)
     sin_omega = math.sin(omega)
-    
+
     # Handle near-parallel quaternions
     if abs(sin_omega) < EPSILON:
         # Use linear interpolation
@@ -716,11 +716,11 @@ def slerp(q1: Quaternion, q2: Quaternion, t: float) -> Quaternion:
             (1-t)*q1.y + t*q2.y,
             (1-t)*q1.z + t*q2.z
         ).normalize()
-    
+
     # Standard SLERP formula
     a = math.sin((1-t) * omega) / sin_omega
     b = math.sin(t * omega) / sin_omega
-    
+
     return Quaternion(
         a*q1.w + b*q2.w,
         a*q1.x + b*q2.x,
@@ -743,7 +743,7 @@ def slerp(q1: Quaternion, q2: Quaternion, t: float) -> Quaternion:
 
    ```python
    EPSILON = 1e-6
-   
+
    if abs(magnitude - 1.0) < EPSILON:
        # Treat as unit
    ```
@@ -891,7 +891,7 @@ qᵗ = [cos(tθ/2), sin(tθ/2)·n̂]
 def power(self, t: float) -> Quaternion:
     """
     Raise quaternion to power t.
-    
+
     For unit quaternion representing rotation by θ:
     qᵗ represents rotation by t·θ
     """
@@ -982,5 +982,5 @@ Pure connection: [0, 0, 1] → Rotation around Z-axis (connection)
 
 ---
 
-**Previous:** [← Deep Dive Architecture](01-deep-dive.md)  
+**Previous:** [← Deep Dive Architecture](01-deep-dive.md)
 **Next:** [VAC Conversion →](03-vac-conversion.md)

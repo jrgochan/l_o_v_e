@@ -61,7 +61,7 @@ else
     YELLOW='\033[1;33m'
     BLUE='\033[0;34m'
     NC='\033[0m'
-    
+
     print_success() { printf "%b[OK] %s%b\n" "$GREEN" "$1" "$NC"; }
     print_error() { printf "%b[ERR] %s%b\n" "$RED" "$1" "$NC"; }
     print_warning() { printf "%b[WARN] %s%b\n" "$YELLOW" "$1" "$NC"; }
@@ -89,21 +89,21 @@ OPTIONS:
     -h, --help              Show this help message
     --version               Show version information
     -y, --yes               Skip confirmation prompts
-    
+
     Output:
     -o, --output-dir DIR    Directory where the archive will be saved (default: current dir)
     -n, --name NAME         Base name for the archive file (default: love-stack-archive-YYYYMMDD)
     --format FORMAT         Archive format: tar.gz (default) or zip
-    
+
     Temporary Storage:
     -t, --temp-dir DIR      Directory for temporary files
     --keep-temp             Do not delete temporary directory after archiving
-    
+
     Git Options (passed to clone script):
     --https                 Use HTTPS instead of SSH
     --branch BRANCH         Clone specific branch
     --shallow               Shallow clone (faster, smaller archive)
-    
+
     Behavior:
     -q, --quiet             Minimal output
     -v, --verbose           Detailed output
@@ -111,10 +111,10 @@ OPTIONS:
 EXAMPLES:
     # Standard backup
     ./archive-project.sh
-    
+
     # Create a zip archive in a specific folder
     ./archive-project.sh -o ~/backups --format zip
-    
+
     # Quick shallow backup with HTTPS
     ./archive-project.sh --shallow --https
 
@@ -222,7 +222,7 @@ get_date_string() {
 cleanup() {
     local temp_dir="$1"
     local keep="$2"
-    
+
     if [ -d "$temp_dir" ]; then
         if [ "$keep" = true ]; then
             [ "$OPT_QUIET" != true ] && print_info "Keeping temporary directory: $temp_dir"
@@ -239,9 +239,9 @@ cleanup() {
 
 main() {
     parse_arguments "$@"
-    
+
     [ "$OPT_QUIET" != true ] && print_header "📦 L.O.V.E. Stack Archiver"
-    
+
     # Check dependencies
     if [ "$OPT_FORMAT" = "zip" ]; then
         if ! command_exists zip; then
@@ -254,7 +254,7 @@ main() {
             exit 1
         fi
     fi
-    
+
     # Determine full output paths
     local output_dir_abs
     if [ -d "$OPT_OUTPUT_DIR" ]; then
@@ -269,109 +269,109 @@ main() {
             exit 1
         fi
     fi
-    
+
     # Set filename if not provided
     if [ -z "$OPT_FILENAME" ]; then
         OPT_FILENAME="${DEFAULT_FILENAME_PREFIX}-$(get_date_string)"
     fi
-    
+
     # Clean filename of extension if user provided one that matches format
     local clean_filename="${OPT_FILENAME%.zip}"
     clean_filename="${clean_filename%.tar.gz}"
     clean_filename="${clean_filename%.tgz}"
     clean_filename="${clean_filename%.tar}"
-    
+
     # Setup temporary directory
     local temp_root="${OPT_TEMP_DIR:-${TMPDIR:-/tmp}}"
     local work_dir
     work_dir="$temp_root/love-archive-$(get_timestamp)"
-    
+
     # Register cleanup trap
     trap 'cleanup "$work_dir" "$OPT_KEEP_TEMP"' EXIT INT TERM
-    
+
     mkdir -p "$work_dir"
     [ "$OPT_VERBOSE" = true ] && print_info "Created working directory: $work_dir"
-    
+
     # ------------------------------------------------------------------------
     # STEP 1: Clone Repositories
     # ------------------------------------------------------------------------
     [ "$OPT_QUIET" != true ] && print_info "Step 1/3: Cloning repositories..."
-    
+
     local clone_script="$PROJECT_ROOT/infra/scripts/setup/clone-love-repos.sh"
     if [ ! -f "$clone_script" ]; then
         print_error "Clone script not found at: $clone_script"
         exit 1
     fi
-    
+
     # Build clone options
     local clone_opts="--target-dir \"$work_dir\" --yes"
-    
+
     [ "$OPT_GIT_PROTOCOL" = "https" ] && clone_opts="$clone_opts --https"
     [ "$OPT_GIT_BRANCH" != "main" ] && clone_opts="$clone_opts --branch \"$OPT_GIT_BRANCH\""
     [ "$OPT_GIT_SHALLOW" = true ] && clone_opts="$clone_opts --shallow"
     [ "$OPT_QUIET" = true ] && clone_opts="$clone_opts --quiet"
     [ "$OPT_VERBOSE" = true ] && clone_opts="$clone_opts --verbose"
-    
+
     # Run the clone script
     if ! eval "$clone_script" "$clone_opts"; then
         print_error "Failed to clone repositories."
         exit 1
     fi
-    
+
     # Verify the clone worked
     local project_dir="$work_dir/l_o_v_e"
     if [ ! -d "$project_dir" ]; then
         print_error "Project directory not found after sync: $project_dir"
         exit 1
     fi
-    
+
     # Remove .git directories to make archive smaller data-only snapshot?
     # Usually 'archive' implies clean source code.
-    # But if users want git history, they might not want this. 
-    # Let's clean .git folders by default if shallow is on, otherwise keep them? 
+    # But if users want git history, they might not want this.
+    # Let's clean .git folders by default if shallow is on, otherwise keep them?
     # Actually, standard behavior for "Snapshot" archives (like GitHub's download ZIP) is NO .git folders.
     # But for a developer backup, maybe yes.
-    # Let's remove .git folders if shallow is used (since history is truncated anyway), 
+    # Let's remove .git folders if shallow is used (since history is truncated anyway),
     # or if a --clean flag is passed (which we can add, but for now lets stick to the plan).
-    # Since the request says "compress the project", usually that means the source tree. 
+    # Since the request says "compress the project", usually that means the source tree.
     # I'll leave .git folders for now as it's a "clone", not just an "export".
-    
+
     # ------------------------------------------------------------------------
     # STEP 2: Create Archive
     # ------------------------------------------------------------------------
     [ "$OPT_QUIET" != true ] && print_info "Step 2/3: Compressing files..."
-    
+
     local final_archive_path=""
-    
+
     cd "$work_dir"
-    
+
     if [ "$OPT_FORMAT" = "zip" ]; then
         local zip_file="${clean_filename}.zip"
         final_archive_path="$output_dir_abs/$zip_file"
-        
+
         if [ "$OPT_VERBOSE" = true ]; then
             zip -r "$final_archive_path" l_o_v_e
         else
             zip -q -r "$final_archive_path" l_o_v_e
         fi
-        
+
     else
         # Default: tar.gz
         local tar_file="${clean_filename}.tar.gz"
         final_archive_path="$output_dir_abs/$tar_file"
-        
+
         if [ "$OPT_VERBOSE" = true ]; then
             tar -czf "$final_archive_path" l_o_v_e
         else
             tar -czf "$final_archive_path" l_o_v_e
         fi
     fi
-    
+
     if [ ! -f "$final_archive_path" ]; then
         print_error "Failed to create archive."
         exit 1
     fi
-    
+
     # ------------------------------------------------------------------------
     # STEP 3: Finalize
     # ------------------------------------------------------------------------
@@ -388,7 +388,7 @@ main() {
     else
         file_size="unknown"
     fi
-    
+
     # Convert size to human readable if possible
     local file_size_hr="$file_size bytes"
     if [ "$file_size" != "unknown" ]; then
@@ -398,14 +398,14 @@ main() {
             file_size_hr="$((file_size / 1024)) KB"
         fi
     fi
-    
+
     [ "$OPT_QUIET" != true ] && print_success "Archive created successfully!"
     [ "$OPT_QUIET" != true ] && echo ""
     [ "$OPT_QUIET" != true ] && echo "  File:   $final_archive_path"
     [ "$OPT_QUIET" != true ] && echo "  Size:   $file_size_hr"
     [ "$OPT_QUIET" != true ] && echo "  Format: $OPT_FORMAT"
     [ "$OPT_QUIET" != true ] && echo ""
-    
+
     cd "$SCRIPT_DIR" # Restore directory before exit (not strictly needed due to subshell but good practice)
 }
 

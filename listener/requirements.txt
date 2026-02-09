@@ -26,7 +26,7 @@ langchain-google-vertexai>=2.0.0
 
 # Core AI - Explicit version pinning for Python 3.12 compatibility
 torch==2.3.0
-numpy==2.3.1
+numpy<2.0
 
 # Task Queue
 arq==0.26.1

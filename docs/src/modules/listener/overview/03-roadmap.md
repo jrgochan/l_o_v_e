@@ -1,8 +1,8 @@
 # Roadmap & Future Capabilities
 
-**Reading Time:** ~7 minutes  
-**Audience:** C-level, VPs, Product Leaders  
-**Prerequisites:** [Business Value](02-business-value.md)  
+**Reading Time:** ~7 minutes
+**Audience:** C-level, VPs, Product Leaders
+**Prerequisites:** [Business Value](02-business-value.md)
 **Goal:** Understand future direction and strategic priorities
 
 ---
@@ -164,7 +164,7 @@
 
 #### 3. Streaming Responses
 
-**Current:** Wait 2s, get complete result  
+**Current:** Wait 2s, get complete result
 **Future:** Get partial results every 200ms
 
 **UX Impact:** Feels faster, more interactive
@@ -187,7 +187,7 @@
 
 #### 5. Context-Aware Analysis
 
-**Current:** Each input analyzed in isolation  
+**Current:** Each input analyzed in isolation
 **Future:** Consider conversation history
 
 **Example:**
@@ -427,11 +427,11 @@ Outcome: Track if intervention helps
 
 ## Key Takeaways
 
-✅ **Clear roadmap:** Q1 foundation → Q4 profitability  
-✅ **Strategic priorities:** Patent, clinical validation, scale  
-✅ **Investment required:** ~$250k-450k for critical path  
-✅ **Exit potential:** $50M-100M in 24-36 months  
-✅ **Defensible moat:** Privacy + IP + clinical validation  
+✅ **Clear roadmap:** Q1 foundation → Q4 profitability
+✅ **Strategic priorities:** Patent, clinical validation, scale
+✅ **Investment required:** ~$250k-450k for critical path
+✅ **Exit potential:** $50M-100M in 24-36 months
+✅ **Defensible moat:** Privacy + IP + clinical validation
 
 ---
 

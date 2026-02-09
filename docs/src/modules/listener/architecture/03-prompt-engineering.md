@@ -1,8 +1,8 @@
 # Prompt Engineering Guide
 
-**Reading Time:** ~35 minutes  
-**Audience:** Senior developers, ML engineers  
-**Prerequisites:** [Semantic Analysis Internals](02-semantic-analysis.md)  
+**Reading Time:** ~35 minutes
+**Audience:** Senior developers, ML engineers
+**Prerequisites:** [Semantic Analysis Internals](02-semantic-analysis.md)
 **Goal:** Master the art of crafting effective prompts for VAC extraction
 
 ---
@@ -39,7 +39,7 @@ prompt = """
 
 ```python
 system_message = """
-You are the Listener, an expert psychometrician trained in 
+You are the Listener, an expert psychometrician trained in
 Dr. Brené Brown's Atlas of the Heart.
 """
 ```
@@ -61,7 +61,7 @@ Dr. Brené Brown's Atlas of the Heart.
 **Best (current):**
 
 ```python
-"You are the Listener, an expert psychometrician trained in 
+"You are the Listener, an expert psychometrician trained in
 Dr. Brené Brown's Atlas of the Heart."
 ```
 
@@ -163,7 +163,7 @@ Example X - EMOTION_NAME (Connection Quality):
 Input: "User's text here"
 Analysis:
 - Valence: [Analysis] → [value]
-- Arousal: [Analysis] → [value]  
+- Arousal: [Analysis] → [value]
 - Connection: [Detailed analysis emphasizing relational aspect] → [value]
 Output: {
   "primary_emotion": "Emotion",
@@ -180,7 +180,7 @@ Output: {
 # 1. PITY (separation) - Connection < 0
 "I feel sorry for them, they're struggling."
 
-# 2. COMPASSION (connection) - Connection > 0.5  
+# 2. COMPASSION (connection) - Connection > 0.5
 "I understand their pain. I'm here for them."
 
 # 3. JOY (positive connection) - Connection > 0.5
@@ -323,10 +323,10 @@ Follow this analysis process:
 
 ```python
 # Edge case: Grief (negative + positive)
-"I miss them so much" → 
+"I miss them so much" →
   Valence: -0.8 (painful)
   Connection: +0.7 (love persists!)
-  
+
 # This teaches: Connection can be positive even with pain
 ```
 
@@ -353,22 +353,22 @@ Follow this analysis process:
 ```python
 def compare_prompts(text: str, prompt_a: str, prompt_b: str):
     """Compare two prompts on same input"""
-    
+
     analyzer_a = SemanticAnalyzer(prompt=prompt_a)
     analyzer_b = SemanticAnalyzer(prompt=prompt_b)
-    
+
     result_a = analyzer_a.analyze_sync(text)
     result_b = analyzer_b.analyze_sync(text)
-    
+
     print(f"Input: {text}\n")
     print(f"Prompt A:")
     print(f"  Connection: {result_a.vac.connection:.2f}")
     print(f"  Reasoning: {result_a.reasoning}\n")
-    
+
     print(f"Prompt B:")
     print(f"  Connection: {result_b.vac.connection:.2f}")
     print(f"  Reasoning: {result_b.reasoning}\n")
-    
+
     # Calculate difference
     diff = abs(result_a.vac.connection - result_b.vac.connection)
     print(f"Connection difference: {diff:.2f}")
@@ -381,19 +381,19 @@ def compare_prompts(text: str, prompt_a: str, prompt_b: str):
 ```python
 def ablation_study(test_cases: List[str]):
     """Test impact of removing prompt elements"""
-    
+
     prompts = {
         "full": create_full_prompt(),
         "no_connection_teaching": create_prompt_without_connection_section(),
         "no_few_shot": create_prompt_without_examples(),
         "minimal": create_minimal_prompt()
     }
-    
+
     for case in test_cases:
         print(f"\n{'='*60}")
         print(f"Test case: {case}")
         print('='*60)
-        
+
         for name, prompt in prompts.items():
             analyzer = SemanticAnalyzer(prompt=prompt)
             result = analyzer.analyze_sync(case)
@@ -485,10 +485,10 @@ Example 2: "Gratitude" → Connection: +0.8 (explicitly acknowledging connection
 ```python
 def select_examples_for_input(text: str) -> List[Example]:
     """Choose most relevant examples based on input"""
-    
+
     # Detect emotion keywords
     keywords = extract_keywords(text)
-    
+
     if "sorry" in keywords or "pity" in keywords:
         # Include pity vs. compassion contrast
         return [pity_example, compassion_example, ...]
@@ -505,10 +505,10 @@ def select_examples_for_input(text: str) -> List[Example]:
 ```python
 def iterative_analysis(text: str, max_iterations: int = 3):
     """Refine analysis through multiple passes"""
-    
+
     # First pass
     result = analyzer.analyze_sync(text)
-    
+
     for i in range(max_iterations):
         # Check if Connection value makes sense
         if not validate_connection(result):
@@ -518,7 +518,7 @@ def iterative_analysis(text: str, max_iterations: int = 3):
             result = refined_analyzer.analyze_sync(text)
         else:
             break
-    
+
     return result
 ```
 
@@ -526,18 +526,18 @@ def iterative_analysis(text: str, max_iterations: int = 3):
 
 ```python
 async def analyze_with_confidence_threshold(
-    text: str, 
+    text: str,
     min_confidence: float = 0.8
 ):
     """Re-analyze if confidence is low"""
-    
+
     result = await analyzer.analyze(text)
-    
+
     if result.confidence < min_confidence:
         # Try with more detailed prompt
         detailed_analyzer = SemanticAnalyzer(prompt=detailed_prompt)
         result = await detailed_analyzer.analyze(text)
-    
+
     return result
 ```
 
@@ -551,23 +551,23 @@ async def analyze_with_confidence_threshold(
 def evaluate_connection_accuracy(test_set: List[Tuple[str, float]]):
     """
     Evaluate how well the prompt extracts Connection.
-    
+
     Args:
         test_set: List of (text, expected_connection) pairs
     """
     errors = []
-    
+
     for text, expected in test_set:
         result = analyzer.analyze_sync(text)
         error = abs(result.vac.connection - expected)
         errors.append(error)
-    
+
     mae = np.mean(errors)  # Mean Absolute Error
     rmse = np.sqrt(np.mean([e**2 for e in errors]))  # Root Mean Square Error
-    
+
     print(f"MAE: {mae:.3f}")
     print(f"RMSE: {rmse:.3f}")
-    
+
     return mae, rmse
 ```
 
@@ -644,13 +644,13 @@ v1.0 (2025-11-15):
 
 ## Key Takeaways
 
-✅ **Role definition** sets context  
-✅ **Connection teaching** is critical  
-✅ **Few-shot examples** teach the model  
-✅ **Contrastive pairs** (pity vs. compassion) are essential  
-✅ **Explicit reasoning** improves learning  
-✅ **Test systematically** on critical cases  
-✅ **Version control** prompts like code  
+✅ **Role definition** sets context
+✅ **Connection teaching** is critical
+✅ **Few-shot examples** teach the model
+✅ **Contrastive pairs** (pity vs. compassion) are essential
+✅ **Explicit reasoning** improves learning
+✅ **Test systematically** on critical cases
+✅ **Version control** prompts like code
 
 ---
 

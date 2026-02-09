@@ -1,8 +1,8 @@
 # Codebase Tour
 
-**Reading Time:** ~20 minutes  
-**Audience:** New developers  
-**Prerequisites:** [Getting Started](01-getting-started.md) completed  
+**Reading Time:** ~20 minutes
+**Audience:** New developers
+**Prerequisites:** [Getting Started](01-getting-started.md) completed
 **Goal:** Understand the Observer codebase structure and know where to find things
 
 ---
@@ -82,7 +82,7 @@ class Settings(BaseSettings):
     ENVIRONMENT: str = "development"
     VERSOR_URL: str = "http://localhost:8001"
     EMBEDDING_PROVIDER: str = "local"
-    
+
     class Config:
         env_file = ".env"
 
@@ -133,7 +133,7 @@ Each file defines a SQLAlchemy model representing a database table.
 ```python
 class AtlasDefinition(Base):
     __tablename__ = "atlas_definitions"
-    
+
     id = Column(UUID, primary_key=True)
     name = Column(String, unique=True)  # "Joy", "Compassion", etc.
     category = Column(String)           # "When Life Is Good"
@@ -147,7 +147,7 @@ class AtlasDefinition(Base):
 ```python
 class UserTrajectory(Base):
     __tablename__ = "user_trajectory"
-    
+
     id = Column(UUID, primary_key=True)
     user_id = Column(String, index=True)
     session_id = Column(String, index=True)
@@ -164,7 +164,7 @@ class UserTrajectory(Base):
 ```python
 class TransitionStrategy(Base):
     __tablename__ = "transition_strategies"
-    
+
     id = Column(UUID, primary_key=True)
     name = Column(String)
     category = Column(String)          # ACT, DBT, CBT, etc.
@@ -297,11 +297,11 @@ Organizes routes and request/response schemas.
 @router.get("/emotions")
 async def get_emotions(category: Optional[str] = None):
     """Get all emotions, optionally filtered by category"""
-    
+
 @router.get("/emotions/{name}")
 async def get_emotion(name: str):
     """Get specific emotion by name"""
-    
+
 @router.post("/similar")
 async def find_similar(request: SimilarityRequest):
     """Find emotions similar to given VAC coordinates"""
@@ -313,7 +313,7 @@ async def find_similar(request: SimilarityRequest):
 @router.post("/")
 async def store_state(state: StateCreate):
     """Store a new emotional state"""
-    
+
 @router.get("/{user_id}")
 async def get_trajectory(user_id: str, limit: int = 100):
     """Get user's emotional trajectory"""
@@ -325,7 +325,7 @@ async def get_trajectory(user_id: str, limit: int = 100):
 @router.post("/path")
 async def find_path(request: PathRequest):
     """Find therapeutic path between two emotions"""
-    
+
 @router.get("/strategies")
 async def get_strategies(from_id: str, to_id: str):
     """Get recommended strategies for transition"""
@@ -542,14 +542,14 @@ Controllers (routes) stay thin, services handle logic:
 @router.post("/path")
 async def find_path(request: PathRequest, db: AsyncSession = Depends(get_db)):
     # 100 lines of A* algorithm here...
-    
+
 # ✅ Good: Logic in service
 @router.post("/path")
 async def find_path(request: PathRequest, db: AsyncSession = Depends(get_db)):
     planner = PathPlanner(db)
     path = await planner.find_transition_path(
-        request.from_emotion, 
-        request.to_emotion, 
+        request.from_emotion,
+        request.to_emotion,
         request.user_id
     )
     return path
@@ -566,21 +566,21 @@ Let's trace a request from start to finish:
 ```text
 1. HTTP POST /state
    └─> app/api/routes/state.py
-       
+
 2. store_state(state: StateCreate, db: AsyncSession)
    └─> Validates request with Pydantic
-       
+
 3. emotion_mapper = EmotionMapper(db)
    emotion = await emotion_mapper.find_nearest(state.vac, state.text)
    └─> app/services/emotion_mapper.py
        └─> Queries atlas_definitions table
        └─> Calculates weighted fusion
-       
+
 4. quaternion_builder = QuaternionBuilder()
    q = await quaternion_builder.from_vac(state.vac)
    └─> app/services/quaternion_builder.py
        └─> Calls Versor module (or local math)
-       
+
 5. Create UserTrajectory record
    trajectory = UserTrajectory(
        user_id=state.user_id,
@@ -593,7 +593,7 @@ Let's trace a request from start to finish:
    await db.commit()
    └─> app/models/user_trajectory.py
        └─> Inserts into user_trajectory table
-       
+
 6. Return response
    └─> 201 Created with trajectory data
 ```

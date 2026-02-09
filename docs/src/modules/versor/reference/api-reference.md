@@ -6,7 +6,7 @@ Complete API documentation for all Versor endpoints with request/response schema
 
 ## Base URL
 
-**Development:** `http://localhost:8001`  
+**Development:** `http://localhost:8001`
 **Production:** `http://versor.love-platform.com`
 
 **All endpoints prefixed with:** `/versor/`
@@ -361,7 +361,7 @@ interface QuaternionModel {
 ### InsightCode
 
 ```typescript
-type InsightCode = 
+type InsightCode =
   | "VALENCE_SHIFT"     // Feeling better/worse
   | "AROUSAL_SHIFT"     // Energy level changed
   | "CONNECTION_SHIFT"; // Connection to others changed
@@ -382,7 +382,7 @@ type InsightCode =
 
 ## Versioning
 
-**Current:** No API versioning  
+**Current:** No API versioning
 **All endpoints:** Implicit v1
 
 **Future (if breaking changes):**
@@ -446,11 +446,11 @@ async function calculateQuaternion(
       time_delta_seconds: 1.0
     })
   });
-  
+
   if (!response.ok) {
     throw new Error(`Versor API error: ${response.status}`);
   }
-  
+
   return await response.json();
 }
 ```
@@ -536,5 +536,5 @@ async function calculateQuaternion(vac, previous = null) {
 
 ---
 
-**Previous:** [← Roadmap](../overview/03-roadmap.md)  
+**Previous:** [← Roadmap](../overview/03-roadmap.md)
 **Next:** [Configuration →](configuration.md)

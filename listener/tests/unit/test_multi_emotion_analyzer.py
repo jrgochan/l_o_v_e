@@ -1,14 +1,17 @@
 """Unit tests for MultiEmotionAnalyzer."""
 
+# pylint: disable=protected-access, too-many-lines, too-many-public-methods, broad-exception-raised
+
 import asyncio
 import json
+from typing import Any
 from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
 from pydantic import ValidationError
 
 import app.services.multi_emotion_analyzer
-from app.models.multi_emotion_response import MultiEmotionAnalysisResponse
+from app.models.multi_emotion_response import DetectedEmotionResponse, MultiEmotionAnalysisResponse
 from app.models.vac_response import VACVector
 from app.services.multi_emotion_analyzer import MultiEmotionAnalyzer, get_multi_emotion_analyzer
 
@@ -16,12 +19,12 @@ from app.services.multi_emotion_analyzer import MultiEmotionAnalyzer, get_multi_
 class TestMultiEmotionAnalyzer:
     """Test MultiEmotionAnalyzer class."""
 
-    def setup_method(self):
+    def setup_method(self) -> None:
         """Reset singleton."""
-        app.services.multi_emotion_analyzer._multi_emotion_analyzer_instance = None
+        app.services.multi_emotion_analyzer._multi_emotion_analyzer_instance = None  # type: ignore
 
     @pytest.fixture
-    def analyzer(self):
+    def analyzer(self) -> Any:
         """Create analyzer instance with mocks."""
         with patch("app.services.multi_emotion_analyzer.get_llm") as mock_get_llm:
             mock_llm = AsyncMock()
@@ -33,7 +36,7 @@ class TestMultiEmotionAnalyzer:
             return analyzer
 
     @pytest.mark.asyncio
-    async def test_init_dynamic_fetch(self):
+    async def test_init_dynamic_fetch(self) -> None:
         """Test dynamic model fetching during init."""
         with (
             patch("app.services.multi_emotion_analyzer.get_model_fetcher") as mock_get_fetcher,
@@ -51,7 +54,7 @@ class TestMultiEmotionAnalyzer:
 
             mock_loop_instance = MagicMock()
 
-            def mock_run_until_complete(coro):
+            def mock_run_until_complete(coro: Any) -> Any:
                 coro.close()
                 return "dynamic_model"
 
@@ -62,7 +65,7 @@ class TestMultiEmotionAnalyzer:
             assert analyzer.model == "dynamic_model"
 
     @pytest.mark.asyncio
-    async def test_init_dynamic_fetch_failure(self):
+    async def test_init_dynamic_fetch_failure(self) -> None:
         """Test fallback when dynamic fetch fails."""
         with (
             patch("app.services.multi_emotion_analyzer.get_model_fetcher"),
@@ -74,7 +77,7 @@ class TestMultiEmotionAnalyzer:
             mock_settings.LLM_TEMPERATURE = 0.5
             mock_settings.OLLAMA_BASE_URL = "http://localhost:11434"
 
-            def mock_fail(coro):
+            def mock_fail(coro: Any) -> Any:
                 coro.close()
                 raise Exception("Fail")
 
@@ -84,7 +87,7 @@ class TestMultiEmotionAnalyzer:
             assert analyzer.model == "default"
 
     @pytest.mark.asyncio
-    async def test_analyze_success(self, analyzer):
+    async def test_analyze_success(self, analyzer: Any) -> None:
         """Test successful analysis."""
         mock_response = {
             "emotions": [
@@ -115,7 +118,7 @@ class TestMultiEmotionAnalyzer:
         assert result.emotions[0].emotion_name == "Joy"
         assert result.aggregate_vac.valence == 0.8
 
-    async def test_init_loop_error(self):
+    async def test_init_loop_error(self) -> None:
         """Test initialization when get_event_loop fails."""
         # Use global asyncio patch since it is imported locally
         # Must pass model=None to trigger dynamic fetch logic
@@ -129,7 +132,7 @@ class TestMultiEmotionAnalyzer:
 
             mock_fetcher.return_value.get_model_for_function = AsyncMock(return_value="model")
 
-            def mock_run_coro(coro):
+            def mock_run_coro(coro: Any) -> Any:
                 coro.close()
                 return "model"
 
@@ -140,7 +143,7 @@ class TestMultiEmotionAnalyzer:
             mock_set_loop.assert_called_once()
 
     @pytest.mark.asyncio
-    async def test_refresh_prompts_error(self, analyzer):
+    async def test_refresh_prompts_error(self, analyzer: Any) -> None:
         """Test prompt refresh error handling."""
         # 1. Fetcher returns None for prompt data
         with patch("app.services.multi_emotion_analyzer.get_model_fetcher") as mock_get_fetcher:
@@ -160,7 +163,7 @@ class TestMultiEmotionAnalyzer:
             await analyzer._refresh_prompts()
             # Should log warning but not raise
 
-    def test_filter_emotions_edge_cases(self, analyzer):
+    def test_filter_emotions_edge_cases(self, analyzer: Any) -> None:
         """Test emotion filtering edge cases."""
         # 1. No emotions meeting confidence
         emotions = [
@@ -194,12 +197,12 @@ class TestMultiEmotionAnalyzer:
         assert len(filtered) == 3
 
     @pytest.mark.asyncio
-    async def test_analyze_empty_text(self, analyzer):
+    async def test_analyze_empty_text(self, analyzer: Any) -> None:
         """Test analyze with empty text."""
         with pytest.raises(ValueError, match="Input text cannot be empty"):
             await analyzer.analyze("")
 
-    def test_process_llm_markdown_cleaning(self, analyzer):
+    def test_process_llm_markdown_cleaning(self, analyzer: Any) -> None:
         """Test markdown cleaning logic."""
         # 1. ```json at start and ``` at end
         # resp1 = '```json\n{"emotions": []}\n```' (unused)
@@ -244,13 +247,13 @@ class TestMultiEmotionAnalyzer:
         assert len(res4.emotions) == 1
 
     @pytest.mark.asyncio
-    async def test_analyze_json_decode_error(self, analyzer):
+    async def test_analyze_json_decode_error(self, analyzer: Any) -> None:
         """Test handling of invalid JSON response."""
         analyzer.llm.ainvoke.return_value = "Not JSON"
         with pytest.raises(RuntimeError, match="Invalid JSON response from LLM"):
             await analyzer.analyze("text")
 
-    def test_process_llm_markdown_cleaning_explicit(self, analyzer):
+    def test_process_llm_markdown_cleaning_explicit(self, analyzer: Any) -> None:
         """Test markdown cleaning logic explicitly."""
         # Use valid content so it doesn't fail validation downstream
         # Must align with DetectedEmotionResponse: emotion_name (not name),
@@ -284,14 +287,14 @@ class TestMultiEmotionAnalyzer:
         assert res4 is not None
 
     @pytest.mark.asyncio
-    async def test_analyze_generic_error(self, analyzer):
+    async def test_analyze_generic_error(self, analyzer: Any) -> None:
         """Test handling of generic errors during analysis."""
         analyzer.llm.ainvoke.side_effect = Exception("LLM connection failed")
         with pytest.raises(RuntimeError, match="Analysis error: LLM connection failed"):
             await analyzer.analyze("text")
 
     @pytest.mark.asyncio
-    async def test_analyze_three_way_generic_error(self, analyzer):
+    async def test_analyze_three_way_generic_error(self, analyzer: Any) -> None:
         """Test handling of generic errors in 3-way analysis."""
         # Mock gather to raise exception
         with (
@@ -302,7 +305,7 @@ class TestMultiEmotionAnalyzer:
             with pytest.raises(RuntimeError, match="3-way analysis error: Parallel failure"):
                 await analyzer.analyze_three_way("text")
 
-    def test_calculate_aggregate_vac_edge_cases(self, analyzer):
+    def test_calculate_aggregate_vac_edge_cases(self, analyzer: Any) -> None:
         """Test VAC calculation edge cases."""
         # 1. Empty list
         assert analyzer._calculate_aggregate_vac([]) == (0.0, 0.0, 0.0)
@@ -311,10 +314,8 @@ class TestMultiEmotionAnalyzer:
         assert analyzer._calculate_aggregate_vac(emotions) == (0.0, 0.0, 0.0)
 
     @pytest.mark.asyncio
-    async def test_process_llm_response_missing_emotions_fails(self, analyzer):
+    async def test_process_llm_response_missing_emotions_fails(self, analyzer: Any) -> None:
         """Test that missing emotions key raises ValidationError."""
-        from pydantic import ValidationError
-
         # Valid JSON but missing required 'emotions'
         json_payload = (
             '{"relationships": [], "complexity_score": 0.5, "emotional_clarity": 0.8, '
@@ -325,10 +326,8 @@ class TestMultiEmotionAnalyzer:
             analyzer._process_llm_response(json_payload, "t")
 
     @pytest.mark.asyncio
-    async def test_process_llm_response_missing_vac_fails(self, analyzer):
+    async def test_process_llm_response_missing_vac_fails(self, analyzer: Any) -> None:
         """Test that missing vac field raises ValidationError."""
-        from pydantic import ValidationError
-
         # Missing vac in emotion
         json_payload = (
             '{"emotions": [{"emotion_name": "Joy", "category": "Happiness", '
@@ -340,7 +339,7 @@ class TestMultiEmotionAnalyzer:
         with pytest.raises(ValidationError):
             analyzer._process_llm_response(json_payload, "t")
 
-    def test_analyze_sync_loop_creation(self, analyzer):
+    def test_analyze_sync_loop_creation(self, analyzer: Any) -> None:
         """Test sync analysis loop creation."""
         # Patch global asyncio
         with (
@@ -352,7 +351,7 @@ class TestMultiEmotionAnalyzer:
             # Mock analyze to return valid response
             analyzer.analyze = AsyncMock(return_value=MagicMock())
 
-            def mock_run_coro(coro):
+            def mock_run_coro(coro: Any) -> Any:
                 coro.close()
                 return MagicMock()
 
@@ -362,169 +361,180 @@ class TestMultiEmotionAnalyzer:
             mock_new.assert_called_once()
             mock_set.assert_called_once()
 
-    def test_clinical_flags_coverage(self, analyzer):
-        """Test logic for clinical flags in 3-way analysis."""
-        # No, wait, checking file content.
-        # Ah, analyze_three_way calculates distances and flags inline.
-
-        # I need to mock the responses of the 3 calls to return specific VACs
-
-        # Case 1: content positive, voice negative (Suppression)
+    @pytest.mark.asyncio
+    async def test_clinical_flags_suppression(self, analyzer: Any) -> None:
+        """Test clinical flag: Emotional Suppression."""
         content_vac = VACVector(valence=0.8, arousal=0.5, connection=0.5)
         voice_vac = VACVector(valence=-0.8, arousal=0.5, connection=0.5)
 
-        # Setup mocks
         with (
             patch.object(analyzer, "_analyze_content_only", new_callable=AsyncMock) as mock_content,
             patch.object(analyzer, "_analyze_voice_only", new_callable=AsyncMock) as mock_voice,
             patch.object(analyzer, "analyze", new_callable=AsyncMock) as mock_analyze,
         ):
-
             mock_content.return_value.aggregate_vac = content_vac
             mock_voice.return_value.aggregate_vac = voice_vac
-            # Blended
             mock_analyze.return_value.aggregate_vac = VACVector(
                 valence=0.0, arousal=0.5, connection=0.5
             )
-
-            # Mock emotions lists for primary emotion extraction
             mock_content.return_value.emotions = [MagicMock(emotion_name="Joy")]
             mock_voice.return_value.emotions = [MagicMock(emotion_name="Sadness")]
             mock_analyze.return_value.emotions = [MagicMock(emotion_name="Mixed")]
 
-            result = asyncio.run(
-                analyzer.analyze_three_way(text="text", prosody_features={"pitch": 100.0})
+            result = await analyzer.analyze_three_way(
+                text="text", prosody_features={"pitch": 100.0}
             )
-            flags = result["discrepancy"]["flags"]
-            assert "emotional_suppression" in flags
+            assert "emotional_suppression" in result["discrepancy"]["flags"]
 
-        # Case 2: Minimization (Content very negative, Voice very positive)
+    @pytest.mark.asyncio
+    async def test_clinical_flags_minimization(self, analyzer: Any) -> None:
+        """Test clinical flag: Minimization."""
         content_vac = VACVector(valence=-0.8, arousal=0.5, connection=0.5)
         voice_vac = VACVector(valence=0.8, arousal=0.5, connection=0.5)
 
         with (
-            patch.object(analyzer, "_analyze_content_only") as mock_content,
-            patch.object(analyzer, "_analyze_voice_only") as mock_voice,
-            patch.object(analyzer, "analyze") as mock_analyze,
+            patch.object(analyzer, "_analyze_content_only", new_callable=AsyncMock) as mock_content,
+            patch.object(analyzer, "_analyze_voice_only", new_callable=AsyncMock) as mock_voice,
+            patch.object(analyzer, "analyze", new_callable=AsyncMock) as mock_analyze,
         ):
-
             mock_content.return_value.aggregate_vac = content_vac
             mock_voice.return_value.aggregate_vac = voice_vac
-            # Blended matches voice to keep distance high
             mock_analyze.return_value.aggregate_vac = voice_vac
-
             mock_content.return_value.emotions = [MagicMock(emotion_name="Sadness")]
             mock_voice.return_value.emotions = [MagicMock(emotion_name="Joy")]
             mock_analyze.return_value.emotions = [MagicMock(emotion_name="Mixed")]
 
-            result = asyncio.run(
-                analyzer.analyze_three_way(text="text", prosody_features={"pitch": 100.0})
+            result = await analyzer.analyze_three_way(
+                text="text", prosody_features={"pitch": 100.0}
             )
             flags = result["discrepancy"]["flags"]
             assert "significant_incongruence" in flags
             assert "minimization" in flags
 
-        # Case 3: Arousal Mismatch (Content high arousal, Voice low arousal)
-        content_vac = VACVector(valence=0.0, arousal=0.8, connection=0.5)
-        voice_vac = VACVector(valence=0.0, arousal=-0.8, connection=0.5)
-
+    @pytest.mark.asyncio
+    async def test_clinical_flags_arousal_mismatch(self, analyzer: Any) -> None:
+        """Test clinical flag: Arousal Mismatch."""
+        # Case 1: Content high arousal, Voice low arousal
         with (
-            patch.object(analyzer, "_analyze_content_only") as mock_content,
-            patch.object(analyzer, "_analyze_voice_only") as mock_voice,
-            patch.object(analyzer, "analyze") as mock_analyze,
+            patch.object(analyzer, "_analyze_content_only", new_callable=AsyncMock) as mock_content,
+            patch.object(analyzer, "_analyze_voice_only", new_callable=AsyncMock) as mock_voice,
+            patch.object(analyzer, "analyze", new_callable=AsyncMock) as mock_analyze,
         ):
-
-            mock_content.return_value.aggregate_vac = content_vac
-            mock_voice.return_value.aggregate_vac = voice_vac
-            mock_analyze.return_value.aggregate_vac = voice_vac
+            mock_content.return_value.aggregate_vac = VACVector(
+                valence=0.0, arousal=0.8, connection=0.5
+            )
+            mock_voice.return_value.aggregate_vac = VACVector(
+                valence=0.0, arousal=-0.8, connection=0.5
+            )
+            mock_analyze.return_value.aggregate_vac = VACVector(
+                valence=0.0, arousal=-0.8, connection=0.5
+            )
             mock_content.return_value.emotions = []
             mock_voice.return_value.emotions = []
             mock_analyze.return_value.emotions = []
 
-            result = asyncio.run(
-                analyzer.analyze_three_way(text="text", prosody_features={"pitch": 100.0})
+            result = await analyzer.analyze_three_way(
+                text="text", prosody_features={"pitch": 100.0}
             )
             flags = result["discrepancy"]["flags"]
             assert "arousal_mismatch" in flags
             assert "significant_incongruence" in flags
 
-        # Case 4: Arousal Mismatch (Content low arousal, Voice high arousal)
-        content_vac = VACVector(valence=0.0, arousal=-0.8, connection=0.5)
-        voice_vac = VACVector(valence=0.0, arousal=0.8, connection=0.5)
-
+    @pytest.mark.asyncio
+    async def test_clinical_flags_arousal_mismatch_inverse(self, analyzer: Any) -> None:
+        """Test clinical flag: Arousal Mismatch (Voice > Content)."""
+        # Case 2: Content low arousal, Voice high arousal (Inverse of previous test)
         with (
-            patch.object(analyzer, "_analyze_content_only") as mock_content,
-            patch.object(analyzer, "_analyze_voice_only") as mock_voice,
-            patch.object(analyzer, "analyze") as mock_analyze,
+            patch.object(analyzer, "_analyze_content_only", new_callable=AsyncMock) as mock_content,
+            patch.object(analyzer, "_analyze_voice_only", new_callable=AsyncMock) as mock_voice,
+            patch.object(analyzer, "analyze", new_callable=AsyncMock) as mock_analyze,
         ):
-
-            mock_content.return_value.aggregate_vac = content_vac
-            mock_voice.return_value.aggregate_vac = voice_vac
-            mock_analyze.return_value.aggregate_vac = voice_vac
-            mock_content.return_value.emotions = []
-            mock_voice.return_value.emotions = []
-            mock_analyze.return_value.emotions = []
-
-            result = asyncio.run(
-                analyzer.analyze_three_way(text="text", prosody_features={"pitch": 100.0})
+            mock_content.return_value.aggregate_vac = VACVector(
+                valence=0.0, arousal=-0.8, connection=0.5
             )
-            assert "arousal_mismatch" in result["discrepancy"]["flags"]
-
-        # Case 5: Well Aligned (Distance < 0.3)
-        content_vac = VACVector(valence=0.5, arousal=0.5, connection=0.5)
-        voice_vac = VACVector(valence=0.55, arousal=0.5, connection=0.5)  # distance is small
-
-        with (
-            patch.object(analyzer, "_analyze_content_only") as mock_content,
-            patch.object(analyzer, "_analyze_voice_only") as mock_voice,
-            patch.object(analyzer, "analyze") as mock_analyze,
-        ):
-
-            mock_content.return_value.aggregate_vac = content_vac
-            mock_voice.return_value.aggregate_vac = voice_vac
-            mock_analyze.return_value.aggregate_vac = voice_vac
+            mock_voice.return_value.aggregate_vac = VACVector(
+                valence=0.0, arousal=0.8, connection=0.5
+            )
+            mock_analyze.return_value.aggregate_vac = VACVector(
+                valence=0.0, arousal=0.8, connection=0.5
+            )
             mock_content.return_value.emotions = []
             mock_voice.return_value.emotions = []
             mock_analyze.return_value.emotions = []
 
-            result = asyncio.run(
-                analyzer.analyze_three_way(text="text", prosody_features={"pitch": 100.0})
+            result = await analyzer.analyze_three_way(
+                text="text", prosody_features={"pitch": 100.0}
+            )
+            flags = result["discrepancy"]["flags"]
+            interpretation = result["discrepancy"]["interpretation"]
+
+            assert "arousal_mismatch" in flags
+            assert "significant_incongruence" in flags
+            assert "Voice shows high activation" in interpretation
+
+    @pytest.mark.asyncio
+    async def test_clinical_flags_well_aligned(self, analyzer: Any) -> None:
+        """Test clinical flag: Well Aligned."""
+        with (
+            patch.object(analyzer, "_analyze_content_only", new_callable=AsyncMock) as mock_content,
+            patch.object(analyzer, "_analyze_voice_only", new_callable=AsyncMock) as mock_voice,
+            patch.object(analyzer, "analyze", new_callable=AsyncMock) as mock_analyze,
+        ):
+            mock_content.return_value.aggregate_vac = VACVector(
+                valence=0.5, arousal=0.5, connection=0.5
+            )
+            mock_voice.return_value.aggregate_vac = VACVector(
+                valence=0.55, arousal=0.5, connection=0.5
+            )
+            mock_analyze.return_value.aggregate_vac = VACVector(
+                valence=0.55, arousal=0.5, connection=0.5
+            )
+            mock_content.return_value.emotions = []
+            mock_voice.return_value.emotions = []
+            mock_analyze.return_value.emotions = []
+
+            result = await analyzer.analyze_three_way(
+                text="text", prosody_features={"pitch": 100.0}
             )
             assert "well_aligned" in result["discrepancy"]["flags"]
 
-        # Case 6: Moderate Discrepancy (0.3 <= Distance <= 0.5)
-        content_vac = VACVector(valence=0.5, arousal=0.5, connection=0.5)
-        voice_vac = VACVector(valence=0.9, arousal=0.5, connection=0.5)  # distance 0.4
-
+    @pytest.mark.asyncio
+    async def test_clinical_flags_moderate_discrepancy(self, analyzer: Any) -> None:
+        """Test clinical flag: Moderate Discrepancy."""
         with (
-            patch.object(analyzer, "_analyze_content_only") as mock_content,
-            patch.object(analyzer, "_analyze_voice_only") as mock_voice,
-            patch.object(analyzer, "analyze") as mock_analyze,
+            patch.object(analyzer, "_analyze_content_only", new_callable=AsyncMock) as mock_content,
+            patch.object(analyzer, "_analyze_voice_only", new_callable=AsyncMock) as mock_voice,
+            patch.object(analyzer, "analyze", new_callable=AsyncMock) as mock_analyze,
         ):
+            mock_content.return_value.aggregate_vac = VACVector(
+                valence=0.5, arousal=0.5, connection=0.5
+            )
+            mock_voice.return_value.aggregate_vac = VACVector(
+                valence=0.9, arousal=0.5, connection=0.5
+            )
+            mock_analyze.return_value.aggregate_vac = VACVector(
+                valence=0.9, arousal=0.5, connection=0.5
+            )
+            mock_content.return_value.emotions = []
+            mock_voice.return_value.emotions = []
+            mock_analyze.return_value.emotions = []
 
-            mock_content.return_value.aggregate_vac = content_vac
-            mock_voice.return_value.aggregate_vac = voice_vac
-            mock_analyze.return_value.aggregate_vac = voice_vac
-            result = asyncio.run(
-                analyzer.analyze_three_way(text="text", prosody_features={"pitch": 100.0})
+            result = await analyzer.analyze_three_way(
+                text="text", prosody_features={"pitch": 100.0}
             )
             assert "moderate_discrepancy" in result["discrepancy"]["flags"]
 
-        # Case 7: Significant Discrepancy but no specific pattern flag (Generic)
-        # Dist > 0.5, but valence signs match and arousal diff small
+    @pytest.mark.asyncio
+    async def test_clinical_flags_generic_incongruence(self, analyzer: Any) -> None:
+        """Test clinical flag: Significant Incongruence (Generic)."""
         content_vac = VACVector(valence=0.9, arousal=0.5, connection=0.5)
         voice_vac = VACVector(valence=0.3, arousal=0.5, connection=0.5)
-        # vac diff: 0.6 on valence alone -> dist 0.6 > 0.5
-        # v1 > 0.3 (True), v2 < -0.3 (False, is 0.3) -> No suppression
-        # v1 < -0.3 (False) -> No minimization
-        # arousal diff 0 -> No mismatch
 
         with (
-            patch.object(analyzer, "_analyze_content_only") as mock_content,
-            patch.object(analyzer, "_analyze_voice_only") as mock_voice,
-            patch.object(analyzer, "analyze") as mock_analyze,
+            patch.object(analyzer, "_analyze_content_only", new_callable=AsyncMock) as mock_content,
+            patch.object(analyzer, "_analyze_voice_only", new_callable=AsyncMock) as mock_voice,
+            patch.object(analyzer, "analyze", new_callable=AsyncMock) as mock_analyze,
         ):
-
             mock_content.return_value.aggregate_vac = content_vac
             mock_voice.return_value.aggregate_vac = voice_vac
             mock_analyze.return_value.aggregate_vac = voice_vac
@@ -532,8 +542,8 @@ class TestMultiEmotionAnalyzer:
             mock_voice.return_value.emotions = []
             mock_analyze.return_value.emotions = []
 
-            result = asyncio.run(
-                analyzer.analyze_three_way(text="text", prosody_features={"pitch": 100.0})
+            result = await analyzer.analyze_three_way(
+                text="text", prosody_features={"pitch": 100.0}
             )
             flags = result["discrepancy"]["flags"]
             assert "significant_incongruence" in flags
@@ -541,7 +551,7 @@ class TestMultiEmotionAnalyzer:
             assert "minimization" not in flags
             assert "arousal_mismatch" not in flags
 
-    def test_vac_distance_edge_case(self, analyzer):
+    def test_vac_distance_edge_case(self, analyzer: Any) -> None:
         """Test private vac_distance method with None inputs."""
         # Force one of the inputs to be None to trigger the guard in vac_distance
         # vac_distance(content_vac, blended_vac) is called unconditionally.
@@ -567,7 +577,7 @@ class TestMultiEmotionAnalyzer:
         # ... (implementation simplified for brevity, assume similar pattern)
 
     @pytest.mark.asyncio
-    async def test_analyze_content_only(self, analyzer):
+    async def test_analyze_content_only(self, analyzer: Any) -> None:
         """Test content-only analysis."""
         mock_response = {
             "emotions": [
@@ -592,7 +602,7 @@ class TestMultiEmotionAnalyzer:
         assert result.emotions[0].emotion_name == "Sadness"
 
     @pytest.mark.asyncio
-    async def test_analyze_voice_only(self, analyzer):
+    async def test_analyze_voice_only(self, analyzer: Any) -> None:
         """Test voice-only analysis."""
         mock_response = {
             "emotions": [
@@ -617,21 +627,24 @@ class TestMultiEmotionAnalyzer:
         assert result.emotions[0].emotion_name == "Anger"
 
     @pytest.mark.asyncio
-    async def test_analyze_three_way(self, analyzer):
+    async def test_analyze_three_way(self, analyzer: Any) -> None:
         """Test 3-way analysis."""
         # We need to mock the internal methods to return different results
         result_content = MultiEmotionAnalysisResponse(
             emotions=[
-                {
-                    "emotion_name": "Joy",
-                    "category": "Happiness",
-                    "vac": {"valence": 0.8, "arousal": 0.5, "connection": 0.5},
-                    "confidence": 0.9,
-                    "prominence": "primary",
-                }
+                DetectedEmotionResponse(
+                    emotion_name="Joy",
+                    category="Happiness",
+                    vac=VACVector(valence=0.8, arousal=0.5, connection=0.5),
+                    confidence=0.9,
+                    prominence="primary",
+                    original_name=None,
+                    match_method=None,
+                    match_confidence=None,
+                )
             ],
             relationships=[],
-            aggregate_vac={"valence": 0.8, "arousal": 0.5, "connection": 0.5},
+            aggregate_vac=VACVector(valence=0.8, arousal=0.5, connection=0.5),
             complexity_score=0.1,
             emotional_clarity=0.9,
             temporal_pattern="concurrent",
@@ -639,16 +652,19 @@ class TestMultiEmotionAnalyzer:
         )
         result_voice = MultiEmotionAnalysisResponse(
             emotions=[
-                {
-                    "emotion_name": "Sadness",
-                    "category": "Sadness",
-                    "vac": {"valence": -0.8, "arousal": -0.5, "connection": -0.5},
-                    "confidence": 0.9,
-                    "prominence": "primary",
-                }
+                DetectedEmotionResponse(
+                    emotion_name="Sadness",
+                    category="Sadness",
+                    vac=VACVector(valence=-0.8, arousal=-0.5, connection=-0.5),
+                    confidence=0.9,
+                    prominence="primary",
+                    original_name=None,
+                    match_method=None,
+                    match_confidence=None,
+                )
             ],
             relationships=[],
-            aggregate_vac={"valence": -0.8, "arousal": -0.5, "connection": -0.5},
+            aggregate_vac=VACVector(valence=-0.8, arousal=-0.5, connection=-0.5),
             complexity_score=0.1,
             emotional_clarity=0.9,
             temporal_pattern="concurrent",
@@ -656,16 +672,19 @@ class TestMultiEmotionAnalyzer:
         )
         result_blended = MultiEmotionAnalysisResponse(
             emotions=[
-                {
-                    "emotion_name": "Confusion",
-                    "category": "Cognitive",
-                    "vac": {"valence": 0.0, "arousal": 0.0, "connection": 0.0},
-                    "confidence": 0.9,
-                    "prominence": "primary",
-                }
+                DetectedEmotionResponse(
+                    emotion_name="Confusion",
+                    category="Cognitive",
+                    vac=VACVector(valence=0.0, arousal=0.0, connection=0.0),
+                    confidence=0.9,
+                    prominence="primary",
+                    original_name=None,
+                    match_method=None,
+                    match_confidence=None,
+                )
             ],
             relationships=[],
-            aggregate_vac={"valence": 0.0, "arousal": 0.0, "connection": 0.0},
+            aggregate_vac=VACVector(valence=0.0, arousal=0.0, connection=0.0),
             complexity_score=0.1,
             emotional_clarity=0.9,
             temporal_pattern="concurrent",
@@ -686,20 +705,23 @@ class TestMultiEmotionAnalyzer:
         assert result["discrepancy"]["content_voice_distance"] > 1.0
 
     @pytest.mark.asyncio
-    async def test_analyze_three_way_no_prosody(self, analyzer):
+    async def test_analyze_three_way_no_prosody(self, analyzer: Any) -> None:
         """Test 3-way analysis without prosody."""
         result_content = MultiEmotionAnalysisResponse(
             emotions=[
-                {
-                    "emotion_name": "Joy",
-                    "category": "Happiness",
-                    "vac": {"valence": 0.8, "arousal": 0.5, "connection": 0.5},
-                    "confidence": 0.9,
-                    "prominence": "primary",
-                }
+                DetectedEmotionResponse(
+                    emotion_name="Joy",
+                    category="Happiness",
+                    vac=VACVector(valence=0.8, arousal=0.5, connection=0.5),
+                    confidence=0.9,
+                    prominence="primary",
+                    original_name=None,
+                    match_method=None,
+                    match_confidence=None,
+                )
             ],
             relationships=[],
-            aggregate_vac={"valence": 0.8, "arousal": 0.5, "connection": 0.5},
+            aggregate_vac=VACVector(valence=0.8, arousal=0.5, connection=0.5),
             complexity_score=0.1,
             emotional_clarity=0.9,
             temporal_pattern="concurrent",
@@ -715,7 +737,7 @@ class TestMultiEmotionAnalyzer:
         assert result["voice_only"] is None
         assert result["discrepancy"]["content_voice_distance"] == 0.0
 
-    def test_calculate_aggregate_vac(self, analyzer):
+    def test_calculate_aggregate_vac(self, analyzer: Any) -> None:
         """Test weighted VAC calculation."""
         emotions = [
             {"vac": {"valence": 1.0, "arousal": 0.0, "connection": 0.0}, "confidence": 1.0},
@@ -724,7 +746,7 @@ class TestMultiEmotionAnalyzer:
         res = analyzer._calculate_aggregate_vac(emotions)
         assert res == (0.5, 0.0, 0.0)
 
-    def test_filter_and_validate_emotions(self, analyzer):
+    def test_filter_and_validate_emotions(self, analyzer: Any) -> None:
         """Test filtering logic."""
         emotions = [
             {"confidence": 0.9, "name": "High"},
@@ -734,7 +756,7 @@ class TestMultiEmotionAnalyzer:
         assert len(filtered) == 1
         assert filtered[0]["name"] == "High"
 
-    def test_ensure_single_primary(self, analyzer):
+    def test_ensure_single_primary(self, analyzer: Any) -> None:
         """Test primary enforcement."""
         # Case 0: No primary
         emotions = [{"prominence": "secondary"}, {"prominence": "underlying"}]
@@ -747,7 +769,7 @@ class TestMultiEmotionAnalyzer:
         assert emotions[0]["prominence"] == "primary"
         assert emotions[1]["prominence"] == "secondary"
 
-    def test_process_llm_response_clamping(self, analyzer):
+    def test_process_llm_response_clamping(self, analyzer: Any) -> None:
         """Test clamping of values and markdown parsing."""
         response = """```json
         {
@@ -776,7 +798,7 @@ class TestMultiEmotionAnalyzer:
         assert result.complexity_score == 1.0
         assert result.emotional_clarity == 0.0
 
-    def test_process_llm_response_relationships_and_missing_keys(self, analyzer):
+    def test_process_llm_response_relationships_and_missing_keys(self, analyzer: Any) -> None:
         """Test processing with relationships and missing keys."""
         response = """```json
         {
@@ -821,7 +843,7 @@ class TestMultiEmotionAnalyzer:
         with pytest.raises(ValidationError):  # Validation error
             analyzer._process_llm_response(response, "test")
 
-    def test_process_llm_response_missing_optional_keys(self, analyzer):
+    def test_process_llm_response_missing_optional_keys(self, analyzer: Any) -> None:
         """Test processing with missing optional keys to hit conditional branches."""
         # 1. Missing complexity, clarity, relationships
         # But aggregate_vac usually required.
@@ -909,7 +931,7 @@ class TestMultiEmotionAnalyzer:
         with pytest.raises(ValidationError):
             analyzer._process_llm_response(f"```json{json.dumps(no_vac)}```", "t")
 
-    def test_process_llm_response_relationships_valid(self, analyzer):
+    def test_process_llm_response_relationships_valid(self, analyzer: Any) -> None:
         """Test valid relationships parsing."""
         valid_json = {
             "emotions": [
@@ -951,7 +973,7 @@ class TestMultiEmotionAnalyzer:
         assert result.relationships[0].emotion_a == "A"
 
     @pytest.mark.asyncio
-    async def test_refresh_prompts(self, analyzer):
+    async def test_refresh_prompts(self, analyzer: Any) -> None:
         """Test prompt refreshing logic."""
         mock_fetcher = AsyncMock()
         mock_fetcher.get_prompt_for_function.return_value = {
@@ -971,20 +993,20 @@ class TestMultiEmotionAnalyzer:
             messages = analyzer.prompt.format_messages(input_text="test")
             assert "New System" in messages[0].content
 
-    def test_singleton(self):
+    def test_singleton(self) -> None:
         """Test singleton pattern."""
         a1 = get_multi_emotion_analyzer()
         a2 = get_multi_emotion_analyzer()
         assert a1 is a2
 
     @pytest.mark.asyncio
-    async def test_analyze_sync(self, analyzer):
+    async def test_analyze_sync(self, analyzer: Any) -> None:
         """Test synchronous analyze wrapper."""
         analyzer.analyze = AsyncMock(return_value="result")
 
         with patch("asyncio.get_event_loop") as mock_loop:
 
-            def mock_run_coro(coro):
+            def mock_run_coro(coro: Any) -> Any:
                 coro.close()
                 return "result"
 

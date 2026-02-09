@@ -3,7 +3,7 @@
   "source": "Brown, B. (2021). Atlas of the Heart; Keltner, D. & Haidt, J. (2003). Approaching awe: A moral, spiritual, and aesthetic emotion.",
   "version": "1.0",
   "created": "2025-12-05",
-  
+
   "bridge_emotions": [
     {
       "emotion_name": "Vulnerability",
@@ -216,7 +216,7 @@
       "caution": "Toxic positivity alert: Don't use gratitude to bypass genuine pain or force positivity. 'At least' statements can invalidate. Gratitude works best alongside, not instead of, acknowledging difficulty. Bittersweet gratitude (grateful AND sad) is valid and powerful."
     }
   ],
-  
+
   "usage_in_path_planning": {
     "detection_rules": {
       "shame_to_positive_connection": {
@@ -240,14 +240,14 @@
         "reasoning": "Need pattern interrupt - awe/curiosity shifts from threat-focus to exploration"
       }
     },
-    
+
     "automatic_insertion": {
       "description": "Path planner should automatically detect when bridge is required and insert it, with explanation to user",
       "user_message_template": "We're routing your path through {BRIDGE_EMOTION} because {REASON}. This is a psychologically necessary step for this transition.",
       "example": "We're routing your path through Vulnerability because healing shame requires connection, and connection requires being seen. This is a psychologically necessary step for moving from shame to self-compassion."
     }
   },
-  
+
   "meta": {
     "total_bridges": 6,
     "critical_bridge": "Vulnerability (required for shame work)",

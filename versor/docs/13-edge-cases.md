@@ -26,7 +26,7 @@ if magnitude < EPSILON:
 def test_zero_vector_returns_identity():
     vac = VACVector(0.0, 0.0, 0.0)
     q = vac.to_quaternion()
-    
+
     assert q == Quaternion.identity()
 ```
 
@@ -70,7 +70,7 @@ vac_clamped = [
 def test_clamping_extreme_values():
     vac = VACVector(valence=5.0, arousal=-10.0, connection=0.5)
     q = vac.to_quaternion()
-    
+
     # Should clamp to [1.0, -1.0, 0.5] and produce valid quaternion
     assert q.magnitude() == pytest.approx(1.0)
 ```
@@ -90,7 +90,7 @@ def generate_slerp_path(q1, q2, steps):
     if abs(abs(dot) - 1.0) < 1e-6:
         # No rotation needed - return constant path
         return [q1] * steps
-    
+
     # Normal SLERP...
 ```
 
@@ -113,9 +113,9 @@ def test_double_cover_shortest_path():
     """Ensure shortest path is taken"""
     q1 = Quaternion(1, 0, 0, 0)
     q2 = Quaternion(-0.7071, -0.7071, 0, 0)  # Opposite representation
-    
+
     q1_corr, q2_corr = ensure_shortest_path(q1, q2)
-    
+
     # After correction, dot should be positive
     assert q1_corr.dot(q2_corr) > 0
 ```
@@ -132,7 +132,7 @@ def test_double_cover_shortest_path():
 def safe_normalize(q: Quaternion, tolerance: float = 1e-6) -> Quaternion:
     """Normalize if needed"""
     norm = q.magnitude()
-    
+
     if abs(norm - 1.0) > tolerance:
         return Quaternion(
             w=q.w / norm,
@@ -140,7 +140,7 @@ def safe_normalize(q: Quaternion, tolerance: float = 1e-6) -> Quaternion:
             y=q.y / norm,
             z=q.z / norm
         )
-    
+
     return q  # Already normalized
 ```
 
@@ -212,7 +212,7 @@ def smooth_transition(
 ) -> Quaternion:
     """
     Apply exponential smoothing.
-    
+
     alpha = 0.1: 90% previous, 10% new (heavy smoothing)
     alpha = 0.5: 50/50 blend
     alpha = 1.0: No smoothing (use new)
@@ -226,15 +226,15 @@ def smooth_transition(
 def is_noisy_input(history: List[float], window: int = 5) -> bool:
     """
     Detect if recent elasticity values indicate noise.
-    
+
     High variance in elasticity = likely noise
     """
     if len(history) < window:
         return False
-    
+
     recent = history[-window:]
     variance = np.var(recent)
-    
+
     return variance > 2.0  # Threshold for "noisy"
 ```
 
@@ -269,7 +269,7 @@ except SingularityError as e:
 ```python
 def safe_process_state(vac, previous, time_delta):
     """Process with fallbacks"""
-    
+
     try:
         return engine.process_state(vac, previous, time_delta)
     except SingularityError:
@@ -330,7 +330,7 @@ def test_opposite_quaternions_slerp():
     """SLERP with q₁ = -q₂ (double cover)"""
     q1 = Quaternion(1, 0, 0, 0)
     q2 = Quaternion(-1, 0, 0, 0)
-    
+
     path = generate_slerp_path(q1, q2, steps=10)
     # Should take short path (both represent identity)
     assert len(path) == 10
@@ -346,7 +346,7 @@ def test_opposite_quaternions_slerp():
 ✅ Comprehensive testing strategy
 ✅ Production deployment guides
 
-**Next Steps**: 
+**Next Steps**:
 1. Implement core math (docs 02-05)
 2. Build API layer (docs 01, 06)
 3. Write tests (doc 11)

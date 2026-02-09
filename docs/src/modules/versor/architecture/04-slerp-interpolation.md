@@ -8,8 +8,8 @@ This guide provides a comprehensive treatment of Spherical Linear Interpolation 
 
 **SLERP** (Spherical Linear Interpolation) is the algorithm for interpolating between two unit quaternions while maintaining **constant angular velocity** and staying on the unit sphere.
 
-**Inventor:** Ken Shoemake (1985)  
-**Paper:** "Animating Rotation with Quaternion Curves"  
+**Inventor:** Ken Shoemake (1985)
+**Paper:** "Animating Rotation with Quaternion Curves"
 **Application:** Standard in computer graphics, robotics, and now emotional state visualization
 
 ---
@@ -105,40 +105,40 @@ def generate_slerp_path(
 ) -> List[Quaternion]:
     """
     Generate SLERP interpolation path.
-    
+
     Args:
         q_start: Starting quaternion
         q_target: Target quaternion
         steps: Number of frames (default: 60 for 60fps @ 1 second)
-    
+
     Returns:
         List of `steps` quaternions from q_start to q_target
     """
     # 1. Ensure shortest path (double-cover correction)
     q_start_corrected, q_target_corrected = ensure_shortest_path(q_start, q_target)
-    
+
     # 2. Convert to SciPy format [x, y, z, w]
     q_start_scipy = love_to_scipy(q_start_corrected)
     q_target_scipy = love_to_scipy(q_target_corrected)
-    
+
     # 3. Create SciPy Rotation objects
     rotations = R.from_quat([q_start_scipy, q_target_scipy])
-    
+
     # 4. Create Slerp interpolator
     times = np.array([0.0, 1.0])
     slerp = Slerp(times, rotations)
-    
+
     # 5. Generate interpolation points
     t_values = np.linspace(0, 1, steps)
     interpolated_rotations = slerp(t_values)
-    
+
     # 6. Convert back to L.O.V.E. format [w, x, y, z]
     path = []
     for rotation in interpolated_rotations:
         q_scipy = rotation.as_quat()  # [x, y, z, w]
         q_love = scipy_to_love(q_scipy)  # [w, x, y, z]
         path.append(q_love)
-    
+
     return path
 ```
 
@@ -173,20 +173,20 @@ q2 = [0, 1, 0, 0]       # 180° around X
 def ensure_shortest_path(q1: Quaternion, q2: Quaternion):
     """
     Ensure SLERP takes the shortest path.
-    
+
     If q1 · q2 < 0, quaternions are on opposite hemispheres
     of the 4D unit sphere. Negate q2 to choose the shorter arc.
-    
+
     Geometric intuition:
     - Dot product < 0 → angle > 90° → long way
     - Negate q2 → angle < 90° → short way
     """
     dot = q1.dot(q2)
-    
+
     if dot < 0:
         # Negate q2 to take short path
         q2 = Quaternion(-q2.w, -q2.x, -q2.y, -q2.z)
-    
+
     return q1, q2
 ```
 
@@ -195,7 +195,7 @@ def ensure_shortest_path(q1: Quaternion, q2: Quaternion):
 ```text
         q₁ •───────────• q₂
            └─ Long path (>180°)
-           
+
         q₁ •───• -q₂
            └─ Short path (<180°)
 ```
@@ -268,7 +268,7 @@ SLERP produces constant angular velocity.
 
 ### The Scalar Convention Problem
 
-**L.O.V.E. Convention:** Scalar-first `[w, x, y, z]`  
+**L.O.V.E. Convention:** Scalar-first `[w, x, y, z]`
 **SciPy Convention:** Scalar-last `[x, y, z, w]`
 
 **Must convert before/after SciPy calls!**
@@ -281,7 +281,7 @@ SLERP produces constant angular velocity.
 def love_to_scipy(q: Quaternion) -> np.ndarray:
     """
     Convert L.O.V.E. format to SciPy format.
-    
+
     L.O.V.E.:  [w, x, y, z]  (scalar-first)
     SciPy:     [x, y, z, w]  (scalar-last)
     """
@@ -290,7 +290,7 @@ def love_to_scipy(q: Quaternion) -> np.ndarray:
 def scipy_to_love(arr: np.ndarray) -> Quaternion:
     """
     Convert SciPy format to L.O.V.E. format.
-    
+
     SciPy:     [x, y, z, w]  (scalar-last)
     L.O.V.E.:  [w, x, y, z]  (scalar-first)
     """
@@ -429,7 +429,7 @@ if abs(sin_omega) < EPSILON:
 def smooth_transition(q_prev, q_new, alpha=0.1):
     """
     Apply exponential moving average smoothing.
-    
+
     Args:
         q_prev: Previously smoothed quaternion
         q_new: New raw quaternion
@@ -437,23 +437,23 @@ def smooth_transition(q_prev, q_new, alpha=0.1):
             - 0.0 = ignore new (full damping)
             - 1.0 = use new (no smoothing)
             - 0.1 = recommended (90% old, 10% new)
-    
+
     Returns:
         Smoothed quaternion
     """
     if alpha >= 1.0:
         return q_new  # No smoothing
-    
+
     if alpha <= 0.0:
         return q_prev  # Full damping
-    
+
     # Generate SLERP path
     steps = max(10, int(10 / alpha))
     path = generate_slerp_path(q_prev, q_new, steps=steps)
-    
+
     # Pick frame at alpha position
     index = min(int(alpha * (steps - 1)), steps - 1)
-    
+
     return path[index]
 ```
 
@@ -467,7 +467,7 @@ def smooth_transition(q_prev, q_new, alpha=0.1):
 # Frame 3: VAC[0.79, 0.61, 0.69]  # More jitter
 ```
 
-**Without smoothing:** Quaternions jump around  
+**Without smoothing:** Quaternions jump around
 **With smoothing:** Smooth, gradual changes
 
 **Implementation:**
@@ -619,9 +619,9 @@ def test_slerp_endpoints():
     """Test that SLERP starts and ends at correct quaternions."""
     q1 = Quaternion.identity()
     q2 = Quaternion(0.707, 0, 0.707, 0)
-    
+
     path = generate_slerp_path(q1, q2, steps=60)
-    
+
     assert path[0] == q1
     assert path[-1] == q2
 
@@ -629,9 +629,9 @@ def test_slerp_unit_quaternions():
     """Test that all SLERP frames are unit quaternions."""
     q1 = VACVector(0.8, 0.6, 0.7).to_quaternion()
     q2 = VACVector(-0.3, -0.2, -0.4).to_quaternion()
-    
+
     path = generate_slerp_path(q1, q2, steps=60)
-    
+
     for q in path:
         assert abs(q.magnitude() - 1.0) < EPSILON
 
@@ -639,16 +639,16 @@ def test_slerp_constant_angular_velocity():
     """Test that angular distance between frames is constant."""
     q1 = Quaternion.identity()
     q2 = Quaternion(0, 1, 0, 0)  # 180° rotation
-    
+
     path = generate_slerp_path(q1, q2, steps=10)
-    
+
     # Calculate angular distance between consecutive frames
     distances = []
     for i in range(len(path) - 1):
         q_trans = calculate_transition(path[i], path[i+1])
         phi = angular_distance(q_trans)
         distances.append(phi)
-    
+
     # All distances should be equal
     avg_distance = sum(distances) / len(distances)
     for d in distances:
@@ -700,7 +700,7 @@ interface SlerpPath {
 
 function animateSoulSphere(path: Quaternion[]) {
   const frameDuration = 1000 / 60;  // ~16.67ms per frame
-  
+
   path.forEach((quaternion, index) => {
     setTimeout(() => {
       // Apply quaternion to 3D mesh
@@ -710,7 +710,7 @@ function animateSoulSphere(path: Quaternion[]) {
         quaternion.z,
         quaternion.w
       );
-      
+
       // Render frame
       renderer.render(scene, camera);
     }, index * frameDuration);
@@ -730,17 +730,17 @@ Here's a pure Python SLERP implementation:
 def slerp_pure(q1: Quaternion, q2: Quaternion, t: float) -> Quaternion:
     """
     Pure Python SLERP implementation (educational).
-    
+
     Use SciPy version in production for better performance.
     """
     # Ensure shortest path
     q1, q2 = ensure_shortest_path(q1, q2)
-    
+
     # Calculate angle
     dot = np.clip(q1.dot(q2), -1.0, 1.0)
     omega = math.acos(dot)
     sin_omega = math.sin(omega)
-    
+
     # Near-parallel case
     if abs(sin_omega) < EPSILON:
         return Quaternion(
@@ -749,11 +749,11 @@ def slerp_pure(q1: Quaternion, q2: Quaternion, t: float) -> Quaternion:
             (1-t)*q1.y + t*q2.y,
             (1-t)*q1.z + t*q2.z
         ).normalize()
-    
+
     # Standard SLERP
     a = math.sin((1-t) * omega) / sin_omega
     b = math.sin(t * omega) / sin_omega
-    
+
     return Quaternion(
         a*q1.w + b*q2.w,
         a*q1.x + b*q2.x,
@@ -851,5 +851,5 @@ pip install scipy==1.12.0
 
 ---
 
-**Previous:** [← VAC Conversion](03-vac-conversion.md)  
+**Previous:** [← VAC Conversion](03-vac-conversion.md)
 **Next:** [SciPy Integration →](05-scipy-integration.md)

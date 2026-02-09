@@ -97,14 +97,14 @@ services:
       dockerfile: containers/Containerfile.postgresql
     ports: ["5432:5432"]
     volumes: ["postgres-data:/var/lib/postgresql/data"]
-    
+
   redis:
     build:
       context: ..
       dockerfile: containers/Containerfile.redis
     ports: ["6379:6379"]
     volumes: ["redis-data:/data"]
-    
+
   ollama:
     build:
       context: ..
@@ -171,28 +171,28 @@ services:
   postgresql: {...}
   redis: {...}
   ollama: {...}
-  
+
   versor:
     build:
       context: ..
       dockerfile: containers/Containerfile.versor
     depends_on: [postgresql, redis]
     ports: ["8001:8001"]
-    
+
   observer:
     build:
       context: ..
       dockerfile: containers/Containerfile.observer
     depends_on: [postgresql]
     ports: ["8000:8000"]
-    
+
   listener:
     build:
       context: ..
       dockerfile: containers/Containerfile.listener
     depends_on: [redis, ollama]
     ports: ["8002:8002"]
-    
+
   experience-web:
     build:
       context: ..
@@ -210,7 +210,7 @@ services:
     volumes:
       - ../versor/app:/app/app:ro
     command: uvicorn app.main:app --reload --host 0.0.0.0
-    
+
   experience-web:
     volumes:
       - ../experience/web:/app:ro
@@ -697,7 +697,7 @@ curl http://localhost:8002/health
 
 **Date:** December 8, 2025
 **Decision:** Use Containerfiles + Podman (not Dockerfiles + Docker)
-**Rationale:** 
+**Rationale:**
 - OCI standard compatibility
 - Rootless security
 - No licensing concerns

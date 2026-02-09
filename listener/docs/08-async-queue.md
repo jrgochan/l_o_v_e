@@ -56,28 +56,28 @@ async def process_audio_task(
 ) -> dict:
     """
     Main worker task for audio/text processing.
-    
+
     This runs asynchronously in a worker process.
     """
-    
+
     if audio_path:
         # Transcribe audio
         transcription_service = ctx.get('transcription_service')
         result = transcription_service.transcribe(audio_path)
         text = result.text
-    
+
     # Semantic analysis
     analyzer = ctx.get('semantic_analyzer')
     emotion = await analyzer.analyze(text)
-    
+
     # PII scrubbing
     scrubber = ctx.get('pii_scrubber')
     sanitized = scrubber.scrub(text)
-    
+
     # Store in Observer
     observer = ctx.get('observer_client')
     await observer.record_state(user_id, session_id, sanitized, emotion.vac.dict())
-    
+
     return {
         "status": "success",
         "emotion": emotion.dict()
@@ -85,14 +85,14 @@ async def process_audio_task(
 
 class WorkerSettings:
     """Arq worker configuration"""
-    
+
     functions = [process_audio_task]
     redis_settings = RedisSettings(
         host=settings.REDIS_HOST,
         port=settings.REDIS_PORT,
         database=settings.REDIS_DB
     )
-    
+
     async def on_startup(ctx):
         """Initialize services once per worker"""
         ctx['transcription_service'] = TranscriptionService()
@@ -121,11 +121,11 @@ from arq.connections import RedisSettings
 
 async def enqueue_audio_job(audio_path: str, user_id: str):
     """Enqueue job from API handler"""
-    
+
     redis = await create_pool(
         RedisSettings(host=settings.REDIS_HOST)
     )
-    
+
     job = await redis.enqueue_job(
         'process_audio_task',
         audio_path=audio_path,
@@ -134,7 +134,7 @@ async def enqueue_audio_job(audio_path: str, user_id: str):
         session_id=session_id,
         timestamp=timestamp
     )
-    
+
     return job.job_id
 ```
 
@@ -143,13 +143,13 @@ async def enqueue_audio_job(audio_path: str, user_id: str):
 ```python
 async def get_job_status(job_id: str):
     """Check job status"""
-    
+
     redis = await create_pool()
     job = await redis.get_job(job_id)
-    
+
     if job is None:
         return {"status": "not_found"}
-    
+
     return {
         "status": job.status,  # 'queued', 'in_progress', 'complete', 'failed'
         "result": job.result

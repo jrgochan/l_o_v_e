@@ -5,7 +5,7 @@ import SoulCore
 public enum SoulMenuAction: CaseIterable, Identifiable {
     case chat, history, journeys, explore, paths, bookmarks, visualMode, settings
     public var id: Self { self }
-    
+
     var icon: String {
         switch self {
         case .chat: return "bubble.left.and.bubble.right.fill"
@@ -22,17 +22,17 @@ public enum SoulMenuAction: CaseIterable, Identifiable {
 
 public struct SoulSideMenu: View {
     let onSelect: (SoulMenuAction) -> Void
-    var onSettingsChange: (() -> Void)? = nil
+    var onSettingsChange: (() -> Void)?
     @Binding var isPresented: Bool
     @Binding var chatMode: SoulPersona.ChatMode
-    
+
     public init(isPresented: Binding<Bool>, chatMode: Binding<SoulPersona.ChatMode>, onSelect: @escaping (SoulMenuAction) -> Void, onSettingsChange: (() -> Void)? = nil) {
         self._isPresented = isPresented
         self._chatMode = chatMode
         self.onSelect = onSelect
         self.onSettingsChange = onSettingsChange
     }
-    
+
     public var body: some View {
         VStack(spacing: 12) {
             ForEach(SoulMenuAction.allCases.filter { $0 != .chat }) { action in
@@ -60,7 +60,7 @@ public struct SoulSideMenu: View {
                                         lineWidth: 1
                                     )
                             )
-                        
+
                         // Icon
                         Image(systemName: action.icon)
                             .font(.system(size: 18, weight: .medium))
@@ -77,18 +77,18 @@ public struct SoulSideMenu: View {
             // Brain Settings
             Section("Brain Settings") {
                 @Bindable var settings = InferenceSettings.shared
-                
+
                 Picker("Inference", selection: $settings.mode) {
                     ForEach(InferenceMode.allCases, id: \.self) { mode in
                         Text(mode.rawValue.capitalized).tag(mode)
                     }
                 }
                 .pickerStyle(.segmented)
-                .onChange(of: settings.mode) { _, _ in 
+                .onChange(of: settings.mode) { _, _ in
                     hapticFeedback()
-                    onSettingsChange?() 
+                    onSettingsChange?()
                 }
-                
+
                 if settings.mode == .remote {
                     TextField("Server URL", text: $settings.remoteUrl)
                         .textFieldStyle(.roundedBorder)
@@ -98,10 +98,9 @@ public struct SoulSideMenu: View {
             }
             .padding(.vertical, 4)
 
-            
             // Mode Toggle (Separate from general actions)
             Divider().background(Color.white.opacity(0.2))
-            
+
             Button {
                 hapticFeedback()
                 cycleChatMode()
@@ -112,16 +111,16 @@ public struct SoulSideMenu: View {
                             .fill(.ultraThinMaterial)
                             .frame(width: 44, height: 44)
                             .overlay(Circle().stroke(.white.opacity(0.2), lineWidth: 1))
-                        
+
                         Image(systemName: modeIcon)
                             .font(.system(size: 18))
                             .foregroundStyle(modeColor)
                     }
-                    
+
                     Text(chatMode.rawValue)
                         .font(.caption.bold())
                         .foregroundStyle(.white.opacity(0.9))
-                    
+
                     Spacer()
                 }
                 .padding(.horizontal, 4)
@@ -135,13 +134,13 @@ public struct SoulSideMenu: View {
                 .stroke(Color.white.opacity(0.1), lineWidth: 1)
         )
     }
-    
+
     func hapticFeedback() {
         // Simple fallback if engine isn't passed, though ideally it should be tapped into the engine
         let generator = UIImpactFeedbackGenerator(style: .light)
         generator.impactOccurred()
     }
-    
+
     var modeIcon: String {
         switch chatMode {
         case .standard: return "bubble.left.and.bubble.right.fill"
@@ -149,7 +148,7 @@ public struct SoulSideMenu: View {
         case .deepFeeling: return "brain.head.profile"
         }
     }
-    
+
     var modeColor: Color {
         switch chatMode {
         case .standard: return .white
@@ -157,7 +156,7 @@ public struct SoulSideMenu: View {
         case .deepFeeling: return .purple
         }
     }
-    
+
     func cycleChatMode() {
         let all = SoulPersona.ChatMode.allCases
         if let idx = all.firstIndex(of: chatMode) {

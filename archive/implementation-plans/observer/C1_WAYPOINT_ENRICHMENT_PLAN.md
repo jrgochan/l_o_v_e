@@ -1,8 +1,8 @@
 # C1: Enriched Waypoint Metadata - Full Implementation Plan
 
-**Status:** In Progress  
-**Estimated Time:** 6 hours  
-**Priority:** ⭐ HIGH - Foundation for therapeutic value  
+**Status:** In Progress
+**Estimated Time:** 6 hours
+**Priority:** ⭐ HIGH - Foundation for therapeutic value
 **Date Started:** December 5, 2025
 
 ---
@@ -118,41 +118,41 @@ Move waypoint explanations from hardcoded frontend strings to research-backed ba
 ```sql
 CREATE TABLE waypoint_explanation_templates (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    
+
     -- Pattern matching (emotion-specific)
     from_emotion_id UUID REFERENCES atlas_definition(id),
     to_emotion_id UUID REFERENCES atlas_definition(id),
     waypoint_emotion_id UUID REFERENCES atlas_definition(id),
-    
+
     -- OR category-level patterns (for broader matching)
     from_category VARCHAR(100),
     to_category VARCHAR(100),
-    
+
     -- Core explanations
     psychological_purpose TEXT NOT NULL,
     why_this_order TEXT NOT NULL,
     what_it_enables TEXT NOT NULL,
-    
+
     -- Previous emotion context
     previous_what_changed TEXT[],
     previous_why_necessary TEXT,
-    
-    -- Next emotion context  
+
+    -- Next emotion context
     next_what_enabled TEXT[],
     next_how_prepares TEXT,
-    
+
     -- User guidance
     readiness_signs TEXT[] NOT NULL,
     warning_signs TEXT[],
-    
+
     -- Research backing
     research_citations JSONB,
-    
+
     -- Metadata
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
     updated_by VARCHAR(100) DEFAULT 'system',
     priority INTEGER DEFAULT 100,
-    
+
     -- Uniqueness
     UNIQUE (from_emotion_id, to_emotion_id, waypoint_emotion_id)
 );
@@ -170,9 +170,9 @@ CREATE INDEX idx_waypoint_templates_priority ON waypoint_explanation_templates(p
 ```json
 {
   "psychological_purpose": "Vulnerability is the critical zero-crossing on the Connection axis where shame begins to heal. It represents the moment you risk being truly seen by a trusted other, shifting from isolation (-0.9 connection) toward positive connection (+0.6 connection).",
-  
+
   "why_this_order": "Shame cannot heal in isolation. Vulnerability must precede self-compassion because we first need to experience being seen and accepted by another before we can offer that same acceptance to ourselves. This is Brené Brown's core finding on shame resilience.",
-  
+
   "vac_analysis": {
     "valence_shift": {
       "delta": 0.7,
@@ -193,7 +193,7 @@ CREATE INDEX idx_waypoint_templates_priority ON waypoint_explanation_templates(p
       "psychological_meaning": "THE KEY transformation for shame healing - most important shift"
     }
   },
-  
+
   "previous_context": {
     "from_emotion": "Shame",
     "what_changed": [
@@ -209,7 +209,7 @@ CREATE INDEX idx_waypoint_templates_priority ON waypoint_explanation_templates(p
       "quote": "Vulnerability is the birthplace of connection and the path to the feeling of worthiness."
     }
   },
-  
+
   "next_context": {
     "to_emotion": "Self-Compassion",
     "what_this_enables": [
@@ -224,7 +224,7 @@ CREATE INDEX idx_waypoint_templates_priority ON waypoint_explanation_templates(p
       "finding": "Self-compassion has 3 components: self-kindness, common humanity, and mindfulness. Vulnerability provides the common humanity experience."
     }
   },
-  
+
   "readiness_signs": [
     "Feeling less isolated or alone with your shame",
     "Willingness to share your struggle with a trusted person",
@@ -233,7 +233,7 @@ CREATE INDEX idx_waypoint_templates_priority ON waypoint_explanation_templates(p
     "Decreased fear of judgment or rejection",
     "Recognition that you're not the only one who struggles"
   ],
-  
+
   "warning_signs": [
     "⚠️ If you're completely alone: Find a safe, trusted person first before attempting vulnerability",
     "⚠️ If shame triggers are active: Pause, regulate your arousal level before risking vulnerability",
@@ -241,7 +241,7 @@ CREATE INDEX idx_waypoint_templates_priority ON waypoint_explanation_templates(p
     "⚠️ Do not 'vulnerability-dump' on someone who hasn't consented or earned that trust",
     "⚠️ If dissociating: Ground first, then attempt vulnerability when present"
   ],
-  
+
   "research_citations": [
     {
       "author": "Brené Brown",
@@ -334,5 +334,5 @@ CREATE INDEX idx_waypoint_templates_priority ON waypoint_explanation_templates(p
 
 ---
 
-**Ready to implement!**  
+**Ready to implement!**
 **Starting with:** Backend WaypointExplainer Service

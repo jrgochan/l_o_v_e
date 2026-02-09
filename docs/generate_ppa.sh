@@ -59,12 +59,12 @@ FIGS=("figures/fig1.png" "figures/fig2.png" "figures/fig3.png" "figures/fig4.png
 COUNT=0
 for fig in "${FIGS[@]}"; do
     COUNT=$((COUNT+1))
-    
+
     # Add new page if not the first page
     if [ $COUNT -gt 1 ]; then
         echo "\newpage" >> "$DRAWINGS_MD"
     fi
-    
+
     # Add Figure Label and Image (LaTeX formatting for xelatex)
     echo "\begin{center}" >> "$DRAWINGS_MD"
     echo "\textbf{\huge FIG. $COUNT}" >> "$DRAWINGS_MD"

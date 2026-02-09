@@ -1,7 +1,7 @@
 # Error Codes Reference
 
-**Last Updated:** January 2, 2026  
-**Audience:** All developers  
+**Last Updated:** January 2, 2026
+**Audience:** All developers
 **Goal:** Understand and resolve Listener errors
 
 ---
@@ -291,10 +291,10 @@ async def analyze_with_retry(text: str):
         "user_id": user_id,
         "session_id": session_id
     })
-    
+
     if response.status_code == 503:
         raise Exception("Service unavailable")  # Will retry
-    
+
     return response.json()
 ```
 
@@ -342,11 +342,11 @@ errors_total.labels(code='LLM_ERROR', endpoint='/analyze').inc()
 
 ## Key Takeaways
 
-✅ **Consistent format:** All errors follow same structure  
-✅ **Clear codes:** Specific codes for each error type  
-✅ **Actionable messages:** Tell user how to fix  
-✅ **Non-blocking:** Observer errors don't stop Listener  
-✅ **Retry logic:** Client can retry transient errors  
+✅ **Consistent format:** All errors follow same structure
+✅ **Clear codes:** Specific codes for each error type
+✅ **Actionable messages:** Tell user how to fix
+✅ **Non-blocking:** Observer errors don't stop Listener
+✅ **Retry logic:** Client can retry transient errors
 
 ---
 

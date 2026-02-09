@@ -240,10 +240,10 @@ calculation_duration = Histogram('versor_calculation_seconds', 'Calculation dura
 @router.post("/calculate")
 async def calculate_state(request: StateRequest):
     calculation_requests.inc()
-    
+
     with calculation_duration.time():
         result = engine.process_state(...)
-    
+
     return result
 ```
 

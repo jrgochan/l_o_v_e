@@ -12,8 +12,8 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.api.deps import get_db
-from app.config import settings
 from app.core.security import create_access_token, get_password_hash, verify_password
+from app.core.settings import settings
 from app.models.user import User
 from app.schemas.user import Token, UserCreate, UserResponse
 

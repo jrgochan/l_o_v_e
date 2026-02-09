@@ -1,8 +1,8 @@
 # Product Roadmap
 
-**Reading Time:** ~12 minutes  
-**Audience:** Executives, product leaders  
-**Prerequisites:** [Business Value](02-business-value.md)  
+**Reading Time:** ~12 minutes
+**Audience:** Executives, product leaders
+**Prerequisites:** [Business Value](02-business-value.md)
 **Goal:** Understand Observer's strategic direction and planned enhancements
 
 ---
@@ -313,14 +313,14 @@
 
 ### Revenue Milestones
 
-**2026:** $1M ARR  
-**2027:** $5M ARR  
+**2026:** $1M ARR
+**2027:** $5M ARR
 **2028:** $20M ARR
 
 ### Clinical Milestones
 
-**2026:** 1 published case study  
-**2027:** 1 peer-reviewed publication  
+**2026:** 1 published case study
+**2027:** 1 peer-reviewed publication
 **2028:** 3+ published studies, clinician adoption
 
 ---

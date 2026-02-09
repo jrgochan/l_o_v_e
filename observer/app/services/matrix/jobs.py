@@ -1,7 +1,9 @@
+"""Module documentation."""
+
 import logging
 from datetime import datetime
 from typing import Any, Dict, Optional
-from uuid import UUID
+from uuid import UUID, uuid4
 
 from sqlalchemy import text
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -13,9 +15,10 @@ class JobManager:
     """Manages path computation jobs."""
 
     def __init__(self, session: AsyncSession):
+        """Docstring."""
         self.session = session
 
-    async def update_job_status(
+    async def update_job_status(  # pylint: disable=too-many-positional-arguments
         self,
         job_id: UUID,
         status: str,
@@ -54,9 +57,7 @@ class JobManager:
 
     async def create_job(self, total_paths: int, user_id: Optional[str] = None) -> UUID:
         """Create a new computation job."""
-        import uuid
-
-        job_id = uuid.uuid4()
+        job_id = uuid4()
         stmt = text(
             """
             INSERT INTO path_computation_jobs (

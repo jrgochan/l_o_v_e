@@ -34,6 +34,7 @@ See Also:
     - Models: app/models/vac_response.py
 """
 
+import asyncio
 import json
 import logging
 import time
@@ -279,7 +280,6 @@ class SemanticAnalyzer:
         # Fetch assigned model if not explicitly provided
         if model is None and fetch_dynamic_model:
             try:
-                import asyncio
 
                 fetcher = get_model_fetcher(settings.OBSERVER_URL)
                 # Fetch model assignment (cached for 60 seconds)
@@ -293,7 +293,7 @@ class SemanticAnalyzer:
                     fetcher.get_model_for_function("semantic_vac", settings.OLLAMA_MODEL)
                 )
                 logger.info("Using dynamically assigned model for semantic_vac: %s", self.model)
-            except Exception as e:
+            except Exception as e:  # pylint: disable=broad-exception-caught
                 logger.warning("Failed to fetch dynamic model, using default: %s", e)
                 self.model = settings.OLLAMA_MODEL
         else:
@@ -356,7 +356,7 @@ class SemanticAnalyzer:
                 )
                 logger.debug("Updated prompt to version %s", prompt_data.get("version"))
 
-        except Exception as e:
+        except Exception as e:  # pylint: disable=broad-exception-caught
             logger.warning("Failed to refresh prompt: %s", e)
 
         # _create_prompt removed as it is replaced by _create_default_prompt and dynamic fetching
@@ -588,8 +588,6 @@ class SemanticAnalyzer:
             - Tests: tests/semantic/test_connection_axis.py (uses this method)
             - Usage: tests/unit/test_vac_models.py
         """
-        import asyncio
-
         # Get or create event loop
         try:
             loop = asyncio.get_event_loop()

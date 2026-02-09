@@ -1,8 +1,8 @@
 # Architecture Overview
 
-**Reading Time:** ~20 minutes  
-**Audience:** Engineering managers, technical leads  
-**Prerequisites:** Basic understanding of microservices  
+**Reading Time:** ~20 minutes
+**Audience:** Engineering managers, technical leads
+**Prerequisites:** Basic understanding of microservices
 **Goal:** Understand Observer's high-level architecture and technology stack
 
 ---
@@ -36,23 +36,23 @@ graph TB
         Versor[Versor Module<br/>Quaternion Math]
         Experience[Experience Module<br/>Visualization]
     end
-    
+
     User[User] -->|Voice/Text| Listener
     Listener -->|VAC + Text| Observer
     Observer -->|VAC| Versor
     Versor -->|Quaternion| Observer
     Observer -->|Trajectory| Experience
     Experience -->|3D Viz| User
-    
+
     subgraph "Observer Internals"
         API[FastAPI<br/>REST + WebSocket]
         Services[Services<br/>Business Logic]
         DB[(PostgreSQL<br/>+ pgvector)]
-        
+
         API --> Services
         Services --> DB
     end
-    
+
     Observer -.-> API
 ```
 

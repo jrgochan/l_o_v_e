@@ -20,7 +20,7 @@ echo "Retrieving Connection Info..."
 
 # DB Headers
 DB_IP=$(gcloud sql instances describe "$SQL_INSTANCE_NAME" --project="$PROJECT_ID" --format='value(ipAddresses[0].ipAddress)')
-# We use Secret Manager for password, but for Cloud Run env var injection "value-source", 
+# We use Secret Manager for password, but for Cloud Run env var injection "value-source",
 # we need the secret version resource ID.
 DB_SECRET_VERSION="${APP_NAME}-db-password:latest"
 
@@ -71,11 +71,11 @@ deploy_service() {
     local service=$1
     local image="${REGISTRY}/${service}:latest"
     local port=$2
-    
+
     # Custom config per service
     local svc_cpu=$CPU
     local svc_mem=$MEMORY
-    
+
     if [ "$service" == "experience" ]; then
         svc_cpu=$EXP_CPU
         svc_mem=$EXP_MEMORY
@@ -86,9 +86,9 @@ deploy_service() {
         svc_cpu=$OBSERVER_CPU
         svc_mem=$OBSERVER_MEMORY
     fi
-    
+
     echo "Deploying $service..."
-    
+
     # Construct base command
     # Construct base command as array
     local cmd=(gcloud run deploy "${APP_NAME}-${service}" \
@@ -133,15 +133,15 @@ deploy_service() {
         fi
         cmd+=(--set-env-vars "^++^CORS_ORIGINS=$cors_origins_val")
     fi
-    
+
     # Execute (allow output to be seen)
     "${cmd[@]}" || { echo "Deployment failed"; exit 1; }
-        
+
     # Retrieve and print URL
     local url
     url=$(gcloud run services describe "${APP_NAME}-${service}" --platform managed --region "$REGION" --project "$PROJECT_ID" --format 'value(status.url)')
     echo "  -> Deployed to: $url"
-    
+
     # Export for master script usage
     echo "$service=$url" >> deployed_services.tmp
 }

@@ -6,7 +6,7 @@
 ## Error Breakdown by File
 
 ### transitions.py (12 errors) - Variable Naming Issues
-Lines 484, 517, 557: Using `journey` variable instead of `waypoint` 
+Lines 484, 517, 557: Using `journey` variable instead of `waypoint`
 Fix: The code queries waypoint but assigns to `journey` variable name
 
 Lines 495, 496, 497, 521, 561: Accessing waypoint attributes on journey object
@@ -45,7 +45,7 @@ Fix: Cast to str
 ## Execution Plan
 
 1. Fix transitions.py variable names (12 errors) → ~28 errors
-2. Fix ai_settings.py types (6 errors) → ~22 errors  
+2. Fix ai_settings.py types (6 errors) → ~22 errors
 3. Fix insight_generator.py (6 errors) → ~16 errors
 4. Fix remaining service errors (16 errors) → 0 errors!
 

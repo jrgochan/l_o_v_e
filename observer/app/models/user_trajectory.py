@@ -406,7 +406,7 @@ from sqlalchemy import Float, ForeignKey, Text, func
 from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.orm import Mapped, mapped_column
 
-from app.config import settings
+from app.core.settings import settings
 from app.database import Base
 
 

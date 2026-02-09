@@ -9,8 +9,8 @@
 import Foundation
 
 // Stub for _MTLTensorDomain (MLX)
-// This symbol is referenced by MLX libraries. 
-// Since we don't link MLX on iOS, but something is trying to reference it, 
+// This symbol is referenced by MLX libraries.
+// Since we don't link MLX on iOS, but something is trying to reference it,
 // we provide a dummy definition to satisfy the linker.
 @_cdecl("MTLTensorDomain")
 public var _MTLTensorDomain: String = "MTLTensorDomainStub"

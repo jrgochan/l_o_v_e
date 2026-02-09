@@ -118,7 +118,7 @@ ambiguous_cases = [
 
 We recruited 5 psychologists to independently rate 100 emotional expressions on Connection (-1 to +1):
 
-**Inter-Annotator Agreement**: Krippendorff's α = 0.78 (substantial agreement)  
+**Inter-Annotator Agreement**: Krippendorff's α = 0.78 (substantial agreement)
 **System vs. Human Correlation**: Pearson's r = 0.82, p < 0.001
 
 This demonstrates that:
@@ -164,10 +164,10 @@ def test_slerp_endpoints():
     """SLERP(q1, q2, t) should reach q1 at t=0, q2 at t=1"""
     q1 = [1, 0, 0, 0]
     q2 = [0.707, 0.707, 0, 0]
-    
+
     q_start = slerp(q1, q2, t=0.0)
     assert np.allclose(q_start, q1, atol=1e-6)
-    
+
     q_end = slerp(q1, q2, t=1.0)
     assert np.allclose(q_end, q2, atol=1e-6)
 
@@ -175,13 +175,13 @@ def test_slerp_constant_angular_velocity():
     """SLERP should maintain constant angular velocity"""
     q1 = [1, 0, 0, 0]
     q2 = [0.707, 0.707, 0, 0]
-    
+
     angles = []
     for t in np.linspace(0, 1, 20):
         q = slerp(q1, q2, t)
         angle = np.arccos(np.clip(np.dot(q1, q), -1, 1))
         angles.append(angle)
-    
+
     # Angular velocity should be constant
     velocities = np.diff(angles)
     assert np.std(velocities) < 0.01  # Low variance
@@ -286,8 +286,8 @@ The system should flag inappropriate shortcuts (e.g., grief → joy):
 Query: Path from Grief (-0.8, -0.3, 0.7) to Joy (0.9, 0.7, 0.8)
 
 System Response:
-"Warning: This transition has very high difficulty (0.95). 
-Attempting to 'skip' grief may be counterproductive. 
+"Warning: This transition has very high difficulty (0.95).
+Attempting to 'skip' grief may be counterproductive.
 Consider intermediate states: Grief → Acceptance → Peace → Contentment → Joy.
 Grief needs to be honored, not bypassed."
 ```

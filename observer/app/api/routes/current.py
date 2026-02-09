@@ -203,7 +203,7 @@ References:
 """
 
 import logging
-from typing import Annotated
+from typing import Annotated, Any, Optional
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, HTTPException
@@ -219,6 +219,45 @@ from app.models.user_trajectory import UserTrajectory
 logger = logging.getLogger(__name__)
 
 router = APIRouter()
+
+
+async def _get_emotion_info(
+    db: AsyncSession, emotion_id: UUID, current_vac: list[float]
+) -> EmotionInfo:
+    """Fetch emotion info or return unknown."""
+    stmt = select(EmotionDefinition).where(EmotionDefinition.id == emotion_id)
+    result = await db.execute(stmt)
+    emotion = result.scalar_one_or_none()
+
+    if not emotion:
+        return EmotionInfo(
+            id=str(emotion_id),
+            name="Unknown",
+            category="Unknown",
+            vac=current_vac,
+        )
+
+    return EmotionInfo(
+        id=str(emotion.id),
+        name=emotion.emotion_name,
+        category=emotion.category,
+        vac=list(emotion.vac_vector),
+    )
+
+
+async def _calculate_angular_distance(
+    db: AsyncSession, current_quat: list[float], previous_quat: Optional[list[float]]
+) -> float:
+    """Calculate angular distance between states."""
+    if not previous_quat:
+        return 0.0
+
+    from app.services.analytics.metrics import (  # pylint: disable=import-outside-toplevel
+        MetricsCalculator,
+    )
+
+    metrics_calc = MetricsCalculator(db)
+    return metrics_calc.angular_distance(current_quat, previous_quat)
 
 
 @router.get("/observer/current/{user_id}", response_model=StateResponse, tags=["Current"])
@@ -238,7 +277,7 @@ async def get_current_state(
         HTTPException: 404 if no states found for user
     """
     try:
-        logger.info(f"Retrieving current state for user {user_id}")
+        logger.info("Retrieving current state for user %s", user_id)
 
         # Query most recent state
         stmt = (
@@ -265,62 +304,55 @@ async def get_current_state(
         previous_state = prev_result.scalar_one_or_none()
 
         # Get emotion info
-        emotion_stmt = select(EmotionDefinition).where(
-            EmotionDefinition.id == current_state.dominant_emotion_id
+        # Get emotion info
+        emotion_info = None
+        if current_state.dominant_emotion_id:
+            emotion_info = await _get_emotion_info(
+                db, current_state.dominant_emotion_id, list(current_state.vac_values)
+            )
+
+        # Calculate metrics
+        angular_dist = await _calculate_angular_distance(
+            db,
+            list(current_state.quaternion_state),
+            list(previous_state.quaternion_state) if previous_state else None,
         )
-        emotion_result = await db.execute(emotion_stmt)
-        emotion = emotion_result.scalar_one_or_none()
-
-        if not emotion:
-            emotion_info = EmotionInfo(
-                id=str(current_state.dominant_emotion_id),
-                name="Unknown",
-                category="Unknown",
-                vac=list(current_state.vac_values),
-            )
-        else:
-            emotion_info = EmotionInfo(
-                id=str(emotion.id),
-                name=emotion.emotion_name,
-                category=emotion.category,
-                vac=list(emotion.vac_vector),
-            )
-
-        # Calculate angular distance if previous state exists
-        angular_distance = 0.0
-        if previous_state:
-            from app.services.metrics_calculator import MetricsCalculator
-
-            metrics_calc = MetricsCalculator(db)
-            angular_distance = metrics_calc._angular_distance(
-                list(current_state.quaternion_state),
-                list(previous_state.quaternion_state),
-            )
 
         # Build response
-        response = StateResponse(
-            state_id=str(current_state.id),
-            dominant_emotion=emotion_info,
-            quaternion=QuaternionModel.from_list(list(current_state.quaternion_state)),
-            previous_quaternion=(
-                QuaternionModel.from_list(list(previous_state.quaternion_state))
-                if previous_state
-                else None
-            ),
-            metrics=MetricsInfo(
-                elasticity=current_state.elasticity_metric,
-                rigidity=current_state.rigidity_score,
-                angular_distance=angular_distance,
-                alerts=[],
-            ),
-            timestamp=current_state.timestamp,
-        )
+        response = _build_state_response(current_state, previous_state, emotion_info, angular_dist)
 
-        logger.info(f"Current state: {emotion_info.name}")
+        emotion_name = emotion_info.name if emotion_info else "Neutral"
+        logger.info("Current state: %s", emotion_name)
         return response
 
     except HTTPException:
         raise
     except Exception as e:
-        logger.error(f"Failed to get current state: {e}", exc_info=True)
-        raise HTTPException(status_code=500, detail=f"Failed to get current state: {str(e)}")
+        logger.error("Failed to get current state: %s", e, exc_info=True)
+        raise HTTPException(status_code=500, detail=f"Failed to get current state: {str(e)}") from e
+
+
+def _build_state_response(
+    current_state: Any,
+    previous_state: Optional[Any],
+    emotion_info: Optional[EmotionInfo],
+    angular_dist: float,
+) -> StateResponse:
+    """Build the StateResponse object."""
+    return StateResponse(
+        state_id=str(current_state.id),
+        dominant_emotion=emotion_info,
+        quaternion=QuaternionModel.from_list(list(current_state.quaternion_state)),
+        previous_quaternion=(
+            QuaternionModel.from_list(list(previous_state.quaternion_state))
+            if previous_state
+            else None
+        ),
+        metrics=MetricsInfo(
+            elasticity=current_state.elasticity_metric,
+            rigidity=current_state.rigidity_score,
+            angular_distance=angular_dist,
+            alerts=[],
+        ),
+        timestamp=current_state.timestamp,
+    )

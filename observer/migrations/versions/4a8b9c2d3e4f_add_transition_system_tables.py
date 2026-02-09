@@ -11,7 +11,7 @@ emotion regulation strategies.
 
 Tables created:
 - transition_strategies: Evidence-based emotion regulation strategies
-- transition_patterns: Common emotional transition patterns  
+- transition_patterns: Common emotional transition patterns
 - pattern_strategies: Junction table mapping strategies to patterns
 - user_journeys: Tracks users' emotional transition attempts
 - journey_waypoints: Individual waypoints within journeys
@@ -32,9 +32,10 @@ depends_on = None
 
 def upgrade() -> None:
     """Create transition system tables, views, functions, and triggers."""
-    
+
     # transition_strategies table
-    op.execute("""
+    op.execute(
+        """
         CREATE TABLE IF NOT EXISTS transition_strategies (
             id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
             strategy_name VARCHAR(200) NOT NULL,
@@ -54,12 +55,17 @@ def upgrade() -> None:
             created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
             updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
         )
-    """)
-    
+    """
+    )
+
     op.execute("CREATE INDEX idx_strategy_type ON transition_strategies(strategy_type)")
-    op.execute("CREATE INDEX idx_strategy_difficulty ON transition_strategies(difficulty_level)")
-    op.execute("CREATE INDEX idx_strategy_evidence ON transition_strategies(evidence_level)")
-    
+    op.execute(
+        "CREATE INDEX idx_strategy_difficulty ON transition_strategies(difficulty_level)"
+    )
+    op.execute(
+        "CREATE INDEX idx_strategy_evidence ON transition_strategies(evidence_level)"
+    )
+
     op.execute(
         "COMMENT ON TABLE transition_strategies IS "
         "'Evidence-based emotion regulation strategies from research literature'"
@@ -72,9 +78,10 @@ def upgrade() -> None:
         "COMMENT ON COLUMN transition_strategies.evidence_level IS "
         "'Hierarchy: meta_analysis > rct > clinical > theoretical'"
     )
-    
+
     # transition_patterns table
-    op.execute("""
+    op.execute(
+        """
         CREATE TABLE IF NOT EXISTS transition_patterns (
             id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
             pattern_name VARCHAR(100) NOT NULL UNIQUE,
@@ -86,16 +93,20 @@ def upgrade() -> None:
             example_transitions JSONB,
             created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
         )
-    """)
-    
-    op.execute("CREATE INDEX idx_pattern_categories ON transition_patterns(from_category, to_category)")
+    """
+    )
+
+    op.execute(
+        "CREATE INDEX idx_pattern_categories ON transition_patterns(from_category, to_category)"
+    )
     op.execute(
         "COMMENT ON TABLE transition_patterns IS "
         "'Common emotional transition patterns (e.g., high arousal to low arousal)'"
     )
-    
+
     # pattern_strategies junction table
-    op.execute("""
+    op.execute(
+        """
         CREATE TABLE IF NOT EXISTS pattern_strategies (
             id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
             pattern_id UUID NOT NULL REFERENCES transition_patterns(id) ON DELETE CASCADE,
@@ -106,16 +117,22 @@ def upgrade() -> None:
             created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
             UNIQUE(pattern_id, strategy_id)
         )
-    """)
-    
-    op.execute("CREATE INDEX idx_pattern_strategies_pattern ON pattern_strategies(pattern_id)")
+    """
+    )
+
+    op.execute(
+        "CREATE INDEX idx_pattern_strategies_pattern ON pattern_strategies(pattern_id)"
+    )
     op.execute(
         "CREATE INDEX idx_pattern_strategies_order ON pattern_strategies(pattern_id, recommendation_order)"
     )
-    op.execute("COMMENT ON TABLE pattern_strategies IS 'Junction table mapping strategies to patterns'")
-    
+    op.execute(
+        "COMMENT ON TABLE pattern_strategies IS 'Junction table mapping strategies to patterns'"
+    )
+
     # user_journeys table
-    op.execute("""
+    op.execute(
+        """
         CREATE TABLE IF NOT EXISTS user_journeys (
             id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
             user_id UUID NOT NULL,
@@ -139,13 +156,16 @@ def upgrade() -> None:
             created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
             updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
         )
-    """)
-    
+    """
+    )
+
     op.execute("CREATE INDEX idx_user_journeys_user_id ON user_journeys(user_id)")
     op.execute("CREATE INDEX idx_user_journeys_status ON user_journeys(status)")
     op.execute("CREATE INDEX idx_user_journeys_started ON user_journeys(started_at)")
-    op.execute("CREATE INDEX idx_user_journeys_user_status ON user_journeys(user_id, status)")
-    
+    op.execute(
+        "CREATE INDEX idx_user_journeys_user_status ON user_journeys(user_id, status)"
+    )
+
     op.execute(
         "COMMENT ON TABLE user_journeys IS 'User emotional transition attempts and progress tracking'"
     )
@@ -153,9 +173,10 @@ def upgrade() -> None:
         "COMMENT ON COLUMN user_journeys.context_metadata IS "
         "'Contextual factors: location, time, support, energy level'"
     )
-    
+
     # journey_waypoints table
-    op.execute("""
+    op.execute(
+        """
         CREATE TABLE IF NOT EXISTS journey_waypoints (
             id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
             journey_id UUID NOT NULL REFERENCES user_journeys(id) ON DELETE CASCADE,
@@ -178,12 +199,15 @@ def upgrade() -> None:
             created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
             UNIQUE(journey_id, waypoint_index)
         )
-    """)
-    
+    """
+    )
+
     op.execute("CREATE INDEX idx_waypoints_journey ON journey_waypoints(journey_id)")
-    op.execute("CREATE INDEX idx_waypoints_journey_order ON journey_waypoints(journey_id, waypoint_index)")
+    op.execute(
+        "CREATE INDEX idx_waypoints_journey_order ON journey_waypoints(journey_id, waypoint_index)"
+    )
     op.execute("CREATE INDEX idx_waypoints_reached ON journey_waypoints(reached)")
-    
+
     op.execute(
         "COMMENT ON TABLE journey_waypoints IS "
         "'Individual waypoints within a journey with progress tracking'"
@@ -192,9 +216,10 @@ def upgrade() -> None:
         "COMMENT ON COLUMN journey_waypoints.reasoning IS "
         "'Psychological explanation for why this waypoint is chosen'"
     )
-    
+
     # strategy_attempts table
-    op.execute("""
+    op.execute(
+        """
         CREATE TABLE IF NOT EXISTS strategy_attempts (
             id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
             journey_id UUID NOT NULL REFERENCES user_journeys(id) ON DELETE CASCADE,
@@ -210,19 +235,23 @@ def upgrade() -> None:
             abandoned BOOLEAN DEFAULT FALSE,
             created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
         )
-    """)
-    
+    """
+    )
+
     op.execute("CREATE INDEX idx_attempts_journey ON strategy_attempts(journey_id)")
     op.execute("CREATE INDEX idx_attempts_strategy ON strategy_attempts(strategy_id)")
     op.execute("CREATE INDEX idx_attempts_helpful ON strategy_attempts(helpful_rating)")
-    op.execute("CREATE INDEX idx_attempts_strategy_rating ON strategy_attempts(strategy_id, helpful_rating)")
-    
+    op.execute(
+        "CREATE INDEX idx_attempts_strategy_rating ON strategy_attempts(strategy_id, helpful_rating)"
+    )
+
     op.execute(
         "COMMENT ON TABLE strategy_attempts IS 'Records of strategy usage and user-reported effectiveness'"
     )
-    
+
     # category_transitions table
-    op.execute("""
+    op.execute(
+        """
         CREATE TABLE IF NOT EXISTS category_transitions (
             id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
             from_category VARCHAR(200) NOT NULL,
@@ -235,12 +264,19 @@ def upgrade() -> None:
             created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
             UNIQUE(from_category, to_category)
         )
-    """)
-    
-    op.execute("CREATE INDEX idx_category_trans_from ON category_transitions(from_category)")
-    op.execute("CREATE INDEX idx_category_trans_to ON category_transitions(to_category)")
-    op.execute("CREATE INDEX idx_category_trans_difficulty ON category_transitions(difficulty_score)")
-    
+    """
+    )
+
+    op.execute(
+        "CREATE INDEX idx_category_trans_from ON category_transitions(from_category)"
+    )
+    op.execute(
+        "CREATE INDEX idx_category_trans_to ON category_transitions(to_category)"
+    )
+    op.execute(
+        "CREATE INDEX idx_category_trans_difficulty ON category_transitions(difficulty_score)"
+    )
+
     op.execute(
         "COMMENT ON TABLE category_transitions IS "
         "'Difficulty matrix for category-to-category emotional transitions'"
@@ -249,11 +285,12 @@ def upgrade() -> None:
         "COMMENT ON COLUMN category_transitions.difficulty_score IS "
         "'Scale 0-1 where 1.0 = impossible without bridge'"
     )
-    
+
     # Create views
-    op.execute("""
+    op.execute(
+        """
         CREATE OR REPLACE VIEW user_transition_success_rates AS
-        SELECT 
+        SELECT
             user_id, start_emotion_id, goal_emotion_id,
             COUNT(*) as attempts,
             SUM(CASE WHEN status = 'completed' THEN 1 ELSE 0 END) as completions,
@@ -262,11 +299,13 @@ def upgrade() -> None:
         FROM user_journeys
         WHERE status IN ('completed', 'abandoned')
         GROUP BY user_id, start_emotion_id, goal_emotion_id
-    """)
-    
-    op.execute("""
+    """
+    )
+
+    op.execute(
+        """
         CREATE OR REPLACE VIEW user_strategy_effectiveness AS
-        SELECT 
+        SELECT
             sa.strategy_id, ts.strategy_name, uj.user_id,
             COUNT(*) as times_tried,
             AVG(sa.helpful_rating) as avg_rating,
@@ -277,11 +316,13 @@ def upgrade() -> None:
         JOIN transition_strategies ts ON sa.strategy_id = ts.id
         WHERE sa.helpful_rating IS NOT NULL
         GROUP BY sa.strategy_id, ts.strategy_name, uj.user_id
-    """)
-    
-    op.execute("""
+    """
+    )
+
+    op.execute(
+        """
         CREATE OR REPLACE VIEW global_strategy_effectiveness AS
-        SELECT 
+        SELECT
             sa.strategy_id, ts.strategy_name, ts.strategy_type,
             COUNT(DISTINCT uj.user_id) as users_tried,
             COUNT(*) as total_attempts,
@@ -294,10 +335,12 @@ def upgrade() -> None:
         JOIN transition_strategies ts ON sa.strategy_id = ts.id
         WHERE sa.helpful_rating IS NOT NULL
         GROUP BY sa.strategy_id, ts.strategy_name, ts.strategy_type
-    """)
-    
+    """
+    )
+
     # Create functions
-    op.execute("""
+    op.execute(
+        """
         CREATE OR REPLACE FUNCTION calculate_transition_success_probability(
             p_user_id UUID, p_start_emotion_id UUID, p_goal_emotion_id UUID
         ) RETURNS FLOAT AS $$
@@ -309,9 +352,9 @@ def upgrade() -> None:
             WHERE user_id = p_user_id
               AND start_emotion_id = p_start_emotion_id
               AND goal_emotion_id = p_goal_emotion_id;
-            
+
             IF v_success_rate IS NULL THEN
-                SELECT 
+                SELECT
                     CAST(SUM(CASE WHEN status = 'completed' THEN 1 ELSE 0 END) AS FLOAT) / NULLIF(COUNT(*), 0)
                 INTO v_success_rate
                 FROM user_journeys
@@ -319,13 +362,15 @@ def upgrade() -> None:
                   AND goal_emotion_id = p_goal_emotion_id
                   AND status IN ('completed', 'abandoned');
             END IF;
-            
+
             RETURN COALESCE(v_success_rate, 0.5);
         END;
         $$ LANGUAGE plpgsql
-    """)
-    
-    op.execute("""
+    """
+    )
+
+    op.execute(
+        """
         CREATE OR REPLACE FUNCTION get_user_top_strategies(p_user_id UUID, p_limit INT DEFAULT 5)
         RETURNS TABLE (strategy_id UUID, strategy_name VARCHAR(200), avg_rating FLOAT, times_tried BIGINT) AS $$
         BEGIN
@@ -337,24 +382,30 @@ def upgrade() -> None:
             LIMIT p_limit;
         END;
         $$ LANGUAGE plpgsql
-    """)
-    
-    op.execute("""
+    """
+    )
+
+    op.execute(
+        """
         CREATE OR REPLACE FUNCTION update_journey_timestamp() RETURNS TRIGGER AS $$
         BEGIN
             NEW.updated_at = NOW();
             RETURN NEW;
         END;
         $$ LANGUAGE plpgsql
-    """)
-    
-    op.execute("""
+    """
+    )
+
+    op.execute(
+        """
         CREATE TRIGGER trigger_update_journey_timestamp
         BEFORE UPDATE ON user_journeys FOR EACH ROW
         EXECUTE FUNCTION update_journey_timestamp()
-    """)
-    
-    op.execute("""
+    """
+    )
+
+    op.execute(
+        """
         CREATE OR REPLACE FUNCTION check_journey_completion() RETURNS TRIGGER AS $$
         DECLARE
             v_total_waypoints INT;
@@ -363,7 +414,7 @@ def upgrade() -> None:
             SELECT COUNT(*), SUM(CASE WHEN reached THEN 1 ELSE 0 END)
             INTO v_total_waypoints, v_reached_waypoints
             FROM journey_waypoints WHERE journey_id = NEW.journey_id;
-            
+
             IF v_reached_waypoints = v_total_waypoints THEN
                 UPDATE user_journeys
                 SET status = 'completed', completed_at = NEW.reached_at, current_waypoint = v_total_waypoints
@@ -371,28 +422,37 @@ def upgrade() -> None:
             ELSE
                 UPDATE user_journeys SET current_waypoint = NEW.waypoint_index WHERE id = NEW.journey_id;
             END IF;
-            
+
             RETURN NEW;
         END;
         $$ LANGUAGE plpgsql
-    """)
-    
-    op.execute("""
+    """
+    )
+
+    op.execute(
+        """
         CREATE TRIGGER trigger_check_journey_completion
         AFTER UPDATE OF reached ON journey_waypoints FOR EACH ROW
         WHEN (NEW.reached = TRUE AND OLD.reached = FALSE)
         EXECUTE FUNCTION check_journey_completion()
-    """)
+    """
+    )
 
 
 def downgrade() -> None:
     """Drop transition system tables, views, functions, and triggers."""
-    op.execute("DROP TRIGGER IF EXISTS trigger_check_journey_completion ON journey_waypoints")
-    op.execute("DROP TRIGGER IF EXISTS trigger_update_journey_timestamp ON user_journeys")
+    op.execute(
+        "DROP TRIGGER IF EXISTS trigger_check_journey_completion ON journey_waypoints"
+    )
+    op.execute(
+        "DROP TRIGGER IF EXISTS trigger_update_journey_timestamp ON user_journeys"
+    )
     op.execute("DROP FUNCTION IF EXISTS check_journey_completion()")
     op.execute("DROP FUNCTION IF EXISTS update_journey_timestamp()")
     op.execute("DROP FUNCTION IF EXISTS get_user_top_strategies(UUID, INT)")
-    op.execute("DROP FUNCTION IF EXISTS calculate_transition_success_probability(UUID, UUID, UUID)")
+    op.execute(
+        "DROP FUNCTION IF EXISTS calculate_transition_success_probability(UUID, UUID, UUID)"
+    )
     op.execute("DROP VIEW IF EXISTS global_strategy_effectiveness")
     op.execute("DROP VIEW IF EXISTS user_strategy_effectiveness")
     op.execute("DROP VIEW IF EXISTS user_transition_success_rates")

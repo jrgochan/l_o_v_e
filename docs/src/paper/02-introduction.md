@@ -76,8 +76,8 @@ This three-dimensional space enables computational systems to distinguish:
 We implement the VAC model in a complete microservices platform designed for mental health applications:
 
 **L**istener - Audio transcription and semantic VAC extraction using local LLMs
-**O**bserver - Data persistence, vector search, and therapeutic pathfinding  
-**V**ersor - Quaternion mathematics for smooth 3D emotional transitions  
+**O**bserver - Data persistence, vector search, and therapeutic pathfinding
+**V**ersor - Quaternion mathematics for smooth 3D emotional transitions
 **E**xperience - Real-time 3D visualization of emotional states
 
 Key design principles:

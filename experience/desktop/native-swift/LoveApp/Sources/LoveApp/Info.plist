@@ -10,21 +10,21 @@
     <string>1.0</string>
     <key>CFBundleVersion</key>
     <string>1</string>
-    
+
     <!-- Privacy - Microphone (Required for Voice Viz & Chat) -->
     <key>NSMicrophoneUsageDescription</key>
     <string>We need access to your microphone to visualize your voice and enable voice chat.</string>
-    
+
     <!-- Privacy - Speech Recognition (Required for Transcription) -->
     <key>NSSpeechRecognitionUsageDescription</key>
     <string>We use speech recognition to transcribe your voice for the AI interaction.</string>
-    
+
     <!-- Privacy - Health (Anticipatory for BioMonitor) -->
     <key>NSHealthShareUsageDescription</key>
     <string>We analyze heart rate data to adapt the AI's emotional responses.</string>
     <key>NSHealthUpdateUsageDescription</key>
     <string>We may sync relaxation sessions back to your health data.</string>
-    
+
     <!-- UI Configuration -->
     <key>UIViewControllerBasedStatusBarAppearance</key>
     <false/>
@@ -32,7 +32,7 @@
     <true/>
     <key>UISupportsDocumentBrowser</key>
     <false/>
-    
+
     <!-- Scoped Capabilities -->
     <key>UIRequiredDeviceCapabilities</key>
     <array>

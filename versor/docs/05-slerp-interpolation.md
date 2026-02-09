@@ -84,15 +84,15 @@ Quaternions q and -q represent the same rotation, but:
 def ensure_shortest_path(q1: Quaternion, q2: Quaternion) -> Tuple[Quaternion, Quaternion]:
     """
     Ensure SLERP takes the shortest path.
-    
+
     If dot product is negative, negate one quaternion.
     """
     dot = q1.dot(q2)
-    
+
     if dot < 0:
         # Negate q2 to ensure short path
         q2 = Quaternion(w=-q2.w, x=-q2.x, y=-q2.y, z=-q2.z)
-    
+
     return q1, q2
 ```
 
@@ -117,40 +117,40 @@ def generate_slerp_path(
 ) -> List[Quaternion]:
     """
     Generate SLERP interpolation path.
-    
+
     Args:
         q_start: Starting quaternion
         q_target: Target quaternion
         steps: Number of intermediate frames (default: 60 for 60fps)
-    
+
     Returns:
         List of quaternions representing the path
     """
     # 1. Ensure shortest path (double-cover correction)
     q_start_corrected, q_target_corrected = ensure_shortest_path(q_start, q_target)
-    
+
     # 2. Convert to SciPy format (scalar-last)
     q_start_scipy = love_to_scipy(q_start_corrected)
     q_target_scipy = love_to_scipy(q_target_corrected)
-    
+
     # 3. Create Rotation objects
     rotations = R.from_quat([q_start_scipy, q_target_scipy])
-    
+
     # 4. Create Slerp interpolator
     times = np.array([0.0, 1.0])
     slerp = Slerp(times, rotations)
-    
+
     # 5. Generate interpolation points
     t_values = np.linspace(0, 1, steps)
     interpolated_rotations = slerp(t_values)
-    
+
     # 6. Convert back to L.O.V.E. format
     path = []
     for rotation in interpolated_rotations:
         q_scipy = rotation.as_quat()  # Returns [x,y,z,w]
         q_love = scipy_to_love(q_scipy)
         path.append(q_love)
-    
+
     return path
 ```
 
@@ -188,7 +188,7 @@ def smooth_transition(
 ) -> Quaternion:
     """
     Apply low-pass filter to reduce jitter.
-    
+
     Args:
         q_prev: Previous quaternion (smoothed)
         q_new: New quaternion (raw from LLM)
@@ -196,28 +196,28 @@ def smooth_transition(
             - 0.0 = no change (use previous)
             - 1.0 = no smoothing (use new)
             - 0.1 = recommended (90% old, 10% new)
-    
+
     Returns:
         Smoothed quaternion
     """
     # Use SLERP for smoothing
     path = generate_slerp_path(q_prev, q_new, steps=2)
-    
+
     # Or directly:
     q_prev_corrected, q_new_corrected = ensure_shortest_path(q_prev, q_new)
-    
+
     # Manual SLERP at t=alpha
     dot = q_prev_corrected.dot(q_new_corrected)
     omega = np.arccos(np.clip(dot, -1.0, 1.0))
-    
+
     if abs(omega) < 1e-6:
         # Quaternions are nearly identical
         return q_prev
-    
+
     sin_omega = np.sin(omega)
     w1 = np.sin((1 - alpha) * omega) / sin_omega
     w2 = np.sin(alpha * omega) / sin_omega
-    
+
     return Quaternion(
         w=w1 * q_prev_corrected.w + w2 * q_new_corrected.w,
         x=w1 * q_prev_corrected.x + w2 * q_new_corrected.x,
@@ -235,12 +235,12 @@ def test_slerp_endpoints():
     """SLERP at t=0 and t=1 should match inputs"""
     q1 = Quaternion(1, 0, 0, 0)
     q2 = Quaternion(0.7071, 0.7071, 0, 0)
-    
+
     path = generate_slerp_path(q1, q2, steps=10)
-    
+
     # First frame = q1
     assert path[0].w == pytest.approx(q1.w, abs=1e-5)
-    
+
     # Last frame = q2
     assert path[-1].w == pytest.approx(q2.w, abs=1e-5)
 
@@ -248,9 +248,9 @@ def test_all_path_quaternions_unit():
     """All quaternions in path must be unit length"""
     q1 = VACVector(0.5, 0.3, 0.6).to_quaternion()
     q2 = VACVector(-0.4, 0.7, -0.2).to_quaternion()
-    
+
     path = generate_slerp_path(q1, q2, steps=100)
-    
+
     for q in path:
         norm = math.sqrt(q.w**2 + q.x**2 + q.y**2 + q.z**2)
         assert abs(norm - 1.0) < 1e-5

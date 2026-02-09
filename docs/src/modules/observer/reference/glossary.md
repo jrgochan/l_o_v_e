@@ -1,6 +1,6 @@
 # Glossary
 
-**Audience:** All users  
+**Audience:** All users
 **Goal:** Definitions of Observer-specific terminology
 
 ---
@@ -311,23 +311,23 @@ Percentage of time service is available. Observer targets 99.9% (43 minutes down
 
 ## Acronyms
 
-**ACT:** Acceptance and Commitment Therapy  
-**ADR:** Architecture Decision Record  
-**API:** Application Programming Interface  
-**CBT:** Cognitive Behavioral Therapy  
-**DBT:** Dialectical Behavior Therapy  
-**DBA:** Database Administrator  
-**FFT:** Fast Fourier Transform (for cycle detection)  
-**HNSW:** Hierarchical Navigable Small Worlds  
-**JWT:** JSON Web Token  
-**PITR:** Point-In-Time Recovery  
-**RLS:** Row-Level Security  
-**SLI:** Service Level Indicator  
-**SLO:** Service Level Objective  
-**SQL:** Structured Query Language  
-**TLS:** Transport Layer Security  
-**VAC:** Valence-Arousal-Connection  
-**VAD:** Valence-Arousal-Dominance (traditional model)  
+**ACT:** Acceptance and Commitment Therapy
+**ADR:** Architecture Decision Record
+**API:** Application Programming Interface
+**CBT:** Cognitive Behavioral Therapy
+**DBT:** Dialectical Behavior Therapy
+**DBA:** Database Administrator
+**FFT:** Fast Fourier Transform (for cycle detection)
+**HNSW:** Hierarchical Navigable Small Worlds
+**JWT:** JSON Web Token
+**PITR:** Point-In-Time Recovery
+**RLS:** Row-Level Security
+**SLI:** Service Level Indicator
+**SLO:** Service Level Objective
+**SQL:** Structured Query Language
+**TLS:** Transport Layer Security
+**VAC:** Valence-Arousal-Connection
+**VAD:** Valence-Arousal-Dominance (traditional model)
 **WAL:** Write-Ahead Log
 
 ---

@@ -41,7 +41,7 @@ npm run test:coverage
 
 ### 1. useSettingsStore Tests
 
-**File**: `__tests__/stores/useSettingsStore.test.ts`  
+**File**: `__tests__/stores/useSettingsStore.test.ts`
 **Test Count**: 31 tests across 8 describe blocks
 
 #### Test Categories:
@@ -94,7 +94,7 @@ npm run test:coverage
 
 ### 2. Settings Presets Tests
 
-**File**: `__tests__/utils/settingsPresets.test.ts`  
+**File**: `__tests__/utils/settingsPresets.test.ts`
 **Test Count**: 40+ tests across 11 describe blocks
 
 #### Test Categories:
@@ -395,6 +395,6 @@ describe("Feature Name", () => {
 
 ---
 
-**Last Updated**: December 7, 2025  
-**Test Count**: 71 tests  
+**Last Updated**: December 7, 2025
+**Test Count**: 71 tests
 **Coverage**: >90%

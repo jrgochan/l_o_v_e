@@ -1,7 +1,7 @@
 # Turbopack GLSL Shader Loading Issue
 
-**Status:** Known Issue  
-**Impact:** Shaders not loading in Turbopack mode  
+**Status:** Known Issue
+**Impact:** Shaders not loading in Turbopack mode
 **Severity:** Medium (has workaround)
 
 ---
@@ -113,5 +113,5 @@ Once Turbopack GLSL loading is working:
 
 ---
 
-**Updated:** December 4, 2025  
+**Updated:** December 4, 2025
 **Status:** Workaround available (--webpack flag)

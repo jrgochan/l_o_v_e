@@ -62,19 +62,19 @@ if ! gcloud sql instances describe "$SQL_INSTANCE_NAME" --project="$PROJECT_ID" 
         --network="$VPC_NAME" \
         --no-assign-ip \
         --project="$PROJECT_ID"
-        
+
     # Set password
     DB_PASSWORD=$(openssl rand -base64 12)
     gcloud sql users set-password postgres --instance="$SQL_INSTANCE_NAME" --password="$DB_PASSWORD" --project="$PROJECT_ID"
-    
+
     # Create DB and User
     gcloud sql databases create "$DB_NAME" --instance="$SQL_INSTANCE_NAME" --project="$PROJECT_ID"
     gcloud sql users create "$DB_USER" --instance="$SQL_INSTANCE_NAME" --password="$DB_PASSWORD" --project="$PROJECT_ID"
-    
+
     # Store password in Secret Manager
     echo -n "$DB_PASSWORD" | gcloud secrets create "${APP_NAME}-db-password" --data-file=- --project="$PROJECT_ID" 2>/dev/null || \
     echo -n "$DB_PASSWORD" | gcloud secrets versions add "${APP_NAME}-db-password" --data-file=- --project="$PROJECT_ID"
-    
+
     echo "Cloud SQL created. Password saved to Secret Manager: ${APP_NAME}-db-password"
 else
     echo "Cloud SQL instance exists."
@@ -86,9 +86,9 @@ if ! gcloud secrets describe "$JWT_SECRET_NAME" --project="$PROJECT_ID" >/dev/nu
     echo "Creating JWT Secret..."
     # Generate a secure random key
     JWT_KEY=$(openssl rand -base64 32)
-    
+
     echo -n "$JWT_KEY" | gcloud secrets create "$JWT_SECRET_NAME" --data-file=- --project="$PROJECT_ID"
-    
+
     echo "JWT Secret created: $JWT_SECRET_NAME"
 else
     echo "JWT Secret exists."
@@ -116,7 +116,7 @@ else
     if ! gcloud compute instances describe "$OLLAMA_INSTANCE_NAME" --zone="$ZONE" --project="$PROJECT_ID" >/dev/null 2>&1; then
 
     echo "Creating Ollama VM..."
-    
+
     # Startup script to install Ollama
     cat <<EOF > startup-ollama.sh
 #!/bin/bash
@@ -138,7 +138,7 @@ EOF
         --tags="ollama-server" \
         --metadata-from-file startup-script=startup-ollama.sh \
         --project="$PROJECT_ID"
-        
+
     # Firewall rule for internal access
     gcloud compute firewall-rules create "${APP_NAME}-allow-internal-ollama" \
         --network="$VPC_NAME" \
@@ -147,7 +147,7 @@ EOF
         --target-tags="ollama-server" \
         --description="Allow Cloud Run connector to access Ollama" \
         --project="$PROJECT_ID" 2>/dev/null || true
-        
+
     rm startup-ollama.sh
     else
         echo "Ollama VM exists."

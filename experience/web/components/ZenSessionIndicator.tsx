@@ -34,7 +34,7 @@ export function ZenSessionIndicator({ lastSync, visible }: Props) {
   return (
     <div
       className={`
-        absolute top-4 left-4 
+        absolute top-4 left-4
         px-3 py-1.5 rounded-full text-xs font-medium
         backdrop-blur-md transition-all duration-300
         ${

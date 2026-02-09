@@ -1,6 +1,5 @@
-
-import pytest
 from app.api.schemas.common import QuaternionModel
+
 
 def test_quaternion_model_to_list():
     """Test converting QuaternionModel to list."""

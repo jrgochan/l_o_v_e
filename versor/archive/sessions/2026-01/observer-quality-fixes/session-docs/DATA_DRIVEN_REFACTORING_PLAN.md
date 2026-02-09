@@ -1,6 +1,6 @@
 # Data-Driven Architecture Refactoring Plan
-**Created:** 2026-01-03  
-**Goal:** Extract hardcoded data to JSON for better maintainability  
+**Created:** 2026-01-03
+**Goal:** Extract hardcoded data to JSON for better maintainability
 **Status:** 🚀 Ready to Implement
 
 ---
@@ -64,8 +64,8 @@ Refactor the Observer seeding system from **hardcoded Python data structures** t
 ## Implementation Plan
 
 ### Phase 1: Atlas Emotions ⚡ (Highest Impact)
-**Effort:** 2-3 hours  
-**Impact:** 640 lines of code → simple JSON loader  
+**Effort:** 2-3 hours
+**Impact:** 640 lines of code → simple JSON loader
 **Priority:** HIGH
 
 #### Task 1.1: Create emotions.json
@@ -144,8 +144,8 @@ def load_atlas_emotions() -> List[Dict]:
 ---
 
 ### Phase 2: Category System 📊
-**Effort:** 1-2 hours  
-**Impact:** Matrix visualization, easier updates  
+**Effort:** 1-2 hours
+**Impact:** Matrix visualization, easier updates
 **Priority:** HIGH
 
 #### Task 2.1: Create categories.json
@@ -205,8 +205,8 @@ def load_atlas_emotions() -> List[Dict]:
 ---
 
 ### Phase 3: Base Strategies & Patterns 📋
-**Effort:** 1-2 hours  
-**Impact:** Consistency with enhanced strategies  
+**Effort:** 1-2 hours
+**Impact:** Consistency with enhanced strategies
 **Priority:** MEDIUM
 
 #### Task 3.1: Extract core strategies
@@ -273,8 +273,8 @@ Move hardcoded mappings to:
 ---
 
 ### Phase 4: Validation & Tooling 🛡️
-**Effort:** 2-3 hours  
-**Impact:** Data quality assurance  
+**Effort:** 2-3 hours
+**Impact:** Data quality assurance
 **Priority:** MEDIUM
 
 #### Task 4.1: JSON Schema Definitions
@@ -303,13 +303,13 @@ from pathlib import Path
 
 def validate_all_data():
     """Validate all JSON files against schemas."""
-    
+
     validations = [
         ("data/atlas/emotions.json", "data/atlas/schemas/emotions.schema.json"),
         ("data/atlas/categories.json", "data/atlas/schemas/categories.schema.json"),
         # ... etc
     ]
-    
+
     errors = []
     for data_file, schema_file in validations:
         try:
@@ -317,13 +317,13 @@ def validate_all_data():
                 data = json.load(f)
             with open(schema_file) as f:
                 schema = json.load(f)
-            
+
             jsonschema.validate(data, schema)
             print(f"✅ {data_file} - Valid")
         except Exception as e:
             errors.append((data_file, str(e)))
             print(f"❌ {data_file} - {e}")
-    
+
     return len(errors) == 0
 ```
 
@@ -347,8 +347,8 @@ Add JSON validation hook:
 ---
 
 ### Phase 5: Documentation & Testing 📚
-**Effort:** 1-2 hours  
-**Impact:** Team onboarding, data quality  
+**Effort:** 1-2 hours
+**Impact:** Team onboarding, data quality
 **Priority:** LOW
 
 #### Task 5.1: Data Documentation
@@ -505,13 +505,13 @@ async def seed_atlas():
 def load_atlas_emotions() -> Dict:
     """Load Atlas emotions from canonical JSON file."""
     data_path = Path(__file__).parent.parent / "data/atlas/emotions.json"
-    
+
     with open(data_path, 'r') as f:
         data = json.load(f)
-    
+
     # Optional: Validate against schema
     validate_emotions_data(data)
-    
+
     return data
 
 async def seed_atlas():
@@ -692,13 +692,13 @@ git checkout HEAD~1 observer/scripts/seed_atlas.py
 
 ## Timeline Estimate
 
-**Phase 1 (Atlas):** Tonight (2-3 hours)  
-**Phase 2 (Categories):** Tomorrow (1-2 hours)  
-**Phase 3 (Strategies/Patterns):** Weekend (2-3 hours)  
-**Phase 4 (Validation):** Weekend (2-3 hours)  
+**Phase 1 (Atlas):** Tonight (2-3 hours)
+**Phase 2 (Categories):** Tomorrow (1-2 hours)
+**Phase 3 (Strategies/Patterns):** Weekend (2-3 hours)
+**Phase 4 (Validation):** Weekend (2-3 hours)
 **Phase 5 (Docs):** Sunday (1-2 hours)
 
-**Total:** 8-13 hours over 3 days  
+**Total:** 8-13 hours over 3 days
 **Target:** Complete by Monday ✅
 
 ---

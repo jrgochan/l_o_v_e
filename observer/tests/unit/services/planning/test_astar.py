@@ -39,7 +39,15 @@ async def test_find_path_basic(searcher):
     # Simple direct neighbor
     searcher.graph.get_valid_neighbors.side_effect = [[goal]]
 
-    paths, metrics = await searcher.find_path(start, goal, 3, None)
+    from app.services.planning.types import PathFindingContext
+
+    context = PathFindingContext(
+        current_vac=[0, 0, 0],
+        goal_vac=[1, 1, 1],
+        max_waypoints=3,
+        user_history=None,
+    )
+    paths, metrics = await searcher.find_path(start, goal, context)
 
     assert len(paths) >= 1
     # Path should include start -> goal
@@ -70,7 +78,10 @@ async def test_pruning_visited(searcher):
 
     searcher.graph.get_category_difficulty.return_value = 0.0
 
-    paths, metrics = await searcher.find_path(start, goal, 5, None)
+    from app.services.planning.types import PathFindingContext
+
+    context = PathFindingContext(current_vac=[0, 0, 0], goal_vac=[10, 10, 10], max_waypoints=5)
+    paths, metrics = await searcher.find_path(start, goal, context)
 
     # Expected: S(1) + A1(1) + A2(1-pruned) = 3 nodes explored
     assert metrics["pruned_paths"] >= 1, f"Metrics: {metrics}"

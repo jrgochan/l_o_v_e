@@ -7,13 +7,13 @@ public struct GlassPane<Content: View>: View {
     let content: Content
     var onClose: (() -> Void)?
     var onMinimize: (() -> Void)?
-    
+
     // Drag State
     @State private var offset: CGSize = .zero
     @State private var lastOffset: CGSize = .zero
-    
-    public init(title: String, 
-                onClose: (() -> Void)? = nil, 
+
+    public init(title: String,
+                onClose: (() -> Void)? = nil,
                 onMinimize: (() -> Void)? = nil,
                 @ViewBuilder content: () -> Content) {
         self.title = title
@@ -30,9 +30,9 @@ public struct GlassPane<Content: View>: View {
                     .font(.caption.bold())
                     .kerning(1.5)
                     .foregroundStyle(.white.opacity(0.8))
-                
+
                 Spacer()
-                
+
                 HStack(spacing: 12) {
                     if let onMinimize {
                         Button(action: onMinimize) {
@@ -42,7 +42,7 @@ public struct GlassPane<Content: View>: View {
                         }
                         .buttonStyle(.plain)
                     }
-                    
+
                     if let onClose {
                         Button(action: onClose) {
                             Image(systemName: "xmark")
@@ -67,7 +67,7 @@ public struct GlassPane<Content: View>: View {
                         lastOffset = offset
                     }
             )
-            
+
             // Content
             content
                 .frame(maxWidth: .infinity, maxHeight: .infinity)

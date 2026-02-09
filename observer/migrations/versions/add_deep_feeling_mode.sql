@@ -7,7 +7,7 @@
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 
 -- Add deep_feeling_mode to chat_sessions
-ALTER TABLE chat_sessions 
+ALTER TABLE chat_sessions
 ADD COLUMN IF NOT EXISTS deep_feeling_mode BOOLEAN DEFAULT FALSE;
 
 -- Create multi_emotion_analyses table
@@ -16,18 +16,18 @@ CREATE TABLE IF NOT EXISTS multi_emotion_analyses (
     message_id UUID REFERENCES chat_messages(id) ON DELETE CASCADE,
     session_id UUID REFERENCES chat_sessions(id) ON DELETE CASCADE,
     deep_feeling_enabled BOOLEAN DEFAULT TRUE,
-    
+
     -- Aggregate state
     aggregate_vac FLOAT[3],  -- weighted VAC blend [valence, arousal, connection]
     complexity_score FLOAT CHECK (complexity_score >= 0 AND complexity_score <= 1),  -- 0-1
     emotional_clarity FLOAT CHECK (emotional_clarity >= 0 AND emotional_clarity <= 1),  -- 0-1
-    
+
     -- Temporal pattern
     temporal_pattern VARCHAR(50),  -- 'concurrent', 'sequential', 'emerging'
-    
+
     -- Metadata
     created_at TIMESTAMP DEFAULT NOW(),
-    
+
     -- Constraints
     CONSTRAINT fk_message FOREIGN KEY (message_id) REFERENCES chat_messages(id) ON DELETE CASCADE,
     CONSTRAINT fk_session FOREIGN KEY (session_id) REFERENCES chat_sessions(id) ON DELETE CASCADE
@@ -43,19 +43,19 @@ CREATE TABLE IF NOT EXISTS detected_emotions (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     analysis_id UUID NOT NULL REFERENCES multi_emotion_analyses(id) ON DELETE CASCADE,
     emotion_id UUID REFERENCES atlas_definitions(id),
-    
+
     -- Detection data
     confidence FLOAT NOT NULL CHECK (confidence >= 0 AND confidence <= 1),  -- 0-1
     prominence VARCHAR(20) NOT NULL CHECK (prominence IN ('primary', 'secondary', 'underlying')),
     vac FLOAT[3] NOT NULL,  -- VAC coordinates for this emotion
-    
+
     -- Voice-content alignment (from prosody)
     voice_alignment FLOAT CHECK (voice_alignment IS NULL OR (voice_alignment >= 0 AND voice_alignment <= 1)),  -- 0-1
     voice_interpretation_vac FLOAT[3],  -- VAC from voice-only analysis
-    
+
     -- Metadata
     created_at TIMESTAMP DEFAULT NOW(),
-    
+
     -- Constraints
     CONSTRAINT fk_analysis FOREIGN KEY (analysis_id) REFERENCES multi_emotion_analyses(id) ON DELETE CASCADE,
     CONSTRAINT fk_emotion FOREIGN KEY (emotion_id) REFERENCES atlas_definitions(id)
@@ -72,15 +72,15 @@ CREATE TABLE IF NOT EXISTS emotion_relationships (
     analysis_id UUID NOT NULL REFERENCES multi_emotion_analyses(id) ON DELETE CASCADE,
     emotion_a_id UUID NOT NULL REFERENCES detected_emotions(id) ON DELETE CASCADE,
     emotion_b_id UUID NOT NULL REFERENCES detected_emotions(id) ON DELETE CASCADE,
-    
+
     -- Relationship data
     relationship_type VARCHAR(50) NOT NULL CHECK (relationship_type IN ('complementary', 'contradictory', 'masking', 'amplifying', 'sequential')),
     strength FLOAT CHECK (strength >= 0 AND strength <= 1),  -- 0-1
     description TEXT,  -- Human-readable explanation
-    
+
     -- Metadata
     created_at TIMESTAMP DEFAULT NOW(),
-    
+
     -- Constraints
     CONSTRAINT fk_relationship_analysis FOREIGN KEY (analysis_id) REFERENCES multi_emotion_analyses(id) ON DELETE CASCADE,
     CONSTRAINT fk_emotion_a FOREIGN KEY (emotion_a_id) REFERENCES detected_emotions(id) ON DELETE CASCADE,
@@ -97,19 +97,19 @@ CREATE TABLE IF NOT EXISTS emotion_goals (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     session_id UUID NOT NULL REFERENCES chat_sessions(id) ON DELETE CASCADE,
     user_id VARCHAR(255) NOT NULL,
-    
+
     -- Goal definition
     goal_emotion_id UUID REFERENCES atlas_definitions(id),
     priority INTEGER DEFAULT 1 CHECK (priority > 0),  -- if multiple goals, which is most important
     target_date TIMESTAMP,
-    
+
     -- Status
     status VARCHAR(50) DEFAULT 'active' CHECK (status IN ('active', 'achieved', 'abandoned')),
-    
+
     -- Metadata
     created_at TIMESTAMP DEFAULT NOW(),
     updated_at TIMESTAMP DEFAULT NOW(),
-    
+
     -- Constraints
     CONSTRAINT fk_goal_session FOREIGN KEY (session_id) REFERENCES chat_sessions(id) ON DELETE CASCADE,
     CONSTRAINT fk_goal_emotion FOREIGN KEY (goal_emotion_id) REFERENCES atlas_definitions(id)

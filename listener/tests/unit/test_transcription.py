@@ -4,7 +4,10 @@ Listener Module - Transcription Service Tests
 Unit tests for the TranscriptionService.
 """
 
+# pylint: disable=protected-access
+
 from pathlib import Path
+from typing import Any
 
 import pytest
 
@@ -15,7 +18,7 @@ from app.services.transcription import TranscriptionService, get_transcription_s
 class TestTranscriptionService:
     """Test TranscriptionService functionality"""
 
-    def test_service_initialization(self):
+    def test_service_initialization(self) -> None:
         """Test service can be initialized with custom parameters"""
         service = TranscriptionService(model_size="base.en", device="cpu", compute_type="int8")
 
@@ -24,7 +27,7 @@ class TestTranscriptionService:
         assert service.compute_type == "int8"
         assert not service._model_loaded
 
-    def test_get_model_info(self):
+    def test_get_model_info(self) -> None:
         """Test getting model information"""
         service = TranscriptionService()
         info = service.get_model_info()
@@ -35,7 +38,7 @@ class TestTranscriptionService:
         assert "loaded" in info
         assert info["loaded"] is False  # Not loaded until first use
 
-    def test_transcribe_text(self, sample_text):
+    def test_transcribe_text(self, sample_text: Any) -> None:
         """Test direct text transcription (no audio)"""
         service = TranscriptionService()
         result = service.transcribe_text(sample_text)
@@ -46,7 +49,7 @@ class TestTranscriptionService:
         assert result.duration_seconds == 0.0
         assert result.transcription_time_seconds == 0.0
 
-    def test_singleton_pattern(self):
+    def test_singleton_pattern(self) -> None:
         """Test that get_transcription_service returns same instance"""
         service1 = get_transcription_service()
         service2 = get_transcription_service()
@@ -61,7 +64,7 @@ class TestTranscriptionService:
 class TestTranscriptionWithAudio:
     """Tests requiring actual audio files (marked as slow)"""
 
-    def test_transcribe_audio_file(self, fixtures_dir):
+    def test_transcribe_audio_file(self, fixtures_dir: Any) -> None:
         """Test transcribing a real audio file"""
         audio_path = fixtures_dir / "sample.wav"
 
@@ -77,7 +80,7 @@ class TestTranscriptionWithAudio:
         assert result.transcription_time_seconds > 0
         assert result.language == "en"
 
-    def test_transcription_latency(self, fixtures_dir):
+    def test_transcription_latency(self, fixtures_dir: Any) -> None:
         """Test that transcription meets latency targets"""
         audio_path = fixtures_dir / "sample.wav"
 
@@ -98,7 +101,7 @@ class TestTranscriptionWithAudio:
 class TestTranscriptionResultModel:
     """Test TranscriptionResult Pydantic model"""
 
-    def test_model_validation(self):
+    def test_model_validation(self) -> None:
         """Test that model validates correctly"""
         result = TranscriptionResult(
             text="Hello world", language="en", duration_seconds=5.0, transcription_time_seconds=0.5
@@ -109,7 +112,7 @@ class TestTranscriptionResultModel:
         assert result.duration_seconds == 5.0
         assert result.transcription_time_seconds == 0.5
 
-    def test_model_serialization(self):
+    def test_model_serialization(self) -> None:
         """Test that model can be serialized to JSON"""
         result = TranscriptionResult(
             text="Test", language="en", duration_seconds=1.0, transcription_time_seconds=0.1

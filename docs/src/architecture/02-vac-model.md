@@ -1,7 +1,7 @@
 # The VAC Model - The Core Innovation
 
-**Document:** 02-vac-model.md  
-**Last Updated:** December 5, 2025  
+**Document:** 02-vac-model.md
+**Last Updated:** December 5, 2025
 **Status:** Current
 
 ---
@@ -13,7 +13,7 @@
 ```text
        Arousal (+1)
            ↑
-           |      
+           |
            |    / Connection (+1)
            |   /
            |  /
@@ -193,7 +193,7 @@ def vac_distance(vac1, vac2):
     dv = (vac1.valence - vac2.valence) * 1.0      # Weight: 1.0
     da = (vac1.arousal - vac2.arousal) * 1.2      # Weight: 1.2
     dc = (vac1.connection - vac2.connection) * 1.5 # Weight: 1.5
-    
+
     return sqrt(dv² + da² + dc²)
 ```
 
@@ -213,18 +213,18 @@ def vac_to_quaternion(vac):
     v_norm = (vac.valence + 1) / 2
     a_norm = (vac.arousal + 1) / 2
     c_norm = (vac.connection + 1) / 2
-    
+
     # Map to quaternion components
     theta = π * v_norm  # Rotation angle
     phi = π * a_norm    # Azimuthal angle
     psi = π * c_norm    # Polar angle
-    
+
     # Compute quaternion (details in Versor module)
     w = cos(theta/2)
     x = sin(theta/2) * cos(phi) * sin(psi)
     y = sin(theta/2) * sin(phi) * sin(psi)
     z = sin(theta/2) * cos(psi)
-    
+
     return normalize([w, x, y, z])
 ```
 
@@ -390,11 +390,11 @@ def test_pity_vs_compassion():
     # Pity: feeling FOR someone (separation)
     pity_result = analyzer.analyze("I feel so sorry for them")
     assert pity_result.vac.connection < 0  # Negative connection
-    
+
     # Compassion: feeling WITH someone (alignment)
     compassion_result = analyzer.analyze("I feel their pain with them")
     assert compassion_result.vac.connection > 0.5  # Positive connection
-    
+
     # They should differ primarily on Connection
     assert abs(pity_result.vac.valence - compassion_result.vac.valence) < 0.4
     assert abs(pity_result.vac.arousal - compassion_result.vac.arousal) < 0.4
@@ -454,13 +454,13 @@ def test_pity_vs_compassion():
 
 ## Glossary
 
-**Valence:** The pleasantness or unpleasantness of an emotion  
-**Arousal:** The level of physiological activation  
-**Connection:** The degree of interpersonal alignment or separation  
-**Pity:** Feeling FOR someone from a distance (negative Connection)  
-**Compassion:** Feeling WITH someone in their experience (positive Connection)  
-**Empathy:** Cognitive and affective resonance with another (high Connection)  
-**Sympathy:** Feeling concern for another without deep resonance (moderate Connection)  
+**Valence:** The pleasantness or unpleasantness of an emotion
+**Arousal:** The level of physiological activation
+**Connection:** The degree of interpersonal alignment or separation
+**Pity:** Feeling FOR someone from a distance (negative Connection)
+**Compassion:** Feeling WITH someone in their experience (positive Connection)
+**Empathy:** Cognitive and affective resonance with another (high Connection)
+**Sympathy:** Feeling concern for another without deep resonance (moderate Connection)
 **SLERP:** Spherical Linear Interpolation for smooth quaternion transitions
 
 ---
@@ -473,5 +473,5 @@ def test_pity_vs_compassion():
 
 ---
 
-**Last Updated:** December 5, 2025  
+**Last Updated:** December 5, 2025
 **Next Review:** February 2026 (after clinical pilot)

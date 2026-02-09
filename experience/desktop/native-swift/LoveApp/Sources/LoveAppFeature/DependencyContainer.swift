@@ -91,12 +91,12 @@ public class DependencyContainer {
         #else
             let localInference = MockInferenceProvider()
         #endif
-        
+
         self.inference = localInference
         SoulLog.app.info("🧬 DependencyContainer: Initialized Inference (Default Safe Mode)")
-        
+
         self.llmEngine = LLMEngine(embedder: embedder, inference: localInference)
-        
+
         self.searchManager = SemanticSearchManager(container: context.container, embedder: embedder)
 
         SoulLog.app.info("🧬 DependencyContainer: Core Systems Online")
@@ -117,7 +117,7 @@ public class DependencyContainer {
         // ... (Reactive Chains)
 
         // ...
-        
+
         setupSubscriptions()
 
     }
@@ -135,7 +135,7 @@ public class DependencyContainer {
                 self?.audioLevel = level
             }
             .store(in: &cancellables)
-        
+
         // Live Transcription Sync
         speechEngine.$transcript
             .receive(on: RunLoop.main)
@@ -275,7 +275,7 @@ public class DependencyContainer {
 
         var accumulatedResponse = ""
         let recentHistory = fetchRecentHistory()
-        
+
         // Convert to Sendable Snapshot (must be done on MainActor before awaiting)
         let strategySnapshot = self.activeStrategy.map { strategy in
             SoulPersona.StrategySnapshot(
@@ -299,7 +299,7 @@ public class DependencyContainer {
         ) {
             accumulatedResponse += token
             buffer += token
-            
+
             // Check for Reflection Tags
             if buffer.contains("<reflection>") {
                 self.isReflecting = true
@@ -310,7 +310,7 @@ public class DependencyContainer {
                     let content = buffer[start.upperBound..<end.lowerBound]
                     self.thoughtContent = String(content)
                     self.isReflecting = false
-                    
+
                     // The Visible Response is what comes AFTER </reflection>
                     // Only update streamingResponse with post-reflection text
                     let visiblePart = buffer[end.upperBound...]
@@ -327,7 +327,7 @@ public class DependencyContainer {
                 self.streamingResponse = buffer
             }
         }
-        
+
         // Cleanup final response (remove tags)
         let finalCleanResponse = self.streamingResponse.trimmingCharacters(in: .whitespacesAndNewlines)
 
@@ -386,14 +386,14 @@ public class DependencyContainer {
     func searchEmotions(query: String) async -> [Emotion] {
         let ids = await searchManager.search(query: query)
         guard !ids.isEmpty else { return [] }
-        
+
         do {
             // Fetch unordered objects
             let descriptor = FetchDescriptor<Emotion>(
                 predicate: #Predicate { ids.contains($0.id) }
             )
             let unsorted = try context.fetch(descriptor)
-            
+
             // Restore search ranking order
             let map: [UUID: Emotion] = Dictionary(uniqueKeysWithValues: unsorted.map { ($0.id, $0) })
             return ids.compactMap { map[$0] }
@@ -435,13 +435,13 @@ public class DependencyContainer {
     }
 
     // MARK: - Settings Support
-    
+
     public func refreshInference() {
         let settings = InferenceSettings.shared
         SoulLog.app.info("🧬 DependencyContainer: Refreshing Inference to: \(String(describing: settings.mode))")
-        
+
         let newProvider: InferenceProvider
-        
+
         #if os(macOS)
         switch settings.mode {
         case .onDevice:
@@ -452,14 +452,12 @@ public class DependencyContainer {
         #else
             newProvider = MockInferenceProvider()
         #endif
-        
+
         self.inference = newProvider
-        
+
         Task {
             await llmEngine.updateProvider(inference: newProvider)
             SoulLog.app.info("🧬 DependencyContainer: Hot-swap complete.")
         }
     }
 }
-
-

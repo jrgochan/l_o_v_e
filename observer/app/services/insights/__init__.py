@@ -1,3 +1,6 @@
-from app.services.insights.core import InsightGenerator
+"""Module documentation."""
 
-__all__ = ["InsightGenerator"]
+from app.services.insights.core import InsightGenerator
+from app.types.insights import InsightGenerationRequest
+
+__all__ = ["InsightGenerator", "InsightGenerationRequest"]

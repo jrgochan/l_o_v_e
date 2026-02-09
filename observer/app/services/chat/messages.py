@@ -1,5 +1,7 @@
+"""Module documentation."""
+
 import logging
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Any, Dict, List, Optional
 from uuid import UUID
 
@@ -10,6 +12,7 @@ from sqlalchemy.orm import aliased, selectinload
 from app.models.chat_message import ChatMessage
 from app.models.message_relationship import MessageRelationship
 from app.services.chat.session import SessionManager
+from app.services.chat.types import MessageCreationContext
 
 logger = logging.getLogger(__name__)
 
@@ -18,55 +21,49 @@ class MessageManager:
     """Manages chat messages and relationships."""
 
     def __init__(self, db: AsyncSession):
+        """Docstring."""
         self.db = db
         # We need SessionManager to update message counts
         self.session_manager = SessionManager(db)
 
     async def save_user_message(
         self,
-        session_id: UUID,
-        content: Optional[str] = None,
-        audio_url: Optional[str] = None,
-        transcription: Optional[str] = None,
-        message_type: str = "user_text",
-        related_message_id: Optional[UUID] = None,
-        relationship_type: Optional[str] = None,
-        relationship_metadata: Optional[Dict[str, Any]] = None,
+        context: "MessageCreationContext",
     ) -> ChatMessage:
         """Save a user message (text or audio)."""
         message = ChatMessage(
-            session_id=session_id,
-            message_type=message_type,
-            content=content,
-            audio_url=audio_url,
-            transcription=transcription,
-            timestamp=datetime.utcnow(),
+            session_id=context.session_id,
+            message_type=context.message_type,
+            content=context.content,
+            audio_url=context.audio_url,
+            transcription=context.transcription,
+            timestamp=datetime.now(timezone.utc).replace(tzinfo=None),
         )
 
         self.db.add(message)
 
         # Update session message count
-        session = await self.session_manager.get_session(session_id)
+        session = await self.session_manager.get_session(context.session_id)
         if session:
             session.message_count += 1
 
         await self.db.commit()
         await self.db.refresh(message)
 
-        logger.info("Saved user message %s to session %s", message.id, session_id)
+        logger.info("Saved user message %s to session %s", message.id, context.session_id)
 
         # Create relationship if requested
-        if related_message_id:
+        if context.related_message_id:
             await self.create_message_relationship(
                 source_id=message.id,
-                target_id=related_message_id,
-                relationship_type=relationship_type or "reply",
-                relationship_metadata=relationship_metadata,
+                target_id=context.related_message_id,
+                relationship_type=context.relationship_type or "reply",
+                relationship_metadata=context.relationship_metadata,
             )
 
         # Trigger Semantic Auto-Linking
         try:
-            from app.services.association_engine import (  # pylint: disable=import-outside-toplevel
+            from app.services.memory.association import (  # pylint: disable=import-outside-toplevel
                 get_association_engine,
             )
 
@@ -74,7 +71,7 @@ class MessageManager:
             # We await here for simplicity in this version.
             # In a high-scale env, this should be a BackgroundTask.
             await engine.auto_link(message.id, self.db)
-        except Exception as e:
+        except Exception as e:  # pylint: disable=broad-exception-caught
             logger.error("Auto-linking failed for message %s: %s", message.id, e)
 
         return message
@@ -92,7 +89,7 @@ class MessageManager:
             target_message_id=target_id,
             relationship_type=relationship_type,
             relationship_metadata=relationship_metadata,
-            created_at=datetime.utcnow(),
+            created_at=datetime.now(timezone.utc).replace(tzinfo=None),
         )
 
         self.db.add(relationship)
@@ -220,7 +217,10 @@ class MessageManager:
 
         # Count messages by type
         count_stmt = (
-            select(ChatMessage.message_type, func.count(ChatMessage.id).label("count"))
+            select(
+                ChatMessage.message_type,
+                func.count(ChatMessage.id).label("count"),  # pylint: disable=not-callable
+            )
             .where(ChatMessage.session_id == session_id)
             .group_by(ChatMessage.message_type)
         )

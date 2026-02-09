@@ -2,8 +2,8 @@
 
 ## Technical Deep-Dive: Ollama Model Integration*
 
-**Created**: December 7, 2025  
-**Purpose**: Document Ollama REST API integration for model management  
+**Created**: December 7, 2025
+**Purpose**: Document Ollama REST API integration for model management
 **Scope**: Backend services (Listener + Observer)
 
 ---
@@ -154,7 +154,7 @@ class ModelDetails(BaseModel):
     family: str
     parameter_size: str
     quantization_level: str
-    
+
     # Derived/estimated
     estimated_ram_gb: float
     estimated_speed_tokens_per_sec: float
@@ -171,12 +171,12 @@ class OllamaManager:
     def __init__(self, base_url: str = "http://localhost:11434"):
         self.base_url = base_url
         self.client = httpx.AsyncClient(base_url=base_url, timeout=300.0)
-    
+
     async def list_local_models(self) -> List[ModelInfo]:
         """Get all models currently installed locally"""
         response = await self.client.get("/api/tags")
         data = response.json()
-        
+
         models = []
         for model in data.get("models", []):
             models.append(ModelInfo(
@@ -188,9 +188,9 @@ class OllamaManager:
                 quantization=model["details"]["quantization_level"],
                 family=model["details"]["family"]
             ))
-        
+
         return models
-    
+
     async def pull_model(self, model_name: str) -> AsyncIterator[PullProgress]:
         """
         Pull (download) a model from Ollama registry
@@ -204,12 +204,12 @@ class OllamaManager:
             async for line in response.aiter_lines():
                 if line:
                     data = json.loads(line)
-                    
+
                     # Calculate percentage if available
                     percent = None
                     if data.get("total") and data.get("completed"):
                         percent = (data["completed"] / data["total"]) * 100
-                    
+
                     yield PullProgress(
                         status=data["status"],
                         digest=data.get("digest"),
@@ -217,7 +217,7 @@ class OllamaManager:
                         completed=data.get("completed"),
                         percent=percent
                     )
-    
+
     async def delete_model(self, model_name: str):
         """Delete a model from local storage"""
         response = await self.client.request(
@@ -226,7 +226,7 @@ class OllamaManager:
             json={"name": model_name}
         )
         return response.json()
-    
+
     async def get_model_details(self, model_name: str) -> ModelDetails:
         """Get detailed information about a model"""
         response = await self.client.post(
@@ -234,17 +234,17 @@ class OllamaManager:
             json={"name": model_name}
         )
         data = response.json()
-        
+
         # Estimate RAM requirements based on parameter size
         param_size = data["details"]["parameter_size"]
         estimated_ram = estimate_ram_requirement(param_size)
-        
+
         # Estimate speed based on size and quantization
         estimated_speed = estimate_speed(param_size, data["details"]["quantization_level"])
-        
+
         # Recommend for functions
         recommendations = recommend_for_functions(param_size, data["details"]["family"])
-        
+
         return ModelDetails(
             name=model_name,
             size=data["details"].get("size", 0),
@@ -258,7 +258,7 @@ class OllamaManager:
             estimated_speed_tokens_per_sec=estimated_speed,
             recommended_for=recommendations
         )
-    
+
     async def health_check(self) -> bool:
         """Check if Ollama is running"""
         try:
@@ -291,7 +291,7 @@ def estimate_speed(parameter_size: str, quantization: str) -> float:
         "47B": 5.0,
         "70B": 3.0
     }
-    
+
     # Quantization affects speed slightly
     quant_mult = {
         "Q4_0": 1.0,
@@ -299,7 +299,7 @@ def estimate_speed(parameter_size: str, quantization: str) -> float:
         "Q8_0": 0.8,
         "F16": 0.7
     }
-    
+
     base = base_speeds.get(parameter_size, 20.0)
     mult = quant_mult.get(quantization, 1.0)
     return base * mult
@@ -307,26 +307,26 @@ def estimate_speed(parameter_size: str, quantization: str) -> float:
 def recommend_for_functions(parameter_size: str, family: str) -> List[str]:
     """Recommend which functions this model is good for"""
     recommendations = []
-    
+
     # Fast models good for real-time
     if parameter_size in ["3B", "7B", "8B"]:
         recommendations.append("semantic_vac")
         recommendations.append("atlas_mapping")
-    
+
     # Medium models good for everything
     if parameter_size in ["8B", "13B"]:
         recommendations.append("multi_emotion")
         recommendations.append("insight_generation")
-    
+
     # Large models best for complex tasks
     if parameter_size in ["47B", "70B"]:
         recommendations.append("insight_generation")
         recommendations.append("multi_emotion")
-    
+
     # Mixtral good for nuance
     if family == "mixtral":
         recommendations.append("multi_emotion")
-    
+
     return recommendations
 ```
 
@@ -350,38 +350,38 @@ from sqlalchemy.orm import Session
 from typing import Dict
 
 class AIModelService:
-    
+
     FUNCTIONS = [
         "semantic_vac",
         "multi_emotion",
         "insight_generation",
         "atlas_mapping"
     ]
-    
+
     def __init__(self, db: Session):
         self.db = db
-    
+
     async def get_model_assignments(self) -> Dict[str, str]:
         """Get current model assigned to each function"""
         # Query from database or return defaults
         assignments = await self.db.query(ModelAssignment).all()
-        
+
         return {
             assignment.function: assignment.model_name
             for assignment in assignments
         }
-    
+
     async def assign_model(self, function: str, model_name: str):
         """Assign a model to a function"""
         if function not in self.FUNCTIONS:
             raise ValueError(f"Unknown function: {function}")
-        
+
         # Validate model exists in Ollama
         ollama = OllamaManager()
         local_models = await ollama.list_local_models()
         if model_name not in [m.name for m in local_models]:
             raise ValueError(f"Model {model_name} not found locally. Pull it first.")
-        
+
         # Update database
         assignment = await self.db.query(ModelAssignment).filter_by(function=function).first()
         if assignment:
@@ -389,17 +389,17 @@ class AIModelService:
         else:
             assignment = ModelAssignment(function=function, model_name=model_name)
             self.db.add(assignment)
-        
+
         await self.db.commit()
-        
+
         return {"function": function, "model": model_name, "status": "assigned"}
-    
+
     async def get_assignment_for_function(self, function: str) -> str:
         """Get model name for a specific function"""
         assignment = await self.db.query(ModelAssignment).filter_by(function=function).first()
         if assignment:
             return assignment.model_name
-        
+
         # Default fallback
         return "llama3.1:8b-instruct-q4_0"
 ```
@@ -415,12 +415,12 @@ from app.database import Base
 
 class ModelAssignment(Base):
     __tablename__ = "model_assignments"
-    
+
     function = Column(String, primary_key=True)  # semantic_vac, multi_emotion, etc.
     model_name = Column(String, nullable=False)
     assigned_at = Column(DateTime, default=datetime.utcnow)
     assigned_by = Column(String, nullable=True)  # Future: user ID
-    
+
     # Performance tracking
     avg_latency_ms = Column(Float, nullable=True)
     total_invocations = Column(Integer, default=0)
@@ -455,7 +455,7 @@ async def pull_model(model_name: str):
     """
     # Start pull in background task
     task_id = start_pull_task(model_name)
-    
+
     return {
         "task_id": task_id,
         "websocket_url": f"ws://localhost:8002/listener/ai/models/pull/{task_id}"
@@ -465,14 +465,14 @@ async def pull_model(model_name: str):
 async def pull_model_progress(websocket: WebSocket, task_id: str):
     """Stream pull progress updates"""
     await websocket.accept()
-    
+
     ollama = OllamaManager()
     async for progress in ollama.pull_model(model_name):
         await websocket.send_json({
             "task_id": task_id,
             "progress": progress.dict()
         })
-    
+
     await websocket.close()
 ```
 
@@ -676,14 +676,14 @@ model = await model_service.get_assignment_for_function("insight_generation")
 # Store in database:
 class ModelPerformanceMetric(Base):
     __tablename__ = "model_performance_metrics"
-    
+
     id = Column(Integer, primary_key=True)
     function = Column(String)
     model_name = Column(String)
     latency_ms = Column(Float)
     success = Column(Boolean)
     timestamp = Column(DateTime, default=datetime.utcnow)
-    
+
     # Optional: track quality
     user_rating = Column(Integer, nullable=True)  # 1-5 stars
 ```
@@ -709,7 +709,7 @@ async def auto_select_model(function: str, hardware_profile: HardwareProfile) ->
     - User's speed/quality preference
     - Historical performance data
     """
-    
+
     if hardware_profile.ram_gb < 8:
         # Low RAM: use smallest model
         return "phi-3:mini"
@@ -732,7 +732,7 @@ async def preload_models():
     """Load models into RAM on Listener startup"""
     assignments = await get_model_assignments()
     unique_models = set(assignments.values())
-    
+
     for model in unique_models:
         # Ollama loads model on first use
         # We can "warm up" by sending a dummy request
@@ -747,7 +747,7 @@ async def generate_with_fallback(function: str, prompt: str):
     Try assigned model, fall back to default if it fails
     """
     assigned_model = await get_assignment_for_function(function)
-    
+
     try:
         return await ollama.generate(model=assigned_model, prompt=prompt)
     except Exception as e:
@@ -790,7 +790,7 @@ CREATE TABLE model_performance_metrics (
     timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     user_rating INTEGER CHECK (user_rating >= 1 AND user_rating <= 5),
     error_message TEXT,
-    
+
     INDEX idx_function_model (function, model_name),
     INDEX idx_timestamp (timestamp)
 );

@@ -12,11 +12,11 @@ The Observer module is the "hippocampus" of the L.O.V.E. stack:
 
 ### Key Features
 
-✅ **87 Emotions Digital Atlas** - From Brené Brown's "Atlas of the Heart"  
-✅ **VAC Model** - Valence, Arousal, **Connection** (replaces Dominance in traditional VAD)  
-✅ **Vector Search** - pgvector with HNSW indexing for fast similarity queries  
-✅ **Local Embeddings** - sentence-transformers (no API keys needed)  
-✅ **Versor Integration** - HTTP API calls for quaternion calculations  
+✅ **87 Emotions Digital Atlas** - From Brené Brown's "Atlas of the Heart"
+✅ **VAC Model** - Valence, Arousal, **Connection** (replaces Dominance in traditional VAD)
+✅ **Vector Search** - pgvector with HNSW indexing for fast similarity queries
+✅ **Local Embeddings** - sentence-transformers (no API keys needed)
+✅ **Versor Integration** - HTTP API calls for quaternion calculations
 ✅ **Async Architecture** - SQLAlchemy 2.0 with asyncpg for high performance
 
 ---
@@ -285,10 +285,10 @@ def test_compassion_pity_distinction():
     """
     compassion_vac = [0.5, 0.2, 0.9]   # Positive Connection
     pity_vac = [-0.3, -0.1, -0.7]      # Negative Connection
-    
+
     compassion_emotion = find_nearest_emotion(compassion_vac)
     pity_emotion = find_nearest_emotion(pity_vac)
-    
+
     assert compassion_emotion.emotion_name == "Compassion"
     assert pity_emotion.emotion_name == "Pity"
 ```

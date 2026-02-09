@@ -26,7 +26,7 @@ struct LoveApp: App {
 
             // 2. Seed Data (if needed)
             try DatabaseSeeder.seed(modelContext: modelContainer.mainContext)
-            
+
             // 3. DependencyContainer is initialized in onAppear to guarantee MainActor usage
 
         } catch {

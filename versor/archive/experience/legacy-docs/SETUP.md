@@ -60,7 +60,7 @@ Press `i` in the terminal, or run:
 npm run ios
 ```
 
-**Expected Result**: 
+**Expected Result**:
 - App launches in iOS Simulator
 - You see a **rotating cyan cube**
 - Status bar shows: ✓ React 18.2.0, ✓ R3F v8.17, ✓ Legacy Bridge
@@ -77,7 +77,7 @@ In the Expo DevTools, check the Performance tab. You should see:
 
 ### Issue: "Can't find variable: THREE"
 
-**Cause**: Three.js not installed  
+**Cause**: Three.js not installed
 **Solution**:
 ```bash
 npm install three@^0.160.0
@@ -85,7 +85,7 @@ npm install three@^0.160.0
 
 ### Issue: "ExponentGLObjectManager is not defined"
 
-**Cause**: New Architecture is enabled  
+**Cause**: New Architecture is enabled
 **Solution**: Verify `app.json` has `newArchEnabled: false` in both iOS and Android sections. Then rebuild:
 ```bash
 rm -rf node_modules .expo ios android
@@ -95,7 +95,7 @@ npm run ios
 
 ### Issue: React 19 installed instead of 18.2
 
-**Cause**: npm/Expo auto-upgraded React  
+**Cause**: npm/Expo auto-upgraded React
 **Solution**:
 ```bash
 npm install react@18.2.0 react-dom@18.2.0 --save-exact
@@ -104,7 +104,7 @@ npm install
 
 ### Issue: "Module not found: @react-three/fiber"
 
-**Cause**: R3F not installed  
+**Cause**: R3F not installed
 **Solution**:
 ```bash
 npm install @react-three/fiber@^8.17.0
@@ -112,12 +112,12 @@ npm install @react-three/fiber@^8.17.0
 
 ### Issue: TypeScript errors in App.tsx
 
-**Cause**: Dependencies not installed yet  
+**Cause**: Dependencies not installed yet
 **Solution**: Run `npm install` and restart VS Code
 
 ### Issue: Blank screen / app crashes
 
-**Cause**: Likely New Architecture or version mismatch  
+**Cause**: Likely New Architecture or version mismatch
 **Solution**:
 1. Check `app.json` for `newArchEnabled: false`
 2. Verify React version with `npm list react`

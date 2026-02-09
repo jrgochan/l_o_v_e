@@ -165,7 +165,7 @@ Enhance existing `/observer/transition-path` response:
     "emotion": "Vulnerability",
     "vac": [0.0, 0.3, 0.6],
     "reasoning": "...", # Already have
-    
+
     # NEW: VAC Analysis
     "vac_analysis": {
       "valence_shift": {
@@ -177,7 +177,7 @@ Enhance existing `/observer/transition-path` response:
       "arousal_shift": {...},
       "connection_shift": {...}
     },
-    
+
     # NEW: Relational Context
     "relation_to_previous": {
       "emotion": "Shame",
@@ -185,21 +185,21 @@ Enhance existing `/observer/transition-path` response:
       "why_this_order": "Cannot heal shame in isolation. Vulnerability enables connection.",
       "research_citation": "Brown (2012) - Daring Greatly"
     },
-    
+
     "relation_to_next": {
       "emotion": "Self-Compassion",
       "what_this_enables": ["Self-kindness vs self-judgment", "..."],
       "preparation": "Vulnerability creates foundation for compassionate self-relation",
       "research_citation": "Neff (2003)"
     },
-    
+
     # NEW: Readiness Signs
     "signs_of_arrival": [
       "Feeling less isolated",
       "Willingness to be seen",
       "Reduced shame intensity"
     ],
-    
+
     # NEW: Warnings
     "warning_signs": [
       "If alone: need safe person first",

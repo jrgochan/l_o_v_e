@@ -9,7 +9,7 @@ alembic upgrade head
 echo "Checking if database is seeded..."
 # Use export PYTHONPATH to ensure module resolution works
 export PYTHONPATH=.
-SEEDED=$(python3 -c "import asyncio, logging; logging.disable(logging.CRITICAL); from app.database import AsyncSessionLocal; from sqlalchemy import text; 
+SEEDED=$(python3 -c "import asyncio, logging; logging.disable(logging.CRITICAL); from app.database import AsyncSessionLocal; from sqlalchemy import text;
 async def check():
     try:
         async with AsyncSessionLocal() as session:
@@ -25,7 +25,7 @@ if [ "$SEEDED" -eq "0" ] || [ "${FORCE_RESEED:-false}" == "true" ]; then
     # Default to goemotions if not set, consistent with config.sh
     TARGET_DATASET="${DATASET:-goemotions}"
     echo "Seeding database (Force=${FORCE_RESEED:-false}) with DATASET=$TARGET_DATASET..."
-    
+
     # Run seeding with force-reseed to bypass prompts/overwrite data
     # We use --level=enhanced matching typical production setup
     python3 scripts/seed_all.py --level=enhanced --dataset="$TARGET_DATASET" --force-reseed

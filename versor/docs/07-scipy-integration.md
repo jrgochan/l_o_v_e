@@ -50,13 +50,13 @@ from app.core.quaternion import Quaternion
 def love_to_scipy(q: Quaternion) -> np.ndarray:
     """
     Convert L.O.V.E. quaternion to SciPy format.
-    
+
     L.O.V.E.: [w, x, y, z] (scalar-first)
     SciPy:    [x, y, z, w] (scalar-last)
-    
+
     Args:
         q: Quaternion in L.O.V.E. format
-    
+
     Returns:
         NumPy array in SciPy format
     """
@@ -65,13 +65,13 @@ def love_to_scipy(q: Quaternion) -> np.ndarray:
 def scipy_to_love(q_array: np.ndarray) -> Quaternion:
     """
     Convert SciPy format to L.O.V.E. quaternion.
-    
+
     SciPy:    [x, y, z, w] (scalar-last)
     L.O.V.E.: [w, x, y, z] (scalar-first)
-    
+
     Args:
         q_array: NumPy array in SciPy format
-    
+
     Returns:
         Quaternion in L.O.V.E. format
     """
@@ -85,10 +85,10 @@ def scipy_to_love(q_array: np.ndarray) -> Quaternion:
 def create_rotation(q: Quaternion) -> R:
     """
     Create SciPy Rotation object from L.O.V.E. quaternion.
-    
+
     Args:
         q: Quaternion in L.O.V.E. format
-    
+
     Returns:
         SciPy Rotation object
     """
@@ -98,10 +98,10 @@ def create_rotation(q: Quaternion) -> R:
 def rotation_to_love(rotation: R) -> Quaternion:
     """
     Extract quaternion from SciPy Rotation object.
-    
+
     Args:
         rotation: SciPy Rotation object
-    
+
     Returns:
         Quaternion in L.O.V.E. format
     """
@@ -119,28 +119,28 @@ from app.utils.scipy_adapter import love_to_scipy, scipy_to_love
 
 def generate_path_with_scipy(q_start: Quaternion, q_target: Quaternion, steps: int):
     """Generate SLERP path using SciPy"""
-    
+
     # 1. Convert to SciPy format
     q_start_scipy = love_to_scipy(q_start)
     q_target_scipy = love_to_scipy(q_target)
-    
+
     # 2. Create rotations
     rotations = R.from_quat([q_start_scipy, q_target_scipy])
-    
+
     # 3. Create SLERP interpolator
     times = np.array([0.0, 1.0])
     slerp = Slerp(times, rotations)
-    
+
     # 4. Interpolate
     t_values = np.linspace(0, 1, steps)
     interpolated = slerp(t_values)
-    
+
     # 5. Convert back to L.O.V.E. format
     path = []
     for rotation in interpolated:
         q_love = rotation_to_love(rotation)
         path.append(q_love)
-    
+
     return path
 ```
 
@@ -194,11 +194,11 @@ from app.utils.scipy_adapter import love_to_scipy, scipy_to_love
 def test_round_trip_conversion():
     """Converting back and forth should preserve values"""
     q_love = Quaternion(w=0.7071, x=0.7071, y=0, z=0)
-    
+
     # L.O.V.E. → SciPy → L.O.V.E.
     q_scipy = love_to_scipy(q_love)
     q_back = scipy_to_love(q_scipy)
-    
+
     assert q_back.w == pytest.approx(q_love.w)
     assert q_back.x == pytest.approx(q_love.x)
     assert q_back.y == pytest.approx(q_love.y)
@@ -208,7 +208,7 @@ def test_scipy_format_correct():
     """Verify SciPy array has correct order"""
     q_love = Quaternion(w=1, x=2, y=3, z=4)
     q_scipy = love_to_scipy(q_love)
-    
+
     assert q_scipy[0] == 2  # x first
     assert q_scipy[1] == 3  # y second
     assert q_scipy[2] == 4  # z third
@@ -218,10 +218,10 @@ def test_rotation_object_creation():
     """Verify SciPy Rotation object is created correctly"""
     q_love = Quaternion(w=0.7071, x=0.7071, y=0, z=0)
     rotation = create_rotation(q_love)
-    
+
     # Extract back
     q_result = rotation_to_love(rotation)
-    
+
     assert q_result.w == pytest.approx(q_love.w, abs=1e-5)
 ```
 

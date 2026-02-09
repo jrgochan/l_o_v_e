@@ -24,13 +24,21 @@ print_header "🍎 Checking Swift Quality"
 # 1. Check for SwiftLint
 if command -v swiftlint >/dev/null 2>&1; then
     print_info "Running SwiftLint..."
-    
+
     # Check if .swiftlint.yml exists
     if [ ! -f "$SWIFT_ROOT/.swiftlint.yml" ]; then
         print_error "Configuration .swiftlint.yml not found in $SWIFT_ROOT"
         # Optional: Continue anyway with defaults?
     fi
-    
+
+    # Parse arguments
+    FIX_MODE=0
+    for arg in "$@"; do
+        if [ "$arg" == "--fix" ]; then
+            FIX_MODE=1
+        fi
+    done
+
     # Run linting
     # Allow failure if we just want to report, but stricter for CI
     # Using --strict if CI is set
@@ -38,10 +46,20 @@ if command -v swiftlint >/dev/null 2>&1; then
     if [ "${CI-}" = "true" ]; then
         LINT_ARGS="--strict"
     fi
-    
+
+    if [ $FIX_MODE -eq 1 ]; then
+        print_info "Running SwiftLint Autocorrect..."
+        # swiftlint --fix was introduced recently, older versions use autocorrect
+        if swiftlint help | grep -q "autocorrect"; then
+             swiftlint autocorrect --format
+        else
+             swiftlint --fix
+        fi
+    fi
+
     # We change dir to valid lint root usually
     cd "$SWIFT_ROOT"
-    
+
     if swiftlint lint $LINT_ARGS; then
         print_success "SwiftLint Passed"
     else

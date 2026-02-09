@@ -1,3 +1,5 @@
+"""Module documentation."""
+
 from typing import Any, Dict, List
 
 
@@ -69,43 +71,22 @@ def analyze_voice_content_correlation(
 
 
 def generate_voice_observations_warm(
-    prosody_data: Dict[str, Any], vac_data: Dict[str, float]
+    prosody_data: Dict[str, Any],
+    vac_data: Dict[str, float],  # pylint: disable=unused-argument
 ) -> List[str]:
     """Generate natural language voice observations."""
-    observations = []
+    observations: List[str] = []
 
     energy = prosody_data.get("energy", 0.5)
     pitch = prosody_data.get("pitch_mean", 150)
     rate = prosody_data.get("rate", 4.0)
     variability = prosody_data.get("pitch_std", 20)
+    jitter = prosody_data.get("jitter", 0)
 
-    # Energy + Pitch combo
-    if energy > 0.7 and pitch > 170:
-        observations.append("Your voice has a lot of energy and tension")
-    elif energy > 0.7 and pitch < 130:
-        observations.append("There's power and intensity in your voice")
-    elif energy < 0.3 and pitch > 170:
-        observations.append("Your voice sounds soft, almost fragile")
-    elif energy < 0.3:
-        observations.append("There's a heaviness in your voice")
-
-    # Speech rate
-    if rate > 5.0:
-        observations.append("You're speaking quickly, which often happens when thoughts are racing")
-    elif rate < 3.0:
-        observations.append("You're speaking slowly and deliberately, taking your time with words")
-
-    # Variability
-    if variability > 40:
-        observations.append("Your voice is animated with lots of expression")
-    elif variability < 15:
-        observations.append(
-            "Your voice sounds flat or monotone, which can happen when we're overwhelmed"
-        )
-
-    # Voice quality
-    if prosody_data.get("jitter", 0) > 0.02:
-        observations.append("There's a tightness in your voice that suggests your body is on alert")
+    _observe_energy_pitch(observations, energy, pitch)
+    _observe_rate(observations, rate)
+    _observe_variability(observations, variability)
+    _observe_quality(observations, jitter)
 
     return observations[:4]  # Max 4
 
@@ -136,118 +117,166 @@ def generate_voice_observations_legacy(
     return ""
 
 
-def generate_voice_metrics_clinical(prosody_data: Dict[str, Any]) -> List[Dict[str, Any]]:
+def generate_voice_metrics_clinical(
+    prosody_data: Dict[str, Any]
+) -> List[Dict[str, Any]]:  # pylint: disable=too-many-branches,too-many-statements
     """Generate structured voice metrics for clinical display."""
     metrics = []
 
-    # Pitch metrics
     if "pitch_mean" in prosody_data:
-        pitch_mean = prosody_data["pitch_mean"]
-        pitch_std = prosody_data.get("pitch_std", 0)
+        metrics.append(_get_pitch_metric(prosody_data))
 
-        # Classify pitch
-        if pitch_mean > 180:
-            interpretation = "Elevated (potential stress indicator)"
-            status = "attention"
-        elif pitch_mean < 100:
-            interpretation = "Depressed (potential low affect indicator)"
-            status = "attention"
-        else:
-            interpretation = "Within normal range"
-            status = "stable"
-
-        metrics.append(
-            {
-                "label": "Pitch (F0)",
-                "value": f"{pitch_mean:.1f} Hz (±{pitch_std:.1f})",
-                "interpretation": interpretation,
-                "status": status,
-            }
-        )
-
-    # Energy metrics
     if "energy" in prosody_data:
-        energy = prosody_data["energy"]
+        metrics.append(_get_energy_metric(prosody_data))
 
-        if energy > 0.75:
-            interpretation = "High vocal intensity"
-            status = "attention"
-        elif energy < 0.25:
-            interpretation = "Low vocal intensity (potential flattened affect)"
-            status = "warning"
-        else:
-            interpretation = "Appropriate vocal energy"
-            status = "stable"
-
-        metrics.append(
-            {
-                "label": "Energy Level",
-                "value": f"{energy:.3f}",
-                "interpretation": interpretation,
-                "status": status,
-            }
-        )
-
-    # Speech rate
     if "rate" in prosody_data:
-        rate = prosody_data["rate"]
+        metrics.append(_get_rate_metric(prosody_data))
 
-        if rate > 5.5:
-            interpretation = "Accelerated speech (potential agitation)"
-            status = "attention"
-        elif rate < 2.5:
-            interpretation = "Slowed speech (potential psychomotor retardation)"
-            status = "warning"
-        else:
-            interpretation = "Normal speech rate"
-            status = "stable"
-
-        metrics.append(
-            {
-                "label": "Speech Rate",
-                "value": f"{rate:.1f} syll/sec",
-                "interpretation": interpretation,
-                "status": status,
-            }
-        )
-
-    # Voice quality metrics
     if "jitter" in prosody_data:
-        jitter = prosody_data["jitter"]
-
-        if jitter > 0.025:
-            interpretation = "Elevated (potential vocal tension)"
-            status = "attention"
-        else:
-            interpretation = "Within normal limits"
-            status = "stable"
-
-        metrics.append(
-            {
-                "label": "Jitter",
-                "value": f"{jitter:.4f}",
-                "interpretation": interpretation,
-                "status": status,
-            }
-        )
+        metrics.append(_get_jitter_metric(prosody_data))
 
     if "shimmer" in prosody_data:
-        shimmer = prosody_data["shimmer"]
-
-        if shimmer > 0.06:
-            interpretation = "Elevated (potential voice quality concern)"
-            status = "attention"
-        else:
-            interpretation = "Within normal limits"
-            status = "stable"
-
-        metrics.append(
-            {
-                "label": "Shimmer",
-                "value": f"{shimmer:.4f}",
-                "interpretation": interpretation,
-                "status": status,
-            }
-        )
+        metrics.append(_get_shimmer_metric(prosody_data))
 
     return metrics
+
+
+def _get_pitch_metric(prosody_data: Dict[str, Any]) -> Dict[str, Any]:
+    """Generate pitch metric."""
+    pitch_mean = prosody_data["pitch_mean"]
+    pitch_std = prosody_data.get("pitch_std", 0)
+
+    if pitch_mean > 180:
+        interpretation = "Elevated (potential stress indicator)"
+        status = "attention"
+    elif pitch_mean < 100:
+        interpretation = "Depressed (potential low affect indicator)"
+        status = "attention"
+    else:
+        interpretation = "Within normal range"
+        status = "stable"
+
+    return {
+        "label": "Pitch (F0)",
+        "value": f"{pitch_mean:.1f} Hz (±{pitch_std:.1f})",
+        "interpretation": interpretation,
+        "status": status,
+    }
+
+
+def _get_energy_metric(prosody_data: Dict[str, Any]) -> Dict[str, Any]:
+    """Generate energy metric."""
+    energy = prosody_data["energy"]
+
+    if energy > 0.75:
+        interpretation = "High vocal intensity"
+        status = "attention"
+    elif energy < 0.25:
+        interpretation = "Low vocal intensity (potential flattened affect)"
+        status = "warning"
+    else:
+        interpretation = "Appropriate vocal energy"
+        status = "stable"
+
+    return {
+        "label": "Energy Level",
+        "value": f"{energy:.3f}",
+        "interpretation": interpretation,
+        "status": status,
+    }
+
+
+def _get_rate_metric(prosody_data: Dict[str, Any]) -> Dict[str, Any]:
+    """Generate speech rate metric."""
+    rate = prosody_data["rate"]
+
+    if rate > 5.5:
+        interpretation = "Accelerated speech (potential agitation)"
+        status = "attention"
+    elif rate < 2.5:
+        interpretation = "Slowed speech (potential psychomotor retardation)"
+        status = "warning"
+    else:
+        interpretation = "Normal speech rate"
+        status = "stable"
+
+    return {
+        "label": "Speech Rate",
+        "value": f"{rate:.1f} syll/sec",
+        "interpretation": interpretation,
+        "status": status,
+    }
+
+
+def _get_jitter_metric(prosody_data: Dict[str, Any]) -> Dict[str, Any]:
+    """Generate jitter metric."""
+    jitter = prosody_data["jitter"]
+
+    if jitter > 0.025:
+        interpretation = "Elevated (potential vocal tension)"
+        status = "attention"
+    else:
+        interpretation = "Within normal limits"
+        status = "stable"
+
+    return {
+        "label": "Jitter",
+        "value": f"{jitter:.4f}",
+        "interpretation": interpretation,
+        "status": status,
+    }
+
+
+def _get_shimmer_metric(prosody_data: Dict[str, Any]) -> Dict[str, Any]:
+    """Generate shimmer metric."""
+    shimmer = prosody_data["shimmer"]
+
+    if shimmer > 0.06:
+        interpretation = "Elevated (potential voice quality concern)"
+        status = "attention"
+    else:
+        interpretation = "Within normal limits"
+        status = "stable"
+
+    return {
+        "label": "Shimmer",
+        "value": f"{shimmer:.4f}",
+        "interpretation": interpretation,
+        "status": status,
+    }
+
+
+def _observe_energy_pitch(observations: List[str], energy: float, pitch: float) -> None:
+    """Add observations based on energy and pitch."""
+    if energy > 0.7 and pitch > 170:
+        observations.append("Your voice has a lot of energy and tension")
+    elif energy > 0.7 and pitch < 130:
+        observations.append("There's power and intensity in your voice")
+    elif energy < 0.3 and pitch > 170:
+        observations.append("Your voice sounds soft, almost fragile")
+    elif energy < 0.3:
+        observations.append("There's a heaviness in your voice")
+
+
+def _observe_rate(observations: List[str], rate: float) -> None:
+    """Add observations based on speech rate."""
+    if rate > 5.0:
+        observations.append("You're speaking quickly, which often happens when thoughts are racing")
+    elif rate < 3.0:
+        observations.append("You're speaking slowly and deliberately, taking your time with words")
+
+
+def _observe_variability(observations: List[str], variability: float) -> None:
+    """Add observations based on pitch variability."""
+    if variability > 40:
+        observations.append("Your voice is animated with lots of expression")
+    elif variability < 15:
+        observations.append(
+            "Your voice sounds flat or monotone, which can happen when we're overwhelmed"
+        )
+
+
+def _observe_quality(observations: List[str], jitter: float) -> None:
+    """Add observations based on voice quality."""
+    if jitter > 0.02:
+        observations.append("There's a tightness in your voice that suggests your body is on alert")

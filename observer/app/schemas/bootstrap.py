@@ -18,8 +18,6 @@ class BootstrapDataBase(BaseModel):
 class BootstrapDataCreate(BootstrapDataBase):
     """Schema for creating bootstrap data."""
 
-    pass
-
 
 class BootstrapDataUpdate(BaseModel):
     """Schema for updating bootstrap data."""

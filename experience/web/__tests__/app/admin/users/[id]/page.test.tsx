@@ -69,7 +69,7 @@ describe("AdminUserDetailsPage", () => {
   });
 
   it("renders loading state initially", async () => {
-    (api.get as jest.Mock).mockImplementation(() => new Promise(() => { }));
+    (api.get as jest.Mock).mockImplementation(() => new Promise(() => {}));
     render(<AdminUserDetailsPage />);
     expect(screen.getByText("Loading user details...")).toBeInTheDocument();
   });

@@ -1,3 +1,9 @@
+"""Transitions Router.
+
+Aggregates all transition-related sub-routers (planning, execution, analysis, library)
+into a single `APIRouter` for the main application to include.
+"""
+
 from fastapi import APIRouter
 
 from app.api.routes.transitions.analysis import router as analysis_router

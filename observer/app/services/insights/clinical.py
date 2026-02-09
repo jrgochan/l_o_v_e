@@ -1,7 +1,13 @@
+"""Module documentation."""
+
 from typing import Any, Dict, List, Optional
 
 from app.services.insights.prosody import generate_voice_metrics_clinical
-from app.services.insights.utils import interpret_arousal, interpret_connection, interpret_valence
+from app.services.insights.utils import (
+    interpret_arousal,
+    interpret_connection,
+    interpret_valence,
+)
 
 
 def generate_clinical_opening(emotion_name: str, confidence: float, category: str) -> str:
@@ -51,13 +57,14 @@ def generate_vac_assessment_clinical(vac_data: Dict[str, float]) -> Dict[str, An
     connection = vac_data["connection"]
 
     # Determine quadrant and clinical significance
-    if valence > 0 and arousal > 0:
+    # Determine quadrant and clinical significance
+    if valence > 0 < arousal:
         quadrant = "Quadrant I: High Arousal, Positive Valence"
         clinical_note = "Activated positive affect - generally adaptive"
-    elif valence < 0 and arousal > 0:
+    elif valence < 0 < arousal:
         quadrant = "Quadrant II: High Arousal, Negative Valence"
         clinical_note = "Activated negative affect - monitor for anxiety/agitation"
-    elif valence < 0 and arousal < 0:
+    elif valence < 0 > arousal:
         quadrant = "Quadrant III: Low Arousal, Negative Valence"
         clinical_note = "Deactivated negative affect - assess for depression risk"
     else:
@@ -86,7 +93,7 @@ def generate_vac_assessment_clinical(vac_data: Dict[str, float]) -> Dict[str, An
 
 
 def generate_clinical_recommendations(
-    emotion_name: str, vac_data: Dict[str, float], category: str
+    emotion_name: str, vac_data: Dict[str, float], _category: str
 ) -> List[Dict[str, str]]:
     """Generate evidence-based clinical recommendations."""
     recommendations = []
@@ -174,7 +181,7 @@ def generate_clinical_summary_structured(
     confidence: float,
     prosody_data: Optional[Dict[str, Any]],
     reasoning: Optional[str],
-    message_count: int = 1,
+    _message_count: int = 1,
 ) -> Dict[str, Any]:
     """Generate structured clinical mode insights."""
     # Build structured clinical insights

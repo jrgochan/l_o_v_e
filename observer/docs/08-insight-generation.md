@@ -30,7 +30,7 @@ cosine_distance = 1 - (A · B) / (||A|| × ||B||)
 ### SQL Query
 
 ```sql
-SELECT 
+SELECT
     id,
     timestamp,
     input_transcription,
@@ -64,11 +64,11 @@ from app.services.embedding_service import EmbeddingService
 
 class InsightService:
     """Generates insights by finding similar past moments"""
-    
+
     def __init__(self, session: AsyncSession, embedding_service: EmbeddingService):
         self.session = session
         self.embedding_service = embedding_service
-    
+
     async def find_similar_moments(
         self,
         user_id: UUID,
@@ -78,20 +78,20 @@ class InsightService:
     ) -> List[SimilarMoment]:
         """
         Find semantically similar past emotional states.
-        
+
         Args:
             user_id: User ID
             current_text: Current input text
             limit: Maximum number of results
             min_similarity: Minimum similarity threshold (0-1)
-        
+
         Returns:
             List of similar moments with metadata
         """
-        
+
         # Generate embedding for current text
         query_embedding = await self.embedding_service.generate_embedding(current_text)
-        
+
         # Query for similar moments
         stmt = (
             select(
@@ -108,20 +108,20 @@ class InsightService:
             .order_by(UserTrajectory.input_embedding.cosine_distance(query_embedding))
             .limit(limit)
         )
-        
+
         result = await self.session.execute(stmt)
         rows = result.all()
-        
+
         # Filter by minimum similarity
         similar_moments = []
         now = datetime.utcnow()
-        
+
         for trajectory, emotion, similarity in rows:
             if similarity < min_similarity:
                 continue
-            
+
             days_ago = (now - trajectory.timestamp).days
-            
+
             similar_moments.append(SimilarMoment(
                 state_id=trajectory.id,
                 timestamp=trajectory.timestamp,
@@ -132,34 +132,34 @@ class InsightService:
                 similarity_score=round(similarity, 3),
                 days_ago=days_ago
             ))
-        
+
         return similar_moments
-    
+
     async def generate_insight_text(
         self,
         similar_moments: List[SimilarMoment]
     ) -> str:
         """
         Generate human-readable insight from similar moments.
-        
+
         Examples:
         - "You've felt this way 3 times in the past month."
         - "This is similar to how you felt on November 15th."
         - "You've been here before, and you got through it."
         """
-        
+
         if not similar_moments:
             return "This is a new experience for you."
-        
+
         # Count occurrences in time windows
         past_week = sum(1 for m in similar_moments if m.days_ago <= 7)
         past_month = sum(1 for m in similar_moments if m.days_ago <= 30)
         past_year = sum(1 for m in similar_moments if m.days_ago <= 365)
-        
+
         # Determine dominant emotion
         emotions = [m.emotion for m in similar_moments]
         dominant = max(set(emotions), key=emotions.count)
-        
+
         # Generate insight
         if past_week > 0:
             return f"You've experienced similar {dominant.lower()} {past_week} time(s) this week."
@@ -187,13 +187,13 @@ async def detect_recurring_patterns(
 ) -> Optional[Pattern]:
     """
     Detect recurring emotional patterns (e.g., weekly anxiety).
-    
+
     Returns pattern if detected, None otherwise.
     """
-    
+
     # Get all instances of this emotion in timeframe
     start_date = datetime.utcnow() - timedelta(days=lookback_days)
-    
+
     stmt = (
         select(UserTrajectory.timestamp)
         .join(AtlasDefinition)
@@ -206,36 +206,36 @@ async def detect_recurring_patterns(
         )
         .order_by(UserTrajectory.timestamp)
     )
-    
+
     result = await self.session.execute(stmt)
     timestamps = [row[0] for row in result.all()]
-    
+
     if len(timestamps) < 3:
         return None
-    
+
     # Calculate intervals
     intervals = [
         (timestamps[i+1] - timestamps[i]).total_seconds() / 86400  # Days
         for i in range(len(timestamps) - 1)
     ]
-    
+
     # Check for recurring pattern (e.g., ~7 days, ~30 days)
     mean_interval = np.mean(intervals)
     std_interval = np.std(intervals)
-    
+
     # Pattern detected if variance is low
     if std_interval / mean_interval < 0.3:  # Coefficient of variation < 30%
         frequency = "weekly" if 6 <= mean_interval <= 8 else \
                    "monthly" if 28 <= mean_interval <= 32 else \
                    f"every {int(mean_interval)} days"
-        
+
         return Pattern(
             emotion=emotion_name,
             frequency=frequency,
             confidence=1 - (std_interval / mean_interval),
             occurrences=len(timestamps)
         )
-    
+
     return None
 ```
 
@@ -252,37 +252,37 @@ async def compare_to_past(
 ) -> Comparison:
     """
     Compare current emotional response to a past similar situation.
-    
+
     Detects growth/regression in emotional regulation.
     """
-    
+
     # Extract VAC values
     current_vac = current_state.vac_values
     past_vac = similar_moment.vac_values
-    
+
     # Calculate changes
     valence_change = current_vac[0] - past_vac[0]
     arousal_change = current_vac[1] - past_vac[1]
     connection_change = current_vac[2] - past_vac[2]
-    
+
     # Determine growth
     insights = []
-    
+
     if valence_change > 0.3:
         insights.append("You're responding more positively than before.")
-    
+
     if arousal_change < -0.3:
         insights.append("You're staying calmer this time.")
-    
+
     if connection_change > 0.3:
         insights.append("You're more connected than you were.")
-    
+
     # Compare elasticity (resilience)
     if current_state.elasticity_metric < similar_moment.elasticity_metric:
         insights.append("You're handling this more steadily.")
-    
+
     growth_detected = len(insights) > 0
-    
+
     return Comparison(
         past_date=similar_moment.timestamp,
         growth_detected=growth_detected,
@@ -308,20 +308,20 @@ async def get_insight(
 ):
     """
     Find similar past emotional moments.
-    
+
     This powers the "You felt this way before..." feature.
     """
-    
+
     # Find similar moments
     similar_moments = await insight_service.find_similar_moments(
         user_id=request.user_id,
         current_text=request.current_text,
         limit=request.limit
     )
-    
+
     # Generate natural language insight
     insight_text = await insight_service.generate_insight_text(similar_moments)
-    
+
     # Detect recurring patterns (optional enhancement)
     patterns = []
     if len(similar_moments) >= 3:
@@ -333,7 +333,7 @@ async def get_insight(
         )
         if pattern:
             patterns.append(pattern)
-    
+
     return InsightResponse(
         similar_moments=similar_moments,
         insight=insight_text,
@@ -349,16 +349,16 @@ async def get_insight(
 @pytest.mark.asyncio
 async def test_finds_similar_moments(session, seed_user_data):
     """Test that similar moments are retrieved correctly"""
-    
+
     service = InsightService(session, embedding_service)
-    
+
     # Query similar to past "stress" entries
     results = await service.find_similar_moments(
         user_id=test_user_id,
         current_text="I'm stressed about the deadline",
         limit=5
     )
-    
+
     assert len(results) > 0
     assert all(r.similarity_score >= 0.7 for r in results)
     assert any("stress" in r.emotion.lower() for r in results)
@@ -366,15 +366,15 @@ async def test_finds_similar_moments(session, seed_user_data):
 @pytest.mark.asyncio
 async def test_detects_recurring_weekly_pattern(session, seed_weekly_anxiety):
     """Test detection of weekly recurring emotions"""
-    
+
     service = InsightService(session, embedding_service)
-    
+
     pattern = await service.detect_recurring_patterns(
         user_id=test_user_id,
         emotion_name="Anxiety",
         lookback_days=60
     )
-    
+
     assert pattern is not None
     assert pattern.frequency == "weekly"
     assert pattern.confidence > 0.7
@@ -407,9 +407,9 @@ async def find_similar_moments_paginated(
     page_size: int = 10
 ) -> PaginatedResults:
     """Paginate similar moments for large datasets"""
-    
+
     offset = (page - 1) * page_size
-    
+
     stmt = (
         select(UserTrajectory)
         .where(UserTrajectory.user_id == user_id)
@@ -417,7 +417,7 @@ async def find_similar_moments_paginated(
         .limit(page_size)
         .offset(offset)
     )
-    
+
     # ... execute and return
 ```
 

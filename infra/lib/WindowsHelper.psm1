@@ -13,12 +13,12 @@ function Write-ColoredMessage {
     param(
         [Parameter(Mandatory = $true)]
         [string]$Message,
-        
+
         [Parameter(Mandatory = $true)]
         [ValidateSet('Success', 'Error', 'Warning', 'Info', 'Header')]
         [string]$Type
     )
-    
+
     $symbols = @{
         Success = "✅"
         Error   = "❌"
@@ -26,7 +26,7 @@ function Write-ColoredMessage {
         Info    = "ℹ️ "
         Header  = "🚀"
     }
-    
+
     $colors = @{
         Success = 'Green'
         Error   = 'Red'
@@ -34,7 +34,7 @@ function Write-ColoredMessage {
         Info    = 'Cyan'
         Header  = 'Blue'
     }
-    
+
     Write-Host "$($symbols[$Type]) " -NoNewline -ForegroundColor $colors[$Type]
     Write-Host $Message -ForegroundColor $colors[$Type]
 }
@@ -45,7 +45,7 @@ function Write-Header {
         [Parameter(Mandatory = $true)]
         [string]$Title
     )
-    
+
     Write-Host ""
     Write-ColoredMessage -Message $Title -Type Header
     Write-Host ("=" * 50)
@@ -55,14 +55,14 @@ function Test-WSLInstalled {
     <#
     .SYNOPSIS
     Checks if WSL is installed on the system
-    
+
     .DESCRIPTION
     Tests for WSL installation by checking wsl.exe availability
-    
+
     .OUTPUTS
     Boolean indicating if WSL is installed
     #>
-    
+
     try {
         $null = wsl.exe --version 2>$null
         return $true
@@ -76,23 +76,23 @@ function Test-WSLDistributionInstalled {
     <#
     .SYNOPSIS
     Checks if a specific WSL distribution is installed
-    
+
     .PARAMETER DistroName
     Name of the distribution to check (default: Ubuntu-22.04)
-    
+
     .OUTPUTS
     Boolean indicating if the distribution is installed
     #>
-    
+
     [CmdletBinding()]
     param(
         [string]$DistroName = $script:WSLDistroName
     )
-    
+
     if (-not (Test-WSLInstalled)) {
         return $false
     }
-    
+
     try {
         $distros = wsl.exe --list --quiet 2>$null | ForEach-Object { $_.Trim() }
         return $distros -contains $DistroName
@@ -106,15 +106,15 @@ function Get-WSLDefaultDistribution {
     <#
     .SYNOPSIS
     Gets the default WSL distribution name
-    
+
     .OUTPUTS
     String containing the default distribution name, or $null if none set
     #>
-    
+
     if (-not (Test-WSLInstalled)) {
         return $null
     }
-    
+
     try {
         $output = wsl.exe --list --verbose 2>$null
         $lines = $output -split "`n" | Where-Object { $_ -match '\*' }
@@ -126,7 +126,7 @@ function Get-WSLDefaultDistribution {
     catch {
         return $null
     }
-    
+
     return $null
 }
 
@@ -134,20 +134,20 @@ function Install-WSL {
     <#
     .SYNOPSIS
     Installs WSL with Ubuntu distribution
-    
+
     .DESCRIPTION
     Installs WSL 2 with Ubuntu 22.04 distribution using wsl --install command.
     Requires administrator privileges and may require a system restart.
-    
+
     .OUTPUTS
     Boolean indicating success or failure
     #>
-    
+
     Write-Header "Installing WSL"
-    
+
     # Check if running as administrator
     $isAdmin = ([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)
-    
+
     if (-not $isAdmin) {
         Write-ColoredMessage -Message "Administrator privileges required to install WSL" -Type Error
         Write-Host ""
@@ -157,14 +157,14 @@ function Install-WSL {
         Write-Host ""
         return $false
     }
-    
+
     Write-ColoredMessage -Message "Installing WSL with $script:WSLDistroName distribution..." -Type Info
     Write-Host "This may take several minutes and might require a system restart." -ForegroundColor Yellow
     Write-Host ""
-    
+
     try {
         wsl.exe --install -d $script:WSLDistroName
-        
+
         Write-Host ""
         Write-ColoredMessage -Message "WSL installation initiated" -Type Success
         Write-Host ""
@@ -176,7 +176,7 @@ function Install-WSL {
         Write-Host "  2. You'll be prompted to create a Unix username and password" -ForegroundColor Cyan
         Write-Host "  3. Re-run this script to continue setup" -ForegroundColor Cyan
         Write-Host ""
-        
+
         return $true
     }
     catch {
@@ -195,52 +195,52 @@ function Invoke-WSLCommand {
     <#
     .SYNOPSIS
     Executes a command in WSL and returns the output
-    
+
     .PARAMETER Command
     The bash command to execute
-    
+
     .PARAMETER DistroName
     Name of the distribution to use (optional)
-    
+
     .PARAMETER WorkingDirectory
     Working directory in WSL filesystem (optional)
-    
+
     .OUTPUTS
     Object containing ExitCode, Output, and Error properties
     #>
-    
+
     [CmdletBinding()]
     param(
         [Parameter(Mandatory = $true)]
         [string]$Command,
-        
+
         [string]$DistroName = "",
-        
+
         [string]$WorkingDirectory = ""
     )
-    
+
     if (-not (Test-WSLInstalled)) {
         throw "WSL is not installed"
     }
-    
+
     # Build wsl command
     $wslArgs = @()
-    
+
     if ($DistroName) {
         $wslArgs += @("-d", $DistroName)
     }
-    
+
     if ($WorkingDirectory) {
         $wslPath = Convert-WindowsPathToWSL -Path $WorkingDirectory
         $Command = "cd '$wslPath' && $Command"
     }
-    
+
     $wslArgs += @("bash", "-c", $Command)
-    
+
     # Execute command
     $output = @()
     $errorOutput = @()
-    
+
     try {
         $process = Start-Process -FilePath "wsl.exe" `
             -ArgumentList $wslArgs `
@@ -249,13 +249,13 @@ function Invoke-WSLCommand {
             -PassThru `
             -RedirectStandardOutput ([System.IO.Path]::GetTempFileName()) `
             -RedirectStandardError ([System.IO.Path]::GetTempFileName())
-        
+
         $output = Get-Content $process.StandardOutput.FileName
         $errorOutput = Get-Content $process.StandardError.FileName
-        
+
         Remove-Item $process.StandardOutput.FileName -Force -ErrorAction SilentlyContinue
         Remove-Item $process.StandardError.FileName -Force -ErrorAction SilentlyContinue
-        
+
         return [PSCustomObject]@{
             ExitCode = $process.ExitCode
             Output   = $output
@@ -275,36 +275,36 @@ function Convert-WindowsPathToWSL {
     <#
     .SYNOPSIS
     Converts a Windows path to WSL path format
-    
+
     .PARAMETER Path
     Windows path to convert
-    
+
     .OUTPUTS
     String containing the WSL path
-    
+
     .EXAMPLE
     Convert-WindowsPathToWSL -Path "C:\Users\john\code\project"
     # Returns: /mnt/c/Users/john/code/project
     #>
-    
+
     [CmdletBinding()]
     param(
         [Parameter(Mandatory = $true)]
         [string]$Path
     )
-    
+
     $Path = $Path.Trim()
-    
+
     # Convert backslashes to forward slashes
     $wslPath = $Path -replace '\\', '/'
-    
+
     # Convert drive letter (C: -> /mnt/c)
     if ($wslPath -match '^([A-Za-z]):(.*)$') {
         $drive = $matches[1].ToLower()
         $rest = $matches[2]
         $wslPath = "/mnt/$drive$rest"
     }
-    
+
     return $wslPath
 }
 
@@ -312,26 +312,26 @@ function Convert-WSLPathToWindows {
     <#
     .SYNOPSIS
     Converts a WSL path to Windows path format
-    
+
     .PARAMETER Path
     WSL path to convert
-    
+
     .OUTPUTS
     String containing the Windows path
-    
+
     .EXAMPLE
     Convert-WSLPathToWindows -Path "/mnt/c/Users/john/code/project"
     # Returns: C:\Users\john\code\project
     #>
-    
+
     [CmdletBinding()]
     param(
         [Parameter(Mandatory = $true)]
         [string]$Path
     )
-    
+
     $Path = $Path.Trim()
-    
+
     # Convert /mnt/drive to Windows drive letter
     if ($Path -match '^/mnt/([a-z])(.*)$') {
         $drive = $matches[1].ToUpper()
@@ -342,10 +342,10 @@ function Convert-WSLPathToWindows {
         # Path is in WSL filesystem, can't convert
         return $Path
     }
-    
+
     # Convert forward slashes to backslashes
     $windowsPath = $windowsPath -replace '/', '\'
-    
+
     return $windowsPath
 }
 
@@ -353,15 +353,15 @@ function Test-WSLServiceRunning {
     <#
     .SYNOPSIS
     Checks if WSL is currently running
-    
+
     .OUTPUTS
     Boolean indicating if WSL is running
     #>
-    
+
     if (-not (Test-WSLInstalled)) {
         return $false
     }
-    
+
     try {
         $result = Invoke-WSLCommand -Command "echo test" -ErrorAction Stop
         return $result.ExitCode -eq 0
@@ -375,17 +375,17 @@ function Start-WSL {
     <#
     .SYNOPSIS
     Ensures WSL is running
-    
+
     .OUTPUTS
     Boolean indicating success
     #>
-    
+
     if (Test-WSLServiceRunning) {
         return $true
     }
-    
+
     Write-ColoredMessage -Message "Starting WSL..." -Type Info
-    
+
     try {
         $null = wsl.exe echo "WSL started"
         Start-Sleep -Seconds 2
@@ -401,35 +401,35 @@ function Invoke-WSLBashScript {
     <#
     .SYNOPSIS
     Executes a bash script file in WSL
-    
+
     .PARAMETER ScriptPath
     Path to the bash script (Windows path)
-    
+
     .PARAMETER Arguments
     Arguments to pass to the script
-    
+
     .OUTPUTS
     Object containing ExitCode, Output, and Error properties
     #>
-    
+
     [CmdletBinding()]
     param(
         [Parameter(Mandatory = $true)]
         [string]$ScriptPath,
-        
+
         [string[]]$Arguments = @()
     )
-    
+
     if (-not (Test-Path $ScriptPath)) {
         throw "Script not found: $ScriptPath"
     }
-    
+
     $wslScriptPath = Convert-WindowsPathToWSL -Path $ScriptPath
     $argString = $Arguments -join " "
-    
+
     # Make script executable and run it
     $command = "chmod +x '$wslScriptPath' && '$wslScriptPath' $argString"
-    
+
     return Invoke-WSLCommand -Command $command -WorkingDirectory (Split-Path $ScriptPath)
 }
 
@@ -438,7 +438,7 @@ function Show-WSLSetupInstructions {
     .SYNOPSIS
     Displays instructions for completing WSL setup
     #>
-    
+
     Write-Host ""
     Write-Host "═══════════════════════════════════════════════════════════" -ForegroundColor Blue
     Write-Host "  WSL Setup Required" -ForegroundColor Yellow
@@ -463,11 +463,11 @@ function Get-ProjectWSLPath {
     <#
     .SYNOPSIS
     Gets the WSL path to the project root
-    
+
     .OUTPUTS
     String containing the WSL path to the project
     #>
-    
+
     return Convert-WindowsPathToWSL -Path $script:ProjectRoot
 }
 

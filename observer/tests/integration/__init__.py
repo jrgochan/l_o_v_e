@@ -1,1 +1,1 @@
-"""Integration tests"""
+"""Observer integration tests package."""

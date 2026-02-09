@@ -2,35 +2,33 @@
 Quick script to seed only the pattern-strategy mappings.
 Run this after patterns and strategies are already seeded.
 """
+
 import asyncio
-from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker
-from sqlalchemy import select
+
 from app.config import settings
-from app.models.transition_strategy import (
-    TransitionPattern,
-    TransitionStrategy,
-    PatternStrategy
-)
+from app.models.transition_strategy import PatternStrategy, TransitionPattern, TransitionStrategy
+from sqlalchemy import select
+from sqlalchemy.ext.asyncio import async_sessionmaker, create_async_engine
 
 
 async def seed_mappings():
     """Seed pattern-strategy mappings only."""
     engine = create_async_engine(settings.DATABASE_URL, echo=False)
     AsyncSessionLocal = async_sessionmaker(engine, expire_on_commit=False)
-    
+
     async with AsyncSessionLocal() as session:
         # Get all patterns and strategies
         patterns_stmt = select(TransitionPattern)
         strategies_stmt = select(TransitionStrategy)
-        
+
         patterns_result = await session.execute(patterns_stmt)
         strategies_result = await session.execute(strategies_stmt)
-        
+
         patterns = {p.pattern_name: p for p in patterns_result.scalars().all()}
         strategies = {s.strategy_name: s for s in strategies_result.scalars().all()}
-        
+
         print(f"Found {len(patterns)} patterns and {len(strategies)} strategies")
-        
+
         # Define mappings: pattern_name -> [(strategy_name, order, effectiveness)]
         mappings = {
             "High Arousal to Low Arousal": [
@@ -65,7 +63,7 @@ async def seed_mappings():
                 ("Progressive Muscle Relaxation", 5, 4.1),
             ],
         }
-        
+
         # Create mappings
         count = 0
         for pattern_name, strategy_mappings in mappings.items():
@@ -73,26 +71,26 @@ async def seed_mappings():
             if not pattern:
                 print(f"  ⚠️  Pattern not found: {pattern_name}")
                 continue
-            
+
             for strategy_name, order, effectiveness in strategy_mappings:
                 strategy = strategies.get(strategy_name)
                 if not strategy:
                     print(f"  ⚠️  Strategy not found: {strategy_name}")
                     continue
-                
+
                 mapping = PatternStrategy(
                     pattern_id=pattern.id,
                     strategy_id=strategy.id,
                     recommendation_order=order,
                     effectiveness_rating=effectiveness,
-                    applicability_conditions=None
+                    applicability_conditions=None,
                 )
                 session.add(mapping)
                 count += 1
-        
+
         await session.commit()
         print(f"✅ Seeded {count} pattern-strategy mappings")
-    
+
     await engine.dispose()
 
 

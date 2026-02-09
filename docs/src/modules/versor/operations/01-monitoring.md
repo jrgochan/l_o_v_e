@@ -57,11 +57,11 @@ alerts:
   - name: HighLatency
     condition: p99_latency > 100ms for 5 minutes
     severity: warning
-    
+
   - name: HighErrorRate
     condition: error_rate > 1% for 2 minutes
     severity: critical
-    
+
   - name: AllInstancesDown
     condition: healthy_instances == 0
     severity: critical
@@ -252,7 +252,7 @@ kubectl rollout restart deployment/versor
    - Instances auto-register with load balancer
    - No data recovery needed
 
-**RTO (Recovery Time Objective):** < 5 minutes  
+**RTO (Recovery Time Objective):** < 5 minutes
 **RPO (Recovery Point Objective):** N/A (no data)
 
 ---
@@ -420,5 +420,5 @@ trivy image versor:latest
 
 ---
 
-**Previous:** [← Integration Points](../architecture/10-integration-points.md)  
+**Previous:** [← Integration Points](../architecture/10-integration-points.md)
 **Next:** [Team Structure →](02-team-structure.md)

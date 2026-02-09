@@ -1,7 +1,7 @@
 # REFERENCES - L.O.V.E. Platform
 
-**Document:** REFERENCES.md  
-**Last Updated:** January 4, 2026  
+**Document:** REFERENCES.md
+**Last Updated:** January 4, 2026
 **Status:** Comprehensive
 
 ---
@@ -569,16 +569,16 @@ The L.O.V.E. platform opens several research questions:
 To cite the L.O.V.E. Platform in academic work:
 
 ```bibtex
-L.O.V.E. Project Team. (2026). L.O.V.E. Platform: Listener-Observer-Versor-Experience - 
-A Multi-Modal Emotional Intelligence System Using the VAC Model. 
+L.O.V.E. Project Team. (2026). L.O.V.E. Platform: Listener-Observer-Versor-Experience -
+A Multi-Modal Emotional Intelligence System Using the VAC Model.
 https://love-platform.dev
 ```
 
 To cite the VAC model specifically:
 
 ```bibtex
-L.O.V.E. Project Team. (2026). The VAC (Valence-Arousal-Connection) Model: 
-A Three-Dimensional Framework for Representing Relational Quality in Emotions. 
+L.O.V.E. Project Team. (2026). The VAC (Valence-Arousal-Connection) Model:
+A Three-Dimensional Framework for Representing Relational Quality in Emotions.
 L.O.V.E. Platform Documentation.
 ```
 
@@ -596,8 +596,8 @@ The L.O.V.E. Platform itself integrates these works in novel ways to create a un
 
 If you are a researcher whose work should be cited here, or if you find any attribution errors, please contact the L.O.V.E. project team or open an issue in the project repository.
 
-**Last Updated:** January 4, 2026  
-**Maintainer:** L.O.V.E. Project Team  
+**Last Updated:** January 4, 2026
+**Maintainer:** L.O.V.E. Project Team
 **Review Cycle:** Quarterly
 
 ---

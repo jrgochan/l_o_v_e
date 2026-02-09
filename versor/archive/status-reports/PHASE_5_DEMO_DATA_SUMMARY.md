@@ -1,6 +1,6 @@
 # Phase 5: Demo Journey Data - Summary
 
-**Date:** December 5, 2025, 12:36 AM  
+**Date:** December 5, 2025, 12:36 AM
 **Status:** ✅ **Framework Complete** - Needs Schema Adjustment
 
 ---
@@ -59,7 +59,7 @@
 **Problem:** Some emotions in journeys don't exist in atlas:
 - Overwhelm
 - Focused
-- Grief  
+- Grief
 - Peace
 - Despair
 - Hope
@@ -121,7 +121,7 @@ This file: PHASE_5_DEMO_DATA_SUMMARY.md
    ```python
    import hashlib
    from uuid import UUID
-   
+
    def user_id_to_uuid(user_id_str: str) -> UUID:
        # Generate consistent UUID from string
        hash_bytes = hashlib.md5(user_id_str.encode()).digest()

@@ -1,8 +1,8 @@
 # Beautiful Therapeutic Insights v2.0 - Overview
 
-**Created**: December 6, 2025, 10:22 PM MDT  
-**Purpose**: Transform plain text insights into beautiful, structured therapeutic responses  
-**Estimated Implementation**: 5.5-7 hours  
+**Created**: December 6, 2025, 10:22 PM MDT
+**Purpose**: Transform plain text insights into beautiful, structured therapeutic responses
+**Estimated Implementation**: 5.5-7 hours
 **Priority**: HIGH (UX & Therapeutic Value)
 
 ---
@@ -32,11 +32,11 @@ Transform the current plain-text insight responses into **beautiful, structured,
 ### Current (Plain Text)
 
 ```text
-I hear that you're experiencing anxiety. There's a lot of energy 
-in what you're expressing. This might be making you feel disconnected 
+I hear that you're experiencing anxiety. There's a lot of energy
+in what you're expressing. This might be making you feel disconnected
 or alone.
 
-What this means: Anxiety is characterized by apprehension, worry, 
+What this means: Anxiety is characterized by apprehension, worry,
 or unease...
 
 This emotion belongs to: Negative High-Energy
@@ -134,32 +134,32 @@ This emotion belongs to: Negative High-Energy
 
 ### Warm Mode
 
-✅ "I" language ("I sense...", "I notice...")  
-✅ Voice observations in natural language  
-✅ Emotion understanding (accessible)  
-✅ VAC interpretation (relatable)  
-✅ Gentle invitations (alternating reflections/suggestions)  
-✅ Similar emotions as clickable badges  
-✅ Deep Feeling: Multi-emotion narrative + relationship insights  
+✅ "I" language ("I sense...", "I notice...")
+✅ Voice observations in natural language
+✅ Emotion understanding (accessible)
+✅ VAC interpretation (relatable)
+✅ Gentle invitations (alternating reflections/suggestions)
+✅ Similar emotions as clickable badges
+✅ Deep Feeling: Multi-emotion narrative + relationship insights
 
 ### Clinical Mode
 
-✅ Structured assessment summary  
-✅ Biomarkers with clinical interpretation  
-✅ Recommended interventions with scripts  
-✅ Evidence citations  
-✅ Clinical alerts (front and center)  
-✅ Session context  
-✅ Differential emotions  
-✅ Deep Feeling: Complexity + pattern analysis  
+✅ Structured assessment summary
+✅ Biomarkers with clinical interpretation
+✅ Recommended interventions with scripts
+✅ Evidence citations
+✅ Clinical alerts (front and center)
+✅ Session context
+✅ Differential emotions
+✅ Deep Feeling: Complexity + pattern analysis
 
 ### Smart Features
 
-✅ Auto-alternate reflections/suggestions based on message count  
-✅ Fully expanded by default with collapse option  
-✅ "Read more" truncation in chat messages  
-✅ Deep Feeling: Both primary focus AND synthesis  
-✅ Backwards compatible (detects legacy insights)  
+✅ Auto-alternate reflections/suggestions based on message count
+✅ Fully expanded by default with collapse option
+✅ "Read more" truncation in chat messages
+✅ Deep Feeling: Both primary focus AND synthesis
+✅ Backwards compatible (detects legacy insights)
 
 ---
 
@@ -169,7 +169,7 @@ This specification is split into multiple focused documents:
 
 1. **00-OVERVIEW.md** (this file) - High-level vision
 2. **01-WARM-MODE-SPEC.md** - Warm mode detailed specification
-3. **02-CLINICAL-MODE-SPEC.md** - Clinical mode detailed specification  
+3. **02-CLINICAL-MODE-SPEC.md** - Clinical mode detailed specification
 4. **03-DEEP-FEELING-ENHANCEMENTS.md** - Multi-emotion special features
 5. **04-BACKEND-IMPLEMENTATION.md** - Python code changes
 6. **05-FRONTEND-COMPONENTS.md** - React component specifications
@@ -189,6 +189,6 @@ This specification is split into multiple focused documents:
 
 ---
 
-**Status**: Specification In Progress  
-**Next**: Review individual specification documents  
+**Status**: Specification In Progress
+**Next**: Review individual specification documents
 **Ready For**: Implementation after specification approval

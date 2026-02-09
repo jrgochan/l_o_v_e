@@ -63,7 +63,7 @@ echo "Executing Job for Dataset(s): $DATASET..."
 run_job() {
     local dataset_alias=$1
     local dataset_arg=""
-    
+
     # Map alias to actual collection name (Must match seed_all.py)
     case "$(echo "$dataset_alias" | tr '[:upper:]' '[:lower:]')" in
         "goemotions")
@@ -88,9 +88,9 @@ run_job() {
             dataset_arg="$dataset_alias" # Fallback to passed value
             ;;
     esac
-    
+
     local args_params=()
-    
+
     if [ -n "$dataset_arg" ]; then
         # Override args (replaces the default args set in deploy)
         # We use an array to handle spaces in dataset names (e.g. "Unified Affective Lexicon") correctly

@@ -1,3 +1,1 @@
-"""
-Listener Module - Tests Package
-"""
+"""Listener Module - Tests Package."""

@@ -1,8 +1,8 @@
 # Troubleshooting Guide
 
-**Reading Time:** ~40 minutes  
-**Audience:** Senior developers, DevOps  
-**Prerequisites:** All previous senior guides  
+**Reading Time:** ~40 minutes
+**Audience:** Senior developers, DevOps
+**Prerequisites:** All previous senior guides
 **Goal:** Diagnose and resolve common Observer issues
 
 ---
@@ -60,7 +60,7 @@ engine = create_async_engine(
 
 ```python
 # Check for unclosed sessions
-SELECT 
+SELECT
     pid,
     application_name,
     state,
@@ -160,7 +160,7 @@ SELECT * FROM pg_available_extensions WHERE name = 'vector';
 ALTER DATABASE observer_dev SET log_min_duration_statement = 100;
 
 -- Check slow queries
-SELECT 
+SELECT
     substring(query, 1, 100) as query,
     calls,
     mean_exec_time,
@@ -196,7 +196,7 @@ CREATE INDEX idx_trajectory_user ON user_trajectory(user_id);
 ANALYZE user_trajectory;
 
 -- Check last analysis
-SELECT 
+SELECT
     schemaname,
     tablename,
     last_analyze,
@@ -209,7 +209,7 @@ WHERE tablename = 'user_trajectory';
 
 ```sql
 -- Check index size
-SELECT 
+SELECT
     indexname,
     pg_size_pretty(pg_relation_size(indexrelid)) as size
 FROM pg_stat_user_indexes
@@ -233,7 +233,7 @@ REINDEX INDEX CONCURRENTLY idx_trajectory_embedding;
 async def test_recall():
     """Compare HNSW vs exact search"""
     query_vector = [0.1, 0.2, ...]
-    
+
     # Exact search (no index)
     exact = await db.execute(text("""
         SET enable_indexscan = off;
@@ -243,7 +243,7 @@ async def test_recall():
         LIMIT 10
     """), {"query": query_vector})
     exact_names = [row.name for row in exact]
-    
+
     # HNSW search
     hnsw = await db.execute(text("""
         SET enable_seqscan = off;
@@ -253,12 +253,12 @@ async def test_recall():
         LIMIT 10
     """), {"query": query_vector})
     hnsw_names = [row.name for row in hnsw]
-    
+
     # Compare
     overlap = len(set(exact_names) & set(hnsw_names))
     recall = overlap / 10
     print(f"Recall: {recall:.1%}")
-    
+
     if recall < 0.9:
         print("WARNING: Low recall!")
         print(f"Exact: {exact_names}")
@@ -323,9 +323,9 @@ SET enable_seqscan = off;
 1. **Check index exists:**
 
 ```sql
-SELECT indexname, indexdef 
-FROM pg_indexes 
-WHERE tablename = 'user_trajectory' 
+SELECT indexname, indexdef
+FROM pg_indexes
+WHERE tablename = 'user_trajectory'
   AND indexdef LIKE '%hnsw%';
 ```
 
@@ -402,7 +402,7 @@ python scripts/seed_atlas.py
 
 ```sql
 -- Check data integrity
-SELECT 
+SELECT
     count(*) as total,
     count(*) FILTER (WHERE vac IS NULL) as null_vac,
     count(*) FILTER (WHERE embedding IS NULL) as null_embedding
@@ -418,13 +418,13 @@ def upgrade():
     # Migrate data
     conn = op.get_bind()
     result = conn.execute("SELECT id, old_field FROM my_table")
-    
+
     for row in result:
         # Validate before update
         if not validate_data(row.old_field):
             logger.error(f"Invalid data for row {row.id}")
             continue
-        
+
         new_value = transform(row.old_field)
         conn.execute(
             "UPDATE my_table SET new_field = :val WHERE id = :id",
@@ -463,21 +463,21 @@ PathNotFoundException: No valid path from Despair to Joy
 async def diagnose_path_failure(from_emotion: str, to_emotion: str):
     """Debug why A* failed"""
     planner = PathPlanner(db)
-    
+
     # Get emotions
     start = await planner._get_emotion(from_emotion)
     goal = await planner._get_emotion(to_emotion)
-    
+
     # Check VAC distance
     distance = np.linalg.norm(np.array(start.vac) - np.array(goal.vac))
     print(f"VAC distance: {distance:.2f}")
-    
+
     # Check category transition
     valid = planner._is_category_transition_valid(
         start.category, goal.category
     )
     print(f"Category transition valid: {valid}")
-    
+
     # Check neighbors
     neighbors = await planner._get_valid_neighbors(start, goal)
     print(f"Valid neighbors from start: {len(neighbors)}")
@@ -527,12 +527,12 @@ import time
 
 async def profile_pathfinding():
     start_time = time.time()
-    
+
     path = await planner.find_transition_path("Anger", "Calm", "user123")
-    
+
     elapsed = time.time() - start_time
     print(f"Pathfinding took {elapsed:.2f}s")
-    
+
     if elapsed > 1.0:
         print("WARNING: Slow pathfinding!")
 ```
@@ -556,13 +556,13 @@ if cached_path:
 ```python
 class PathPlanner:
     MAX_ITERATIONS = 1000  # Prevent infinite loops
-    
+
     async def _astar_search(self, start, goal):
         iterations = 0
         while open_set and iterations < self.MAX_ITERATIONS:
             iterations += 1
             # ... A* logic
-        
+
         if iterations >= self.MAX_ITERATIONS:
             logger.warning("A* hit iteration limit")
             return None
@@ -647,10 +647,10 @@ async def timing_middleware(request: Request, call_next):
     start = time.time()
     response = await call_next(request)
     elapsed = time.time() - start
-    
+
     if elapsed > 0.5:
         logger.warning(f"Slow request: {request.url.path} took {elapsed:.2f}s")
-    
+
     response.headers["X-Process-Time"] = str(elapsed)
     return response
 ```
@@ -667,12 +667,12 @@ import cProfile
 async def slow_endpoint(request: Request):
     profiler = cProfile.Profile()
     profiler.enable()
-    
+
     result = await process_request(request)
-    
+
     profiler.disable()
     profiler.print_stats(sort='cumtime')
-    
+
     return result
 ```
 
@@ -684,7 +684,7 @@ SELECT pg_stat_statements_reset();
 
 -- Run slow request
 -- Then check
-SELECT 
+SELECT
     substring(query, 1, 100),
     calls,
     mean_exec_time
@@ -719,18 +719,18 @@ def expensive_calculation(param):
 @router.websocket("/ws/{session_id}")
 async def websocket_endpoint(websocket: WebSocket, session_id: str):
     logger.info(f"Connection attempt: {session_id}")
-    
+
     try:
         await manager.connect(websocket, session_id)
         logger.info(f"Connected: {session_id}")
-        
+
         async for message in websocket.iter_json():
             logger.debug(f"Message received: {message['type']}")
             # Process
-    
+
     except WebSocketDisconnect as e:
         logger.warning(f"Disconnect: {session_id}, code: {e.code}, reason: {e.reason}")
-    
+
     except Exception as e:
         logger.error(f"WebSocket error: {session_id}, {e}", exc_info=True)
 ```
@@ -810,10 +810,10 @@ import pdb
 
 async def debug_function():
     result = await some_operation()
-    
+
     # Drop into debugger
     pdb.set_trace()
-    
+
     # Inspect variables
     # Continue with 'c'
     # Step with 's'
@@ -834,7 +834,7 @@ async def process_state(user_id: str, vac: List[float]):
         vac=vac,
         operation="find_nearest"
     )
-    
+
     try:
         result = await find_nearest(vac)
         logger.info(
@@ -970,13 +970,13 @@ groups:
         for: 5m
         annotations:
           summary: "High error rate in Observer"
-      
+
       - alert: SlowQueries
         expr: histogram_quantile(0.95, observer_request_duration_seconds) > 1.0
         for: 5m
         annotations:
           summary: "P95 latency > 1s"
-      
+
       - alert: DatabaseConnectionsHigh
         expr: observer_db_connections > 25
         for: 2m

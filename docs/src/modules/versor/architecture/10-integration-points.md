@@ -124,8 +124,8 @@ frames.forEach((frame, index) => {
 
 ### Frame Rate Coordination
 
-**Versor default:** 60 frames/second  
-**Experience:** 60 fps display  
+**Versor default:** 60 frames/second
+**Experience:** 60 fps display
 **Result:** 1-second smooth animation
 
 **Configurable:**
@@ -412,7 +412,7 @@ def test_observer_contract():
         "previous_state": {"w": 0.5, "x": 0.5, "y": 0.5, "z": 0.5},
         "time_delta_seconds": 1.0
     })
-    
+
     # Verify response matches Observer's expectations
     assert response.status_code == 200
     data = response.json()
@@ -424,7 +424,7 @@ def test_experience_contract():
     """Verify Experience can parse Versor's response."""
     response = client.post("/versor/calculate", json={...})
     data = response.json()
-    
+
     # Verify format Experience expects
     for frame in data["interpolation_path"]:
         assert "w" in frame
@@ -463,7 +463,7 @@ def test_experience_contract():
 class TrajectoryResponse(BaseModel):
     # Existing required fields...
     current_state: QuaternionModel
-    
+
     # New optional field
     processing_time_ms: Optional[float] = None  # Clients can ignore
 ```
@@ -479,17 +479,17 @@ class TrajectoryResponse(BaseModel):
 
 async def test_full_platform_flow():
     """Test complete flow: Listener → Observer → Versor → Experience."""
-    
+
     # 1. Listener produces VAC
     vac = {"valence": 0.8, "arousal": 0.6, "connection": 0.7}
-    
+
     # 2. Observer calls Versor
     versor_response = await call_versor(vac, previous=None)
-    
+
     # 3. Verify response structure
     assert "current_state" in versor_response
     assert "interpolation_path" in versor_response
-    
+
     # 4. Verify Experience can use it
     frames = versor_response["interpolation_path"]
     assert len(frames) == 60
@@ -519,7 +519,7 @@ curl http://localhost:8001/openapi.json > versor-api.json
 
 ### Integration Examples
 
-**Observer integration:** See `docs/modules/observer/architecture/10-integration-points.md`  
+**Observer integration:** See `docs/modules/observer/architecture/10-integration-points.md`
 **Experience integration:** See `docs/modules/experience/` (when available)
 
 ---
@@ -532,5 +532,5 @@ curl http://localhost:8001/openapi.json > versor-api.json
 
 ---
 
-**Previous:** [← Architecture Overview](00-high-level-overview.md)  
+**Previous:** [← Architecture Overview](00-high-level-overview.md)
 **Next:** [Monitoring & Operations →](../operations/01-monitoring.md)

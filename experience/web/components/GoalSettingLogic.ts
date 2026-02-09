@@ -80,7 +80,7 @@ export function useGoalSettingLogic() {
         user_id: "00000000-0000-0000-0000-000000000001",
         current_vac: currentVAC,
         goal_vac: selectedGoal.vac,
-        max_waypoints: 3
+        max_waypoints: 3,
       };
 
       // Fetch alternatives
@@ -112,31 +112,30 @@ export function useGoalSettingLogic() {
         // Given Phase 2 is about "Path Comparison", let's prioritize that.
 
         if (paths.length > 1) {
-            logger.info("api", `Found ${paths.length} alternative paths`);
-            // We don't set generatedPath yet, we let the user choose in PathComparisonView?
-            // But GoalSetting.tsx doesn't know about PathComparisonView yet.
+          logger.info("api", `Found ${paths.length} alternative paths`);
+          // We don't set generatedPath yet, we let the user choose in PathComparisonView?
+          // But GoalSetting.tsx doesn't know about PathComparisonView yet.
         } else {
-             // If only one path, treat as standard
-             // We might need the full viz data which findAlternativePaths might simplify?
-             // Actually findAlternativePaths includes 'quaternion_path' in the backend?
-             // Checking backend: NO, find_alternative_paths (the endpoint) returns a SIMPLIFIED list.
-             // It does NOT return 'visualization_data' (the 3D curves).
+          // If only one path, treat as standard
+          // We might need the full viz data which findAlternativePaths might simplify?
+          // Actually findAlternativePaths includes 'quaternion_path' in the backend?
+          // Checking backend: NO, find_alternative_paths (the endpoint) returns a SIMPLIFIED list.
+          // It does NOT return 'visualization_data' (the 3D curves).
         }
 
         // fallback: Call the original GENERATE endpoint to get the full 3D data for the BEST path
         // This ensures the 3D scene works while we show the alternatives in the UI.
         const client = getObserverClient();
         const primaryPathFull = await client.generateTransitionPath(
-            "00000000-0000-0000-0000-000000000001",
-            currentVAC,
-            selectedGoal.vac,
-            3
+          "00000000-0000-0000-0000-000000000001",
+          currentVAC,
+          selectedGoal.vac,
+          3
         );
 
         setGeneratedPath(primaryPathFull);
         setTransitionPath(primaryPathFull);
       }
-
     } catch (err) {
       const errorMsg = err instanceof Error ? err.message : "Failed to generate path";
       setError(errorMsg);

@@ -88,7 +88,7 @@ print_header "🗄️  Initializing Database"
 print_header "🔍 Checking Database Status"
 # Checks:
 # - Database exists
-# - Required tables exist  
+# - Required tables exist
 # - Core data is seeded (87+ emotions)
 ```
 
@@ -211,7 +211,7 @@ Result: Re-seeds all data while keeping schema.
 - **Message:** Clear error with start commands
 - **Resolution:** Script exits with code 1
 
-### Database Not Initialized  
+### Database Not Initialized
 - **Detection:** Database or tables missing
 - **Message:** Points to init-database.sh
 - **Resolution:** User can initialize or skip (with warning)

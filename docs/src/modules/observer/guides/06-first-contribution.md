@@ -1,8 +1,8 @@
 # First Contribution
 
-**Reading Time:** ~20 minutes  
-**Audience:** New developers  
-**Prerequisites:** All previous guides completed  
+**Reading Time:** ~20 minutes
+**Audience:** New developers
+**Prerequisites:** All previous guides completed
 **Goal:** Make your first successful contribution to Observer
 
 ---
@@ -458,18 +458,18 @@ async def find_nearest_emotion(
 ) -> List[EmotionMatch]:
     """
     Find k nearest emotions using weighted fusion.
-    
+
     Args:
         vac: VAC coordinates [valence, arousal, connection]
         text: Transcribed text for semantic matching
         k: Number of results to return
-        
+
     Returns:
         List of EmotionMatch objects sorted by distance
-        
+
     Raises:
         ValueError: If VAC coordinates are invalid
-        
+
     Example:
         >>> emotions = await find_nearest_emotion(
         ...     vac=[0.8, 0.6, 0.7],

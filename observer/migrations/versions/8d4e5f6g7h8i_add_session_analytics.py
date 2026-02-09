@@ -27,9 +27,10 @@ depends_on = None
 
 def upgrade() -> None:
     """Create session_analytics table."""
-    
+
     # Create session_analytics table
-    op.execute("""
+    op.execute(
+        """
         CREATE TABLE IF NOT EXISTS session_analytics (
             id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
             session_id UUID NOT NULL UNIQUE REFERENCES chat_sessions(id) ON DELETE CASCADE,
@@ -47,40 +48,41 @@ def upgrade() -> None:
             created_at TIMESTAMP NOT NULL DEFAULT NOW(),
             updated_at TIMESTAMP NOT NULL DEFAULT NOW()
         )
-    """)
-    
+    """
+    )
+
     # Create indexes
     op.execute(
         "CREATE UNIQUE INDEX idx_session_analytics_session "
         "ON session_analytics(session_id)"
     )
-    
+
     op.execute(
         "CREATE INDEX idx_session_analytics_start_time "
         "ON session_analytics(start_time)"
     )
-    
+
     op.execute(
         "CREATE INDEX idx_session_analytics_emotion_count "
         "ON session_analytics(emotion_count)"
     )
-    
+
     op.execute(
         "CREATE INDEX idx_session_analytics_dominant_category "
         "ON session_analytics(dominant_category)"
     )
-    
+
     # Add comments
     op.execute(
         "COMMENT ON TABLE session_analytics IS "
         "'Real-time aggregated metrics for emotional analysis sessions'"
     )
-    
+
     op.execute(
         "COMMENT ON COLUMN session_analytics.category_counts IS "
-        "'Breakdown of emotions by category: {\"anxiety\": 3, \"joy\": 2, ...}'"
+        '\'Breakdown of emotions by category: {"anxiety": 3, "joy": 2, ...}\''
     )
-    
+
     op.execute(
         "COMMENT ON COLUMN session_analytics.vac_stats IS "
         "'Aggregated VAC statistics: {valence_avg, arousal_avg, connection_avg, ...}'"

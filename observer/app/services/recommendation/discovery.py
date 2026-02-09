@@ -1,3 +1,5 @@
+"""Module documentation."""
+
 import logging
 from typing import Any, Dict, List
 from uuid import UUID
@@ -12,6 +14,7 @@ class DiscoveryEngine:
     """Handles problematic transitions and complementary path discovery."""
 
     def __init__(self, session: AsyncSession):
+        """Docstring."""
         self.session = session
 
     async def get_problematic_transitions(self, limit: int = 10) -> List[Dict[str, Any]]:
@@ -142,12 +145,12 @@ class DiscoveryEngine:
             for row in rows
         ]
 
-    async def _suggest_triangle_completion(self, selected_two: List[UUID]) -> List[Dict[str, Any]]:
+    async def _suggest_triangle_completion(self, _selected_two: List[UUID]) -> List[Dict[str, Any]]:
         """Suggest third emotion to form an interesting triangle."""
         # Simplified - just return empty for now to avoid errors
         return []
 
-    async def _suggest_opposites(self, selected_emotions: List[UUID]) -> List[Dict[str, Any]]:
+    async def _suggest_opposites(self, _selected_emotions: List[UUID]) -> List[Dict[str, Any]]:
         """Suggest emotions that are opposite in VAC space."""
         # Simplified - just return empty for now
         return []

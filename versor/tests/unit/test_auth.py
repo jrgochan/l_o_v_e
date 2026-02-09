@@ -1,37 +1,44 @@
 """Unit tests for authentication dependency."""
+
 import pytest
 from fastapi import HTTPException
 from jose import jwt
+
 from app.api.deps import get_current_user
 from app.config import settings
 
+
 @pytest.mark.asyncio
-async def test_get_current_user_valid_token():
+async def test_get_current_user_valid_token() -> None:
     """Test get_current_user with valid token."""
-    token = jwt.encode({"sub": "test@example.com"}, settings.SECRET_KEY, algorithm=settings.ALGORITHM)
+    token = jwt.encode(
+        {"sub": "test@example.com"}, settings.SECRET_KEY, algorithm=settings.ALGORITHM
+    )
     user = await get_current_user(token)
     assert user["sub"] == "test@example.com"
 
+
 @pytest.mark.asyncio
-async def test_get_current_user_invalid_token():
+async def test_get_current_user_invalid_token() -> None:
     """Test get_current_user with invalid token."""
     with pytest.raises(HTTPException) as exc:
         await get_current_user("invalid.token")
     assert exc.value.status_code == 401
 
+
 @pytest.mark.asyncio
-async def test_get_current_user_expired_token():
+async def test_get_current_user_expired_token() -> None:
     """Test get_current_user with expired token."""
     # Create expired token (future todo: use proper expiry time)
     # For now, just junk signature ensures failure
     with pytest.raises(HTTPException):
         await get_current_user("header.payload.signature")
 
+
 @pytest.mark.asyncio
-async def test_get_current_user_missing_sub():
+async def test_get_current_user_missing_sub() -> None:
     """Test get_current_user with token missing 'sub' claim."""
     token = jwt.encode({"other": "claim"}, settings.SECRET_KEY, algorithm=settings.ALGORITHM)
     with pytest.raises(HTTPException) as exc:
         await get_current_user(token)
     assert exc.value.status_code == 401
-

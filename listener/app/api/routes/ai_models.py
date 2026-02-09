@@ -60,7 +60,7 @@ router = APIRouter(prefix="/ai/models", tags=["AI Models"])
 
 
 # Helper for unconditional cleanup coverage
-class NoOpOllama:
+class NoOpOllama:  # pylint: disable=too-few-public-methods
     """No-op implementation of Ollama manager for safe cleanup."""
 
     async def close(self) -> None:
@@ -100,7 +100,7 @@ active_pulls: Dict[str, Any] = {}
 
 @router.get("/local", response_model=List[ModelInfo])
 async def list_local_models(
-    current_user: dict[str, Any] = Depends(get_current_user),  # noqa: B008
+    _current_user: dict[str, Any] = Depends(get_current_user),  # noqa: B008
 ) -> List[ModelInfo]:
     """List all Ollama models currently installed locally.
 
@@ -120,7 +120,7 @@ async def list_local_models(
 @router.post("/pull", response_model=PullModelResponse)
 async def start_model_pull(
     request: PullModelRequest,
-    current_user: dict[str, Any] = Depends(get_current_user),  # noqa: B008
+    _current_user: dict[str, Any] = Depends(get_current_user),  # noqa: B008
 ) -> PullModelResponse:
     """Start pulling (downloading) a model from Ollama registry.
 
@@ -150,7 +150,7 @@ async def start_model_pull(
 async def stream_pull_progress(
     websocket: WebSocket,
     task_id: str,
-    current_user: dict[str, Any] = Depends(get_current_user_ws),  # noqa: B008
+    _current_user: dict[str, Any] = Depends(get_current_user_ws),  # noqa: B008
 ) -> None:
     """Websocket endpoint for streaming model pull progress.
 
@@ -203,14 +203,14 @@ async def stream_pull_progress(
     finally:
         try:
             await websocket.close()
-        except Exception:
+        except Exception:  # pylint: disable=broad-exception-caught
             pass
 
 
 @router.delete("/{model_name}")
 async def delete_model(
     model_name: str,
-    current_user: dict[str, Any] = Depends(get_current_user),  # noqa: B008
+    _current_user: dict[str, Any] = Depends(get_current_user),  # noqa: B008
 ) -> Dict[str, Any]:
     """Delete a model from local storage.
 
@@ -235,7 +235,7 @@ async def delete_model(
 @router.get("/{model_name}/details", response_model=ModelDetails)
 async def get_model_details(
     model_name: str,
-    current_user: dict[str, Any] = Depends(get_current_user),  # noqa: B008
+    _current_user: dict[str, Any] = Depends(get_current_user),  # noqa: B008
 ) -> ModelDetails:
     """Get detailed information about a specific model.
 
@@ -257,7 +257,7 @@ async def get_model_details(
 
 @router.get("/health")
 async def check_ollama_health(
-    current_user: dict[str, Any] = Depends(get_current_user),  # noqa: B008
+    _current_user: dict[str, Any] = Depends(get_current_user),  # noqa: B008
 ) -> Dict[str, str]:
     """Check if Ollama is running and accessible.
 
@@ -272,7 +272,6 @@ async def check_ollama_health(
         if is_healthy:
             return {"status": "ok", "ollama": "running"}
 
-        return {"status": "error", "ollama": "not running"}
         return {"status": "error", "ollama": "not running"}
     except Exception as e:  # pylint: disable=broad-exception-caught
         return {"status": "error", "ollama": "not accessible", "error": str(e)}

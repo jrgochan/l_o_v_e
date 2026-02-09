@@ -1,13 +1,15 @@
+# pylint: disable=redefined-outer-name, unused-argument
+from typing import Any
 from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
 
 from app.models.vac_response import EmotionalClassification, VACVector
-from app.workers.audio_processor import process_audio
+from app.workers.audio_processor import WorkerSettings, process_audio
 
 
 @pytest.fixture
-def mock_transcription_service():
+def mock_transcription_service() -> Any:
     with patch("app.workers.audio_processor.get_transcription_service") as mock:
         service = MagicMock()
         mock.return_value = service
@@ -15,7 +17,7 @@ def mock_transcription_service():
 
 
 @pytest.fixture
-def mock_prosody_analyzer():
+def mock_prosody_analyzer() -> Any:
     with patch("app.workers.audio_processor.get_prosody_analyzer") as mock:
         analyzer = MagicMock()
         mock.return_value = analyzer
@@ -23,7 +25,7 @@ def mock_prosody_analyzer():
 
 
 @pytest.fixture
-def mock_semantic_analyzer():
+def mock_semantic_analyzer() -> Any:
     with patch("app.workers.audio_processor.get_semantic_analyzer") as mock:
         analyzer = MagicMock()
         analyzer.analyze = AsyncMock()  # Async method
@@ -32,7 +34,7 @@ def mock_semantic_analyzer():
 
 
 @pytest.fixture
-def mock_pii_scrubber():
+def mock_pii_scrubber() -> Any:
     with patch("app.workers.audio_processor.get_pii_scrubber") as mock:
         scrubber = MagicMock()
         text = "scrubbed text"
@@ -43,7 +45,7 @@ def mock_pii_scrubber():
 
 
 @pytest.fixture
-def mock_observer_client():
+def mock_observer_client() -> Any:
     with patch("app.workers.audio_processor.get_observer_client") as mock:
         client = MagicMock()
         client.record_state = AsyncMock()
@@ -54,12 +56,12 @@ def mock_observer_client():
 
 @pytest.mark.asyncio
 async def test_process_audio_full_pipeline(
-    mock_transcription_service,
-    mock_prosody_analyzer,
-    mock_semantic_analyzer,
-    mock_pii_scrubber,
-    mock_observer_client,
-):
+    mock_transcription_service: Any,
+    mock_prosody_analyzer: Any,
+    mock_semantic_analyzer: Any,
+    mock_pii_scrubber: Any,
+    mock_observer_client: Any,
+) -> None:
     """Test processing with audio input (full pipeline)."""
 
     # Setup Mocks
@@ -103,12 +105,12 @@ async def test_process_audio_full_pipeline(
 
 @pytest.mark.asyncio
 async def test_process_text_only(
-    mock_transcription_service,
-    mock_prosody_analyzer,
-    mock_semantic_analyzer,
-    mock_pii_scrubber,
-    mock_observer_client,
-):
+    mock_transcription_service: Any,
+    mock_prosody_analyzer: Any,
+    mock_semantic_analyzer: Any,
+    mock_pii_scrubber: Any,
+    mock_observer_client: Any,
+) -> None:
     """Test processing with text input (skips audio/prosody steps)."""
 
     mock_transcription_service.transcribe_text.return_value = MagicMock(
@@ -133,7 +135,7 @@ async def test_process_text_only(
 
 
 @pytest.mark.asyncio
-async def test_missing_input_error(mock_transcription_service):
+async def test_missing_input_error(mock_transcription_service: Any) -> None:
     """Test error when no audio or text provided."""
     result = await process_audio(_ctx={})
 
@@ -142,7 +144,7 @@ async def test_missing_input_error(mock_transcription_service):
 
 
 @pytest.mark.asyncio
-async def test_processing_exception(mock_transcription_service):
+async def test_processing_exception(mock_transcription_service: Any) -> None:
     """Test handling of unexpected exceptions."""
     mock_transcription_service.transcribe_text.side_effect = Exception("Fatal error")
 
@@ -154,8 +156,8 @@ async def test_processing_exception(mock_transcription_service):
 
 @pytest.mark.asyncio
 async def test_pii_scrubbing_branch(
-    mock_pii_scrubber, mock_semantic_analyzer, mock_transcription_service
-):
+    mock_pii_scrubber: Any, mock_semantic_analyzer: Any, mock_transcription_service: Any
+) -> None:
     """Test logic when PII is detected."""
     mock_transcription_service.transcribe_text.return_value.text = "PII here"
     mock_semantic_analyzer.analyze.return_value = EmotionalClassification(
@@ -175,8 +177,8 @@ async def test_pii_scrubbing_branch(
 
 @pytest.mark.asyncio
 async def test_observer_storage_without_user_id(
-    mock_transcription_service, mock_semantic_analyzer, mock_observer_client
-):
+    mock_transcription_service: Any, mock_semantic_analyzer: Any, mock_observer_client: Any
+) -> None:
     """Test that observer storage is skipped without user_id."""
     mock_transcription_service.transcribe_text.return_value.text = "text"
     mock_semantic_analyzer.analyze.return_value = EmotionalClassification(
@@ -194,9 +196,8 @@ async def test_observer_storage_without_user_id(
     mock_observer_client.record_state.assert_not_called()
 
 
-def test_worker_settings():
+def test_worker_settings() -> None:
     """Test worker configuration."""
-    from app.workers.audio_processor import WorkerSettings, process_audio
 
     assert process_audio in WorkerSettings.functions
     assert WorkerSettings.max_jobs == 5

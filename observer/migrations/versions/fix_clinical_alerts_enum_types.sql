@@ -3,7 +3,7 @@
 -- Created: 2025-12-06
 
 -- Alter columns to VARCHAR
-ALTER TABLE clinical_alerts 
+ALTER TABLE clinical_alerts
   ALTER COLUMN level TYPE VARCHAR(20),
   ALTER COLUMN type TYPE VARCHAR(50);
 

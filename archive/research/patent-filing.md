@@ -270,12 +270,12 @@ Alexandria, VA 22313-1450
 
 ## Common Mistakes to Avoid
 
-❌ **Missing the 12-month deadline** - You lose everything  
-❌ **Public disclosure before filing** - Destroys patentability in most countries  
-❌ **Inadequate description** - Can't add new matter later  
-❌ **Not consulting attorney** - Expensive mistakes in claims  
-❌ **Ignoring Dr. Brown's contribution** - Ethical and legal liability  
-❌ **Filing in wrong entity status** - Pay wrong fees, complications later  
+❌ **Missing the 12-month deadline** - You lose everything
+❌ **Public disclosure before filing** - Destroys patentability in most countries
+❌ **Inadequate description** - Can't add new matter later
+❌ **Not consulting attorney** - Expensive mistakes in claims
+❌ **Ignoring Dr. Brown's contribution** - Ethical and legal liability
+❌ **Filing in wrong entity status** - Pay wrong fees, complications later
 
 ✅ **Do This Instead:**
 - Set calendar reminders for month 6, 9, 10, 11

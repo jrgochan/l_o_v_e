@@ -4,8 +4,8 @@
 
 This document provides a **16-week phased implementation plan** for building the complete L.O.V.E. Stack (Listener-Observer-Versor-Experience). The roadmap sequences modules by dependency, identifies critical paths, and provides concrete milestones.
 
-**Total Duration**: 16 weeks (4 months)  
-**Team Size**: 2-3 developers (full-stack + mobile)  
+**Total Duration**: 16 weeks (4 months)
+**Team Size**: 2-3 developers (full-stack + mobile)
 **Risk Level**: Medium-High (novel technology, complex math)
 
 ---
@@ -403,7 +403,7 @@ Week 12: Complete integration
 **Work that can happen simultaneously**:
 
 - **Weeks 1-2**: Versor math **||** Observer schema design
-- **Weeks 5-6**: Experience UI **||** Soul Sphere shaders  
+- **Weeks 5-6**: Experience UI **||** Soul Sphere shaders
 - **Weeks 9-10**: Edge transcription **||** Cloud backend
 - **Weeks 13-14**: Testing **||** Optimization
 

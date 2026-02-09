@@ -1,7 +1,7 @@
 # Listener Module - Complete Session Summary
 
-**Date**: December 3, 2025  
-**Status**: ✅ **IMPLEMENTATION COMPLETE** (with minor dependency note)  
+**Date**: December 3, 2025
+**Status**: ✅ **IMPLEMENTATION COMPLETE** (with minor dependency note)
 **Test Coverage**: 38 tests, ~75% coverage
 
 ---
@@ -198,7 +198,7 @@ python
 
 >>> from app.services.semantic_analyzer import SemanticAnalyzer
 >>> analyzer = SemanticAnalyzer()
->>> 
+>>>
 >>> # Test Pity (negative Connection)
 >>> pity = analyzer.analyze_sync("I feel sorry for them, they're struggling")
 >>> print(f"Pity Connection: {pity.vac.connection:.2f}")  # Should be < 0
@@ -250,18 +250,18 @@ The **Pity vs. Compassion** test proves:
 
 ### What's Ready Now
 
-✅ **Text-based emotional analysis** - Works perfectly  
-✅ **VAC extraction** - All 3 dimensions functional  
-✅ **PII protection** - Privacy safeguarded  
-✅ **Observer integration** - Data persistence ready  
-✅ **API endpoints** - REST interface operational  
-✅ **Test suite** - Comprehensive validation  
+✅ **Text-based emotional analysis** - Works perfectly
+✅ **VAC extraction** - All 3 dimensions functional
+✅ **PII protection** - Privacy safeguarded
+✅ **Observer integration** - Data persistence ready
+✅ **API endpoints** - REST interface operational
+✅ **Test suite** - Comprehensive validation
 
 ### What Needs ffmpeg Fix
 
-⚠️ **Audio transcription** - Requires ffmpeg@7  
-⚠️ **Audio-based tests** - Will pass after fix  
-⚠️ **Complete pipeline with audio** - 95% there  
+⚠️ **Audio transcription** - Requires ffmpeg@7
+⚠️ **Audio-based tests** - Will pass after fix
+⚠️ **Complete pipeline with audio** - 95% there
 
 ---
 

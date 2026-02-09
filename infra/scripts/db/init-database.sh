@@ -72,7 +72,7 @@ done
 # Check if PostgreSQL is installed
 check_postgresql() {
     print_header "🔍 Checking PostgreSQL"
-    
+
     # Fix for macOS: Prepend PostgreSQL 18 bin to PATH if it exists
     if [[ "$OSTYPE" == "darwin"* ]]; then
         if [ -d "/opt/homebrew/opt/postgresql@18/bin" ]; then
@@ -80,7 +80,7 @@ check_postgresql() {
             print_info "Added postgresql@18 to PATH"
         fi
     fi
-    
+
     if command_exists psql; then
         # Check version
         psql_version=$(psql --version | awk '{print $3}')
@@ -100,7 +100,7 @@ check_postgresql() {
 # Check if PostgreSQL is running
 check_postgresql_running() {
     print_info "Checking if PostgreSQL is running..."
-    
+
     # Use pg_isready if available (standard and robust)
     if command_exists pg_isready; then
         if pg_isready -h "$DB_HOST" -p "$DB_PORT" >/dev/null 2>&1; then
@@ -116,12 +116,12 @@ check_postgresql_running() {
     fi
 
     print_warning "Cannot connect to PostgreSQL"
-    
+
     # Auto-start attempt for macOS
     if [[ "$OSTYPE" == "darwin"* ]] && command_exists brew; then
         print_info "Attempting to start postgresql@18..."
         brew services start postgresql@18
-        
+
         # Wait for it to start
         print_info "Waiting for database to initialize..."
         for _ in {1..10}; do
@@ -136,7 +136,7 @@ check_postgresql_running() {
             fi
             sleep 1
         done
-        
+
         # Try restart if start didn't work (maybe stuck state)
         print_info "Waiting up to 30 seconds for database to accept connections..."
     for _ in {1..30}; do
@@ -161,9 +161,9 @@ check_postgresql_running() {
 # Create database user if it doesn't exist
 create_user() {
     print_header "👤 Creating Database User"
-    
+
     print_info "Checking if user '$DB_USER' exists..."
-    
+
     # Check if user exists
     if psql -d postgres -tAc "SELECT 1 FROM pg_roles WHERE rolname='$DB_USER'" 2>/dev/null | grep -q 1; then
         print_success "User '$DB_USER' already exists"
@@ -172,9 +172,9 @@ create_user() {
         print_success "User '$DB_USER' already exists"
         return 0
     fi
-    
+
     print_info "Creating user '$DB_USER'..."
-    
+
     # Create user
     # Try using the local user first (macOS default), fallback to postgres user
     if psql -d postgres -c "CREATE USER $DB_USER WITH PASSWORD '$DB_PASSWORD' CREATEDB;" 2>/dev/null; then
@@ -193,9 +193,9 @@ create_user() {
 # Create database if it doesn't exist
 create_database() {
     print_header "🗄️  Creating Database"
-    
+
     print_info "Checking if database '$DB_NAME' exists..."
-    
+
     # Check if database exists (PostgreSQL 17 compatible query)
     if PGPASSWORD="$DB_PASSWORD" psql -h "$DB_HOST" -p "$DB_PORT" -U "$DB_USER" -d postgres -tAc "SELECT 1 FROM pg_database WHERE datname = '$DB_NAME'" | grep -q 1; then
         print_success "Database '$DB_NAME' already exists"
@@ -203,9 +203,9 @@ create_database() {
     fi
     # Also check as current user/postgres if above failed due to auth but DB exists?
     # Actually if DB exists but we can't connect, that's an issue. But let's assume if we created user, we can connect.
-    
+
     print_info "Creating database '$DB_NAME'..."
-    
+
     # Database creation requires superuser privileges
     # Try using the local user first (macOS default), fallback to postgres user
     if psql -d postgres -c "CREATE DATABASE $DB_NAME OWNER $DB_USER;" 2>/dev/null; then
@@ -224,9 +224,9 @@ create_database() {
 # Initialize extensions
 initialize_extensions() {
     print_header "🔧 Initializing Extensions"
-    
+
     print_info "Creating PostgreSQL extensions (requires superuser)..."
-    
+
     # Extensions require superuser privileges, so we use the default postgres user
     # Try using the local user first (macOS default), fallback to postgres user
     if psql -d "$DB_NAME" -c "CREATE EXTENSION IF NOT EXISTS vector; CREATE EXTENSION IF NOT EXISTS \"uuid-ossp\"; CREATE EXTENSION IF NOT EXISTS pg_trgm;" > /dev/null 2>&1; then
@@ -238,7 +238,7 @@ initialize_extensions() {
         print_info "Try running manually: psql -d $DB_NAME -c \"CREATE EXTENSION IF NOT EXISTS vector;\""
         return 1
     fi
-    
+
     # Verify vector extension was created
     print_info "Verifying vector extension..."
     if PGPASSWORD="$DB_PASSWORD" psql -h "$DB_HOST" -p "$DB_PORT" -U "$DB_USER" -d "$DB_NAME" -t -c "SELECT extname FROM pg_extension WHERE extname = 'vector';" 2>/dev/null | grep -q "vector"; then
@@ -255,26 +255,26 @@ initialize_extensions() {
 # Run Alembic migrations
 run_migrations() {
     print_header "🔄 Running Database Migrations"
-    
+
     if [ ! -d "$OBSERVER_DIR" ]; then
         print_error "Observer directory not found: $OBSERVER_DIR"
         return 1
     fi
-    
+
     cd "$OBSERVER_DIR"
-    
+
     # Check for virtual environment
     if [ ! -d ".venv" ]; then
         print_error "Virtual environment not found in .venv. Run setup-love-stack.sh first"
         cd - > /dev/null
         return 1
     fi
-    
+
     # Activate venv
     . .venv/bin/activate
-    
+
     print_info "Running Alembic migrations..."
-    
+
     # Run migrations
     if alembic upgrade head 2>&1 | tee /tmp/alembic-output.log; then
         print_success "Migrations completed successfully"
@@ -293,9 +293,9 @@ run_migrations() {
 # Verify tables exist
 verify_tables() {
     print_header "✅ Verifying Database Schema"
-    
+
     print_info "Checking for required tables..."
-    
+
     # List of required tables (complete as of 2026-01-03)
     # Core tables
     required_tables=(
@@ -303,7 +303,7 @@ verify_tables() {
         "emotion_definitions"
         "user_trajectory"
     )
-    
+
     # Transition system tables
     required_tables+=(
         "transition_strategies"
@@ -314,7 +314,7 @@ verify_tables() {
         "journey_waypoints"
         "strategy_attempts"
     )
-    
+
     # New tables (added 2026-01-03)
     required_tables+=(
         "waypoint_explanation_templates"
@@ -327,7 +327,7 @@ verify_tables() {
         "model_assignments"
         "model_performance_metrics"
     )
-    
+
     # Multi-emotion analysis tables (exist but no migration yet - created by models)
     # Note: These are created automatically by SQLAlchemy from models
     required_tables+=(
@@ -336,7 +336,7 @@ verify_tables() {
         "emotion_relationships"
         "emotion_goals"
     )
-    
+
     all_exist=true
     missing_count=0
     for table in "${required_tables[@]}"; do
@@ -348,7 +348,7 @@ verify_tables() {
             ((missing_count++))
         fi
     done
-    
+
     echo ""
     if [ "$all_exist" = true ]; then
         print_success "All ${#required_tables[@]} required tables exist"
@@ -363,19 +363,19 @@ verify_tables() {
 # Validate JSON data files
 validate_json_data() {
     print_header "✅ Validating JSON Data"
-    
+
     cd "$OBSERVER_DIR"
-    
+
     if [ ! -d ".venv" ]; then
         print_error "Virtual environment not found in .venv"
         cd - > /dev/null
         return 1
     fi
-    
+
     . .venv/bin/activate
-    
+
     print_info "Validating canonical data files..."
-    
+
     if python scripts/validate_data.py; then
         print_success "All JSON data validated successfully"
         deactivate
@@ -394,22 +394,22 @@ validate_json_data() {
 # Seed database
 seed_database() {
     print_header "🌱 Seeding Database"
-    
+
     if [ "$SKIP_SEED" = true ]; then
         print_warning "Skipping data seeding (--skip-seed flag)"
         return 0
     fi
-    
+
     # Seeding requires Versor API for quaternion calculation
     print_info "Checking Versor availability..."
     VERSOR_DIR="$PROJECT_ROOT/versor"
-    
+
     if [ ! -d "$VERSOR_DIR/.venv" ]; then
         print_error "Versor virtual environment not found in .venv"
         print_info "Run setup-love-stack.sh first to set up Versor"
         return 1
     fi
-    
+
     # Check if Versor is running
     if ! curl -s http://localhost:8080/health > /dev/null 2>&1; then
         print_info "Starting Versor API (required for Atlas seeding)..."
@@ -417,13 +417,13 @@ seed_database() {
         . .venv/bin/activate
         nohup uvicorn app.main:app --host 0.0.0.0 --port 8080 > /tmp/versor.log 2>&1 &
         VERSOR_PID=$!
-        
+
         # Track PID for graceful cleanup
         mkdir -p "$SCRIPT_DIR/.pids"
         echo "$VERSOR_PID" > "$SCRIPT_DIR/.pids/versor_seeding.pid"
-        
+
         deactivate
-        
+
         # Wait for Versor to be ready
         print_info "Waiting for Versor to start..."
         for _ in {1..30}; do
@@ -433,7 +433,7 @@ seed_database() {
             fi
             sleep 1
         done
-        
+
         if ! curl -s http://localhost:8080/health > /dev/null 2>&1; then
             print_error "Versor failed to start (check /tmp/versor.log)"
             return 1
@@ -441,26 +441,26 @@ seed_database() {
     else
         print_success "Versor API already running"
     fi
-    
+
     cd "$OBSERVER_DIR"
-    
+
     if [ ! -d ".venv" ]; then
         print_error "Virtual environment not found in .venv"
         cd - > /dev/null
         return 1
     fi
-    
+
     . .venv/bin/activate
-    
+
     # Check if already seeded
     if [ "$FORCE_RESEED" = false ]; then
         print_info "Checking if database already has data..."
-        
+
         atlas_count=$(PGPASSWORD="$DB_PASSWORD" psql -h "$DB_HOST" -p "$DB_PORT" -U "$DB_USER" -d "$DB_NAME" -t -c "SELECT COUNT(*) FROM emotion_definitions;" 2>/dev/null | xargs)
-        
+
         if [ "$atlas_count" -gt 0 ]; then
             print_warning "Database already contains $atlas_count emotions"
-            
+
             if prompt_yes_no "Clear and re-seed all data?"; then
                 print_info "Clearing existing data..."
                 FORCE_RESEED=true
@@ -472,28 +472,28 @@ seed_database() {
             fi
         fi
     fi
-    
+
     # Build seed_all.py arguments
     seed_args=("--level=enhanced" "--verify")
-    
+
     if [ "$WITH_DEMO" = true ]; then
         seed_args+=("--with-demo")
     fi
-    
+
     if [ "$WITH_BOOTSTRAP" = true ]; then
         seed_args+=("--with-bootstrap")
     fi
-    
+
     if [ "$FORCE_RESEED" = true ]; then
         seed_args+=("--force-reseed")
     fi
-    
+
     # Add dataset
     seed_args+=("--dataset=$DATASET")
-    
+
     print_info "Running master seeding script with args: ${seed_args[*]}"
     echo ""
-    
+
     # Run seed_all.py
     if python scripts/seed_all.py "${seed_args[@]}"; then
         echo ""
@@ -513,29 +513,29 @@ seed_database() {
 # Compute path matrix cache
 compute_path_matrix() {
     print_header "🔄 Computing Path Matrix Cache"
-    
+
     if [ "$PRECOMPUTE_PATHS" = false ]; then
         print_info "Path matrix computation skipped (use --precompute-paths to enable)"
         return 0
     fi
-    
+
     cd "$OBSERVER_DIR"
-    
+
     if [ ! -d ".venv" ]; then
         print_error "Virtual environment not found in .venv"
         cd - > /dev/null
         return 1
     fi
-    
+
     . .venv/bin/activate
-    
+
     print_info "Pre-computing transition paths..."
     print_warning "This will take significantly longer for multiple datasets"
     echo ""
-    
+
     # Determine which collections to process
     collections_to_process=()
-    
+
     if [ "$DATASET" == "all" ]; then
         collections_to_process=("brene_brown" "Plutchik Wheel" "GoEmotions")
     else
@@ -551,10 +551,10 @@ compute_path_matrix() {
                 ;;
         esac
     fi
-    
+
     # Process each collection
     overall_success=true
-    
+
     for collection in "${collections_to_process[@]}"; do
         print_info "Processing collection: $collection"
         if python scripts/compute_path_matrix.py --collection "$collection"; then
@@ -565,10 +565,10 @@ compute_path_matrix() {
         fi
         echo ""
     done
-    
+
     deactivate
     cd - > /dev/null
-    
+
     if [ "$overall_success" = true ]; then
         return 0
     else
@@ -579,35 +579,35 @@ compute_path_matrix() {
 # Verify seeded data
 verify_data() {
     print_header "📊 Verifying Seeded Data"
-    
+
     if [ "$SKIP_SEED" = true ]; then
         print_warning "Skipping data verification (seeding was skipped)"
         return 0
     fi
-    
+
     print_info "Checking data counts..."
-    
+
     # Count atlas_definitions
     atlas_count=$(PGPASSWORD="$DB_PASSWORD" psql -h "$DB_HOST" -p "$DB_PORT" -U "$DB_USER" -d "$DB_NAME" -t -c "SELECT COUNT(*) FROM emotion_definitions;" 2>/dev/null | xargs)
-    
+
     if [ "$atlas_count" -ge 10 ]; then
         print_success "Emotions seeded: $atlas_count"
     else
         print_warning "Emotions seeded: $atlas_count (This seems low, expected > 10)"
     fi
-    
+
     # Count transition_strategies (if table exists)
     if PGPASSWORD="$DB_PASSWORD" psql -h "$DB_HOST" -p "$DB_PORT" -U "$DB_USER" -d "$DB_NAME" -c "\dt transition_strategies" 2>/dev/null | grep -q "transition_strategies"; then
         strategy_count=$(PGPASSWORD="$DB_PASSWORD" psql -h "$DB_HOST" -p "$DB_PORT" -U "$DB_USER" -d "$DB_NAME" -t -c "SELECT COUNT(*) FROM transition_strategies;" 2>/dev/null | xargs)
         print_success "Transition strategies: $strategy_count"
     fi
-    
+
     # Count transition_patterns (if table exists)
     if PGPASSWORD="$DB_PASSWORD" psql -h "$DB_HOST" -p "$DB_PORT" -U "$DB_USER" -d "$DB_NAME" -c "\dt transition_patterns" 2>/dev/null | grep -q "transition_patterns"; then
         pattern_count=$(PGPASSWORD="$DB_PASSWORD" psql -h "$DB_HOST" -p "$DB_PORT" -U "$DB_USER" -d "$DB_NAME" -t -c "SELECT COUNT(*) FROM transition_patterns;" 2>/dev/null | xargs)
         print_success "Transition patterns: $pattern_count"
     fi
-    
+
     return 0
 }
 
@@ -622,69 +622,69 @@ main() {
     echo "  With Demo: $WITH_DEMO"
     echo "  With Bootstrap: $WITH_BOOTSTRAP"
     echo ""
-    
+
     # Step 1: Check PostgreSQL
     if ! check_postgresql; then
         print_error "PostgreSQL not installed"
         exit 1
     fi
-    
+
     # Step 2: Check if running
     if ! check_postgresql_running; then
         print_error "PostgreSQL not running"
         exit 1
     fi
-    
+
     # Step 3: Create user
     if ! create_user; then
         print_error "Failed to create database user"
         exit 1
     fi
-    
+
     # Step 4: Create database
     if ! create_database; then
         print_error "Failed to create database"
         exit 1
     fi
-    
+
     # Step 5: Initialize extensions
     if ! initialize_extensions; then
         print_error "Failed to initialize extensions"
         exit 1
     fi
-    
+
     # Step 5: Run migrations
     if ! run_migrations; then
         print_error "Failed to run migrations"
         exit 1
     fi
-    
+
     # Step 6: Verify schema
     if ! verify_tables; then
         print_error "Schema verification failed"
         exit 1
     fi
-    
+
     # Step 7: Validate JSON data
     if ! validate_json_data; then
         print_error "JSON data validation failed"
         exit 1
     fi
-    
+
     # Step 8: Seed database
     if ! seed_database; then
         print_error "Failed to seed database"
         exit 1
     fi
-    
+
     # Step 9: Verify data
     verify_data
-    
+
     # Step 10: Compute path matrix (optional)
     if [ "$PRECOMPUTE_PATHS" = true ]; then
         compute_path_matrix
     fi
-    
+
     # Success summary
     print_header "🎉 Database Initialization Complete!"
     echo ""

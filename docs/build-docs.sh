@@ -34,7 +34,7 @@ show_help() {
         local BLUE='\033[0;34m'
         local GREEN='\033[0;32m'
         local NC='\033[0m'
-        
+
         echo -e "${BOLD}L.O.V.E. Documentation Build Script${NC}"
         echo -e "${BLUE}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
         echo ""

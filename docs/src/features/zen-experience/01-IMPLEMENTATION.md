@@ -1,7 +1,7 @@
 # Zen Experience - Implementation Guide
 
-**Document:** 01-IMPLEMENTATION.md  
-**Status:** Planning Document  
+**Document:** 01-IMPLEMENTATION.md
+**Status:** Planning Document
 **Last Updated:** December 7, 2025
 
 ---
@@ -17,7 +17,7 @@
 ```typescript
 /**
  * Sphere Synchronization Hook
- * 
+ *
  * Enables real-time sync between admin/atlas (broadcaster) and main page (listener)
  * using BroadcastChannel API for local cross-tab communication.
  */
@@ -52,18 +52,18 @@ export function useSphereSync({ mode, onSync }: UseSphereSync Options) {
   // Broadcaster: Admin/Atlas side
   const broadcastSphereState = useCallback(() => {
     if (!channelRef.current) return;
-    
+
     const currentVAC = useExperienceStore.getState().currentVAC;
     const selectedIds = useAtlasAdminStore.getState().selectedEmotionIds;
     const transitionPath = useAtlasAdminStore.getState().computedPaths;
-    
+
     const message: SphereStateMessage = {
       type: 'sphere_update',
       vac: currentVAC,
       selectedEmotionIds: Array.from(selectedIds),
       timestamp: Date.now()
     };
-    
+
     channelRef.current.postMessage(message);
     logger.debug('sync', 'Broadcasted sphere state', message);
   }, []);
@@ -72,31 +72,31 @@ export function useSphereSync({ mode, onSync }: UseSphereSync Options) {
   const handleMessage = useCallback((event: MessageEvent<SphereStateMessage>) => {
     const message = event.data;
     lastMessageRef.current = message.timestamp;
-    
+
     if (message.type === 'sphere_update' && message.vac) {
       useExperienceStore.getState().setTargetVAC(message.vac);
       logger.debug('sync', 'Received sphere update', message.vac);
     }
-    
+
     if (message.type === 'path_update' && message.path) {
       useExperienceStore.getState().setTransitionPath(message.path);
     }
-    
+
     onSync?.(message);
   }, [onSync]);
 
   // Setup channel
   useEffect(() => {
     if (typeof window === 'undefined') return;
-    
+
     try {
       channelRef.current = new BroadcastChannel(CHANNEL_NAME);
       logger.info('sync', `Sphere sync ${mode} initialized`);
-      
+
       if (mode === 'listener') {
         channelRef.current.onmessage = handleMessage;
       }
-      
+
       if (mode === 'broadcaster') {
         // Send heartbeat
         heartbeatRef.current = setInterval(() => {
@@ -109,7 +109,7 @@ export function useSphereSync({ mode, onSync }: UseSphereSync Options) {
     } catch (error) {
       logger.error('sync', 'Failed to initialize BroadcastChannel', error);
     }
-    
+
     return () => {
       if (heartbeatRef.current) {
         clearInterval(heartbeatRef.current);
@@ -151,7 +151,7 @@ Add near top:
 ```typescript
 const [lastSync, setLastSync] = useState<number>(0);
 
-useSphereSync({ 
+useSphereSync({
   mode: 'listener',
   onSync: (message) => setLastSync(message.timestamp)
 });
@@ -177,29 +177,29 @@ interface Props {
 
 export function ZenSessionIndicator({ lastSync, visible }: Props) {
   const [timeSinceSync, setTimeSinceSync] = useState(0);
-  
+
   useEffect(() => {
     const interval = setInterval(() => {
       setTimeSinceSync(Math.floor((Date.now() - lastSync) / 1000));
     }, 1000);
     return () => clearInterval(interval);
   }, [lastSync]);
-  
+
   if (!visible) return null;
-  
+
   const isStale = timeSinceSync > 10;
-  
+
   return (
     <div className={`
-      absolute top-4 left-4 
+      absolute top-4 left-4
       px-3 py-1.5 rounded-full text-xs
       backdrop-blur-md transition-all duration-300
-      ${isStale 
+      ${isStale
         ? 'bg-orange-500/30 border border-orange-400 text-orange-200'
         : 'bg-cyan-500/20 border border-cyan-400 text-cyan-200'
       }
     `}>
-      {timeSinceSync === 0 
+      {timeSinceSync === 0
         ? 'Following Admin Session'
         : isStale
         ? `No updates for ${timeSinceSync}s`
@@ -222,24 +222,24 @@ Strip down to essentials:
 export default function ZenExperience() {
   const [showIndicator, setShowIndicator] = useState(true);
   const [lastSync, setLastSync] = useState(Date.now());
-  
-  useSphereSync({ 
+
+  useSphereSync({
     mode: 'listener',
     onSync: (msg) => setLastSync(msg.timestamp)
   });
-  
+
   // Expose indicator toggle for keyboard shortcut
   useEffect(() => {
     (window as any).toggleZenIndicator = () => setShowIndicator(p => !p);
     return () => delete (window as any).toggleZenIndicator;
   }, []);
-  
+
   return (
     <div className="w-screen h-screen bg-black relative">
       <Scene />
-      
+
       <ZenSessionIndicator lastSync={lastSync} visible={showIndicator} />
-      
+
       {/* Minimal settings - top right corner */}
       <div className="absolute top-4 right-4">
         <Settings />
@@ -289,7 +289,7 @@ useEffect(() => {
       // Optionally: revert to neutral state
     }
   }, 5000);
-  
+
   return () => clearInterval(checkStale);
 }, []);
 ```

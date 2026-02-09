@@ -82,7 +82,10 @@ async def test_generate_transition_path_success(
 ):
     # Setup Request
     request = TransitionPathRequest(
-        user_id=uuid4(), current_vac=[-0.5, 0.5, -0.2], goal_vac=[0.5, -0.2, 0.4], max_waypoints=3
+        user_id=uuid4(),
+        current_vac=[-0.5, 0.5, -0.2],
+        goal_vac=[0.5, -0.2, 0.4],
+        max_waypoints=3,
     )
 
     # Setup PathPlanner result
@@ -110,9 +113,9 @@ async def test_generate_transition_path_success(
 
     mock_path_planner.find_transition_path.return_value = mock_path
 
-    # Mock _vac_distance as MAGIC MOCK because it is a synchronous method
-    # AsyncMock would return a coroutine, which float() cannot handle
-    mock_path_planner._vac_distance = MagicMock(return_value=0.5)
+    # Mock graph explicitly as MagicMock
+    mock_path_planner.graph = MagicMock()
+    mock_path_planner.graph.vac_distance.return_value = 0.5
 
     # Setup Strategy Recommender
     mock_strategy_recommender.get_strategies_for_transition.return_value = [
@@ -478,7 +481,11 @@ async def test_get_user_journey_history(mock_db):
         j.to_dict.return_value = {"id": str(uuid4()), "status": status}
         return j
 
-    journeys = [make_journey("completed"), make_journey("abandoned"), make_journey("in_progress")]
+    journeys = [
+        make_journey("completed"),
+        make_journey("abandoned"),
+        make_journey("in_progress"),
+    ]
 
     result = MagicMock()
     result.scalars.return_value.all.return_value = journeys
@@ -624,7 +631,9 @@ async def test_mark_waypoint_reached_waypoint_not_found(mock_db):
         await mark_waypoint_reached(
             journey_id,
             WaypointReachedRequest(
-                waypoint_index=99, strategies_tried=[], self_assessment={"confidence": 5}
+                waypoint_index=99,
+                strategies_tried=[],
+                self_assessment={"confidence": 5},
             ),
             mock_db,
         )
@@ -635,5 +644,5 @@ async def test_mark_waypoint_reached_waypoint_not_found(mock_db):
 @pytest.mark.asyncio
 async def test_get_all_cached_paths(mock_db):
     """Test get_all_cached_paths stub."""
-    response = await get_all_cached_paths(limit=100, db=mock_db)
+    response = await get_all_cached_paths(_db=mock_db)
     assert response == {"paths": []}

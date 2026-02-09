@@ -58,7 +58,7 @@ cosine_distance = 1 - (A · B) / (||A|| × ||B||)
 **SQL Operator**: `<=>`
 
 ```sql
-SELECT emotion_name, 
+SELECT emotion_name,
        semantic_embedding <=> :query_embedding AS distance
 FROM atlas_definitions
 ORDER BY distance
@@ -95,8 +95,8 @@ LIMIT 5;
 ### Creating HNSW Index
 
 ```sql
-CREATE INDEX idx_trajectory_embedding_hnsw 
-ON user_trajectory 
+CREATE INDEX idx_trajectory_embedding_hnsw
+ON user_trajectory
 USING hnsw (input_embedding vector_cosine_ops)
 WITH (m = 16, ef_construction = 64);
 ```
@@ -157,7 +157,7 @@ async def set_search_quality(quality: str):
 Find 5 most similar emotions:
 
 ```sql
-SELECT 
+SELECT
     id,
     emotion_name,
     vac_vector,
@@ -175,7 +175,7 @@ LIMIT 5;
 Find similar moments within a specific time range:
 
 ```sql
-SELECT 
+SELECT
     id,
     timestamp,
     input_transcription,
@@ -194,7 +194,7 @@ LIMIT 10;
 Combine semantic search with traditional filters:
 
 ```sql
-SELECT 
+SELECT
     id,
     emotion_name,
     metadata->>'context' AS context,
@@ -226,20 +226,20 @@ RETURNS TABLE (
 BEGIN
     RETURN QUERY
     WITH distances AS (
-        SELECT 
+        SELECT
             id,
             emotion_name,
             vac_vector <-> query_vac AS vac_dist,
             semantic_embedding <=> query_embedding AS semantic_dist
         FROM atlas_definitions
     )
-    SELECT 
+    SELECT
         id,
         emotion_name,
-        CASE 
-            WHEN word_count < 10 THEN 
+        CASE
+            WHEN word_count < 10 THEN
                 0.8 * vac_dist + 0.2 * semantic_dist
-            ELSE 
+            ELSE
                 0.4 * vac_dist + 0.6 * semantic_dist
         END AS combined_distance
     FROM distances
@@ -275,7 +275,7 @@ LIMIT 10;
 
 ```sql
 -- Check index bloat
-SELECT 
+SELECT
     schemaname,
     tablename,
     indexname,
@@ -290,7 +290,7 @@ REINDEX INDEX idx_trajectory_embedding_hnsw;
 ### Monitoring Index Usage
 
 ```sql
-SELECT 
+SELECT
     schemaname,
     tablename,
     indexname,
@@ -316,7 +316,7 @@ class Base(DeclarativeBase):
 
 class UserTrajectory(Base):
     __tablename__ = 'user_trajectory'
-    
+
     id = Column(UUID, primary_key=True)
     input_embedding = Column(Vector(1536))
     vac_values = Column(Vector(3))
@@ -336,14 +336,14 @@ async def find_similar_moments(
     limit: int = 5
 ) -> List[UserTrajectory]:
     """Find semantically similar past moments"""
-    
+
     stmt = (
         select(UserTrajectory)
         .where(UserTrajectory.user_id == user_id)
         .order_by(UserTrajectory.input_embedding.cosine_distance(query_embedding))
         .limit(limit)
     )
-    
+
     result = await session.execute(stmt)
     return result.scalars().all()
 ```
@@ -356,13 +356,13 @@ async def find_nearest_atlas_emotion(
     vac_vector: List[float]
 ) -> AtlasDefinition:
     """Find nearest emotion by VAC distance (Euclidean)"""
-    
+
     stmt = (
         select(AtlasDefinition)
         .order_by(AtlasDefinition.vac_vector.l2_distance(vac_vector))
         .limit(1)
     )
-    
+
     result = await session.execute(stmt)
     return result.scalar_one()
 ```
@@ -378,33 +378,33 @@ from app.services.emotion_mapper import EmotionMapper
 @pytest.mark.asyncio
 async def test_compassion_pity_distinction(session):
     """Critical test: System must distinguish based on Connection"""
-    
+
     # Input: "I feel sorry for them" (Pity)
     pity_vac = [-0.3, -0.1, -0.7]
     pity_text = "I feel sorry for them, they're struggling."
     pity_embedding = await embedding_service.generate_embedding(pity_text)
-    
+
     mapper = EmotionMapper(session)
     result = await mapper.find_nearest(
         vac_scalars=pity_vac,
         text_embedding=pity_embedding,
         word_count=len(pity_text.split())
     )
-    
+
     assert result.emotion_name == "Pity"
     assert result.vac_vector[2] < 0  # Negative Connection
-    
+
     # Input: "I feel with them" (Compassion)
     compassion_vac = [0.5, 0.2, 0.9]
     compassion_text = "I understand their pain, I'm here for them."
     compassion_embedding = await embedding_service.generate_embedding(compassion_text)
-    
+
     result = await mapper.find_nearest(
         vac_scalars=compassion_vac,
         text_embedding=compassion_embedding,
         word_count=len(compassion_text.split())
     )
-    
+
     assert result.emotion_name == "Compassion"
     assert result.vac_vector[2] > 0.5  # Positive Connection
 ```
@@ -416,16 +416,16 @@ import time
 
 async def benchmark_vector_search(session, iterations=100):
     """Benchmark vector similarity search performance"""
-    
+
     query_embedding = [0.1] * 1536  # Dummy query
-    
+
     start = time.time()
     for _ in range(iterations):
         await find_similar_moments(session, user_id, query_embedding, limit=10)
     end = time.time()
-    
+
     avg_latency = (end - start) / iterations * 1000  # ms
-    
+
     assert avg_latency < 50, f"Query too slow: {avg_latency}ms"
     print(f"Average query latency: {avg_latency:.2f}ms")
 ```

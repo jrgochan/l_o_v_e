@@ -1,7 +1,7 @@
 # System Overview
 
-**Document:** 01-system-overview.md  
-**Last Updated:** December 5, 2025  
+**Document:** 01-system-overview.md
+**Last Updated:** December 5, 2025
 **Status:** Current
 
 ---
@@ -83,9 +83,9 @@ The L.O.V.E. Stack is a **microservices-based emotional intelligence platform** 
 
 ### 1. LISTENER - The Sensory Cortex
 
-**Purpose:** Transform human expression into VAC coordinates  
-**Port:** 8002  
-**Language:** Python 3.11 + FastAPI  
+**Purpose:** Transform human expression into VAC coordinates
+**Port:** 8002
+**Language:** Python 3.11 + FastAPI
 **Status:** ✅ Production Ready
 
 **Key Features:**
@@ -96,16 +96,16 @@ The L.O.V.E. Stack is a **microservices-based emotional intelligence platform** 
 - Async processing (Redis + Arq workers)
 - **Critical capability:** Distinguishes pity from compassion
 
-**Input:** Audio file or text string  
+**Input:** Audio file or text string
 **Output:** `{emotion, vac: {valence, arousal, connection}, confidence, reasoning}`
 
 ---
 
 ### 2. OBSERVER - The Hippocampus
 
-**Purpose:** Memory and context—stores emotional states, finds patterns  
-**Port:** 8000  
-**Language:** Python 3.11 + FastAPI  
+**Purpose:** Memory and context—stores emotional states, finds patterns
+**Port:** 8000
+**Language:** Python 3.11 + FastAPI
 **Status:** ✅ Production Ready
 
 **Key Features:**
@@ -123,9 +123,9 @@ The L.O.V.E. Stack is a **microservices-based emotional intelligence platform** 
 
 ### 3. VERSOR - The Mathematical Engine
 
-**Purpose:** Pure quaternion mathematics for smooth 3D rotations  
-**Port:** 8001  
-**Language:** Python 3.11 + FastAPI  
+**Purpose:** Pure quaternion mathematics for smooth 3D rotations
+**Port:** 8001
+**Language:** Python 3.11 + FastAPI
 **Status:** ✅ Production Ready (56/56 tests passing)
 
 **Key Features:**
@@ -142,9 +142,9 @@ The L.O.V.E. Stack is a **microservices-based emotional intelligence platform** 
 
 ### 4. EXPERIENCE - The Presentation Layer
 
-**Purpose:** 3D visualization of emotional states as "Soul Spheres"  
-**Port:** 3000  
-**Language:** TypeScript + Next.js 16  
+**Purpose:** 3D visualization of emotional states as "Soul Spheres"
+**Port:** 3000
+**Language:** TypeScript + Next.js 16
 **Status:** 🚧 90% Complete (React dependency issue)
 
 **Key Features:**
@@ -177,20 +177,20 @@ The L.O.V.E. Stack is a **microservices-based emotional intelligence platform** 
    - Extracts VAC coordinates
    - Scrubs PII
    ↓ POST /listener/analyze
-   
+
 3. OBSERVER
    - Receives VAC coordinates
    - Stores emotional state (timestamped)
    - Finds nearest atlas emotion
    - Calculates metrics (elasticity, rigidity)
    ↓ POST /observer/state
-   
+
 4. VERSOR (called by Observer)
    - Converts VAC → quaternion
    - Calculates transition from previous state
    - Generates SLERP animation frames
    ↓ POST /versor/calculate
-   
+
 5. EXPERIENCE
    - Polls Observer for current state
    - Receives quaternion + VAC
@@ -223,8 +223,8 @@ All modules expose FastAPI REST endpoints:
 
 ### API Contracts
 
-**Type Safety:** Pydantic models on backend, TypeScript interfaces on frontend  
-**Error Handling:** Non-blocking—if one service is down, others continue  
+**Type Safety:** Pydantic models on backend, TypeScript interfaces on frontend
+**Error Handling:** Non-blocking—if one service is down, others continue
 **Retry Logic:** Exponential backoff with max attempts
 
 ---
@@ -315,7 +315,7 @@ See `infra/podman-compose.yml` for complete configuration.
 
 ### Why Quaternions?
 
-**Problem:** Euler angles suffer from gimbal lock and discontinuities.  
+**Problem:** Euler angles suffer from gimbal lock and discontinuities.
 **Solution:** Quaternions represent rotations in 4D space (S³), providing:
 
 - Smooth interpolation (SLERP)
@@ -325,7 +325,7 @@ See `infra/podman-compose.yml` for complete configuration.
 
 ### Why PostgreSQL + pgvector?
 
-**Problem:** Need fast similarity search over emotional state embeddings.  
+**Problem:** Need fast similarity search over emotional state embeddings.
 **Solution:** pgvector extension provides:
 
 - HNSW indexing (< 50ms queries on 1000+ records)
@@ -335,7 +335,7 @@ See `infra/podman-compose.yml` for complete configuration.
 
 ### Why FastAPI?
 
-**Problem:** Need high-performance async Python APIs.  
+**Problem:** Need high-performance async Python APIs.
 **Solution:** FastAPI provides:
 
 - Native async/await support
@@ -345,7 +345,7 @@ See `infra/podman-compose.yml` for complete configuration.
 
 ### Why Next.js + React Three Fiber?
 
-**Problem:** Need 3D rendering with modern React.  
+**Problem:** Need 3D rendering with modern React.
 **Solution:**
 
 - **Next.js 16**: Server-side rendering, optimal performance
@@ -541,5 +541,5 @@ cd experience/web && npm test
 
 ---
 
-**Last Updated:** December 5, 2025  
+**Last Updated:** December 5, 2025
 **Next Review:** January 2026

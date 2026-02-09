@@ -134,7 +134,7 @@ sudo apt install -y python3.11 python3.11-venv python3.11-dev
 # With systemd
 sudo systemctl status postgresql
 
-# Without systemd  
+# Without systemd
 sudo service postgresql status
 
 # Manual start

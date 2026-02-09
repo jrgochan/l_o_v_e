@@ -30,10 +30,10 @@ async def process_audio_task(ctx, audio_path, ...):
         text = transcribe(audio_path)
         emotion = analyze(text)
         sanitized = scrub(text)
-        
+
         # Store only sanitized data
         await observer.record_state(sanitized, emotion.vac)
-        
+
     finally:
         # Always delete audio
         if os.path.exists(audio_path):
@@ -63,17 +63,17 @@ if pii_scrubber.contains_pii(text):
 async def delete_user_data(user_id: UUID):
     """
     Delete all Listener data for user (GDPR Article 17).
-    
+
     Note: Most data is already ephemeral (audio deleted immediately).
     This endpoint clears any cached job results.
     """
     redis = await create_pool()
-    
+
     # Clear job history
     keys = await redis.keys(f"arq:job:*:{user_id}:*")
     if keys:
         await redis.delete(*keys)
-    
+
     return {"message": "Listener data deleted"}
 ```
 
@@ -162,7 +162,7 @@ Before production:
 **Congratulations!** You've completed all documentation for the entire L.O.V.E. Stack:
 
 ✅ **Experience** (14 files) - 3D visualization
-✅ **Observer** (14 files) - State persistence  
+✅ **Observer** (14 files) - State persistence
 ✅ **Versor** (14 files) - Quaternion math
 ✅ **Listener** (14 files) - Audio/text ingestion
 

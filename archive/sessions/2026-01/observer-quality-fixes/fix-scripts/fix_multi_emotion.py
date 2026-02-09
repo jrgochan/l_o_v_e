@@ -10,11 +10,11 @@ content = file_path.read_text()
 lines_to_fix = [518, 524, 726, 728, 824]
 print("Removing unused type:ignore comments...")
 for line_num in sorted(lines_to_fix, reverse=True):
-    lines = content.split('\n')
+    lines = content.split("\n")
     if line_num - 1 < len(lines):
-        lines[line_num - 1] = lines[line_num - 1].replace('  # type: ignore[misc]', '')
-        lines[line_num - 1] = lines[line_num - 1].replace('  # type: ignore[assignment]', '')
-    content = '\n'.join(lines)
+        lines[line_num - 1] = lines[line_num - 1].replace("  # type: ignore[misc]", "")
+        lines[line_num - 1] = lines[line_num - 1].replace("  # type: ignore[assignment]", "")
+    content = "\n".join(lines)
 
 file_path.write_text(content)
 print("✅ Removed 5 unused type:ignore comments")
@@ -26,12 +26,20 @@ print("\nAdding type casts to return statements...")
 # We need to add cast() wrappers
 replacements = [
     # Line 535, 537 - DetectedEmotion returns
-    ('return self.emotions[0]', 'return cast(DetectedEmotion, self.emotions[0])'),
-    ('return next((e for e in self.emotions if e.prominence', 'return cast(Optional[DetectedEmotion], next((e for e in self.emotions if e.prominence'),
-    
+    ("return self.emotions[0]", "return cast(DetectedEmotion, self.emotions[0])"),
+    (
+        "return next((e for e in self.emotions if e.prominence",
+        "return cast(Optional[DetectedEmotion], next((e for e in self.emotions if e.prominence",
+    ),
     # Bool returns - wrap in bool()
-    ('return self.emotions and len(self.emotions) >= 2', 'return bool(self.emotions and len(self.emotions) >= 2)'),
-    ('return self.emotions and len(self.emotions) >= 3', 'return bool(self.emotions and len(self.emotions) >= 3)'),
+    (
+        "return self.emotions and len(self.emotions) >= 2",
+        "return bool(self.emotions and len(self.emotions) >= 2)",
+    ),
+    (
+        "return self.emotions and len(self.emotions) >= 3",
+        "return bool(self.emotions and len(self.emotions) >= 3)",
+    ),
 ]
 
 for old, new in replacements:

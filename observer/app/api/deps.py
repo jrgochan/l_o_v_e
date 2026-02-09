@@ -3,7 +3,7 @@
 Common dependencies for API routes, including database sessions and authentication.
 """
 
-from typing import Annotated
+from typing import Annotated, Optional
 
 from fastapi import Depends, HTTPException, Query, WebSocketException, status
 from fastapi.security import OAuth2PasswordBearer
@@ -12,7 +12,7 @@ from pydantic import ValidationError
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.config import settings
+from app.core.settings import settings
 from app.database import get_db as get_db  # pylint: disable=useless-import-alias
 from app.models.user import User, UserRole
 from app.schemas.user import TokenData
@@ -36,32 +36,30 @@ async def get_current_user(
     if token == "dev-token-bypass":
         stmt = select(User).where(User.email == "dev@admin.com")
         result = await db.execute(stmt)
-        user = result.scalars().first()
+        db_user = result.scalars().first()
 
-        if not user:
+        if not db_user:
             # Auto-create dev admin if not exists
             from app.core.security import (  # pylint: disable=import-outside-toplevel
                 get_password_hash,
             )
 
-            user = User(
+            db_user = User(
                 email="dev@admin.com",
                 full_name="Dev Admin",
                 role=UserRole.ADMIN,
                 is_active=True,
                 password_hash=get_password_hash("dev"),
             )
-            db.add(user)
+            db.add(db_user)
             await db.commit()
-            await db.refresh(user)
+            await db.refresh(db_user)
 
-        if user:
-            return user
-        raise credentials_exception  # pragma: no cover
+        return db_user
 
     try:
         payload = jwt.decode(token, settings.SECRET_KEY, algorithms=[settings.ALGORITHM])
-        email: str = payload.get("sub")
+        email: Optional[str] = payload.get("sub")
         if email is None:
             raise credentials_exception
         token_data = TokenData(email=email)
@@ -70,12 +68,12 @@ async def get_current_user(
 
     stmt = select(User).where(User.email == token_data.email)
     result = await db.execute(stmt)
-    user = result.scalars().first()
+    db_user = result.scalars().first()
 
-    if user is None:
+    if db_user is None:
         raise credentials_exception
 
-    return user
+    return db_user
 
 
 async def get_current_active_user(current_user: Annotated[User, Depends(get_current_user)]) -> User:
@@ -111,34 +109,29 @@ async def get_current_user_ws(
     if token == "dev-token-bypass":
         stmt = select(User).where(User.email == "dev@admin.com")
         result = await db.execute(stmt)
-        user = result.scalars().first()
-        if not user:
+        db_user = result.scalars().first()
+        if not db_user:
             # Auto-create dev admin if not exists (same logic as HTTP auth)
             from app.core.security import (  # pylint: disable=import-outside-toplevel
                 get_password_hash,
             )
-            from app.models.user import (  # pylint: disable=import-outside-toplevel,reimported
-                UserRole,
-            )
 
-            user = User(
+            db_user = User(
                 email="dev@admin.com",
                 full_name="Dev Admin",
                 role=UserRole.ADMIN,
                 is_active=True,
                 password_hash=get_password_hash("dev"),
             )
-            db.add(user)
+            db.add(db_user)
             await db.commit()
-            await db.refresh(user)
+            await db.refresh(db_user)
 
-        if user:
-            return user
-        raise credentials_exception  # pragma: no cover
+        return db_user
 
     try:
         payload = jwt.decode(token, settings.SECRET_KEY, algorithms=[settings.ALGORITHM])
-        email: str = payload.get("sub")
+        email: Optional[str] = payload.get("sub")
         if email is None:
             raise credentials_exception
         token_data = TokenData(email=email)
@@ -147,9 +140,9 @@ async def get_current_user_ws(
 
     stmt = select(User).where(User.email == token_data.email)
     result = await db.execute(stmt)
-    user = result.scalars().first()
+    db_user = result.scalars().first()
 
-    if user is None:
+    if db_user is None:
         raise credentials_exception
 
-    return user
+    return db_user

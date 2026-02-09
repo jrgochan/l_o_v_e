@@ -1,3 +1,4 @@
+# pylint: disable=too-few-public-methods
 """Multi-Emotion Analysis Response Models.
 
 Pydantic models for Deep Feeling mode supporting detection of multiple concurrent emotions.

@@ -364,7 +364,7 @@ GitHub Actions / GitLab CI matrix:
 strategy:
   matrix:
     os: [ubuntu-22.04, macos-13, windows-2022]
-    
+
 steps:
   - name: Setup L.O.V.E. Stack
     run: |

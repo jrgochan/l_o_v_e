@@ -18,7 +18,7 @@ interface VoiceChatProps {
 
 export function VoiceChat({ personaId, personaColor, personaDescription }: VoiceChatProps) {
   const [debugLogs, setDebugLogs] = useState<string[]>([]);
-  const addLog = (msg: string) => setDebugLogs(prev => [...prev.slice(-50), msg]); // Keep more logs
+  const addLog = (msg: string) => setDebugLogs((prev) => [...prev.slice(-50), msg]); // Keep more logs
   const logsEndRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -39,16 +39,16 @@ export function VoiceChat({ personaId, personaColor, personaDescription }: Voice
     personaId,
     enabled: true,
     onSessionStart: () => {
-        console.log("Voice session started");
-        addLog("Session STARTED");
+      console.log("Voice session started");
+      addLog("Session STARTED");
     },
     onSessionEnd: () => {
-        console.log("Voice session ended");
-        addLog("Session ENDED");
+      console.log("Voice session ended");
+      addLog("Session ENDED");
     },
     onError: (err) => {
-        console.error("Voice session error:", err);
-        addLog(`ERROR: ${err}`);
+      console.error("Voice session error:", err);
+      addLog(`ERROR: ${err}`);
     },
     onDebug: addLog,
   });
@@ -98,11 +98,7 @@ export function VoiceChat({ personaId, personaColor, personaDescription }: Voice
         <div className="flex items-center justify-between text-sm">
           <span className="text-gray-400">Status:</span>
           <span className={isConnected ? "text-green-400" : "text-gray-400"}>
-            {isConnecting
-              ? "Connecting..."
-              : isConnected
-                ? "Connected"
-                : "Disconnected"}
+            {isConnecting ? "Connecting..." : isConnected ? "Connected" : "Disconnected"}
           </span>
         </div>
 
@@ -127,9 +123,7 @@ export function VoiceChat({ personaId, personaColor, personaDescription }: Voice
           onClick={handleSessionToggle}
           disabled={isConnecting}
           className={`flex-1 px-6 py-4 rounded-lg font-semibold text-white transition ${
-            isConnected
-              ? "bg-red-600 hover:bg-red-500"
-              : "bg-gradient-to-r hover:opacity-90"
+            isConnected ? "bg-red-600 hover:bg-red-500" : "bg-gradient-to-r hover:opacity-90"
           } disabled:opacity-50 disabled:cursor-not-allowed`}
           style={{
             background: !isConnected
@@ -143,13 +137,9 @@ export function VoiceChat({ personaId, personaColor, personaDescription }: Voice
               Connecting...
             </span>
           ) : isConnected ? (
-            <span className="flex items-center justify-center gap-2">
-              ⏹️ End Session
-            </span>
+            <span className="flex items-center justify-center gap-2">⏹️ End Session</span>
           ) : (
-            <span className="flex items-center justify-center gap-2">
-              🎙️ Start Voice Session
-            </span>
+            <span className="flex items-center justify-center gap-2">🎙️ Start Voice Session</span>
           )}
         </button>
 
@@ -172,11 +162,10 @@ export function VoiceChat({ personaId, personaColor, personaDescription }: Voice
       {/* Instructions */}
       {!isConnected && !error && (
         <div className="text-center text-gray-400 text-sm space-y-2">
-          <p>Click "Start Voice Session" to begin full-duplex conversation</p>
+          <p>Click &quot;Start Voice Session&quot; to begin full-duplex conversation</p>
           <p className="text-xs">
-            • Microphone access required
-            • You can interrupt the AI naturally
-            • Audio is processed in real-time
+            • Microphone access required • You can interrupt the AI naturally • Audio is processed
+            in real-time
           </p>
         </div>
       )}
@@ -184,7 +173,7 @@ export function VoiceChat({ personaId, personaColor, personaDescription }: Voice
       {/* Debug Logs */}
       <div className="mt-4 p-2 bg-black/50 rounded text-xs font-mono text-gray-500 overflow-y-auto max-h-32">
         {debugLogs.map((log, i) => (
-            <div key={i}>{log}</div>
+          <div key={i}>{log}</div>
         ))}
         <div ref={logsEndRef} />
       </div>

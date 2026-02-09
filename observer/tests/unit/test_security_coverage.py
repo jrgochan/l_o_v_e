@@ -1,8 +1,12 @@
 def test_verify_password_logic():
     """Coverage for verify_password and get_password_hash."""
-    from datetime import timedelta
+    from datetime import timedelta  # pylint: disable=import-outside-toplevel
 
-    from app.core.security import create_access_token, get_password_hash, verify_password
+    from app.core.security import (  # pylint: disable=import-outside-toplevel
+        create_access_token,
+        get_password_hash,
+        verify_password,
+    )
 
     # Hash
     pwd = "secret"

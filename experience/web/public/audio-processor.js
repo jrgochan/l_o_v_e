@@ -13,19 +13,18 @@ class PersonaPlexAudioProcessor extends AudioWorkletProcessor {
 
     this.port.onmessage = (event) => {
       const { type, data } = event.data;
-      if (type === 'enqueue') {
+      if (type === "enqueue") {
         // data is Float32Array
         // We need to push individual samples or chunks.
         // Pushing the whole chunk is more efficient if we handle it right in process.
         this.buffer.push(data);
-      } else if (type === 'clear') {
+      } else if (type === "clear") {
         this.buffer = [];
       }
     };
   }
 
-
-  process(inputs, outputs, parameters) {
+  process(inputs, outputs) {
     // --- Input Handling (Mic -> AudioContext -> Worklet -> Main Thread -> WS) ---
     const input = inputs[0];
     if (input && input[0]) {
@@ -35,7 +34,7 @@ class PersonaPlexAudioProcessor extends AudioWorkletProcessor {
       // 128 samples @ 24kHz is ~5ms.
       // Sending every 5ms is fine for real-time.
       // Optimization: we could bundle, but low latency is key.
-      this.port.postMessage({ type: 'input', data: inputChannel });
+      this.port.postMessage({ type: "input", data: inputChannel });
     }
 
     // --- Output Handling (WS -> Main Thread -> Worklet -> AudioContext -> Speakers) ---
@@ -76,14 +75,14 @@ class PersonaPlexAudioProcessor extends AudioWorkletProcessor {
 
       // Update or shift buffer
       if (take < remainingInChunk) {
-         // We only used part of the chunk
-         // Create a view or slice for the rest? Slice is expensive.
-         // Better to keep a pointer?
-         // For simplicity v1: Slice.
-         this.buffer[0] = currentChunk.subarray(take);
+        // We only used part of the chunk
+        // Create a view or slice for the rest? Slice is expensive.
+        // Better to keep a pointer?
+        // For simplicity v1: Slice.
+        this.buffer[0] = currentChunk.subarray(take);
       } else {
-         // Used the whole chunk
-         this.buffer.shift();
+        // Used the whole chunk
+        this.buffer.shift();
       }
     }
 
@@ -99,4 +98,4 @@ class PersonaPlexAudioProcessor extends AudioWorkletProcessor {
   }
 }
 
-registerProcessor('personaplex-audio-processor', PersonaPlexAudioProcessor);
+registerProcessor("personaplex-audio-processor", PersonaPlexAudioProcessor);

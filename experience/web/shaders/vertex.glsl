@@ -108,33 +108,33 @@ void main() {
   // Pass values to fragment shader
   vNormal = normalize(normalMatrix * normal);
   vPosition = position;
-  
+
   // Calculate noise frequency and amplitude based on arousal
   // High arousal = high frequency and amplitude (spiky, chaotic)
   // Low arousal = low frequency and amplitude (smooth, calm)
   float arousalAbs = abs(uArousal);
   float noiseFreq = 1.5 + (arousalAbs * 2.5);  // Range: 1.5 to 4.0
   float noiseAmp = 0.25 * arousalAbs;          // Range: 0.0 to 0.25
-  
+
   // Sample 3D simplex noise at vertex position
   // Add time component for "breathing" animation
   vec3 noisePos = position * noiseFreq + vec3(uTime * 0.15);
   float noiseValue = snoise(noisePos);
-  
+
   // Add second octave for more organic feel
   vec3 noisePos2 = position * noiseFreq * 2.0 + vec3(uTime * 0.1);
   float noiseValue2 = snoise(noisePos2) * 0.5;
-  
+
   // Combine noise octaves
   float combinedNoise = noiseValue + noiseValue2;
-  
+
   // Displace vertex along normal
   vec3 displaced = position + normal * (combinedNoise * noiseAmp);
-  
+
   // Transform to world space for Fresnel calculation
   vec4 worldPos = modelMatrix * vec4(displaced, 1.0);
   vWorldPosition = worldPos.xyz;
-  
+
   // Final position
   gl_Position = projectionMatrix * modelViewMatrix * vec4(displaced, 1.0);
 }

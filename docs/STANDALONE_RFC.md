@@ -39,7 +39,7 @@ Tauri provides a "sidecar" mechanism to bundle external binaries. Here, the Pyth
 
 **Workflow:**
 1.  **Build Time**: Use PyInstaller to compile `observer/main.py` -> `observer-server` executable.
-2.  **Sign & Notarize**: 
+2.  **Sign & Notarize**:
     - macOS Gatekeeper requires all bundled binaries to be signed.
     - We must sign `observer-server` and `ffmpeg` with the Apple Developer ID *before* bundling them into the Tauri .app structure.
 3.  **Package**: Include distinct binaries for macOS Intel and Apple Silicon in the Tauri bundle resources.
@@ -58,7 +58,7 @@ We currently rely heavily on PostgreSQL-specific features (`pgvector`, `ARRAY`, 
         - Maps `ARRAY` → `JSON` text field.
         - Maps `JSONB` → `JSON` text field.
     - **Encryption At Rest**: Use **SQLCipher** (via `sqlcipher3` or `sqlite-pysqlcipher`) to encrypt `soul.db`. The key is managed by the OS Keychain (via Tauri) and passed to Python via Stdin.
-    - **Safe Migrations**: 
+    - **Safe Migrations**:
         - On startup, create a snapshot backup: `soul.db` -> `soul.db.pre-migration.bak`.
         - Run Alembic migrations.
         - **Fail-Safe**: If migration crashes, auto-restore the backup and boot into "Safe Mode".
@@ -122,7 +122,7 @@ We must ensure the Python sidecar is secure and does not become a zombie process
 - **Access Control**: Application launch requires TouchID/FaceID to retrieve the key from Keychain before passing it to the Python sidecar.
 
 ### 3.7. Advanced Reliability & Safety
-1.  **Resource Governance**: 
+1.  **Resource Governance**:
     - Rust monitors Python memory usage.
     - If RAM > 1.5GB (Memory Leak), trigger a graceful restart when user is idle.
 2.  **Type Safety Contracts**:

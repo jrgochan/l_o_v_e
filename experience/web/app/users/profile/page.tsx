@@ -176,7 +176,7 @@ export default function UserProfilePage() {
                     </div>
 
                     {/* Placeholder for View Chat */}
-                    {/* 
+                    {/*
                                 <button className="opacity-0 group-hover:opacity-100 px-3 py-1.5 text-sm bg-gray-800 hover:bg-gray-700 text-white rounded transition-all">
                                     View Chat
                                 </button>

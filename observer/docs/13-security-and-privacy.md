@@ -52,7 +52,7 @@ async def record_state(
 ):
     # Set RLS context
     await set_user_context(session, current_user.id)
-    
+
     # Even if input_data.user_id != current_user.id, RLS prevents access
     await observer_service.process_state(...)
 ```
@@ -125,15 +125,15 @@ pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 def create_access_token(data: dict, expires_delta: timedelta = None):
     """Create JWT token"""
     to_encode = data.copy()
-    
+
     if expires_delta:
         expire = datetime.utcnow() + expires_delta
     else:
         expire = datetime.utcnow() + timedelta(minutes=15)
-    
+
     to_encode.update({"exp": expire})
     encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
-    
+
     return encoded_jwt
 
 async def get_current_user(token: str = Depends(oauth2_scheme)):
@@ -143,7 +143,7 @@ async def get_current_user(token: str = Depends(oauth2_scheme)):
         detail="Could not validate credentials",
         headers={"WWW-Authenticate": "Bearer"},
     )
-    
+
     try:
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
         user_id: str = payload.get("sub")
@@ -151,12 +151,12 @@ async def get_current_user(token: str = Depends(oauth2_scheme)):
             raise credentials_exception
     except JWTError:
         raise credentials_exception
-    
+
     # Fetch user from database
     user = await get_user_by_id(UUID(user_id))
     if user is None:
         raise credentials_exception
-    
+
     return user
 ```
 
@@ -191,23 +191,23 @@ class StateInput(BaseModel):
     user_id: UUID
     input_text: str = Field(max_length=5000)
     vac_scalars: VACVector
-    
+
     @validator('input_text')
     def validate_no_sql_injection(cls, v):
         """Prevent SQL injection in text fields"""
         dangerous_patterns = [';--', 'DROP TABLE', 'DELETE FROM', 'UPDATE ']
-        
+
         if any(pattern.lower() in v.lower() for pattern in dangerous_patterns):
             raise ValueError("Potentially malicious input detected")
-        
+
         return v
-    
+
     @validator('input_text')
     def validate_no_scripts(cls, v):
         """Prevent XSS"""
         if '<script' in v.lower() or 'javascript:' in v.lower():
             raise ValueError("Script tags not allowed")
-        
+
         return v
 ```
 
@@ -220,23 +220,23 @@ import re
 
 class PIIScrubber:
     """Secondary PII check (primary is in Listener)"""
-    
+
     PATTERNS = {
         'email': r'\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b',
         'phone': r'\b\d{3}[-.]?\d{3}[-.]?\d{4}\b',
         'ssn': r'\b\d{3}-\d{2}-\d{4}\b',
         'credit_card': r'\b\d{4}[-\s]?\d{4}[-\s]?\d{4}[-\s]?\d{4}\b',
     }
-    
+
     def scrub(self, text: str) -> str:
         """Remove PII from text"""
         scrubbed = text
-        
+
         for pii_type, pattern in self.PATTERNS.items():
             scrubbed = re.sub(pattern, f'[{pii_type.upper()}_REDACTED]', scrubbed)
-        
+
         return scrubbed
-    
+
     def contains_pii(self, text: str) -> bool:
         """Check if text contains PII"""
         for pattern in self.PATTERNS.values():
@@ -288,13 +288,13 @@ MAX_REQUEST_SIZE = 1024 * 1024  # 1MB
 @app.middleware("http")
 async def limit_request_size(request: Request, call_next):
     content_length = request.headers.get('content-length')
-    
+
     if content_length and int(content_length) > MAX_REQUEST_SIZE:
         return JSONResponse(
             status_code=413,
             content={"detail": "Request too large"}
         )
-    
+
     response = await call_next(request)
     return response
 ```
@@ -312,28 +312,28 @@ async def delete_user_data(
 ):
     """
     Delete all user data (GDPR Article 17).
-    
+
     Requires user confirmation and is irreversible.
     """
-    
+
     # Verify current user owns the data
     if current_user.id != user_id:
         raise HTTPException(status_code=403, detail="Forbidden")
-    
+
     # Delete from user_trajectory
     await session.execute(
         delete(UserTrajectory).where(UserTrajectory.user_id == user_id)
     )
-    
+
     # Delete user account
     await session.execute(
         delete(User).where(User.id == user_id)
     )
-    
+
     await session.commit()
-    
+
     logger.info("User data deleted", extra={"user_id": str(user_id)})
-    
+
     return {"message": "All data permanently deleted"}
 ```
 
@@ -345,22 +345,22 @@ async def delete_user_data(
 async def cleanup_old_transcriptions():
     """
     Remove transcription text after 90 days (privacy).
-    
+
     Keep VAC values and embeddings for analytics.
     """
-    
+
     cutoff_date = datetime.utcnow() - timedelta(days=90)
-    
+
     async with AsyncSessionLocal() as session:
         stmt = (
             update(UserTrajectory)
             .where(UserTrajectory.timestamp < cutoff_date)
             .values(input_transcription=None)
         )
-        
+
         result = await session.execute(stmt)
         await session.commit()
-        
+
         logger.info(f"Cleaned {result.rowcount} transcriptions")
 
 # Schedule daily via cron
@@ -372,7 +372,7 @@ async def cleanup_old_transcriptions():
 ```python
 class AuditLog(Base):
     __tablename__ = 'audit_logs'
-    
+
     id = Column(UUID, primary_key=True, default=uuid4)
     timestamp = Column(DateTime, default=datetime.utcnow)
     user_id = Column(UUID)
@@ -386,7 +386,7 @@ class AuditLog(Base):
 @app.middleware("http")
 async def audit_middleware(request: Request, call_next):
     start_time = datetime.utcnow()
-    
+
     try:
         response = await call_next(request)
         success = response.status_code < 400
@@ -402,7 +402,7 @@ async def audit_middleware(request: Request, call_next):
             user_agent=request.headers.get('user-agent'),
             success=success
         )
-    
+
     return response
 ```
 
@@ -431,7 +431,7 @@ import json
 
 def get_secret(secret_name: str) -> dict:
     client = boto3.client('secretsmanager', region_name='us-east-1')
-    
+
     response = client.get_secret_value(SecretId=secret_name)
     return json.loads(response['SecretString'])
 
@@ -456,12 +456,12 @@ app.add_middleware(
 @app.middleware("http")
 async def add_security_headers(request: Request, call_next):
     response = await call_next(request)
-    
+
     response.headers["X-Content-Type-Options"] = "nosniff"
     response.headers["X-Frame-Options"] = "DENY"
     response.headers["X-XSS-Protection"] = "1; mode=block"
     response.headers["Strict-Transport-Security"] = "max-age=31536000; includeSubDomains"
-    
+
     return response
 ```
 
@@ -493,13 +493,13 @@ security_logger.critical("PII detected in input", extra={
 async def detect_anomalous_activity(user_id: UUID) -> bool:
     """
     Detect suspicious activity patterns.
-    
+
     Examples:
     - 100+ state records in 1 minute (DDoS/bot)
     - Insight queries from different IPs simultaneously
     - Unusual access patterns
     """
-    
+
     # Check request frequency
     recent_count = await session.scalar(
         select(func.count(UserTrajectory.id))
@@ -508,14 +508,14 @@ async def detect_anomalous_activity(user_id: UUID) -> bool:
             UserTrajectory.timestamp > datetime.utcnow() - timedelta(minutes=1)
         )
     )
-    
+
     if recent_count > 100:
         logger.warning("Anomalous activity detected", extra={
             "user_id": str(user_id),
             "count": recent_count
         })
         return True
-    
+
     return False
 ```
 
@@ -542,10 +542,10 @@ async def export_user_data(
     """
     Export all user data in machine-readable format (GDPR Article 20).
     """
-    
+
     if current_user.id != user_id:
         raise HTTPException(status_code=403)
-    
+
     # Fetch all user states
     result = await session.execute(
         select(UserTrajectory)
@@ -553,7 +553,7 @@ async def export_user_data(
         .order_by(UserTrajectory.timestamp)
     )
     states = result.scalars().all()
-    
+
     # Format as JSON
     export_data = {
         "user_id": str(user_id),
@@ -569,7 +569,7 @@ async def export_user_data(
             for s in states
         ]
     }
-    
+
     return export_data
 ```
 
@@ -612,30 +612,30 @@ Before production:
 async def emergency_wipe_user(user_id: UUID, reason: str):
     """
     Emergency deletion of user data.
-    
+
     Only use in case of security breach or legal requirement.
     Logs action to audit trail.
     """
-    
+
     logger.critical("Emergency data wipe initiated", extra={
         "user_id": str(user_id),
         "reason": reason,
         "initiated_by": "system_admin"
     })
-    
+
     async with AsyncSessionLocal() as session:
         # Delete trajectory
         await session.execute(
             delete(UserTrajectory).where(UserTrajectory.user_id == user_id)
         )
-        
+
         # Delete user
         await session.execute(
             delete(User).where(User.id == user_id)
         )
-        
+
         await session.commit()
-    
+
     logger.info("Emergency wipe completed", extra={"user_id": str(user_id)})
 ```
 

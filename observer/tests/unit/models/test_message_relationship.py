@@ -8,7 +8,9 @@ def test_message_relationship_repr():
     source_id = uuid4()
     target_id = uuid4()
     rel = MessageRelationship(
-        source_message_id=source_id, target_message_id=target_id, relationship_type="reply"
+        source_message_id=source_id,
+        target_message_id=target_id,
+        relationship_type="reply",
     )
 
     repr_str = repr(rel)

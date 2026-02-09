@@ -64,18 +64,18 @@ import RNFS from 'react-native-fs';
 export class WhisperService {
   private whisper: any = null;
   private isInitialized = false;
-  
+
   async initialize(): Promise<void> {
     if (this.isInitialized) return;
-    
+
     const modelPath = `${RNFS.DocumentDirectoryPath}/ggml-base.en.bin`;
-    
+
     // Check if model exists
     const modelExists = await RNFS.exists(modelPath);
     if (!modelExists) {
       throw new Error('Whisper model not downloaded');
     }
-    
+
     // Initialize whisper
     this.whisper = await initWhisper({
       filePath: modelPath,
@@ -83,18 +83,18 @@ export class WhisperService {
       enableNNAPI: Platform.OS === 'android',   // Android DSP
       audioSessionOnStartIos: AudioSessionIos.playAndRecord,
     });
-    
+
     this.isInitialized = true;
     console.log('Whisper initialized');
   }
-  
+
   async transcribe(audioFilePath: string): Promise<TranscriptionResult> {
     if (!this.isInitialized) {
       await this.initialize();
     }
-    
+
     const startTime = Date.now();
-    
+
     const result = await this.whisper.transcribe({
       filePath: audioFilePath,
       language: 'en',
@@ -102,16 +102,16 @@ export class WhisperService {
       tokenTimestamps: false,  // Disable for speed
       speedUp: true       // Trade slight accuracy for speed
     });
-    
+
     const duration = Date.now() - startTime;
-    
+
     return {
       text: result.result,
       duration_ms: duration,
       confidence: 0.85  // Estimated for edge processing
     };
   }
-  
+
   async release(): Promise<void> {
     // Cleanup resources
     this.whisper = null;
@@ -131,7 +131,7 @@ import { PermissionsAndroid, Platform } from 'react-native';
 export class AudioRecorder {
   private recorder = new AudioRecorderPlayer();
   private isRecording = false;
-  
+
   async requestPermissions(): Promise<boolean> {
     if (Platform.OS === 'android') {
       const granted = await PermissionsAndroid.request(
@@ -141,13 +141,13 @@ export class AudioRecorder {
     }
     return true;  // iOS handles via Info.plist
   }
-  
+
   async startRecording(): Promise<string> {
     const hasPermission = await this.requestPermissions();
     if (!hasPermission) {
       throw new Error('Microphone permission denied');
     }
-    
+
     const audioPath = await this.recorder.startRecorder(
       undefined,
       {
@@ -156,11 +156,11 @@ export class AudioRecorder {
         AudioEncoding: 'pcm_16bit',
       }
     );
-    
+
     this.isRecording = true;
     return audioPath;
   }
-  
+
   async stopRecording(): Promise<string> {
     const audioPath = await this.recorder.stopRecorder();
     this.isRecording = false;
@@ -183,21 +183,21 @@ export class CrudeSentiment {
   analyze(text: string): number {
     """
     Quick lexicon-based sentiment for immediate feedback.
-    
+
     Returns: Valence estimate [-1.0, 1.0]
     """
     const words = text.toLowerCase().split(/\s+/);
-    
+
     let score = 0;
-    
+
     for (const word of words) {
       if (NEGATIVE_WORDS.includes(word)) score -= 1;
       if (POSITIVE_WORDS.includes(word)) score += 1;
     }
-    
+
     // Normalize to [-1, 1]
     const normalized = Math.max(-1, Math.min(1, score / 3));
-    
+
     return normalized;
   }
 }
@@ -217,33 +217,33 @@ export const useVoiceInput = () => {
   const [isRecording, setIsRecording] = useState(false);
   const [partialText, setPartialText] = useState('');
   const [sentiment, setSentiment] = useState(0);
-  
+
   const whisper = new WhisperService();
   const recorder = new AudioRecorder();
   const sentiment analyzer = new CrudeSentiment();
-  
+
   const startRecording = async () => {
     const audioPath = await recorder.startRecording();
     setIsRecording(true);
   };
-  
+
   const stopRecording = async () => {
     // Stop recording
     const audioPath = await recorder.stopRecording();
     setIsRecording(false);
-    
+
     // Edge transcription (immediate)
     const result = await whisper.transcribe(audioPath);
     setPartialText(result.text);
-    
+
     // Crude sentiment (immediate)
     const crudeValence = sentimentAnalyzer.analyze(result.text);
     setSentiment(crudeValence);
-    
+
     // Upload to cloud for deep processing (async)
     uploadToCloud(audioPath, result.text);
   };
-  
+
   return {
     isRecording,
     partialText,

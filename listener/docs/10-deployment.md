@@ -68,7 +68,7 @@ services:
     image: redis:7-alpine
     ports:
       - "6379:6379"
-  
+
   listener-api:
     build: .
     ports:
@@ -79,7 +79,7 @@ services:
       OBSERVER_URL: http://observer:8000
     depends_on:
       - redis
-  
+
   listener-worker:
     build: .
     command: arq app.workers.audio_processor.WorkerSettings

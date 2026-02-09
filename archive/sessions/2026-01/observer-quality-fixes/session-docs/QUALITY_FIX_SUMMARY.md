@@ -76,11 +76,11 @@ Variables fixed: 24
 ### Manual Refactoring
 
 **bootstrap.py - Context Recommendations Function:**
-- **Before:** 
+- **Before:**
   - Complexity: 18 (too complex)
   - 85 lines in single function
   - Nested if statements
-  
+
 - **After:**
   - Complexity: 8 (excellent)
   - Extracted 3 helper functions:
@@ -99,15 +99,15 @@ Variables fixed: 24
 1. **SQLAlchemy Column Types** (~100 errors)
    - Issue: `Column[str]` vs `str` type mismatches
    - Solution: Use `Mapped[]` annotations or `# type: ignore[assignment]`
-   
+
 2. **Missing Return Types** (~50 errors)
    - Issue: Functions without return type annotations
    - Solution: Add `-> None`, `-> Dict[str, Any]`, etc.
-   
+
 3. **Generic Type Parameters** (~30 errors)
    - Issue: `Dict` instead of `Dict[str, Any]`
    - Solution: Add type parameters to all generics
-   
+
 4. **Base Class Issues** (~20 errors)
    - Issue: `Base` from database.py not recognized
    - Solution: Proper TYPE_CHECKING imports
@@ -124,12 +124,12 @@ Variables fixed: 24
        """Summary line.
        Description.
        """
-   
+
    # Fixed:
    def func():
        """
        Summary line.
-       
+
        Description.
        """
    ```
@@ -235,7 +235,7 @@ Developers can now run quality checks without noise, making it easier to catch n
    - Add return type annotations to all functions
    - Fix SQLAlchemy Column type hints
    - Add generic type parameters
-   
+
 2. **Pydocstyle Google Format** (~1.5-2 hours)
    - Standardize docstring format
    - Add missing __init__ docstrings

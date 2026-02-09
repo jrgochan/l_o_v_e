@@ -1,8 +1,8 @@
 # Deep Feeling Mode - Next Steps
 ## Post-Session Roadmap
 
-**Last Updated**: December 6, 2025  
-**Current Status**: Phase 1 & 2 Complete (30% of total plan)  
+**Last Updated**: December 6, 2025
+**Current Status**: Phase 1 & 2 Complete (30% of total plan)
 **Verified Working**: Deep feeling toggle successfully sends `deep_feeling=True` to backend
 
 ---
@@ -31,10 +31,10 @@
 ## 🔧 **Immediate Tasks** (1-2 hours)
 
 ### 1. Fix VAC Vector Parsing Bug ⚠️
-**Location**: `observer/app/services/insight_generator.py`, line ~226  
-**Issue**: VAC vector from database is string, not array  
-**Error**: `ValueError: could not convert string to float: '['`  
-**Impact**: Prevents insights from being generated  
+**Location**: `observer/app/services/insight_generator.py`, line ~226
+**Issue**: VAC vector from database is string, not array
+**Error**: `ValueError: could not convert string to float: '['`
+**Impact**: Prevents insights from being generated
 **Priority**: HIGH
 
 **Fix**:
@@ -50,7 +50,7 @@ float(vac_vector[0]) if isinstance(vac_vector[0], (int, float)) else float(vac_v
 ### 2. Test End-to-End Flow (30 minutes)
 - [x] Test deep feeling toggle in UI - **WORKING!**
 - [ ] Test text message with deep feeling enabled
-- [ ] Test audio message with deep feeling enabled  
+- [ ] Test audio message with deep feeling enabled
 - [ ] Verify multi-emotion detection
 - [ ] Verify relationships are detected
 - [ ] Verify database saves multi-emotion analyses
@@ -167,14 +167,14 @@ float(vac_vector[0]) if isinstance(vac_vector[0], (int, float)) else float(vac_v
 // 1. Content-Only Interpretation (from text)
 // 2. Voice-Only Interpretation (from prosody)
 // 3. Blended Interpretation (weighted combination)
-// 
+//
 // With discrepancy alerts when misaligned
 ```
 
 ### 4.2 Voice-Content Discrepancy Detection (2 days)
 
-**Backend**: Update `insight_generator.py` to return 3 interpretations  
-**Frontend**: Display all three clearly  
+**Backend**: Update `insight_generator.py` to return 3 interpretations
+**Frontend**: Display all three clearly
 **Alerts**: Clinical alert when discrepancy > 0.5
 
 ---

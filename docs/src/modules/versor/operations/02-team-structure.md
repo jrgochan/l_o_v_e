@@ -452,5 +452,5 @@ Include in L.O.V.E. platform standup:
 
 ---
 
-**Previous:** [← Monitoring & Operations](01-monitoring.md)  
+**Previous:** [← Monitoring & Operations](01-monitoring.md)
 **Next:** [Incident Response →](03-incident-response.md)

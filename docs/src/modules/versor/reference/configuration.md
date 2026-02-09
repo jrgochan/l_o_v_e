@@ -102,25 +102,25 @@ from typing import List
 
 class Settings(BaseSettings):
     """Application configuration."""
-    
+
     # Server
     HOST: str = "0.0.0.0"
     PORT: int = 8001
     API_TITLE: str = "Versor API"
     API_DESCRIPTION: str = "Quaternion mathematics for emotional state"
-    
+
     # Thresholds
     FLOODING_THRESHOLD: float = 2.0
     EPSILON: float = 1e-6
-    
+
     # SLERP
     DEFAULT_SLERP_STEPS: int = 60
     MIN_SLERP_STEPS: int = 10
     MAX_SLERP_STEPS: int = 120
-    
+
     # CORS
     CORS_ORIGINS: List[str] = ["http://localhost:8002"]
-    
+
     class Config:
         env_file = ".env"
         env_file_encoding = "utf-8"
@@ -438,5 +438,5 @@ class Settings(BaseSettings):
 
 ---
 
-**Previous:** [← API Reference](api-reference.md)  
+**Previous:** [← API Reference](api-reference.md)
 **Next:** [Error Codes →](error-codes.md)

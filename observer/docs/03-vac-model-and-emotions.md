@@ -308,17 +308,17 @@ EMOTIONS = [
 async def seed_atlas():
     embedding_service = EmbeddingService()
     quaternion_builder = QuaternionBuilder()
-    
+
     async with AsyncSessionLocal() as session:
         for emotion in EMOTIONS:
             # Generate embedding
             embedding = await embedding_service.generate_embedding(
                 f"{emotion['emotion_name']}: {emotion['definition']}"
             )
-            
+
             # Calculate quaternion
             quaternion = quaternion_builder.from_vac(emotion['vac'])
-            
+
             # Create record
             atlas_entry = AtlasDefinition(
                 emotion_name=emotion['emotion_name'],
@@ -329,9 +329,9 @@ async def seed_atlas():
                 semantic_embedding=embedding,
                 haptic_pattern_id=emotion.get('haptic_pattern_id')
             )
-            
+
             session.add(atlas_entry)
-        
+
         await session.commit()
         print(f"Seeded {len(EMOTIONS)} emotions")
 

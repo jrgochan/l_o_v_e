@@ -72,7 +72,6 @@ describe("AdminSessionDetailPage", () => {
     ],
   } as unknown as AdminSession; // Casting for simplification if types are strict
 
-
   beforeEach(() => {
     jest.clearAllMocks();
 
@@ -88,11 +87,13 @@ describe("AdminSessionDetailPage", () => {
 
   it("renders loading state initially", async () => {
     // Return a promise that doesn't resolve immediately to check loading state
-    (adminApi.getSessionDetails as jest.Mock).mockImplementation(() => new Promise(() => { }));
+    (adminApi.getSessionDetails as jest.Mock).mockImplementation(() => new Promise(() => {}));
 
     const { container } = render(
       <React.Suspense fallback={<div data-testid="suspense-loading">Loading...</div>}>
-        render(<AdminSessionDetailPage />);
+        render(
+        <AdminSessionDetailPage />
+        );
       </React.Suspense>
     );
 

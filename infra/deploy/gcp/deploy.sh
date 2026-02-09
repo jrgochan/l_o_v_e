@@ -185,4 +185,3 @@ export CORS_ORIGINS="[\"$experience\", \"http://localhost:3000\", \"http://127.0
 
 # Cleanup
 rm -f deployed_services.tmp
-

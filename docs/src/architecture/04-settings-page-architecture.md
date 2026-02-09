@@ -2,8 +2,8 @@
 
 ## Unified Settings Management for L.O.V.E. Experience
 
-**Date**: December 7, 2025  
-**Purpose**: Centralize all user preferences and configuration  
+**Date**: December 7, 2025
+**Purpose**: Centralize all user preferences and configuration
 **Status**: Planning Phase
 
 ---
@@ -70,12 +70,12 @@ interface SettingsState {
   pathOpacity: number; // 0-1
   emotionSize: number; // 0.5-2.0
   enableAnimations: boolean;
-  
+
   // === BEHAVIOR SETTINGS ===
   autoComputePaths: boolean;
   showAllPaths: boolean;
   focusMode: boolean;
-  
+
   // === LAYER VISIBILITY ===
   layers: {
     soulSphere: boolean;
@@ -86,7 +86,7 @@ interface SettingsState {
     bridgeHighlight: boolean;
     legend: boolean;
   };
-  
+
   // === NETWORK SETTINGS ===
   networkMode: 'local' | 'network';
   apiEndpoints: {
@@ -95,32 +95,32 @@ interface SettingsState {
     versor: string;
   };
   customEndpoints: boolean; // Use custom vs default
-  
+
   // === CHAT PREFERENCES ===
   defaultToneMode: 'warm' | 'clinical';
   defaultDeepFeeling: boolean;
   autoFocusEmotions: boolean; // Auto-add detected emotions to sphere
-  
+
   // === KEYBOARD SHORTCUTS ===
   enableKeyboardShortcuts: boolean;
   customKeyBindings: Record<string, string>; // Future
-  
+
   // === ACCESSIBILITY ===
   reducedMotion: boolean;
   highContrast: boolean;
   fontSize: 'small' | 'medium' | 'large';
-  
+
   // === ACTIONS ===
   updateVisualSetting: (key: string, value: any) => void;
   updateBehaviorSetting: (key: string, value: any) => void;
   updateNetworkSetting: (key: string, value: any) => void;
   updateChatSetting: (key: string, value: any) => void;
   updateLayer: (layer: string, value: boolean) => void;
-  
+
   resetToDefaults: () => void;
   exportSettings: () => string; // JSON string
   importSettings: (json: string) => void;
-  
+
   // === NETWORK UTILITIES ===
   testConnection: () => Promise<ConnectionStatus>;
   switchNetworkMode: (mode: 'local' | 'network') => void;
@@ -143,11 +143,11 @@ export const useSettingsStore = create<SettingsState>()(
       pathOpacity: 0.6,
       emotionSize: 1.0,
       enableAnimations: true,
-      
+
       autoComputePaths: true,
       showAllPaths: true,
       focusMode: false,
-      
+
       layers: {
         soulSphere: true,
         emotionPoints: true,
@@ -157,7 +157,7 @@ export const useSettingsStore = create<SettingsState>()(
         bridgeHighlight: true,
         legend: true
       },
-      
+
       networkMode: 'local',
       apiEndpoints: {
         observer: 'http://localhost:8000',
@@ -165,34 +165,34 @@ export const useSettingsStore = create<SettingsState>()(
         versor: 'http://localhost:8001'
       },
       customEndpoints: false,
-      
+
       defaultToneMode: 'warm',
       defaultDeepFeeling: false,
       autoFocusEmotions: true,
-      
+
       enableKeyboardShortcuts: true,
       customKeyBindings: {},
-      
+
       reducedMotion: false,
       highContrast: false,
       fontSize: 'medium',
-      
+
       // Actions implementation...
       updateVisualSetting: (key, value) => {
         set({ [key]: value });
       },
-      
+
       // ... etc
-      
+
       resetToDefaults: () => {
         // Reset to defaults above
       },
-      
+
       exportSettings: () => {
         const state = get();
         return JSON.stringify(state, null, 2);
       },
-      
+
       importSettings: (json) => {
         try {
           const imported = JSON.parse(json);
@@ -201,7 +201,7 @@ export const useSettingsStore = create<SettingsState>()(
           console.error('Invalid settings JSON:', e);
         }
       },
-      
+
       testConnection: async () => {
         const { apiEndpoints } = get();
         const results: ConnectionStatus = {
@@ -209,36 +209,36 @@ export const useSettingsStore = create<SettingsState>()(
           listener: { connected: false },
           versor: { connected: false }
         };
-        
+
         // Test each endpoint
         for (const [service, url] of Object.entries(apiEndpoints)) {
           try {
             const start = Date.now();
             const response = await fetch(`${url}/health`);
             const latency = Date.now() - start;
-            
+
             if (response.ok) {
               results[service] = { connected: true, latency };
             } else {
-              results[service] = { 
-                connected: false, 
-                error: `HTTP ${response.status}` 
+              results[service] = {
+                connected: false,
+                error: `HTTP ${response.status}`
               };
             }
           } catch (error) {
-            results[service] = { 
-              connected: false, 
-              error: error.message 
+            results[service] = {
+              connected: false,
+              error: error.message
             };
           }
         }
-        
+
         return results;
       },
-      
+
       switchNetworkMode: (mode) => {
         set({ networkMode: mode });
-        
+
         // Update API endpoints based on mode
         if (mode === 'local') {
           set({
@@ -342,7 +342,7 @@ export const useSettingsStore = create<SettingsState>()(
       </div>
     </Radio>
   </RadioGroup>
-  
+
   <h2>Color Scheme</h2>
   <RadioGroup value={colorScheme}>
     <Radio value="category">By Category (13 colors)</Radio>
@@ -350,11 +350,11 @@ export const useSettingsStore = create<SettingsState>()(
     <Radio value="arousal">By Arousal (Blue to Red)</Radio>
     <Radio value="connection">By Connection (Purple to Yellow)</Radio>
   </RadioGroup>
-  
+
   <h2>Visual Options</h2>
   <Toggle label="Show Motion Indicators" checked={showMotionIndicators} />
   <Toggle label="Enable Animations" checked={enableAnimations} />
-  
+
   <h2>Display Sizes</h2>
   <Slider label="Path Opacity" value={pathOpacity} min={0} max={1} step={0.1} />
   <Slider label="Emotion Size" value={emotionSize} min={0.5} max={2.0} step={0.1} />
@@ -366,24 +366,24 @@ export const useSettingsStore = create<SettingsState>()(
 ```typescript
 <BehaviorSettings>
   <h2>Path Computation</h2>
-  <Toggle 
-    label="Auto-Compute Paths" 
+  <Toggle
+    label="Auto-Compute Paths"
     checked={autoComputePaths}
     description="Automatically compute paths when emotions are selected"
   />
-  <Toggle 
-    label="Show All Paths" 
+  <Toggle
+    label="Show All Paths"
     checked={showAllPaths}
     description="Show all paths vs only selected emotion pairs"
   />
-  
+
   <h2>Focus & Visibility</h2>
-  <Toggle 
-    label="Focus Mode" 
+  <Toggle
+    label="Focus Mode"
     checked={focusMode}
     description="Hide unselected emotions for clarity"
   />
-  
+
   <h2>Layer Visibility</h2>
   <div className="grid grid-cols-2 gap-2">
     <Toggle label="Soul Sphere" checked={layers.soulSphere} />
@@ -408,7 +408,7 @@ export const useSettingsStore = create<SettingsState>()(
     leftLabel="🏠 Local"
     rightLabel="🌐 Network"
   />
-  
+
   {networkMode === 'local' && (
     <InfoBox variant="success">
       ✅ All data stays on your device<br/>
@@ -417,7 +417,7 @@ export const useSettingsStore = create<SettingsState>()(
       ✅ Maximum privacy
     </InfoBox>
   )}
-  
+
   {networkMode === 'network' && (
     <>
       <InfoBox variant="warning">
@@ -425,34 +425,34 @@ export const useSettingsStore = create<SettingsState>()(
         ⚠️ Internet connection required<br/>
         ✅ Enables collaboration and sync
       </InfoBox>
-      
+
       <h3>API Endpoints</h3>
-      <Toggle 
-        label="Use Custom Endpoints" 
+      <Toggle
+        label="Use Custom Endpoints"
         checked={customEndpoints}
         description="Override default network endpoints"
       />
-      
+
       {customEndpoints && (
         <div className="space-y-2">
-          <Input 
-            label="Observer URL" 
+          <Input
+            label="Observer URL"
             value={apiEndpoints.observer}
             onChange={(value) => updateEndpoint('observer', value)}
           />
-          <Input 
-            label="Listener URL" 
+          <Input
+            label="Listener URL"
             value={apiEndpoints.listener}
             onChange={(value) => updateEndpoint('listener', value)}
           />
-          <Input 
-            label="Versor URL" 
+          <Input
+            label="Versor URL"
             value={apiEndpoints.versor}
             onChange={(value) => updateEndpoint('versor', value)}
           />
         </div>
       )}
-      
+
       <h3>Connection Status</h3>
       <ConnectionTestPanel />
       <Button onClick={testConnection} variant="outline">
@@ -475,27 +475,27 @@ export const useSettingsStore = create<SettingsState>()(
     rightLabel="🔬 Clinical"
     description="Default response style for new chat sessions"
   />
-  
+
   <Toggle
     label="Deep Feeling Mode by Default"
     checked={defaultDeepFeeling}
     description="Analyze multiple emotions and relationships (slower but richer)"
   />
-  
+
   <h2>Behavior</h2>
   <Toggle
     label="Auto-Focus Emotions in Sphere"
     checked={autoFocusEmotions}
     description="Automatically add detected emotions to Soul Sphere"
   />
-  
+
   <h2>Keyboard Shortcuts</h2>
   <Toggle
     label="Enable Keyboard Shortcuts"
     checked={enableKeyboardShortcuts}
     description="Use keyboard for navigation and control"
   />
-  
+
   <Button onClick={showShortcutsHelp} variant="outline">
     View All Shortcuts
   </Button>
@@ -512,20 +512,20 @@ export const useSettingsStore = create<SettingsState>()(
     checked={reducedMotion}
     description="Minimize animations for motion sensitivity"
   />
-  
+
   <h2>Visual</h2>
   <Toggle
     label="High Contrast"
     checked={highContrast}
     description="Increase contrast for better visibility"
   />
-  
+
   <RadioGroup label="Font Size" value={fontSize}>
     <Radio value="small">Small</Radio>
     <Radio value="medium">Medium (Default)</Radio>
     <Radio value="large">Large</Radio>
   </RadioGroup>
-  
+
   <h2>Screen Reader</h2>
   <p>Additional ARIA labels and semantic HTML throughout the application.</p>
 </AccessibilitySettings>
@@ -627,7 +627,7 @@ async def get_preferences(
 export const useSettingsStore = create((set) => ({
   // New unified settings
   ...
-  
+
   // Temporary: sync with old store
   _syncWithAtlasStore: () => {
     const atlasSettings = useAtlasAdminStore.getState().settings;
@@ -849,9 +849,9 @@ For research:
 
 ---
 
-**Status**: Comprehensive architecture defined  
-**Complexity**: Medium (mostly UI work)  
-**Impact**: High (significantly improves UX)  
+**Status**: Comprehensive architecture defined
+**Complexity**: Medium (mostly UI work)
+**Impact**: High (significantly improves UX)
 **Priority**: High (enables many future features)
 
 **Ready for implementation when approved!** ✨

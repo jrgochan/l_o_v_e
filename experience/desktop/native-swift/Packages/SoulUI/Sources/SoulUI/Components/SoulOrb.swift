@@ -13,11 +13,11 @@ public struct SoulOrb: View {
     var audioLevel: Float // NEW: Audio Reactivity
     var onTap: () -> Void
     var onLongPress: () -> Void
-    
+
     // Shader Inputs
     let startDate = Date()
-    
-    public init(vibe: Binding<Vibe>, 
+
+    public init(vibe: Binding<Vibe>,
                 isListening: Binding<Bool>,
                 chatMode: Binding<SoulPersona.ChatMode> = .constant(.standard),
                 isReflecting: Binding<Bool> = .constant(false),
@@ -32,11 +32,11 @@ public struct SoulOrb: View {
         self.onTap = onTap
         self.onLongPress = onLongPress
     }
-    
+
     public var body: some View {
         TimelineView(.animation) { context in
             let elapsedTime = context.date.timeIntervalSince(startDate)
-            
+
             ZStack {
                 // Core Orb via Metal Shader
                 Circle()
@@ -55,7 +55,7 @@ public struct SoulOrb: View {
                             .opacity(0.5 + Double(audioLevel) * 0.5),
                         radius: 20 + CGFloat(audioLevel * 20)
                     )
-                
+
                 // Ring indicator (Listening State)
                 if isListening {
                     Circle()
@@ -82,21 +82,21 @@ public struct SoulOrb: View {
             onLongPress()
         }
     }
-    
+
     func v(_ val: Double) -> Double {
         return (val + 1.0) / 2.0
     }
-    
+
     var effectiveValence: Double {
         if chatMode == .clinical { return max(vibe.valence, 0.2) } // Always positive/calm
         return vibe.valence
     }
-    
+
     // Compute Arousal considering reflection shimmer
     var effectiveArousal: Double {
         // Reflection Shimmer: Oscillation
-        if isReflecting { 
-            // We can't access 'elapsedTime' here directly cleanly without passed in, 
+        if isReflecting {
+            // We can't access 'elapsedTime' here directly cleanly without passed in,
             // but we can fake it or use a simpler boost.
             // Actually, we use 'effectiveArousal' inside body where 'elapsedTime' is available?
             // No, computed var doesn't have local scope.

@@ -25,13 +25,13 @@ Implemented clean, accessible HTML overlay labels positioned at the edges of the
 - **Valence (X-axis):**
   - V+ (Positive) - Right side, cyan
   - V− (Negative) - Left side, red
-  
+
 - **Arousal (Y-axis):**
   - A+ (Activated) - Top, yellow
   - A− (Calm) - Bottom, blue
-  
+
 - **Connection (Z-axis):**
-  - C+ (Connected) - Bottom-right, purple  
+  - C+ (Connected) - Bottom-right, purple
   - C− (Separated) - Top-left, gray
 
 **Styling:**
@@ -45,12 +45,12 @@ Implemented clean, accessible HTML overlay labels positioned at the edges of the
 
 ### Features
 
-✅ **Accessible**: ARIA labels for screen readers  
-✅ **Non-intrusive**: pointer-events: none, doesn't block interaction  
-✅ **Responsive**: Positions relative to canvas edges  
-✅ **Toggleable**: Settings > Visual > Axis Labels On/Off  
-✅ **Persistent**: Saved to localStorage  
-✅ **Educational**: Hover tooltips explain each dimension  
+✅ **Accessible**: ARIA labels for screen readers
+✅ **Non-intrusive**: pointer-events: none, doesn't block interaction
+✅ **Responsive**: Positions relative to canvas edges
+✅ **Toggleable**: Settings > Visual > Axis Labels On/Off
+✅ **Persistent**: Saved to localStorage
+✅ **Educational**: Hover tooltips explain each dimension
 
 ## Technical Implementation
 

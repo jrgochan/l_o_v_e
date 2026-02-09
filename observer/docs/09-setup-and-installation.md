@@ -282,7 +282,7 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
-  
+
   observer:
     build: .
     command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
@@ -352,12 +352,12 @@ repos:
     rev: 23.12.1
     hooks:
       - id: black
-  
+
   - repo: https://github.com/pycqa/flake8
     rev: 7.0.0
     hooks:
       - id: flake8
-  
+
   - repo: https://github.com/pre-commit/mirrors-mypy
     rev: v1.8.0
     hooks:

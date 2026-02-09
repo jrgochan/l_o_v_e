@@ -332,16 +332,16 @@ def validate_vac(vac: dict) -> bool:
     # Check presence
     if not all(k in vac for k in ["valence", "arousal", "connection"]):
         raise ValueError("Missing VAC components")
-    
+
     # Check types
     if not all(isinstance(vac[k], (int, float)) for k in vac):
         raise ValueError("VAC components must be numbers")
-    
+
     # Check ranges
     for key, value in vac.items():
         if not -1.0 <= value <= 1.0:
             raise ValueError(f"{key} must be in [-1, 1], got {value}")
-    
+
     return True
 ```
 
@@ -383,5 +383,5 @@ vac = VACInput(valence=0.8, arousal=0.6, connection=0.7)
 
 ---
 
-**Previous:** [← Configuration](configuration.md)  
+**Previous:** [← Configuration](configuration.md)
 **Next:** [Glossary →](glossary.md)

@@ -1,3 +1,5 @@
+# pylint: disable=redefined-outer-name, unused-argument, protected-access
+from typing import Any
 from unittest.mock import MagicMock, patch
 
 import pytest
@@ -6,7 +8,7 @@ from app.services.pii_scrubber import PIIScrubber, get_pii_scrubber
 
 
 @pytest.fixture
-def mock_pipeline():
+def mock_pipeline() -> Any:
     with patch("app.services.pii_scrubber.pipeline") as mock:
         pipe_mock = MagicMock()
         mock.return_value = pipe_mock
@@ -14,7 +16,7 @@ def mock_pipeline():
 
 
 @pytest.fixture
-def mock_spacy():
+def mock_spacy() -> Any:
     with patch("app.services.pii_scrubber.spacy") as mock:
         nlp_mock = MagicMock()
         mock.load.return_value = nlp_mock
@@ -22,11 +24,11 @@ def mock_spacy():
 
 
 class TestPIIScrubber:
-    def test_singleton_getter(self):
+    def test_singleton_getter(self) -> None:
         """Test singleton pattern."""
         with patch("app.services.pii_scrubber.PIIScrubber") as mock_cls:
             # Reset global
-            import app.services.pii_scrubber
+            import app.services.pii_scrubber  # pylint: disable=import-outside-toplevel
 
             app.services.pii_scrubber._SCRUBBER_INSTANCE = None
 
@@ -36,7 +38,7 @@ class TestPIIScrubber:
             assert s1 is s2
             mock_cls.assert_called_once()
 
-    def test_load_models_success(self, mock_pipeline, mock_spacy):
+    def test_load_models_success(self, mock_pipeline: Any, mock_spacy: Any) -> None:
         """Test hybrid model loading."""
         scrubber = PIIScrubber(model_name="test_model")
         assert scrubber._nlp_bert is None
@@ -65,7 +67,7 @@ class TestPIIScrubber:
         mock_pipeline.assert_called_once()
         mock_spacy.load.assert_called_once()
 
-    def test_load_model_failure_graceful_spacy(self, mock_pipeline, mock_spacy):
+    def test_load_model_failure_graceful_spacy(self, mock_pipeline: Any, mock_spacy: Any) -> None:
         """Test that failure to load Spacy allows BERT to continue."""
         mock_spacy.load.side_effect = Exception("Spacy missing")
 
@@ -75,7 +77,7 @@ class TestPIIScrubber:
         assert nlp_bert is not None
         assert nlp_spacy is None  # Spacy failed but we proceeded
 
-    def test_scrub_pii_structure(self, mock_pipeline, mock_spacy):
+    def test_scrub_pii_structure(self, mock_pipeline: Any, mock_spacy: Any) -> None:
         """Test scrubbing with placeholders (Hybrid)."""
         scrubber = PIIScrubber()
 
@@ -116,7 +118,7 @@ class TestPIIScrubber:
         expected = "I saw Dr. [NAME] at [ORG]"
         assert result == expected
 
-    def test_detect_pii_hybrid_deduplication(self, mock_pipeline, mock_spacy):
+    def test_detect_pii_hybrid_deduplication(self, mock_pipeline: Any, mock_spacy: Any) -> None:
         """Test that overlapping PII is handled (first one wins usually)."""
         scrubber = PIIScrubber()
 
@@ -153,7 +155,7 @@ class TestPIIScrubber:
         assert len(results) == 1
         assert results[0] == ("Bob Smith", "PER", 0, 9)
 
-    def test_detect_pii_regex_fallback(self, mock_pipeline, mock_spacy):
+    def test_detect_pii_regex_fallback(self, mock_pipeline: Any, mock_spacy: Any) -> None:
         """Test regex fallback works with hybrid models."""
         scrubber = PIIScrubber()
 
@@ -166,17 +168,17 @@ class TestPIIScrubber:
 
         assert len(results) == 1
         # PHONE regex match
-        word, label, start, end = results[0]
+        word, label, _, _ = results[0]
         assert "555-123-4567" in word
         assert label == "PHONE"
 
-    def test_scrub_empty(self):
+    def test_scrub_empty(self) -> None:
         """Test empty input."""
         scrubber = PIIScrubber()
         assert scrubber.scrub("") == ""
-        assert scrubber.scrub(None) is None
+        assert scrubber.scrub(None) is None  # type: ignore[arg-type]
 
-    def test_load_model_failure_transformers(self, mock_pipeline, mock_spacy):
+    def test_load_model_failure_transformers(self, mock_pipeline: Any, mock_spacy: Any) -> None:
         """Test that failure to load Transformers raises RuntimeError."""
         mock_pipeline.side_effect = Exception("Model not found")
 
@@ -184,7 +186,7 @@ class TestPIIScrubber:
         with pytest.raises(RuntimeError, match="Failed to load Transformers model"):
             scrubber._load_models()
 
-    def test_scrub_no_structure(self, mock_pipeline, mock_spacy):
+    def test_scrub_no_structure(self, mock_pipeline: Any, mock_spacy: Any) -> None:
         """Test scrubbing with keep_structure=False (Redaction)."""
         scrubber = PIIScrubber()
 
@@ -201,7 +203,7 @@ class TestPIIScrubber:
         result = scrubber.scrub(text, keep_structure=False)
         assert result == "Hello"
 
-    def test_scrub_overlap_complex_break(self, mock_pipeline, mock_spacy):
+    def test_scrub_overlap_complex_break(self, mock_pipeline: Any, mock_spacy: Any) -> None:
         """Test overlap logic causing 'break' in add_entity."""
         scrubber = PIIScrubber()
 
@@ -226,7 +228,7 @@ class TestPIIScrubber:
         result = scrubber.scrub(text, keep_structure=True)
         assert result == "[NAME]"
 
-    def test_detect_pii_overlap_logic_explicit(self, mock_pipeline, mock_spacy):
+    def test_detect_pii_overlap_logic_explicit(self, mock_pipeline: Any, mock_spacy: Any) -> None:
         """Test the overlap break in detect_pii -> add_finding."""
         scrubber = PIIScrubber()
 
@@ -251,7 +253,7 @@ class TestPIIScrubber:
         assert len(findings) == 1
         assert findings[0][0] == "New York"
 
-    def test_unknown_entity_label(self, mock_pipeline, mock_spacy):
+    def test_unknown_entity_label(self, mock_pipeline: Any, mock_spacy: Any) -> None:
         """Test that unknown entity labels are ignored."""
         scrubber = PIIScrubber()
 

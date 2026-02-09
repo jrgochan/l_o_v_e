@@ -95,7 +95,7 @@ EXAMPLES
     $ ./setup-love-stack.sh --yes
 
     SPEED OPTIMIZATIONS:
-    
+
     Fastest re-run (update mode, ~3-5 minutes):
     $ ./setup-love-stack.sh --minimal
 

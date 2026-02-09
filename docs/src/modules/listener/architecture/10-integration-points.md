@@ -1,8 +1,8 @@
 # Integration Points
 
-**Reading Time:** ~15 minutes  
-**Audience:** Engineering managers, technical leads  
-**Prerequisites:** [Architecture Overview](00-high-level-overview.md)  
+**Reading Time:** ~15 minutes
+**Audience:** Engineering managers, technical leads
+**Prerequisites:** [Architecture Overview](00-high-level-overview.md)
 **Goal:** Understand how the Listener integrates with other L.O.V.E. modules
 
 ---
@@ -16,10 +16,10 @@ graph TD
     C -->|Request quaternion| D[VERSOR]
     D -->|Quaternion| C
     C -->|State + quaternion| A
-    
+
     B -.->|LLM| E[Ollama]
     B -.->|Queue| F[Redis]
-    
+
     style B fill:#4f46e5,color:#fff
     style C fill:#6366f1,color:#fff
     style D fill:#818cf8,color:#fff
@@ -45,8 +45,8 @@ const response = await fetch('http://localhost:8002/listener/analyze', {
 const {emotion, vac, confidence} = await response.json();
 ```
 
-**SLA:** < 3s response time  
-**Volume:** ~100 requests/day per active user  
+**SLA:** < 3s response time
+**Volume:** ~100 requests/day per active user
 **Failure Mode:** Non-blocking (client shows error, user retries)
 
 ---
@@ -68,8 +68,8 @@ val response = api.post("/listener/analyze-audio") {
 }
 ```
 
-**SLA:** < 3s response time  
-**Volume:** ~50 requests/day per active user  
+**SLA:** < 3s response time
+**Volume:** ~50 requests/day per active user
 **Failure Mode:** Retry with exponential backoff
 
 ---
@@ -92,8 +92,8 @@ const response = await fetch('/listener/analyze-multi-emotion', {
 const {emotions, relationships, aggregate_vac} = await response.json();
 ```
 
-**SLA:** < 5s (more complex analysis)  
-**Volume:** ~10-20 requests/day  
+**SLA:** < 5s (more complex analysis)
+**Volume:** ~10-20 requests/day
 **Failure Mode:** Show error, therapist reviews manually
 
 ---
@@ -243,7 +243,7 @@ POST /listener/analyze
 @router.get("/health/dependencies")
 async def check_dependencies():
     """Check health of all dependencies"""
-    
+
     return {
         "ollama": await check_ollama_health(),
         "redis": await check_redis_health(),
@@ -277,20 +277,20 @@ async def check_ollama_health() -> dict:
 @pytest.mark.integration
 async def test_full_pipeline():
     """Test complete flow: Listener → Observer"""
-    
+
     # 1. Analyze with Listener
     response = await client.post("/listener/analyze", data={
         "text": "I'm feeling hopeful",
         "user_id": "test-user",
         "session_id": "test-session"
     })
-    
+
     assert response.status_code == 200
     vac = response.json()["vac"]
-    
+
     # 2. Verify Observer received it
     observer_response = await observer_client.get_recent_states("test-user")
-    
+
     assert len(observer_response) > 0
     assert observer_response[0]["vac"] == vac
 ```
@@ -362,11 +362,11 @@ except ConnectionError:
 
 ## Key Takeaways
 
-✅ **Listener is the entry point** for all emotional input  
-✅ **Ollama dependency is critical** - must be highly available  
-✅ **Observer integration is non-blocking** - Listener works standalone  
-✅ **Three client types:** Web UI, mobile, admin panel  
-✅ **API contracts are stable** - versioning planned for v1.0  
+✅ **Listener is the entry point** for all emotional input
+✅ **Ollama dependency is critical** - must be highly available
+✅ **Observer integration is non-blocking** - Listener works standalone
+✅ **Three client types:** Web UI, mobile, admin panel
+✅ **API contracts are stable** - versioning planned for v1.0
 
 ---
 

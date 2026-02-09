@@ -157,7 +157,7 @@ class WaypointExplainer:
         # Calculate shifts
         # Generate interpretations
         # Return structured data
-    
+
     def explain_psychological_order(self, from_emotion, waypoint, to_emotion):
         # Why this order matters
         # Research citations
@@ -218,15 +218,15 @@ class RecommendationEngine:
     async def get_similar_emotions(self, emotion_id, limit=5):
         # Use VAC distance in database
         # Return nearest emotions
-    
+
     async def get_complementary_paths(self, selected_emotions):
         # Find paths that form interesting patterns
         # Loops, triangles, bridges
-    
+
     async def get_problematic_transitions(self):
         # Query cached paths, sort by difficulty
         # Return hardest transitions
-    
+
     async def get_interesting_patterns(self):
         # Detect patterns: shame healing, joy cultivation, etc.
         # Return curated journeys

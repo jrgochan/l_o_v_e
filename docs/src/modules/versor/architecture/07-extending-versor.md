@@ -32,36 +32,36 @@ When extending Versor, preserve:
 def quaternion_distance(q1: Quaternion, q2: Quaternion) -> float:
     """
     Calculate geodesic distance between quaternions on S³.
-    
+
     This is different from angular_distance which measures rotation angle.
     Geodesic distance is the arc length on the 4D unit sphere.
-    
+
     Args:
         q1: First unit quaternion
         q2: Second unit quaternion
-    
+
     Returns:
         Geodesic distance in range [0, π]
-    
+
     Formula:
         d = arccos(|q₁ · q₂|)
-    
+
     Example:
         >>> q1 = Quaternion.identity()
         >>> q2 = Quaternion(0.707, 0.707, 0, 0)
         >>> d = quaternion_distance(q1, q2)
         >>> print(f"{d:.3f} radians")
         0.785
-    
+
     References:
         - Huynh, D. Q. (2009). "Metrics for 3D Rotations"
     """
     # Calculate dot product
     dot = abs(q1.dot(q2))
-    
+
     # Clamp to valid range (numerical stability)
     dot = min(1.0, max(-1.0, dot))
-    
+
     # Geodesic distance
     return math.acos(dot)
 ```
@@ -81,7 +81,7 @@ def test_quaternion_distance_opposite():
     """Test distance to opposite quaternion."""
     q1 = Quaternion(0.5, 0.5, 0.5, 0.5).normalize()
     q2 = Quaternion(-0.5, -0.5, -0.5, -0.5).normalize()
-    
+
     d = quaternion_distance(q1, q2)
     assert d == pytest.approx(0.0, abs=1e-6)  # Same rotation!
 
@@ -89,7 +89,7 @@ def test_quaternion_distance_orthogonal():
     """Test distance between orthogonal quaternions."""
     q1 = Quaternion.identity()
     q2 = Quaternion(0.707, 0.707, 0, 0)
-    
+
     d = quaternion_distance(q1, q2)
     assert d == pytest.approx(math.pi/4, abs=1e-3)
 ```
@@ -102,7 +102,7 @@ def test_quaternion_distance_orthogonal():
 class TrajectoryResponse(BaseModel):
     # Existing fields...
     angular_distance_radians: float
-    
+
     # New field
     quaternion_distance: float = Field(
         description="Geodesic distance on 4D sphere"
@@ -117,10 +117,10 @@ class TrajectoryResponse(BaseModel):
 @router.post("/calculate")
 async def calculate_state(request: StateRequest):
     # ... existing calculations ...
-    
+
     # Add new metric
     quat_distance = quaternion_distance(previous_quat, current_quat)
-    
+
     return TrajectoryResponse(
         # ... existing fields ...
         quaternion_distance=quat_distance
@@ -148,7 +148,7 @@ async def calculate_state(request: StateRequest):
 
 class BatchCalculateRequest(BaseModel):
     """Request for batch quaternion calculation."""
-    
+
     vac_vectors: List[VACInput] = Field(
         ...,
         min_items=1,
@@ -187,11 +187,11 @@ router = APIRouter()
 async def batch_calculate(request: BatchCalculateRequest):
     """
     Batch process multiple VAC vectors.
-    
+
     More efficient than individual requests for bulk analysis.
     """
     start = time.time()
-    
+
     results = []
     for idx, vac_input in enumerate(request.vac_vectors):
         # Convert VAC to quaternion
@@ -201,7 +201,7 @@ async def batch_calculate(request: BatchCalculateRequest):
             vac_input.connection
         )
         quat = vac.to_quaternion()
-        
+
         results.append(QuaternionResult(
             index=idx,
             current_state=QuaternionModel(
@@ -209,9 +209,9 @@ async def batch_calculate(request: BatchCalculateRequest):
             ),
             magnitude=vac.magnitude()
         ))
-    
+
     processing_time = (time.time() - start) * 1000
-    
+
     return BatchCalculateResponse(
         results=results,
         count=len(results),
@@ -248,7 +248,7 @@ def test_batch_calculate(client):
         ],
         "time_delta_seconds": 1.0
     })
-    
+
     assert response.status_code == 200
     data = response.json()
     assert data["count"] == 3
@@ -271,15 +271,15 @@ def test_batch_calculate(client):
 def ease_in_out(t: float) -> float:
     """
     Smooth step easing function.
-    
+
     Starts slow, speeds up in middle, slows down at end.
-    
+
     Args:
         t: Linear parameter [0, 1]
-    
+
     Returns:
         Eased parameter [0, 1]
-    
+
     Formula:
         f(t) = 3t² - 2t³  (smoothstep)
     """
@@ -293,29 +293,29 @@ def generate_eased_slerp_path(
 ) -> List[Quaternion]:
     """
     Generate SLERP path with easing function.
-    
+
     Args:
         q_start: Starting quaternion
         q_target: Target quaternion
         steps: Number of frames
         easing_fn: Easing function t → t'
-    
+
     Returns:
         Eased interpolation path
     """
     path = []
-    
+
     for i in range(steps):
         # Linear parameter
         t_linear = i / (steps - 1)
-        
+
         # Apply easing
         t_eased = easing_fn(t_linear)
-        
+
         # Generate single SLERP frame at eased position
         frame = slerp_single(q_start, q_target, t_eased)
         path.append(frame)
-    
+
     return path
 ```
 
@@ -326,13 +326,13 @@ def test_eased_slerp_starts_slow():
     """Test that eased SLERP starts with small angular steps."""
     q1 = Quaternion.identity()
     q2 = Quaternion(0, 1, 0, 0)
-    
+
     path = generate_eased_slerp_path(q1, q2, steps=60)
-    
+
     # Measure first few frame distances
     d1 = angular_distance(calculate_transition(path[0], path[1]))
     d2 = angular_distance(calculate_transition(path[1], path[2]))
-    
+
     # Should start slow
     assert d1 < d2  # Accelerating
 ```
@@ -351,11 +351,11 @@ def test_eased_slerp_starts_slow():
 class Settings(BaseSettings):
     # Existing settings...
     FLOODING_THRESHOLD: float = 2.0
-    
+
     # New settings
     FLOODING_THRESHOLD_CRITICAL: float = 3.0
     FLOODING_THRESHOLD_WARNING: float = 1.5
-    
+
     # Per-user thresholds (future)
     ENABLE_ADAPTIVE_THRESHOLDS: bool = False
 ```
@@ -390,7 +390,7 @@ def detect_flooding_detailed(
 ) -> FloodingAssessment:
     """
     Detect flooding with multiple severity levels.
-    
+
     Returns detailed assessment instead of boolean.
     """
     if elasticity >= threshold_critical:
@@ -405,7 +405,7 @@ def detect_flooding_detailed(
     else:
         level = FloodingLevel.NONE
         severity = 0.0
-    
+
     return FloodingAssessment(
         level=level,
         elasticity=elasticity,
@@ -431,7 +431,7 @@ class VACInput(BaseModel):
     valence: float
     arousal: float
     connection: float
-    
+
     @field_validator('valence', 'arousal', 'connection')
     @classmethod
     def validate_range(cls, v: float, info: ValidationInfo) -> float:
@@ -442,7 +442,7 @@ class VACInput(BaseModel):
                 f"got {v}"
             )
         return v
-    
+
     @model_validator(mode='after')
     def validate_not_all_zero(self) -> 'VACInput':
         """Ensure at least one component is non-zero."""
@@ -465,14 +465,14 @@ class VACInput(BaseModel):
 def similarity(self, other: "Quaternion") -> float:
     """
     Calculate similarity between quaternions.
-    
+
     Returns value in [0, 1] where:
     - 1.0 = identical rotations
     - 0.0 = opposite rotations
-    
+
     Formula:
         similarity = |q₁ · q₂|
-    
+
     Example:
         >>> q1 = Quaternion.identity()
         >>> q2 = Quaternion.identity()
@@ -498,12 +498,12 @@ import time
 async def add_timing_header(request: Request, call_next):
     """Add processing time to response header."""
     start_time = time.time()
-    
+
     response = await call_next(request)
-    
+
     process_time = time.time() - start_time
     response.headers["X-Process-Time"] = str(process_time)
-    
+
     return response
 ```
 
@@ -538,7 +538,7 @@ class AxisAngleModel(BaseModel):
 class TrajectoryResponse(BaseModel):
     # Existing fields...
     current_state: QuaternionModel
-    
+
     # New field
     axis_angle: Optional[AxisAngleModel] = None
 ```
@@ -551,10 +551,10 @@ class TrajectoryResponse(BaseModel):
 @router.post("/calculate")
 async def calculate_state(request: StateRequest):
     # ... existing logic ...
-    
+
     # Extract axis-angle
     axis, angle = current_quat.to_axis_angle()
-    
+
     return TrajectoryResponse(
         # ... existing fields ...
         axis_angle=AxisAngleModel(
@@ -579,16 +579,16 @@ async def calculate_state(request: StateRequest):
 def to_euler_angles(self, order: str = 'xyz') -> Tuple[float, float, float]:
     """
     Convert quaternion to Euler angles.
-    
+
     Args:
         order: Rotation order (default: 'xyz')
-    
+
     Returns:
         (roll, pitch, yaw) in radians
-    
+
     Warning:
         Euler angles have gimbal lock! Use quaternions when possible.
-    
+
     Example:
         >>> q = Quaternion(0.707, 0, 0.707, 0)
         >>> angles = q.to_euler_angles()
@@ -596,7 +596,7 @@ def to_euler_angles(self, order: str = 'xyz') -> Tuple[float, float, float]:
     """
     from scipy.spatial.transform import Rotation as R
     from app.utils.scipy_adapter import love_to_scipy
-    
+
     q_scipy = love_to_scipy(self)
     rotation = R.from_quat(q_scipy)
     return rotation.as_euler(order, degrees=False)
@@ -614,20 +614,20 @@ def to_euler_angles(self, order: str = 'xyz') -> Tuple[float, float, float]:
 def calculate_rigidity(angular_distance: float, time_delta: float) -> float:
     """
     Calculate "rigidity" - inverse of elasticity.
-    
+
     High rigidity = slow emotional change (stuck, rigid)
     Low rigidity = fast emotional change (flexible, fluid)
-    
+
     Args:
         angular_distance: Angular distance in radians
         time_delta: Time elapsed in seconds
-    
+
     Returns:
         Rigidity metric (seconds/radian)
-    
+
     Formula:
         R = Δt / φ  (inverse of elasticity)
-    
+
     Interpretation:
         - R > 2.0 s/rad: Very rigid (slow to change)
         - R ≈ 1.0 s/rad: Moderate
@@ -635,14 +635,14 @@ def calculate_rigidity(angular_distance: float, time_delta: float) -> float:
     """
     if angular_distance < EPSILON:
         return float('inf')  # No change = infinite rigidity
-    
+
     return time_delta / angular_distance
 
 
 def detect_rigidity(rigidity: float, threshold: float = 2.0) -> bool:
     """
     Detect if emotional state is too rigid (stuck).
-    
+
     Complement to flooding detection.
     """
     return rigidity > threshold
@@ -662,19 +662,19 @@ def detect_rigidity(rigidity: float, threshold: float = 2.0) -> bool:
 def new_calculation(input: Type) -> Type:
     """
     Brief description.
-    
+
     Args:
         input: Description
-    
+
     Returns:
         Description
-    
+
     Formula:
         Mathematical formula
-    
+
     Example:
         >>> example_usage()
-    
+
     References:
         - Paper citation
     """
@@ -727,7 +727,7 @@ def test_new_endpoint(client):
 # app/config.py
 class Settings(BaseSettings):
     NEW_SETTING: type = default_value
-    
+
     class Config:
         env_file = ".env"
 
@@ -759,23 +759,23 @@ For any new feature:
 
 class TestQuaternionDistance:
     """Comprehensive tests for quaternion_distance."""
-    
+
     def test_identity_distance(self):
         """Test distance from identity to itself."""
         # ...
-    
+
     def test_opposite_distance(self):
         """Test q and -q have zero distance."""
         # ...
-    
+
     def test_orthogonal_distance(self):
         """Test perpendicular quaternions."""
         # ...
-    
+
     def test_distance_symmetry(self):
         """Test distance(q1, q2) == distance(q2, q1)."""
         # ...
-    
+
     def test_triangle_inequality(self):
         """Test distance(q1, q3) <= distance(q1, q2) + distance(q2, q3)."""
         # ...
@@ -799,40 +799,40 @@ class TestQuaternionDistance:
 def new_feature(param: Type) -> Type:
     """
     [One-line summary]
-    
+
     [2-3 paragraph detailed explanation with context]
-    
+
     [Mathematical background if applicable]
-    
+
     Args:
         param: Description with constraints
-    
+
     Returns:
         Description of return value
-    
+
     Raises:
         ValueError: When and why
-    
+
     Example:
         >>> code_example()
         expected_output
-        
+
         >>> another_example()
         more_output
-    
+
     Performance:
         Time complexity: O(n)
         Space complexity: O(1)
         Typical timing: ~5ms
-    
+
     See Also:
         - related_function()
         - Other relevant docs
-    
+
     References:
         - Paper (Year). "Title"
         - Documentation URL
-    
+
     Notes:
         Additional information, caveats, future work
     """
@@ -877,7 +877,7 @@ import warnings
 async def old_endpoint():
     """
     Deprecated: Use /new-endpoint instead.
-    
+
     This endpoint will be removed in version 2.0.
     """
     warnings.warn(
@@ -948,5 +948,5 @@ echo "✅ All validation passed!"
 
 ---
 
-**Previous:** [← Performance Optimization](06-performance-optimization.md)  
+**Previous:** [← Performance Optimization](06-performance-optimization.md)
 **Next:** [Troubleshooting →](08-troubleshooting.md)

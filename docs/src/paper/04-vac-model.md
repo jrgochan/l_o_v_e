@@ -56,7 +56,7 @@ These etymological roots suggest that human emotional experience has always incl
 Brown's (2021) research on 87 emotions emphasizes relational quality as fundamental [CITATION]. She distinguishes:
 
 **Pity**: "A feeling that another's suffering is your good fortune" (separates)
-**Sympathy**: "I feel for you" (well-intentioned but maintains distance)  
+**Sympathy**: "I feel for you" (well-intentioned but maintains distance)
 **Empathy**: "I feel with you" (requires vulnerability and connection)
 **Compassion**: "I recognize your suffering and I want to help" (WITH, not FOR)
 

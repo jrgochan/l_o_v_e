@@ -1,7 +1,7 @@
+from unittest.mock import AsyncMock, MagicMock
+
 import pytest
-from unittest.mock import AsyncMock, MagicMock, patch
-from fastapi import HTTPException, WebSocketException
-from app.api.deps import get_current_user, get_current_user_ws
+
 
 @pytest.fixture
 def mock_db_session():
@@ -11,6 +11,7 @@ def mock_db_session():
     mock_result.scalars.return_value.first.return_value = None
     session.execute.return_value = mock_result
     return session
+
 
 @pytest.mark.asyncio
 async def test_get_current_user_dev_bypass_failure(mock_db_session):
@@ -212,5 +213,3 @@ async def test_get_current_user_dev_bypass_failure(mock_db_session):
     # No, if it's dead code, I can't test it without modifying the code to be testable (e.g. dependency injection).
     #
     # I'll update the file to add `# pragma: no cover`.
-    
-    pass

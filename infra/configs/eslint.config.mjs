@@ -1,7 +1,7 @@
 /**
  * ESLint configuration for L.O.V.E. platform
  * Canonical configuration maintained in infra/configs/
- * 
+ *
  * This is a base configuration for TypeScript/React projects
  * Individual modules (like Next.js apps) can extend this with framework-specific rules
  */
@@ -14,7 +14,7 @@ import tsParser from "@typescript-eslint/parser";
 const config = [
   // Base JavaScript recommendations
   js.configs.recommended,
-  
+
   {
     files: ["**/*.{ts,tsx,mts,cts}"],
     languageOptions: {
@@ -35,18 +35,18 @@ const config = [
       "@typescript-eslint/no-unused-vars": ["error", { argsIgnorePattern: "^_" }],
       "@typescript-eslint/no-explicit-any": "warn",
       "@typescript-eslint/explicit-module-boundary-types": "off",
-      
+
       // General code quality
       "no-console": ["warn", { allow: ["warn", "error"] }],
       "prefer-const": "error",
       "no-var": "error",
-      
+
       // Complexity limits
       "complexity": ["warn", 15],
       "max-lines-per-function": ["warn", 100],
     },
   },
-  
+
   {
     ignores: [
       "**/node_modules/**",

@@ -1,8 +1,8 @@
 # Testing Guide
 
-**Reading Time:** ~25 minutes  
-**Audience:** New developers  
-**Prerequisites:** [Common Tasks](04-common-tasks.md) complete  
+**Reading Time:** ~25 minutes
+**Audience:** New developers
+**Prerequisites:** [Common Tasks](04-common-tasks.md) complete
 **Goal:** Learn how to write and run tests for the Listener
 
 ---
@@ -32,21 +32,21 @@ tests/
 
 ### 1. Unit Tests
 
-**What:** Test individual functions in isolation  
-**Example:** Testing that PII scrubber removes names  
+**What:** Test individual functions in isolation
+**Example:** Testing that PII scrubber removes names
 **Speed:** Fast (milliseconds)
 
 ### 2. Semantic Tests
 
-**What:** Test that VAC extraction works correctly  
-**Example:** Pity vs. Compassion distinction  
-**Speed:** Slow (seconds - calls LLM)  
+**What:** Test that VAC extraction works correctly
+**Example:** Pity vs. Compassion distinction
+**Speed:** Slow (seconds - calls LLM)
 **Importance:** ⭐⭐⭐⭐⭐ CRITICAL!
 
 ### 3. Integration Tests
 
-**What:** Test multiple components together  
-**Example:** Full audio → transcription → VAC pipeline  
+**What:** Test multiple components together
+**Example:** Full audio → transcription → VAC pipeline
 **Speed:** Slowest (seconds to minutes)
 
 ---
@@ -121,34 +121,34 @@ This test validates the entire VAC model innovation. **If this test fails, the C
 def test_pity_vs_compassion():
     """
     THE CRITICAL TEST
-    
+
     This test validates the core innovation: the Connection axis.
     Pity and compassion both involve witnessing suffering, but:
     - Pity = feeling FOR someone (separation) → Connection < 0
     - Compassion = feeling WITH someone (alignment) → Connection > 0.5
-    
+
     If this test fails, our innovation is broken!
     """
     analyzer = get_semantic_analyzer()
-    
+
     # Test Pity (negative connection - separation)
     pity_result = analyzer.analyze_sync("I feel sorry for them, they're struggling")
-    
+
     assert pity_result.vac.connection < 0, \
         f"Pity should have negative Connection! Got {pity_result.vac.connection}"
-    
+
     assert pity_result.primary_emotion in ["Pity", "Sympathy"], \
         f"Expected Pity or Sympathy, got {pity_result.primary_emotion}"
-    
+
     # Test Compassion (positive connection - alignment)
     compassion_result = analyzer.analyze_sync("I understand their pain. I'm here with them")
-    
+
     assert compassion_result.vac.connection > 0.5, \
         f"Compassion should have positive Connection! Got {compassion_result.vac.connection}"
-    
+
     assert compassion_result.primary_emotion in ["Compassion", "Empathy"], \
         f"Expected Compassion or Empathy, got {compassion_result.primary_emotion}"
-    
+
     print(f"✅ Pity Connection: {pity_result.vac.connection:.2f}")
     print(f"✅ Compassion Connection: {compassion_result.vac.connection:.2f}")
 ```
@@ -184,33 +184,33 @@ from app.services.semantic_analyzer import get_semantic_analyzer
 def test_gratitude_detection():
     """
     Test that Gratitude is correctly detected with appropriate VAC values.
-    
+
     Gratitude should have:
     - Positive valence (pleasant feeling)
     - Low to moderate arousal (calm appreciation)
     - Positive connection (feeling connected through thanks)
     """
     analyzer = get_semantic_analyzer()
-    
+
     # Test input
     text = "I'm so grateful for all the support I've received"
-    
+
     # Analyze
     result = analyzer.analyze_sync(text)
-    
+
     # Assertions
     assert result.primary_emotion == "Gratitude", \
         f"Expected Gratitude, got {result.primary_emotion}"
-    
+
     assert result.vac.valence > 0.5, \
         f"Gratitude should be positive! Got valence={result.vac.valence}"
-    
+
     assert result.vac.connection > 0.5, \
         f"Gratitude should have positive connection! Got {result.vac.connection}"
-    
+
     assert result.confidence > 0.7, \
         f"Should be confident! Got {result.confidence}"
-    
+
     print(f"✅ Detected: {result.primary_emotion}")
     print(f"✅ VAC: ({result.vac.valence:.2f}, {result.vac.arousal:.2f}, {result.vac.connection:.2f})")
 ```
@@ -282,7 +282,7 @@ def sample_texts():
 def test_joy_detection(semantic_analyzer, sample_texts):
     """Test joy detection using fixtures"""
     result = semantic_analyzer.analyze_sync(sample_texts["joy"])
-    
+
     assert result.primary_emotion == "Joy"
     assert result.vac.valence > 0.7
 ```
@@ -304,8 +304,8 @@ import pytest
     ("I understand their pain", "Compassion", 0.5),
     ("I love spending time with them", "Love", 0.8),
     ("I feel so grateful", "Gratitude", 0.7),
-    
-    # Negative connection emotions  
+
+    # Negative connection emotions
     ("I feel sorry for them", "Pity", -0.5),
     ("Nobody understands me", "Loneliness", -0.8),
     ("I feel so ashamed", "Shame", -0.8),
@@ -313,11 +313,11 @@ import pytest
 def test_connection_axis(semantic_analyzer, text, expected_emotion, expected_connection):
     """Test Connection axis across multiple emotions"""
     result = semantic_analyzer.analyze_sync(text)
-    
+
     # Check emotion
     assert result.primary_emotion == expected_emotion, \
         f"Expected {expected_emotion}, got {result.primary_emotion}"
-    
+
     # Check connection sign
     if expected_connection > 0:
         assert result.vac.connection > 0, \
@@ -347,7 +347,7 @@ from unittest.mock import Mock, patch
 
 def test_analyze_with_mock_llm():
     """Test semantic analysis with mocked LLM"""
-    
+
     # Create mock LLM response
     mock_response = '''
     {
@@ -358,14 +358,14 @@ def test_analyze_with_mock_llm():
         "reasoning": "High positive valence with energy and connection"
     }
     '''
-    
+
     # Patch the LLM
     with patch('app.services.semantic_analyzer.Ollama') as mock_ollama:
         mock_ollama.return_value.ainvoke.return_value = mock_response
-        
+
         analyzer = SemanticAnalyzer()
         result = analyzer.analyze_sync("I'm happy!")
-        
+
         assert result.primary_emotion == "Joy"
         assert result.vac.valence == 0.9
 ```
@@ -390,10 +390,10 @@ import pytest
 async def test_async_analysis():
     """Test async semantic analysis"""
     analyzer = get_semantic_analyzer()
-    
+
     # Use await for async functions
     result = await analyzer.analyze("I'm feeling great!")
-    
+
     assert result.primary_emotion in ["Joy", "Happiness"]
     assert result.vac.valence > 0.5
 ```
@@ -463,11 +463,11 @@ TDD means writing tests BEFORE writing code.
 def test_awe_detection():
     """Test Awe detection (WILL FAIL - feature doesn't exist yet!)"""
     analyzer = get_semantic_analyzer()
-    
+
     result = analyzer.analyze_sync(
         "The universe is so vast and beautiful. I feel small but connected."
     )
-    
+
     assert result.primary_emotion == "Awe"
     assert result.vac.valence > 0.5  # Positive
     assert result.vac.connection > 0.7  # High connection
@@ -506,12 +506,12 @@ Clean up the code, run tests again to ensure nothing broke.
 ```python
 def test_emotion_detection():
     result = analyzer.analyze_sync("I'm confused")
-    
+
     # ADD: Print for debugging
     print(f"\nEmotion: {result.primary_emotion}")
     print(f"VAC: {result.vac}")
     print(f"Reasoning: {result.reasoning}")
-    
+
     assert result.primary_emotion == "Confusion"
 ```
 
@@ -526,10 +526,10 @@ pytest tests/semantic/test_emotion.py -s
 ```python
 def test_emotion_detection():
     result = analyzer.analyze_sync("I'm confused")
-    
+
     # ADD: Breakpoint
     import pdb; pdb.set_trace()
-    
+
     assert result.primary_emotion == "Confusion"
 ```
 
@@ -584,7 +584,7 @@ pytest tests/ -vv  # Very verbose
    ```python
    # Bad: Testing internal variable names
    assert analyzer._prompt is not None
-   
+
    # Good: Testing behavior
    assert analyzer.analyze_sync("test") is not None
    ```
@@ -596,7 +596,7 @@ pytest tests/ -vv  # Very verbose
    def test_1():
        global result
        result = analyzer.analyze_sync("test")
-   
+
    def test_2():
        assert result is not None  # Fails if test_1 doesn't run!
    ```
@@ -642,10 +642,10 @@ def test_feature_name():
     """Clear description of what this tests"""
     # Arrange: Set up test data
     text = "I'm happy!"
-    
+
     # Act: Perform the action
     result = analyzer.analyze_sync(text)
-    
+
     # Assert: Check the result
     assert result.primary_emotion == "Joy"
 ```
@@ -685,11 +685,11 @@ You now understand testing! 🎉
 
 ## Key Takeaways
 
-✅ **Three types of tests:** Unit, Semantic, Integration  
-✅ **Sacred test:** Pity vs. Compassion validates the innovation  
-✅ **Run tests before committing:** `pytest tests/ -v`  
-✅ **Aim for > 90% coverage** on critical files  
-✅ **Write tests first** (TDD) when possible  
+✅ **Three types of tests:** Unit, Semantic, Integration
+✅ **Sacred test:** Pity vs. Compassion validates the innovation
+✅ **Run tests before committing:** `pytest tests/ -v`
+✅ **Aim for > 90% coverage** on critical files
+✅ **Write tests first** (TDD) when possible
 
 ---
 

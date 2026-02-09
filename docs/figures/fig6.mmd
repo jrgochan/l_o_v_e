@@ -12,19 +12,19 @@ classDiagram
         +DateTime created_at
         +DateTime updated_at
     }
-    
+
     class VACVector {
         +float valence
         +float arousal
         +float connection
     }
-    
+
     class Quaternion {
         +float w
         +float x
         +float y
         +float z
     }
-    
+
     AtlasDefinition "1" *-- "1" VACVector : has
     AtlasDefinition "1" *-- "1" Quaternion : has

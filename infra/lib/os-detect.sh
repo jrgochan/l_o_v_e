@@ -9,7 +9,7 @@ detect_os() {
         echo "macos"
         return 0
     fi
-    
+
     # Check if we're in WSL
     if is_wsl; then
         # Detect Linux distro within WSL
@@ -25,7 +25,7 @@ detect_os() {
         fi
         return 0
     fi
-    
+
     # Detect Linux distribution
     if [ -f /etc/os-release ]; then
         . /etc/os-release
@@ -47,11 +47,11 @@ is_wsl() {
             return 0
         fi
     fi
-    
+
     if [ -n "$WSL_DISTRO_NAME" ]; then
         return 0
     fi
-    
+
     return 1
 }
 
@@ -87,7 +87,7 @@ detect_init_system() {
         fi
         return 0
     fi
-    
+
     # Check for systemd
     if command -v systemctl >/dev/null 2>&1; then
         if systemctl --version >/dev/null 2>&1; then
@@ -95,13 +95,13 @@ detect_init_system() {
             return 0
         fi
     fi
-    
+
     # Check for OpenRC
     if command -v rc-service >/dev/null 2>&1; then
         echo "openrc"
         return 0
     fi
-    
+
     # Check for SysVinit
     if [ -d /etc/init.d ]; then
         if command -v service >/dev/null 2>&1; then
@@ -109,7 +109,7 @@ detect_init_system() {
             return 0
         fi
     fi
-    
+
     echo "none"
 }
 
@@ -118,7 +118,7 @@ detect_init_system() {
 get_os_family() {
     local os
     os=$(detect_os)
-    
+
     case "$os" in
         macos)
             echo "macos"
@@ -145,16 +145,16 @@ needs_sudo() {
         # Already root
         return 1
     fi
-    
+
     if [ "$(uname)" = "Darwin" ]; then
         # macOS Homebrew doesn't typically need sudo
         return 1
     fi
-    
+
     if command -v sudo >/dev/null 2>&1; then
         return 0
     fi
-    
+
     return 1
 }
 
@@ -172,15 +172,15 @@ is_container() {
     if [ -f /.dockerenv ]; then
         return 0
     fi
-    
+
     if [ -f /run/.containerenv ]; then
         return 0
     fi
-    
+
     if grep -q "/docker/" /proc/1/cgroup 2>/dev/null; then
         return 0
     fi
-    
+
     return 1
 }
 

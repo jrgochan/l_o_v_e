@@ -11,7 +11,7 @@ The present invention provides a comprehensive computational system for modeling
 **Valence-Arousal-Connection (VAC)** represents emotional states as points in three-dimensional space where:
 
 - **Valence (V) ∈ [-1, 1]:** Hedonic quality (unpleasant to pleasant)
-- **Arousal (A) ∈ [-1, 1]:** Activation level (deactivated to activated)  
+- **Arousal (A) ∈ [-1, 1]:** Activation level (deactivated to activated)
 - **Connection (C) ∈ [-1, 1]:** Interpersonal alignment (separation to unity)
 
 The Connection axis is the novel contribution, measuring:
@@ -34,7 +34,7 @@ The system converts VAC coordinates to unit quaternions for smooth 3D rotation:
 
 ```python
 θ = π·(V+1)/2    # Rotation angle from valence
-φ = π·(A+1)/2    # Azimuthal angle from arousal  
+φ = π·(A+1)/2    # Azimuthal angle from arousal
 ψ = π·(C+1)/2    # Polar angle from connection
 
 w = cos(θ/2)
@@ -77,19 +77,19 @@ f(n) = g(n) + h(n)
 
 The system analyzes emotional expression across three modalities and detects incongruence:
 
-**Modality 1: Semantic Content**  
+**Modality 1: Semantic Content**
 
 - LLM-based extraction of VAC coordinates from text
 - Prompt engineering teaches the Connection dimension
 - Few-shot learning with pity vs. compassion examples
 
-**Modality 2: Voice Prosody**  
+**Modality 2: Voice Prosody**
 
 - Pitch variance, speaking rate, energy, spectral features
 - Maps to arousal and valence
 - Detects suppression patterns
 
-**Modality 3: Self-Report**  
+**Modality 3: Self-Report**
 
 - User's stated emotional state
 - Confidence assessment

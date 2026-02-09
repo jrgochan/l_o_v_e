@@ -8,7 +8,7 @@ from typing import Dict, List, Tuple
 
 def fix_implicit_optional(filepath: Path) -> int:
     """Fix implicit Optional parameters (PEP 484 compliance)."""
-    with open(filepath, 'r', encoding='utf-8') as f:
+    with open(filepath, "r", encoding="utf-8") as f:
         content = f.read()
 
     original = content
@@ -17,14 +17,14 @@ def fix_implicit_optional(filepath: Path) -> int:
     # Pattern: param: Type = None should be param: Optional[Type] = None
     # Find all function signatures with Type = None
     patterns = [
-        (r'(\w+):\s*str\s*=\s*None', r'\1: Optional[str] = None'),
-        (r'(\w+):\s*int\s*=\s*None', r'\1: Optional[int] = None'),
-        (r'(\w+):\s*float\s*=\s*None', r'\1: Optional[float] = None'),
-        (r'(\w+):\s*bool\s*=\s*None', r'\1: Optional[bool] = None'),
-        (r'(\w+):\s*dict\s*=\s*None', r'\1: Optional[dict] = None'),
-        (r'(\w+):\s*Dict\s*=\s*None', r'\1: Optional[Dict] = None'),
-        (r'(\w+):\s*EmbeddingProvider\s*=\s*None', r'\1: Optional[EmbeddingProvider] = None'),
-        (r'(\w+):\s*AsyncSession\s*=\s*None', r'\1: Optional[AsyncSession] = None'),
+        (r"(\w+):\s*str\s*=\s*None", r"\1: Optional[str] = None"),
+        (r"(\w+):\s*int\s*=\s*None", r"\1: Optional[int] = None"),
+        (r"(\w+):\s*float\s*=\s*None", r"\1: Optional[float] = None"),
+        (r"(\w+):\s*bool\s*=\s*None", r"\1: Optional[bool] = None"),
+        (r"(\w+):\s*dict\s*=\s*None", r"\1: Optional[dict] = None"),
+        (r"(\w+):\s*Dict\s*=\s*None", r"\1: Optional[Dict] = None"),
+        (r"(\w+):\s*EmbeddingProvider\s*=\s*None", r"\1: Optional[EmbeddingProvider] = None"),
+        (r"(\w+):\s*AsyncSession\s*=\s*None", r"\1: Optional[AsyncSession] = None"),
     ]
 
     for pattern, replacement in patterns:
@@ -34,16 +34,14 @@ def fix_implicit_optional(filepath: Path) -> int:
             content = new_content
 
     # Ensure Optional is imported
-    if fixes > 0 and 'from typing import' in content:
-        if 'Optional' not in content:
+    if fixes > 0 and "from typing import" in content:
+        if "Optional" not in content:
             content = re.sub(
-                r'from typing import ([^\n]+)',
-                r'from typing import Optional, \1',
-                content
+                r"from typing import ([^\n]+)", r"from typing import Optional, \1", content
             )
 
     if content != original:
-        with open(filepath, 'w', encoding='utf-8') as f:
+        with open(filepath, "w", encoding="utf-8") as f:
             f.write(content)
         return fixes
 
@@ -52,7 +50,7 @@ def fix_implicit_optional(filepath: Path) -> int:
 
 def fix_generic_type_parameters(filepath: Path) -> int:
     """Fix missing generic type parameters."""
-    with open(filepath, 'r', encoding='utf-8') as f:
+    with open(filepath, "r", encoding="utf-8") as f:
         content = f.read()
 
     original = content
@@ -60,13 +58,13 @@ def fix_generic_type_parameters(filepath: Path) -> int:
 
     # Pattern: -> Dict should be -> Dict[str, Any]
     replacements = [
-        (r'-> Dict\b(?!\[)', r'-> Dict[str, Any]'),
-        (r'-> dict\b(?!\[)', r'-> dict[str, Any]'),
-        (r'-> List\b(?!\[)', r'-> List[Any]'),
-        (r'-> list\b(?!\[)', r'-> list[Any]'),
-        (r': Dict\b(?!\[)', r': Dict[str, Any]'),
-        (r': dict\b(?!\[)', r': dict[str, Any]'),
-        (r': List\b(?!\[)', r': List[Any]'),
+        (r"-> Dict\b(?!\[)", r"-> Dict[str, Any]"),
+        (r"-> dict\b(?!\[)", r"-> dict[str, Any]"),
+        (r"-> List\b(?!\[)", r"-> List[Any]"),
+        (r"-> list\b(?!\[)", r"-> list[Any]"),
+        (r": Dict\b(?!\[)", r": Dict[str, Any]"),
+        (r": dict\b(?!\[)", r": dict[str, Any]"),
+        (r": List\b(?!\[)", r": List[Any]"),
     ]
 
     for pattern, replacement in replacements:
@@ -76,16 +74,12 @@ def fix_generic_type_parameters(filepath: Path) -> int:
             content = new_content
 
     # Ensure Any is imported
-    if fixes > 0 and 'from typing import' in content:
-        if ', Any' not in content and 'Any,' not in content:
-            content = re.sub(
-                r'from typing import ([^\n]+)',
-                r'from typing import \1, Any',
-                content
-            )
+    if fixes > 0 and "from typing import" in content:
+        if ", Any" not in content and "Any," not in content:
+            content = re.sub(r"from typing import ([^\n]+)", r"from typing import \1, Any", content)
 
     if content != original:
-        with open(filepath, 'w', encoding='utf-8') as f:
+        with open(filepath, "w", encoding="utf-8") as f:
             f.write(content)
         return fixes
 
@@ -94,20 +88,20 @@ def fix_generic_type_parameters(filepath: Path) -> int:
 
 def add_type_ignore_to_base_classes(filepath: Path) -> int:
     """Add type: ignore to all SQLAlchemy Base subclasses."""
-    with open(filepath, 'r', encoding='utf-8') as f:
+    with open(filepath, "r", encoding="utf-8") as f:
         lines = f.readlines()
 
     fixes = 0
 
     for i, line in enumerate(lines):
         # Find class definitions that inherit from Base
-        if re.match(r'^class \w+\(Base\):', line) and '# type: ignore' not in line:
+        if re.match(r"^class \w+\(Base\):", line) and "# type: ignore" not in line:
             # Add type ignore comment
-            lines[i] = line.rstrip() + '  # type: ignore[misc]\n'
+            lines[i] = line.rstrip() + "  # type: ignore[misc]\n"
             fixes += 1
 
     if fixes > 0:
-        with open(filepath, 'w', encoding='utf-8') as f:
+        with open(filepath, "w", encoding="utf-8") as f:
             f.writelines(lines)
 
     return fixes
@@ -115,7 +109,7 @@ def add_type_ignore_to_base_classes(filepath: Path) -> int:
 
 def add_missing_return_types(filepath: Path) -> int:
     """Add -> None to functions missing return type annotations."""
-    with open(filepath, 'r', encoding='utf-8') as f:
+    with open(filepath, "r", encoding="utf-8") as f:
         content = f.read()
 
     original = content
@@ -125,29 +119,17 @@ def add_missing_return_types(filepath: Path) -> int:
     # This is complex - we'll handle specific known patterns
 
     # __repr__ methods
-    content = re.sub(
-        r'(\s+def __repr__\(self\):)',
-        r'\1 -> str:',
-        content
-    )
+    content = re.sub(r"(\s+def __repr__\(self\):)", r"\1 -> str:", content)
 
     # __init__ methods without return type
-    content = re.sub(
-        r'(\s+def __init__\([^)]+\)):(\s*\n\s*""")',
-        r'\1 -> None:\2',
-        content
-    )
+    content = re.sub(r'(\s+def __init__\([^)]+\)):(\s*\n\s*""")', r"\1 -> None:\2", content)
 
     # to_dict methods
-    content = re.sub(
-        r'(\s+def to_dict\(self[^)]*\)):',
-        r'\1 -> Dict[str, Any]:',
-        content
-    )
+    content = re.sub(r"(\s+def to_dict\(self[^)]*\)):", r"\1 -> Dict[str, Any]:", content)
 
     if content != original:
         fixes = 1
-        with open(filepath, 'w', encoding='utf-8') as f:
+        with open(filepath, "w", encoding="utf-8") as f:
             f.write(content)
 
     return fixes
@@ -155,39 +137,34 @@ def add_missing_return_types(filepath: Path) -> int:
 
 def fix_config_return_type(filepath: Path) -> int:
     """Fix config.py ALLOWED_ORIGINS_LIST return type."""
-    if 'config.py' not in str(filepath):
+    if "config.py" not in str(filepath):
         return 0
 
-    with open(filepath, 'r', encoding='utf-8') as f:
+    with open(filepath, "r", encoding="utf-8") as f:
         content = f.read()
 
     original = content
 
     # Fix the ALLOWED_ORIGINS_LIST property
     content = re.sub(
-        r'def ALLOWED_ORIGINS_LIST\(self\) -> list\[str\]:',
-        r'def ALLOWED_ORIGINS_LIST(self) -> List[str]:',
-        content
+        r"def ALLOWED_ORIGINS_LIST\(self\) -> list\[str\]:",
+        r"def ALLOWED_ORIGINS_LIST(self) -> List[str]:",
+        content,
     )
 
     # Ensure List is imported
-    if 'from typing import' in content and 'List' not in content:
-        content = re.sub(
-            r'from typing import',
-            r'from typing import List,',
-            content,
-            count=1
-        )
+    if "from typing import" in content and "List" not in content:
+        content = re.sub(r"from typing import", r"from typing import List,", content, count=1)
 
     # Add cast to the return statement
     content = re.sub(
         r'return self\.ALLOWED_ORIGINS\.split\(","\)',
         r'return list(self.ALLOWED_ORIGINS.split(","))',
-        content
+        content,
     )
 
     if content != original:
-        with open(filepath, 'w', encoding='utf-8') as f:
+        with open(filepath, "w", encoding="utf-8") as f:
             f.write(content)
         return 1
 
@@ -199,12 +176,12 @@ def main():
     print("🔧 Fixing Mypy Type Issues")
     print("=" * 60)
 
-    app_dir = Path('app')
+    app_dir = Path("app")
     total_fixes = 0
 
     # Fix implicit Optional
     print("\n📍 Fixing implicit Optional parameters...")
-    for py_file in app_dir.rglob('*.py'):
+    for py_file in app_dir.rglob("*.py"):
         fixes = fix_implicit_optional(py_file)
         if fixes > 0:
             total_fixes += fixes
@@ -212,7 +189,7 @@ def main():
 
     # Fix generic type parameters
     print("\n📦 Adding generic type parameters...")
-    for py_file in app_dir.rglob('*.py'):
+    for py_file in app_dir.rglob("*.py"):
         fixes = fix_generic_type_parameters(py_file)
         if fixes > 0:
             total_fixes += fixes
@@ -220,7 +197,7 @@ def main():
 
     # Fix Base class issues
     print("\n🏗️  Adding type ignores to Base subclasses...")
-    for py_file in (app_dir / 'models').rglob('*.py'):
+    for py_file in (app_dir / "models").rglob("*.py"):
         fixes = add_type_ignore_to_base_classes(py_file)
         if fixes > 0:
             total_fixes += fixes
@@ -228,7 +205,7 @@ def main():
 
     # Fix missing return types
     print("\n🔤 Adding missing return types...")
-    for py_file in app_dir.rglob('*.py'):
+    for py_file in app_dir.rglob("*.py"):
         fixes = add_missing_return_types(py_file)
         if fixes > 0:
             total_fixes += fixes
@@ -236,7 +213,7 @@ def main():
 
     # Fix config.py specifically
     print("\n⚙️  Fixing config.py...")
-    config_file = app_dir / 'config.py'
+    config_file = app_dir / "config.py"
     if config_file.exists():
         fixes = fix_config_return_type(config_file)
         if fixes > 0:
@@ -253,5 +230,5 @@ def main():
     print("\n✨ Run quality check to see remaining issues!")
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

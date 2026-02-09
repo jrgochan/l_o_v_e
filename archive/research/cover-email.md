@@ -41,9 +41,9 @@ Thank you for considering this. Your work on human-centered emotion recognition 
 
 Best regards,
 
-Jason Gochanour  
-Independent Researcher  
-jason.gochanour@example.com  
+Jason Gochanour
+Independent Researcher
+jason.gochanour@example.com
 
 P.S. The L.O.V.E. Stack (Listener-Observer-Versor-Experience) is a working implementation with:
 - Privacy-first architecture (local LLM, no cloud APIs)
@@ -69,8 +69,8 @@ Traditional VA/VAD models cannot. We've introduced the **Connection axis** (C âˆ
 
 **Ask**: 20 minutes to review + 30-minute Zoom if intriguing?
 
-Best,  
-Jason Gochanour  
+Best,
+Jason Gochanour
 jason.gochanour@example.com
 
 ---

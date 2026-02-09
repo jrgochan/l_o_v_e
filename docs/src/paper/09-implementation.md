@@ -70,7 +70,7 @@
 **HNSW Index Parameters**:
 
 ```sql
-CREATE INDEX ON user_trajectory 
+CREATE INDEX ON user_trajectory
 USING hnsw (vac_values vector_cosine_ops)
 WITH (m = 16, ef_construction = 64);
 ```
@@ -218,13 +218,13 @@ services:
     healthcheck:
       test: ["CMD", "pg_isready"]
       interval: 10s
-      
+
   redis:
     image: redis:7-alpine
     healthcheck:
       test: ["CMD", "redis-cli", "ping"]
       interval: 5s
-      
+
   ollama:
     image: ollama/ollama
     volumes:
@@ -233,13 +233,13 @@ services:
     # runtime: nvidia
     # environment:
     #   - NVIDIA_VISIBLE_DEVICES=all
-    
+
   versor:
     build: ./versor
     ports:
       - "8001:8001"
     restart: unless-stopped
-    
+
   observer:
     build: ./observer
     ports:
@@ -250,7 +250,7 @@ services:
     environment:
       DATABASE_URL: postgresql://user:pass@postgres/love_db
     restart: unless-stopped
-    
+
   listener:
     build: ./listener
     ports:
@@ -262,7 +262,7 @@ services:
       OLLAMA_HOST: http://ollama:11434
       REDIS_URL: redis://redis:6379
     restart: unless-stopped
-    
+
   experience:
     build: ./experience/web
     ports:

@@ -1,8 +1,8 @@
 # Experience Module - Seed Data Integration Plan
 
-**Created:** December 5, 2025, 1:13 AM  
-**Purpose:** Comprehensive plan to integrate Observer's rich seed data into Experience web module  
-**Estimated Time:** 4-6 hours  
+**Created:** December 5, 2025, 1:13 AM
+**Purpose:** Comprehensive plan to integrate Observer's rich seed data into Experience web module
+**Estimated Time:** 4-6 hours
 **Status:** Ready for implementation
 
 ---
@@ -262,8 +262,8 @@ router = APIRouter()
 async def get_strategy_effectiveness(db: AsyncSession = Depends(get_db)):
     """Get global strategy effectiveness ratings."""
     query = text("""
-        SELECT content 
-        FROM bootstrap_data 
+        SELECT content
+        FROM bootstrap_data
         WHERE data_type = 'strategy_effectiveness'
         ORDER BY data_category
     """)
@@ -279,7 +279,7 @@ async def get_path_templates(
     """Get pre-computed path templates."""
     # Filter by emotions if provided
     # Return path templates with success rates
-    
+
 @router.get("/bootstrap/context-recommendations")
 async def get_context_recommendations(
     time_of_day: str = None,
@@ -357,7 +357,7 @@ interface Props {
 export function ContextualRecommendations({ currentVAC, goalVAC }: Props) {
   const [context, setContext] = useState<UserContext>({});
   const [recommendations, setRecommendations] = useState<any[]>([]);
-  
+
   // Context capture form
   // Query bootstrap API
   // Display recommendations
@@ -369,7 +369,7 @@ export function ContextualRecommendations({ currentVAC, goalVAC }: Props) {
 ```typescript
 export function PersonalStrategies({ userId }: { userId: string }) {
   const [topStrategies, setTopStrategies] = useState([]);
-  
+
   // Query /user/{id}/effective-strategies
   // Display with star ratings
   // Show user notes
@@ -382,7 +382,7 @@ export function PersonalStrategies({ userId }: { userId: string }) {
 export function JourneyHistory({ userId }: { userId: string }) {
   const [journeys, setJourneys] = useState([]);
   const [analytics, setAnalytics] = useState({});
-  
+
   // Query /user/{id}/journey-history
   // Timeline visualization
   // Success metrics
@@ -411,7 +411,7 @@ export function StrategyFeedbackModal({ waypoint, onSubmit, onSkip }: Props) {
 ```typescript
 interface ExperienceStore {
   // Existing...
-  
+
   // NEW:
   userContext: UserContext | null;
   bootstrapData: {
@@ -420,7 +420,7 @@ interface ExperienceStore {
   } | null;
   journeyHistory: any[];
   effectiveStrategies: any[];
-  
+
   // Actions:
   setUserContext: (context: UserContext) => void;
   loadBootstrapData: () => Promise<void>;
@@ -480,7 +480,7 @@ interface ExperienceStore {
   - [ ] Collect strategy attempts on waypoint reached
   - [ ] Send feedback to API
   - [ ] Show confirmation after feedback
-  
+
 - [ ] Enhance GoalSetting.tsx:
   - [ ] Display pattern name ("You're following: Anxiety Regulation")
   - [ ] Show pattern psychological reasoning
@@ -517,8 +517,8 @@ interface ExperienceStore {
 
 ### 1. Smart Onboarding for New Users
 
-**Before:** Generic recommendations, no guidance  
-**After:** 
+**Before:** Generic recommendations, no guidance
+**After:**
 - "New here? Let's find what works for you"
 - Quick context questions (30 seconds)
 - Show path templates: "Most people go Anxiety → Calm this way"
@@ -526,7 +526,7 @@ interface ExperienceStore {
 
 ### 2. Personalized Dashboard for Returning Users
 
-**Before:** Same experience every time  
+**Before:** Same experience every time
 **After:**
 - "Welcome back! Your top 3 strategies: ..."
 - "Your success rate: 75%"
@@ -535,7 +535,7 @@ interface ExperienceStore {
 
 ### 3. Context-Aware Suggestions
 
-**Before:** All 107 strategies shown equally  
+**Before:** All 107 strategies shown equally
 **After:**
 - "You're at work with 15 minutes → Try these 3"
 - "Late night, low energy → Calming practices"
@@ -544,7 +544,7 @@ interface ExperienceStore {
 
 ### 4. Educational Journey Experience
 
-**Before:** Just waypoints and strategies  
+**Before:** Just waypoints and strategies
 **After:**
 - "You're on a Shame Resilience journey"
 - "This pattern works because: [psychological reasoning]"
@@ -553,7 +553,7 @@ interface ExperienceStore {
 
 ### 5. Learning Loop
 
-**Before:** No feedback collected  
+**Before:** No feedback collected
 **After:**
 - After each waypoint: "How helpful were these?"
 - Ratings inform future recommendations
@@ -742,15 +742,15 @@ Once core integration complete:
 ## 🎉 Expected Impact
 
 ### For Users
-✨ **New users** get smart recommendations from day one  
-✨ **Returning users** see their progress and growth  
-✨ **All users** get context-appropriate suggestions  
+✨ **New users** get smart recommendations from day one
+✨ **Returning users** see their progress and growth
+✨ **All users** get context-appropriate suggestions
 ✨ **Everyone** experiences continuous improvement as system learns
 
 ### For Product
-✨ **Higher engagement** through personalization  
-✨ **Better outcomes** with evidence-based, context-aware recommendations  
-✨ **Rich data collection** for future improvements  
+✨ **Higher engagement** through personalization
+✨ **Better outcomes** with evidence-based, context-aware recommendations
+✨ **Rich data collection** for future improvements
 ✨ **Competitive advantage** with sophisticated ML-ready foundation
 
 ---
@@ -758,7 +758,7 @@ Once core integration complete:
 ## 📅 Estimated Timeline
 
 - **Backend (Phase 1):** 1-1.5 hours
-- **API Client (Phase 2):** 30 minutes  
+- **API Client (Phase 2):** 30 minutes
 - **Feedback Collection (Phase 3):** 1-1.5 hours
 - **Personalization (Phase 4):** 1 hour
 - **History (Phase 5):** 1-1.5 hours

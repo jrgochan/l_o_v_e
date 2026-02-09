@@ -1,3 +1,1 @@
-"""
-Test suite for Versor module.
-"""
+"""Test suite for Versor module."""

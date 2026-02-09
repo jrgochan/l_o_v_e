@@ -3,7 +3,7 @@
   "version": "1.0",
   "created": "2025-12-05",
   "purpose": "Development testing, UX validation, demo presentations, system feature testing",
-  
+
   "personas": [
     {
       "user_id": "demo-alex-new-user",
@@ -215,14 +215,14 @@
       ]
     }
   ],
-  
+
   "usage_guidelines": {
     "development_testing": "Use these personas to test different user journeys through the system. Each tests different features and edge cases.",
     "demo_presentations": "Use Morgan (success story) for positive demos, Alex for onboarding demos, Casey for showing support features.",
     "data_seeding": "These personas become the user_id for demo journeys in the database. Clear naming (demo-*) indicates test data.",
     "deletion": "All demo data should be easily identifiable and deletable. Never mix with real user data in production."
   },
-  
+
   "meta": {
     "total_personas": 5,
     "persona_types": {

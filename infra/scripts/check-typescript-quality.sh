@@ -105,11 +105,11 @@ fi
 
 # === 4. Package Audit (Security) ===
 print_info "Running npm audit (security check)..."
-# We allow audit to fail if issues are found, but we want to see them. 
-# We don't increment failure count for audit warnings unless it returns a very bad code, 
+# We allow audit to fail if issues are found, but we want to see them.
+# We don't increment failure count for audit warnings unless it returns a very bad code,
 # but usually 'npm audit' returns non-zero if ANY vulnerability is found.
-# For now, we print valid output and don't count it as a blocking failure for 'quality check' 
-# unless we decide critical vulns block deployment. 
+# For now, we print valid output and don't count it as a blocking failure for 'quality check'
+# unless we decide critical vulns block deployment.
 # The current script logic didn't count it. We'll keep it that way but show output.
 if run_in_module "experience" "npm audit --audit-level=moderate"; then
     print_success "npm audit: No security vulnerabilities"

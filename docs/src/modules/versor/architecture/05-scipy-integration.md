@@ -86,13 +86,13 @@ from app.core.quaternion import Quaternion
 def love_to_scipy(q: Quaternion) -> np.ndarray:
     """
     Convert L.O.V.E. quaternion to SciPy format.
-    
+
     Args:
         q: Quaternion in scalar-first format [w, x, y, z]
-    
+
     Returns:
         NumPy array in scalar-last format [x, y, z, w]
-    
+
     Example:
         >>> q = Quaternion(w=0.707, x=0.0, y=0.707, z=0.0)
         >>> q_scipy = love_to_scipy(q)
@@ -105,13 +105,13 @@ def love_to_scipy(q: Quaternion) -> np.ndarray:
 def scipy_to_love(arr: np.ndarray) -> Quaternion:
     """
     Convert SciPy quaternion to L.O.V.E. format.
-    
+
     Args:
         arr: NumPy array in scalar-last format [x, y, z, w]
-    
+
     Returns:
         Quaternion in scalar-first format [w, x, y, z]
-    
+
     Example:
         >>> arr = np.array([0.0, 0.707, 0.0, 0.707])
         >>> q = scipy_to_love(arr)
@@ -254,7 +254,7 @@ scipy_time = timeit.timeit(
     number=1000
 ) / 1000
 
-# Pure Python implementation  
+# Pure Python implementation
 python_time = timeit.timeit(
     "slerp_pure_python(q1, q2, 60)",
     setup="...",
@@ -287,7 +287,7 @@ def test_love_to_scipy_conversion():
     """Test scalar-first to scalar-last conversion."""
     q_love = Quaternion(w=0.5, x=0.5, y=0.5, z=0.5)
     q_scipy = love_to_scipy(q_love)
-    
+
     # Check conversion
     assert q_scipy[0] == 0.5  # x
     assert q_scipy[1] == 0.5  # y
@@ -298,7 +298,7 @@ def test_scipy_to_love_conversion():
     """Test scalar-last to scalar-first conversion."""
     arr_scipy = np.array([0.0, 0.707, 0.0, 0.707])
     q_love = scipy_to_love(arr_scipy)
-    
+
     # Check conversion
     assert q_love.w == 0.707  # scalar
     assert q_love.x == 0.0    # x
@@ -308,11 +308,11 @@ def test_scipy_to_love_conversion():
 def test_round_trip_conversion():
     """Test that converting back and forth preserves quaternion."""
     q_original = Quaternion(0.5, 0.5, 0.5, 0.5)
-    
+
     # Convert to SciPy and back
     q_scipy = love_to_scipy(q_original)
     q_recovered = scipy_to_love(q_scipy)
-    
+
     # Should be identical
     assert q_recovered.w == q_original.w
     assert q_recovered.x == q_original.x
@@ -404,7 +404,7 @@ from typing import List
 def slerp_pure(q1: Quaternion, q2: Quaternion, t: float) -> Quaternion:
     """
     Pure Python SLERP (no SciPy dependency).
-    
+
     Note: SciPy version is 3-4x faster. Use this only if necessary.
     """
     # Shortest path check
@@ -412,14 +412,14 @@ def slerp_pure(q1: Quaternion, q2: Quaternion, t: float) -> Quaternion:
     if dot < 0:
         q2 = Quaternion(-q2.w, -q2.x, -q2.y, -q2.z)
         dot = -dot
-    
+
     # Clamp to valid range
     dot = np.clip(dot, -1.0, 1.0)
-    
+
     # Calculate angle
     omega = math.acos(dot)
     sin_omega = math.sin(omega)
-    
+
     # Handle near-parallel case
     if abs(sin_omega) < 1e-6:
         # Linear interpolation
@@ -429,11 +429,11 @@ def slerp_pure(q1: Quaternion, q2: Quaternion, t: float) -> Quaternion:
             (1-t)*q1.y + t*q2.y,
             (1-t)*q1.z + t*q2.z
         ).normalize()
-    
+
     # SLERP formula
     a = math.sin((1-t) * omega) / sin_omega
     b = math.sin(t * omega) / sin_omega
-    
+
     return Quaternion(
         a*q1.w + b*q2.w,
         a*q1.x + b*q2.x,
@@ -579,7 +579,7 @@ def safe_love_to_scipy(q: Quaternion) -> np.ndarray:
     """Convert with NaN checking."""
     if math.isnan(q.w) or math.isnan(q.x) or math.isnan(q.y) or math.isnan(q.z):
         raise ValueError("Quaternion contains NaN")
-    
+
     return np.array([q.x, q.y, q.z, q.w])
 ```
 
@@ -593,13 +593,13 @@ def safe_love_to_scipy(q: Quaternion) -> np.ndarray:
 def test_adapter_preserves_rotation():
     """Test that conversion preserves the rotation."""
     q_love = Quaternion(0.5, 0.5, 0.5, 0.5).normalize()
-    
+
     # Convert to SciPy
     q_scipy = love_to_scipy(q_love)
-    
+
     # Convert back
     q_recovered = scipy_to_love(q_scipy)
-    
+
     # Should be identical
     assert abs(q_love.w - q_recovered.w) < EPSILON
     assert abs(q_love.x - q_recovered.x) < EPSILON
@@ -614,13 +614,13 @@ def test_slerp_matches_pure_python():
     """Verify SciPy SLERP matches pure Python implementation."""
     q1 = Quaternion.identity()
     q2 = Quaternion(0.707, 0, 0.707, 0)
-    
+
     # SciPy version
     path_scipy = generate_slerp_path(q1, q2, steps=10)
-    
+
     # Pure Python version
     path_pure = generate_slerp_path_pure(q1, q2, steps=10)
-    
+
     # Should match within tolerance
     for q_scipy, q_pure in zip(path_scipy, path_pure):
         assert abs(q_scipy.w - q_pure.w) < 0.001
@@ -706,5 +706,5 @@ When quaternions seem wrong:
 
 ---
 
-**Previous:** [← SLERP Interpolation](04-slerp-interpolation.md)  
+**Previous:** [← SLERP Interpolation](04-slerp-interpolation.md)
 **Next:** [Performance Optimization →](06-performance-optimization.md)

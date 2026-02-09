@@ -1,8 +1,8 @@
 # Extending Observer
 
-**Reading Time:** ~35 minutes  
-**Audience:** Senior developers  
-**Prerequisites:** All previous senior developer guides  
+**Reading Time:** ~35 minutes
+**Audience:** Senior developers
+**Prerequisites:** All previous senior developer guides
 **Goal:** Learn how to extend Observer with new features and capabilities
 
 ---
@@ -63,10 +63,10 @@ async def seed_new_emotion():
     embedding = await embedding_service.generate_embedding(
         f"{ANTICIPATION['name']}. {ANTICIPATION['description']}"
     )
-    
+
     # Convert VAC to quaternion
     quaternion = await quaternion_builder.from_vac(ANTICIPATION['vac'])
-    
+
     # Create atlas entry
     emotion = AtlasDefinition(
         name=ANTICIPATION['name'],
@@ -78,7 +78,7 @@ async def seed_new_emotion():
         keywords=ANTICIPATION['keywords'],
         citations=ANTICIPATION['citations']
     )
-    
+
     db.add(emotion)
     await db.commit()
 ```
@@ -115,7 +115,7 @@ async def test_anticipation_in_atlas():
         select(AtlasDefinition).where(AtlasDefinition.name == "Anticipation")
     )
     emotion = result.scalar_one()
-    
+
     assert emotion.name == "Anticipation"
     assert emotion.category == "When It's Beyond Us"
     assert emotion.vac[0] == 0.5  # Valence
@@ -160,13 +160,13 @@ async def test_anticipation_in_atlas():
 async def seed_custom_strategies():
     with open("data/strategies/custom.json") as f:
         data = json.load(f)
-    
+
     for strategy_data in data["strategies"]:
         # Generate embedding
         embedding = await embedding_service.generate_embedding(
             f"{strategy_data['name']}. {strategy_data['description']}"
         )
-        
+
         strategy = TransitionStrategy(
             name=strategy_data['name'],
             category=strategy_data['category'],
@@ -178,9 +178,9 @@ async def seed_custom_strategies():
             effectiveness=strategy_data.get('effectiveness'),
             embedding=embedding
         )
-        
+
         db.add(strategy)
-    
+
     await db.commit()
 ```
 
@@ -206,11 +206,11 @@ async def get_user_statistics(
 ):
     """
     Get statistical summary of user's emotional journey.
-    
+
     Args:
         user_id: User identifier
         days: Number of days to analyze
-        
+
     Returns:
         Statistical summary including:
         - Total trajectory points
@@ -221,14 +221,14 @@ async def get_user_statistics(
     """
     # Time range
     since = datetime.utcnow() - timedelta(days=days)
-    
+
     # Total points
     count_query = select(func.count(UserTrajectory.id)).where(
         UserTrajectory.user_id == user_id,
         UserTrajectory.timestamp >= since
     )
     total_points = await db.scalar(count_query)
-    
+
     # Average VAC
     avg_query = select(
         func.avg(UserTrajectory.vac[0]).label('avg_valence'),
@@ -240,7 +240,7 @@ async def get_user_statistics(
     )
     avg_result = await db.execute(avg_query)
     avg_vac = avg_result.one()
-    
+
     # Most common emotions
     emotion_query = select(
         AtlasDefinition.name,
@@ -255,13 +255,13 @@ async def get_user_statistics(
     ).order_by(
         func.count(UserTrajectory.id).desc()
     ).limit(5)
-    
+
     emotion_result = await db.execute(emotion_query)
     top_emotions = [
         {"emotion": row.name, "count": row.count}
         for row in emotion_result
     ]
-    
+
     return {
         "user_id": user_id,
         "period_days": days,
@@ -299,10 +299,10 @@ app.include_router(
 ```python
 class DriftDetector:
     """Detect emotional drift over time"""
-    
+
     def __init__(self, db: AsyncSession):
         self.db = db
-    
+
     async def detect_drift(
         self,
         user_id: str,
@@ -311,7 +311,7 @@ class DriftDetector:
     ) -> Dict:
         """
         Compare recent emotional state to baseline.
-        
+
         Returns drift metrics:
         - VAC drift vector
         - Category distribution changes
@@ -320,26 +320,26 @@ class DriftDetector:
         # Get baseline period
         baseline_start = datetime.utcnow() - timedelta(days=baseline_days)
         baseline_end = baseline_start + timedelta(days=baseline_days - recent_days)
-        
+
         baseline_avg = await self._get_average_vac(
             user_id, baseline_start, baseline_end
         )
-        
+
         # Get recent period
         recent_start = datetime.utcnow() - timedelta(days=recent_days)
         recent_avg = await self._get_average_vac(
             user_id, recent_start, datetime.utcnow()
         )
-        
+
         # Calculate drift
         drift_vector = [
             recent_avg[i] - baseline_avg[i]
             for i in range(3)
         ]
-        
+
         # Magnitude of drift
         drift_magnitude = np.linalg.norm(drift_vector)
-        
+
         # Classify
         if drift_magnitude < 0.2:
             status = "stable"
@@ -347,7 +347,7 @@ class DriftDetector:
             status = "minor_drift"
         else:
             status = "significant_drift"
-        
+
         return {
             "baseline_vac": baseline_avg,
             "recent_vac": recent_avg,
@@ -356,26 +356,26 @@ class DriftDetector:
             "status": status,
             "interpretation": self._interpret_drift(drift_vector)
         }
-    
+
     def _interpret_drift(self, drift: List[float]) -> str:
         """Generate human-readable interpretation"""
         interpretations = []
-        
+
         if drift[0] > 0.3:
             interpretations.append("Moving toward more positive emotions")
         elif drift[0] < -0.3:
             interpretations.append("Moving toward more negative emotions")
-        
+
         if drift[1] > 0.3:
             interpretations.append("Energy levels increasing")
         elif drift[1] < -0.3:
             interpretations.append("Energy levels decreasing")
-        
+
         if drift[2] > 0.3:
             interpretations.append("Feeling more connected")
         elif drift[2] < -0.3:
             interpretations.append("Feeling more isolated")
-        
+
         return ". ".join(interpretations) if interpretations else "Stable emotional state"
 ```
 
@@ -388,7 +388,7 @@ class DriftDetector:
 ```python
 class PatternInsightGenerator:
     """Generate insights from trajectory patterns"""
-    
+
     async def detect_cycles(
         self,
         user_id: str,
@@ -396,7 +396,7 @@ class PatternInsightGenerator:
     ) -> Dict:
         """
         Detect cyclical emotional patterns.
-        
+
         Example: Weekly anxiety spikes, monthly mood cycles
         """
         # Get trajectory
@@ -410,39 +410,39 @@ class PatternInsightGenerator:
             .order_by(UserTrajectory.timestamp)
         )
         trajectory = result.scalars().all()
-        
+
         # Extract valence time series
         timestamps = [t.timestamp for t in trajectory]
         valence_series = [t.vac[0] for t in trajectory]
-        
+
         # Detect cycles using FFT
         from scipy import signal
-        
+
         # Detrend
         detrended = signal.detrend(valence_series)
-        
+
         # Find periodicities
         frequencies, power = signal.periodogram(detrended)
-        
+
         # Identify peaks
         peaks, _ = signal.find_peaks(power, height=np.mean(power) * 2)
-        
+
         if len(peaks) > 0:
             # Convert frequency to period (days)
             dominant_freq = frequencies[peaks[0]]
             period_days = 1 / (dominant_freq * len(trajectory) / lookback_days)
-            
+
             return {
                 "cycle_detected": True,
                 "period_days": float(period_days),
                 "interpretation": self._interpret_cycle(period_days)
             }
-        
+
         return {
             "cycle_detected": False,
             "interpretation": "No clear cyclical patterns detected"
         }
-    
+
     def _interpret_cycle(self, period_days: float) -> str:
         """Interpret cycle period"""
         if 6 <= period_days <= 8:
@@ -472,7 +472,7 @@ async def handle_historical_insight(
 ):
     """
     New message type: Find similar past moments.
-    
+
     Client sends:
     {
         "type": "request_historical_insight",
@@ -482,14 +482,14 @@ async def handle_historical_insight(
     """
     # Get current emotion's embedding
     emotion = await chat_service.get_emotion(data["current_emotion"])
-    
+
     # Find similar past moments
     similar_moments = await chat_service.find_similar_trajectory_moments(
         session_id=session_id,
         query_embedding=emotion.embedding,
         limit=data.get("limit", 5)
     )
-    
+
     # Send response
     await manager.broadcast_to_session(
         session_id,
@@ -520,7 +520,7 @@ MESSAGE_HANDLERS = {
 @router.websocket("/ws/{session_id}")
 async def websocket_endpoint(websocket: WebSocket, session_id: str):
     await manager.connect(websocket, session_id)
-    
+
     try:
         async for message in websocket.iter_json():
             handler = MESSAGE_HANDLERS.get(message["type"])
@@ -545,10 +545,10 @@ async def websocket_endpoint(websocket: WebSocket, session_id: str):
 # app/repositories/trajectory_repository.py
 class TrajectoryRepository:
     """Specialized queries for user trajectories"""
-    
+
     def __init__(self, db: AsyncSession):
         self.db = db
-    
+
     async def get_emotional_velocity(
         self,
         user_id: str,
@@ -556,11 +556,11 @@ class TrajectoryRepository:
     ) -> List[Dict]:
         """
         Calculate emotional velocity over sliding windows.
-        
+
         Velocity = distance traveled / time
         """
         since = datetime.utcnow() - timedelta(hours=window_hours)
-        
+
         # Get trajectory points
         result = await self.db.execute(
             select(UserTrajectory)
@@ -571,31 +571,31 @@ class TrajectoryRepository:
             .order_by(UserTrajectory.timestamp)
         )
         points = result.scalars().all()
-        
+
         # Calculate velocities
         velocities = []
         for i in range(len(points) - 1):
             p1 = points[i]
             p2 = points[i + 1]
-            
+
             # Angular distance (quaternion)
             theta = self._angular_distance(p1.quaternion, p2.quaternion)
-            
+
             # Time delta (seconds)
             dt = (p2.timestamp - p1.timestamp).total_seconds()
-            
+
             # Velocity (radians/second)
             velocity = theta / dt if dt > 0 else 0
-            
+
             velocities.append({
                 "timestamp": p2.timestamp,
                 "velocity": velocity,
                 "from_emotion": p1.emotion.name,
                 "to_emotion": p2.emotion.name
             })
-        
+
         return velocities
-    
+
     async def get_category_distribution(
         self,
         user_id: str,
@@ -603,7 +603,7 @@ class TrajectoryRepository:
     ) -> Dict[str, float]:
         """Get percentage of time in each category"""
         since = datetime.utcnow() - timedelta(days=days)
-        
+
         query = select(
             AtlasDefinition.category,
             func.count(UserTrajectory.id).label('count')
@@ -615,12 +615,12 @@ class TrajectoryRepository:
         ).group_by(
             AtlasDefinition.category
         )
-        
+
         result = await self.db.execute(query)
         rows = result.all()
-        
+
         total = sum(row.count for row in rows)
-        
+
         return {
             row.category: (row.count / total) * 100
             for row in rows
@@ -638,7 +638,7 @@ class TrajectoryRepository:
 ```python
 class CoherenceCalculator:
     """Calculate emotional coherence metrics"""
-    
+
     async def calculate_coherence(
         self,
         user_id: str,
@@ -646,10 +646,10 @@ class CoherenceCalculator:
     ) -> float:
         """
         Coherence: How aligned are emotional dimensions?
-        
+
         High coherence: All dimensions moving together
         Low coherence: Dimensions moving independently
-        
+
         Formula: Correlation between VAC dimension changes
         """
         # Get recent trajectory
@@ -663,25 +663,25 @@ class CoherenceCalculator:
             .order_by(UserTrajectory.timestamp)
         )
         points = result.scalars().all()
-        
+
         if len(points) < 10:
             return None  # Insufficient data
-        
+
         # Extract time series
         valence_series = [p.vac[0] for p in points]
         arousal_series = [p.vac[1] for p in points]
         connection_series = [p.vac[2] for p in points]
-        
+
         # Calculate correlations
         import numpy as np
-        
+
         corr_va = np.corrcoef(valence_series, arousal_series)[0, 1]
         corr_vc = np.corrcoef(valence_series, connection_series)[0, 1]
         corr_ac = np.corrcoef(arousal_series, connection_series)[0, 1]
-        
+
         # Average absolute correlation
         coherence = (abs(corr_va) + abs(corr_vc) + abs(corr_ac)) / 3
-        
+
         return float(coherence)
 ```
 
@@ -697,7 +697,7 @@ from abc import ABC, abstractmethod
 
 class ObserverPlugin(ABC):
     """Base class for Observer plugins"""
-    
+
     @abstractmethod
     async def on_state_stored(
         self,
@@ -706,7 +706,7 @@ class ObserverPlugin(ABC):
     ):
         """Called after new state is stored"""
         pass
-    
+
     @abstractmethod
     async def on_path_computed(
         self,
@@ -715,7 +715,7 @@ class ObserverPlugin(ABC):
     ):
         """Called after path is computed"""
         pass
-    
+
     @abstractmethod
     def get_api_routes(self) -> Optional[APIRouter]:
         """Return additional API routes"""
@@ -725,7 +725,7 @@ class ObserverPlugin(ABC):
 # Example plugin
 class EmotionalJournalPlugin(ObserverPlugin):
     """Auto-generate journal prompts based on emotions"""
-    
+
     async def on_state_stored(
         self,
         trajectory: UserTrajectory,
@@ -735,18 +735,18 @@ class EmotionalJournalPlugin(ObserverPlugin):
         if trajectory.emotion.category == "When We're Hurting":
             prompt = self._generate_grief_prompt(trajectory)
             await self._send_to_user(trajectory.user_id, prompt)
-    
+
     async def on_path_computed(self, path: TransitionPath, context: Dict):
         # Log path for analysis
         pass
-    
+
     def get_api_routes(self) -> APIRouter:
         router = APIRouter()
-        
+
         @router.get("/journal/prompts/{user_id}")
         async def get_prompts(user_id: str):
             return await self._get_user_prompts(user_id)
-        
+
         return router
 
 
@@ -754,16 +754,16 @@ class EmotionalJournalPlugin(ObserverPlugin):
 class PluginManager:
     def __init__(self):
         self.plugins: List[ObserverPlugin] = []
-    
+
     def register(self, plugin: ObserverPlugin):
         """Register a plugin"""
         self.plugins.append(plugin)
-        
+
         # Add plugin routes to app
         routes = plugin.get_api_routes()
         if routes:
             app.include_router(routes, prefix="/plugins")
-    
+
     async def trigger_state_stored(self, trajectory, context):
         """Trigger all plugins"""
         for plugin in self.plugins:
@@ -821,17 +821,17 @@ def add_custom_emotion(
 ) -> AtlasDefinition:
     """
     Add custom emotion to atlas.
-    
+
     **Extension Point:** Use this to add domain-specific emotions.
-    
+
     Args:
         name: Emotion name (must be unique)
         vac: VAC coordinates (validated)
         category: One of the 13 standard categories
-        
+
     Returns:
         Created AtlasDefinition
-        
+
     Example:
         >>> emotion = add_custom_emotion(
         ...     name="Flow State",
@@ -868,7 +868,7 @@ emotion = AtlasDefinition(
 # ❌ BAD: Synchronous call in async function
 async def process_state():
     result = expensive_sync_function()  # Blocks!
-    
+
 # ✅ GOOD: Run in thread pool
 async def process_state():
     result = await asyncio.to_thread(expensive_sync_function)

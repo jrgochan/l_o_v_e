@@ -21,27 +21,27 @@ This document outlines the complete seeding strategy for the LOVE stack transiti
 1. **DBT Skills** (8-10 strategies)
    - DEAR MAN, GIVE, FAST, STOP, Opposite Action, Check the Facts
    - Builds on Linehan's evidence-based approach
-   
+
 2. **ACT Techniques** (6-8 strategies)
    - Defusion, Values, Committed Action, Observer Self, Willingness
    - Hayes et al.'s acceptance-based approach
-   
+
 3. **Mindfulness Variations** (5-7 strategies)
    - Body Scan, Loving-Kindness, RAIN, Noting, Mountain
    - Kabat-Zinn lineage
-   
+
 4. **Somatic/Body-Based** (6-8 strategies)
    - TRE, Shaking, Dance, Yoga, Bilateral Stimulation
    - Van der Kolk's body-keeps-score approach
-   
+
 5. **Social Connection** (4-6 strategies)
    - Authentic Relating, NVC, Co-regulation, Asking for Help
    - Brown's connection research
-   
+
 6. **Creative Expression** (4-6 strategies)
    - Art, Movement, Music, Journaling, Poetry
    - Expressive arts therapy lineage
-   
+
 7. **Meaning-Making** (4-5 strategies)
    - Narrative Therapy, PTG, Silver Linings, Legacy, Purpose
    - Frankl's logotherapy influence

@@ -174,9 +174,9 @@ This work makes the following contributions to affective computing and mental he
 
 \begin{enumerate}
     \item \textbf{Theoretical}: Introduction of the Connection axis as a novel dimension for emotion representation, grounded in relational psychology research
-    
+
     \item \textbf{Computational}: Demonstration that the Connection axis can be extracted from natural language using large language models with high accuracy (98\% on validation tests)
-    
+
     \item \textbf{Architectural}: A complete microservices implementation (L.O.V.E. Stack) including:
     \begin{itemize}
         \item Semantic VAC extraction with local LLMs
@@ -185,14 +185,14 @@ This work makes the following contributions to affective computing and mental he
         \item Evidence-based therapeutic pathfinding (107 strategies)
         \item Real-time 3D visualization
     \end{itemize}
-    
+
     \item \textbf{Validation}: Multiple validation approaches:
     \begin{itemize}
         \item Semantic: Pity vs. compassion discrimination
         \item Mathematical: Quaternion operation correctness (56/56 tests)
         \item Therapeutic: Evidence mapping for 107 strategies
     \end{itemize}
-    
+
     \item \textbf{Practical}: A privacy-first mental health platform suitable for clinical deployment, with full user data control and local processing
 \end{enumerate}
 
@@ -280,11 +280,11 @@ Existing emotion models face a common limitation: they cannot distinguish emotio
 
 \begin{enumerate}
     \item \textbf{Therapeutic Invalidity}: Mental health applications may guide users toward pity when compassion is needed, or fail to recognize that shame requires vulnerability before self-compassion can emerge.
-    
+
     \item \textbf{Missed Opportunities in HCI}: Conversational AI systems cannot adjust their relational stance to match user needs. A system that recognizes when a user needs ``feeling WITH'' versus ``feeling FOR'' could provide more appropriate support.
-    
+
     \item \textbf{Cultural Insensitivity}: Different cultures may emphasize connection differently. Without measuring this dimension, systems cannot adapt to cultural variations in emotional expression.
-    
+
     \item \textbf{Incomplete Multimodal Models}: If Connection can be detected in speech prosody (a hypothesis supported by linguistic research on empathy), current systems are missing a valuable signal.
 \end{enumerate}
 
@@ -362,14 +362,14 @@ The Connection dimension has direct therapeutic implications:
         \item Guilt: ``I did something bad'' (connection to values maintained: $C > 0$)
     \end{itemize}
     Shame is less amenable to change because it involves identity-level disconnection, while guilt allows for repair.
-    
+
     \item \textbf{Grief vs. Despair}:
     \begin{itemize}
         \item Grief: ``I lost someone I love'' (love persists: $C > 0$)
         \item Despair: ``I am alone in my suffering'' (isolation: $C < 0$)
     \end{itemize}
     Therapeutic approaches differ: grief benefits from connection-enhancing interventions, while despair requires first addressing isolation.
-    
+
     \item \textbf{Compassion vs. Pity}:
     \begin{itemize}
         \item Compassion fosters healing and agency
@@ -939,10 +939,10 @@ where $g(n)$ is the actual weighted VAC distance from start to node $n$, and $h(
 \begin{enumerate}
     \item Shame $(-0.7, -0.2, -0.8)$\\
     Strategy: ``Name your feelings without judgment''~\cite{linehan2015}
-    
+
     \item Vulnerability $(0.0, 0.3, 0.6)$\\
     Strategy: ``Practice sharing your experience with a trusted person''~\cite{brown2012}
-    
+
     \item Self-Compassion $(0.6, 0.1, 0.85)$\\
     Strategy: ``Treat yourself as you would a good friend''~\cite{neff2013}
 \end{enumerate}
@@ -1261,16 +1261,16 @@ We specifically invite collaboration with Prof. Emily Mower Provost and the Univ
 
 \begin{enumerate}
     \item \textbf{Complementary Expertise}: Provost brings speech-centered emotion recognition, acoustic features, and clinical deployment experience. L.O.V.E. brings semantic VAC extraction, therapeutic pathfinding, and 3D visualization.
-    
+
     \item \textbf{Shared Goals}: Human-centered emotion recognition, mental health applications, interpretable representations, and real-world deployment.
-    
+
     \item \textbf{Concrete Projects}:
     \begin{itemize}
         \item Multimodal VAC Extraction: Integrate acoustic and semantic channels
         \item Clinical Validation: 12-week trial with UM participants
         \item Prosodic Connection Study: Test acoustic correlates of Connection dimension
     \end{itemize}
-    
+
     \item \textbf{Mutual Benefits}: Provost's lab gains a novel research direction (Connection dimension) and validated dataset. L.O.V.E. gains acoustic expertise, clinical deployment experience, and academic credibility.
 \end{enumerate}
 

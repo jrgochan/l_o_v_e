@@ -5,28 +5,28 @@
 CREATE TABLE session_analytics (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     session_id UUID NOT NULL UNIQUE REFERENCES chat_sessions(id) ON DELETE CASCADE,
-    
+
     -- Emotion metrics
     emotion_count INTEGER NOT NULL DEFAULT 0,
     average_confidence FLOAT NOT NULL DEFAULT 0.0,
     dominant_category VARCHAR(100),
-    
+
     -- Session timing
     start_time TIMESTAMP NOT NULL DEFAULT NOW(),
     last_emotion_time TIMESTAMP,
     total_duration_seconds INTEGER NOT NULL DEFAULT 0,
-    
+
     -- Alert counts
     critical_alert_count INTEGER NOT NULL DEFAULT 0,
     warning_alert_count INTEGER NOT NULL DEFAULT 0,
     attention_alert_count INTEGER NOT NULL DEFAULT 0,
-    
+
     -- Category breakdown (flexible JSON structure)
     category_counts JSONB NOT NULL DEFAULT '{}'::jsonb,
-    
+
     -- VAC statistics (flexible JSON structure)
     vac_stats JSONB NOT NULL DEFAULT '{}'::jsonb,
-    
+
     -- Timestamps
     created_at TIMESTAMP NOT NULL DEFAULT NOW(),
     updated_at TIMESTAMP NOT NULL DEFAULT NOW()

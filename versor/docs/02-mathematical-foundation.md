@@ -23,7 +23,7 @@ q = w + xi + yj + zk
 
 Where:
 - `w` = scalar (real) part
-- `x, y, z` = vector (imaginary) parts  
+- `x, y, z` = vector (imaginary) parts
 - `i, j, k` = imaginary units satisfying: **i² = j² = k² = ijk = -1**
 
 ### Component Notation

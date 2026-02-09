@@ -448,5 +448,5 @@ livenessProbe:
 
 ---
 
-**Previous:** [← Architecture Decisions](../architecture/09-architecture-decisions.md)  
+**Previous:** [← Architecture Decisions](../architecture/09-architecture-decisions.md)
 **Next:** [Integration Points →](../architecture/10-integration-points.md)

@@ -46,41 +46,41 @@ from typing import List, Tuple
 
 class PIIScrubber:
     """Remove PII using Named Entity Recognition"""
-    
+
     def __init__(self):
         # Load English NER model
         self.nlp = spacy.load("en_core_web_sm")
-    
+
     def scrub(self, text: str) -> str:
         """
         Remove PII from text.
-        
+
         Args:
             text: Raw transcription
-        
+
         Returns:
             Sanitized text with PII replaced by tokens
         """
         # Step 1: NER with Spacy
         doc = self.nlp(text)
-        
+
         # Collect entities to replace (in reverse order to preserve positions)
         replacements = []
         for ent in reversed(doc.ents):
             if ent.label_ in ['PERSON', 'ORG', 'GPE', 'DATE']:
                 token = self._get_token(ent.label_)
                 replacements.append((ent.start_char, ent.end_char, token))
-        
+
         # Apply replacements
         sanitized = text
         for start, end, token in replacements:
             sanitized = sanitized[:start] + token + sanitized[end:]
-        
+
         # Step 2: Regex patterns for structured PII
         sanitized = self._scrub_patterns(sanitized)
-        
+
         return sanitized
-    
+
     def _get_token(self, entity_type: str) -> str:
         """Map entity type to replacement token"""
         mapping = {
@@ -90,38 +90,38 @@ class PIIScrubber:
             'DATE': '[DATE]'
         }
         return mapping.get(entity_type, '[REDACTED]')
-    
+
     def _scrub_patterns(self, text: str) -> str:
         """Use regex for structured PII"""
-        
+
         # Email addresses
         text = re.sub(
             r'\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b',
             '[EMAIL]',
             text
         )
-        
+
         # Phone numbers
         text = re.sub(
             r'\b\d{3}[-.]?\d{3}[-.]?\d{4}\b',
             '[PHONE]',
             text
         )
-        
+
         # SSN
         text = re.sub(
             r'\b\d{3}-\d{2}-\d{4}\b',
             '[SSN]',
             text
         )
-        
+
         return text
-    
+
     def contains_pii(self, text: str) -> bool:
         """Check if text contains PII"""
         doc = self.nlp(text)
         return len(doc.ents) > 0 or self._has_pattern_pii(text)
-    
+
     def _has_pattern_pii(self, text: str) -> bool:
         """Check for regex-pattern PII"""
         patterns = [
@@ -129,11 +129,11 @@ class PIIScrubber:
             r'\b\d{3}[-.]?\d{3}[-.]?\d{4}\b',  # Phone
             r'\b\d{3}-\d{2}-\d{4}\b'  # SSN
         ]
-        
+
         for pattern in patterns:
             if re.search(pattern, text):
                 return True
-        
+
         return False
 ```
 
@@ -141,15 +141,15 @@ class PIIScrubber:
 
 **Input**:
 ```
-"I had a terrible meeting with Dr. Sarah Johnson at Kaiser Hospital 
-on Tuesday. I felt so anxious I could barely think. You can reach 
+"I had a terrible meeting with Dr. Sarah Johnson at Kaiser Hospital
+on Tuesday. I felt so anxious I could barely think. You can reach
 me at sarah.j@example.com if you need to talk."
 ```
 
 **Output**:
 ```
-"I had a terrible meeting with [NAME] at [ORG] on [DATE]. I felt so 
-anxious I could barely think. You can reach me at [EMAIL] if you 
+"I had a terrible meeting with [NAME] at [ORG] on [DATE]. I felt so
+anxious I could barely think. You can reach me at [EMAIL] if you
 need to talk."
 ```
 
@@ -164,7 +164,7 @@ need to talk."
 def test_person_name_scrubbed():
     text = "I talked to Dr. Smith about my anxiety."
     result = scrubber.scrub(text)
-    
+
     assert "Dr. Smith" not in result
     assert "[NAME]" in result
     assert "anxiety" in result  # Emotional word preserved
@@ -172,14 +172,14 @@ def test_person_name_scrubbed():
 def test_email_scrubbed():
     text = "Contact me at user@example.com"
     result = scrubber.scrub(text)
-    
+
     assert "user@example.com" not in result
     assert "[EMAIL]" in result
 
 def test_emotional_language_preserved():
     text = "I feel so overwhelmed and disconnected"
     result = scrubber.scrub(text)
-    
+
     assert result == text  # No PII, no changes
 ```
 

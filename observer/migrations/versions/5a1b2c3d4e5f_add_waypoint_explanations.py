@@ -24,9 +24,10 @@ depends_on = None
 
 def upgrade() -> None:
     """Create waypoint_explanation_templates table."""
-    
+
     # Create the main table
-    op.execute("""
+    op.execute(
+        """
         CREATE TABLE IF NOT EXISTS waypoint_explanation_templates (
             id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
             from_emotion_id UUID REFERENCES atlas_definitions(id) ON DELETE CASCADE,
@@ -50,34 +51,35 @@ def upgrade() -> None:
             priority INTEGER DEFAULT 100,
             UNIQUE (from_emotion_id, to_emotion_id, waypoint_emotion_id)
         )
-    """)
-    
+    """
+    )
+
     # Create indexes for performance
     op.execute(
         "CREATE INDEX idx_waypoint_templates_from "
         "ON waypoint_explanation_templates(from_emotion_id)"
     )
-    
+
     op.execute(
         "CREATE INDEX idx_waypoint_templates_to "
         "ON waypoint_explanation_templates(to_emotion_id)"
     )
-    
+
     op.execute(
         "CREATE INDEX idx_waypoint_templates_waypoint "
         "ON waypoint_explanation_templates(waypoint_emotion_id)"
     )
-    
+
     op.execute(
         "CREATE INDEX idx_waypoint_templates_priority "
         "ON waypoint_explanation_templates(priority DESC)"
     )
-    
+
     op.execute(
         "CREATE INDEX idx_waypoint_templates_categories "
         "ON waypoint_explanation_templates(from_category, to_category)"
     )
-    
+
     # Add table comment
     op.execute(
         "COMMENT ON TABLE waypoint_explanation_templates IS "
@@ -85,18 +87,18 @@ def upgrade() -> None:
         "transition waypoints. Used by WaypointExplainer service to provide "
         "rich psychological context.'"
     )
-    
+
     # Add column comments
     op.execute(
         "COMMENT ON COLUMN waypoint_explanation_templates.psychological_purpose IS "
         "'Why this waypoint is psychologically necessary (core purpose)'"
     )
-    
+
     op.execute(
         "COMMENT ON COLUMN waypoint_explanation_templates.research_citations IS "
         "'Array of research citations in JSON format with author, year, work, key_finding'"
     )
-    
+
     op.execute(
         "COMMENT ON COLUMN waypoint_explanation_templates.priority IS "
         "'Higher priority templates are used first when multiple matches exist (100 = default)'"

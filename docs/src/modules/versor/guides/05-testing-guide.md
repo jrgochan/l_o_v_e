@@ -133,10 +133,10 @@ def test_function_name():
     """Test description explaining what this verifies."""
     # Arrange - Setup test data
     input_value = ...
-    
+
     # Act - Call the function
     result = function_under_test(input_value)
-    
+
     # Assert - Verify the result
     assert result == expected_value
 ```
@@ -148,10 +148,10 @@ def test_quaternion_normalize():
     """Test that normalize() produces a unit quaternion."""
     # Arrange
     q = Quaternion(1.0, 2.0, 3.0, 4.0)
-    
+
     # Act
     q_norm = q.normalize()
-    
+
     # Assert
     magnitude = q_norm.magnitude()
     assert abs(magnitude - 1.0) < 1e-6  # Check it's unit length
@@ -166,10 +166,10 @@ def test_angular_distance():
     """Test angular distance calculation."""
     q1 = Quaternion.identity()
     q2 = Quaternion(0.707, 0, 0.707, 0)  # 90° rotation
-    
+
     q_trans = calculate_transition(q1, q2)
     phi = angular_distance(q_trans)
-    
+
     # Use pytest.approx for float comparison
     assert phi == pytest.approx(1.5708, abs=1e-4)  # π/2
 ```
@@ -225,14 +225,14 @@ def test_calculate_endpoint():
         "previous_state": None,
         "time_delta_seconds": 1.0
     }
-    
+
     # Act
     response = client.post("/versor/calculate", json=payload)
-    
+
     # Assert
     assert response.status_code == 200
     data = response.json()
-    
+
     # Check response structure
     assert "current_state" in data
     assert "angular_distance_radians" in data
@@ -240,7 +240,7 @@ def test_calculate_endpoint():
     assert "is_flooding" in data
     assert "insight_code" in data
     assert "interpolation_path" in data
-    
+
     # Check types
     assert isinstance(data["current_state"], dict)
     assert isinstance(data["is_flooding"], bool)
@@ -259,7 +259,7 @@ def test_calculate_invalid_vac():
             "connection": 0.7
         }
     }
-    
+
     response = client.post("/versor/calculate", json=payload)
     assert response.status_code == 422  # Validation error
 ```
@@ -283,13 +283,13 @@ from app.core.transitions import calculate_transition, detect_dominant_axis
 def test_pity_to_compassion_is_connection_shift():
     """
     Validates that pity and compassion differ only on the Connection axis.
-    
+
     This is the key test proving the VAC model's innovation over VAD.
     Pity and compassion have:
     - Same valence (both negative: sad for someone)
     - Same arousal (both low energy)
     - Different connection (pity is separated, compassion is connected)
-    
+
     Traditional VAD models cannot differentiate these emotions.
     The VAC model with Connection axis can.
     """
@@ -299,19 +299,19 @@ def test_pity_to_compassion_is_connection_shift():
         arousal=-0.2,
         connection=-0.6  # Feeling FOR someone (separation)
     )
-    
+
     compassion = VACVector(
         valence=-0.3,
         arousal=-0.2,
         connection=0.8   # Feeling WITH someone (connection)
     )
-    
+
     # Act
     q_pity = pity.to_quaternion()
     q_compassion = compassion.to_quaternion()
     q_transition = calculate_transition(q_pity, q_compassion)
     dominant_axis = detect_dominant_axis(q_transition)
-    
+
     # Assert
     assert dominant_axis == "CONNECTION_SHIFT", (
         "Pity→Compassion should show CONNECTION_SHIFT, "
@@ -429,7 +429,7 @@ def test_vac_rejects_out_of_range():
     """Test that VAC rejects values outside [-1, 1]."""
     with pytest.raises(ValueError):
         VACVector(valence=1.5, arousal=0.5, connection=0.3)
-    
+
     with pytest.raises(ValueError):
         VACVector(valence=0.5, arousal=-1.5, connection=0.3)
 ```
@@ -452,15 +452,15 @@ def test_quaternion_multiplication_with_identity_returns_same_quaternion():
 def test_slerp_generates_correct_frame_count():
     """
     Test that generate_slerp_path() returns the requested number of frames.
-    
+
     SLERP should generate exactly num_frames quaternions, with the first
     equal to q_start and the last equal to q_end.
     """
     q_start = Quaternion.identity()
     q_end = Quaternion(0.707, 0, 0.707, 0)
-    
+
     frames = generate_slerp_path(q_start, q_end, num_frames=60)
-    
+
     assert len(frames) == 60
     assert frames[0] == q_start
     assert frames[-1] == q_end
@@ -500,11 +500,11 @@ pytest --lf  # --last-failed
 def test_with_debugger():
     """Test with debugger breakpoint."""
     q = Quaternion(1, 2, 3, 4)
-    
+
     breakpoint()  # Python 3.7+
     # OR
     import pdb; pdb.set_trace()
-    
+
     result = q.normalize()
 ```
 
@@ -557,7 +557,7 @@ Tests run before each commit:
 pytest tests/ --cov=app --cov-report=term-missing
 ```
 
-**Target:** 100% coverage  
+**Target:** 100% coverage
 **Current:** 100% ✅
 
 ### What to Cover
@@ -585,7 +585,7 @@ def test_quaternion_conjugate_inverse():
     q = Quaternion(0.5, 0.5, 0.5, 0.5)
     q_conj = q.conjugate()
     result = q.multiply(q_conj)
-    
+
     assert result.w == pytest.approx(1.0, abs=1e-6)
     assert result.x == pytest.approx(0.0, abs=1e-6)
     assert result.y == pytest.approx(0.0, abs=1e-6)
@@ -600,7 +600,7 @@ def test_normalize_is_idempotent():
     q = Quaternion(1, 2, 3, 4)
     q_norm1 = q.normalize()
     q_norm2 = q_norm1.normalize()
-    
+
     assert q_norm1 == q_norm2
 ```
 
@@ -611,7 +611,7 @@ def test_dot_product_is_commutative():
     """Test that q1·q2 = q2·q1."""
     q1 = Quaternion(1, 2, 3, 4).normalize()
     q2 = Quaternion(4, 3, 2, 1).normalize()
-    
+
     assert q1.dot(q2) == pytest.approx(q2.dot(q1))
 ```
 
@@ -678,5 +678,5 @@ Now that you understand testing:
 
 ---
 
-**Previous:** [← Common Tasks](04-common-tasks.md)  
+**Previous:** [← Common Tasks](04-common-tasks.md)
 **Next:** [First Contribution →](06-first-contribution.md)

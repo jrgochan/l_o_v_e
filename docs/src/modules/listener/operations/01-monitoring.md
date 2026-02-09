@@ -1,8 +1,8 @@
 # Monitoring & Operations
 
-**Reading Time:** ~20 minutes  
-**Audience:** Engineering managers, DevOps, SRE  
-**Prerequisites:** [Integration Points](../architecture/10-integration-points.md)  
+**Reading Time:** ~20 minutes
+**Audience:** Engineering managers, DevOps, SRE
+**Prerequisites:** [Integration Points](../architecture/10-integration-points.md)
 **Goal:** Learn how to monitor and operate the Listener in production
 
 ---
@@ -14,11 +14,11 @@ graph TD
     A[Listener Service] --> B[Metrics Export<br/>Prometheus]
     A --> C[Logs<br/>JSON Format]
     A --> D[Health Checks<br/>HTTP]
-    
+
     B --> E[Grafana<br/>Dashboards]
     C --> F[ELK Stack<br/>Log Aggregation]
     D --> G[Alert Manager<br/>PagerDuty]
-    
+
     style A fill:#4f46e5,color:#fff
     style E fill:#6366f1,color:#fff
     style F fill:#818cf8,color:#fff
@@ -73,9 +73,9 @@ async def readiness_check():
         "redis": await check_redis(),
         "disk_space": check_disk_space() > 1024  # > 1GB free
     }
-    
+
     all_healthy = all(checks.values())
-    
+
     return {
         "ready": all_healthy,
         "checks": checks
@@ -405,7 +405,7 @@ echo "\n✅ Daily check complete"
 
 ### Disaster Recovery
 
-**RTO (Recovery Time Objective):** 15 minutes  
+**RTO (Recovery Time Objective):** 15 minutes
 **RPO (Recovery Point Objective):** 0 (no data loss)
 
 **Recovery Process:**
@@ -450,13 +450,13 @@ echo "\n✅ Daily check complete"
 # Daily cost report
 def calculate_daily_cost():
     requests_today = get_request_count_24h()
-    
+
     # Infrastructure cost (prorated)
     infra_cost_daily = 225 / 30  # $225/month
-    
+
     # Cost per request
     cost_per_request = infra_cost_daily / requests_today
-    
+
     return {
         "date": today,
         "requests": requests_today,
@@ -469,11 +469,11 @@ def calculate_daily_cost():
 
 ## Key Takeaways
 
-✅ **Multi-layer monitoring:** Metrics, logs, health checks  
-✅ **Proactive alerting:** Critical vs. warning alerts  
-✅ **Daily operations:** 5-minute morning health check  
-✅ **Incident response:** Clear runbooks for common issues  
-✅ **Cost tracking:** Monitor infrastructure spending  
+✅ **Multi-layer monitoring:** Metrics, logs, health checks
+✅ **Proactive alerting:** Critical vs. warning alerts
+✅ **Daily operations:** 5-minute morning health check
+✅ **Incident response:** Clear runbooks for common issues
+✅ **Cost tracking:** Monitor infrastructure spending
 
 ---
 

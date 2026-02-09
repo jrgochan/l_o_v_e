@@ -43,20 +43,20 @@ def calculate_transition(
 ) -> Quaternion:
     """
     Calculate the transition quaternion.
-    
+
     Args:
         q_start: Starting emotional state
         q_target: Target emotional state
-    
+
     Returns:
         Transition quaternion representing the rotation between states
     """
     # Get conjugate of start
     q_start_conjugate = q_start.conjugate()
-    
+
     # Multiply: q_target × q_start*
     q_transition = q_target.multiply(q_start_conjugate)
-    
+
     return q_transition
 ```
 
@@ -112,19 +112,19 @@ import math
 def angular_distance(q_transition: Quaternion) -> float:
     """
     Calculate angular distance from transition quaternion.
-    
+
     Args:
         q_transition: Transition quaternion (q_target × q_start*)
-    
+
     Returns:
         Angular distance in radians [0, π]
     """
     # Clamp w to [-1, 1] for numerical stability
     w_clamped = max(-1.0, min(1.0, q_transition.w))
-    
+
     # Calculate angle
     phi = 2 * math.acos(abs(w_clamped))
-    
+
     return phi
 ```
 
@@ -175,19 +175,19 @@ def calculate_elasticity(
 ) -> float:
     """
     Calculate elasticity (velocity of change).
-    
+
     Args:
         angular_distance: φ in radians
         time_delta: Δt in seconds
-    
+
     Returns:
         Elasticity in rad/s
     """
     if time_delta <= 0:
         return 0.0
-    
+
     elasticity = angular_distance / time_delta
-    
+
     return elasticity
 ```
 
@@ -199,7 +199,7 @@ FLOODING_THRESHOLD = 2.0  # rad/s (configurable)
 def detect_flooding(elasticity: float) -> bool:
     """
     Detect if user is experiencing emotional flooding.
-    
+
     Flooding = rapid state changes that overwhelm processing
     """
     return elasticity > FLOODING_THRESHOLD
@@ -235,20 +235,20 @@ Identify which emotional dimension changed most significantly.
 def detect_dominant_axis(q_trans: Quaternion) -> str:
     """
     Identify dominant axis of change.
-    
+
     Returns:
         "VALENCE_SHIFT" | "AROUSAL_SHIFT" | "CONNECTION_SHIFT" | "NEUTRAL"
     """
     abs_x = abs(q_trans.x)
     abs_y = abs(q_trans.y)
     abs_z = abs(q_trans.z)
-    
+
     max_component = max(abs_x, abs_y, abs_z)
-    
+
     # Threshold for significance
     if max_component < 0.1:
         return "NEUTRAL"
-    
+
     # Find dominant
     if abs_x == max_component:
         return "VALENCE_SHIFT"
@@ -290,28 +290,28 @@ def process_transition(
 ) -> TransitionResult:
     """
     Complete transition analysis pipeline.
-    
+
     Returns:
         TransitionResult with all metrics
     """
     # 1. Calculate transition quaternion
     q_trans = calculate_transition(q_start, q_target)
-    
+
     # 2. Calculate angular distance
     phi = angular_distance(q_trans)
-    
+
     # 3. Calculate elasticity
     elasticity = calculate_elasticity(phi, time_delta)
-    
+
     # 4. Detect flooding
     is_flooding = elasticity > flooding_threshold
-    
+
     # 5. Detect dominant axis
     axis_code = detect_dominant_axis(q_trans)
-    
+
     # 6. Generate insight
     insight = generate_insight(axis_code)
-    
+
     return TransitionResult(
         transition_quaternion=q_trans,
         angular_distance_radians=phi,
@@ -332,9 +332,9 @@ def test_transition_from_identity():
     """Transition from neutral should equal target state"""
     q_identity = Quaternion.identity()
     q_joy = VACVector(0.9, 0.7, 0.8).to_quaternion()
-    
+
     q_trans = calculate_transition(q_identity, q_joy)
-    
+
     # Should be approximately equal to q_joy
     assert abs(q_trans.w - q_joy.w) < 1e-5
     assert abs(q_trans.x - q_joy.x) < 1e-5
@@ -344,17 +344,17 @@ def test_angular_distance_to_self():
     q = VACVector(0.5, 0.3, 0.6).to_quaternion()
     q_trans = calculate_transition(q, q)
     phi = angular_distance(q_trans)
-    
+
     assert phi < 1e-5  # Essentially zero
 
 def test_flooding_detection():
     """High elasticity should trigger flooding"""
     phi = 3.0  # radians
     time_delta = 1.0  # second
-    
+
     elasticity = calculate_elasticity(phi, time_delta)
     assert elasticity == 3.0
-    
+
     is_flooding = detect_flooding(elasticity)
     assert is_flooding == True
 ```
@@ -366,10 +366,10 @@ def test_pity_to_compassion_connection_shift():
     """Critical: Pity → Compassion must show CONNECTION_SHIFT"""
     pity = VACVector(-0.3, -0.2, -0.6).to_quaternion()
     compassion = VACVector(-0.3, -0.2, 0.8).to_quaternion()
-    
+
     q_trans = calculate_transition(pity, compassion)
     axis_code = detect_dominant_axis(q_trans)
-    
+
     assert axis_code == "CONNECTION_SHIFT", \
         "Pity→Compassion MUST be a pure connection shift"
 ```

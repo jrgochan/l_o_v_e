@@ -131,21 +131,21 @@ def batch_vac_to_quaternion(vacs: List[VACVector]) -> List[Quaternion]:
     """Vectorized VAC conversion using NumPy."""
     # Stack VACs into array
     vac_array = np.array([[v.valence, v.arousal, v.connection] for v in vacs])
-    
+
     # Vectorized magnitude calculation
     magnitudes = np.linalg.norm(vac_array, axis=1)
-    
+
     # Vectorized normalization
     axes = vac_array / magnitudes[:, np.newaxis]
-    
+
     # Vectorized angle calculation
     angles = PI_OVER_MAX_MAG * magnitudes
-    
+
     # Vectorized quaternion construction
     half_angles = angles / 2
     sin_halves = np.sin(half_angles)
     cos_halves = np.cos(half_angles)
-    
+
     # Build quaternions
     quaternions = []
     for i in range(len(vacs)):
@@ -156,7 +156,7 @@ def batch_vac_to_quaternion(vacs: List[VACVector]) -> List[Quaternion]:
             z=axes[i, 2] * sin_halves[i]
         )
         quaternions.append(q)
-    
+
     return quaternions
 ```text
 
@@ -269,7 +269,7 @@ from locust import HttpUser, task, between
 
 class VersorUser(HttpUser):
     wait_time = between(0.1, 0.5)
-    
+
     @task
     def calculate(self):
         self.client.post("/versor/calculate", json={
@@ -324,7 +324,7 @@ async def calculate_streaming(request: StateRequest):
         path = generate_slerp_path(...)
         for q in path:
             yield json.dumps({"w": q.w, "x": q.x, "y": q.y, "z": q.z})
-    
+
     return StreamingResponse(generate(), media_type="application/json")
 ```text
 
@@ -545,18 +545,18 @@ redis_client = redis.Redis(host='localhost', port=6379)
 def cached_slerp_path(q1, q2, steps):
     # Generate cache key
     key = f"slerp:{q1}:{q2}:{steps}"
-    
+
     # Check cache
     cached = redis_client.get(key)
     if cached:
         return pickle.loads(cached)
-    
+
     # Calculate
     path = generate_slerp_path(q1, q2, steps)
-    
+
     # Store in cache (TTL: 1 hour)
     redis_client.setex(key, 3600, pickle.dumps(path))
-    
+
     return path
 ```text
 
@@ -682,11 +682,11 @@ request_duration = Histogram('versor_request_duration_seconds', 'Request duratio
 @router.post("/calculate")
 async def calculate_state(request: StateRequest):
     request_count.inc()
-    
+
     with request_duration.time():
         # Calculate
         result = ...
-    
+
     return result
 ```text
 
@@ -779,14 +779,14 @@ import time
 def test_vac_to_quaternion_performance():
     """Ensure VAC conversion stays fast."""
     vac = VACVector(0.8, 0.6, 0.7)
-    
+
     start = time.perf_counter()
     for _ in range(1000):
         q = vac.to_quaternion()
     end = time.perf_counter()
-    
+
     avg_time = (end - start) / 1000
-    
+
     # Should be < 0.001ms per call
     assert avg_time < 0.000001
 
@@ -794,13 +794,13 @@ def test_slerp_performance():
     """Ensure SLERP generation stays under 10ms."""
     q1 = VACVector(0.8, 0.6, 0.7).to_quaternion()
     q2 = VACVector(-0.3, -0.2, -0.4).to_quaternion()
-    
+
     start = time.perf_counter()
     path = generate_slerp_path(q1, q2, steps=60)
     end = time.perf_counter()
-    
+
     duration_ms = (end - start) * 1000
-    
+
     # Should be < 10ms
     assert duration_ms < 10.0
 ```text
@@ -940,5 +940,5 @@ def quaternion_multiply_jit(q1, q2):
 
 ---
 
-**Previous:** [← SciPy Integration](05-scipy-integration.md)  
+**Previous:** [← SciPy Integration](05-scipy-integration.md)
 **Next:** [Extending Versor →](07-extending-versor.md)

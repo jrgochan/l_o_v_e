@@ -1,4 +1,4 @@
-from pwdlib import PasswordHash
+from pwdlib import PasswordHash  # pylint: disable=import-error
 
 from app.core.security import get_password_hash, verify_password
 
@@ -12,7 +12,9 @@ def test_password_hashing():
 
 def test_hasher_configuration():
     # Verify execution uses Argon2
-    from app.core.security import password_hash
+    from app.core.security import (  # pylint: disable=import-outside-toplevel
+        password_hash,
+    )
 
     assert isinstance(password_hash, PasswordHash)
 

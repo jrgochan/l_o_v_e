@@ -65,7 +65,7 @@ if magnitude < EPSILON:
     return Quaternion(w=1.0, x=0.0, y=0.0, z=0.0)  # Identity
 ```
 
-**Rationale**: 
+**Rationale**:
 - Prevents division by zero in normalization
 - Neutral emotional state = no rotation from baseline
 - Identity quaternion represents 0° rotation
@@ -112,7 +112,7 @@ def construct_quaternion(axis: List[float], angle: float) -> Quaternion:
     half_angle = angle / 2
     sin_half = math.sin(half_angle)
     cos_half = math.cos(half_angle)
-    
+
     return Quaternion(
         w=cos_half,
         x=axis[0] * sin_half,
@@ -157,49 +157,49 @@ class VACVector:
     valence: float   # [-1.0, 1.0]
     arousal: float   # [-1.0, 1.0]
     connection: float  # [-1.0, 1.0]
-    
+
     def to_quaternion(self) -> 'Quaternion':
         """
         Convert VAC vector to unit quaternion.
-        
+
         Returns:
             Unit quaternion in scalar-first notation [w, x, y, z]
         """
         # Step 1: Validate and clamp
         v = self._validate_and_clamp()
-        
+
         # Step 2: Calculate magnitude
         magnitude = math.sqrt(v[0]**2 + v[1]**2 + v[2]**2)
-        
+
         # Step 3: Handle zero vector
         if magnitude < EPSILON:
             return Quaternion.identity()
-        
+
         # Step 4: Normalize axis
         axis = [component / magnitude for component in v]
-        
+
         # Step 5: Calculate angle
         max_magnitude = math.sqrt(3)
         angle = math.pi * (magnitude / max_magnitude)
-        
+
         # Step 6: Construct quaternion
         half_angle = angle / 2
         sin_half = math.sin(half_angle)
         cos_half = math.cos(half_angle)
-        
+
         q = Quaternion(
             w=cos_half,
             x=axis[0] * sin_half,
             y=axis[1] * sin_half,
             z=axis[2] * sin_half
         )
-        
+
         # Step 7: Verify (in debug mode)
         if __debug__:
             assert self._verify_unit(q), "Quaternion not unit length"
-        
+
         return q
-    
+
     def _validate_and_clamp(self) -> List[float]:
         """Validate and clamp VAC components"""
         return [
@@ -207,7 +207,7 @@ class VACVector:
             max(-1.0, min(1.0, self.arousal)),
             max(-1.0, min(1.0, self.connection))
         ]
-    
+
     def _verify_unit(self, q: 'Quaternion') -> bool:
         """Verify quaternion is unit length"""
         norm = math.sqrt(q.w**2 + q.x**2 + q.y**2 + q.z**2)
@@ -240,7 +240,7 @@ class VACVector:
    θ/2 = 1.263 rad
    cos(1.263) ≈ 0.306
    sin(1.263) ≈ 0.952
-   
+
    q = [0.306, 0.646×0.952, 0.502×0.952, 0.574×0.952]
      = [0.306, 0.615, 0.478, 0.546]
 
@@ -270,7 +270,7 @@ class VACVector:
    θ/2 ≈ 1.223 rad
    cos(1.223) ≈ 0.342
    sin(1.223) ≈ 0.940
-   
+
    q = [0.342, -0.627, -0.070, -0.697]
 
 6. Verify: ||q|| ≈ 1.0 ✓
@@ -305,7 +305,7 @@ def test_neutral_state_identity():
     """Neutral VAC should produce identity quaternion"""
     vac = VACVector(valence=0.0, arousal=0.0, connection=0.0)
     q = vac.to_quaternion()
-    
+
     assert q.w == 1.0
     assert q.x == 0.0
     assert q.y == 0.0
@@ -319,11 +319,11 @@ def test_all_quaternions_unit_length():
         [0.5, -0.7, 0.4],    # Calm
         [-0.5, 0.8, -0.2]    # Anger
     ]
-    
+
     for vac_values in test_cases:
         vac = VACVector(*vac_values)
         q = vac.to_quaternion()
-        
+
         norm = math.sqrt(q.w**2 + q.x**2 + q.y**2 + q.z**2)
         assert abs(norm - 1.0) < 1e-6, f"Failed for {vac_values}"
 
@@ -331,7 +331,7 @@ def test_clamping_out_of_range():
     """Values > 1.0 should be clamped to 1.0"""
     vac = VACVector(valence=1.5, arousal=0.5, connection=0.5)
     q = vac.to_quaternion()
-    
+
     # Should clamp to [1.0, 0.5, 0.5] internally
     # Verify result is still unit quaternion
     norm = math.sqrt(q.w**2 + q.x**2 + q.y**2 + q.z**2)
