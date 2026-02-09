@@ -1,0 +1,74 @@
+[
+  {
+    "id": "shame_healing",
+    "name": "Shame Healing Triangle",
+    "description": "Brené Brown's research-backed path from shame to compassion through vulnerability",
+    "emotions": ["Shame", "Vulnerability", "Compassion"],
+    "why_powerful": "Addresses shame's core mechanism: isolation. Vulnerability breaks the secrecy that feeds shame, enabling compassionate connection.",
+    "research": "Brown, B. (2012). Daring Greatly",
+    "estimated_time": "2-4 weeks",
+    "category": "healing",
+    "difficulty": "difficult",
+    "icon": "🔺"
+  },
+  {
+    "id": "joy_cultivation",
+    "name": "Joy Cultivation Path",
+    "description": "Building sustainable joy through gratitude and awe",
+    "emotions": ["Contentment", "Gratitude", "Joy", "Awe"],
+    "why_powerful": "Counters foreboding joy. Gratitude amplifies positive emotions, awe provides perspective that sustains joy.",
+    "research": "Emmons (2007), Keltner (2023)",
+    "estimated_time": "1-2 weeks",
+    "category": "growth",
+    "difficulty": "easy",
+    "icon": "😊"
+  },
+  {
+    "id": "anxiety_relief",
+    "name": "Anxiety Relief Sequence",
+    "description": "From worry to peace through perspective shift and acceptance",
+    "emotions": ["Anxiety", "Awe", "Acceptance", "Peace"],
+    "why_powerful": "Awe interrupts anxious rumination by reducing self-focus. Acceptance stops the struggle. Peace emerges naturally.",
+    "research": "Keltner (2023), Hayes (ACT 1999)",
+    "estimated_time": "1-3 weeks",
+    "category": "healing",
+    "difficulty": "moderate",
+    "icon": "🌊"
+  },
+  {
+    "id": "grief_integration",
+    "name": "Grief Integration Journey",
+    "description": "Healthy grief processing toward peace without bypassing loss",
+    "emotions": ["Grief", "Sadness", "Acceptance", "Peace"],
+    "why_powerful": "Honors loss authentically. Acceptance doesn't mean forgetting - it means finding peace alongside grief.",
+    "research": "Kessler (2019) - Finding Meaning",
+    "estimated_time": "Variable (months)",
+    "category": "healing",
+    "difficulty": "difficult",
+    "icon": "💔"
+  },
+  {
+    "id": "connection_building",
+    "name": "Connection Building Path",
+    "description": "From isolation to belonging through vulnerability and compassion",
+    "emotions": ["Loneliness", "Vulnerability", "Compassion", "Belonging"],
+    "why_powerful": "Addresses the core human need for connection. Vulnerability is the pathway from isolation to authentic belonging.",
+    "research": "Brown (2012) - Daring Greatly",
+    "estimated_time": "2-4 weeks",
+    "category": "growth",
+    "difficulty": "moderate",
+    "icon": "🤝"
+  },
+  {
+    "id": "courage_building",
+    "name": "Courage Building Sequence",
+    "description": "From fear to confidence through courageous action",
+    "emotions": ["Fear", "Courage", "Confidence"],
+    "why_powerful": "Confidence comes from evidence that you can handle challenges. Courage provides that evidence.",
+    "research": "Brown (2018) - Dare to Lead",
+    "estimated_time": "2-6 weeks",
+    "category": "growth",
+    "difficulty": "moderate",
+    "icon": "💪"
+  }
+]

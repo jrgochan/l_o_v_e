@@ -1,0 +1,13 @@
+[MASTER]
+extension-pkg-allow-list=parselmouth
+ignore-paths=^migrations/.*$,^tests/.*$
+
+[MESSAGES CONTROL]
+disable=
+    missing-module-docstring,
+    missing-class-docstring,
+    missing-function-docstring,
+    too-few-public-methods,
+    no-name-in-module,
+    no-self-argument,
+    no-member

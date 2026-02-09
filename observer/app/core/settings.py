@@ -1,0 +1,172 @@
+"""Configuration management using Pydantic Settings.
+
+Loads environment variables from .env file.
+"""
+
+import json
+from typing import List
+
+from pydantic import Field, model_validator
+from pydantic_settings import SettingsConfigDict
+
+try:
+    from settings import LoveBaseSettings
+except ImportError:
+    # pylint: disable=ungrouped-imports
+    from pydantic_settings import BaseSettings as LoveBaseSettings
+
+
+class Settings(LoveBaseSettings):  # type: ignore
+    """Application settings loaded from environment variables.
+
+    pylint: disable=invalid-name
+    """
+
+    # ============================================================================
+    # DATABASE CONFIGURATION
+    # ============================================================================
+
+    # pylint: disable=invalid-name
+    POSTGRES_USER: str = Field(default="love_user")
+    POSTGRES_PASSWORD: str = Field(default="love_password")
+    POSTGRES_DB: str = Field(default="love_db")
+    POSTGRES_HOST: str = Field(default="localhost")
+    POSTGRES_PORT: int = Field(default=5432)
+    # pylint: enable=invalid-name
+
+    DATABASE_URL: str | None = None  # pylint: disable=invalid-name
+
+    @model_validator(mode="after")
+    def assemble_db_connection(self) -> "Settings":
+        """Docstring."""
+        if not self.DATABASE_URL:  # pylint: disable=invalid-name
+            self.DATABASE_URL = (  # pylint: disable=invalid-name
+                f"postgresql+asyncpg://{self.POSTGRES_USER}:{self.POSTGRES_PASSWORD}"
+                f"@{self.POSTGRES_HOST}:{self.POSTGRES_PORT}/{self.POSTGRES_DB}"
+            )
+        return self
+
+    # ============================================================================
+    # EMBEDDING SERVICE
+    # ============================================================================
+
+    EMBEDDING_PROVIDER: str = Field(default="local")  # "local" or "openai"
+    EMBEDDING_MODEL: str = Field(default="all-MiniLM-L6-v2")
+
+    # OpenAI (optional)
+    OPENAI_API_KEY: str = Field(default="")
+    OPENAI_EMBEDDING_MODEL: str = Field(default="text-embedding-3-small")
+
+    @property
+    def EMBEDDING_DIMENSION(self) -> int:  # pylint: disable=invalid-name
+        """Return embedding dimension based on model."""
+        dimensions = {
+            "all-MiniLM-L6-v2": 384,
+            "all-mpnet-base-v2": 768,
+            "text-embedding-3-small": 1536,
+            "text-embedding-3-large": 3072,
+        }
+        return dimensions.get(self.EMBEDDING_MODEL, 384)
+
+    # ============================================================================
+    # EXTERNAL SERVICES
+    # ============================================================================
+
+    VERSOR_URL: str = Field(default="http://localhost:8001")
+    LISTENER_URL: str = Field(default="http://localhost:8002")
+
+    @property
+    def LISTENER_API_URL(self) -> str:  # pylint: disable=invalid-name
+        """Construct Listener API URL for latency checks."""
+        return self.LISTENER_URL
+
+    # ============================================================================
+    # SECURITY
+    # ============================================================================
+
+    SECRET_KEY: str = Field(default="dev-secret-key-change-in-production")
+    ALGORITHM: str = Field(default="HS256")
+    ACCESS_TOKEN_EXPIRE_MINUTES: int = Field(default=30)
+    ALLOWED_ORIGINS: str = Field(
+        default='["http://localhost:3000", "http://127.0.0.1:3000", "http://localhost:19006"]'
+    )
+
+    @property
+    def ALLOWED_ORIGINS_LIST(self) -> List[str]:  # pylint: disable=invalid-name
+        """Parse comma-separated allowed origins into list."""
+        try:
+            result: List[str] = json.loads(self.ALLOWED_ORIGINS)
+            return result
+        except json.JSONDecodeError:
+            # Fallback to comma-separated string
+            return [
+                origin.strip()
+                for origin in self.ALLOWED_ORIGINS.split(",")  # pylint: disable=no-member
+                if origin.strip()
+            ]
+
+    # ============================================================================
+    # PERFORMANCE TUNING
+    # ============================================================================
+
+    HNSW_EF_SEARCH: int = Field(default=40)
+    DB_POOL_SIZE: int = Field(default=20)
+    DB_MAX_OVERFLOW: int = Field(default=10)
+    DB_POOL_RECYCLE: int = Field(default=3600)
+
+    # ============================================================================
+    # LOGGING & DEBUGGING
+    # ============================================================================
+
+    DEBUG: bool = Field(default=True)
+    LOG_LEVEL: str = Field(default="DEBUG")
+
+    # ============================================================================
+    # EMOTION MATCHING STRATEGY
+    # ============================================================================
+
+    EMOTION_MATCHING_VAC_WEIGHT_SHORT: float = Field(default=0.8)
+    EMOTION_MATCHING_SEMANTIC_WEIGHT_SHORT: float = Field(default=0.2)
+    EMOTION_MATCHING_VAC_WEIGHT_LONG: float = Field(default=0.4)
+    EMOTION_MATCHING_SEMANTIC_WEIGHT_LONG: float = Field(default=0.6)
+    EMOTION_MATCHING_SHORT_TEXT_THRESHOLD: int = Field(default=10)
+
+    # Normalization constants (based on max possible distances)
+    EMOTION_MATCHING_VAC_MAX_DISTANCE: float = Field(default=3.46)
+    EMOTION_MATCHING_SEMANTIC_MAX_DISTANCE: float = Field(default=2.0)
+
+    # ============================================================================
+    # APPLICATION SETTINGS
+    # ============================================================================
+
+    API_VERSION: str = Field(default="v1")
+    APP_NAME: str = Field(default="L.O.V.E. Observer API")
+    APP_DESCRIPTION: str = Field(default="Emotional state persistence and context retrieval")
+    DEFAULT_EMOTION_COLLECTION: str = Field(default="goemotions")
+
+    # Server Configuration
+    HOST: str = Field(default="0.0.0.0")  # nosec B104
+    PORT: int = Field(default=8000)
+
+    @model_validator(mode="after")
+    def validate_embedding_config(self) -> "Settings":
+        """Validate embedding provider configuration."""
+        if self.EMBEDDING_PROVIDER == "openai" and not self.OPENAI_API_KEY:
+            raise ValueError("OPENAI_API_KEY must be set when EMBEDDING_PROVIDER is 'openai'")
+        return self
+
+    model_config = SettingsConfigDict(
+        env_file=(".env", "../../../infra/config/base.env"),
+        case_sensitive=True,
+        extra="ignore",
+    )
+
+
+# Global settings instance
+settings = Settings()
+
+
+# Convenience function for external imports
+def get_settings() -> Settings:
+    """Get application settings instance."""
+    return settings
