@@ -26,7 +26,7 @@ export const StepAlternativeSelector: React.FC<StepAlternativeSelectorProps> = (
         setIsLoading(true);
         const data = await therapeuticService.getStepAlternatives(currentEmotionId, goalEmotionId);
         setAlternatives(data.alternatives || []);
-      } catch (_err) {
+      } catch {
         setError("Could not load alternatives");
       } finally {
         setIsLoading(false);
