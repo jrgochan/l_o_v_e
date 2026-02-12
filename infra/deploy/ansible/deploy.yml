@@ -1,0 +1,20 @@
+---
+- name: Deploy Love Stack to RHEL9
+  hosts: rhel9
+  become: true
+  
+  roles:
+    - role: common
+      tags: setup
+    - role: python
+      tags: setup
+    - role: postgres
+      tags: [setup, deploy]
+    - role: redis
+      tags: setup
+    - role: ollama
+      tags: setup
+    - role: nginx
+      tags: setup
+    - role: app
+      tags: deploy

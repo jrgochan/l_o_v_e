@@ -7,7 +7,7 @@ sys.path.insert(0, str(Path(__file__).parent.parent))
 
 from app.database import AsyncSessionLocal  # noqa: E402
 from app.models.multi_emotion_analysis import MultiEmotionAnalysis  # noqa: E402
-from app.services.chat_service import ChatService  # noqa: E402
+from app.services.chat.service import ChatService  # noqa: E402
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)

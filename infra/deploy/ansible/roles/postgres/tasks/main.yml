@@ -1,0 +1,185 @@
+---
+- name: Remove conflicting postgres packages
+  dnf:
+    name:
+      - postgresql
+      - postgresql-server
+      - postgresql-libs
+    state: absent
+
+- name: Install PGDG Repo
+  dnf:
+    name: https://download.postgresql.org/pub/repos/yum/reporpms/EL-9-x86_64/pgdg-redhat-repo-latest.noarch.rpm
+    state: present
+    disable_gpg_check: yes
+
+- name: Disable default postgresql module
+  command: dnf -qy module disable postgresql
+  changed_when: false
+  ignore_errors: yes
+
+- name: Install PostgreSQL 18
+  dnf:
+    name:
+      - postgresql18-server
+      - postgresql18-contrib
+    state: present
+    nobest: true
+    skip_broken: true
+
+- name: Check if PG_VERSION exists
+  stat:
+    path: /var/lib/pgsql/18/data/PG_VERSION
+  register: pg_version
+
+- name: Check if data directory is empty
+  find:
+    paths: /var/lib/pgsql/18/data
+    file_type: any
+  register: pg_data_files
+  when: not pg_version.stat.exists
+
+- name: Backup and clear corrupted data directory
+  shell: |
+    mv /var/lib/pgsql/18/data /var/lib/pgsql/18/data.bak.$(date +%s)
+    mkdir -p /var/lib/pgsql/18/data
+    chown postgres:postgres /var/lib/pgsql/18/data
+    chmod 700 /var/lib/pgsql/18/data
+  when: not pg_version.stat.exists and pg_data_files.matched > 0
+
+- name: Initialize PostgreSQL
+  command: /usr/pgsql-18/bin/postgresql-18-setup initdb
+  when: not pg_version.stat.exists
+
+- name: Enable and Start PostgreSQL
+  service:
+    name: postgresql-18
+    state: started
+    enabled: yes
+
+- name: Wait for PostgreSQL to start
+  wait_for:
+    port: 5432
+    delay: 2
+    timeout: 30
+  when: not ansible_check_mode
+
+- name: Install python3-psycopg2 (System Python)
+  dnf:
+    name: python3-psycopg2
+    state: present
+    nobest: true
+    skip_broken: true
+
+- name: Find PostgreSQL socket
+  find:
+    paths:
+      - /var/run/postgresql
+      - /tmp
+    patterns: ".s.PGSQL.5432"
+    file_type: any
+    hidden: yes
+    recurse: yes
+  register: pg_socket_found
+
+- name: Set PostgreSQL socket directory
+  set_fact:
+    pg_socket_dir: "{{ pg_socket_found.files[0].path | dirname }}"
+  when: pg_socket_found.matched > 0
+
+- name: Warn if PostgreSQL is not running
+  debug:
+    msg: "PostgreSQL socket not found. Database configuration tasks will be skipped. This is expected if PostgreSQL is not running yet."
+  when: pg_socket_found.matched == 0
+
+- name: Create database user
+  community.postgresql.postgresql_user:
+    name: love_user
+    password: love_password
+    role_attr_flags: CREATEDB,NOSUPERUSER
+    login_user: postgres
+    login_unix_socket: "{{ pg_socket_dir | default('/tmp') }}"
+  become: true
+  become_user: postgres
+  vars:
+    ansible_python_interpreter: /usr/bin/python3
+  when: pg_socket_found.matched > 0
+
+- name: Debug DB Reset Variables
+  debug:
+    msg: "force_db_reset: {{ force_db_reset | default('UNDEFINED') }}, pg_socket_found matched: {{ pg_socket_found.matched }}"
+
+- name: Terminate connections to database
+  community.postgresql.postgresql_query:
+    db: postgres
+    login_user: postgres
+    login_unix_socket: "{{ pg_socket_dir | default('/tmp') }}"
+    query: "SELECT pg_terminate_backend(pid) FROM pg_stat_activity WHERE datname = '{{ db_name }}' AND pid <> pg_backend_pid();"
+  become: true
+  become_user: postgres
+  vars:
+    ansible_python_interpreter: /usr/bin/python3
+  when: pg_socket_found.matched > 0 and force_db_reset
+  ignore_errors: yes
+
+- name: Drop database (Clean Deploy)
+  community.postgresql.postgresql_db:
+    name: "{{ db_name }}"
+    state: absent
+    login_user: postgres
+    login_unix_socket: "{{ pg_socket_dir | default('/tmp') }}"
+  become: true
+  become_user: postgres
+  vars:
+    ansible_python_interpreter: /usr/bin/python3
+  when: pg_socket_found.matched > 0 and force_db_reset
+
+- name: Create database
+  community.postgresql.postgresql_db:
+    name: love_db
+    owner: love_user
+    login_user: postgres
+    login_unix_socket: "{{ pg_socket_dir | default('/tmp') }}"
+  become: true
+  become_user: postgres
+  vars:
+    ansible_python_interpreter: /usr/bin/python3
+  when: pg_socket_found.matched > 0
+
+- name: Install PostgreSQL Development Headers
+  dnf:
+    name: postgresql18-devel
+    state: present
+    nobest: true
+
+- name: Clone pgvector repository
+  git:
+    repo: https://github.com/pgvector/pgvector.git
+    dest: /tmp/pgvector
+    version: master
+    force: yes
+
+- name: Build and Install pgvector
+  shell: |
+    export PATH=/usr/pgsql-18/bin:$PATH
+    make
+    make install
+  args:
+    chdir: /tmp/pgvector
+  become: true
+
+- name: Enable PostgreSQL extensions
+  community.postgresql.postgresql_ext:
+    name: "{{ item }}"
+    login_db: love_db
+    login_user: postgres
+    login_unix_socket: "{{ pg_socket_dir | default('/tmp') }}"
+  become: true
+  become_user: postgres
+  vars:
+    ansible_python_interpreter: /usr/bin/python3
+  loop:
+    - vector
+    - uuid-ossp
+    - pg_trgm
+  when: pg_socket_found.matched > 0 and not ansible_check_mode

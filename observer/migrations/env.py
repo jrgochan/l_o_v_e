@@ -8,8 +8,14 @@ from logging.config import fileConfig
 
 from alembic import context
 
+import sys
+import os
+
+# Add parent directory to path so we can import app
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
+
 # Import the app config and models
-from app.config import settings
+from app.core.settings import settings
 from app.database import Base
 from sqlalchemy import pool
 from sqlalchemy.engine import Connection

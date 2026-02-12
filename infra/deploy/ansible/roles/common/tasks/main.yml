@@ -1,0 +1,116 @@
+---
+- name: Clean up conflicting repositories
+  dnf:
+    name: remi-release
+    state: absent
+  ignore_errors: yes
+
+- name: Disable conflicting services (as requested)
+  service:
+    name: "{{ item }}"
+    state: stopped
+    enabled: no
+  loop:
+    - nuxt-ssr
+    - open-webui
+  ignore_errors: yes
+
+- name: Enable CRB (Code Ready Builder) via Subscription Manager
+  command: subscription-manager repos --enable codeready-builder-for-rhel-9-x86_64-rpms
+  register: sub_mgr_crb
+  failed_when: false
+  changed_when: "'enabled' in sub_mgr_crb.stdout"
+
+- name: Enable CRB (Code Ready Builder) via DNF (Fallback)
+  command: dnf config-manager --set-enabled crb
+  when: sub_mgr_crb.rc != 0
+  failed_when: false
+
+- name: Update all packages
+  dnf:
+    name: "*"
+    state: latest
+    nobest: true
+    skip_broken: true
+
+- name: Install EPEL Release
+  dnf:
+    name: epel-release
+    state: present
+
+- name: Install core dependencies
+  dnf:
+    name:
+      - git
+      - curl
+      - wget
+      - tar
+      - rsync
+      - gcc
+      - make
+      - openssl-devel
+      - bzip2-devel
+      - libffi-devel
+      - zlib-devel
+      - policycoreutils-python-utils
+      - nodejs
+    state: present
+    nobest: true
+    skip_broken: true
+
+- name: Allow Nginx/HTTPD to connect to network (SELinux)
+  seboolean:
+    name: httpd_can_network_connect
+    state: yes
+    persistent: yes
+  ignore_errors: yes
+
+- name: Allow Nginx to connect to application ports (SELinux)
+  seport:
+    ports: "{{ item }}"
+    proto: tcp
+    setype: http_port_t
+    state: present
+  loop:
+    - "{{ port_frontend }}"
+    - "{{ port_versor }}"
+    - "{{ port_observer }}"
+    - "{{ port_listener }}"
+  ignore_errors: yes
+
+- name: Create application group
+  group:
+    name: "{{ app_group }}"
+    state: present
+
+- name: Create application user
+  user:
+    name: "{{ app_user }}"
+    group: "{{ app_group }}"
+    home: "/home/{{ app_user }}"
+    shell: /bin/bash
+    state: present
+
+- name: Create application directory
+  file:
+    path: "{{ app_dir }}"
+    state: directory
+    owner: "{{ app_user if not ansible_check_mode else omit }}"
+    group: "{{ app_group if not ansible_check_mode else omit }}"
+    mode: '0755'
+
+- name: Ensure firewalld is running
+  service:
+    name: firewalld
+    state: started
+    enabled: yes
+
+- name: Open HTTP/HTTPS ports
+  firewalld:
+    service: "{{ item }}"
+    permanent: yes
+    state: enabled
+  loop:
+    - http
+    - https
+  notify: Reload firewalld

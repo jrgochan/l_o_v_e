@@ -1,0 +1,71 @@
+server {
+    listen 80;
+    server_name ${DOMAIN_NAME};
+
+    # Redirect HTTP to HTTPS
+    location / {
+        return 301 https://$host$request_uri;
+    }
+}
+
+server {
+    listen 443 ssl http2;
+    server_name ${DOMAIN_NAME};
+
+    # SSL Configuration (Certbot will manage these paths usually, but we include placeholders)
+    # ssl_certificate /etc/letsencrypt/live/${DOMAIN_NAME}/fullchain.pem;
+    # ssl_certificate_key /etc/letsencrypt/live/${DOMAIN_NAME}/privkey.pem;
+    # include /etc/letsencrypt/options-ssl-nginx.conf;
+    # ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem;
+
+    # Frontend
+    location / {
+        proxy_pass http://localhost:${PORT_FRONTEND};
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection 'upgrade';
+        proxy_set_header Host $host;
+        proxy_cache_bypass $http_upgrade;
+    }
+
+    # API Proxy - Observer
+    location /api/observer/ {
+        proxy_pass http://localhost:${PORT_OBSERVER}/;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection "upgrade";
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+
+    # API Proxy - Versor
+    location /api/versor/ {
+        proxy_pass http://localhost:${PORT_VERSOR}/;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection "upgrade";
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+
+    # API Proxy - Listener
+    location /api/listener/ {
+        proxy_pass http://localhost:${PORT_LISTENER}/;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection "upgrade";
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+
+    # Optional: Admin Visualization shortcut
+    location /admin/visualization {
+        return 301 /love/admin/visualization;
+    }
+}

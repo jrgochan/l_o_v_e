@@ -1,0 +1,21 @@
+---
+- name: Restart Backend Services
+  service:
+    name: "love-{{ item }}"
+    state: restarted
+    daemon_reload: yes
+  loop:
+    - versor
+    - observer
+    - listener
+
+- name: Restart Frontend Service
+  service:
+    name: love-frontend
+    state: restarted
+    daemon_reload: yes
+
+- name: Reload Nginx
+  service:
+    name: nginx
+    state: reloaded

@@ -1,0 +1,14 @@
+[Unit]
+Description=Love Stack - Listener Worker (Background Tasks)
+After=network.target love-listener.service redis.service
+
+[Service]
+User={{ app_user }}
+Group={{ app_group }}
+WorkingDirectory={{ app_dir }}/listener
+ExecStart={{ app_dir }}/listener/.venv/bin/arq app.workers.audio_processor.WorkerSettings
+Restart=always
+EnvironmentFile={{ app_dir }}/infra/deploy/configs/env/production.env
+
+[Install]
+WantedBy=multi-user.target

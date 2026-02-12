@@ -1,0 +1,16 @@
+[Unit]
+Description=Love Stack - Experience Frontend
+After=network.target
+
+[Service]
+User=${USER}
+Group=${GROUP}
+WorkingDirectory=${APP_DIR}/experience/web
+ExecStart=/usr/bin/npm start -- -p ${PORT_FRONTEND}
+Restart=always
+Environment=NODE_ENV=production
+Environment=PORT=${PORT_FRONTEND}
+EnvironmentFile=${APP_DIR}/infra/deploy/configs/env/production.env
+
+[Install]
+WantedBy=multi-user.target

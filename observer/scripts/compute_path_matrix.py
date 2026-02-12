@@ -30,7 +30,7 @@ import logging
 import uuid
 
 from app.database import AsyncSessionLocal
-from app.services.path_matrix_service import PathMatrixService
+from app.services.matrix.service import PathMatrixService
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)

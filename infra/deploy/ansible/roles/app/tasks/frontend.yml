@@ -1,0 +1,39 @@
+---
+- name: Link .env.production for frontend build
+  file:
+    src: "{{ app_dir }}/infra/deploy/configs/env/production.env"
+    dest: "{{ app_dir }}/experience/web/.env.production"
+    state: link
+    force: yes
+  become_user: "{{ app_user }}"
+
+- name: Install Frontend Dependencies
+  command: npm ci
+  args:
+    chdir: "{{ app_dir }}/experience/web"
+  become_user: "{{ app_user }}"
+
+- name: Build Frontend
+  command: npm run build
+  args:
+    chdir: "{{ app_dir }}/experience/web"
+  environment:
+    NEXT_PUBLIC_API_URL: "https://{{ domain_name }}/api/observer"
+    NEXT_PUBLIC_WS_URL: "wss://{{ domain_name }}/api/observer"
+    NEXT_PUBLIC_OBSERVER_URL: "https://{{ domain_name }}/api/observer"
+    NEXT_PUBLIC_VERSOR_URL: "https://{{ domain_name }}/api/versor"
+    NEXT_PUBLIC_LISTENER_URL: "https://{{ domain_name }}/api/listener"
+  become_user: "{{ app_user }}"
+
+- name: Deploy Frontend Systemd Unit
+  template:
+    src: love-frontend.service.j2
+    dest: "/etc/systemd/system/love-frontend.service"
+    mode: '0644'
+  notify: Restart Frontend Service
+
+- name: Enable Frontend Service
+  service:
+    name: love-frontend
+    enabled: yes
+    state: started

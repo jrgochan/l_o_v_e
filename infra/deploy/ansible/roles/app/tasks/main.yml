@@ -1,0 +1,56 @@
+---
+- name: Debug port_frontend variable
+  debug:
+    msg: "The value of port_frontend is {{ port_frontend }}"
+
+- name: Sync local repository to application directory
+  synchronize:
+    src: "{{ playbook_dir }}/../../../"
+    dest: "{{ app_dir }}"
+    archive: yes
+    recursive: yes
+    delete: yes
+    rsync_opts:
+      - "--exclude=.git"
+      - "--exclude=.venv"
+      - "--exclude=node_modules"
+      - "--exclude=.next"
+      - "--exclude=*.env"
+      - "--exclude=*.log"
+      - "--exclude=__pycache__"
+      - "--exclude=*.egg-info"
+
+- name: Ensure correct permissions on application directory (fast)
+  command: "chown -R {{ app_user }}:{{ app_group }} /home/love/love-stack"
+  become: yes
+
+- name: Grant Nginx access to home directory
+  file:
+    path: "{{ item }}"
+    mode: '0755'
+    state: directory
+  loop:
+    - /home/love
+    - /home/love/love-stack
+
+- name: Ensure env config directory exists
+  file:
+    path: "{{ app_dir }}/infra/deploy/configs/env"
+    state: directory
+    owner: "{{ app_user }}"
+    group: "{{ app_group }}"
+    mode: '0755'
+  become: yes
+
+- name: Create shared env file
+  template:
+    src: production.env.j2
+    dest: "{{ app_dir }}/infra/deploy/configs/env/production.env"
+    owner: "{{ app_user }}"
+    group: "{{ app_group }}"
+    mode: '0640'
+  become_user: "{{ app_user }}"
+
+- include_tasks: backend.yml
+- include_tasks: frontend.yml
+- include_tasks: nginx.yml

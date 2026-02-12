@@ -1,0 +1,27 @@
+---
+# Project Configuration
+domain_name: love.jrgochan.io
+admin_email: admin@jrgochan.io
+app_dir: /home/love/love-stack
+repo_url: git@github.com:jrgochan/l_o_v_e.git
+repo_branch: main
+app_user: love
+app_group: love
+
+# Versions
+python_version: "3.12"
+nodejs_version: "20"
+postgresql_version: "18"
+
+# Ports
+port_frontend: 3001
+port_observer: 8000
+port_versor: 8001
+port_listener: 8002
+port_personaplex: 8003
+
+# Database
+db_user: love_user
+db_password: love_password
+db_name: love_db
+force_db_reset: true

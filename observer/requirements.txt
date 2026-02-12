@@ -13,7 +13,7 @@ pgvector==0.3.6
 # Local Embeddings (Default) - Python 3.12+ compatible
 # Using explicit versions to ensure compatibility
 sentence-transformers>=2.7.0
-torch==2.3.0
+torch==2.4.0
 
 # Optional: External AI Support
 openai==2.15.0

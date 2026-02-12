@@ -1,0 +1,14 @@
+[Unit]
+Description=Love Stack - Experience Frontend
+After=network.target love-versor.service love-observer.service love-listener.service
+
+[Service]
+User={{ app_user }}
+Group={{ app_group }}
+WorkingDirectory={{ app_dir }}/experience/web
+ExecStart=/usr/bin/node .next/standalone/experience/web/server.js
+Restart=always
+EnvironmentFile={{ app_dir }}/infra/deploy/configs/env/production.env
+
+[Install]
+WantedBy=multi-user.target
