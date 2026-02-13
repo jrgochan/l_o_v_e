@@ -66,7 +66,7 @@ class JobManager:
                 total_paths,
                 completed_paths,
                 failed_paths,
-                created_at,
+                started_at,
                 created_by
             ) VALUES (
                 :job_id,
@@ -93,7 +93,7 @@ class JobManager:
                 total_paths,
                 completed_paths,
                 failed_paths,
-                created_at,
+                started_at,
                 completed_at,
                 error_message
             FROM path_computation_jobs

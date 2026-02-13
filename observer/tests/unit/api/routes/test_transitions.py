@@ -7,7 +7,6 @@ from fastapi import HTTPException
 
 from app.api.routes.transitions import (
     generate_transition_path,
-    get_all_cached_paths,
     get_journey_status,
     get_user_effective_strategies,
     get_user_journey_history,
@@ -639,10 +638,3 @@ async def test_mark_waypoint_reached_waypoint_not_found(mock_db):
         )
     assert exc.value.status_code == 404
     assert "Waypoint not found" in exc.value.detail
-
-
-@pytest.mark.asyncio
-async def test_get_all_cached_paths(mock_db):
-    """Test get_all_cached_paths stub."""
-    response = await get_all_cached_paths(_db=mock_db)
-    assert response == {"paths": []}

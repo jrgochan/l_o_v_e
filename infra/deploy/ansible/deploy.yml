@@ -2,9 +2,11 @@
 - name: Deploy Love Stack to RHEL9
   hosts: rhel9
   become: true
-  
+
   roles:
     - role: common
+      tags: setup
+    - role: fail2ban
       tags: setup
     - role: python
       tags: setup

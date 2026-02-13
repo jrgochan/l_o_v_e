@@ -17,30 +17,28 @@ except ImportError:
 
 
 class Settings(LoveBaseSettings):  # type: ignore
-    """Application settings loaded from environment variables.
+    """Application settings loaded from environment variables."""
 
-    pylint: disable=invalid-name
-    """
+    # Pydantic Settings fields use UPPER_CASE by convention.
+    # pylint: disable=invalid-name
 
     # ============================================================================
     # DATABASE CONFIGURATION
     # ============================================================================
 
-    # pylint: disable=invalid-name
     POSTGRES_USER: str = Field(default="love_user")
     POSTGRES_PASSWORD: str = Field(default="love_password")
     POSTGRES_DB: str = Field(default="love_db")
     POSTGRES_HOST: str = Field(default="localhost")
     POSTGRES_PORT: int = Field(default=5432)
-    # pylint: enable=invalid-name
 
-    DATABASE_URL: str | None = None  # pylint: disable=invalid-name
+    DATABASE_URL: str | None = None
 
     @model_validator(mode="after")
     def assemble_db_connection(self) -> "Settings":
-        """Docstring."""
-        if not self.DATABASE_URL:  # pylint: disable=invalid-name
-            self.DATABASE_URL = (  # pylint: disable=invalid-name
+        """Build DATABASE_URL from components if not explicitly set."""
+        if not self.DATABASE_URL:
+            self.DATABASE_URL = (
                 f"postgresql+asyncpg://{self.POSTGRES_USER}:{self.POSTGRES_PASSWORD}"
                 f"@{self.POSTGRES_HOST}:{self.POSTGRES_PORT}/{self.POSTGRES_DB}"
             )
@@ -58,7 +56,7 @@ class Settings(LoveBaseSettings):  # type: ignore
     OPENAI_EMBEDDING_MODEL: str = Field(default="text-embedding-3-small")
 
     @property
-    def EMBEDDING_DIMENSION(self) -> int:  # pylint: disable=invalid-name
+    def EMBEDDING_DIMENSION(self) -> int:
         """Return embedding dimension based on model."""
         dimensions = {
             "all-MiniLM-L6-v2": 384,
@@ -76,7 +74,7 @@ class Settings(LoveBaseSettings):  # type: ignore
     LISTENER_URL: str = Field(default="http://localhost:8002")
 
     @property
-    def LISTENER_API_URL(self) -> str:  # pylint: disable=invalid-name
+    def LISTENER_API_URL(self) -> str:
         """Construct Listener API URL for latency checks."""
         return self.LISTENER_URL
 
@@ -92,7 +90,7 @@ class Settings(LoveBaseSettings):  # type: ignore
     )
 
     @property
-    def ALLOWED_ORIGINS_LIST(self) -> List[str]:  # pylint: disable=invalid-name
+    def ALLOWED_ORIGINS_LIST(self) -> List[str]:
         """Parse comma-separated allowed origins into list."""
         try:
             result: List[str] = json.loads(self.ALLOWED_ORIGINS)

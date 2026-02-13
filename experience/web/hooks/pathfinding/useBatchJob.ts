@@ -28,7 +28,7 @@ export function useBatchJob(onComplete?: () => void, onFail?: (error: string) =>
 
     try {
       const response = await fetch(
-        `${OBSERVER_API_URL}/observer/atlas/computation-status/${currentJobId}`
+        `${OBSERVER_API_URL}/observer/computation-status/${currentJobId}`
       );
 
       if (response.ok) {

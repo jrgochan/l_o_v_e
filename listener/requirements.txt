@@ -4,7 +4,7 @@
 # FastAPI & Server
 fastapi[all]==0.115.6
 uvicorn[standard]==0.34.0
-python-multipart==0.0.20
+python-multipart==0.0.22
 
 # Audio Transcription (Local)
 openai-whisper==20250625
@@ -25,7 +25,7 @@ transformers>=4.48.0
 langchain-google-vertexai>=2.0.0
 
 # Core AI - Explicit version pinning for Python 3.12 compatibility
-torch==2.3.0
+torch==2.8.0
 numpy<2.0
 
 # Task Queue
@@ -35,7 +35,7 @@ redis==5.2.1
 # Data Models & Validation
 pydantic==2.12.5
 pydantic-settings==2.7.0
-python-jose[cryptography]==3.3.0
+python-jose[cryptography]==3.4.0
 
 # HTTP Client
 aiofiles==24.1.0

@@ -45,8 +45,9 @@ export function useComputeAllPaths() {
         }
       });
       logger.info("api", `Loaded ${data.paths.length} cached paths`);
-    } catch {
-      // Error logged in service
+    } catch (err) {
+      logger.error("api", "Failed to load cached paths after computation", err);
+      alert("Computation succeeded but failed to load results. Try 'Load Cached Paths'.");
     }
   }, [allEmotions, addComputedPath]);
 

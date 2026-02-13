@@ -104,24 +104,29 @@ async def test_get_strategies_for_transition_with_match(
 
 @pytest.mark.asyncio
 async def test_fallback_to_universal(recommender, mock_session, sample_emotions):
-    """Test fallback when no pattern matches."""
+    """Test fallback when no pattern matches and VAC-profile returns empty."""
     from_e, to_e = sample_emotions
 
     # 1. Match Pattern -> returns empty list
     res_patterns = MagicMock()
     res_patterns.scalars().all.return_value = []
 
-    # 2. Universal Strategies -> returns list of strategies
+    # 2. VAC-profile match -> returns empty list (no matching strategy types in DB)
+    res_vac = MagicMock()
+    res_vac.scalars().all.return_value = []
+
+    # 3. Universal Strategies -> returns list of strategies
     univ_strategy = TransitionStrategy(id=uuid4(), strategy_name="Universal", difficulty_level=1)
     res_universal = MagicMock()
     res_universal.scalars().all.return_value = [univ_strategy]
 
-    mock_session.execute.side_effect = [res_patterns, res_universal]
+    mock_session.execute.side_effect = [res_patterns, res_vac, res_universal]
 
     strategies = await recommender.get_strategies_for_transition(from_e, to_e)
 
     assert len(strategies) == 1
     assert strategies[0]["name"] == "Universal"
+    assert strategies[0]["match_reason"] == "universal"
 
 
 @pytest.mark.asyncio

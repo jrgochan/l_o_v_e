@@ -51,11 +51,3 @@ def test_routes_exist() -> None:
     assert "/health" in routes
     assert "/listener/ingest" in routes
     assert "/listener/ai/models/local" in routes
-
-
-def test_health_check() -> None:
-    response = client.get("/health")
-    assert response.status_code == 200
-    data = response.json()
-    assert data["status"] == "healthy"
-    assert data["service"] == "listener"

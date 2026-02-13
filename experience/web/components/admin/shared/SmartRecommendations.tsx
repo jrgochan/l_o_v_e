@@ -59,7 +59,7 @@ export function SmartRecommendations() {
           selectedIds.size > 0 ? `&selected_ids=${Array.from(selectedIds).join(",")}` : "";
 
         const response = await fetch(
-          `${OBSERVER_URL}/observer/atlas/recommendations?context=${context}${selectedIdsParam}&limit=5`
+          `${OBSERVER_URL}/observer/recommendations?context=${context}${selectedIdsParam}&limit=5`
         );
 
         if (!response.ok) {

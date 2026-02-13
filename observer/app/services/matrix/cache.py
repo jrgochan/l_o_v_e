@@ -149,21 +149,14 @@ class CacheManager:
         result = await self.session.execute(text(query), params)
         rows = result.fetchall()
 
-        return [
-            {
-                "from_id": str(row[0]),
-                "to_id": str(row[1]),
-                "path": row[2] if isinstance(row[2], dict) else json.loads(row[2]),
-                "metadata": {
-                    "distance": row[3],
-                    "difficulty": row[4],
-                    "waypoints": row[5],
-                    "bridge": row[6],
-                    "time": row[7],
-                },
-            }
-            for row in rows
-        ]
+        paths = []
+        for row in rows:
+            # path_data is the full path dict stored by BatchProcessor
+            # (contains from_emotion, to_emotion, waypoints, distance, etc.)
+            path_data = row[2] if isinstance(row[2], dict) else json.loads(row[2])
+            paths.append(path_data)
+
+        return paths
 
     async def get_cache_statistics(self) -> Dict[str, Any]:
         """Get statistics about the path matrix cache."""

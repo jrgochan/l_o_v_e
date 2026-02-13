@@ -24,14 +24,14 @@ def mock_admin_user():
 
 
 @pytest.mark.asyncio
-async def test_import_atlas_data_generic_exception(mock_db, mock_admin_user):
+async def test_import_visualization_data_generic_exception(mock_db, mock_admin_user):
     """Test generic 500 error when AdminService.import_atlas_emotions fails."""
     with patch("app.api.routes.admin.AdminService") as MockService:
         service_instance = MockService.return_value
         service_instance.import_atlas_emotions.side_effect = Exception("Unexpected Failure")
 
         with pytest.raises(HTTPException) as exc:
-            await admin.import_atlas_data({}, mock_db, mock_admin_user)
+            await admin.import_visualization_data({}, mock_db, mock_admin_user)
 
         assert exc.value.status_code == 500
         assert "Import process failed" in exc.value.detail

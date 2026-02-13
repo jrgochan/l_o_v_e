@@ -52,7 +52,7 @@ describe("useBatchJob", () => {
     });
 
     expect(global.fetch).toHaveBeenCalledWith(
-      expect.stringContaining("/observer/atlas/computation-status/job-123")
+      expect.stringContaining("/observer/computation-status/job-123")
     );
     expect(result.current.progress.current).toBe(50);
     expect(result.current.estimatedTimeRemaining).toBe("10s");

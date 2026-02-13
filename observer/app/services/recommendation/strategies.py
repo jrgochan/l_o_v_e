@@ -33,11 +33,13 @@ Recommendation Algorithm:
 
         Each pattern has curated strategies with effectiveness ratings.
 
-        Tier 2: Category-Based
-        ──────────────────────
-        If no pattern match, use strategies for the category:
-        - From category: "When We Feel Wronged" → anger techniques
-        - To category: "When Life Is Good" → joy cultivation
+        Tier 2: VAC-Profile Matching (Dataset-Agnostic)
+        ─────────────────────────────────────────────────
+        When no pattern match (e.g. non-Atlas datasets), analyze VAC delta:
+        - Large arousal decrease → response_modulation (breathing, PMR)
+        - Valence improvement → cognitive_reappraisal (reframing, CBT)
+        - Connection increase → situation_modification (social strategies)
+        - Mixed/ambiguous → highest-evidence strategies across types
 
         Tier 3: Universal Strategies
         ────────────────────────────
@@ -217,6 +219,14 @@ class StrategyRecommender:
     ) -> List[Dict[str, Any]]:
         """Get recommended strategies for a transition.
 
+        Uses a 3-tier matching system:
+        1. Pattern match (curated strategies for known transition patterns)
+        2. VAC-profile match (dataset-agnostic, based on emotional shift type)
+        3. Universal fallback (always-safe strategies)
+
+        Each returned strategy dict includes a 'match_reason' field:
+        'pattern', 'vac_profile', or 'universal'.
+
         Args:
             from_emotion: Starting emotion
             to_emotion: Target emotion
@@ -232,18 +242,29 @@ class StrategyRecommender:
             to_emotion.emotion_name,
         )
 
-        # 1. Identify which pattern this transition matches
+        # Tier 1: Pattern match (category-specific, curated strategies)
         pattern = await self._match_to_pattern(from_emotion, to_emotion)
 
         if pattern:
-            logger.info("Matched to pattern: %s", pattern.pattern_name)
-            # Get strategies for this pattern
+            logger.info("Tier 1: Matched to pattern '%s'", pattern.pattern_name)
             strategies = await self._get_pattern_strategies(pattern, user_id, limit)
-        else:
-            logger.warning("No pattern match, using universal strategies")
-            # Fallback to universal strategies
-            strategies = await self._get_universal_strategies(limit)
+            for s in strategies:
+                s["match_reason"] = "pattern"
+            return strategies
 
+        # Tier 2: VAC-profile match (dataset-agnostic)
+        strategies = await self._match_by_vac_profile(from_emotion, to_emotion, user_id, limit)
+        if strategies:
+            logger.info("Tier 2: VAC-profile matched %d strategies", len(strategies))
+            for s in strategies:
+                s["match_reason"] = "vac_profile"
+            return strategies
+
+        # Tier 3: Universal fallback
+        logger.warning("No pattern or VAC-profile match, using universal strategies")
+        strategies = await self._get_universal_strategies(limit)
+        for s in strategies:
+            s["match_reason"] = "universal"
         return strategies
 
     async def _match_to_pattern(
@@ -410,6 +431,90 @@ class StrategyRecommender:
             strategies.append(strategy_dict)
 
         return strategies
+
+    async def _match_by_vac_profile(
+        self,
+        from_emotion: EmotionDefinition,
+        to_emotion: EmotionDefinition,
+        user_id: Optional[str],
+        limit: int,
+    ) -> List[Dict[str, Any]]:
+        """Tier 2: Dataset-agnostic strategy selection based on VAC shift profile.
+
+        Analyzes the *type* of emotional shift (arousal decrease, valence
+        improvement, connection building) and selects strategy types from
+        Gross's process model that are clinically appropriate.
+
+        This ensures non-Atlas datasets (GoEmotions, Plutchik, UAL) still
+        get targeted recommendations rather than generic fallbacks.
+        """
+        target_types = self._vac_delta_to_strategy_types(
+            list(from_emotion.vac_vector), list(to_emotion.vac_vector)
+        )
+
+        # Query strategies matching the identified types
+        stmt = (
+            select(TransitionStrategy)
+            .where(
+                TransitionStrategy.strategy_type.in_(target_types),
+                TransitionStrategy.evidence_level.in_(["meta_analysis", "rct", "clinical"]),
+            )
+            .order_by(
+                TransitionStrategy.difficulty_level,
+                TransitionStrategy.evidence_level,
+            )
+            .limit(limit)
+        )
+
+        result = await self.session.execute(stmt)
+        strategies = result.scalars().all()
+
+        if not strategies:
+            return []
+
+        strategy_dicts = []
+        for s in strategies:
+            d = s.to_dict()
+            # Add personalization if user_id provided
+            if user_id:
+                user_data = await self._get_user_strategy_data(str(s.id), user_id)
+                d["times_successful_for_user"] = user_data.get("times_tried", 0)
+                d["user_notes"] = user_data.get("notes", [])
+            d["effectiveness_rating"] = 3.5  # Default for VAC-profile matches
+            strategy_dicts.append(d)
+
+        return strategy_dicts
+
+    @staticmethod
+    def _vac_delta_to_strategy_types(from_vac: List[float], to_vac: List[float]) -> List[str]:
+        """Map a VAC delta to the most appropriate strategy types.
+
+        VAC Shift → Strategy Type Mapping (clinical rationale):
+            Large arousal decrease → response_modulation
+                Physiological calming must precede cognitive work.
+            Valence improvement → cognitive_reappraisal
+                Reframing enables shift from negative to positive tone.
+            Connection increase → situation_modification
+                Social/relational strategies build interpersonal bonds.
+            Arousal increase → attentional_deployment
+                Engagement and activation strategies.
+            Mixed/ambiguous → attentional_deployment
+                Mindfulness and attention redirection are broadly applicable.
+        """
+        # Threshold: |change| > 0.3 is therapeutically significant
+        delta = [to_vac[i] - from_vac[i] for i in range(3)]  # [V, A, C]
+        types: List[str] = []
+
+        if delta[1] < -0.3:  # Arousal decrease → calming
+            types.append("response_modulation")
+        if delta[0] > 0.3:  # Valence improvement → reframing
+            types.append("cognitive_reappraisal")
+        if delta[2] > 0.3:  # Connection increase → social
+            types.append("situation_modification")
+        if delta[1] > 0.3:  # Arousal increase → engagement
+            types.append("attentional_deployment")
+
+        return types or ["attentional_deployment"]
 
     async def _get_universal_strategies(self, limit: int) -> List[Dict[str, Any]]:
         """Get universal strategies that work for most transitions.

@@ -5,8 +5,8 @@ fastapi==0.115.6
 uvicorn[standard]==0.34.0
 pydantic==2.12.5
 pydantic-settings==2.7.0
-python-jose[cryptography]==3.3.0
-python-multipart==0.0.20
+python-jose[cryptography]==3.4.0
+python-multipart==0.0.22
 
 # Scientific Computing
 numpy==2.3.1

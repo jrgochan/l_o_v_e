@@ -82,7 +82,7 @@ async def test_get_current_user_bypass_create(mock_db):
 
     mock_db.refresh.side_effect = side_effect_refresh
 
-    with patch("app.core.security.get_password_hash") as mock_hash:
+    with patch("app.api.deps.get_password_hash") as mock_hash:
         mock_hash.return_value = "hashed"
 
         res = await get_current_user(token, mock_db)
@@ -205,7 +205,7 @@ async def test_get_current_user_ws_bypass_create(mock_db):
 
     mock_db.refresh.side_effect = side_effect_refresh
 
-    with patch("app.core.security.get_password_hash") as mock_hash:
+    with patch("app.api.deps.get_password_hash") as mock_hash:
         mock_hash.return_value = "hashed"
 
         res = await get_current_user_ws(token, mock_db)

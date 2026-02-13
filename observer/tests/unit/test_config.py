@@ -41,9 +41,7 @@ def test_embedding_dimension_property():
 
 def test_get_settings_helper():
     """Test get_settings helper."""
-    from app.core.settings import (  # pylint: disable=import-outside-toplevel
-        get_settings,
-    )
+    from app.core.settings import get_settings  # pylint: disable=import-outside-toplevel
 
     s = get_settings()
     assert isinstance(s, Settings)

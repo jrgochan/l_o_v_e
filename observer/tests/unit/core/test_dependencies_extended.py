@@ -87,9 +87,8 @@ async def test_get_current_user_dev_bypass_create(mock_db):
     mock_result.scalars.return_value.first.return_value = None  # Not found
     mock_db.execute.return_value = mock_result
 
-    # We need to ensure get_password_hash calls inside deps don't fail or are mocked
-    # deps.py imports get_password_hash inside the function
-    with patch("app.core.security.get_password_hash", return_value="hashed_dev"):
+    # get_password_hash is imported at module level in deps.py
+    with patch("app.api.deps.get_password_hash", return_value="hashed_dev"):
         user = await deps.get_current_user(token="dev-token-bypass", db=mock_db)
 
         assert user.email == "dev@admin.com"

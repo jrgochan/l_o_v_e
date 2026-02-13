@@ -1,9 +1,11 @@
 # pylint: disable=protected-access, redefined-outer-name, unused-argument
+from pathlib import Path
 from typing import Any, Generator
 from unittest.mock import MagicMock, patch
 
 import pytest
 
+from app.models.vac_response import TranscriptionResult
 from app.services.transcription import TranscriptionService, get_transcription_service
 
 
@@ -176,3 +178,42 @@ class TestTranscriptionService:
 
             with pytest.raises(RuntimeError, match="Transcription error"):
                 service.transcribe("valid.wav")
+
+
+@pytest.mark.slow
+@pytest.mark.skipif(
+    not Path("tests/fixtures/sample.wav").exists(), reason="No sample audio file available"
+)
+class TestTranscriptionWithAudio:
+    """Tests requiring actual audio files (marked as slow)."""
+
+    def test_transcribe_audio_file(self, fixtures_dir: Any) -> None:
+        """Test transcribing a real audio file."""
+        audio_path = fixtures_dir / "sample.wav"
+
+        if not audio_path.exists():
+            pytest.skip("No sample audio file")
+
+        service = TranscriptionService(model_size="tiny.en")
+        result = service.transcribe(str(audio_path))
+
+        assert isinstance(result, TranscriptionResult)
+        assert len(result.text) > 0
+        assert result.duration_seconds > 0
+        assert result.transcription_time_seconds > 0
+        assert result.language == "en"
+
+    def test_transcription_latency(self, fixtures_dir: Any) -> None:
+        """Test that transcription meets latency targets."""
+        audio_path = fixtures_dir / "sample.wav"
+
+        if not audio_path.exists():
+            pytest.skip("No sample audio file")
+
+        service = TranscriptionService(model_size="base.en")
+        result = service.transcribe(str(audio_path))
+
+        max_latency = max(1.0, result.duration_seconds * 0.15)
+        assert (
+            result.transcription_time_seconds < max_latency
+        ), f"Transcription too slow: {result.transcription_time_seconds}s"

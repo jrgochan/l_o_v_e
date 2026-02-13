@@ -12,13 +12,35 @@ from pydantic import ValidationError
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.core.security import get_password_hash
 from app.core.settings import settings
-from app.database import get_db as get_db  # pylint: disable=useless-import-alias
+from app.database import get_db as get_db  # re-export  # pylint: disable=useless-import-alias
 from app.models.user import User, UserRole
 from app.schemas.user import TokenData
 
 # OAuth2 scheme for token extraction
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="auth/login")
+
+
+async def _get_or_create_dev_user(db: AsyncSession) -> User:
+    """Get or create the dev admin user for bypass authentication."""
+    stmt = select(User).where(User.email == "dev@admin.com")
+    result = await db.execute(stmt)
+    db_user = result.scalars().first()
+
+    if not db_user:
+        db_user = User(
+            email="dev@admin.com",
+            full_name="Dev Admin",
+            role=UserRole.ADMIN,
+            is_active=True,
+            password_hash=get_password_hash("dev"),
+        )
+        db.add(db_user)
+        await db.commit()
+        await db.refresh(db_user)
+
+    return db_user
 
 
 async def get_current_user(
@@ -32,30 +54,8 @@ async def get_current_user(
         headers={"WWW-Authenticate": "Bearer"},
     )
 
-    # Dev Bypass for testing
     if token == "dev-token-bypass":
-        stmt = select(User).where(User.email == "dev@admin.com")
-        result = await db.execute(stmt)
-        db_user = result.scalars().first()
-
-        if not db_user:
-            # Auto-create dev admin if not exists
-            from app.core.security import (  # pylint: disable=import-outside-toplevel
-                get_password_hash,
-            )
-
-            db_user = User(
-                email="dev@admin.com",
-                full_name="Dev Admin",
-                role=UserRole.ADMIN,
-                is_active=True,
-                password_hash=get_password_hash("dev"),
-            )
-            db.add(db_user)
-            await db.commit()
-            await db.refresh(db_user)
-
-        return db_user
+        return await _get_or_create_dev_user(db)
 
     try:
         payload = jwt.decode(token, settings.SECRET_KEY, algorithms=[settings.ALGORITHM])
@@ -105,29 +105,8 @@ async def get_current_user_ws(
         reason="Could not validate credentials",
     )
 
-    # Dev Bypass for testing
     if token == "dev-token-bypass":
-        stmt = select(User).where(User.email == "dev@admin.com")
-        result = await db.execute(stmt)
-        db_user = result.scalars().first()
-        if not db_user:
-            # Auto-create dev admin if not exists (same logic as HTTP auth)
-            from app.core.security import (  # pylint: disable=import-outside-toplevel
-                get_password_hash,
-            )
-
-            db_user = User(
-                email="dev@admin.com",
-                full_name="Dev Admin",
-                role=UserRole.ADMIN,
-                is_active=True,
-                password_hash=get_password_hash("dev"),
-            )
-            db.add(db_user)
-            await db.commit()
-            await db.refresh(db_user)
-
-        return db_user
+        return await _get_or_create_dev_user(db)
 
     try:
         payload = jwt.decode(token, settings.SECRET_KEY, algorithms=[settings.ALGORITHM])

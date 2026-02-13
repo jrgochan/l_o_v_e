@@ -212,13 +212,22 @@ async def test_cache_path(cache_manager, mock_session):
 @pytest.mark.asyncio
 async def test_get_all_cached_paths(cache_manager, mock_session):
     """Test retrieving cached paths."""
+    path_data = {
+        "from_emotion": {"id": "abc", "name": "Joy"},
+        "to_emotion": {"id": "def", "name": "Sadness"},
+        "waypoints": [],
+        "distance": 1.0,
+        "difficulty": "easy",
+        "estimated_time": "5m",
+        "requires_bridge": False,
+    }
     mock_res = MagicMock()
     # row = (from_id, to_id, path_data, distance, diff, wpc, bridge, time)
     mock_res.fetchall.return_value = [
         (
             uuid.uuid4(),
             uuid.uuid4(),
-            json.dumps({"foo": "bar"}),
+            json.dumps(path_data),
             1.0,
             "easy",
             0,
@@ -230,7 +239,9 @@ async def test_get_all_cached_paths(cache_manager, mock_session):
 
     res = await cache_manager.get_all_cached_paths(limit=10)
     assert len(res) == 1
-    assert res[0]["metadata"]["distance"] == 1.0
+    # Flattened response: path_data fields are at top level
+    assert res[0]["distance"] == 1.0
+    assert res[0]["from_emotion"]["id"] == "abc"
 
 
 @pytest.mark.asyncio

@@ -1,4 +1,5 @@
 # pylint: disable=redefined-outer-name, unused-argument, protected-access
+import os
 from typing import Any
 from unittest.mock import MagicMock, patch
 
@@ -281,3 +282,63 @@ class TestPIIScrubber:
         # 2. Test detect_pii (should return empty)
         findings = scrubber.detect_pii(text)
         assert len(findings) == 0
+
+    def test_detect_pii_empty(self) -> None:
+        """Test detect_pii with empty input."""
+        scrubber = PIIScrubber()
+        assert not scrubber.detect_pii("")
+        assert not scrubber.detect_pii("   ")
+        assert not scrubber.detect_pii(None)  # type: ignore[arg-type]
+
+    def test_env_var_override(self) -> None:
+        """Test model path override via env var."""
+        with patch.dict(os.environ, {"PII_MODEL_PATH": "custom-model-path"}):
+            scrubber = PIIScrubber()
+            assert scrubber.model_name == "custom-model-path"
+
+    def test_scrub_overlap_bert_regex(self, mock_pipeline: Any, mock_spacy: Any) -> None:
+        """Test regex entity overlapping with BERT entity in scrub."""
+        scrubber = PIIScrubber()
+        text = "Tuesday"
+
+        bert_mock = mock_pipeline.return_value
+        bert_mock.return_value = [
+            {"entity_group": "PER", "score": 0.9, "word": "Tuesday", "start": 0, "end": 7}
+        ]
+        mock_spacy.load.return_value.return_value.ents = []
+
+        scrubbed = scrubber.scrub(text)
+        assert scrubbed == "[NAME]"
+
+    def test_detect_pii_overlap_bert_regex(self, mock_pipeline: Any, mock_spacy: Any) -> None:
+        """Test regex entity overlapping with BERT entity in detect_pii."""
+        scrubber = PIIScrubber()
+        text = "Tuesday"
+
+        bert_mock = mock_pipeline.return_value
+        bert_mock.return_value = [
+            {"entity_group": "PER", "score": 0.9, "word": "Tuesday", "start": 0, "end": 7}
+        ]
+        mock_spacy.load.return_value.return_value.ents = []
+
+        detected = scrubber.detect_pii(text)
+        assert len(detected) == 1
+        assert detected[0][1] == "PER"
+        assert detected[0][0] == "Tuesday"
+
+    def test_regex_no_overlap(self, mock_pipeline: Any, mock_spacy: Any) -> None:
+        """Test regex entity with NO overlap."""
+        scrubber = PIIScrubber()
+        text = "Contact test@example.com"
+
+        bert_mock = mock_pipeline.return_value
+        bert_mock.return_value = []
+        mock_spacy.load.return_value.return_value.ents = []
+
+        detected = scrubber.detect_pii(text)
+        assert len(detected) == 1
+        assert detected[0][1] == "EMAIL"
+        assert detected[0][0] == "test@example.com"
+
+        scrubbed = scrubber.scrub(text)
+        assert scrubbed == "Contact [EMAIL]"

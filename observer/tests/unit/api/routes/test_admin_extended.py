@@ -78,7 +78,7 @@ async def test_update_user_not_found(mock_db, mock_admin):
 
 
 @pytest.mark.asyncio
-async def test_import_atlas_data_service_failure(mock_db, mock_admin):
+async def test_import_visualization_data_service_failure(mock_db, mock_admin):
     """Test partial failure handling during atlas import when services fail."""
     import_data = {
         "emotions": [
@@ -116,7 +116,7 @@ async def test_import_atlas_data_service_failure(mock_db, mock_admin):
         qb = AsyncMock()
         mock_get_qb.return_value = qb
 
-        response = await admin.import_atlas_data(import_data, mock_db, mock_admin)
+        response = await admin.import_visualization_data(import_data, mock_db, mock_admin)
 
         # Verify it didn't crash but reported error
         assert response["status"] == "success"
@@ -137,7 +137,7 @@ async def test_import_strategies_invalid_format(mock_db, mock_admin):
 
 
 @pytest.mark.asyncio
-async def test_update_atlas_emotion_not_found(mock_db, mock_admin):
+async def test_update_visualization_emotion_not_found(mock_db, mock_admin):
     """Test 404 when updating non-existent atlas emotion."""
     emotion_id = uuid4()
 
@@ -146,7 +146,7 @@ async def test_update_atlas_emotion_not_found(mock_db, mock_admin):
     mock_db.execute.return_value = result
 
     with pytest.raises(HTTPException) as exc:
-        await admin.update_atlas_emotion(
+        await admin.update_visualization_emotion(
             emotion_id, EmotionUpdate(category="Joy"), mock_db, mock_admin
         )
 
@@ -154,7 +154,7 @@ async def test_update_atlas_emotion_not_found(mock_db, mock_admin):
 
 
 @pytest.mark.asyncio
-async def test_update_atlas_emotion_service_failure(mock_db, mock_admin):
+async def test_update_visualization_emotion_service_failure(mock_db, mock_admin):
     """Test 400 when calculation service fails during update."""
     emotion_id = uuid4()
     emotion = EmotionDefinition(id=emotion_id, emotion_name="Joy")
@@ -173,7 +173,7 @@ async def test_update_atlas_emotion_service_failure(mock_db, mock_admin):
         qb.from_vac.side_effect = Exception("Math Error")
 
         with pytest.raises(HTTPException) as exc:
-            await admin.update_atlas_emotion(emotion_id, update, mock_db, mock_admin)
+            await admin.update_visualization_emotion(emotion_id, update, mock_db, mock_admin)
 
         assert exc.value.status_code == 400
         assert "Failed to calculate quaternion" in exc.value.detail
@@ -279,7 +279,7 @@ async def test_import_atlas_invalid_format(mock_db, mock_admin):
     data = {"wrong_key": []}
 
     with pytest.raises(HTTPException) as exc:
-        await admin.import_atlas_data(data, mock_db, mock_admin)
+        await admin.import_visualization_data(data, mock_db, mock_admin)
 
     assert exc.value.status_code == 400
     assert "Invalid format" in exc.value.detail

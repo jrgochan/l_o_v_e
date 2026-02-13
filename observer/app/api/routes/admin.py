@@ -24,11 +24,7 @@ from app.models.transition_strategy import TransitionStrategy
 from app.models.user import User
 from app.models.user_trajectory import UserTrajectory
 from app.schemas.ai_models import ModelAssignmentResponse, ModelAssignmentUpdate
-from app.schemas.bootstrap import (
-    BootstrapDataCreate,
-    BootstrapDataResponse,
-    BootstrapDataUpdate,
-)
+from app.schemas.bootstrap import BootstrapDataCreate, BootstrapDataResponse, BootstrapDataUpdate
 from app.schemas.emotions import EmotionResponse, EmotionUpdate
 from app.schemas.prompts import (
     PromptTemplateCreate,
@@ -134,9 +130,7 @@ async def update_user(
     # but for admin helper we might want to reset password.
     # For now, excluding password update from this generic update for safety
     if "password" in update_data:
-        from app.core.security import (  # pylint: disable=import-outside-toplevel
-            get_password_hash,
-        )
+        from app.core.security import get_password_hash  # pylint: disable=import-outside-toplevel
 
         update_data["password_hash"] = get_password_hash(update_data.pop("password"))
 
@@ -314,16 +308,16 @@ async def get_session_details(
 
 
 # -----------------------------------------------------------------------------
-# Atlas Management Routes
+# Visualization Data Routes
 # -----------------------------------------------------------------------------
 
 
-@router.get("/atlas/emotions", response_model=List[EmotionResponse])
-async def list_atlas_emotions(
+@router.get("/visualization/emotions", response_model=List[EmotionResponse])
+async def list_visualization_emotions(
     db: Annotated[AsyncSession, Depends(get_db)],
     _current_admin: Annotated[User, Depends(get_current_admin)],
 ) -> Any:
-    """List all 87 atlas emotions."""
+    """List all emotion definitions for the visualization."""
     # Simply list all - no pagination needed for 87 items
     stmt = select(EmotionDefinition).order_by(EmotionDefinition.emotion_name)
     result = await db.execute(stmt)
@@ -333,9 +327,7 @@ async def list_atlas_emotions(
 async def _update_emotion_quaternion(update_data: Dict[str, Any], emotion: Any) -> None:
     """Recalculate quaternion if VAC changed."""
     if "vac_vector" in update_data:
-        from app.services import (  # pylint: disable=import-outside-toplevel
-            get_quaternion_builder,
-        )
+        from app.services import get_quaternion_builder  # pylint: disable=import-outside-toplevel
 
         try:
             qb = get_quaternion_builder()
@@ -354,9 +346,7 @@ async def _update_emotion_quaternion(update_data: Dict[str, Any], emotion: Any) 
 async def _update_emotion_embedding(update_data: Dict[str, Any], emotion: Any) -> None:
     """Recalculate embedding if definition changed."""
     if "definition" in update_data:
-        from app.services import (  # pylint: disable=import-outside-toplevel
-            get_embedding_service,
-        )
+        from app.services import get_embedding_service  # pylint: disable=import-outside-toplevel
 
         try:
             es = get_embedding_service()
@@ -373,8 +363,8 @@ async def _update_emotion_embedding(update_data: Dict[str, Any], emotion: Any) -
             ) from e
 
 
-@router.put("/atlas/emotions/{emotion_id}", response_model=EmotionResponse)
-async def update_atlas_emotion(
+@router.put("/visualization/emotions/{emotion_id}", response_model=EmotionResponse)
+async def update_visualization_emotion(
     emotion_id: UUID,
     emotion_in: EmotionUpdate,
     db: Annotated[AsyncSession, Depends(get_db)],
@@ -413,8 +403,8 @@ async def update_atlas_emotion(
     return emotion
 
 
-@router.get("/atlas/export")
-async def export_atlas_data(
+@router.get("/visualization/export")
+async def export_visualization_data(
     db: Annotated[AsyncSession, Depends(get_db)],
     _current_admin: Annotated[User, Depends(get_current_admin)],
 ) -> Any:
@@ -423,8 +413,8 @@ async def export_atlas_data(
     return await service.export_atlas_emotions()
 
 
-@router.post("/atlas/import")
-async def import_atlas_data(
+@router.post("/visualization/import")
+async def import_visualization_data(
     import_data: Dict[str, Any],  # Receive raw JSON body
     db: Annotated[AsyncSession, Depends(get_db)],
     _current_admin: Annotated[User, Depends(get_current_admin)],
@@ -592,9 +582,7 @@ async def list_bootstrap_data(
     data_type: Optional[str] = None,
 ) -> Any:
     """List bootstrap data items (optional filter by type)."""
-    from app.models.bootstrap_data import (  # pylint: disable=import-outside-toplevel
-        BootstrapData,
-    )
+    from app.models.bootstrap_data import BootstrapData  # pylint: disable=import-outside-toplevel
 
     stmt = select(BootstrapData)
     if data_type:
@@ -612,9 +600,7 @@ async def create_bootstrap_data(
     _current_admin: Annotated[User, Depends(get_current_admin)],
 ) -> Any:
     """Create new bootstrap data item."""
-    from app.models.bootstrap_data import (  # pylint: disable=import-outside-toplevel
-        BootstrapData,
-    )
+    from app.models.bootstrap_data import BootstrapData  # pylint: disable=import-outside-toplevel
 
     item = BootstrapData(
         data_type=data_in.data_type,
@@ -635,9 +621,7 @@ async def update_bootstrap_data(
     _current_admin: Annotated[User, Depends(get_current_admin)],
 ) -> Any:
     """Update bootstrap data item."""
-    from app.models.bootstrap_data import (  # pylint: disable=import-outside-toplevel
-        BootstrapData,
-    )
+    from app.models.bootstrap_data import BootstrapData  # pylint: disable=import-outside-toplevel
 
     stmt = select(BootstrapData).where(BootstrapData.id == item_id)
     result = await db.execute(stmt)
@@ -663,9 +647,7 @@ async def delete_bootstrap_data(
     _current_admin: Annotated[User, Depends(get_current_admin)],
 ) -> Any:
     """Delete bootstrap data item."""
-    from app.models.bootstrap_data import (  # pylint: disable=import-outside-toplevel
-        BootstrapData,
-    )
+    from app.models.bootstrap_data import BootstrapData  # pylint: disable=import-outside-toplevel
 
     stmt = select(BootstrapData).where(BootstrapData.id == item_id)
     result = await db.execute(stmt)

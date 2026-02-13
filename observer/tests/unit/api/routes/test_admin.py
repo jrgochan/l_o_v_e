@@ -128,12 +128,12 @@ async def test_update_user(mock_db, mock_admin_user):
 
 
 @pytest.mark.asyncio
-async def test_list_atlas_emotions(mock_db, mock_admin_user):
+async def test_list_visualization_emotions(mock_db, mock_admin_user):
     mock_res = MagicMock()
     mock_res.scalars.return_value.all.return_value = []
     mock_db.execute.return_value = mock_res
 
-    await admin.list_atlas_emotions(mock_db, mock_admin_user)
+    await admin.list_visualization_emotions(mock_db, mock_admin_user)
     mock_db.execute.assert_called()
 
 
@@ -265,8 +265,8 @@ async def test_admin_update_user_password(mock_db, mock_admin_user):
 
 
 @pytest.mark.asyncio
-async def test_admin_update_atlas_emotion_exceptions(mock_db, mock_admin_user):
-    """Test exception handling in atlas updates."""
+async def test_admin_update_visualization_emotion_exceptions(mock_db, mock_admin_user):
+    """Test exception handling in visualization updates."""
     from app.schemas.emotions import EmotionUpdate
 
     emotion = MagicMock()
@@ -281,22 +281,22 @@ async def test_admin_update_atlas_emotion_exceptions(mock_db, mock_admin_user):
         mock_get_qb.return_value.from_vac.side_effect = Exception("Math Error")
         update = EmotionUpdate(vac_vector=[1.0, 1.0, 1.0])
         with pytest.raises(HTTPException) as exc:
-            await admin.update_atlas_emotion(emotion.id, update, mock_db, mock_admin_user)
+            await admin.update_visualization_emotion(emotion.id, update, mock_db, mock_admin_user)
         assert exc.value.status_code == 400
 
     with patch("app.services.get_embedding_service") as mock_get_es:
         mock_get_es.return_value.generate_embedding.side_effect = Exception("API Error")
         update = EmotionUpdate(definition="New Definition")
         with pytest.raises(HTTPException) as exc:
-            await admin.update_atlas_emotion(emotion.id, update, mock_db, mock_admin_user)
+            await admin.update_visualization_emotion(emotion.id, update, mock_db, mock_admin_user)
         assert exc.value.status_code == 400
 
 
 @pytest.mark.asyncio
-async def test_admin_import_atlas_data_edge_cases(mock_db, mock_admin_user):
+async def test_admin_import_visualization_data_edge_cases(mock_db, mock_admin_user):
     """Test import edge cases (missing name, exceptions)."""
     bad_data = {"emotions": [{"category": "Test"}]}
-    res = await admin.import_atlas_data(bad_data, mock_db, mock_admin_user)
+    res = await admin.import_visualization_data(bad_data, mock_db, mock_admin_user)
     assert res["updated"] == 0
 
     good_data = {"emotions": [{"emotion_name": "Joy", "definition": "New"}]}
@@ -309,7 +309,7 @@ async def test_admin_import_atlas_data_edge_cases(mock_db, mock_admin_user):
 
     with patch("app.services.admin.service.get_embedding_service") as mock_get_es:
         mock_get_es.return_value.generate_embedding.side_effect = Exception("Embed Fail")
-        res = await admin.import_atlas_data(good_data, mock_db, mock_admin_user)
+        res = await admin.import_visualization_data(good_data, mock_db, mock_admin_user)
         assert res["updated"] == 0
         assert len(res["errors"]) == 1
 
@@ -341,7 +341,7 @@ async def test_admin_prompt_render_endpoints(mock_db, mock_admin_user):
 
 
 @pytest.mark.asyncio
-async def test_admin_update_atlas_emotion_other_fields(mock_db, mock_admin_user):
+async def test_admin_update_visualization_emotion_other_fields(mock_db, mock_admin_user):
     """Test updating fields other than VAC/Definition."""
     from app.schemas.emotions import EmotionUpdate
 
@@ -353,7 +353,7 @@ async def test_admin_update_atlas_emotion_other_fields(mock_db, mock_admin_user)
     mock_db.execute.return_value = mock_res
 
     update = EmotionUpdate(category="New Category")
-    await admin.update_atlas_emotion(emotion.id, update, mock_db, mock_admin_user)
+    await admin.update_visualization_emotion(emotion.id, update, mock_db, mock_admin_user)
     assert emotion.category == "New Category"
 
 
@@ -367,7 +367,7 @@ async def test_admin_export_atlas_multiple(mock_db, mock_admin_user):
     mock_res.scalars.return_value.all.return_value = [e1, e2]
     mock_db.execute.return_value = mock_res
 
-    res = await admin.export_atlas_data(mock_db, mock_admin_user)
+    res = await admin.export_visualization_data(mock_db, mock_admin_user)
     assert len(res["emotions"]) == 2
 
 
@@ -378,7 +378,7 @@ async def test_admin_import_atlas_not_found(mock_db, mock_admin_user):
     mock_res = MagicMock()
     mock_res.scalars.return_value.first.return_value = None
     mock_db.execute.return_value = mock_res
-    res = await admin.import_atlas_data(data, mock_db, mock_admin_user)
+    res = await admin.import_visualization_data(data, mock_db, mock_admin_user)
     assert res["updated"] == 0
 
 
@@ -400,7 +400,7 @@ async def test_admin_import_atlas_success(mock_db, mock_admin_user):
             mock_qb_instance = MagicMock()
             mock_qb_instance.from_vac = AsyncMock(return_value=0.5)
             mock_get_qb.return_value = mock_qb_instance
-            res = await admin.import_atlas_data(data, mock_db, mock_admin_user)
+            res = await admin.import_visualization_data(data, mock_db, mock_admin_user)
 
     assert res["updated"] == 1
     assert res["status"] == "success"
@@ -453,7 +453,7 @@ async def test_admin_import_atlas_full_coverage(mock_db, mock_admin_user):
             mock_qb_instance.from_vac = AsyncMock(return_value=0.8)
             mock_get_qb.return_value = mock_qb_instance
             mock_db.execute.return_value = mock_res
-            res = await admin.import_atlas_data(data_full, mock_db, mock_admin_user)
+            res = await admin.import_visualization_data(data_full, mock_db, mock_admin_user)
 
             assert mock_emotion.vac_vector == [0.1, 0.2, 0.3]
             assert res["updated"] == 1
@@ -462,7 +462,7 @@ async def test_admin_import_atlas_full_coverage(mock_db, mock_admin_user):
         "emotions": [{"emotion_name": "Joy", "definition": "Same Def", "vac": [0.1, 0.2, 0.3]}]
     }
     mock_db.execute.return_value = mock_res
-    res = await admin.import_atlas_data(data_no_change, mock_db, mock_admin_user)
+    res = await admin.import_visualization_data(data_no_change, mock_db, mock_admin_user)
     assert res["updated"] == 1
 
 
@@ -553,7 +553,7 @@ async def test_admin_update_user_no_password(mock_db, mock_admin_user):
 
 
 @pytest.mark.asyncio
-async def test_export_atlas_data(mock_db, mock_admin_user):
+async def test_export_visualization_data(mock_db, mock_admin_user):
     e1 = MagicMock()
     e1.emotion_name = "Joy"
     e1.vac_vector = [1, 1, 1]
@@ -562,7 +562,7 @@ async def test_export_atlas_data(mock_db, mock_admin_user):
     mock_res.scalars.return_value.all.return_value = [e1]
     mock_db.execute.return_value = mock_res
 
-    res = await admin.export_atlas_data(mock_db, mock_admin_user)
+    res = await admin.export_visualization_data(mock_db, mock_admin_user)
     assert res["metadata"]["total_emotions"] == 1
     assert res["emotions"][0]["emotion_name"] == "Joy"
 
@@ -614,7 +614,7 @@ async def test_test_prompt_render_placeholder():
 
 
 @pytest.mark.asyncio
-async def test_update_atlas_emotion(mock_db, mock_admin_user):
+async def test_update_visualization_emotion(mock_db, mock_admin_user):
     e = EmotionDefinition(
         id=uuid.uuid4(),
         emotion_name="Joy",
@@ -636,7 +636,7 @@ async def test_update_atlas_emotion(mock_db, mock_admin_user):
         mock_get_es.return_value = mock_es
 
         up = EmotionUpdate(definition="New Def")
-        await admin.update_atlas_emotion(e.id, up, mock_db, mock_admin_user)
+        await admin.update_visualization_emotion(e.id, up, mock_db, mock_admin_user)
 
         assert e.definition == "New Def"
         assert e.semantic_embedding == [0.1, 0.1]
@@ -649,14 +649,14 @@ async def test_update_atlas_emotion(mock_db, mock_admin_user):
         mock_get_qb.return_value = mock_qb
 
         up_vac = EmotionUpdate(vac_vector=[0.1, 0.2, 0.3])
-        await admin.update_atlas_emotion(e.id, up_vac, mock_db, mock_admin_user)
+        await admin.update_visualization_emotion(e.id, up_vac, mock_db, mock_admin_user)
 
         assert e.vac_vector == [0.1, 0.2, 0.3]
         assert e.q_constant == [0, 0, 0, 1]
 
 
 @pytest.mark.asyncio
-async def test_import_atlas_data(mock_db, mock_admin_user):
+async def test_import_visualization_data(mock_db, mock_admin_user):
     import_data = {
         "emotions": [
             {
@@ -686,7 +686,7 @@ async def test_import_atlas_data(mock_db, mock_admin_user):
         mock_qb = AsyncMock()
         mock_get_qb.return_value = mock_qb
 
-        res = await admin.import_atlas_data(import_data, mock_db, mock_admin_user)
+        res = await admin.import_visualization_data(import_data, mock_db, mock_admin_user)
 
         assert res["updated"] == 1
         assert e.category == "New Cat"
@@ -790,7 +790,7 @@ async def test_update_user_not_found(mock_db, mock_admin_user):
 
 
 @pytest.mark.asyncio
-async def test_update_atlas_emotion_quat_fail(mock_db, mock_admin_user):
+async def test_update_visualization_emotion_quat_fail(mock_db, mock_admin_user):
     """Test handling of quaternion calculation failure during update."""
     # Mock finding emotion
     emotion = MagicMock()
@@ -807,7 +807,7 @@ async def test_update_atlas_emotion_quat_fail(mock_db, mock_admin_user):
         mock_get_qb.return_value = mock_qb
 
         with pytest.raises(HTTPException) as exc:
-            await admin.update_atlas_emotion(
+            await admin.update_visualization_emotion(
                 uuid.uuid4(),
                 EmotionUpdate(vac_vector=[0.5, 0.5, 0.5]),
                 mock_db,
@@ -818,7 +818,7 @@ async def test_update_atlas_emotion_quat_fail(mock_db, mock_admin_user):
 
 
 @pytest.mark.asyncio
-async def test_import_atlas_data_partial_failure(mock_db, mock_admin_user):
+async def test_import_visualization_data_partial_failure(mock_db, mock_admin_user):
     """Test import accumulates errors for failed items."""
     import_data = {
         "emotions": [
@@ -851,7 +851,7 @@ async def test_import_atlas_data_partial_failure(mock_db, mock_admin_user):
     anger_result.scalars.return_value.first.return_value = anger
 
     # We verify calls by order.
-    # Note: import_atlas_data implementation queries one by one.
+    # Note: import_visualization_data implementation queries one by one.
 
     mock_db.execute.side_effect = [joy_result, anger_result]
 
@@ -869,7 +869,7 @@ async def test_import_atlas_data_partial_failure(mock_db, mock_admin_user):
         mock_qb = AsyncMock()
         mock_get_qb.return_value = mock_qb
 
-        result = await admin.import_atlas_data(import_data, mock_db, mock_admin_user)
+        result = await admin.import_visualization_data(import_data, mock_db, mock_admin_user)
 
     assert result["updated"] == 1  # Joy succeeded
     assert len(result["errors"]) == 1

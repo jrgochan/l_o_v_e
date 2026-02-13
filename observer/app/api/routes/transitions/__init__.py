@@ -24,7 +24,6 @@ from app.api.routes.transitions.planning import (
     explain_transition_path,
     find_alternative_paths,
     generate_transition_path,
-    get_all_cached_paths,
     get_step_alternatives,
 )
 from app.api.routes.transitions.router import router
@@ -46,7 +45,6 @@ __all__ = [
     "get_user_journey_history",
     "get_user_journey_history",
     "get_user_effective_strategies",
-    "get_all_cached_paths",
     "PathPlanner",
     "UserJourney",
     "StrategyRecommender",

@@ -105,14 +105,29 @@ export interface PathWaypoint {
 }
 
 /**
- * Transition strategy for a path
+ * Transition strategy for a path.
+ *
+ * Field names match the backend StrategyInfo schema in
+ * observer/app/api/schemas/transition.py. The API response is passed
+ * through from useSinglePath without transformation.
  */
 export interface TransitionStrategy {
-  id: string;
+  strategy_id: string;
   name: string;
+  type: string;
   description: string;
-  category: string;
   evidence_level?: string;
+  time_required?: string;
+  steps?: string[];
+  difficulty_level?: number;
+  effectiveness_rating?: number;
+  times_successful_for_user?: number;
+  match_reason?: "pattern" | "vac_profile" | "universal";
+  /** @deprecated Use strategy_id instead */
+  id?: string;
+  /** @deprecated Use type instead */
+  category?: string;
+  /** @deprecated Use time_required instead */
   time_commitment?: string;
 }
 

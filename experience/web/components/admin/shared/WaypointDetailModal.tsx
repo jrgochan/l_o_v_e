@@ -37,11 +37,21 @@ interface JourneyStep {
     warning_signs?: string[];
   } | null;
   strategies?: {
+    strategy_id?: string;
     name?: string;
+    type?: string;
     evidence_level?: string;
     description?: string;
-    time_commitment?: string;
+    time_required?: string;
+    steps?: string[];
+    difficulty_level?: number;
+    effectiveness_rating?: number;
+    times_successful_for_user?: number;
+    match_reason?: string;
+    // Legacy aliases
+    id?: string;
     category?: string;
+    time_commitment?: string;
   }[];
 }
 
@@ -475,26 +485,108 @@ export function WaypointDetailModal({
                 {currentStep.strategies && currentStep.strategies.length > 0 ? (
                   <div className="grid grid-cols-1 gap-4">
                     {currentStep.strategies.map((strategy, index: number) => (
-                      <div
+                      <details
                         key={index}
-                        className="bg-gray-800 rounded-lg p-5 border border-gray-700 hover:border-cyan-500/30 transition"
+                        className="group bg-gray-800 rounded-lg border border-gray-700 hover:border-cyan-500/30 transition"
                       >
-                        <div className="flex items-start justify-between mb-3">
-                          <h4 className="text-white font-bold text-lg">{strategy.name}</h4>
-                          {strategy.evidence_level && (
-                            <span className="text-xs bg-green-900/30 text-green-400 px-2 py-1 rounded border border-green-500/20">
-                              {strategy.evidence_level}
-                            </span>
-                          )}
-                        </div>
-                        <p className="text-sm text-gray-300 mb-4 leading-relaxed">
-                          {strategy.description}
-                        </p>
-                        <div className="flex items-center gap-4 text-xs text-gray-400 bg-gray-900/50 p-2 rounded">
-                          {strategy.time_commitment && <span>⏱️ {strategy.time_commitment}</span>}
-                          {strategy.category && <span>📂 {strategy.category}</span>}
-                        </div>
-                      </div>
+                        <summary className="p-5 cursor-pointer list-none">
+                          <div className="flex items-start justify-between mb-3">
+                            <div className="flex items-center gap-3">
+                              <h4 className="text-white font-bold text-lg">{strategy.name}</h4>
+                              {/* Match reason badge */}
+                              {strategy.match_reason && strategy.match_reason !== "universal" && (
+                                <span
+                                  className={`text-[10px] uppercase tracking-wider px-2 py-0.5 rounded-full font-semibold border ${
+                                    strategy.match_reason === "pattern"
+                                      ? "bg-purple-900/30 text-purple-300 border-purple-500/30"
+                                      : "bg-sky-900/30 text-sky-300 border-sky-500/30"
+                                  }`}
+                                >
+                                  {strategy.match_reason === "pattern"
+                                    ? "Pattern Match"
+                                    : "VAC Profile"}
+                                </span>
+                              )}
+                            </div>
+                            <div className="flex items-center gap-2 shrink-0">
+                              {strategy.evidence_level && (
+                                <span className="text-xs bg-green-900/30 text-green-400 px-2 py-1 rounded border border-green-500/20">
+                                  {strategy.evidence_level}
+                                </span>
+                              )}
+                              <span className="text-gray-500 text-xs group-open:rotate-180 transition-transform">
+                                ▼
+                              </span>
+                            </div>
+                          </div>
+
+                          <p className="text-sm text-gray-300 mb-3 leading-relaxed">
+                            {strategy.description}
+                          </p>
+
+                          {/* Metadata row */}
+                          <div className="flex flex-wrap items-center gap-3 text-xs text-gray-400">
+                            {(strategy.time_required || strategy.time_commitment) && (
+                              <span>⏱️ {strategy.time_required || strategy.time_commitment}</span>
+                            )}
+                            {(strategy.type || strategy.category) && (
+                              <span>📂 {strategy.type || strategy.category}</span>
+                            )}
+                            {typeof strategy.difficulty_level === "number" && (
+                              <span className="flex items-center gap-1">
+                                <span>Difficulty:</span>
+                                <span className="flex gap-px">
+                                  {[1, 2, 3, 4, 5].map((level) => (
+                                    <span
+                                      key={level}
+                                      className={`w-3 h-1.5 rounded-sm ${
+                                        level <= (strategy.difficulty_level ?? 0)
+                                          ? level <= 2
+                                            ? "bg-green-500"
+                                            : level <= 3
+                                              ? "bg-yellow-500"
+                                              : "bg-red-400"
+                                          : "bg-gray-700"
+                                      }`}
+                                    />
+                                  ))}
+                                </span>
+                              </span>
+                            )}
+                            {typeof strategy.effectiveness_rating === "number" && (
+                              <span>⭐ {strategy.effectiveness_rating.toFixed(1)}/5</span>
+                            )}
+                            {typeof strategy.times_successful_for_user === "number" &&
+                              strategy.times_successful_for_user > 0 && (
+                                <span className="text-cyan-400">
+                                  ✓ Used {strategy.times_successful_for_user}× by you
+                                </span>
+                              )}
+                          </div>
+                        </summary>
+
+                        {/* Expandable step-by-step instructions */}
+                        {strategy.steps && strategy.steps.length > 0 && (
+                          <div className="px-5 pb-5 pt-2 border-t border-gray-700/50">
+                            <h5 className="text-sm font-semibold text-cyan-400 mb-3 uppercase tracking-wider">
+                              Step-by-Step Guide
+                            </h5>
+                            <ol className="space-y-2">
+                              {strategy.steps.map((step: string, stepIdx: number) => (
+                                <li
+                                  key={stepIdx}
+                                  className="flex items-start gap-3 text-sm text-gray-300"
+                                >
+                                  <span className="shrink-0 w-6 h-6 rounded-full bg-cyan-900/40 border border-cyan-500/30 flex items-center justify-center text-cyan-400 text-xs font-bold">
+                                    {stepIdx + 1}
+                                  </span>
+                                  <span className="pt-0.5">{step}</span>
+                                </li>
+                              ))}
+                            </ol>
+                          </div>
+                        )}
+                      </details>
                     ))}
                   </div>
                 ) : (

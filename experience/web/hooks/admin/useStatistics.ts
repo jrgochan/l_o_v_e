@@ -54,7 +54,7 @@ export function useStatistics(): UseStatisticsReturn {
   // Fetch statistics from backend API
   const fetchStats = async () => {
     try {
-      const response = await fetch(`${OBSERVER_API_URL}/observer/atlas/statistics`);
+      const response = await fetch(`${OBSERVER_API_URL}/observer/statistics`);
 
       if (!response.ok) {
         throw new Error("Failed to fetch statistics");
@@ -79,7 +79,7 @@ export function useStatistics(): UseStatisticsReturn {
 
     setIsClearing(true);
     try {
-      const response = await fetch(`${OBSERVER_API_URL}/observer/atlas/paths/cache`, {
+      const response = await fetch(`${OBSERVER_API_URL}/observer/paths/cache`, {
         method: "DELETE",
       });
 

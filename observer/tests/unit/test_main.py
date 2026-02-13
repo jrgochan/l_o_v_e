@@ -1,3 +1,6 @@
+import runpy
+import sys
+from contextlib import asynccontextmanager
 from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
@@ -78,3 +81,46 @@ def test_lifespan_shutdown_failure():
                 pass
 
     mock_close.assert_awaited_once()
+
+
+@asynccontextmanager
+async def mock_lifespan(_app):
+    yield
+
+
+def test_main_app_loads():
+    """Verify main app instantiates and root endpoint works."""
+    app.router.lifespan_context = mock_lifespan
+
+    with TestClient(app) as test_client:
+        response = test_client.get("/")
+        assert response.status_code == 200
+        assert response.json()["service"] == "L.O.V.E. Observer API"
+
+
+@pytest.fixture
+def mock_uvicorn():
+    with patch("uvicorn.run") as mock:
+        yield mock
+
+
+def test_main_startup_block(
+    mock_uvicorn,
+):  # pylint: disable=unused-argument, redefined-outer-name
+    """Test the main startup block (if __name__ == '__main__')."""
+    try:
+        with patch.object(sys, "argv", ["app/main.py"]):
+            runpy.run_module("app.main", run_name="__main__")
+    except SystemExit:
+        pass
+    except Exception:  # pylint: disable=broad-exception-caught
+        pass
+
+    mock_uvicorn.assert_called_once()
+
+    args, kwargs = mock_uvicorn.call_args
+    assert args[0] == "app.main:app"
+    assert "host" in kwargs
+    assert "port" in kwargs
+    assert "reload" in kwargs
+    assert "log_level" in kwargs

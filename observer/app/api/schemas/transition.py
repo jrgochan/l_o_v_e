@@ -226,6 +226,7 @@ class StrategyInfo(BaseModel):
     effectiveness_rating: Optional[float] = None
     times_successful_for_user: int = 0
     user_notes: List[str] = []
+    match_reason: str = "universal"  # pattern | vac_profile | universal
 
 
 class WaypointInfo(BaseModel):

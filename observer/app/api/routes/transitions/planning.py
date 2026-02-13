@@ -35,24 +35,6 @@ logger = logging.getLogger(__name__)
 router = APIRouter()
 
 
-@router.get("/atlas/paths/all", response_model=Dict[str, Any])
-async def get_all_cached_paths(
-    _db: Annotated[AsyncSession, Depends(get_db)],
-    _limit: int = 1000,
-) -> Dict[str, Any]:
-    """Retrieve pre-calculated transition paths for the Emotional Atlas visualization.
-
-    Args:
-        _db: Database session.
-        _limit: Max paths to return.
-
-    Returns:
-        Dict: Collection of cached paths.
-    """
-    # Placeholder for future implementation where we return pre-calculated paths
-    return {"paths": []}
-
-
 @router.post("/transition-path", response_model=TransitionPathResponse)
 async def generate_transition_path(
     request: TransitionPathRequest, db: Annotated[AsyncSession, Depends(get_db)]
@@ -457,6 +439,7 @@ async def _get_strategies_for_waypoint(
             effectiveness_rating=strat.get("effectiveness_rating"),
             times_successful_for_user=strat.get("times_successful_for_user", 0),
             user_notes=strat.get("user_notes", []),
+            match_reason=strat.get("match_reason", "universal"),
         )
         strategy_infos.append(strategy_info)
 
