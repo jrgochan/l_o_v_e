@@ -1,0 +1,44 @@
+---
+# =============================================================================
+# Tier 2 — Staging (Pre-production / QA)
+# =============================================================================
+# Target: 4 vCPU, 8 GB RAM, no GPU
+# Purpose: QA testing, integration testing, demo environments
+
+deployment_tier: "staging"
+
+# --- Identity ---
+domain_name: staging.jrgochan.io
+admin_email: admin@jrgochan.io
+
+# --- Database ---
+db_user: love_user
+db_password: "{{ vault_db_password | default('love_staging_pw') }}"
+db_name: love_db
+force_db_reset: false
+seed_level: "enhanced"
+
+# --- Resource Scaling ---
+uvicorn_workers_observer: 2
+uvicorn_workers_default: 2
+
+# --- PostgreSQL Tuning ---
+postgres_shared_buffers: "1GB"
+postgres_work_mem: "16MB"
+postgres_maintenance_work_mem: "256MB"
+postgres_effective_cache_size: "4GB"
+postgres_max_connections: 100
+
+# --- Redis ---
+redis_maxmemory: "512mb"
+
+# --- Services ---
+enable_ollama: true
+enable_personaplex: false
+enable_fail2ban: true
+
+# --- SSL ---
+ssl_mode: "letsencrypt-staging"
+
+# --- Logging ---
+log_level: "INFO"

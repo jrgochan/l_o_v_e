@@ -1,22 +1,61 @@
 ---
-- name: Deploy Love Stack to RHEL9
-  hosts: rhel9
+# =============================================================================
+# L.O.V.E. Stack — Main Deployment Playbook
+# =============================================================================
+# Usage:
+#   ansible-playbook deploy.yml -i inventory/production.ini  (full deploy)
+#   ansible-playbook deploy.yml -i inventory/dev.ini --tags setup
+#   ansible-playbook deploy.yml -i inventory/staging.ini --tags deploy
+#
+# Tier is determined by which inventory file (and matching group_vars) you use.
+# See group_vars/all.yml for shared defaults, tier files for overrides.
+
+- name: Deploy Love Stack
+  hosts: all
   become: true
+
+  pre_tasks:
+    - name: Display deployment tier
+      debug:
+        msg: "Deploying tier: {{ deployment_tier | default('unknown') }} to {{ inventory_hostname }}"
+
+    - name: Detect GPU availability
+      shell: lspci 2>/dev/null | grep -i nvidia || echo "none"
+      register: gpu_check
+      changed_when: false
+      failed_when: false
+
+    - name: Set GPU fact
+      set_fact:
+        gpu_available: "{{ 'nvidia' in (gpu_check.stdout | default('none') | lower) }}"
+
+    - name: Display GPU status
+      debug:
+        msg: "GPU detected: {{ gpu_available }}"
 
   roles:
     - role: common
       tags: setup
+
     - role: fail2ban
       tags: setup
+      when: enable_fail2ban | default(false) | bool
+
     - role: python
       tags: setup
+
     - role: postgres
       tags: [setup, deploy]
+
     - role: redis
       tags: setup
+
     - role: ollama
       tags: setup
+      when: enable_ollama | default(false) | bool
+
     - role: nginx
       tags: setup
+
     - role: app
       tags: deploy

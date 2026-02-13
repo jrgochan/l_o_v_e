@@ -1,12 +1,12 @@
 [Unit]
 Description=Love Stack - Versor API
-After=network.target postgresql-15.service redis.service
+After=network.target postgresql-{{ postgresql_version }}.service redis.service
 
 [Service]
 User={{ app_user }}
 Group={{ app_group }}
 WorkingDirectory={{ app_dir }}/versor
-ExecStart={{ app_dir }}/versor/.venv/bin/uvicorn app.main:app --host 0.0.0.0 --port {{ port_versor }} --workers 4
+ExecStart={{ app_dir }}/versor/.venv/bin/uvicorn app.main:app --host 0.0.0.0 --port {{ port_versor }} --workers {{ uvicorn_workers_default }}
 Restart=always
 EnvironmentFile={{ app_dir }}/infra/deploy/configs/env/production.env
 

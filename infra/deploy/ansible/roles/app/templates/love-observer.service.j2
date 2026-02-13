@@ -1,12 +1,12 @@
 [Unit]
 Description=Love Stack - Observer API
-After=network.target postgresql-15.service redis.service
+After=network.target postgresql-{{ postgresql_version }}.service redis.service
 
 [Service]
 User={{ app_user }}
 Group={{ app_group }}
 WorkingDirectory={{ app_dir }}/observer
-ExecStart={{ app_dir }}/observer/.venv/bin/uvicorn app.main:app --host 0.0.0.0 --port {{ port_observer }} --workers 4
+ExecStart={{ app_dir }}/observer/.venv/bin/uvicorn app.main:app --host 0.0.0.0 --port {{ port_observer }} --workers {{ uvicorn_workers_observer }}
 Restart=always
 EnvironmentFile={{ app_dir }}/infra/deploy/configs/env/production.env
 

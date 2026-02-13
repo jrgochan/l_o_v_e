@@ -1,0 +1,50 @@
+---
+# =============================================================================
+# Tier 3 — Production (Live)
+# =============================================================================
+# Target: 8+ vCPU, 16+ GB RAM, optional GPU
+# Purpose: Live deployment at jrgochan.io
+
+deployment_tier: "production"
+
+# --- Identity ---
+domain_name: love.jrgochan.io
+admin_email: admin@jrgochan.io
+
+# --- Database ---
+db_user: love_user
+db_password: "{{ vault_db_password | default('love_password') }}"
+db_name: love_db
+force_db_reset: false
+seed_level: "enhanced"
+
+# --- Security ---
+jwt_secret_key: "{{ vault_jwt_secret | default(lookup('password', '/dev/null chars=ascii_letters,digits length=64')) }}"
+
+# --- Resource Scaling ---
+uvicorn_workers_observer: 4
+uvicorn_workers_default: 2
+
+# --- PostgreSQL Tuning ---
+postgres_shared_buffers: "4GB"
+postgres_work_mem: "32MB"
+postgres_maintenance_work_mem: "512MB"
+postgres_effective_cache_size: "12GB"
+postgres_max_connections: 200
+postgres_wal_buffers: "64MB"
+
+# --- Redis ---
+redis_maxmemory: "1gb"
+
+# --- Services ---
+enable_ollama: true
+enable_personaplex: "{{ gpu_available | default(false) }}"
+enable_fail2ban: true
+fail2ban_maxretry: 3
+fail2ban_bantime: 3600
+
+# --- SSL ---
+ssl_mode: "letsencrypt"
+
+# --- Logging ---
+log_level: "WARNING"

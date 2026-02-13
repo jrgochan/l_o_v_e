@@ -17,6 +17,7 @@ VERBOSE=false
 EXTRA_TAGS=""
 REMOTE_HOST=""
 ACTION="deploy"
+TIER="production"
 
 # 3. Output Styling & Common Lib
 # shellcheck source=../scripts/../lib/common.sh
@@ -40,14 +41,24 @@ show_help() {
     echo "    -h, --help            Show this help message"
     echo "    -v, --verbose         Enable verbose Ansible output (-vv)"
     echo "    --tags [tags]         Pass additional Ansible tags (comma-separated)"
+    echo "    --tier [tier]         Deployment tier: minimal, staging, production [default: production]"
+    echo "    --vault               Prompt for Ansible Vault password"
+    echo ""
+    echo -e "${BOLD}TIERS${NC}"
+    echo "    minimal     Dev/CI  — 4GB RAM, no Ollama/PersonaPlex, debug logging"
+    echo "    staging     QA      — 8GB RAM, optional Ollama, LE staging certs"
+    echo "    production  Live    — 16GB+ RAM, full services, LE production certs"
     echo ""
     echo -e "${BOLD}EXAMPLES${NC}"
     echo "    $0 jrgochan@love.jrgochan.io deploy"
-    echo "    $0 --verbose jrgochan@love.jrgochan.io check"
-    echo "    $0 --tags nginx,certs jrgochan@love.jrgochan.io setup"
+    echo "    $0 --tier staging jrgochan@staging.jrgochan.io deploy"
+    echo "    $0 --tier minimal --verbose jrgochan@dev-server setup"
+    echo "    $0 --vault jrgochan@love.jrgochan.io deploy"
     echo ""
     exit 0
 }
+
+USE_VAULT=false
 
 while [[ $# -gt 0 ]]; do
     case "$1" in
@@ -55,6 +66,9 @@ while [[ $# -gt 0 ]]; do
         -v|--verbose) VERBOSE=true; shift ;;
         --tags) EXTRA_TAGS="$2"; shift 2 ;;
         --tags=*) EXTRA_TAGS="${1#*=}"; shift ;;
+        --tier) TIER="$2"; shift 2 ;;
+        --tier=*) TIER="${1#*=}"; shift ;;
+        --vault) USE_VAULT=true; shift ;;
         -*)
             print_error "Unknown option: $1"
             echo "Run '$0 --help' for usage."
@@ -98,6 +112,26 @@ case "$ACTION" in
         ;;
 esac
 
+# Validate tier
+case "$TIER" in
+    minimal|staging|production) ;; # valid
+    *)
+        print_error "Unknown tier '$TIER'. Use 'minimal', 'staging', or 'production'."
+        exit 1
+        ;;
+esac
+
+# Map tier to inventory file (used via indirect expansion below)
+# shellcheck disable=SC2034
+INVENTORY_MAP_minimal="dev.ini"
+# shellcheck disable=SC2034
+INVENTORY_MAP_staging="staging.ini"
+# shellcheck disable=SC2034
+INVENTORY_MAP_production="production.ini"
+
+TIER_VAR="INVENTORY_MAP_${TIER}"
+INVENTORY_FILE_NAME="${!TIER_VAR}"
+
 # Extract user and host
 USER_NAME="${REMOTE_HOST%%@*}"
 HOST_NAME="${REMOTE_HOST#*@}"
@@ -106,7 +140,9 @@ HOST_NAME="${REMOTE_HOST#*@}"
 
 print_header "🚀 Ansible Deployment: $ACTION"
 echo "  Target:  $HOST_NAME ($USER_NAME)"
+echo "  Tier:    $TIER"
 echo "  Verbose: $VERBOSE"
+echo "  Vault:   $USE_VAULT"
 [ -n "$EXTRA_TAGS" ] && echo "  Tags:    $EXTRA_TAGS"
 
 # 6a. Ansible installation
@@ -155,21 +191,29 @@ fi
 
 # 7. Generate Inventory
 
-INVENTORY_FILE="$ANSIBLE_DIR/inventory/hosts.ini"
-mkdir -p "$(dirname "$INVENTORY_FILE")"
+INVENTORY_FILE="$ANSIBLE_DIR/inventory/$INVENTORY_FILE_NAME"
 
+# Determine the Ansible group name from tier
+case "$TIER" in
+    minimal) GROUP_NAME="minimal" ;;
+    staging) GROUP_NAME="staging" ;;
+    production) GROUP_NAME="production" ;;
+esac
+
+# Write the inventory with the correct group
+mkdir -p "$(dirname "$INVENTORY_FILE")"
 cat > "$INVENTORY_FILE" <<EOF
-[rhel9]
+[$GROUP_NAME]
 $HOST_NAME ansible_host=$HOST_NAME ansible_user=$USER_NAME
 EOF
 
-print_info "Inventory written to $INVENTORY_FILE"
+print_info "Inventory written to $INVENTORY_FILE (tier: $TIER)"
 
 # 8. Build Ansible Command & Execute
 
 cd "$ANSIBLE_DIR"
 
-ANSIBLE_ARGS=(-i inventory/hosts.ini)
+ANSIBLE_ARGS=(-i "inventory/$INVENTORY_FILE_NAME")
 
 if [ "$VERBOSE" = true ]; then
     ANSIBLE_ARGS+=(-vv)
@@ -177,6 +221,10 @@ fi
 
 if [ -n "$EXTRA_TAGS" ]; then
     ANSIBLE_ARGS+=(--tags "$EXTRA_TAGS")
+fi
+
+if [ "$USE_VAULT" = true ]; then
+    ANSIBLE_ARGS+=(--ask-vault-pass)
 fi
 
 case "$ACTION" in
@@ -187,11 +235,11 @@ case "$ACTION" in
         ansible-playbook deploy.yml "${ANSIBLE_ARGS[@]}" --check --diff
         ;;
     setup)
-        print_info "Running Infrastructure Setup..."
+        print_info "Running Infrastructure Setup ($TIER)..."
         ansible-playbook deploy.yml "${ANSIBLE_ARGS[@]}" --tags setup
         ;;
     deploy)
-        print_info "Running Application Deployment..."
+        print_info "Running Application Deployment ($TIER)..."
         ansible-playbook deploy.yml "${ANSIBLE_ARGS[@]}" --tags deploy
         ;;
 esac
@@ -203,6 +251,7 @@ DURATION=$((END_TIME - START_TIME))
 
 print_header "📊 Deployment Summary"
 echo "  Action:   $ACTION"
+echo "  Tier:     $TIER"
 echo "  Target:   $HOST_NAME ($USER_NAME)"
 echo "  Duration: ${DURATION}s"
 echo ""

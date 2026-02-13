@@ -1,6 +1,13 @@
 ---
-- name: Create Virtual Environments
-  command: python3.12 -m venv .venv
+# =============================================================================
+# Backend Deployment Tasks
+# =============================================================================
+# Conditional on deployment_tier and service toggles from group_vars.
+
+# --- Core Services (always deployed) ---
+
+- name: Create Virtual Environments (Core)
+  command: python{{ python_version }} -m venv .venv
   args:
     chdir: "{{ app_dir }}/{{ item }}"
     creates: "{{ app_dir }}/{{ item }}/.venv"
@@ -8,10 +15,17 @@
     - versor
     - observer
     - listener
-    - personaplex
   become_user: "{{ app_user }}"
 
-- name: Install Python Dependencies
+- name: Create Virtual Environment (PersonaPlex)
+  command: python{{ python_version }} -m venv .venv
+  args:
+    chdir: "{{ app_dir }}/personaplex"
+    creates: "{{ app_dir }}/personaplex/.venv"
+  become_user: "{{ app_user }}"
+  when: enable_personaplex | default(false) | bool
+
+- name: Install Python Dependencies (Core)
   pip:
     requirements: "{{ app_dir }}/{{ item }}/requirements.txt"
     virtualenv: "{{ app_dir }}/{{ item }}/.venv"
@@ -19,10 +33,16 @@
     - versor
     - observer
     - listener
-    - personaplex
   become_user: "{{ app_user }}"
 
-- name: Install Package in Editable Mode (for dependencies)
+- name: Install Python Dependencies (PersonaPlex)
+  pip:
+    requirements: "{{ app_dir }}/personaplex/requirements.txt"
+    virtualenv: "{{ app_dir }}/personaplex/.venv"
+  become_user: "{{ app_user }}"
+  when: enable_personaplex | default(false) | bool
+
+- name: Install Package in Editable Mode
   pip:
     name: ".[{{ item }}]"
     virtualenv: "{{ app_dir }}/{{ item }}/.venv"
@@ -31,13 +51,12 @@
     - versor
     - observer
     - listener
-    # Personaplex might not be in pyproject.toml as an extra yet, check? Assuming it is for now or skip editable install for it if fails.
-    # Actually, let's skip editable install for personaplex if it's not in the main repo structure yet or just install deps.
-    # Based on directory structure, it is independent.
   become_user: "{{ app_user }}"
   ignore_errors: yes
 
-- name: Deploy Backend Systemd Units
+# --- Systemd Units ---
+
+- name: Deploy Core Systemd Units
   template:
     src: "love-{{ item }}.service.j2"
     dest: "/etc/systemd/system/love-{{ item }}.service"
@@ -46,11 +65,18 @@
     - versor
     - observer
     - listener
-    - personaplex
     - listener-worker
   notify: Restart Backend Services
 
-- name: Enable Backend Services
+- name: Deploy PersonaPlex Systemd Unit
+  template:
+    src: love-personaplex.service.j2
+    dest: /etc/systemd/system/love-personaplex.service
+    mode: '0644'
+  when: enable_personaplex | default(false) | bool
+  notify: Restart Backend Services
+
+- name: Enable Core Services
   service:
     name: "love-{{ item }}"
     enabled: yes
@@ -59,8 +85,24 @@
     - versor
     - observer
     - listener
-    - personaplex
     - listener-worker
+
+- name: Enable PersonaPlex Service
+  service:
+    name: love-personaplex
+    enabled: yes
+    state: started
+  when: enable_personaplex | default(false) | bool
+
+- name: Disable PersonaPlex Service (when not enabled)
+  service:
+    name: love-personaplex
+    enabled: no
+    state: stopped
+  when: not (enable_personaplex | default(false) | bool)
+  ignore_errors: yes
+
+# --- Database Setup ---
 
 - name: Run Database Migrations (Observer)
   shell: |
@@ -76,6 +118,7 @@
     POSTGRES_PORT: "5432"
   become_user: "{{ app_user }}"
   run_once: true
+  when: run_migrations | default(true) | bool
 
 - name: Validate JSON Data
   shell: |
@@ -106,7 +149,7 @@
 
 - name: Seed Database Content (GoEmotions)
   shell: |
-    .venv/bin/python scripts/seed_all.py --dataset=goemotions --level=enhanced --force-reseed
+    .venv/bin/python scripts/seed_all.py --dataset=goemotions --level={{ seed_level | default('minimal') }} --force-reseed
   args:
     chdir: "{{ app_dir }}/observer"
   environment:
@@ -136,7 +179,9 @@
   become_user: "{{ app_user }}"
   run_once: true
 
-- name: Restart Backend Services After Deploy
+# --- Restart ---
+
+- name: Restart Core Services After Deploy
   service:
     name: "love-{{ item }}"
     state: restarted
@@ -145,5 +190,11 @@
     - versor
     - observer
     - listener
-    - personaplex
     - listener-worker
+
+- name: Restart PersonaPlex After Deploy
+  service:
+    name: love-personaplex
+    state: restarted
+    daemon_reload: yes
+  when: enable_personaplex | default(false) | bool

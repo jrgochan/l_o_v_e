@@ -183,3 +183,28 @@
     - uuid-ossp
     - pg_trgm
   when: pg_socket_found.matched > 0 and not ansible_check_mode
+
+- name: Ensure conf.d directory exists
+  file:
+    path: /var/lib/pgsql/{{ postgresql_version }}/data/conf.d
+    state: directory
+    owner: postgres
+    group: postgres
+    mode: '0755'
+
+- name: Ensure conf.d include exists in postgresql.conf
+  lineinfile:
+    path: /var/lib/pgsql/{{ postgresql_version }}/data/postgresql.conf
+    line: "include_dir = 'conf.d'"
+    state: present
+  notify: Restart PostgreSQL
+
+- name: Deploy PostgreSQL Performance Tuning
+  template:
+    src: postgresql_tuning.conf.j2
+    dest: /var/lib/pgsql/{{ postgresql_version }}/data/conf.d/99-love-tuning.conf
+    owner: postgres
+    group: postgres
+    mode: '0644'
+  notify: Restart PostgreSQL
+

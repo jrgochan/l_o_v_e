@@ -1,0 +1,33 @@
+---
+# =============================================================================
+# Tier 1 — Minimal (Dev / CI / Demo)
+# =============================================================================
+# Target: 2 vCPU, 4 GB RAM, no GPU
+# Purpose: Local development, CI pipelines, quick demos
+#
+# Inherits all defaults from all.yml.
+# Only overrides what differs from defaults.
+
+deployment_tier: "minimal"
+
+# --- Identity ---
+domain_name: localhost
+admin_email: dev@localhost
+
+# --- Database ---
+db_user: love_user
+db_password: love_password
+db_name: love_db
+force_db_reset: true
+seed_level: "minimal"
+
+# --- Services ---
+enable_ollama: false
+enable_personaplex: false
+enable_fail2ban: false
+
+# --- SSL ---
+ssl_mode: "none"
+
+# --- Logging ---
+log_level: "DEBUG"

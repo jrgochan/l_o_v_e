@@ -1,0 +1,67 @@
+---
+# =============================================================================
+# L.O.V.E. Stack — Shared Defaults (All Tiers)
+# =============================================================================
+# These values apply to every deployment tier.
+# Tier-specific group_vars override individual values as needed.
+
+# --- Project ---
+repo_url: git@github.com:jrgochan/l_o_v_e.git
+repo_branch: main
+app_user: love
+app_group: love
+app_dir: /home/love/love-stack
+
+# --- Versions ---
+python_version: "3.12"
+nodejs_version: "20"
+postgresql_version: "18"
+
+# --- Ports ---
+port_frontend: 3001
+port_observer: 8000
+port_versor: 8001
+port_listener: 8002
+port_personaplex: 8003
+
+# --- Service Toggles ---
+enable_ollama: false
+enable_personaplex: false
+enable_docs: true
+enable_fail2ban: false
+
+# --- Resource Scaling (Defaults = Minimal) ---
+uvicorn_workers_observer: 1
+uvicorn_workers_default: 1
+
+# --- PostgreSQL Tuning ---
+postgres_shared_buffers: "512MB"
+postgres_work_mem: "4MB"
+postgres_maintenance_work_mem: "128MB"
+postgres_effective_cache_size: "1GB"
+postgres_max_connections: 50
+
+# --- Redis ---
+redis_maxmemory: "256mb"
+redis_maxmemory_policy: "allkeys-lru"
+
+# --- Database Lifecycle ---
+force_db_reset: false
+seed_level: "minimal"
+run_migrations: true
+
+# --- SSL ---
+# Options: none | self-signed | letsencrypt-staging | letsencrypt
+ssl_mode: "none"
+
+# --- Security (Fail2ban) ---
+fail2ban_maxretry: 5
+fail2ban_bantime: 600
+
+# --- AI / Embeddings ---
+ai_provider: "ollama"
+ollama_base_url: "http://localhost:11434"
+embedding_model: "all-MiniLM-L6-v2"
+
+# --- Logging ---
+log_level: "INFO"
