@@ -1,6 +1,6 @@
 #!/bin/bash
 # Master verification script - runs all quality checks
-# POSIX-compliant, comprehensive, production-ready
+# comprehensive, production-ready
 
 set -e
 

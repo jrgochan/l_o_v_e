@@ -1,0 +1,31 @@
+---
+# Documentation site (MkDocs) build tasks
+
+- name: Create docs virtual environment
+  command: python3 -m venv {{ app_dir }}/docs/.venv
+  args:
+    creates: "{{ app_dir }}/docs/.venv/bin/pip"
+  become_user: "{{ app_user }}"
+
+- name: Install docs Python dependencies
+  pip:
+    requirements: "{{ app_dir }}/docs/requirements-docs.txt"
+    virtualenv: "{{ app_dir }}/docs/.venv"
+  become_user: "{{ app_user }}"
+
+- name: Build MkDocs documentation site
+  shell: |
+    source {{ app_dir }}/docs/.venv/bin/activate
+    mkdocs build --clean --site-dir {{ app_dir }}/docs-build
+  args:
+    chdir: "{{ app_dir }}/docs"
+    executable: /bin/bash
+  become_user: "{{ app_user }}"
+
+- name: Ensure docs-build directory is readable by Nginx
+  file:
+    path: "{{ app_dir }}/docs-build"
+    state: directory
+    mode: '0755'
+    recurse: yes
+  become: yes

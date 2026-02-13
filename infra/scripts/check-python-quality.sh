@@ -1,6 +1,6 @@
 #!/bin/bash
 # Check Python code quality across all modules
-# POSIX-compliant, supports --fix flag, mypy --strict
+# supports --fix flag, mypy --strict
 
 set -e
 
@@ -44,21 +44,13 @@ fi
 
 print_header "Python Code Quality Check"
 
-# Activate DX venv to use quality tools
-print_info "Activating DX tools venv..."
-if ! activate_dx_venv >/dev/null 2>&1; then
-    print_error "DX venv not found. Run: infra/scripts/install-dev-tools.sh"
+# Activate project venv (includes all module deps + dev tools)
+print_info "Activating project venv..."
+if ! activate_project_venv; then
+    print_error "Project venv setup failed. Ensure uv is installed: curl -LsSf https://astral.sh/uv/install.sh | sh"
     exit 1
 fi
-print_success "DX venv activated"
-
-# Ensure environment is up-to-date
-print_info "Syncing dependencies with uv..."
-if uv sync --all-extras >/dev/null 2>&1; then
-    print_success "Dependencies synced"
-else
-    print_warning "Failed to sync dependencies (continuing anyway)"
-fi
+print_success "Project venv ready"
 
 if [ $FIX_MODE -eq 1 ]; then
     print_info "Running in FIX mode - will auto-format code"

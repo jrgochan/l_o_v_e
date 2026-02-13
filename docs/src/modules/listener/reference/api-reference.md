@@ -1,6 +1,6 @@
 # API Reference
 
-**Last Updated:** January 2, 2026
+**Last Updated:** February 2026
 **Audience:** All developers
 **Goal:** Complete reference for all Listener API endpoints
 
@@ -10,7 +10,7 @@
 
 ```text
 Development: http://localhost:8002
-Production: https://api.love-platform.dev/listener
+Production: https://love.jrgochan.io/listener
 ```
 
 ---
@@ -31,9 +31,15 @@ Production: https://api.love-platform.dev/listener
 | `/listener/analyze` | POST | Analyze text (sync) | ~2s |
 | `/listener/analyze-audio` | POST | Analyze audio (sync) | ~3s |
 | `/listener/analyze-multi-emotion` | POST | Multi-emotion analysis | ~4s |
+| `/listener/analyze-audio-multi-emotion` | POST | Audio + multi-emotion | ~5s |
+| `/listener/extract-audio-features` | POST | Audio feature extraction | ~1s |
 | `/listener/ingest` | POST | Queue audio (async) | < 100ms |
 | `/listener/status/{job_id}` | GET | Check job status | < 50ms |
-| `/listener/ai/models/local` | GET | List local models | < 100ms |
+| `/listener/ai-models/local` | GET | List local models | < 100ms |
+| `/listener/ai-models/pull` | POST | Pull a new model | varies |
+| `/listener/ai-models/{name}` | DELETE | Delete a model | < 1s |
+| `/listener/ai-models/{name}/details` | GET | Model details | < 100ms |
+| `/listener/ai-models/health` | GET | AI model health | < 100ms |
 
 ---
 
@@ -368,6 +374,83 @@ curl http://localhost:8002/listener/ai/models/local
 }
 ```
 
+### POST /listener/ai-models/pull
+
+**Purpose:** Pull (download) a new Ollama model.
+
+**Request:**
+
+```json
+{
+  "model_name": "llama3.1:8b-instruct-q4_0"
+}
+```
+
+**Response:**
+
+```json
+{
+  "status": "pulling",
+  "model_name": "llama3.1:8b-instruct-q4_0",
+  "message": "Model download initiated"
+}
+```
+
+### DELETE /listener/ai-models/{model_name}
+
+**Purpose:** Delete a locally cached model.
+
+### GET /listener/ai-models/{model_name}/details
+
+**Purpose:** Get detailed info about a specific model.
+
+### GET /listener/ai-models/health
+
+**Purpose:** Check if Ollama and configured models are accessible.
+
+---
+
+## Additional Analysis Endpoints
+
+### POST /listener/extract-audio-features
+
+**Purpose:** Extract audio features (prosody) without full emotional analysis.
+
+**Request:**
+
+```bash
+curl -X POST http://localhost:8002/listener/extract-audio-features \
+  -F "audio=@recording.wav"
+```
+
+**Response:**
+
+```json
+{
+  "prosody": {
+    "pitch_mean": 185.5,
+    "pitch_std": 42.3,
+    "energy": 0.65,
+    "speech_rate": 3.2
+  }
+}
+```
+
+### POST /listener/analyze-audio-multi-emotion
+
+**Purpose:** Combined audio transcription with multi-emotion analysis.
+
+**Request:**
+
+```bash
+curl -X POST http://localhost:8002/listener/analyze-audio-multi-emotion \
+  -F "audio=@recording.wav" \
+  -F "user_id=demo-user" \
+  -F "session_id=demo-session"
+```
+
+**Response:** Same format as `/analyze-multi-emotion` but includes `transcription` and `prosody` fields.
+
 ---
 
 ## Error Codes
@@ -481,7 +564,7 @@ http://localhost:8002/openapi.json
 
 ## Key Takeaways
 
-✅ **5 main endpoints** for various use cases
+✅ **13 endpoints** covering text, audio, multi-emotion, and AI model management
 ✅ **Sync and async** options available
 ✅ **Well-documented** with examples
 ✅ **Error handling** with clear codes

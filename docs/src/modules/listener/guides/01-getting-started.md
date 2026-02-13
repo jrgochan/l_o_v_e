@@ -52,7 +52,7 @@ Before we start, make sure you have these installed:
 
   ```bash
   python3 --version
-  # Should show: Python 3.11.x or higher
+  # Should show: Python 3.12.x or higher
   ```
 
 - [ ] **Ollama** (for running local LLMs)

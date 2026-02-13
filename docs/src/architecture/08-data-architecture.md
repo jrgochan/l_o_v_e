@@ -5,7 +5,7 @@
 
 ## Database: PostgreSQL + pgvector
 
-The core data store is PostgreSQL 16 enabled with the `pgvector` extension.
+The core data store is PostgreSQL 18 enabled with the `pgvector` extension.
 
 ### Key Tables
 

@@ -9,8 +9,9 @@
 
 "use client";
 
-import { useState, useMemo, useEffect } from "react";
+import { useState, useMemo, useEffect, useRef, useCallback } from "react";
 import { useVisualizationStore } from "@/stores/useVisualizationStore";
+import { logger } from "@/utils/logger";
 import type { PathWaypoint, EmotionPath } from "@/types/visualization";
 
 interface JourneyStep {
@@ -86,6 +87,15 @@ export function WaypointDetailModal({
 }: Omit<WaypointDetailModalProps, "waypoint"> & { waypoint?: PathWaypoint }) {
   const [activeTab, setActiveTab] = useState<TabType>("why");
   const allEmotions = useVisualizationStore((state) => state.allEmotions);
+
+  // On-demand strategy fetching for cached paths that lack strategy data
+  const [fetchedStrategies, setFetchedStrategies] = useState<
+    Record<number, JourneyStep["strategies"]>
+  >({});
+  const [isLoadingStrategies, setIsLoadingStrategies] = useState(false);
+  const [strategyFetchError, setStrategyFetchError] = useState<string | null>(null);
+  const fetchedIndicesRef = useRef<Set<number>>(new Set());
+
   const setFocusedEmotion = useVisualizationStore((state) => state.setFocusedEmotion);
 
   // Construct unified steps array [Start, ...Waypoints, End]
@@ -129,8 +139,76 @@ export function WaypointDetailModal({
     return [startStep, ...intermediateSteps, endStep] as JourneyStep[];
   }, [path]);
 
+  // Fetch strategies on-demand when empty (cached path scenario)
+  const fetchStrategiesForStep = useCallback(
+    async (stepIndex: number) => {
+      if (fetchedIndicesRef.current.has(stepIndex)) return;
+      const step = allSteps[stepIndex];
+      if (!step || step.type === "start" || step.type === "end") return;
+      if (step.strategies && step.strategies.length > 0) return;
+
+      // Get previous step's VAC for the from_vac parameter
+      const prevStep = allSteps[Math.max(0, stepIndex - 1)];
+      if (!prevStep?.vac || !step.vac) return;
+
+      fetchedIndicesRef.current.add(stepIndex);
+      setIsLoadingStrategies(true);
+      setStrategyFetchError(null);
+
+      try {
+        const baseUrl = process.env.NEXT_PUBLIC_OBSERVER_URL || "http://localhost:8000";
+        const response = await fetch(`${baseUrl}/observer/strategies/for-transition`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            from_vac: Array.from(prevStep.vac),
+            to_vac: Array.from(step.vac),
+            limit: 5,
+          }),
+        });
+
+        if (!response.ok) {
+          throw new Error(`HTTP ${response.status}`);
+        }
+
+        const data = await response.json();
+        if (data.strategies && data.strategies.length > 0) {
+          setFetchedStrategies((prev) => ({ ...prev, [stepIndex]: data.strategies }));
+          logger.info(
+            "api",
+            `Fetched ${data.strategies.length} strategies for waypoint ${stepIndex}`
+          );
+        }
+      } catch (err) {
+        logger.error("api", "Failed to fetch strategies", err);
+        setStrategyFetchError("Could not load strategies. The backend may be unavailable.");
+        fetchedIndicesRef.current.delete(stepIndex); // Allow retry
+      } finally {
+        setIsLoadingStrategies(false);
+      }
+    },
+    [allSteps]
+  );
+
+  // Trigger fetch when navigating to a waypoint with empty strategies
+  useEffect(() => {
+    const safeIndex = Math.max(0, Math.min(waypointIndex, allSteps.length - 1));
+    const step = allSteps[safeIndex];
+    if (step && (!step.strategies || step.strategies.length === 0) && step.type === "waypoint") {
+      fetchStrategiesForStep(safeIndex);
+    }
+  }, [waypointIndex, allSteps, fetchStrategiesForStep]);
+
   // Safe current step retrieval
   const currentStep = allSteps[Math.max(0, Math.min(waypointIndex, allSteps.length - 1))];
+
+  // Merge inline strategies with any fetched on-demand
+  const displayStrategies = useMemo(() => {
+    const safeIdx = Math.max(0, Math.min(waypointIndex, allSteps.length - 1));
+    const inline = currentStep?.strategies;
+    if (inline && inline.length > 0) return inline;
+    return fetchedStrategies[safeIdx] || [];
+  }, [waypointIndex, allSteps, currentStep, fetchedStrategies]);
 
   // Find and highlight the waypoint emotion in 3D when modal opens or navigates
   useEffect(() => {
@@ -476,15 +554,33 @@ export function WaypointDetailModal({
               <section>
                 <h3 className="text-lg font-semibold text-white mb-3">
                   Recommended Strategies
-                  {currentStep.strategies && (
-                    <span className="ml-2 text-sm text-gray-400">
-                      ({currentStep.strategies.length})
-                    </span>
+                  {displayStrategies.length > 0 && (
+                    <span className="ml-2 text-sm text-gray-400">({displayStrategies.length})</span>
                   )}
                 </h3>
-                {currentStep.strategies && currentStep.strategies.length > 0 ? (
+                {isLoadingStrategies && displayStrategies.length === 0 ? (
+                  <div className="bg-gray-800 rounded-lg p-6 border border-gray-700 text-center">
+                    <div className="flex items-center justify-center gap-3">
+                      <div className="w-5 h-5 border-2 border-cyan-500 border-t-transparent rounded-full animate-spin" />
+                      <p className="text-gray-400">Loading strategies...</p>
+                    </div>
+                  </div>
+                ) : strategyFetchError && displayStrategies.length === 0 ? (
+                  <div className="bg-gray-800 rounded-lg p-6 border border-red-900/30 text-center">
+                    <p className="text-red-400 text-sm">{strategyFetchError}</p>
+                    <button
+                      className="mt-3 text-xs text-cyan-400 hover:text-cyan-300 underline"
+                      onClick={() => {
+                        const safeIdx = Math.max(0, Math.min(waypointIndex, allSteps.length - 1));
+                        fetchStrategiesForStep(safeIdx);
+                      }}
+                    >
+                      Retry
+                    </button>
+                  </div>
+                ) : displayStrategies.length > 0 ? (
                   <div className="grid grid-cols-1 gap-4">
-                    {currentStep.strategies.map((strategy, index: number) => (
+                    {displayStrategies.map((strategy, index: number) => (
                       <details
                         key={index}
                         className="group bg-gray-800 rounded-lg border border-gray-700 hover:border-cyan-500/30 transition"

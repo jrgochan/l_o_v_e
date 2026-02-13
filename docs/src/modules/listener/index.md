@@ -20,22 +20,9 @@ graph TD
     G --> H[Output:<br/>VAC Coordinates<br/>+ Emotion<br/>+ Reasoning]
 
     style E fill:#4f46e5,color:#fff
-```mermaid
-graph TD
-    A[Audio Input] --> B[Transcription]
-    B --> C[Semantic Analysis]
-    C --> D[Emotion Classification]
-    D --> E[VAC Extraction]
-    D --> F[Atlas Mapping]
-    E --> G[Visual Output]
-
-    style A fill:#f3f4f6,stroke:#333,stroke-width:2px
-    style G fill:#f3f4f6,stroke:#333,stroke-width:2px
     style C fill:#818cf8,color:#fff
-    style D fill:#6366f1,color:#fff
-    style E fill:#4f46e5,color:#fff
     style F fill:#6366f1,color:#fff
-    style G fill:#818cf8,color:#fff
+    style G fill:#4f46e5,color:#fff
 ```
 
 ```text
@@ -53,7 +40,7 @@ listener/
 
 - Audio transcription (faster-whisper)
 - Direct text analysis
-- Async processing queue (Redis + Arq)
+- Multi-emotion analysis pipeline
 
 ### 🧠 **Semantic VAC Extraction**
 
@@ -214,7 +201,7 @@ Complete technical reference material:
 | Component | Technology | Version | Purpose |
 |-----------|------------|---------|---------|
 | **Framework** | FastAPI | 0.104+ | REST API server |
-| **Transcription** | OpenAI Whisper | base.en | Local speech-to-text |
+| **Transcription** | faster-whisper | base.en | Local speech-to-text |
 | **LLM** | Ollama + Llama 3.1 | 8b-instruct-q4_0 | Semantic analysis |
 | **Task Queue** | Arq + Redis | 0.26+ / 7+ | Async job processing |
 | **NER** | Spacy | 3.7+ | PII detection |

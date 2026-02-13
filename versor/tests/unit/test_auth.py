@@ -1,8 +1,8 @@
 """Unit tests for authentication dependency."""
 
+import jwt
 import pytest
 from fastapi import HTTPException
-from jose import jwt
 
 from app.api.deps import get_current_user
 from app.config import settings

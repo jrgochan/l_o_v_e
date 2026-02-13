@@ -66,7 +66,7 @@ Stores emotional states, finds patterns, and provides therapeutic guidance.
 
 - PostgreSQL + pgvector for similarity search
 - 87-emotion atlas (Brené Brown's taxonomy)
-- A* pathfinding with 107 evidence-based strategies
+- A* pathfinding with 50+ evidence-based strategies
 - Transition system for emotional journeys
 
 [:octicons-arrow-right-24: Observer Documentation](modules/observer/index.md)
@@ -148,7 +148,7 @@ Step-by-step guides, tutorials, and beginner-friendly explanations.
 ## Backend (Python 3.12)
 Python 3.12+
 Node.js 18+
-PostgreSQL 16+
+PostgreSQL 18+
 Redis 7+
 Ollama
 
@@ -245,10 +245,10 @@ curl -X POST http://localhost:8001/versor/calculate \
 
 | Module | Status | Tests | Documentation | Deployment |
 |--------|--------|-------|---------------|------------|
-| **Versor** | :white_check_mark: Complete | 56/56 passing | :white_check_mark: Complete | :white_check_mark: Ready |
+| **Versor** | :white_check_mark: Complete | 68/68 passing | :white_check_mark: Complete | :white_check_mark: Ready |
 | **Observer** | :white_check_mark: Complete | Passing | :white_check_mark: Complete | :white_check_mark: Ready |
 | **Listener** | :white_check_mark: Complete | Passing | :white_check_mark: Complete | :white_check_mark: Ready |
-| **Experience** | :construction: 90% | 43/43 (shared) | :white_check_mark: Complete | :hourglass: Dependency fix |
+| **Experience** | :white_check_mark: Production Ready | Passing | :white_check_mark: Complete | :white_check_mark: Ready |
 
 ---
 

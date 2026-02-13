@@ -30,14 +30,12 @@ class CacheManager:
 
     async def is_cached(self, from_id: UUID, to_id: UUID) -> bool:
         """Check if path is already in cache."""
-        stmt = text(
-            """
+        stmt = text("""
             SELECT EXISTS(
                 SELECT 1 FROM path_matrix_cache
                 WHERE from_emotion_id = :from_id AND to_emotion_id = :to_id
             )
-        """
-        )
+        """)
 
         result = await self.session.execute(stmt, {"from_id": from_id, "to_id": to_id})
         return bool(result.scalar())
@@ -53,8 +51,7 @@ class CacheManager:
             list(from_emotion.vac_vector), list(to_emotion.vac_vector)
         )
 
-        stmt = text(
-            """
+        stmt = text("""
             INSERT INTO path_matrix_cache (
                 from_emotion_id,
                 to_emotion_id,
@@ -86,8 +83,7 @@ class CacheManager:
                 estimated_time = EXCLUDED.estimated_time,
                 computed_at = NOW(),
                 vac_hash = EXCLUDED.vac_hash
-        """
-        )
+        """)
 
         await self.session.execute(
             stmt,
@@ -165,23 +161,19 @@ class CacheManager:
         total = (await self.session.execute(count_stmt)).scalar() or 0
 
         # Difficulty distribution
-        diff_stmt = text(
-            """
+        diff_stmt = text("""
             SELECT difficulty, COUNT(*)
             FROM path_matrix_cache
             GROUP BY difficulty
-        """
-        )
+        """)
         diff_rows = (await self.session.execute(diff_stmt)).fetchall()
         difficulty_dist = {row[0]: row[1] for row in diff_rows}
 
         # Bridge stats
-        bridge_stmt = text(
-            """
+        bridge_stmt = text("""
             SELECT COUNT(*) FROM path_matrix_cache
             WHERE requires_bridge = true
-        """
-        )
+        """)
         bridges = (await self.session.execute(bridge_stmt)).scalar() or 0
 
         return {

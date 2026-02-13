@@ -1,7 +1,7 @@
 # API Reference
 
 **Audience:** Developers integrating with Observer
-**Base URL:** `http://localhost:8000` (development) or `https://api.love-platform.dev` (production)
+**Base URL:** `http://localhost:8000` (development) or `https://love.jrgochan.io` (production)
 **Authentication:** JWT Bearer token (provided by Experience module)
 
 ---
@@ -834,6 +834,280 @@ ws.on('insight', (data) => {
 
 ---
 
+## Authentication Endpoints
+
+### POST /auth/login
+
+Authenticate and receive a JWT token.
+
+**Request:**
+
+```json
+{
+  "username": "admin",
+  "password": "password"
+}
+```
+
+**Response:**
+
+```json
+{
+  "access_token": "eyJhbGciOiJIUzI1NiIs...",
+  "token_type": "bearer"
+}
+```
+
+### POST /auth/register
+
+Register a new user account.
+
+**Request:**
+
+```json
+{
+  "username": "newuser",
+  "email": "user@example.com",
+  "password": "securepassword"
+}
+```
+
+**Response:** `201 Created` with user object.
+
+---
+
+## User Profile Endpoints
+
+### GET /observer/me
+
+Get the current authenticated user's profile.
+
+**Headers:** `Authorization: Bearer <token>`
+
+**Response:**
+
+```json
+{
+  "id": "uuid",
+  "username": "admin",
+  "email": "user@example.com",
+  "created_at": "2026-01-01T00:00:00Z"
+}
+```
+
+### GET /observer/me/sessions
+
+Get the current user's chat sessions.
+
+---
+
+## Strategy Library Endpoints
+
+### GET /observer/strategies
+
+List all transition strategies with optional filtering.
+
+**Query Parameters:**
+
+- `category`: Filter by category (e.g., `ACT`, `DBT`, `Mindfulness`, `Somatic`, `Creative`, `Social`, `Meaning`)
+- `limit`: Max results (default: 50)
+
+**Response:**
+
+```json
+[
+  {
+    "id": "uuid",
+    "name": "Deep Breathing",
+    "category": "Somatic",
+    "description": "Focus on slow, deep breaths...",
+    "suitable_transitions": ["high_arousal_to_low"]
+  }
+]
+```
+
+### GET /observer/strategies/{strategy_id}
+
+Get a specific strategy by ID.
+
+### POST /observer/strategies/for-transition
+
+Get strategies suitable for a specific emotional transition.
+
+**Request:**
+
+```json
+{
+  "from_vac": [-0.6, 0.8, -0.4],
+  "to_vac": [0.4, 0.1, 0.5]
+}
+```
+
+**Response:**
+
+```json
+[
+  {
+    "strategy": { "id": "uuid", "name": "Progressive Relaxation", "category": "Somatic" },
+    "relevance_score": 0.92,
+    "reasoning": "Addresses the high arousal reduction needed"
+  }
+]
+```
+
+---
+
+## Collections Endpoints
+
+### GET /observer/collections
+
+List available emotion collections (curated subsets of the atlas).
+
+### POST /observer/collections/{collection_id}/activate
+
+Activate a specific emotion collection for the current session.
+
+---
+
+## Smart Recommendations Endpoint
+
+### GET /observer/recommendations
+
+Get contextual recommendations based on current emotional state and history.
+
+**Query Parameters:**
+
+- `user_id`: User ID for personalized recommendations
+
+---
+
+## Admin Endpoints
+
+All admin endpoints require authentication. Prefix: `/admin`.
+
+### User Management
+
+| Method | Path | Description |
+|--------|------|-------------|
+| GET | `/admin/users` | List all users |
+| GET | `/admin/users/{user_id}` | Get user details |
+| PUT | `/admin/users/{user_id}` | Update user |
+| GET | `/admin/users/{user_id}/sessions` | User's sessions |
+| GET | `/admin/users/{user_id}/trajectory` | User's emotional trajectory |
+
+### Session Management
+
+| Method | Path | Description |
+|--------|------|-------------|
+| GET | `/admin/sessions` | List all sessions |
+| GET | `/admin/sessions/{session_id}` | Session details |
+
+### Visualization Data
+
+| Method | Path | Description |
+|--------|------|-------------|
+| GET | `/admin/visualization/emotions` | All emotions (admin view) |
+| PUT | `/admin/visualization/emotions/{id}` | Update emotion definition |
+| GET | `/admin/visualization/export` | Export visualization data |
+| POST | `/admin/visualization/import` | Import visualization data |
+
+### Strategy Management
+
+| Method | Path | Description |
+|--------|------|-------------|
+| GET | `/admin/strategies` | List all strategies |
+| PUT | `/admin/strategies/{id}` | Update a strategy |
+| GET | `/admin/strategies/export` | Export strategies as JSON |
+| POST | `/admin/strategies/import` | Import strategies from JSON |
+
+### AI Model Configuration
+
+| Method | Path | Description |
+|--------|------|-------------|
+| GET | `/admin/ai-models` | Current model assignments |
+| PUT | `/admin/ai-models/{function}` | Update model for a function |
+
+### Clinical Alerts
+
+| Method | Path | Description |
+|--------|------|-------------|
+| GET | `/admin/alerts` | Active clinical alerts |
+
+### Bootstrap Data Management
+
+| Method | Path | Description |
+|--------|------|-------------|
+| GET | `/admin/bootstrap` | List bootstrap data |
+| POST | `/admin/bootstrap` | Create bootstrap item |
+| PUT | `/admin/bootstrap/{id}` | Update bootstrap item |
+| DELETE | `/admin/bootstrap/{id}` | Delete bootstrap item |
+| GET | `/admin/strategy-effectiveness` | Strategy effectiveness data |
+| GET | `/admin/path-templates` | Path template data |
+| GET | `/admin/context-recommendations` | Context recommendation data |
+| GET | `/admin/challenge-patterns` | Challenge pattern data |
+| GET | `/admin/all` | All bootstrap data combined |
+
+### Prompt Management
+
+| Method | Path | Description |
+|--------|------|-------------|
+| GET | `/admin/prompts` | List prompt templates |
+| POST | `/admin/prompts` | Create prompt template |
+| PUT | `/admin/prompts/{id}` | Update prompt template |
+| POST | `/admin/prompts/test` | Test a prompt template |
+
+---
+
+## Transition Analysis Endpoints
+
+### GET /observer/user/{user_id}/journey-history
+
+Get a user's complete journey history with outcomes.
+
+### GET /observer/user/{user_id}/effective-strategies
+
+Get strategies that have been most effective for this user.
+
+### GET /observer/transition-path/explain
+
+Get a detailed explanation of a transition path.
+
+### POST /observer/transition-path/alternatives
+
+Get alternative paths between two emotions.
+
+### GET /observer/transition-path/alternatives/{current_emotion_id}
+
+Get alternative destination emotions from a given starting emotion.
+
+---
+
+## Path Matrix Endpoints
+
+### POST /atlas/compute-all-paths
+
+Trigger batch computation of all emotion-to-emotion paths.
+
+**Response:** `202 Accepted` with job ID.
+
+### GET /atlas/computation-status/{job_id}
+
+Check progress of batch path computation.
+
+### GET /observer/paths/all
+
+Get all pre-computed paths from the cache.
+
+### GET /observer/statistics
+
+Get path cache statistics.
+
+### DELETE /observer/paths/cache
+
+Clear the path cache.
+
+---
+
 ## Next Steps
 
 **Related documentation:**
@@ -845,3 +1119,8 @@ ws.on('insight', (data) => {
 **Integration guides:**
 
 - [Manager: Integration Points](../architecture/10-integration-points.md)
+
+**Live API docs:**
+
+- Interactive (Swagger): `http://localhost:8000/docs`
+- ReDoc: `http://localhost:8000/redoc`

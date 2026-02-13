@@ -1,6 +1,6 @@
 #!/bin/bash
 # Auto-format all code (Python + TypeScript)
-# POSIX-compliant, idempotent, safe
+# idempotent, safe
 
 set -e
 
@@ -32,13 +32,13 @@ done
 
 print_header "Auto-Formatting Code"
 
-# Activate DX venv for formatting tools
-print_info "Activating DX tools venv..."
-if ! activate_dx_venv >/dev/null 2>&1; then
-    print_error "DX venv not found. Run: infra/scripts/install-dev-tools.sh"
+# Activate project venv for formatting tools
+print_info "Activating project venv..."
+if ! activate_project_venv; then
+    print_error "Project venv setup failed. Ensure uv is installed: curl -LsSf https://astral.sh/uv/install.sh | sh"
     exit 1
 fi
-print_success "DX venv activated"
+print_success "Project venv ready"
 
 # Track failures
 total_failures=0

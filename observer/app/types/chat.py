@@ -6,7 +6,7 @@ from uuid import UUID
 
 
 @dataclass
-class MessageCreationContext:
+class MessageCreationContext:  # pylint: disable=too-many-instance-attributes
     """Context for creating a new user message.
 
     Encapsulates all necessary data to persist a message, reducing
@@ -38,7 +38,7 @@ class AnalysisMessageContext:
 
 
 @dataclass
-class MultiEmotionAnalysisContext:
+class MultiEmotionAnalysisContext:  # pylint: disable=too-many-instance-attributes
     """Context for saving a multi-emotion analysis."""
 
     message_id: UUID

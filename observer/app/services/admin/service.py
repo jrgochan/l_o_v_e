@@ -90,7 +90,7 @@ class AdminService:
                     await self._update_emotion(emotion, item, es, qb)
                     self.db.add(emotion)
                     updated_count += 1
-            except Exception as e:
+            except Exception as e:  # pylint: disable=broad-exception-caught
                 errors.append(f"Failed to update {name}: {str(e)}")
                 logger.error("Error importing emotion %s: %s", name, e)
 

@@ -12,7 +12,8 @@ set -e
 # Configuration
 LOCAL_SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 PROJECT_ROOT="$(cd "$LOCAL_SCRIPT_DIR/../../.." && pwd)" # Assumes script is in infra/deploy
-REMOTE_TEMP_DIR="~/love-deploy-temp"
+export PROJECT_ROOT
+REMOTE_TEMP_DIR="$HOME/love-deploy-temp"
 
 # Arguments
 REMOTE_HOST="$1"

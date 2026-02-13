@@ -2,69 +2,11 @@ server {
     listen 80;
     server_name {{ domain_name }};
 
-    # Redirect HTTP to HTTPS (once SSL is set up)
-    # return 301 https://$host$request_uri;
-
-    # Frontend (Experience)
-    location / {
-        proxy_pass http://127.0.0.1:{{ port_frontend }};
-        proxy_http_version 1.1;
-        proxy_set_header Upgrade $http_upgrade;
-        proxy_set_header Connection 'upgrade';
-        proxy_set_header Host $host;
-        proxy_cache_bypass $http_upgrade;
-        proxy_cache_bypass $http_upgrade;
-    }
-
-    # Serve Next.js Static Files directly
-    location /_next/static/ {
-        alias {{ app_dir }}/experience/web/.next/static/;
-        expires 365d;
-        access_log off;
-    }
-
-    # API Proxy - Observer
-    location /api/observer/ {
-        proxy_pass http://127.0.0.1:{{ port_observer }}/;
-        proxy_http_version 1.1;
-        proxy_set_header Upgrade $http_upgrade;
-        proxy_set_header Connection 'upgrade';
-        proxy_set_header Host $host;
-        proxy_cache_bypass $http_upgrade;
-        proxy_set_header X-Real-IP $remote_addr;
-        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-        proxy_set_header X-Forwarded-Proto $scheme;
-    }
-
-    # API Proxy - Versor
-    location /api/versor/ {
-        proxy_pass http://127.0.0.1:{{ port_versor }}/;
-        proxy_http_version 1.1;
-        proxy_set_header Upgrade $http_upgrade;
-        proxy_set_header Connection 'upgrade';
-        proxy_set_header Host $host;
-        proxy_cache_bypass $http_upgrade;
-        proxy_set_header X-Real-IP $remote_addr;
-        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-        proxy_set_header X-Forwarded-Proto $scheme;
-    }
-
-    # API Proxy - Listener
-    location /api/listener/ {
-        proxy_pass http://127.0.0.1:{{ port_listener }}/;
-        proxy_http_version 1.1;
-        proxy_set_header Upgrade $http_upgrade;
-        proxy_set_header Connection 'upgrade';
-        proxy_set_header Host $host;
-        proxy_cache_bypass $http_upgrade;
-        proxy_set_header X-Real-IP $remote_addr;
-        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-        proxy_set_header X-Forwarded-Proto $scheme;
-        
-        # Increase body size for audio uploads
-        client_max_body_size 50M;
-    }
+    # Redirect HTTP to HTTPS
+    return 301 https://$host$request_uri;
 }
+
+
 
 server {
     listen 443 ssl http2;
@@ -74,6 +16,14 @@ server {
     ssl_certificate_key /etc/nginx/ssl/server.key;
     include /etc/nginx/conf.d/ssl-params.conf;
 
+    # Security Headers
+    add_header X-Content-Type-Options "nosniff" always;
+    add_header X-Frame-Options "DENY" always;
+    add_header X-XSS-Protection "1; mode=block" always;
+    add_header Strict-Transport-Security "max-age=31536000; includeSubDomains" always;
+    add_header Referrer-Policy "strict-origin-when-cross-origin" always;
+    add_header Content-Security-Policy "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; connect-src 'self' wss://{{ domain_name }};" always;
+
     # Frontend (Experience)
     location / {
         proxy_pass http://127.0.0.1:{{ port_frontend }};
@@ -131,5 +81,12 @@ server {
         
         # Increase body size for audio uploads
         client_max_body_size 50M;
+    }
+
+    # Documentation (MkDocs static site)
+    location /docs {
+        alias {{ app_dir }}/docs-build;
+        index index.html;
+        try_files $uri $uri/ $uri/index.html =404;
     }
 }

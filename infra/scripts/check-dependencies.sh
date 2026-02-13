@@ -1,6 +1,6 @@
 #!/bin/bash
 # Check for all required development tools
-# POSIX-compliant, idempotent, provides installation guidance
+# idempotent, provides installation guidance
 
 set -e
 
@@ -40,14 +40,14 @@ check_command_verbose "pip3" "pip" || {
 }
 
 # === Python Quality Tools ===
-print_info "\nChecking Python quality tools (in DX venv)..."
+print_info "\nChecking Python quality tools (in project venv)..."
 
-# Activate DX venv to check tools there
-if [ -d "$PROJECT_ROOT/infra/.venv-dx" ]; then
-    print_info "Activating DX venv to check tools..."
+# Activate project venv to check tools there
+if [ -d "$PROJECT_ROOT/.venv" ]; then
+    print_info "Checking tools in project venv..."
     # Temporarily add venv to PATH for checking
     OLD_PATH="$PATH"
-    export PATH="$PROJECT_ROOT/infra/.venv-dx/bin:$PATH"
+    export PATH="$PROJECT_ROOT/.venv/bin:$PATH"
 fi
 
 check_command_verbose "black" "black (formatter)" || {

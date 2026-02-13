@@ -1,7 +1,7 @@
 site_name: L.O.V.E. Platform Documentation
 site_description: 'Listener-Observer-Versor-Experience: 3D Emotional Intelligence Platform'
 site_author: 'L.O.V.E. Project Team'
-site_url: https://love-platform.dev
+site_url: https://love.jrgochan.io/docs/
 repo_url: https://gitlab.com/l_o_v_e/platform
 repo_name: 'GitLab'
 docs_dir: src
@@ -93,6 +93,7 @@ nav:
     - Deployment & Ops: architecture/10-deployment-operations.md
     - Development Guide: architecture/11-development-guide.md
     - Known Issues: architecture/12-known-issues.md
+    - Infrastructure: architecture/11-infrastructure.md
 
   - Modules:
     - modules/index.md
@@ -128,6 +129,7 @@ nav:
         - Configuration: modules/listener/reference/configuration.md
         - Error Codes: modules/listener/reference/error-codes.md
         - Glossary: modules/listener/reference/glossary.md
+      - Service Layer: modules/listener/architecture/02-services.md
     - Observer:
       - modules/observer/index.md
       - Overview:
@@ -137,6 +139,7 @@ nav:
       - Architecture:
         - High Level Overview: modules/observer/architecture/00-high-level-overview.md
         - Deep Dive: modules/observer/architecture/01-deep-dive.md
+        - Service Layer: modules/observer/architecture/02-services.md
         - Database Architecture: modules/observer/architecture/02-database-architecture.md
         - Vector Search: modules/observer/architecture/03-vector-search.md
         - Transition System: modules/observer/architecture/04-transition-system.md
@@ -198,6 +201,9 @@ nav:
         - Glossary: modules/versor/reference/glossary.md
     - Experience:
       - modules/experience/index.md
+      - Component Architecture: modules/experience/01-component-architecture.md
+      - Hooks Reference: modules/experience/02-hooks-reference.md
+      - State Management: modules/experience/03-state-management.md
       - Soul Sphere Spec: modules/experience/04-soul-sphere-specification.md
 
   - Features:

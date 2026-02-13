@@ -78,7 +78,7 @@ The Versor is the **mathematical engine** that converts emotional states into ge
 
 | Component | Technology | Purpose |
 |-----------|------------|---------|
-| **Language** | Python 3.11+ | Scientific computing |
+| **Language** | Python 3.12+ | Scientific computing |
 | **Framework** | FastAPI | REST API |
 | **Math Library** | NumPy 1.26.3 | Vector operations |
 | **Rotation Library** | SciPy 1.12.0 | SLERP interpolation |

@@ -20,13 +20,10 @@ set -euo pipefail
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 PROJECT_ROOT="$(cd "$SCRIPT_DIR/../.." && pwd)"
 
-# Source cross-platform libraries
-if [ -f "$PROJECT_ROOT/infra/scripts/lib/common.sh" ]; then
-    . "$PROJECT_ROOT/infra/scripts/lib/common.sh"
-else
-    echo "Error: common.sh not found at $PROJECT_ROOT/infra/scripts/lib/common.sh"
-    exit 1
-fi
+# Source common library
+# shellcheck source=../lib/common.sh
+. "$PROJECT_ROOT/infra/lib/common.sh"
+timer_start
 
 # ============================================================================
 # ARGUMENT PARSING
@@ -237,8 +234,10 @@ echo ""
 echo "=================================================="
 if [ "$GLOBAL_EXIT_CODE" -eq 0 ]; then
     print_success "All quality checks passed! ✨"
+    timer_end "Lint"
     exit 0
 else
     print_error "Some quality checks failed."
+    timer_end "Lint"
     exit $GLOBAL_EXIT_CODE
 fi

@@ -1,6 +1,6 @@
 #!/bin/bash
 # L.O.V.E. Stack - Project Archive Script
-# POSIX-compliant script to clone and archive the entire project
+# script to clone and archive the entire project
 #
 # Usage:
 #   ./archive-project.sh [OPTIONS]
@@ -51,25 +51,9 @@ OPT_GIT_SHALLOW=false
 SCRIPT_DIR="$(cd "$(dirname "$0")" 2>/dev/null && pwd)" || SCRIPT_DIR="."
 PROJECT_ROOT="$(cd "$SCRIPT_DIR/../../.." && pwd)"
 
-# Source common utilities if available
-if [ -f "$PROJECT_ROOT/infra/scripts/lib/common.sh" ]; then
-    . "$PROJECT_ROOT/infra/scripts/lib/common.sh"
-else
-    # Minimal fallback utilities
-    RED='\033[0;31m'
-    GREEN='\033[0;32m'
-    YELLOW='\033[1;33m'
-    BLUE='\033[0;34m'
-    NC='\033[0m'
-
-    print_success() { printf "%b[OK] %s%b\n" "$GREEN" "$1" "$NC"; }
-    print_error() { printf "%b[ERR] %s%b\n" "$RED" "$1" "$NC"; }
-    print_warning() { printf "%b[WARN] %s%b\n" "$YELLOW" "$1" "$NC"; }
-    print_info() { printf "%b[INFO] %s%b\n" "$BLUE" "$1" "$NC"; }
-    print_header() { printf "\n%b%s%b\n" "$BLUE" "$1" "$NC"; echo "----------------------------------------"; }
-    command_exists() { command -v "$1" >/dev/null 2>&1; }
-    get_absolute_path() { echo "$1"; } # Rustic fallback
-fi
+# Source common library
+# shellcheck source=../../lib/common.sh
+. "$PROJECT_ROOT/infra/lib/common.sh"
 
 # ============================================================================
 # HELP TEXT

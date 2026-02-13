@@ -1,355 +1,145 @@
 # L.O.V.E. Stack Infrastructure
 
-This directory contains all orchestration scripts, configuration, and documentation for managing the L.O.V.E. stack as a unified system.
-
-## 📂 Contents
-
-### 🚀 Setup & Management Scripts
-
-- **`clone-love-repos.sh`** - Clone all L.O.V.E. repositories from GitLab
-  - POSIX-compliant script for any Unix-like system
-  - Clones all seven repositories (archive, docs, infra, listener, observer, versor, experience)
-  - Supports both SSH (default) and HTTPS protocols
-  - Can be curled and piped for remote setup
-  - Flexible options for shallow cloning, specific repos, updates
-  - Intelligent pre-flight checks and error handling
-
-- **`setup-love-stack.sh`** - Initial environment setup
-  - Verifies Python 3.12+ installation
-  - Checks system dependencies (PostgreSQL, Redis, Ollama, ffmpeg)
-  - Creates virtual environments for all modules
-  - Installs Python dependencies
-  - Downloads Ollama LLM model
-  - Sets up configuration files
-
-- **`test-love-stack.sh`** - Health checks and test runner
-  - Verifies Python environments
-  - Checks service status (PostgreSQL, Redis, Ollama)
-  - Tests API endpoints
-  - Runs module test suites
-  - Validates critical semantic tests
-  - Generates status summary
-
-- **`run-love-stack.sh`** - Start all services natively
-  - Starts system services (PostgreSQL, Redis, Ollama)
-  - Launches all three API services
-  - Runs in foreground with Ctrl+C to stop
-  - Logs to `logs/` directory
-
-- **`stop-love-stack.sh`** - Stop running APIs
-  - Stops all API processes
-  - Leaves system services running
-  - Cleans up PID files
-
-- **`run-love-stack-podman.sh`** - Containerized deployment
-  - Builds and starts all services with Podman Compose
-  - Pulls Ollama model
-  - Runs database migrations
-  - Seeds emotion atlas
-
-### 🐳 Container Orchestration
-
-- **`podman-compose.yml`** - Complete stack definition
-  - PostgreSQL 16 with pgvector
-  - Redis for job queuing
-  - Ollama for LLM inference
-  - Versor, Observer, and Listener APIs
-  - Network and volume configuration
-
-### 📚 Documentation
-
-- **`STACK_SETUP.md`** - Comprehensive setup guide
-  - Prerequisites and dependencies
-  - Step-by-step installation
-  - Module-specific setup
-  - Troubleshooting guide
-
-- **`CONTAINER_SETUP.md`** - Container deployment guide
-  - Podman installation and configuration
-  - Container architecture
-  - Volume management
-  - Production considerations
-
-- **`MASTER_IMPLEMENTATION_ROADMAP.md`** - Development roadmap
-  - Project phases and milestones
-  - Module implementation status
-  - Future enhancements
-
-- **`PROGRESS.md`** - Current implementation status
-  - Completed features
-  - In-progress work
-  - Known issues
-
-### 📝 Session Summaries
-
-Documentation of development sessions:
-- `LISTENER_SESSION_SUMMARY.md`
-- `OBSERVER_SESSION_SUMMARY.md`
-- `VERSOR_SESSION_SUMMARY.md`
-- `EXPERIENCE_SESSION_SUMMARY.md`
-
-### 📄 Other Files
-
-- **`L.O.V.E. Project Software Requirements.pdf`** - Project requirements
-- **`PYTHON_VERSION`** - Python version tracking
-- **`.python_cmd`** - Detected Python command (auto-generated)
-- **`.vscode/`** - VS Code workspace settings
-- **`prompts/`** - Prompt templates for AI assistance
-
-### 📊 Logs
-
-- **`logs/`** - Centralized logging directory
-  - `Versor.log` - Versor API logs
-  - `Observer.log` - Observer API logs
-  - `Listener.log` - Listener API logs
-  - `.love-stack.pids` - Process ID tracking (auto-generated)
+Orchestration scripts, configuration, and tooling for the L.O.V.E. stack.
 
 ## 🚀 Quick Start
 
-### First Time Setup (Clone Repositories)
-
-If you haven't cloned all repositories yet:
+The easiest way to interact with the stack is through the root **`Makefile`**:
 
 ```bash
-# From an existing repo (e.g., infra)
-cd infra
-./clone-love-repos.sh
-
-# Or remotely (future use)
-# curl -fsSL https://gitlab.com/l_o_v_e/infra/-/raw/main/clone-love-repos.sh | sh
+make help             # Show all available commands
+make setup            # First-time installation
+make dev              # Start dev mode (hot-reload)
+make lint             # Quality checks (shell + python + TS + swift)
+make lint-fix         # Auto-fix issues
+make test             # Run all tests
+make fmt              # Auto-format code
+make clean            # Remove build artifacts
 ```
 
-### Setup Development Environment
-
-**macOS / Linux:**
+Module-specific commands:
 
 ```bash
-cd infra
-./setup-love-stack.sh
+make lint-versor      # Lint Versor only
+make test-observer    # Test Observer only
+make test-listener    # Test Listener only
 ```
 
-### Windows
-
-```powershell
-cd infra
-.\Setup-LoveStack.ps1
-```
-
-### Verify Installation
+Or run scripts directly:
 
 ```bash
-./test-love-stack.sh
+./infra/bin/setup-love-stack.sh    # Initial environment setup
+./infra/bin/run-love-stack.sh      # Start all services
+./infra/bin/stop-love-stack.sh     # Stop all APIs
+./infra/bin/test-love-stack.sh     # Health checks + tests
+./infra/bin/lint-love-stack.sh     # Master lint (--fix to auto-fix)
+./infra/bin/build-love-stack.sh    # Build all modules
+./infra/bin/clean-love-stack.sh    # Clean artifacts
 ```
 
-### Start the Stack
+## 📂 Directory Structure
 
-**macOS / Linux:**
-```bash
-./run-love-stack.sh
+```
+infra/
+├── bin/                 # Top-level commands (setup, run, stop, test, lint, build, clean)
+├── lib/                 # Shared shell libraries
+│   ├── common.sh        # Core utilities (colors, commands, venv, versions)
+│   ├── os-detect.sh     # Cross-platform OS detection
+│   ├── package-manager.sh # Package manager abstraction (brew, apt, etc.)
+│   └── service-manager.sh # Service management (systemd, launchctl, etc.)
+├── scripts/             # Development quality scripts
+│   ├── check-python-quality.sh    # Python lint (black, isort, flake8, pylint, mypy, bandit)
+│   ├── check-typescript-quality.sh # TypeScript lint (eslint, tsc)
+│   ├── check-swift-quality.sh     # Swift lint (swiftlint)
+│   ├── check-dependencies.sh      # Dependency health checks
+│   ├── format-code.sh             # Auto-format (black, isort, autoflake)
+│   ├── run-tests.sh               # Test runner (pytest)
+│   ├── install-dev-tools.sh       # Install dev tools via uv
+│   ├── sync-versions.sh           # Sync from TOOL_VERSIONS
+│   ├── verify-all.sh              # Full verification suite
+│   ├── maintenance/               # Archive, cleanup scripts
+│   └── lib/                       # Backward-compat shim (→ infra/lib/common.sh)
+├── configs/             # Environment and tool configuration
+│   ├── base.env         # Shared environment variables
+│   └── pyproject.toml   # Shared tool configuration (black, isort, etc.)
+├── deploy/              # Deployment tooling
+│   ├── deploy-ansible.sh   # Ansible deployment orchestrator
+│   └── ansible/            # Ansible roles and playbooks
+├── compose/             # (Placeholder) Podman/Docker Compose files
+├── containers/          # (Placeholder) Containerfiles
+├── archive/             # Legacy configuration archive
+├── docs/                # Infra-specific documentation
+├── logs/                # Runtime logs (gitignored)
+├── TOOL_VERSIONS        # Pinned tool versions
+└── .gitignore           # Ignores: .venv*, logs/, .pids/, __pycache__/
 ```
 
-**Windows:**
-```powershell
-.\Run-LoveStack.ps1
-```
+## 🔧 Development Environment
 
-### Stop the Stack
+### Prerequisites
 
-**macOS / Linux:**
-```bash
-./stop-love-stack.sh
-```
+- **Python 3.11+** (3.12 recommended)
+- **Node.js 18+**
+- **uv** — Python package manager
+- **PostgreSQL** (16+ recommended)
+- **Redis** (6+)
+- **Ollama** — LLM inference
 
-**Windows:**
-```powershell
-.\Stop-LoveStack.ps1
-```
+### Virtual Environment
 
-Or if using Podman:
-```bash
-podman-compose down
-```
-
-## 📖 Usage Guide
-
-### Development Workflow
-
-1. **Initial Setup** (once):
-   ```bash
-   ./setup-love-stack.sh
-   ```
-
-2. **Start Services** (each session):
-   ```bash
-   ./run-love-stack.sh
-   ```
-
-3. **Develop & Test**:
-   - Access APIs at http://localhost:8000, 8001, 8002
-   - View logs: `tail -f logs/*.log`
-   - Run tests: `./test-love-stack.sh`
-
-4. **Stop Services** (end of session):
-   ```bash
-   ./stop-love-stack.sh
-   ```
-
-### Container Workflow
-
-1. **Build & Start**:
-   ```bash
-   ./run-love-stack-podman.sh
-   ```
-
-2. **View Logs**:
-   ```bash
-   podman-compose logs -f
-   # Or specific service:
-   podman-compose logs -f listener
-   ```
-
-3. **Check Status**:
-   ```bash
-   podman-compose ps
-   ```
-
-4. **Stop**:
-   ```bash
-   podman-compose down
-   ```
-
-### Running Tests
+The stack uses a single root `.venv` managed by **uv**:
 
 ```bash
-# All tests with health checks
-./test-love-stack.sh
-
-# Critical semantic test only
-cd ../listener
-source .venv/bin/activate
-pytest tests/semantic/test_connection_axis.py::TestConnectionAxis::test_pity_vs_compassion -v -s
+uv sync --all-extras    # Install all deps + dev tools
 ```
 
-## 📥 Cloning Repositories
+All quality scripts activate this venv automatically via `activate_project_venv` in `lib/common.sh`.
 
-### Using the Clone Script
+### Pre-commit Hooks
 
-The `clone-love-repos.sh` script makes it easy to clone all seven L.O.V.E. repositories:
+Install once:
 
 ```bash
-# Clone with SSH (default)
-./clone-love-repos.sh
-
-# Clone with HTTPS
-./clone-love-repos.sh --https
-
-# Clone to specific directory
-./clone-love-repos.sh --target-dir ~/projects
-
-# Quick shallow clone
-./clone-love-repos.sh --shallow --yes
-
-# Clone only specific repos
-./clone-love-repos.sh --only listener,observer,versor
-
-# Update existing repos
-./clone-love-repos.sh --update
-
-# Dry run (see what would happen)
-./clone-love-repos.sh --dry-run
+pre-commit install
 ```
 
-### Repository Structure
-
-All repositories are cloned into the same parent directory:
-
-```
-l_o_v_e/
-├── archive/          # Project documentation archive
-├── docs/             # User-facing documentation (MkDocs)
-├── infra/            # Infrastructure and orchestration scripts (you are here)
-├── listener/         # Audio transcription & semantic VAC analysis
-├── observer/         # Data persistence & vector search
-├── versor/           # Quaternion mathematics engine
-└── experience/       # Mobile 3D visualization
-```
-
-### Manual Cloning
-
-If you prefer to clone manually:
+Hooks run automatically on `git commit`. To run manually:
 
 ```bash
-# Create parent directory
-mkdir -p l_o_v_e && cd l_o_v_e
-
-# Clone all repos
-git clone git@gitlab.com:l_o_v_e/archive.git
-git clone git@gitlab.com:l_o_v_e/docs.git
-git clone git@gitlab.com:l_o_v_e/infra.git
-git clone git@gitlab.com:l_o_v_e/listener.git
-git clone git@gitlab.com:l_o_v_e/observer.git
-git clone git@gitlab.com:l_o_v_e/versor.git
-git clone git@gitlab.com:l_o_v_e/experience.git
+pre-commit run --all-files
 ```
 
-## 🔧 Configuration
+Configured hooks: **black**, **isort**, **flake8**, **bandit**, **shellcheck**, **eslint**, and general hygiene (trailing whitespace, large files, merge conflicts).
 
-### Environment Variables
+### Tool Versions
 
-Each module has its own `.env` file:
-- `../listener/.env`
-- `../observer/.env`
-- `../versor/.env`
+All tool versions are pinned in `TOOL_VERSIONS`. Scripts use `load_versions` and `get_version` from `lib/common.sh` to read them.
 
-Copy from `.env.example` files if needed.
+## 🌐 Service Ports
 
-### Service Ports
-
-- **Versor**: 8001
-- **Observer**: 8000
-- **Listener**: 8002
-- **PostgreSQL**: 5432
-- **Redis**: 6379
-- **Ollama**: 11434
-
-### Python Version
-
-The stack requires Python 3.12+. The setup script will:
-1. Try to find Python 3.12
-2. Save the command to `.python_cmd`
-3. Use this version for all modules
+| Service | Port |
+|---------|------|
+| Observer | 8000 |
+| Versor | 8001 |
+| Listener | 8002 |
+| Experience (Web) | 3000 |
+| PostgreSQL | 5432 |
+| Redis | 6379 |
+| Ollama | 11434 |
 
 ## 📊 Monitoring
 
-### View Logs
-
 ```bash
-# All logs
+# View all logs
 tail -f logs/*.log
 
-# Specific service
-tail -f logs/Listener.log
-```
-
-### Check Services
-
-```bash
-# PostgreSQL
-pg_isready
-
-# Redis
-redis-cli ping
-
-# Ollama
-curl http://localhost:11434/api/tags
-```
-
-### API Health
-
-```bash
-curl http://localhost:8001/health  # Versor
-curl http://localhost:8000/health  # Observer
-curl http://localhost:8002/health  # Listener
+# Service health
+pg_isready                                    # PostgreSQL
+redis-cli ping                                # Redis
+curl http://localhost:11434/api/tags           # Ollama
+curl http://localhost:8001/health              # Versor
+curl http://localhost:8000/health              # Observer
+curl http://localhost:8002/health              # Listener
 ```
 
 ## 🐛 Troubleshooting
@@ -357,77 +147,28 @@ curl http://localhost:8002/health  # Listener
 ### Services Not Starting
 
 ```bash
-# Run diagnostics
-./test-love-stack.sh
-
-# Check service status
-brew services list
-
-# Restart services
-brew services restart postgresql@16
+make test                         # Run diagnostics
+brew services list                # Check service status (macOS)
+brew services restart postgresql@18
 brew services restart redis
 ```
 
 ### Python Environment Issues
 
 ```bash
-# Remove and recreate environments
-cd ../listener && rm -rf .venv
-cd ../observer && rm -rf .venv
-cd ../versor && rm -rf .venv
-
-# Re-run setup
-cd ../infra
-./setup-love-stack.sh
+rm -rf .venv                      # Remove broken venv
+uv sync --all-extras              # Recreate and install
 ```
 
 ### Port Conflicts
 
-Check if ports are already in use:
 ```bash
-lsof -i :8000
-lsof -i :8001
-lsof -i :8002
+lsof -i :8000                     # Find what's using a port
 ```
 
-Kill conflicting processes or change ports in module configs.
+## 📚 Documentation
 
-## 📚 Additional Resources
-
-- **Stack Setup Guide**: `STACK_SETUP.md`
-- **Container Guide**: `CONTAINER_SETUP.md`
-- **Platform-Specific Setup Guides**:
-  - **Ubuntu/WSL**: `SETUP_UBUNTU_WSL.md`
-  - **Windows**: `SETUP_WINDOWS.md`
-  - **Cross-Platform**: `CROSS_PLATFORM_GUIDE.md`
-- **Future Roadmaps**:
-  - **Containerization**: `CONTAINERIZATION_ROADMAP.md`
-- **Root README**: `../README.md`
-- **Module READMEs**:
-  - `../listener/README.md`
-  - `../observer/README.md`
-  - `../versor/README.md`
-  - `../experience/README.md`
-
-## 🎯 Project Structure
-
-```
-l_o_v_e/
-├── listener/          # Audio & semantic analysis module
-├── observer/          # Data persistence module
-├── versor/            # Quaternion math module
-├── experience/        # Mobile visualization module
-└── infra/             # ← You are here
-    ├── *.sh               # Bash scripts (macOS/Linux/WSL)
-    ├── *.ps1              # PowerShell scripts (Windows)
-    ├── lib/               # Cross-platform libraries
-    ├── containers/        # Future: Containerfiles
-    ├── compose/           # Future: Compose orchestration
-    ├── scripts/           # Future: Container management
-    ├── deploy/            # Future: Deployment configs
-    └── logs/              # Centralized logs
-```
-
----
-
-**For more information, see the main project README: [`../README.md`](../README.md)**
+- **`STACK_SETUP.md`** — Step-by-step setup guide
+- **`CONTAINER_SETUP.md`** — Podman/Docker deployment
+- **`CROSS_PLATFORM_GUIDE.md`** — Windows/macOS/Linux setup
+- **Root README** — [`../README.md`](../README.md)

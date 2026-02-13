@@ -4,7 +4,7 @@
 
 ### System Requirements
 
-- **Python:** 3.11+
+- **Python:** 3.12+
 - **PostgreSQL:** 14+ (auto-detects version)
 - **pgvector:** 0.5.0+
 - **Redis:** 6.0+
@@ -77,7 +77,7 @@ cd infra
 
 The setup script will:
 
-1. Check Python 3.11+
+1. Check Python 3.12+
 2. Verify system dependencies
 3. Create virtual environments
 4. Install Python packages
@@ -103,7 +103,7 @@ The setup script will:
 
 ## Troubleshooting
 
-### Python 3.11 not found
+### Python 3.12 not found
 
 ```bash
 # macOS

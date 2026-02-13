@@ -64,7 +64,7 @@ import uuid
 from datetime import datetime
 from typing import Any, Dict, Optional
 
-import aiofiles  # type: ignore[import-untyped]
+import aiofiles
 from arq import create_pool
 from arq.connections import RedisSettings
 from arq.jobs import Job, JobStatus
@@ -117,6 +117,8 @@ async def ingest(
     if audio:
         try:
             audio_path = await _save_upload_file(audio)
+        except HTTPException:
+            raise  # Let validation errors (400, 413) propagate unchanged
         except Exception as e:
             logger.error("Failed to save audio file: %s", e)
             raise HTTPException(status_code=500, detail=f"Failed to save audio: {e}") from e
@@ -133,15 +135,39 @@ async def ingest(
         raise HTTPException(status_code=500, detail=f"Failed to queue job: {e}") from e
 
 
+ALLOWED_AUDIO_EXTENSIONS = {".wav", ".mp3", ".ogg", ".m4a", ".flac", ".webm", ".aac", ".wma"}
+MAX_UPLOAD_SIZE = 50 * 1024 * 1024  # 50MB
+
+
 async def _save_upload_file(audio: UploadFile) -> str:
     """Save uploaded audio file to temp directory."""
     filename = audio.filename or "unknown.wav"
-    file_extension = os.path.splitext(filename)[1]
+    file_extension = os.path.splitext(filename)[1].lower()
+
+    # Validate file extension
+    if file_extension not in ALLOWED_AUDIO_EXTENSIONS:
+        raise HTTPException(
+            status_code=400,
+            detail=(
+                f"Unsupported file type: {file_extension}. "
+                f"Allowed: {', '.join(sorted(ALLOWED_AUDIO_EXTENSIONS))}"
+            ),
+        )
+
     unique_filename = f"{uuid.uuid4()}{file_extension}"
     audio_path = os.path.join(tempfile.gettempdir(), unique_filename)
 
     async with aiofiles.open(audio_path, "wb") as f:
         content = await audio.read()
+        # Validate file size
+        if len(content) > MAX_UPLOAD_SIZE:
+            raise HTTPException(
+                status_code=413,
+                detail=(
+                    f"File too large ({len(content)} bytes). "
+                    f"Maximum size: {MAX_UPLOAD_SIZE} bytes (50MB)."
+                ),
+            )
         await f.write(content)
 
     logger.info("Audio file saved: %s (%d bytes)", audio_path, len(content))

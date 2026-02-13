@@ -8,16 +8,10 @@ set -euo pipefail
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 PROJECT_ROOT="$(cd "$SCRIPT_DIR/../.." && pwd)"
 
-# Source cross-platform libraries
-if [ -f "$PROJECT_ROOT/infra/lib/common.sh" ]; then
-    . "$PROJECT_ROOT/infra/lib/common.sh"
-elif [ -f "$PROJECT_ROOT/infra/scripts/lib/common.sh" ]; then
-    . "$PROJECT_ROOT/infra/scripts/lib/common.sh"
-else
-    # Fallback if common.sh is missing
-    echo "Error: common.sh not found."
-    exit 1
-fi
+# Source common library
+# shellcheck source=../lib/common.sh
+. "$PROJECT_ROOT/infra/lib/common.sh"
+timer_start
 
 # Variables
 DRY_RUN=false
@@ -156,3 +150,4 @@ if [[ "$TARGET_MODULE" == "all" || "$TARGET_MODULE" == "infra" || "$TARGET_MODUL
 fi
 
 print_success "Cleanup complete!"
+timer_end "Clean"

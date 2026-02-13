@@ -1,6 +1,6 @@
 #!/bin/bash
 # Check TypeScript/Experience module code quality
-# POSIX-compliant, supports --fix flag
+# supports --fix flag
 
 set -e
 

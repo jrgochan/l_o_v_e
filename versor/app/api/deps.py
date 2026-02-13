@@ -5,9 +5,9 @@ Common dependencies for API routes, including authentication.
 
 from typing import Annotated, Any
 
+import jwt
 from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
-from jose import JWTError, jwt
 
 from app.config import settings
 
@@ -27,10 +27,10 @@ async def get_current_user(token: Annotated[str, Depends(oauth2_scheme)]) -> dic
     try:
         # Decode and verify signature using the shared secret
         payload = jwt.decode(token, settings.SECRET_KEY, algorithms=[settings.ALGORITHM])
-        email: str = payload.get("sub")
+        email = payload.get("sub")
         if email is None:
             raise credentials_exception
 
-        return payload  # type: ignore[no-any-return]
-    except JWTError as exc:
+        return dict(payload)
+    except (jwt.InvalidTokenError, jwt.ExpiredSignatureError) as exc:
         raise credentials_exception from exc

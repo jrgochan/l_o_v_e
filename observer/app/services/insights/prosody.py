@@ -118,7 +118,7 @@ def generate_voice_observations_legacy(
 
 
 def generate_voice_metrics_clinical(
-    prosody_data: Dict[str, Any]
+    prosody_data: Dict[str, Any],
 ) -> List[Dict[str, Any]]:  # pylint: disable=too-many-branches,too-many-statements
     """Generate structured voice metrics for clinical display."""
     metrics = []

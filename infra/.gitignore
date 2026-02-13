@@ -1,13 +1,19 @@
 # Logs
 logs/
-.venv-dx/
 *.log
+
+# Virtual environments
+.venv/
+.venv-*/
 
 # Process ID files
 .love-stack.pids
+.pids/
 
 # Python cache files
 .python_cmd
+__pycache__/
+*.pyc
 
 # Environment files (may contain secrets)
 .env

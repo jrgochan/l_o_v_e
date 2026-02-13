@@ -370,7 +370,7 @@ versor_request_duration_seconds_bucket{le="0.1"} 15230
 
 **Required:**
 
-- Python 3.11+
+- Python 3.12+
 - NumPy 1.26.3+
 - SciPy 1.12.0+
 - FastAPI 0.109.0+

@@ -8,7 +8,7 @@ Welcome to the Versor module! This guide will help you set up your development e
 
 Before you begin, ensure you have:
 
-- **Python 3.11+** installed
+- **Python 3.12+** installed
 - **pip** (Python package manager)
 - **Git** for version control
 - A code editor (VS Code recommended)
@@ -21,10 +21,10 @@ Before you begin, ensure you have:
 
 ```bash
 python3 --version
-# Should output: Python 3.11.x or higher
+# Should output: Python 3.12.x or higher
 ```
 
-If you need to install Python 3.11+:
+If you need to install Python 3.12+:
 
 - **macOS:** `brew install python@3.11`
 - **Ubuntu:** `sudo apt install python3.11`
@@ -292,7 +292,7 @@ SyntaxError: match statement requires Python 3.10+
 # Check version
 python3 --version
 
-# Install Python 3.11+
+# Install Python 3.12+
 brew install python@3.11  # macOS
 
 # Recreate virtual environment with correct version
@@ -467,7 +467,7 @@ Before moving on, ensure you can:
 
 ### Python Resources
 
-- [Python 3.11 Documentation](https://docs.python.org/3.11/)
+- [Python 3.12 Documentation](https://docs.python.org/3.11/)
 - [FastAPI Tutorial](https://fastapi.tiangolo.com/tutorial/)
 - [NumPy Quickstart](https://numpy.org/doc/stable/user/quickstart.html)
 

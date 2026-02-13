@@ -85,7 +85,7 @@ fi
 
 if command -v nikto &> /dev/null; then
     echo ""
-    read -p "Run Nikto web server scan? (y/N) " run_nikto
+    read -rp "Run Nikto web server scan? (y/N) " run_nikto
     if [[ "$run_nikto" =~ ^[Yy]$ ]]; then
         echo "------------------------------------------"
         echo "🕷️  Running Nikto..."
@@ -97,7 +97,7 @@ fi
 # 5. OWASP ZAP (Podman)
 if command -v podman &> /dev/null; then
     echo ""
-    read -p "Run OWASP ZAP Baseline Scan (Podman)? (y/N) " run_zap
+    read -rp "Run OWASP ZAP Baseline Scan (Podman)? (y/N) " run_zap
     if [[ "$run_zap" =~ ^[Yy]$ ]]; then
         echo "------------------------------------------"
         echo "⚡ Running OWASP ZAP..."

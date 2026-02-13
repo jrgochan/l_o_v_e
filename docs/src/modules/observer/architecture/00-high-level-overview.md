@@ -263,7 +263,7 @@ POST /state
 **Production:**
 
 - **Compute:** 2 vCPU, 4GB RAM per instance
-- **Database:** PostgreSQL 16+ with 20GB storage (grows with usage)
+- **Database:** PostgreSQL 18+ with 20GB storage (grows with usage)
 - **Network:** Load balancer with health checks
 - **Monitoring:** Prometheus + Grafana
 
@@ -277,8 +277,8 @@ POST /state
 
 **Critical:**
 
-- PostgreSQL 16+ (with pgvector 0.6.0+)
-- Python 3.11+
+- PostgreSQL 18+ (with pgvector 0.6.0+)
+- Python 3.12+
 
 **Optional:**
 

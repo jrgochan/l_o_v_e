@@ -53,4 +53,5 @@
 
 - include_tasks: backend.yml
 - include_tasks: frontend.yml
+- include_tasks: docs.yml
 - include_tasks: nginx.yml

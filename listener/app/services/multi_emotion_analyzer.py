@@ -385,16 +385,19 @@ class MultiEmotionAnalyzer:
         )
 
     def _create_default_prompt(self) -> ChatPromptTemplate:
+        """Create the default multi-emotion prompt template."""
         return ChatPromptTemplate.from_messages(
             [("system", DEFAULT_MULTI_EMOTION_SYSTEM), ("user", DEFAULT_MULTI_EMOTION_USER)]
         )
 
     def _create_default_content_only_prompt(self) -> ChatPromptTemplate:
+        """Create the default content-only analysis prompt template."""
         return ChatPromptTemplate.from_messages(
             [("system", DEFAULT_CONTENT_ONLY_SYSTEM), ("user", DEFAULT_CONTENT_ONLY_USER)]
         )
 
     def _create_default_voice_only_prompt(self) -> ChatPromptTemplate:
+        """Create the default voice-only analysis prompt template."""
         return ChatPromptTemplate.from_messages(
             [("system", DEFAULT_VOICE_ONLY_SYSTEM), ("user", DEFAULT_VOICE_ONLY_USER)]
         )

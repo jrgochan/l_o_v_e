@@ -6,7 +6,7 @@ Handles password hashing and JWT token generation.
 from datetime import datetime, timedelta, timezone
 from typing import Any, Dict, Optional
 
-from jose import jwt
+import jwt
 from pwdlib import PasswordHash
 from pwdlib.hashers.argon2 import Argon2Hasher
 

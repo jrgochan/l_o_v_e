@@ -117,6 +117,27 @@ def test_ingest_validation_error() -> None:
     assert response.status_code == 400
 
 
+def test_ingest_unsupported_file_type() -> None:
+    """Test /ingest rejects unsupported audio file extensions (line 147)."""
+    files = {"audio": ("document.txt", b"not audio", "text/plain")}
+    data = {"user_id": "u", "session_id": "s"}
+    response = client.post("/listener/ingest", files=files, data=data)
+    assert response.status_code == 400
+    assert "Unsupported file type" in response.json()["detail"]
+    assert ".txt" in response.json()["detail"]
+
+
+def test_ingest_file_too_large(mock_redis_pool: Any) -> None:
+    """Test /ingest rejects files exceeding MAX_UPLOAD_SIZE (line 162)."""
+    # Create content just over 50MB
+    oversized = b"x" * (50 * 1024 * 1024 + 1)
+    files = {"audio": ("large.wav", oversized, "audio/wav")}
+    data = {"user_id": "u", "session_id": "s"}
+    response = client.post("/listener/ingest", files=files, data=data)
+    assert response.status_code == 413
+    assert "File too large" in response.json()["detail"]
+
+
 @pytest.mark.asyncio
 async def test_get_status_success(mock_redis_pool: Any) -> None:
     """Test /status/{job_id}."""

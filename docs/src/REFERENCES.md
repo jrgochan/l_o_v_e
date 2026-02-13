@@ -387,7 +387,7 @@ The Versor module transforms emotional vectors into smooth 3D rotations using qu
 **Backend:**
 
 - **FastAPI** - Modern Python web framework
-- **PostgreSQL 16** - ACID-compliant relational database
+- **PostgreSQL 18** - ACID-compliant relational database
 - **SQLAlchemy 2.0** - Async ORM with excellent type support
 - **Alembic** - Database migration management
 - **Pydantic** - Data validation and settings management

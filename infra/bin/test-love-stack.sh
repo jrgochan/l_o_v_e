@@ -23,51 +23,9 @@ TARGET_MODULE="all"
 SKIP_DEPS=false
 
 # 3. Output Styling & Common Lib
-# Try to source common lib, otherwise fallback to local definitions
-COMMON_LIB="$PROJECT_ROOT/infra/scripts/lib/common.sh"
-if [ -f "$COMMON_LIB" ]; then
-    #shellcheck source=infra/scripts/lib/common.sh
-    . "$COMMON_LIB"
-    # Overwrite vars if common.sh doesn't handle CI/dumb terminals nicely for this specific script's needs
-    # (common.sh handles tput checks, which is good)
-fi
-
-# If common.sh was sourced, ensure variables are set to avoid unbound errors in strict mode
-RED=${RED:-""}
-GREEN=${GREEN:-""}
-YELLOW=${YELLOW:-""}
-BLUE=${BLUE:-""}
-BOLD=${BOLD:-""}
-NC=${NC:-""}
-
-if [[ ! -t 1 ]]; then
-    RED=''
-    GREEN=''
-    YELLOW=''
-    BLUE=''
-    BOLD=''
-    NC=''
-fi
-
-# Fallback functions if not defined
-if ! command -v print_header &> /dev/null; then
-    print_header() { echo -e "\n${BLUE}${BOLD}=== $1 ===${NC}"; }
-fi
-if ! command -v print_success &> /dev/null; then
-    print_success() { echo -e "${GREEN}✓${NC} $1"; }
-fi
-if ! command -v print_error &> /dev/null; then
-    print_error() { echo -e "${RED}✗${NC} $1" >&2; }
-fi
-if ! command -v print_warning &> /dev/null; then
-    print_warning() { echo -e "${YELLOW}⚠${NC} $1"; }
-fi
-if ! command -v print_info &> /dev/null; then
-    print_info() { echo -e "${BLUE}ℹ${NC} $1"; }
-fi
-if ! command -v check_command &> /dev/null; then
-    check_command() { command -v "$1" >/dev/null 2>&1; }
-fi
+# shellcheck source=../lib/common.sh
+. "$PROJECT_ROOT/infra/lib/common.sh"
+timer_start
 
 # 4. Help & Argument Parsing
 
@@ -483,6 +441,7 @@ main() {
     check_critical
 
     generate_report
+    timer_end "Tests"
     exit $EXIT_CODE
 }
 

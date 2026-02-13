@@ -426,7 +426,7 @@ alembic downgrade -1
 python scripts/seed_atlas.py
 ```
 
-**`seed_enhanced_strategies.py`** - Seed 107 strategies
+**`seed_enhanced_strategies.py`** - Seed 50+ strategies
 
 ```bash
 python scripts/seed_enhanced_strategies.py

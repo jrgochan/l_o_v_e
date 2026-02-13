@@ -9,7 +9,7 @@
 
 ## Overview
 
-Observer uses **PostgreSQL 16+ with pgvector** as a unified data store, combining:
+Observer uses **PostgreSQL 18+ with pgvector** as a unified data store, combining:
 
 - Traditional relational data (emotions, users, sessions)
 - High-dimensional vectors (embeddings)

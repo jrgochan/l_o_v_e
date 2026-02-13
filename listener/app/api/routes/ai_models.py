@@ -158,6 +158,15 @@ async def stream_pull_progress(
     """
     ollama: Any = NoOpOllama()
     try:
+        # M4: Validate Origin header to prevent cross-site WebSocket hijacking
+        origin = websocket.headers.get("origin")
+        if origin:
+            from app.config import settings  # pylint: disable=import-outside-toplevel
+
+            if origin not in settings.allowed_origins_list:
+                await websocket.close(code=1008, reason="Origin not allowed")
+                return
+
         await websocket.accept()
 
         if task_id not in active_pulls:

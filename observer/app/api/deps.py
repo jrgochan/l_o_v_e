@@ -3,11 +3,13 @@
 Common dependencies for API routes, including database sessions and authentication.
 """
 
+import os
 from typing import Annotated, Optional
 
+import jwt
 from fastapi import Depends, HTTPException, Query, WebSocketException, status
 from fastapi.security import OAuth2PasswordBearer
-from jose import JWTError, jwt
+from jwt.exceptions import InvalidTokenError
 from pydantic import ValidationError
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -54,7 +56,7 @@ async def get_current_user(
         headers={"WWW-Authenticate": "Bearer"},
     )
 
-    if token == "dev-token-bypass":
+    if token == "dev-token-bypass" and os.getenv("APP_ENV", "development") != "production":
         return await _get_or_create_dev_user(db)
 
     try:
@@ -63,7 +65,7 @@ async def get_current_user(
         if email is None:
             raise credentials_exception
         token_data = TokenData(email=email)
-    except (JWTError, ValidationError) as e:
+    except (InvalidTokenError, ValidationError) as e:
         raise credentials_exception from e
 
     stmt = select(User).where(User.email == token_data.email)
@@ -84,7 +86,7 @@ async def get_current_active_user(current_user: Annotated[User, Depends(get_curr
 
 
 async def get_current_admin(
-    current_user: Annotated[User, Depends(get_current_active_user)]
+    current_user: Annotated[User, Depends(get_current_active_user)],
 ) -> User:
     """Ensure the current user is an admin."""
     if current_user.role != UserRole.ADMIN:
@@ -114,7 +116,7 @@ async def get_current_user_ws(
         if email is None:
             raise credentials_exception
         token_data = TokenData(email=email)
-    except (JWTError, ValidationError) as e:
+    except (InvalidTokenError, ValidationError) as e:
         raise credentials_exception from e
 
     stmt = select(User).where(User.email == token_data.email)

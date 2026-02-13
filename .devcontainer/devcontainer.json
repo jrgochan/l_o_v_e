@@ -1,0 +1,62 @@
+{
+    "name": "L.O.V.E. Stack",
+    "image": "mcr.microsoft.com/devcontainers/python:1-3.12-bookworm",
+    "features": {
+        "ghcr.io/devcontainers/features/node:1": {
+            "version": "20"
+        },
+        "ghcr.io/devcontainers/features/common-utils:2": {
+            "installZsh": true,
+            "configureZshCompletion": true
+        },
+        "ghcr.io/devcontainers-contrib/features/shellcheck:0": {}
+    },
+    "forwardPorts": [8000, 8001, 8002, 3000, 5432, 6379, 11434],
+    "portsAttributes": {
+        "8000": { "label": "Observer API" },
+        "8001": { "label": "Versor API" },
+        "8002": { "label": "Listener API" },
+        "3000": { "label": "Experience Web" },
+        "5432": { "label": "PostgreSQL" },
+        "6379": { "label": "Redis" },
+        "11434": { "label": "Ollama" }
+    },
+    "postCreateCommand": "pip install uv && uv sync --all-extras && echo 'source infra/lib/completions.sh' >> ~/.bashrc",
+    "postStartCommand": "make status 2>/dev/null || true",
+    "customizations": {
+        "vscode": {
+            "extensions": [
+                "ms-python.python",
+                "ms-python.vscode-pylance",
+                "ms-python.black-formatter",
+                "ms-python.isort",
+                "charliermarsh.ruff",
+                "timonwong.shellcheck",
+                "foxundermoon.shell-format",
+                "dbaeumer.vscode-eslint",
+                "esbenp.prettier-vscode",
+                "bradlc.vscode-tailwindcss",
+                "tamasfe.even-better-toml",
+                "redhat.vscode-yaml",
+                "github.copilot"
+            ],
+            "settings": {
+                "python.defaultInterpreterPath": "${workspaceFolder}/.venv/bin/python",
+                "python.terminal.activateEnvironment": true,
+                "[python]": {
+                    "editor.defaultFormatter": "ms-python.black-formatter",
+                    "editor.formatOnSave": true,
+                    "editor.codeActionsOnSave": {
+                        "source.organizeImports": "explicit"
+                    }
+                },
+                "files.exclude": {
+                    "**/__pycache__": true,
+                    "**/.pytest_cache": true,
+                    "**/.mypy_cache": true
+                }
+            }
+        }
+    },
+    "remoteUser": "vscode"
+}

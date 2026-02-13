@@ -66,7 +66,7 @@ Engineering Manager
 
 **Core skills:**
 
-- Python 3.11+ (advanced async/await)
+- Python 3.12+ (advanced async/await)
 - FastAPI (routing, dependencies, WebSockets)
 - SQLAlchemy (async ORM, query optimization)
 - Pydantic (validation, schemas)

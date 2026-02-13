@@ -22,7 +22,7 @@ class RelationshipContext:
 
 
 @dataclass
-class ResolverConfig:
+class ResolverConfig:  # pylint: disable=too-many-instance-attributes
     """Configuration for Emotion Resolver."""
 
     collection_name: str = "atlas_of_emotions"

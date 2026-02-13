@@ -116,8 +116,8 @@ class Settings(LoveBaseSettings):  # type: ignore
     # LOGGING & DEBUGGING
     # ============================================================================
 
-    DEBUG: bool = Field(default=True)
-    LOG_LEVEL: str = Field(default="DEBUG")
+    DEBUG: bool = Field(default=False)
+    LOG_LEVEL: str = Field(default="INFO")
 
     # ============================================================================
     # EMOTION MATCHING STRATEGY

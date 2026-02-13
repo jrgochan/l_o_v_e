@@ -1,0 +1,70 @@
+#!/bin/bash
+# L.O.V.E. Stack — Post-checkout Git Hook
+# Automatically syncs dependencies when lockfiles change after
+# git checkout, git pull, or git switch.
+#
+# Install: cp infra/hooks/post-checkout .git/hooks/post-checkout
+# Or:      make install-hooks
+
+# post-checkout receives: $1=prev_HEAD, $2=new_HEAD, $3=branch_flag
+PREV_HEAD="$1"
+NEW_HEAD="$2"
+BRANCH_FLAG="$3"
+
+# Only run on branch checkouts (not file checkouts)
+if [ "$BRANCH_FLAG" != "1" ]; then
+    exit 0
+fi
+
+# Skip if this is the initial checkout (no previous HEAD)
+if [ -z "$PREV_HEAD" ] || [ "$PREV_HEAD" = "0000000000000000000000000000000000000000" ]; then
+    exit 0
+fi
+
+# ── Check for lockfile changes ──────────────────────────────
+PY_CHANGED=false
+JS_CHANGED=false
+
+# Check if uv.lock changed
+if ! git diff --quiet "$PREV_HEAD" "$NEW_HEAD" -- uv.lock 2>/dev/null; then
+    PY_CHANGED=true
+fi
+
+# Check if package-lock.json changed
+if ! git diff --quiet "$PREV_HEAD" "$NEW_HEAD" -- experience/web/package-lock.json 2>/dev/null; then
+    JS_CHANGED=true
+fi
+
+# No changes — exit
+if [ "$PY_CHANGED" = false ] && [ "$JS_CHANGED" = false ]; then
+    exit 0
+fi
+
+echo ""
+echo "🔄 Dependency changes detected"
+
+# ── Sync Python deps ────────────────────────────────────────
+if [ "$PY_CHANGED" = true ]; then
+    echo "  📦 uv.lock changed — syncing Python dependencies..."
+    if command -v uv >/dev/null 2>&1; then
+        uv sync --all-extras --quiet 2>/dev/null && \
+            echo "  ✅ Python dependencies synced" || \
+            echo "  ⚠️  Python sync failed (run: uv sync --all-extras)"
+    else
+        echo "  ⚠️  uv not found. Run: uv sync --all-extras"
+    fi
+fi
+
+# ── Sync JS deps ────────────────────────────────────────────
+if [ "$JS_CHANGED" = true ]; then
+    echo "  📦 package-lock.json changed — syncing Node dependencies..."
+    if command -v npm >/dev/null 2>&1; then
+        (cd experience/web && npm ci --quiet 2>/dev/null) && \
+            echo "  ✅ Node dependencies synced" || \
+            echo "  ⚠️  npm install failed (run: cd experience/web && npm ci)"
+    else
+        echo "  ⚠️  npm not found. Run: cd experience/web && npm ci"
+    fi
+fi
+
+echo ""

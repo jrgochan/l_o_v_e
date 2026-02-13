@@ -411,7 +411,7 @@ black==24.1.1      # Formatting
 - **NumPy 1.26.3:** Stable, well-tested array operations
 - **SciPy 1.12.0:** Latest SLERP implementation
 - **FastAPI 0.109:** Pydantic v2 support
-- **Python 3.11+:** Match keyword, performance improvements
+- **Python 3.12+:** Match keyword, performance improvements
 
 ---
 

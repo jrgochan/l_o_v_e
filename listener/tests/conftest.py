@@ -157,7 +157,9 @@ def make_emotion_classification() -> "Callable[..., Any]":
 def make_multi_emotion_response() -> "Callable[..., Any]":
     """Factory fixture for creating MultiEmotionAnalysisResponse with defaults."""
     # pylint: disable=import-outside-toplevel
-    from app.models.multi_emotion_response import DetectedEmotionResponse
+    from app.models.multi_emotion_response import (
+        DetectedEmotionResponse,
+    )
     from app.models.multi_emotion_response import (
         MultiEmotionAnalysisResponse as MultiEmotionAnalysisResponseModel,
     )

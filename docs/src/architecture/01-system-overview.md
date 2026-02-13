@@ -1,7 +1,7 @@
 # System Overview
 
 **Document:** 01-system-overview.md
-**Last Updated:** December 5, 2025
+**Last Updated:** February 13, 2026
 **Status:** Current
 
 ---
@@ -45,7 +45,7 @@ The L.O.V.E. Stack is a **microservices-based emotional intelligence platform** 
 │                                                                   │
 │  - Stores emotional states over time                            │
 │  - Vector similarity search (HNSW indexing)                     │
-│  - A* pathfinding with 107 strategies                           │
+│  - A* pathfinding with 50+ strategies                           │
 └────────────────────────────┬────────────────────────────────────┘
                              ↓
 ┌─────────────────────────────────────────────────────────────────┐
@@ -85,15 +85,16 @@ The L.O.V.E. Stack is a **microservices-based emotional intelligence platform** 
 
 **Purpose:** Transform human expression into VAC coordinates
 **Port:** 8002
-**Language:** Python 3.11 + FastAPI
+**Language:** Python 3.12 + FastAPI
 **Status:** ✅ Production Ready
 
 **Key Features:**
 
 - Local audio transcription (faster-whisper)
 - Semantic VAC extraction using local LLM (Ollama + Llama 3.1)
+- Multi-emotion analysis pipeline
 - PII sanitization (Spacy NER)
-- Async processing (Redis + Arq workers)
+- Prosody analysis (voice tone, pitch, rhythm)
 - **Critical capability:** Distinguishes pity from compassion
 
 **Input:** Audio file or text string
@@ -105,19 +106,20 @@ The L.O.V.E. Stack is a **microservices-based emotional intelligence platform** 
 
 **Purpose:** Memory and context—stores emotional states, finds patterns
 **Port:** 8000
-**Language:** Python 3.11 + FastAPI
+**Language:** Python 3.12 + FastAPI
 **Status:** ✅ Production Ready
 
 **Key Features:**
 
-- PostgreSQL 16 + pgvector for vector similarity search
+- PostgreSQL 18 + pgvector for vector similarity search
 - 87-emotion atlas based on Brené Brown's research
 - A* pathfinding for emotional transitions
-- 107 evidence-based regulation strategies
+- 50 evidence-based regulation strategies across 7 categories
 - Bootstrap patterns for new users
 - HNSW indexing for fast nearest-neighbor queries
+- Admin dashboard, clinical alerts, analytics
 
-**Data:** 400+ records (emotions, strategies, patterns, transitions, journeys)
+**Data:** Emotions, strategies, patterns, transitions, journeys, chat sessions, analytics
 
 ---
 
@@ -125,8 +127,8 @@ The L.O.V.E. Stack is a **microservices-based emotional intelligence platform** 
 
 **Purpose:** Pure quaternion mathematics for smooth 3D rotations
 **Port:** 8001
-**Language:** Python 3.11 + FastAPI
-**Status:** ✅ Production Ready (56/56 tests passing)
+**Language:** Python 3.12 + FastAPI
+**Status:** ✅ Production Ready (68 tests passing)
 
 **Key Features:**
 
@@ -144,16 +146,18 @@ The L.O.V.E. Stack is a **microservices-based emotional intelligence platform** 
 
 **Purpose:** 3D visualization of emotional states as "Soul Spheres"
 **Port:** 3000
-**Language:** TypeScript + Next.js 16
-**Status:** 🚧 90% Complete (React dependency issue)
+**Language:** TypeScript + Next.js 16.1.1
+**Status:** ✅ Production Ready (deployed at love.jrgochan.io)
 
 **Key Features:**
 
-- Real-time 3D rendering (React Three Fiber + Three.js)
+- Real-time 3D rendering (React Three Fiber v9 + Three.js 0.170)
 - Custom GLSL vertex & fragment shaders
 - VAC → visual mapping (color, geometry, glow)
 - Journey tracking with transition paths
 - Emotional input via text analysis
+- Admin dashboard with data management
+- Command palette, settings, strategy browser
 - Zustand state management + localStorage persistence
 
 **Visual Language:**
@@ -216,10 +220,10 @@ All modules expose FastAPI REST endpoints:
 
 | Module | Base URL | Key Endpoints |
 |--------|----------|---------------|
-| Listener | <http://localhost:8002> | `/listener/analyze`, `/listener/ingest` |
-| Observer | <http://localhost:8000> | `/observer/state`, `/observer/transition-path`, `/observer/atlas/emotions` |
+| Listener | <http://localhost:8002> | `/listener/analyze`, `/listener/ingest`, `/listener/analyze-multi-emotion`, `/listener/analyze-audio`, `/listener/ai-models/*` |
+| Observer | <http://localhost:8000> | `/observer/state`, `/observer/transition-path`, `/observer/journey/*`, `/observer/strategies/*`, `/atlas/emotions`, `/admin/*`, `/auth/*`, `/observer/paths/*` |
 | Versor | <http://localhost:8001> | `/versor/calculate`, `/versor/slerp` |
-| Experience | <http://localhost:3000> | Web UI (no API, calls others) |
+| Experience | <http://localhost:3000> | Web UI + Next.js API proxy |
 
 ### API Contracts
 
@@ -246,30 +250,33 @@ All modules expose FastAPI REST endpoints:
 └─────────────────────────────────────────────────────────────┘
 ```
 
-### Production (Containerized)
+### Production (Ansible-managed RHEL 9)
 
 ```text
 ┌─────────────────────────────────────────────────────────────┐
-│                    Podman/Docker Compose                     │
+│            love.jrgochan.io (RHEL 9)                        │
 │                                                             │
-│  ┌────────────┐  ┌────────────┐  ┌────────────┐          │
-│  │  Listener  │  │  Observer  │  │   Versor   │          │
-│  │  :8002     │  │  :8000     │  │   :8001    │          │
-│  └────────────┘  └────────────┘  └────────────┘          │
+│  ┌───────────────────────────────────────────────┐        │
+│  │  Nginx (443/80)                               │        │
+│  │  SSL termination + reverse proxy              │        │
+│  │  + /docs (MkDocs static site)                 │        │
+│  └──────────────────┬────────────────────────────┘        │
+│                     │                                      │
+│  ┌──────────┐  ┌────┴─────┐  ┌──────────┐  ┌──────────┐│
+│  │Experience│  │ Observer │  │  Versor  │  │ Listener ││
+│  │  :3000   │  │  :8000   │  │  :8001   │  │  :8002   ││
+│  │(systemd) │  │(systemd) │  │(systemd) │  │(systemd) ││
+│  └──────────┘  └──────────┘  └──────────┘  └──────────┘│
 │                                                             │
-│  ┌────────────┐  ┌────────────┐  ┌────────────┐          │
-│  │ PostgreSQL │  │   Redis    │  │   Ollama   │          │
-│  │  :5432     │  │  :6379     │  │  :11434    │          │
-│  └────────────┘  └────────────┘  └────────────┘          │
-│                                                             │
-│  ┌────────────┐                                            │
-│  │ Experience │  (Next.js - separate or Vercel)           │
-│  │  :3000     │                                            │
-│  └────────────┘                                            │
+│  ┌────────────┐  ┌────────────┐                           │
+│  │ PostgreSQL │  │   Ollama   │                           │
+│  │ 18+pgvec  │  │  :11434    │                           │
+│  └────────────┘  └────────────┘                           │
 └─────────────────────────────────────────────────────────────┘
 ```
 
-See `infra/podman-compose.yml` for complete configuration.
+Deployed via Ansible playbook: `infra/deploy/deploy-ansible.sh`.
+See `infra/deploy/ansible/` for roles and configuration.
 
 ---
 
@@ -297,7 +304,7 @@ See `infra/podman-compose.yml` for complete configuration.
 
 **Why:** Clinical validity and therapeutic effectiveness.
 
-- All 107 strategies cite peer-reviewed research
+- All 50+ strategies cite peer-reviewed research
 - Evidence hierarchy: meta-analysis > RCT > clinical observation > theory
 - Ready for clinical trials and publication
 
@@ -368,7 +375,7 @@ See `infra/podman-compose.yml` for complete configuration.
 | Versor | Quaternion calculation | < 50ms | ✅ ~10ms (P99) |
 | Versor | SLERP generation (60 frames) | < 50ms | ✅ ~20ms |
 | Experience | Frame rate | 60 FPS | ✅ 60 FPS (M1 Mac) |
-| Experience | Initial load | < 3s | ⏳ Pending React fix |
+| Experience | Initial load | < 3s | ✅ ~2s |
 
 ---
 
@@ -443,8 +450,8 @@ curl http://localhost:8002/health  # Listener
 
 ### Unit Tests
 
-- **Versor:** 56/56 tests (quaternion operations, SLERP, conversions)
-- **Listener:** Transcription, PII scrubbing, semantic extraction
+- **Versor:** 68 tests (quaternion operations, SLERP, conversions, transitions)
+- **Listener:** Transcription, PII scrubbing, semantic extraction, multi-emotion analysis
 - **Observer:** Repository methods, service logic
 - **Experience:** Component tests, store logic
 
@@ -479,7 +486,7 @@ cd infra
 
 This script:
 
-1. Checks Python 3.11+ installed
+1. Checks Python 3.12+ installed
 2. Checks dependencies (Ollama, Redis, PostgreSQL)
 3. Starts services in order (Versor → Observer → Listener → Experience)
 4. Waits for health checks
@@ -510,18 +517,18 @@ cd experience/web && npm test
 
 ## Next Steps
 
-### Short-Term (This Month)
+### Short-Term (Current)
 
-1. **Fix Experience React dependency** - Resolve R3F/React 19 conflict
-2. **Observer pgvector setup** - Complete database initialization
-3. **End-to-end testing** - Validate full pipeline
-4. **Deploy to staging** - Podman compose environment
+1. **Documentation audit** - Comprehensive docs-to-code sync (in progress)
+2. **Code quality** - Cross-stack linting and code cleanup
+3. **Test coverage** - Increase coverage across all modules
+4. **Performance profiling** - Production monitoring and optimization
 
 ### Medium-Term (Next Quarter)
 
 1. **Mobile apps** (iOS/Android using React Native)
 2. **Therapist portal** for clinical oversight
-3. **Real-time WebSocket** updates (eliminate polling)
+3. **Enhanced analytics** - Deeper session and journey analytics
 4. **Performance optimization** (GPU acceleration, caching)
 
 ### Long-Term (Next Year)
@@ -541,5 +548,4 @@ cd experience/web && npm test
 
 ---
 
-**Last Updated:** December 5, 2025
-**Next Review:** January 2026
+**Last Updated:** February 13, 2026

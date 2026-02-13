@@ -1,6 +1,6 @@
 #!/bin/bash
 # L.O.V.E. Stack - Service Manager Library
-# POSIX-compliant service management abstraction
+# service management abstraction
 
 # Source OS detection if not already loaded
 if ! command -v detect_os >/dev/null 2>&1; then

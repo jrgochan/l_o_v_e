@@ -126,8 +126,8 @@ The `infra/` directory contains orchestration scripts and deployment configurati
 - `lint-love-stack.sh`: Runs linters (ShellCheck, Flake8, ESLint) across the stack.
 
 ### Deployment
-- **Red Hat OpenShift (RHOS)**: Full deployment manifests and scripts in `infra/deploy/rhos/`.
-- **Google Cloud Platform (GCP)**: Deployment automation in `infra/deploy/gcp/`.
+- **Ansible**: Production deployment via `./infra/deploy/deploy-ansible.sh` (see [Infrastructure Docs](docs/src/architecture/11-infrastructure.md))
+- **Podman/Docker**: Containerized deployment via `podman-compose`
 
 ## 🧪 Quality Assurance
 
@@ -156,6 +156,9 @@ Each module is independently maintained. See module-specific `README.md` files f
 
 ## 📄 License
 See individual module LICENSE files.
+
+## 🛡️ Intellectual Property
+The VAC (Valence-Arousal-Connection) model and quaternion-based emotional mapping system are the subject of **U.S. Provisional Patent Application No. 63/962,600**.
 
 ---
 **Built with ❤️ for understanding emotional intelligence through geometric transformation.**

@@ -47,14 +47,14 @@ Before we start, make sure you have these installed:
 
 ### ✅ Required
 
-- [ ] **Python 3.11 or higher**
+- [ ] **Python 3.12 or higher**
 
   ```bash
   python3 --version
-  # Should show: Python 3.11.x or higher
+  # Should show: Python 3.12.x or higher
   ```
 
-- [ ] **PostgreSQL 16+**
+- [ ] **PostgreSQL 18+**
 
   ```bash
   # macOS

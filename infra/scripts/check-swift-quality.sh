@@ -8,16 +8,9 @@ SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 PROJECT_ROOT="$(cd "$SCRIPT_DIR/../../" && pwd)"
 SWIFT_ROOT="$PROJECT_ROOT/experience/desktop/native-swift"
 
-# Load common utils if available
-if [ -f "$PROJECT_ROOT/infra/scripts/lib/common.sh" ]; then
-    . "$PROJECT_ROOT/infra/scripts/lib/common.sh"
-else
-    # Minimal Fallback
-    print_header() { echo "=== $1 ==="; }
-    print_info() { echo "INFO: $1"; }
-    print_error() { echo "ERROR: $1"; }
-    print_success() { echo "SUCCESS: $1"; }
-fi
+# Source common library
+# shellcheck source=../lib/common.sh
+. "$PROJECT_ROOT/infra/lib/common.sh"
 
 print_header "🍎 Checking Swift Quality"
 

@@ -12,6 +12,7 @@ if [ ! -f "$CONFIG_FILE" ]; then
     echo "Error: Configuration file not found at $CONFIG_FILE"
     exit 1
 fi
+# shellcheck source=deploy-config.sh disable=SC1091
 source "$CONFIG_FILE"
 
 echo "=========================================="
@@ -49,6 +50,7 @@ setup_python_service() {
         python3.12 -m venv .venv
     fi
     
+    # shellcheck disable=SC1091  # venv activate script exists at runtime
     source .venv/bin/activate
     pip install -U pip setuptools wheel
     if [ -f "requirements.txt" ]; then
@@ -94,6 +96,7 @@ expand_template() {
     # We use envsubst, passing in only the variables we want to replace to avoid accidental replacement
     # We export the variables first
     export DOMAIN_NAME APP_DIR USER GROUP PORT_FRONTEND PORT_OBSERVER PORT_VERSOR PORT_LISTENER
+    # shellcheck disable=SC2016  # Single quotes intentional: envsubst uses them to identify target variables
     envsubst '$DOMAIN_NAME $APP_DIR $USER $GROUP $PORT_FRONTEND $PORT_OBSERVER $PORT_VERSOR $PORT_LISTENER' < "$template" | sudo tee "$destination" > /dev/null
 }
 

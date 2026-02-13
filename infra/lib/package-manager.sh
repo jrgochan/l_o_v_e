@@ -1,6 +1,6 @@
 #!/bin/bash
 # L.O.V.E. Stack - Package Manager Library
-# POSIX-compliant package management abstraction
+# package management abstraction
 
 # Source OS detection if not already loaded
 if ! command -v detect_os >/dev/null 2>&1; then

@@ -184,7 +184,7 @@ Scalar (a) comes first in the definition.
 
 - ✅ **Auto API docs** - Swagger/ReDoc generation
 - ✅ **Type safety** - Pydantic integration
-- ✅ **Modern** - Async support, Python 3.11+
+- ✅ **Modern** - Async support, Python 3.12+
 - ✅ **Performance** - Faster than Flask/Django
 - ✅ **Developer experience** - Excellent error messages
 
@@ -356,7 +356,7 @@ if something_impossible:
 
 ### The Decision
 
-**Chosen:** Python 3.11+ with NumPy/SciPy
+**Chosen:** Python 3.12+ with NumPy/SciPy
 **Rejected:** C/C++/Rust implementation
 
 ### Rationale

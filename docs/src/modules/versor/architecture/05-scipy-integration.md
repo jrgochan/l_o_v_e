@@ -364,7 +364,7 @@ scipy>=1.12.0
 - Latest stable release
 - Improved Slerp performance
 - Better error handling
-- Python 3.11+ support
+- Python 3.12+ support
 
 ### Breaking Changes to Watch
 

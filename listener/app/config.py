@@ -43,7 +43,8 @@ See Also:
     - Deployment: docs/modules/listener/senior-developers/01-deep-dive-architecture.md
 """
 
-from typing import Literal, Optional
+import json
+from typing import List, Literal, Optional
 
 from pydantic import Field
 from pydantic_settings import BaseSettings, SettingsConfigDict
@@ -144,6 +145,17 @@ class Settings(LoveBaseSettings):  # type: ignore[misc]
         validation_alias="JWT_SECRET_KEY", default="dev-secret-key-change-in-production"
     )
     ALGORITHM: str = "HS256"
+    ALLOWED_ORIGINS: str = Field(default='["http://localhost:3000", "http://127.0.0.1:3000"]')
+
+    @property
+    def allowed_origins_list(self) -> List[str]:
+        """Parse allowed origins JSON string into list."""
+        origins_raw = str(self.ALLOWED_ORIGINS)
+        try:
+            result: List[str] = json.loads(origins_raw)
+            return result
+        except json.JSONDecodeError:
+            return [o.strip() for o in origins_raw.split(",") if o.strip()]
 
     # Worker Configuration
     ARQ_MAX_JOBS: int = 5

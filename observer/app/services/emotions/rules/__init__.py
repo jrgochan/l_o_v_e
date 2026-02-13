@@ -1,0 +1,1 @@
+"""Emotion detection rule definitions."""

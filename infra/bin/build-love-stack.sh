@@ -24,31 +24,9 @@ CONFIGURATION="Release"
 CLEAN_MODE=false
 
 # 3. Output Styling & Common Lib
-COMMON_LIB="$PROJECT_ROOT/infra/scripts/lib/common.sh"
-if [ -f "$COMMON_LIB" ]; then
-    #shellcheck source=infra/scripts/lib/common.sh
-    . "$COMMON_LIB"
-fi
-
-# Fallback Colors/Functions
-if [[ ! -t 1 ]]; then
-    RED='' GREEN='' YELLOW='' BLUE='' BOLD='' NC=''
-else
-    RED=${RED:-""} GREEN=${GREEN:-""} YELLOW=${YELLOW:-""} BLUE=${BLUE:-""} BOLD=${BOLD:-""} NC=${NC:-""}
-fi
-
-if ! command -v print_header &> /dev/null; then
-    print_header() { echo -e "\n${BLUE}${BOLD}=== $1 ===${NC}"; }
-fi
-if ! command -v print_success &> /dev/null; then
-    print_success() { echo -e "${GREEN}✓${NC} $1"; }
-fi
-if ! command -v print_error &> /dev/null; then
-    print_error() { echo -e "${RED}✗${NC} $1" >&2; }
-fi
-if ! command -v print_info &> /dev/null; then
-    print_info() { echo -e "${BLUE}ℹ${NC} $1"; }
-fi
+# shellcheck source=../lib/common.sh
+. "$PROJECT_ROOT/infra/lib/common.sh"
+timer_start
 
 # 4. Help & Argument Parsing
 show_help() {
@@ -291,6 +269,7 @@ main() {
     else
         echo -e "${RED}${BOLD}FAILURE: Build failed.${NC}"
     fi
+    timer_end "Build"
     exit $EXIT_CODE
 }
 

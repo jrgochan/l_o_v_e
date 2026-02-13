@@ -8,6 +8,14 @@ from asgi_correlation_id import CorrelationIdMiddleware
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
+try:
+    from security import setup_rate_limiting
+except ImportError:
+
+    def setup_rate_limiting(_app: FastAPI) -> None:
+        """Dummy rate limiting setup for when security module is missing."""
+
+
 from app.api.routes import (
     admin,
     ai_settings,
@@ -49,11 +57,11 @@ structlog.configure(
 
 
 @asynccontextmanager
-async def lifespan(app_instance: FastAPI) -> AsyncGenerator[None, None]:
+async def lifespan(_app_instance: FastAPI) -> AsyncGenerator[None, None]:
     """Application lifespan manager."""
-    # Startup
-    from app.database import close_db
-    from app.db_init import init_db
+    # Startup — lazy imports avoid circular dependency issues
+    from app.database import close_db  # pylint: disable=import-outside-toplevel
+    from app.db_init import init_db  # pylint: disable=import-outside-toplevel
 
     # Startup
     logger = structlog.get_logger()
@@ -87,6 +95,9 @@ def create_app() -> FastAPI:
         allow_methods=["*"],
         allow_headers=["*"],
     )
+
+    # Rate limiting
+    setup_rate_limiting(app)
 
     # Routers
     app.include_router(health.router, tags=["Health"])

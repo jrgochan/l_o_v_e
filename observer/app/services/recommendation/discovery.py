@@ -22,8 +22,7 @@ class DiscoveryEngine:
 
         Useful for research and identifying challenging patterns.
         """
-        stmt = text(
-            """
+        stmt = text("""
             SELECT
                 pmc.from_emotion_id,
                 pmc.to_emotion_id,
@@ -41,8 +40,7 @@ class DiscoveryEngine:
             WHERE pmc.difficulty = 'difficult'
             ORDER BY pmc.distance DESC
             LIMIT :limit
-        """
-        )
+        """)
 
         result = await self.session.execute(stmt, {"limit": limit})
         rows = result.fetchall()
@@ -111,24 +109,20 @@ class DiscoveryEngine:
             selected_ids = [str(eid) for eid in selected_emotions]
 
         # Note: Using emotion_definitions table, correct per model definition
-        stmt = text(
-            """
+        stmt = text("""
             SELECT id, emotion_name, category
             FROM emotion_definitions
             WHERE emotion_name = ANY(:bridge_names)
-            """
-        )
+            """)
         params: Dict[str, Any] = {"bridge_names": bridge_names}
 
         if selected_ids:
-            stmt = text(
-                """
+            stmt = text("""
                 SELECT id, emotion_name, category
                 FROM emotion_definitions
                 WHERE emotion_name = ANY(:bridge_names)
                   AND id != ALL(:selected_ids)
-                """
-            )
+                """)
             params["selected_ids"] = selected_ids
 
         result = await self.session.execute(stmt, params)

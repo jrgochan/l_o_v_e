@@ -5,7 +5,7 @@ from typing import Any, Dict, List, Optional
 
 
 @dataclass
-class InsightGenerationRequest:
+class InsightGenerationRequest:  # pylint: disable=too-many-instance-attributes
     """Request context for insight generation."""
 
     emotion_name: str

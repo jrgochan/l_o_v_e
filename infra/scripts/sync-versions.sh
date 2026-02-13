@@ -1,6 +1,6 @@
 #!/bin/bash
 # Synchronize tool versions and configs from infra/ to all modules
-# POSIX-compliant, idempotent, safe
+# idempotent, safe
 
 set -e
 

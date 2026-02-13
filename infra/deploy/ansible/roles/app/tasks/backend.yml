@@ -135,3 +135,15 @@
     PYTHONPATH: "{{ app_dir }}/observer"
   become_user: "{{ app_user }}"
   run_once: true
+
+- name: Restart Backend Services After Deploy
+  service:
+    name: "love-{{ item }}"
+    state: restarted
+    daemon_reload: yes
+  loop:
+    - versor
+    - observer
+    - listener
+    - personaplex
+    - listener-worker

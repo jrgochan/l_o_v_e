@@ -1,6 +1,6 @@
 #!/bin/bash
 # L.O.V.E. Stack - OS Detection Library
-# POSIX-compliant platform detection functions
+# platform detection functions
 
 # Detect the operating system
 # Returns: "macos", "ubuntu", "debian", "rhel", "fedora", "arch", "wsl", "unknown"
