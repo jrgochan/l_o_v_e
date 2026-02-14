@@ -8,12 +8,14 @@
 "use client";
 
 import type { VoiceContentCorrelation as VoiceContentCorrelationType } from "@/types/chat";
+import { useAdminTheme } from "@/hooks/admin/useAdminTheme";
 
 interface VoiceContentCorrelationProps {
   correlation: VoiceContentCorrelationType;
 }
 
 export function VoiceContentCorrelation({ correlation }: VoiceContentCorrelationProps) {
+  const theme = useAdminTheme();
   const { voice_energy, content_arousal, discrepancy, aligned, interpretation } = correlation;
 
   // Normalize content arousal from [-1, 1] to [0, 1]
@@ -21,8 +23,8 @@ export function VoiceContentCorrelation({ correlation }: VoiceContentCorrelation
 
   return (
     <div
-      className={`bg-gray-700/50 rounded-lg p-4 border ${
-        discrepancy > 0.5 ? "border-orange-500/50" : "border-gray-600"
+      className={`rounded-lg p-4 border ${theme.colors.background} ${
+        discrepancy > 0.5 ? "border-orange-500/50" : theme.colors.border
       }`}
     >
       <div className="flex items-center justify-between mb-3">
@@ -40,11 +42,11 @@ export function VoiceContentCorrelation({ correlation }: VoiceContentCorrelation
       <div className="space-y-3">
         {/* Voice Energy */}
         <div>
-          <div className="flex justify-between text-xs text-gray-400 mb-1.5">
+          <div className={`flex justify-between text-xs mb-1.5 ${theme.colors.text.muted}`}>
             <span>Voice Energy</span>
             <span className="font-mono text-white">{voice_energy.toFixed(3)}</span>
           </div>
-          <div className="h-3 bg-gray-600 rounded-full overflow-hidden relative">
+          <div className={`h-3 rounded-full overflow-hidden relative ${theme.colors.background}`}>
             <div
               className="h-full bg-gradient-to-r from-cyan-500 to-blue-500 transition-all"
               style={{ width: `${voice_energy * 100}%` }}
@@ -54,11 +56,11 @@ export function VoiceContentCorrelation({ correlation }: VoiceContentCorrelation
 
         {/* Content Arousal */}
         <div>
-          <div className="flex justify-between text-xs text-gray-400 mb-1.5">
+          <div className={`flex justify-between text-xs mb-1.5 ${theme.colors.text.muted}`}>
             <span>Content Arousal</span>
             <span className="font-mono text-white">{content_arousal.toFixed(3)}</span>
           </div>
-          <div className="h-3 bg-gray-600 rounded-full overflow-hidden relative">
+          <div className={`h-3 rounded-full overflow-hidden relative ${theme.colors.background}`}>
             <div
               className="h-full bg-gradient-to-r from-purple-500 to-pink-500 transition-all"
               style={{ width: `${normalizedContentArousal * 100}%` }}
@@ -67,9 +69,9 @@ export function VoiceContentCorrelation({ correlation }: VoiceContentCorrelation
         </div>
 
         {/* Discrepancy Indicator */}
-        <div className="pt-2 border-t border-gray-600">
+        <div className={`pt-2 border-t ${theme.colors.border}`}>
           <div className="flex justify-between text-xs mb-1.5">
-            <span className={discrepancy > 0.5 ? "text-orange-300 font-medium" : "text-gray-400"}>
+            <span className={discrepancy > 0.5 ? "text-orange-300 font-medium" : theme.colors.text.muted}>
               Discrepancy Level
             </span>
             <span
@@ -80,7 +82,7 @@ export function VoiceContentCorrelation({ correlation }: VoiceContentCorrelation
               {discrepancy.toFixed(3)}
             </span>
           </div>
-          <div className="h-2 bg-gray-600 rounded-full overflow-hidden">
+          <div className={`h-2 rounded-full overflow-hidden ${theme.colors.background}`}>
             <div
               className={`h-full transition-all ${
                 discrepancy > 0.5
@@ -97,8 +99,8 @@ export function VoiceContentCorrelation({ correlation }: VoiceContentCorrelation
 
       {/* Clinical interpretation */}
       {interpretation && (
-        <div className="mt-3 pt-3 border-t border-gray-600">
-          <div className="text-xs text-gray-300 italic leading-relaxed">{interpretation}</div>
+        <div className={`mt-3 pt-3 border-t ${theme.colors.border}`}>
+          <div className={`text-xs italic leading-relaxed ${theme.colors.text.secondary}`}>{interpretation}</div>
         </div>
       )}
 

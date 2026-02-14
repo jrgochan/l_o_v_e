@@ -8,6 +8,7 @@
 "use client";
 
 import { useMemo, useState, useEffect } from "react";
+import { useAdminTheme } from "@/hooks/admin/useAdminTheme";
 // Re-defining interface locally to match previous file if not exported centrally
 interface LocalProgressStage {
   id: string;
@@ -36,6 +37,7 @@ export function AnalysisProgressIndicator({
   deepFeelingMode,
   className = "",
 }: AnalysisProgressIndicatorProps) {
+  const theme = useAdminTheme();
   // --- Visual Config per Stage ---
   const stageConfig = useMemo(() => {
     return {
@@ -174,7 +176,7 @@ export function AnalysisProgressIndicator({
 
         {/* Text Status */}
         <div className="space-y-1">
-          <h3 className="text-lg font-semibold text-white tracking-wide">
+          <h3 className={`text-lg font-semibold tracking-wide ${theme.colors.text.primary}`}>
             {isComplete ? "Analysis Complete" : activeStage.label}
           </h3>
           <p className={`text-xs font-medium uppercase tracking-wider opacity-80 ${config.color}`}>
@@ -184,7 +186,7 @@ export function AnalysisProgressIndicator({
 
         {/* Dynamic Context Message */}
         <div className="h-6 flex items-center justify-center">
-          <p className="text-xs text-gray-400 italic animate-fade-in line-clamp-1">
+          <p className={`text-xs italic animate-fade-in line-clamp-1 ${theme.colors.text.muted}`}>
             {currentMessage}
           </p>
         </div>
@@ -202,7 +204,7 @@ export function AnalysisProgressIndicator({
         </div>
 
         {/* Steps and Percentage */}
-        <div className="flex justify-between items-center text-[10px] text-gray-500 font-mono mb-2">
+        <div className={`flex justify-between items-center text-[10px] font-mono mb-2 ${theme.colors.text.muted}`}>
           <span>0%</span>
           <span className={isComplete ? "text-emerald-400" : "text-cyan-400"}>
             {displayPercentage}%

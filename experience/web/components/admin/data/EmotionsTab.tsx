@@ -4,8 +4,10 @@ import { useEffect, useState, useRef } from "react";
 import { adminApi } from "@/utils/api";
 import { Emotion, EmotionUpdate } from "@/types/admin";
 import { Loader2, Download, Upload, Save, AlertTriangle } from "lucide-react";
+import { useAdminTheme } from "@/hooks/admin/useAdminTheme";
 
 export function EmotionsTab() {
+  const theme = useAdminTheme();
   const [emotions, setEmotions] = useState<Emotion[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -148,8 +150,8 @@ export function EmotionsTab() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-xl font-semibold text-white mb-1">Emotion Definitions</h2>
-          <p className="text-gray-400 text-sm">
+          <h2 className={`text-xl font-semibold mb-1 ${theme.colors.text.primary}`}>Emotion Definitions</h2>
+          <p className={`text-sm ${theme.colors.text.muted}`}>
             Manage the canonical emotions. Changes affect the entire platform.
           </p>
         </div>
@@ -163,7 +165,7 @@ export function EmotionsTab() {
           />
           <button
             onClick={handleImportClick}
-            className="px-4 py-2 bg-gray-800 hover:bg-gray-700 text-gray-300 rounded border border-gray-700 flex items-center gap-2 transition text-sm"
+            className={`px-4 py-2 rounded flex items-center gap-2 transition text-sm ${theme.colors.background} ${theme.colors.hover} ${theme.colors.text.secondary} border ${theme.colors.border}`}
           >
             <Upload className="w-4 h-4" /> Import
           </button>
@@ -189,10 +191,10 @@ export function EmotionsTab() {
         </div>
       )}
 
-      <div className="bg-gray-900 border border-gray-800 rounded-lg overflow-hidden">
+      <div className={`rounded-lg overflow-hidden ${theme.colors.background} border ${theme.colors.border}`}>
         <div className="overflow-x-auto">
           <table className="w-full text-left text-sm">
-            <thead className="bg-gray-800/80 border-b border-gray-700 text-gray-400 uppercase text-xs font-semibold">
+            <thead className={`border-b uppercase text-xs font-semibold ${theme.colors.background} ${theme.colors.border} ${theme.colors.text.muted}`}>
               <tr>
                 <th className="px-6 py-4 w-32">Emotion</th>
                 <th className="px-6 py-4 w-48">Category</th>
@@ -201,17 +203,17 @@ export function EmotionsTab() {
                 <th className="px-6 py-4 text-right w-24">Actions</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-gray-800">
+            <tbody className={`divide-y ${theme.colors.border}`}>
               {emotions.map((emotion) => (
-                <tr key={emotion.id} className="hover:bg-gray-800/30 group">
-                  <td className="px-6 py-4 font-medium text-white">{emotion.emotion_name}</td>
+                <tr key={emotion.id} className={`${theme.colors.hover} group`}>
+                  <td className={`px-6 py-4 font-medium ${theme.colors.text.primary}`}>{emotion.emotion_name}</td>
 
                   {/* Editing State */}
                   {editingId === emotion.id ? (
                     <>
                       <td className="px-6 py-4">
                         <input
-                          className="w-full bg-gray-800 border border-gray-600 rounded px-2 py-1 text-white focus:ring-1 focus:ring-cyan-500"
+                          className={`w-full rounded px-2 py-1 focus:ring-1 focus:ring-cyan-500 ${theme.colors.background} border ${theme.colors.border} ${theme.colors.text.primary}`}
                           value={editForm.category || ""}
                           onChange={(e) => setEditForm({ ...editForm, category: e.target.value })}
                         />
@@ -225,7 +227,7 @@ export function EmotionsTab() {
                               step="0.1"
                               min="-1"
                               max="1"
-                              className="w-16 bg-gray-800 border border-gray-600 rounded px-1 py-1 text-white text-center focus:ring-1 focus:ring-cyan-500"
+                              className={`w-16 rounded px-1 py-1 text-center focus:ring-1 focus:ring-cyan-500 ${theme.colors.background} border ${theme.colors.border} ${theme.colors.text.primary}`}
                               value={editForm.vac_vector?.[i] ?? 0}
                               onChange={(e) => handleVacChange(i, e.target.value)}
                             />
@@ -237,7 +239,7 @@ export function EmotionsTab() {
                       </td>
                       <td className="px-6 py-4">
                         <textarea
-                          className="w-full bg-gray-800 border border-gray-600 rounded px-2 py-1 text-white text-xs focus:ring-1 focus:ring-cyan-500 min-h-[60px]"
+                          className={`w-full rounded px-2 py-1 text-xs focus:ring-1 focus:ring-cyan-500 min-h-[60px] ${theme.colors.background} border ${theme.colors.border} ${theme.colors.text.primary}`}
                           value={editForm.definition || ""}
                           onChange={(e) => setEditForm({ ...editForm, definition: e.target.value })}
                         />
@@ -262,7 +264,7 @@ export function EmotionsTab() {
                           </button>
                           <button
                             onClick={handleCancelEdit}
-                            className="p-1.5 bg-gray-700 hover:bg-gray-600 text-gray-300 rounded transition"
+                            className={`p-1.5 rounded transition ${theme.colors.background} ${theme.colors.hover} ${theme.colors.text.secondary}`}
                             title="Cancel"
                             aria-label="Cancel"
                             disabled={isSaving}
@@ -275,15 +277,15 @@ export function EmotionsTab() {
                   ) : (
                     /* View State */
                     <>
-                      <td className="px-6 py-4 text-gray-300 text-sm">{emotion.category}</td>
+                      <td className={`px-6 py-4 text-sm ${theme.colors.text.secondary}`}>{emotion.category}</td>
                       <td className="px-6 py-4 font-mono text-xs text-cyan-300">
                         [{(emotion.vac_vector || [0, 0, 0]).join(", ")}]
                       </td>
-                      <td className="px-6 py-4 text-gray-400 text-sm">{emotion.definition}</td>
+                      <td className={`px-6 py-4 text-sm ${theme.colors.text.muted}`}>{emotion.definition}</td>
                       <td className="px-6 py-4 text-right">
                         <button
                           onClick={() => handleEdit(emotion)}
-                          className="p-1.5 text-gray-500 hover:text-cyan-400 hover:bg-gray-800 rounded transition opacity-0 group-hover:opacity-100"
+                          className={`p-1.5 hover:text-cyan-400 ${theme.colors.hover} rounded transition opacity-0 group-hover:opacity-100 ${theme.colors.text.muted}`}
                           title="Edit"
                           aria-label="Edit"
                         >

@@ -8,12 +8,14 @@
 "use client";
 
 import type { EmotionTimelineEvent } from "@/types/chat";
+import { useAdminTheme } from "@/hooks/admin/useAdminTheme";
 
 interface SessionTimelineProps {
   emotionTimeline: EmotionTimelineEvent[];
 }
 
 export function SessionTimeline({ emotionTimeline }: SessionTimelineProps) {
+  const theme = useAdminTheme();
   if (emotionTimeline.length === 0) return null;
 
   const getAlertColor = (level?: "critical" | "warning" | "attention" | "stable") => {
@@ -54,10 +56,10 @@ export function SessionTimeline({ emotionTimeline }: SessionTimelineProps) {
   };
 
   return (
-    <div className="bg-gray-700/50 rounded-lg p-4 border border-gray-600">
-      <div className="text-sm text-gray-300 mb-3 font-semibold flex items-center justify-between">
+    <div className={`rounded-lg p-4 border ${theme.colors.background} ${theme.colors.border}`}>
+      <div className={`text-sm mb-3 font-semibold flex items-center justify-between ${theme.colors.text.secondary}`}>
         <span>🕐 Session Timeline</span>
-        <span className="text-xs text-gray-400">{emotionTimeline.length} events</span>
+        <span className={`text-xs ${theme.colors.text.muted}`}>{emotionTimeline.length} events</span>
       </div>
 
       {/* Timeline */}
@@ -68,7 +70,7 @@ export function SessionTimeline({ emotionTimeline }: SessionTimelineProps) {
           return (
             <div key={index} className="relative">
               {/* Timeline connector line */}
-              {!isLast && <div className="absolute left-3 top-8 bottom-0 w-px bg-gray-600"></div>}
+              {!isLast && <div className={`absolute left-3 top-8 bottom-0 w-px ${theme.colors.background}`}></div>}
 
               {/* Event card */}
               <div className="flex gap-3">
@@ -85,7 +87,7 @@ export function SessionTimeline({ emotionTimeline }: SessionTimelineProps) {
                 <div
                   className={`flex-1 pb-3 ${
                     isLast
-                      ? "bg-gray-700/50 -mt-1 -ml-3 pl-9 pr-4 py-3 rounded-lg border border-cyan-500/30"
+                      ? `${theme.colors.background} -mt-1 -ml-3 pl-9 pr-4 py-3 rounded-lg border border-cyan-500/30`
                       : ""
                   }`}
                 >
@@ -99,7 +101,7 @@ export function SessionTimeline({ emotionTimeline }: SessionTimelineProps) {
                           <span className="text-xs">{getAlertIcon(event.alertLevel)}</span>
                         )}
                       </div>
-                      <div className="text-xs text-gray-400 mb-1">{event.category}</div>
+                      <div className={`text-xs mb-1 ${theme.colors.text.muted}`}>{event.category}</div>
 
                       {/* VAC preview */}
                       <div className="flex gap-3 text-xs font-mono mt-1.5">
@@ -120,10 +122,10 @@ export function SessionTimeline({ emotionTimeline }: SessionTimelineProps) {
 
                     {/* Timestamp and confidence */}
                     <div className="flex-shrink-0 text-right">
-                      <div className="text-xs text-gray-400 font-mono">
+                      <div className={`text-xs font-mono ${theme.colors.text.muted}`}>
                         {formatRelativeTime(event.timestamp)}
                       </div>
-                      <div className="text-xs text-gray-500 mt-0.5">
+                      <div className={`text-xs mt-0.5 ${theme.colors.text.muted}`}>
                         {(event.confidence * 100).toFixed(0)}%
                       </div>
                     </div>
@@ -148,15 +150,15 @@ export function SessionTimeline({ emotionTimeline }: SessionTimelineProps) {
       </div>
 
       {/* Legend */}
-      <div className="mt-4 pt-3 border-t border-gray-600 flex items-center gap-4 text-xs">
-        <span className="text-gray-400">Alert Levels:</span>
+      <div className={`mt-4 pt-3 border-t flex items-center gap-4 text-xs ${theme.colors.border}`}>
+        <span className={theme.colors.text.muted}>Alert Levels:</span>
         <div className="flex items-center gap-1">
           <div className="w-2 h-2 rounded-full bg-green-500"></div>
-          <span className="text-gray-400">Stable</span>
+          <span className={theme.colors.text.muted}>Stable</span>
         </div>
         <div className="flex items-center gap-1">
           <div className="w-2 h-2 rounded-full bg-orange-500"></div>
-          <span className="text-gray-400">Attention</span>
+          <span className={theme.colors.text.muted}>Attention</span>
         </div>
         <div className="flex items-center gap-1">
           <div className="w-2 h-2 rounded-full bg-yellow-500"></div>

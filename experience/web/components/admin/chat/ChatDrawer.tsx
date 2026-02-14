@@ -20,6 +20,7 @@ import { logger } from "@/utils/logger";
 import { ThreadView } from "./ThreadView";
 import { AutoLinkIndicator } from "./AutoLinkIndicator";
 import { VoiceChat } from "./VoiceChat";
+import { useAdminTheme } from "@/hooks/admin/useAdminTheme";
 
 interface ChatDrawerProps {
   isOpen: boolean;
@@ -28,6 +29,7 @@ interface ChatDrawerProps {
 }
 
 export function ChatDrawer({ isOpen, onToggle, sessionId }: ChatDrawerProps) {
+  const theme = useAdminTheme();
   const [height, setHeight] = useState(400);
   const [isResizing, setIsResizing] = useState(false);
   const [chatMode, setChatMode] = useState<"text" | "voice">("text");
@@ -215,7 +217,7 @@ export function ChatDrawer({ isOpen, onToggle, sessionId }: ChatDrawerProps) {
   // Show drawer when open
   return (
     <div
-      className="fixed bottom-0 left-0 right-0 z-40 bg-gray-900/98 backdrop-blur-sm border-t border-gray-700 flex flex-col"
+      className={`fixed bottom-0 left-0 right-0 z-40 backdrop-blur-sm flex flex-col ${theme.colors.background} border-t ${theme.colors.border}`}
       style={{ height: `${height}px` }}
     >
       {/* Resize Handle */}
@@ -226,13 +228,13 @@ export function ChatDrawer({ isOpen, onToggle, sessionId }: ChatDrawerProps) {
           isResizing ? "bg-cyan-500/50" : ""
         }`}
       >
-        <div className="w-12 h-1 bg-gray-600 rounded-full" />
+        <div className={`w-12 h-1 rounded-full ${theme.colors.border}`} />
       </div>
 
       {/* Header */}
-      <div className="flex items-center justify-between px-4 py-3 border-b border-gray-700">
+      <div className={`flex items-center justify-between px-4 py-3 border-b ${theme.colors.border}`}>
         <div className="flex items-center gap-3">
-          <h3 className="text-lg font-semibold text-white">Emotional Chat</h3>
+          <h3 className={`text-lg font-semibold ${theme.colors.text.primary}`}>Emotional Chat</h3>
 
           {/* Connection Status */}
           <div className="flex items-center gap-2 text-sm">
@@ -259,7 +261,7 @@ export function ChatDrawer({ isOpen, onToggle, sessionId }: ChatDrawerProps) {
             className={`px-4 py-2 rounded text-sm font-medium transition ${
               chatMode === "voice"
                 ? "bg-purple-600 text-white"
-                : "bg-gray-700 text-gray-300 hover:bg-gray-600"
+                : `${theme.colors.background} ${theme.colors.text.secondary} ${theme.colors.hover}`
             }`}
             title={`Switch to ${chatMode === "text" ? "voice" : "text"} mode`}
           >
@@ -282,7 +284,7 @@ export function ChatDrawer({ isOpen, onToggle, sessionId }: ChatDrawerProps) {
           {/* Close Button */}
           <button
             onClick={onToggle}
-            className="px-3 py-2 text-gray-400 hover:text-white hover:bg-gray-800 rounded transition"
+            className={`px-3 py-2 rounded transition ${theme.colors.text.muted} hover:${theme.colors.text.primary} ${theme.colors.hover}`}
           >
             ▼ Close
           </button>
@@ -301,7 +303,7 @@ export function ChatDrawer({ isOpen, onToggle, sessionId }: ChatDrawerProps) {
           {/* Messages Area */}
           <div className="flex-1 overflow-y-auto px-4 py-4 space-y-3">
             {messages.length === 0 && (
-              <div className="text-center text-gray-400 py-8">
+              <div className={`text-center py-8 ${theme.colors.text.muted}`}>
                 <p className="text-lg mb-2">👋 How are you feeling?</p>
                 <p className="text-sm">Type a message or record your voice to start</p>
               </div>
@@ -319,8 +321,8 @@ export function ChatDrawer({ isOpen, onToggle, sessionId }: ChatDrawerProps) {
                       : msg.type === "analysis"
                         ? "bg-purple-900/50 border border-purple-500/30 text-white"
                         : msg.type === "insight"
-                          ? "bg-gray-800 border border-gray-600 text-white"
-                          : "bg-gray-700 text-gray-200"
+                          ? `${theme.colors.background} border ${theme.colors.border} ${theme.colors.text.primary}`
+                          : `${theme.colors.background} ${theme.colors.text.secondary}`
                   }`}
                 >
                   {/* Message Content */}
@@ -378,9 +380,9 @@ export function ChatDrawer({ isOpen, onToggle, sessionId }: ChatDrawerProps) {
 
             {isProcessing && (
               <div className="flex justify-start">
-                <div className="bg-gray-800 rounded-lg px-4 py-3 flex items-center gap-2">
+                <div className={`rounded-lg px-4 py-3 flex items-center gap-2 ${theme.colors.background}`}>
                   <div className="animate-spin h-4 w-4 border-2 border-cyan-400 border-t-transparent rounded-full" />
-                  <span className="text-sm text-gray-300">Analyzing...</span>
+                  <span className={`text-sm ${theme.colors.text.secondary}`}>Analyzing...</span>
                 </div>
               </div>
             )}
@@ -389,7 +391,7 @@ export function ChatDrawer({ isOpen, onToggle, sessionId }: ChatDrawerProps) {
           </div>
 
           {/* Input Area */}
-          <div className="border-t border-gray-700 p-4">
+          <div className={`border-t p-4 ${theme.colors.border}`}>
             <div className="flex items-center gap-2">
               <input
                 type="text"
@@ -398,11 +400,11 @@ export function ChatDrawer({ isOpen, onToggle, sessionId }: ChatDrawerProps) {
                 onKeyPress={(e) => e.key === "Enter" && handleSend()}
                 placeholder="How are you feeling?"
                 disabled={!isConnected}
-                className="flex-1 px-4 py-3 bg-gray-800 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-cyan-500 disabled:opacity-50"
+                className={`flex-1 px-4 py-3 border rounded-lg placeholder-gray-400 focus:outline-none focus:border-cyan-500 disabled:opacity-50 ${theme.colors.background} ${theme.colors.border} ${theme.colors.text.primary}`}
               />
 
               <button
-                className="px-4 py-3 bg-gray-700 hover:bg-gray-600 text-white rounded-lg transition disabled:opacity-50"
+                className={`px-4 py-3 rounded-lg transition disabled:opacity-50 ${theme.colors.background} ${theme.colors.hover} ${theme.colors.text.primary}`}
                 disabled={!isConnected}
                 title="Voice recording (coming soon)"
               >

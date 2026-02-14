@@ -14,8 +14,10 @@ import {
   Plus,
   Trash2,
 } from "lucide-react";
+import { useAdminTheme } from "@/hooks/admin/useAdminTheme";
 
 export function StrategiesTab() {
+  const theme = useAdminTheme();
   const [strategies, setStrategies] = useState<TransitionStrategy[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -184,8 +186,8 @@ export function StrategiesTab() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-xl font-semibold text-white mb-1">Therapeutic Strategies</h2>
-          <p className="text-gray-400 text-sm">
+          <h2 className={`text-xl font-semibold mb-1 ${theme.colors.text.primary}`}>Therapeutic Strategies</h2>
+          <p className={`text-sm ${theme.colors.text.muted}`}>
             Manage clinical interventions (ACT, CBT, DBT). Used by the AI for recommendations.
           </p>
         </div>
@@ -199,7 +201,7 @@ export function StrategiesTab() {
           />
           <button
             onClick={handleImportClick}
-            className="px-4 py-2 bg-gray-800 hover:bg-gray-700 text-gray-300 rounded border border-gray-700 flex items-center gap-2 transition text-sm"
+            className={`px-4 py-2 rounded flex items-center gap-2 transition text-sm ${theme.colors.background} ${theme.colors.hover} ${theme.colors.text.secondary} border ${theme.colors.border}`}
           >
             <Upload className="w-4 h-4" /> Import
           </button>
@@ -225,10 +227,10 @@ export function StrategiesTab() {
         </div>
       )}
 
-      <div className="bg-gray-900 border border-gray-800 rounded-lg overflow-hidden">
+      <div className={`rounded-lg overflow-hidden ${theme.colors.background} border ${theme.colors.border}`}>
         <div className="overflow-x-auto">
           <table className="w-full text-left text-sm">
-            <thead className="bg-gray-800/80 border-b border-gray-700 text-gray-400 uppercase text-xs font-semibold">
+            <thead className={`border-b uppercase text-xs font-semibold ${theme.colors.background} ${theme.colors.border} ${theme.colors.text.muted}`}>
               <tr>
                 <th className="px-6 py-4 w-10"></th>
                 <th className="px-6 py-4 w-64">Strategy Name</th>
@@ -238,7 +240,7 @@ export function StrategiesTab() {
                 <th className="px-6 py-4 text-right w-24">Actions</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-gray-800">
+            <tbody className={`divide-y ${theme.colors.border}`}>
               {strategies.map((strategy) => {
                 const isExpanded = expandedIds.has(strategy.id);
                 const isEditing = editingId === strategy.id;
@@ -246,12 +248,12 @@ export function StrategiesTab() {
                 return (
                   <Fragment key={strategy.id}>
                     <tr
-                      className={`hover:bg-gray-800/30 group ${isExpanded ? "bg-gray-800/20" : ""}`}
+                      className={`${theme.colors.hover} group ${isExpanded ? theme.colors.background : ""}`}
                     >
                       <td className="px-6 py-4">
                         <button
                           onClick={() => toggleExpand(strategy.id)}
-                          className="text-gray-500 hover:text-cyan-400 transition"
+                          className={`${theme.colors.text.muted} hover:text-cyan-400 transition`}
                           aria-label={isExpanded ? "Collapse details" : "Expand details"}
                         >
                           {isExpanded ? (
@@ -261,8 +263,8 @@ export function StrategiesTab() {
                           )}
                         </button>
                       </td>
-                      <td className="px-6 py-4 font-medium text-white">{strategy.strategy_name}</td>
-                      <td className="px-6 py-4 text-gray-300">{strategy.strategy_type}</td>
+                      <td className={`px-6 py-4 font-medium ${theme.colors.text.primary}`}>{strategy.strategy_name}</td>
+                      <td className={`px-6 py-4 ${theme.colors.text.secondary}`}>{strategy.strategy_type}</td>
                       <td className="px-6 py-4">
                         <span
                           className={`px-2 py-0.5 rounded text-[10px] uppercase font-bold tracking-wider
@@ -271,7 +273,7 @@ export function StrategiesTab() {
                                                         ? "bg-purple-900/50 text-purple-200 border border-purple-800"
                                                         : strategy.evidence_level === "rct"
                                                           ? "bg-green-900/50 text-green-200 border border-green-800"
-                                                          : "bg-gray-800 text-gray-400 border border-gray-700"
+                                                          : `${theme.colors.background} ${theme.colors.text.muted} border ${theme.colors.border}`
                                                     }`}
                         >
                           {strategy.evidence_level}
@@ -281,7 +283,7 @@ export function StrategiesTab() {
                       {isEditing ? (
                         <td className="px-6 py-4">
                           <textarea
-                            className="w-full bg-gray-800 border border-gray-600 rounded px-2 py-1 text-white text-xs focus:ring-1 focus:ring-cyan-500 min-h-[60px]"
+                            className={`w-full rounded px-2 py-1 text-xs focus:ring-1 focus:ring-cyan-500 min-h-[60px] ${theme.colors.background} border ${theme.colors.border} ${theme.colors.text.primary}`}
                             value={editForm.description || ""}
                             onChange={(e) =>
                               setEditForm({ ...editForm, description: e.target.value })
@@ -289,7 +291,7 @@ export function StrategiesTab() {
                           />
                         </td>
                       ) : (
-                        <td className="px-6 py-4 text-gray-400 text-sm truncate max-w-xs">
+                        <td className={`px-6 py-4 text-sm truncate max-w-xs ${theme.colors.text.muted}`}>
                           {strategy.description}
                         </td>
                       )}
@@ -312,7 +314,7 @@ export function StrategiesTab() {
                             </button>
                             <button
                               onClick={handleCancelEdit}
-                              className="p-1.5 bg-gray-700 hover:bg-gray-600 text-gray-300 rounded transition"
+                              className={`p-1.5 rounded transition ${theme.colors.background} ${theme.colors.hover} ${theme.colors.text.secondary}`}
                               title="Cancel"
                               aria-label="Cancel"
                               disabled={isSaving}
@@ -323,7 +325,7 @@ export function StrategiesTab() {
                         ) : (
                           <button
                             onClick={() => handleEdit(strategy)}
-                            className="p-1.5 text-gray-500 hover:text-cyan-400 hover:bg-gray-800 rounded transition opacity-0 group-hover:opacity-100"
+                            className={`p-1.5 hover:text-cyan-400 ${theme.colors.hover} rounded transition opacity-0 group-hover:opacity-100 ${theme.colors.text.muted}`}
                             title="Edit"
                             aria-label="Edit"
                           >
@@ -335,29 +337,29 @@ export function StrategiesTab() {
 
                     {/* Expanded Details Row */}
                     {isExpanded && (
-                      <tr className="bg-gray-800/10">
-                        <td colSpan={6} className="px-6 py-4 border-t border-gray-800 shadow-inner">
+                      <tr className={theme.colors.background}>
+                        <td colSpan={6} className={`px-6 py-4 border-t shadow-inner ${theme.colors.border}`}>
                           <div className="grid grid-cols-2 gap-8 pl-12">
                             <div>
-                              <h4 className="text-xs font-bold text-gray-500 uppercase mb-2">
+                              <h4 className={`text-xs font-bold uppercase mb-2 ${theme.colors.text.muted}`}>
                                 Detailed Steps
                               </h4>
                               {isEditing ? (
                                 <div className="space-y-2">
                                   {editForm.detailed_steps!.map((step, idx) => (
                                     <div key={idx} className="flex gap-2">
-                                      <span className="text-gray-500 text-xs w-4 pt-1">
+                                      <span className={`text-xs w-4 pt-1 ${theme.colors.text.muted}`}>
                                         {idx + 1}.
                                       </span>
                                       <input
-                                        className="flex-1 bg-gray-800 border border-gray-600 rounded px-2 py-1 text-white text-xs"
+                                        className={`flex-1 rounded px-2 py-1 text-xs ${theme.colors.background} border ${theme.colors.border} ${theme.colors.text.primary}`}
                                         value={step}
                                         onChange={(e) => handleStepChange(idx, e.target.value)}
                                         placeholder={`Step ${idx + 1}`}
                                       />
                                       <button
                                         onClick={() => handleRemoveStep(idx)}
-                                        className="p-1 text-gray-500 hover:text-red-400 hover:bg-gray-800 rounded transition"
+                                        className={`p-1 hover:text-red-400 ${theme.colors.hover} rounded transition ${theme.colors.text.muted}`}
                                         title="Remove step"
                                       >
                                         <Trash2 className="w-3 h-3" />
@@ -372,7 +374,7 @@ export function StrategiesTab() {
                                   </button>
                                 </div>
                               ) : (
-                                <ol className="list-decimal list-outside text-sm text-gray-300 space-y-1 ml-4">
+                                <ol className={`list-decimal list-outside text-sm space-y-1 ml-4 ${theme.colors.text.secondary}`}>
                                   {(strategy.detailed_steps || []).map((step, idx) => (
                                     <li key={idx} className="pl-1">
                                       {step}
@@ -384,25 +386,25 @@ export function StrategiesTab() {
                             <div className="space-y-4">
                               <div className="grid grid-cols-2 gap-4">
                                 <div>
-                                  <h4 className="text-xs font-bold text-gray-500 uppercase mb-1">
+                                  <h4 className={`text-xs font-bold uppercase mb-1 ${theme.colors.text.muted}`}>
                                     Time Required
                                   </h4>
                                   {isEditing ? (
                                     <input
-                                      className="w-full bg-gray-800 border border-gray-600 rounded px-2 py-1 text-white text-xs"
+                                      className={`w-full rounded px-2 py-1 text-xs ${theme.colors.background} border ${theme.colors.border} ${theme.colors.text.primary}`}
                                       value={editForm.time_required || ""}
                                       onChange={(e) =>
                                         setEditForm({ ...editForm, time_required: e.target.value })
                                       }
                                     />
                                   ) : (
-                                    <p className="text-sm text-gray-300">
+                                    <p className={`text-sm ${theme.colors.text.secondary}`}>
                                       {strategy.time_required || "N/A"}
                                     </p>
                                   )}
                                 </div>
                                 <div>
-                                  <h4 className="text-xs font-bold text-gray-500 uppercase mb-1">
+                                  <h4 className={`text-xs font-bold uppercase mb-1 ${theme.colors.text.muted}`}>
                                     Difficulty (1-5)
                                   </h4>
                                   {isEditing ? (
@@ -410,7 +412,7 @@ export function StrategiesTab() {
                                       type="number"
                                       min="1"
                                       max="5"
-                                      className="w-full bg-gray-800 border border-gray-600 rounded px-2 py-1 text-white text-xs"
+                                      className={`w-full rounded px-2 py-1 text-xs ${theme.colors.background} border ${theme.colors.border} ${theme.colors.text.primary}`}
                                       value={editForm.difficulty_level || 1}
                                       onChange={(e) =>
                                         setEditForm({
@@ -437,12 +439,12 @@ export function StrategiesTab() {
                               </div>
 
                               <div>
-                                <h4 className="text-xs font-bold text-gray-500 uppercase mb-1">
+                                <h4 className={`text-xs font-bold uppercase mb-1 ${theme.colors.text.muted}`}>
                                   Contraindications
                                 </h4>
                                 {isEditing ? (
                                   <textarea
-                                    className="w-full bg-gray-800 border border-gray-600 rounded px-2 py-1 text-white text-xs"
+                                    className={`w-full rounded px-2 py-1 text-xs ${theme.colors.background} border ${theme.colors.border} ${theme.colors.text.primary}`}
                                     value={editForm.contraindications || ""}
                                     onChange={(e) =>
                                       setEditForm({

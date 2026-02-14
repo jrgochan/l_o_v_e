@@ -3,6 +3,7 @@
 import { useExperienceStore } from "@/stores/useExperienceStore";
 import { useState, useEffect, useCallback } from "react";
 import type { Emotion } from "@/types";
+import { useAdminTheme } from "@/hooks/admin/useAdminTheme";
 
 interface SyncMessage {
   timestamp: number;
@@ -26,21 +27,22 @@ export function SphereDebugOverlay({
   activeEmotions,
   debugLog,
 }: SphereDebugOverlayProps) {
+  const theme = useAdminTheme();
   // Subscribe to currentVAC locally so ONLY this component re-renders
   const currentVAC = useExperienceStore((state) => state.currentVAC);
 
   return (
-    <div className="absolute top-20 left-4 z-50 p-4 bg-gray-900/90 border border-gray-700 text-xs font-mono rounded shadow-xl backdrop-blur max-w-sm">
-      <h3 className="text-white font-bold mb-2 border-b border-gray-700 pb-1">Sync Diagnostics</h3>
+    <div className={`absolute top-20 left-4 z-50 p-4 text-xs font-mono rounded shadow-xl backdrop-blur max-w-sm ${theme.colors.background} border ${theme.colors.border}`}>
+      <h3 className={`text-white font-bold mb-2 border-b pb-1 ${theme.colors.border}`}>Sync Diagnostics</h3>
 
-      <div className="grid grid-cols-2 gap-x-4 gap-y-1 text-gray-300">
+      <div className={`grid grid-cols-2 gap-x-4 gap-y-1 ${theme.colors.text.secondary}`}>
         <div>Status:</div>
         <div className={isConnected ? "text-green-400 font-bold" : "text-red-400"}>
           {isConnected ? "CONNECTED" : "DISCONNECTED"}
         </div>
 
         <div>Waiting:</div>
-        <div className={isWaiting ? "text-yellow-400" : "text-gray-500"}>
+        <div className={isWaiting ? "text-yellow-400" : theme.colors.text.muted}>
           {isWaiting ? "YES" : "NO"}
         </div>
 
@@ -67,21 +69,21 @@ export function SphereDebugOverlay({
       </div>
 
       {/* Recent Message Log */}
-      <div className="mt-3 pt-2 border-t border-gray-700">
-        <div className="text-gray-500 mb-1 flex justify-between items-center">
+      <div className={`mt-3 pt-2 border-t ${theme.colors.border}`}>
+        <div className={`mb-1 flex justify-between items-center ${theme.colors.text.muted}`}>
           <span>Recent Messages:</span>
           <span className="text-[10px]">{debugLog.length} events</span>
         </div>
         <div className="max-h-24 overflow-y-auto mb-2 space-y-1">
           {debugLog.length === 0 ? (
-            <div className="text-gray-600 italic">No messages received yet</div>
+            <div className={`italic ${theme.colors.text.muted}`}>No messages received yet</div>
           ) : (
             debugLog.map((log, i) => (
               <div
                 key={i}
                 className="text-[10px] text-cyan-300/80 border-l-2 border-cyan-500/30 pl-1"
               >
-                <span className="text-gray-500">
+                <span className={theme.colors.text.muted}>
                   {new Date(log.timestamp).toLocaleTimeString().split(" ")[0]}
                 </span>
                 <span className="mx-1">-</span>
@@ -96,7 +98,7 @@ export function SphereDebugOverlay({
           )}
         </div>
 
-        <div className="mt-2 pt-2 border-t border-gray-700">
+        <div className={`mt-2 pt-2 border-t ${theme.colors.border}`}>
           <RawStorageMonitor />
         </div>
       </div>
@@ -111,6 +113,7 @@ interface StorageData {
 }
 
 function RawStorageMonitor() {
+  const theme = useAdminTheme();
   const [data, setData] = useState<{ raw: string; parsed: StorageData | null }>({
     raw: "Reading...",
     parsed: null,
@@ -154,7 +157,7 @@ function RawStorageMonitor() {
   return (
     <div className="space-y-2">
       <div className="text-[10px]">
-        <span className="text-gray-500">Local Storage:</span>
+        <span className={theme.colors.text.muted}>Local Storage:</span>
         {data.parsed ? (
           <div className="text-green-400 mt-1">
             <div>
@@ -164,7 +167,7 @@ function RawStorageMonitor() {
                 : "No VAC"}
             </div>
             <div>Age: {age}s ago</div>
-            <div className="text-gray-500 text-[9px] truncate">{data.raw.substring(0, 40)}...</div>
+            <div className={`text-[9px] truncate ${theme.colors.text.muted}`}>{data.raw.substring(0, 40)}...</div>
           </div>
         ) : (
           <div className="text-red-400 mt-1 font-bold">{data.raw}</div>
@@ -175,7 +178,7 @@ function RawStorageMonitor() {
       </div>
       <button
         onClick={checkStorage}
-        className="w-full py-1 bg-gray-800 hover:bg-gray-700 border border-gray-600 rounded text-[10px] text-white transition-colors"
+        className={`w-full py-1 border rounded text-[10px] text-white transition-colors ${theme.colors.background} ${theme.colors.hover} ${theme.colors.border}`}
       >
         Force Refresh Storage
       </button>

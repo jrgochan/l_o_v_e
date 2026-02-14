@@ -5,8 +5,10 @@ import { visualizationService } from "@/services/visualizationService";
 import { EmotionCollection } from "@/types";
 import { useVisualizationStore } from "@/stores/useVisualizationStore";
 import { reloadPage } from "@/utils/browser";
+import { useAdminTheme } from "@/hooks/admin/useAdminTheme";
 
 export function CollectionSwitcher() {
+  const theme = useAdminTheme();
   const [loading, setLoading] = useState(false);
   const [activating, setActivating] = useState<string | null>(null);
 
@@ -50,14 +52,14 @@ export function CollectionSwitcher() {
   };
 
   if (loading && collections.length === 0) {
-    return <div className="p-4 text-gray-400">Loading datasets...</div>;
+    return <div className={`p-4 ${theme.colors.text.muted}`}>Loading datasets...</div>;
   }
 
   return (
     <div className="space-y-6">
       <div>
-        <h3 className="text-lg font-medium text-white mb-2">Emotion Dataset</h3>
-        <p className="text-gray-400 text-sm mb-4">
+        <h3 className={`text-lg font-medium mb-2 ${theme.colors.text.primary}`}>Emotion Dataset</h3>
+        <p className={`text-sm mb-4 ${theme.colors.text.muted}`}>
           Select the active emotion dataset for the entire L.O.V.E. stack. Changing this will reload
           the application.
         </p>
@@ -74,30 +76,30 @@ export function CollectionSwitcher() {
               ${
                 collection.is_default
                   ? "bg-purple-900/20 border-purple-500 shadow-lg shadow-purple-900/20"
-                  : "bg-gray-800 border-gray-700 hover:border-gray-600"
+                  : `${theme.colors.background} ${theme.colors.border} ${theme.colors.hover}`
               }
             `}
             >
               <div className="flex-1">
                 <div className="flex items-center gap-3 mb-1">
-                  <h4 className="text-base font-semibold text-white">{collection.name}</h4>
+                  <h4 className={`text-base font-semibold ${theme.colors.text.primary}`}>{collection.name}</h4>
                   {collection.is_default && (
                     <span className="px-2 py-0.5 text-xs font-medium bg-purple-500/20 text-purple-300 rounded-full border border-purple-500/30">
                       Active
                     </span>
                   )}
                 </div>
-                <p className="text-sm text-gray-400">
+                <p className={`text-sm ${theme.colors.text.muted}`}>
                   {collection.description || "No description provided."}
                 </p>
-                <div className="mt-2 text-xs text-gray-500 font-mono">ID: {collection.id}</div>
+                <div className={`mt-2 text-xs font-mono ${theme.colors.text.muted}`}>ID: {collection.id}</div>
               </div>
 
               <div className="ml-4">
                 {collection.is_default ? (
                   <button
                     disabled
-                    className="px-4 py-2 bg-gray-700 text-gray-400 text-sm font-medium rounded cursor-not-allowed opacity-50"
+                    className={`px-4 py-2 text-sm font-medium rounded cursor-not-allowed opacity-50 ${theme.colors.background} ${theme.colors.text.muted}`}
                   >
                     Selected
                   </button>
@@ -109,7 +111,7 @@ export function CollectionSwitcher() {
                     px-4 py-2 text-sm font-medium rounded text-white transition-all
                     ${
                       activating === collection.id
-                        ? "bg-gray-600 cursor-wait"
+                        ? `${theme.colors.background} cursor-wait`
                         : "bg-purple-600 hover:bg-purple-500 shadow hover:shadow-purple-500/25"
                     }
                   `}
@@ -127,7 +129,7 @@ export function CollectionSwitcher() {
           <span className="text-xl">💡</span>
           <div>
             <h4 className="text-sm font-semibold text-blue-200">Did you know?</h4>
-            <p className="text-sm text-gray-300 mt-1">
+            <p className={`text-sm mt-1 ${theme.colors.text.secondary}`}>
               Different datasets create completely different &apos;Soul Spheres&apos;. Atlas of the
               Heart has 87 emotions, while GoEmotions has 28 with different vector embeddings.
             </p>

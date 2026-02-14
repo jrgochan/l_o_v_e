@@ -26,6 +26,7 @@ import { BaseEmotionChip } from "./BaseEmotionChip";
 import { PreviewSphere } from "../spheres/PreviewSphere";
 import type { Emotion } from "@/types/visualization";
 import { resolveEmotionColor } from "@/utils/emotion-colors";
+import { useAdminTheme } from "@/hooks/admin/useAdminTheme";
 
 interface EmotionCardProps {
   emotion: Emotion;
@@ -49,6 +50,7 @@ export function EmotionCard({
   onClick,
   className = "",
 }: EmotionCardProps) {
+  const theme = useAdminTheme();
   const categoryColor = resolveEmotionColor(emotion);
   const isBridge = [
     "Vulnerability",
@@ -62,8 +64,8 @@ export function EmotionCard({
   return (
     <div
       className={`
-        bg-gray-800 rounded-lg p-4 border border-gray-700
-        ${onClick ? "cursor-pointer hover:bg-gray-750 hover:border-gray-600" : ""}
+        rounded-lg p-4 border ${theme.colors.background} ${theme.colors.border}
+        ${onClick ? `cursor-pointer ${theme.colors.hover} hover:border-opacity-80` : ""}
         transition-all duration-200
         ${className}
       `}
@@ -99,11 +101,11 @@ export function EmotionCard({
           {/* Confidence */}
           {confidence !== undefined && (
             <div className="mb-3">
-              <div className="flex items-center justify-between text-xs text-gray-400 mb-1">
+              <div className={`flex items-center justify-between text-xs mb-1 ${theme.colors.text.muted}`}>
                 <span>Confidence</span>
                 <span className="font-mono text-white">{(confidence * 100).toFixed(0)}%</span>
               </div>
-              <div className="w-full bg-gray-700 rounded-full h-2">
+              <div className={`w-full rounded-full h-2 ${theme.colors.background}`}>
                 <div
                   className="h-2 rounded-full transition-all"
                   style={{
@@ -118,15 +120,15 @@ export function EmotionCard({
           {/* VAC Coordinates */}
           {showVAC && (
             <div className="space-y-1 text-sm mb-3">
-              <div className="flex justify-between text-gray-400">
+              <div className={`flex justify-between ${theme.colors.text.muted}`}>
                 <span>Valence:</span>
                 <span className="text-white font-mono">{emotion.vac[0].toFixed(2)}</span>
               </div>
-              <div className="flex justify-between text-gray-400">
+              <div className={`flex justify-between ${theme.colors.text.muted}`}>
                 <span>Arousal:</span>
                 <span className="text-white font-mono">{emotion.vac[1].toFixed(2)}</span>
               </div>
-              <div className="flex justify-between text-gray-400">
+              <div className={`flex justify-between ${theme.colors.text.muted}`}>
                 <span>Connection:</span>
                 <span className="text-white font-mono">{emotion.vac[2].toFixed(2)}</span>
               </div>
@@ -135,8 +137,8 @@ export function EmotionCard({
 
           {/* Definition */}
           {showDefinition && emotion.definition && (
-            <div className="mt-3 pt-3 border-t border-gray-700">
-              <p className="text-sm text-gray-300 leading-relaxed">{emotion.definition}</p>
+            <div className={`mt-3 pt-3 border-t ${theme.colors.border}`}>
+              <p className={`text-sm leading-relaxed ${theme.colors.text.secondary}`}>{emotion.definition}</p>
             </div>
           )}
         </div>

@@ -7,8 +7,10 @@ import {
 } from "../../../types/admin";
 import { adminApi } from "../../../utils/api";
 import { Edit, Plus, Save, Play, Check, X, AlertCircle } from "lucide-react";
+import { useAdminTheme } from "@/hooks/admin/useAdminTheme";
 
 export function PromptTemplatesTab() {
+  const theme = useAdminTheme();
   const [prompts, setPrompts] = useState<PromptTemplate[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -137,14 +139,14 @@ export function PromptTemplatesTab() {
 
   if (isEditing) {
     return (
-      <div className="bg-gray-900/50 border border-gray-800 rounded-lg p-6">
+      <div className={`rounded-lg p-6 ${theme.colors.background} border ${theme.colors.border}`}>
         <div className="flex justify-between items-center mb-6">
-          <h2 className="text-xl font-semibold text-white">
+          <h2 className={`text-xl font-semibold ${theme.colors.text.primary}`}>
             {currentPrompt.id ? "Edit Prompt Template" : "New Prompt Template"}
           </h2>
           <button
             onClick={() => setIsEditing(false)}
-            className="text-gray-400 hover:text-white"
+            className={`${theme.colors.text.muted} hover:${theme.colors.text.primary}`}
             aria-label="Close Editor"
           >
             <X className="w-5 h-5" />
@@ -159,7 +161,7 @@ export function PromptTemplatesTab() {
             </div>
           )}
           <div>
-            <label htmlFor="func-select" className="block text-sm font-medium text-gray-400 mb-1">
+            <label htmlFor="func-select" className={`block text-sm font-medium mb-1 ${theme.colors.text.muted}`}>
               Function
             </label>
             <select
@@ -169,7 +171,7 @@ export function PromptTemplatesTab() {
                 setCurrentPrompt({ ...currentPrompt, function_name: e.target.value })
               }
               disabled={!!currentPrompt.id}
-              className="w-full bg-gray-800 border border-gray-700 rounded px-3 py-2 text-white"
+              className={`w-full rounded px-3 py-2 ${theme.colors.background} border ${theme.colors.border} ${theme.colors.text.primary}`}
             >
               {functions.map((f) => (
                 <option key={f} value={f}>
@@ -179,7 +181,7 @@ export function PromptTemplatesTab() {
             </select>
           </div>
           <div>
-            <label htmlFor="version-input" className="block text-sm font-medium text-gray-400 mb-1">
+            <label htmlFor="version-input" className={`block text-sm font-medium mb-1 ${theme.colors.text.muted}`}>
               Version
             </label>
             <input
@@ -188,13 +190,13 @@ export function PromptTemplatesTab() {
               value={currentPrompt.version}
               onChange={(e) => setCurrentPrompt({ ...currentPrompt, version: e.target.value })}
               disabled={!!currentPrompt.id}
-              className="w-full bg-gray-800 border border-gray-700 rounded px-3 py-2 text-white"
+              className={`w-full rounded px-3 py-2 ${theme.colors.background} border ${theme.colors.border} ${theme.colors.text.primary}`}
             />
           </div>
         </div>
 
         <div className="mb-6">
-          <label htmlFor="desc-input" className="block text-sm font-medium text-gray-400 mb-1">
+          <label htmlFor="desc-input" className={`block text-sm font-medium mb-1 ${theme.colors.text.muted}`}>
             Description
           </label>
           <input
@@ -202,14 +204,14 @@ export function PromptTemplatesTab() {
             type="text"
             value={currentPrompt.description || ""}
             onChange={(e) => setCurrentPrompt({ ...currentPrompt, description: e.target.value })}
-            className="w-full bg-gray-800 border border-gray-700 rounded px-3 py-2 text-white"
+            className={`w-full rounded px-3 py-2 ${theme.colors.background} border ${theme.colors.border} ${theme.colors.text.primary}`}
           />
         </div>
 
         <div className="mb-6">
-          <label htmlFor="content-input" className="block text-sm font-medium text-gray-400 mb-1">
+          <label htmlFor="content-input" className={`block text-sm font-medium mb-1 ${theme.colors.text.muted}`}>
             Template Content
-            <span className="ml-2 text-xs text-gray-500">(Use {"{variable}"} syntax)</span>
+            <span className={`ml-2 text-xs ${theme.colors.text.muted}`}>(Use {"{variable}"} syntax)</span>
           </label>
           <textarea
             id="content-input"
@@ -217,12 +219,12 @@ export function PromptTemplatesTab() {
             onChange={(e) =>
               setCurrentPrompt({ ...currentPrompt, template_content: e.target.value })
             }
-            className="w-full h-96 bg-gray-800 border border-gray-700 rounded px-3 py-2 text-white font-mono text-sm"
+            className={`w-full h-96 rounded px-3 py-2 font-mono text-sm ${theme.colors.background} border ${theme.colors.border} ${theme.colors.text.primary}`}
           />
         </div>
 
         <div className="mb-6">
-          <label htmlFor="vars-input" className="block text-sm font-medium text-gray-400 mb-1">
+          <label htmlFor="vars-input" className={`block text-sm font-medium mb-1 ${theme.colors.text.muted}`}>
             Input Variables (comma separated)
           </label>
           <input
@@ -238,7 +240,7 @@ export function PromptTemplatesTab() {
                   .filter(Boolean),
               })
             }
-            className="w-full bg-gray-800 border border-gray-700 rounded px-3 py-2 text-white"
+            className={`w-full rounded px-3 py-2 ${theme.colors.background} border ${theme.colors.border} ${theme.colors.text.primary}`}
           />
         </div>
 
@@ -248,19 +250,19 @@ export function PromptTemplatesTab() {
               type="checkbox"
               checked={currentPrompt.is_active}
               onChange={(e) => setCurrentPrompt({ ...currentPrompt, is_active: e.target.checked })}
-              className="rounded bg-gray-800 border-gray-700 text-purple-500"
+              className={`rounded border-gray-700 text-purple-500 ${theme.colors.background}`}
             />
-            <span className="text-gray-300">Set as Active Version</span>
+            <span className={theme.colors.text.secondary}>Set as Active Version</span>
           </label>
         </div>
 
         {/* Test Section */}
-        <div className="border-t border-gray-800 pt-6 mb-6">
+        <div className={`border-t pt-6 mb-6 ${theme.colors.border}`}>
           <div className="flex items-center gap-2 mb-4">
             <button
               onClick={handleTest}
               disabled={testing}
-              className="px-3 py-1.5 bg-gray-700 text-white rounded text-sm hover:bg-gray-600 flex items-center gap-2"
+              className={`px-3 py-1.5 rounded text-sm flex items-center gap-2 ${theme.colors.background} ${theme.colors.hover} ${theme.colors.text.primary}`}
               aria-label="Test Render"
             >
               <Play className="w-4 h-4" />
@@ -268,7 +270,7 @@ export function PromptTemplatesTab() {
             </button>
           </div>
           {testResult && (
-            <div className="bg-black/30 p-4 rounded border border-gray-800 font-mono text-xs text-gray-300 whitespace-pre-wrap">
+            <div className={`p-4 rounded font-mono text-xs whitespace-pre-wrap ${theme.colors.background} border ${theme.colors.border} ${theme.colors.text.secondary}`}>
               {testResult}
             </div>
           )}
@@ -277,7 +279,7 @@ export function PromptTemplatesTab() {
         <div className="flex justify-end gap-3">
           <button
             onClick={() => setIsEditing(false)}
-            className="px-4 py-2 text-gray-400 hover:text-white"
+            className={`px-4 py-2 ${theme.colors.text.muted} hover:${theme.colors.text.primary}`}
             aria-label="Cancel"
           >
             Cancel
@@ -300,11 +302,11 @@ export function PromptTemplatesTab() {
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <div className="flex items-center gap-4">
-          <h2 className="text-lg font-medium text-white">Prompt Library</h2>
+          <h2 className={`text-lg font-medium ${theme.colors.text.primary}`}>Prompt Library</h2>
           <select
             value={selectedFunction}
             onChange={(e) => setSelectedFunction(e.target.value)}
-            className="bg-gray-900 border border-gray-700 rounded px-3 py-1.5 text-sm text-white"
+            className={`rounded px-3 py-1.5 text-sm ${theme.colors.background} border ${theme.colors.border} ${theme.colors.text.primary}`}
             aria-label="Filter by Function"
           >
             <option value="all">All Functions</option>
@@ -336,15 +338,15 @@ export function PromptTemplatesTab() {
         {prompts.map((prompt) => (
           <div
             key={prompt.id}
-            className={`bg-gray-900/50 border rounded-lg p-4 transition-colors ${
-              prompt.is_active ? "border-purple-500/50" : "border-gray-800 hover:border-gray-700"
+            className={`rounded-lg p-4 transition-colors border ${theme.colors.background} ${
+              prompt.is_active ? "border-purple-500/50" : `${theme.colors.border} ${theme.colors.hover}`
             }`}
           >
             <div className="flex justify-between items-start">
               <div>
                 <div className="flex items-center gap-2 mb-1">
-                  <h3 className="font-medium text-white">{prompt.function_name}</h3>
-                  <span className="px-2 py-0.5 bg-gray-800 rounded text-xs text-gray-400">
+                  <h3 className={`font-medium ${theme.colors.text.primary}`}>{prompt.function_name}</h3>
+                  <span className={`px-2 py-0.5 rounded text-xs ${theme.colors.background} ${theme.colors.text.muted}`}>
                     v{prompt.version}
                   </span>
                   {prompt.is_active && (
@@ -353,17 +355,17 @@ export function PromptTemplatesTab() {
                     </span>
                   )}
                 </div>
-                <p className="text-sm text-gray-500 mb-2">
+                <p className={`text-sm mb-2 ${theme.colors.text.muted}`}>
                   {prompt.description || "No description"}
                 </p>
-                <div className="text-xs text-gray-600 font-mono">
+                <div className={`text-xs font-mono ${theme.colors.text.muted}`}>
                   Variables: {(prompt.input_variables || []).join(", ")}
                 </div>
               </div>
               <div className="flex gap-2">
                 <button
                   onClick={() => handleEdit(prompt)}
-                  className="p-2 text-gray-400 hover:text-white hover:bg-gray-800 rounded"
+                  className={`p-2 ${theme.colors.text.muted} hover:${theme.colors.text.primary} ${theme.colors.hover} rounded`}
                   aria-label={`Edit ${prompt.function_name}`}
                   data-testid={`edit-btn-${prompt.id}`}
                 >
@@ -375,7 +377,7 @@ export function PromptTemplatesTab() {
         ))}
 
         {prompts.length === 0 && !loading && (
-          <div className="text-center py-12 text-gray-500 bg-gray-900/30 rounded-lg border border-gray-800 border-dashed">
+          <div className={`text-center py-12 rounded-lg border border-dashed ${theme.colors.text.muted} ${theme.colors.background} ${theme.colors.border}`}>
             No templates found. Create one to get started.
           </div>
         )}

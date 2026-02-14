@@ -7,13 +7,14 @@
  * - Clickable waypoints for details
  * - Bridge emotion requirements with explanations
  *
- * Uses store actions for hover management.
+ * Mode-reactive via useAdminTheme.
  */
 
 "use client";
 
 import { useVisualizationStore } from "@/stores/useVisualizationStore";
 import { BRIDGE_EMOTIONS, DIFFICULTY_COLORS } from "@/types/visualization";
+import { useAdminTheme } from "@/hooks/admin/useAdminTheme";
 import type { EmotionPath, PathWaypoint } from "@/types/visualization";
 import { Info } from "lucide-react";
 
@@ -26,14 +27,15 @@ interface PathDetailsProps {
 export function PathDetails({ path, onWaypointClick, onShowDetails }: PathDetailsProps) {
   const setHoveredEmotion = useVisualizationStore((state) => state.setHoveredEmotion);
   const allEmotions = useVisualizationStore((state) => state.allEmotions);
+  const theme = useAdminTheme();
 
   return (
     <section>
-      <h2 className="text-sm font-semibold text-gray-400 mb-3">Path Details</h2>
-      <div className="bg-gray-800 rounded-lg p-4 space-y-3">
+      <h2 className={`text-sm font-semibold mb-3 ${theme.colors.text.secondary}`}>Path Details</h2>
+      <div className={`${theme.layout.borderRadius} p-4 space-y-3 bg-black/20 border ${theme.colors.border} transition-colors duration-500`}>
         {/* Path Header */}
         <div className="flex justify-between items-start">
-          <h3 className="text-sm font-bold text-white">
+          <h3 className={`text-sm font-bold ${theme.colors.text.primary}`}>
             {path.from.name} → {path.to.name}
           </h3>
           <div className="flex gap-2">
@@ -43,7 +45,7 @@ export function PathDetails({ path, onWaypointClick, onShowDetails }: PathDetail
                   .getState()
                   .setIsFlying(!useVisualizationStore.getState().isFlying)
               }
-              className="px-2 py-1 bg-cyan-900/50 hover:bg-cyan-800 text-cyan-200 text-xs rounded border border-cyan-700/50 flex items-center gap-1 transition"
+              className={`px-2 py-1 text-xs ${theme.layout.borderRadius} border transition-colors ${theme.effects.glass} ${theme.colors.primary} ${theme.colors.hover}`}
               title="Play Cinematic Journey"
             >
               <span>▶ Play</span>
@@ -52,7 +54,7 @@ export function PathDetails({ path, onWaypointClick, onShowDetails }: PathDetail
               <button
                 onClick={onShowDetails}
                 disabled={path.waypoints.length === 0}
-                className="px-2 py-1 bg-gray-700/50 hover:bg-gray-600 text-gray-200 text-xs rounded border border-gray-600/50 flex items-center gap-1 transition disabled:opacity-30 disabled:cursor-not-allowed"
+                className={`px-2 py-1 text-xs ${theme.layout.borderRadius} border transition-colors bg-black/20 ${theme.colors.border} ${theme.colors.text.secondary} ${theme.colors.hover} flex items-center gap-1 disabled:opacity-30 disabled:cursor-not-allowed`}
                 title="View Journey Details"
               >
                 <Info size={12} />
@@ -65,18 +67,18 @@ export function PathDetails({ path, onWaypointClick, onShowDetails }: PathDetail
         {/* Path Metrics */}
         <div className="grid grid-cols-2 gap-3">
           <div>
-            <h4 className="text-xs text-gray-400">Distance</h4>
-            <p className="text-sm text-white font-mono">{path.total_distance.toFixed(2)}</p>
+            <h4 className={`text-xs ${theme.colors.text.muted}`}>Distance</h4>
+            <p className={`text-sm font-mono ${theme.colors.text.primary}`}>{path.total_distance.toFixed(2)}</p>
           </div>
           <div>
-            <h4 className="text-xs text-gray-400">Time</h4>
-            <p className="text-sm text-white">{path.estimated_time}</p>
+            <h4 className={`text-xs ${theme.colors.text.muted}`}>Time</h4>
+            <p className={`text-sm ${theme.colors.text.primary}`}>{path.estimated_time}</p>
           </div>
         </div>
 
         {/* Difficulty */}
         <div>
-          <h4 className="text-xs text-gray-400">Difficulty</h4>
+          <h4 className={`text-xs ${theme.colors.text.muted}`}>Difficulty</h4>
           <div className="flex items-center gap-2">
             <div
               className="w-3 h-3 rounded"
@@ -85,32 +87,32 @@ export function PathDetails({ path, onWaypointClick, onShowDetails }: PathDetail
                   DIFFICULTY_COLORS[path.difficulty as keyof typeof DIFFICULTY_COLORS] || "#888888",
               }}
             />
-            <span className="text-sm text-white capitalize">{path.difficulty}</span>
+            <span className={`text-sm capitalize ${theme.colors.text.primary}`}>{path.difficulty}</span>
           </div>
         </div>
 
         {/* Journey Path */}
         {path.waypoints.length > 0 && (
           <div>
-            <h4 className="text-xs font-semibold text-gray-400 mb-2">
+            <h4 className={`text-xs font-semibold mb-2 ${theme.colors.text.secondary}`}>
               Journey Path ({path.waypoints.length + 2} steps)
             </h4>
             <div className="space-y-2">
               {/* Start */}
               <div
-                className="bg-blue-900/20 border border-blue-500/30 rounded p-2 cursor-pointer hover:bg-blue-900/30 transition"
+                className={`bg-black/20 border ${theme.colors.border} ${theme.layout.borderRadius} p-2 cursor-pointer ${theme.colors.hover} transition`}
                 onMouseEnter={() => setHoveredEmotion(path.from.id)}
                 onMouseLeave={() => setHoveredEmotion(null)}
               >
                 <div className="flex items-center gap-2">
-                  <span className="text-blue-400 font-bold">1.</span>
-                  <span className="text-white font-medium">
+                  <span className={`font-bold ${theme.colors.secondary}`}>1.</span>
+                  <span className={`font-medium ${theme.colors.text.primary}`}>
                     {path.from.name}
                     {(BRIDGE_EMOTIONS as readonly string[]).includes(path.from.name) && (
                       <span className="text-yellow-400 ml-1">★</span>
                     )}
                   </span>
-                  <span className="text-xs text-blue-400">(Start)</span>
+                  <span className={`text-xs ${theme.colors.secondary}`}>(Start)</span>
                 </div>
               </div>
 
@@ -123,31 +125,31 @@ export function PathDetails({ path, onWaypointClick, onShowDetails }: PathDetail
                     onClick={() => onWaypointClick(wp, i)}
                     onMouseEnter={() => wpEmotion && setHoveredEmotion(wpEmotion.id)}
                     onMouseLeave={() => setHoveredEmotion(null)}
-                    className="w-full bg-gray-700/50 border border-gray-600 hover:border-cyan-500 hover:bg-gray-700 rounded p-2 text-left transition cursor-pointer"
+                    className={`w-full bg-black/20 border ${theme.colors.border} ${theme.colors.hover} ${theme.layout.borderRadius} p-2 text-left transition cursor-pointer`}
                   >
                     <div className="flex items-center justify-between mb-1">
                       <div className="flex items-center gap-2">
-                        <span className="text-cyan-400 font-bold">{i + 2}.</span>
-                        <span className="text-white font-medium">
+                        <span className={`font-bold ${theme.colors.primary}`}>{i + 2}.</span>
+                        <span className={`font-medium ${theme.colors.text.primary}`}>
                           {wp.emotion}
                           {(BRIDGE_EMOTIONS as readonly string[]).includes(wp.emotion) && (
                             <span className="text-yellow-400 ml-1">★</span>
                           )}
                         </span>
                       </div>
-                      <span className="text-xs text-cyan-400">Click for details →</span>
+                      <span className={`text-xs ${theme.colors.primary}`}>Click for details →</span>
                     </div>
                     {wp.reasoning && (
-                      <div className="text-xs text-gray-300 ml-5 mt-1">💡 {wp.reasoning}</div>
+                      <div className={`text-xs ml-5 mt-1 ${theme.colors.text.secondary}`}>💡 {wp.reasoning}</div>
                     )}
                     {wp.estimated_time && (
-                      <div className="text-xs text-gray-400 ml-5 mt-1">
+                      <div className={`text-xs ml-5 mt-1 ${theme.colors.text.muted}`}>
                         ⏱️ {wp.estimated_time} • {wp.difficulty}
                       </div>
                     )}
                     {wp.strategies && wp.strategies.length > 0 && (
-                      <div className="text-xs text-gray-300 ml-5 mt-1">
-                        <div className="font-semibold text-gray-400">
+                      <div className={`text-xs ml-5 mt-1 ${theme.colors.text.secondary}`}>
+                        <div className={`font-semibold ${theme.colors.text.muted}`}>
                           Strategies ({wp.strategies.length}):
                         </div>
                         <ul className="list-disc list-inside mt-1">
@@ -155,7 +157,7 @@ export function PathDetails({ path, onWaypointClick, onShowDetails }: PathDetail
                             <li key={si}>{strategy.name}</li>
                           ))}
                           {wp.strategies.length > 2 && (
-                            <li className="text-cyan-400">+{wp.strategies.length - 2} more...</li>
+                            <li className={theme.colors.primary}>+{wp.strategies.length - 2} more...</li>
                           )}
                         </ul>
                       </div>
@@ -166,13 +168,13 @@ export function PathDetails({ path, onWaypointClick, onShowDetails }: PathDetail
 
               {/* Goal */}
               <div
-                className="bg-green-900/20 border border-green-500/30 rounded p-2 cursor-pointer hover:bg-green-900/30 transition"
+                className={`bg-black/20 border ${theme.colors.border} ${theme.layout.borderRadius} p-2 cursor-pointer ${theme.colors.hover} transition`}
                 onMouseEnter={() => setHoveredEmotion(path.to.id)}
                 onMouseLeave={() => setHoveredEmotion(null)}
               >
                 <div className="flex items-center gap-2">
                   <span className="text-green-400 font-bold">{path.waypoints.length + 2}.</span>
-                  <span className="text-white font-medium">
+                  <span className={`font-medium ${theme.colors.text.primary}`}>
                     {path.to.name}
                     {(BRIDGE_EMOTIONS as readonly string[]).includes(path.to.name) && (
                       <span className="text-yellow-400 ml-1">★</span>
@@ -187,15 +189,15 @@ export function PathDetails({ path, onWaypointClick, onShowDetails }: PathDetail
 
         {/* Bridge Requirement */}
         {path.requires_bridge && path.bridge_emotions && (
-          <div className="bg-yellow-900/30 border-2 border-yellow-500/50 rounded-lg p-3">
+          <div className={`bg-yellow-900/30 border-2 border-yellow-500/50 ${theme.layout.borderRadius} p-3`}>
             <div className="flex items-center gap-2 mb-2">
               <span className="text-yellow-400 text-lg">★</span>
               <h4 className="text-sm font-bold text-yellow-300">Bridge Emotions Required</h4>
             </div>
-            <p className="text-sm text-gray-200 mb-2">
+            <p className={`text-sm mb-2 ${theme.colors.text.secondary}`}>
               <strong>{path.bridge_emotions.join(", ")}</strong>
             </p>
-            <p className="text-xs text-gray-300 leading-relaxed">
+            <p className={`text-xs leading-relaxed ${theme.colors.text.secondary}`}>
               This transition requires a bridge emotion - a psychologically necessary intermediate
               state that enables an otherwise impossible emotional shift.
               {path.bridge_emotions.includes("Vulnerability") &&

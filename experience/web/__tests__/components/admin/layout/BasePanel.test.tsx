@@ -37,8 +37,8 @@ describe("BasePanel", () => {
         <div>Content</div>
       </BasePanel>
     );
-    // Primary variant has specific classes like bg-cyan-900/30
-    expect(container.firstChild).toHaveClass("bg-cyan-900/30");
+    // Primary variant has specific classes like bg-black/20 with themed border
+    expect(container.firstChild).toHaveClass("bg-black/20");
   });
 });
 

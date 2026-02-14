@@ -14,6 +14,8 @@
 
 "use client";
 
+import { useAdminTheme } from "@/hooks/admin/useAdminTheme";
+
 interface BasePanelProps {
   title?: string;
   subtitle?: string;
@@ -36,20 +38,22 @@ export function BasePanel({
   className = "",
   variant = "default",
 }: BasePanelProps) {
+  const theme = useAdminTheme();
+
   const variantClasses = {
-    default: "bg-gray-800 border-gray-700",
-    primary: "bg-cyan-900/30 border-cyan-500/30",
-    secondary: "bg-purple-900/30 border-purple-500/30",
+    default: `bg-black/20 ${theme.colors.border}`,
+    primary: `bg-black/20 ${theme.colors.primary.replace('text-', 'border-')}`,
+    secondary: `bg-purple-900/30 border-purple-500/30`,
   };
 
   return (
-    <div className={`rounded-lg border ${variantClasses[variant]} ${className}`}>
+    <div className={`${theme.layout.borderRadius} border transition-colors duration-500 ${variantClasses[variant]} ${className}`}>
       {/* Header */}
       {(title || actions) && (
-        <div className="px-4 py-3 border-b border-gray-700 flex items-center justify-between">
+        <div className={`px-4 py-3 border-b ${theme.colors.border} flex items-center justify-between`}>
           <div>
-            {title && <h3 className="text-lg font-semibold text-white">{title}</h3>}
-            {subtitle && <p className="text-sm text-gray-400 mt-0.5">{subtitle}</p>}
+            {title && <h3 className={`text-lg font-semibold ${theme.colors.text.primary}`}>{title}</h3>}
+            {subtitle && <p className={`text-sm mt-0.5 ${theme.colors.text.secondary}`}>{subtitle}</p>}
           </div>
           {actions && <div className="flex items-center gap-2">{actions}</div>}
         </div>
@@ -59,7 +63,7 @@ export function BasePanel({
       <div className="p-4">{children}</div>
 
       {/* Footer */}
-      {footer && <div className="px-4 py-3 border-t border-gray-700 bg-gray-900/50">{footer}</div>}
+      {footer && <div className={`px-4 py-3 border-t ${theme.colors.border} bg-black/30`}>{footer}</div>}
     </div>
   );
 }
@@ -80,17 +84,18 @@ export function PanelSection({
   children: React.ReactNode;
   className?: string;
 }) {
+  const theme = useAdminTheme();
   const [isOpen, setIsOpen] = React.useState(defaultOpen);
 
   return (
     <div className={`space-y-2 ${className}`}>
       {title && (
         <div className="flex items-center justify-between">
-          <h4 className="text-sm font-semibold text-gray-400 uppercase tracking-wide">{title}</h4>
+          <h4 className={`text-sm font-semibold uppercase tracking-wide ${theme.colors.text.secondary}`}>{title}</h4>
           {collapsible && (
             <button
               onClick={() => setIsOpen(!isOpen)}
-              className="text-gray-400 hover:text-white transition text-sm"
+              className={`${theme.colors.text.secondary} hover:${theme.colors.text.primary} transition text-sm`}
             >
               {isOpen ? "▼" : "▶"}
             </button>

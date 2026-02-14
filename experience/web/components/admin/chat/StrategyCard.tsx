@@ -1,4 +1,5 @@
 import { StrategyRecommendation } from "@/types/chat";
+import { useAdminTheme } from "@/hooks/admin/useAdminTheme";
 
 interface StrategyCardProps {
   strategies: StrategyRecommendation[];
@@ -6,6 +7,7 @@ interface StrategyCardProps {
 }
 
 export function StrategyCard({ strategies, onSelect }: StrategyCardProps) {
+  const theme = useAdminTheme();
   if (!strategies || strategies.length === 0) return null;
 
   return (
@@ -25,7 +27,7 @@ export function StrategyCard({ strategies, onSelect }: StrategyCardProps) {
             </span>
           </div>
 
-          <p className="text-gray-400 text-sm mb-4">&quot;{strategy.description}&quot;</p>
+          <p className={`text-sm mb-4 ${theme.colors.text.muted}`}>&quot;{strategy.description}&quot;</p>
 
           <div className="text-xs text-amber-400/60 italic border-t border-amber-500/10 pt-2 mt-1">
             &quot;{strategy.rationale}&quot;

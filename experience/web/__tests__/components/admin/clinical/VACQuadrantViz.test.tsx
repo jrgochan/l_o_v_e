@@ -54,6 +54,6 @@ describe("VACQuadrantViz", () => {
 
     // Neutral connection
     rerender(<VACQuadrantViz vac={{ valence: 0, arousal: 0, connection: 0.2 }} />);
-    expect(screen.getByText("0.20")).toHaveClass("text-gray-300");
+    expect(screen.getByText("0.20")).toHaveClass("text-gray-400");
   });
 });

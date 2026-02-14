@@ -7,12 +7,14 @@
 "use client";
 
 import type { VAC } from "@/types/chat";
+import { useAdminTheme } from "@/hooks/admin/useAdminTheme";
 
 interface VACQuadrantVizProps {
   vac: VAC;
 }
 
 export function VACQuadrantViz({ vac }: VACQuadrantVizProps) {
+  const theme = useAdminTheme();
   // Normalize VAC values from [-1, 1] to [0, 100] for positioning
   const normalizeToPercent = (value: number) => ((value + 1) / 2) * 100;
 
@@ -35,11 +37,11 @@ export function VACQuadrantViz({ vac }: VACQuadrantVizProps) {
   const quadrant = getQuadrant();
 
   return (
-    <div className="bg-gray-700/50 rounded-lg p-4 border border-purple-500/30">
+    <div className={`rounded-lg p-4 border border-purple-500/30 ${theme.colors.background}`}>
       <div className="text-sm text-purple-300 mb-2 font-semibold">VAC Analysis</div>
 
       {/* 2D Plot */}
-      <div className="relative w-full aspect-square bg-gray-800 rounded border border-gray-600">
+      <div className={`relative w-full aspect-square rounded border ${theme.colors.background} ${theme.colors.border}`}>
         {/* Quadrant backgrounds */}
         <div className="absolute inset-0 grid grid-cols-2 grid-rows-2">
           <div className="border-r border-b border-gray-600 bg-purple-500/5"></div>
@@ -51,15 +53,15 @@ export function VACQuadrantViz({ vac }: VACQuadrantVizProps) {
         {/* Axis labels */}
         <div className="absolute inset-0 pointer-events-none">
           {/* Top (Arousal +) */}
-          <div className="absolute top-1 left-1/2 -translate-x-1/2 text-xs text-gray-500">A+</div>
+          <div className={`absolute top-1 left-1/2 -translate-x-1/2 text-xs ${theme.colors.text.muted}`}>A+</div>
           {/* Bottom (Arousal -) */}
-          <div className="absolute bottom-1 left-1/2 -translate-x-1/2 text-xs text-gray-500">
+          <div className={`absolute bottom-1 left-1/2 -translate-x-1/2 text-xs ${theme.colors.text.muted}`}>
             A-
           </div>
           {/* Left (Valence -) */}
-          <div className="absolute left-1 top-1/2 -translate-y-1/2 text-xs text-gray-500">V-</div>
+          <div className={`absolute left-1 top-1/2 -translate-y-1/2 text-xs ${theme.colors.text.muted}`}>V-</div>
           {/* Right (Valence +) */}
-          <div className="absolute right-1 top-1/2 -translate-y-1/2 text-xs text-gray-500">V+</div>
+          <div className={`absolute right-1 top-1/2 -translate-y-1/2 text-xs ${theme.colors.text.muted}`}>V+</div>
         </div>
 
         {/* Center crosshair */}
@@ -74,7 +76,7 @@ export function VACQuadrantViz({ vac }: VACQuadrantVizProps) {
             top: `${y}%`,
           }}
         >
-          <div className="absolute -top-6 left-1/2 -translate-x-1/2 whitespace-nowrap text-xs text-white bg-gray-900 px-1.5 py-0.5 rounded border border-purple-500">
+          <div className={`absolute -top-6 left-1/2 -translate-x-1/2 whitespace-nowrap text-xs text-white px-1.5 py-0.5 rounded border border-purple-500 ${theme.colors.background}`}>
             ({vac.valence.toFixed(2)}, {vac.arousal.toFixed(2)})
           </div>
         </div>
@@ -83,20 +85,20 @@ export function VACQuadrantViz({ vac }: VACQuadrantVizProps) {
       {/* Quadrant Info */}
       <div className="mt-3 space-y-2">
         <div className="flex justify-between items-center text-xs">
-          <span className="text-gray-400">Quadrant {quadrant.name}</span>
+          <span className={theme.colors.text.muted}>Quadrant {quadrant.name}</span>
           <span className={`font-semibold ${quadrant.color}`}>{quadrant.label}</span>
         </div>
 
         {/* Connection value */}
         <div className="flex justify-between items-center text-xs">
-          <span className="text-gray-400">Connection</span>
+          <span className={theme.colors.text.muted}>Connection</span>
           <span
             className={`font-mono ${
               vac.connection > 0.5
                 ? "text-green-400"
                 : vac.connection < -0.5
                   ? "text-red-400"
-                  : "text-gray-300"
+                  : theme.colors.text.secondary
             }`}
           >
             {vac.connection.toFixed(2)}
@@ -104,7 +106,7 @@ export function VACQuadrantViz({ vac }: VACQuadrantVizProps) {
         </div>
 
         {/* Connection bar */}
-        <div className="h-1.5 bg-gray-600 rounded-full overflow-hidden">
+        <div className={`h-1.5 rounded-full overflow-hidden ${theme.colors.background}`}>
           <div
             className={`h-full ${vac.connection > 0 ? "bg-green-500" : "bg-red-500"}`}
             style={{ width: `${Math.abs(vac.connection) * 100}%` }}

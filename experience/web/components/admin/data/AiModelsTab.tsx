@@ -2,8 +2,10 @@ import React, { useEffect, useState } from "react";
 import { ModelAssignment } from "@/types/admin";
 import { adminApi } from "@/utils/api";
 import { RefreshCw, Save, AlertTriangle, Cpu } from "lucide-react";
+import { useAdminTheme } from "@/hooks/admin/useAdminTheme";
 
 export default function AiModelsTab() {
+  const theme = useAdminTheme();
   const [models, setModels] = useState<ModelAssignment[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -63,7 +65,7 @@ export default function AiModelsTab() {
 
   if (loading && models.length === 0) {
     return (
-      <div className="p-8 text-center text-gray-500" role="status">
+      <div className={`p-8 text-center ${theme.colors.text.muted}`} role="status">
         Loading AI configuration...
       </div>
     );
@@ -71,23 +73,23 @@ export default function AiModelsTab() {
 
   return (
     <div className="space-y-6">
-      <div className="flex justify-between items-center bg-gray-900/50 p-4 rounded-lg border border-gray-800">
+      <div className={`flex justify-between items-center p-4 rounded-lg border ${theme.colors.background} ${theme.colors.border}`}>
         <div>
-          <h2 className="text-xl font-bold text-white flex items-center gap-2">
+          <h2 className={`text-xl font-bold flex items-center gap-2 ${theme.colors.text.primary}`}>
             <Cpu className="w-5 h-5 text-purple-400" />
             AI Function Assignments
           </h2>
-          <p className="text-sm text-gray-400 mt-1">
+          <p className={`text-sm mt-1 ${theme.colors.text.muted}`}>
             Configure which local LLM handles each intelligence function. Changes apply immediately.
           </p>
         </div>
         <button
           onClick={fetchModels}
-          className="p-2 hover:bg-gray-800 rounded-full transition-colors"
+          className={`p-2 rounded-full transition-colors ${theme.colors.hover}`}
           title="Refresh Config"
           aria-label="Refresh Config"
         >
-          <RefreshCw className="w-5 h-5 text-gray-400" />
+          <RefreshCw className={`w-5 h-5 ${theme.colors.text.muted}`} />
         </button>
       </div>
 
@@ -98,10 +100,10 @@ export default function AiModelsTab() {
         </div>
       )}
 
-      <div className="bg-gray-900 border border-gray-800 rounded-lg overflow-hidden">
+      <div className={`rounded-lg overflow-hidden ${theme.colors.background} border ${theme.colors.border}`}>
         <table className="w-full text-left border-collapse">
           <thead>
-            <tr className="bg-gray-800 text-gray-400 text-xs uppercase tracking-wider">
+            <tr className={`text-xs uppercase tracking-wider ${theme.colors.background} ${theme.colors.text.muted}`}>
               <th className="p-4 font-semibold">Function</th>
               <th className="p-4 font-semibold">Assigned Model</th>
               <th className="p-4 font-semibold text-right">Avg Latency</th>
@@ -110,9 +112,9 @@ export default function AiModelsTab() {
               <th className="p-4 font-semibold w-24">Actions</th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-gray-800">
+          <tbody className={`divide-y ${theme.colors.border}`}>
             {models.map((model) => (
-              <tr key={model.function} className="hover:bg-gray-800/50">
+              <tr key={model.function} className={theme.colors.hover}>
                 <td className="p-4">
                   <div className="font-mono text-sm text-purple-300">{model.function}</div>
                 </td>
@@ -120,7 +122,7 @@ export default function AiModelsTab() {
                   {editingFunction === model.function ? (
                     <div className="flex gap-2">
                       <select
-                        className="bg-gray-800 border border-gray-600 rounded px-2 py-1 text-sm text-white focus:border-purple-500 outline-none"
+                        className={`rounded px-2 py-1 text-sm focus:border-purple-500 outline-none ${theme.colors.background} border ${theme.colors.border} ${theme.colors.text.primary}`}
                         value={editValue}
                         onChange={(e) => setEditValue(e.target.value)}
                       >
@@ -134,19 +136,19 @@ export default function AiModelsTab() {
                     </div>
                   ) : (
                     <div className="flex items-center gap-2">
-                      <span className="text-gray-300 text-sm bg-gray-800 px-2 py-1 rounded">
+                      <span className={`text-sm px-2 py-1 rounded ${theme.colors.text.secondary} ${theme.colors.background}`}>
                         {model.ai_model_name}
                       </span>
                     </div>
                   )}
                 </td>
-                <td className="p-4 text-right font-mono text-sm text-gray-400">
+                <td className={`p-4 text-right font-mono text-sm ${theme.colors.text.muted}`}>
                   {model.avg_latency_ms ? `${Math.round(model.avg_latency_ms)}ms` : "-"}
                 </td>
-                <td className="p-4 text-right font-mono text-sm text-gray-400">
+                <td className={`p-4 text-right font-mono text-sm ${theme.colors.text.muted}`}>
                   {model.total_invocations}
                 </td>
-                <td className="p-4 text-right text-xs text-gray-500">
+                <td className={`p-4 text-right text-xs ${theme.colors.text.muted}`}>
                   {model.last_used_at ? new Date(model.last_used_at).toLocaleTimeString() : "-"}
                 </td>
                 <td className="p-4">
@@ -162,7 +164,7 @@ export default function AiModelsTab() {
                       </button>
                       <button
                         onClick={() => setEditingFunction(null)}
-                        className="text-gray-500 hover:text-gray-300"
+                        className={`${theme.colors.text.muted} hover:${theme.colors.text.secondary}`}
                         aria-label="Cancel"
                       >
                         ×
@@ -171,7 +173,7 @@ export default function AiModelsTab() {
                   ) : (
                     <button
                       onClick={() => handleEdit(model)}
-                      className="text-gray-500 hover:text-white transition-colors"
+                      className={`${theme.colors.text.muted} hover:${theme.colors.text.primary} transition-colors`}
                       aria-label={`Edit ${model.function}`}
                     >
                       Edit

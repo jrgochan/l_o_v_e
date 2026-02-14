@@ -9,6 +9,7 @@
 import { useVoiceRecording } from "@/hooks/useVoiceRecording";
 import { logger } from "@/utils/logger";
 import { AudioVisualizer } from "../visualizations/AudioVisualizer";
+import { useAdminTheme } from "@/hooks/admin/useAdminTheme";
 
 interface VoiceRecorderProps {
   isOpen: boolean;
@@ -17,6 +18,7 @@ interface VoiceRecorderProps {
 }
 
 export function VoiceRecorder({ isOpen, onClose, onSend }: VoiceRecorderProps) {
+  const theme = useAdminTheme();
   const {
     isRecording,
     isPaused,
@@ -87,13 +89,13 @@ export function VoiceRecorder({ isOpen, onClose, onSend }: VoiceRecorderProps) {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm">
-      <div className="bg-gray-900 rounded-lg border-2 border-cyan-500/50 shadow-[0_0_30px_rgba(6,182,212,0.3)] p-6 max-w-2xl w-full mx-4">
+      <div className={`bg-gray-900 ${theme.layout.borderRadius} border-2 ${theme.colors.border} ${theme.effects.glow} p-6 max-w-2xl w-full mx-4 transition-colors duration-500`}>
         {/* Header */}
         <div className="flex items-center justify-between mb-6">
-          <h3 className="text-xl font-semibold text-white flex items-center gap-2">
+          <h3 className={`text-xl font-semibold flex items-center gap-2 ${theme.colors.text.primary}`}>
             🎤 Voice Recording
           </h3>
-          <div className="text-2xl font-mono text-cyan-400">{formatDuration(duration)}</div>
+          <div className={`text-2xl font-mono ${theme.colors.primary}`}>{formatDuration(duration)}</div>
         </div>
 
         {/* Visualizer */}
@@ -107,10 +109,10 @@ export function VoiceRecorder({ isOpen, onClose, onSend }: VoiceRecorderProps) {
         {/* Status */}
         <div className="mt-4 text-center">
           {!isRecording && !audioBlob && (
-            <p className="text-gray-400 text-sm">Click &quot;Start Recording&quot; to begin</p>
+            <p className={`text-sm ${theme.colors.text.secondary}`}>Click &quot;Start Recording&quot; to begin</p>
           )}
           {isRecording && !isPaused && (
-            <p className="text-cyan-400 text-sm flex items-center justify-center gap-2">
+            <p className={`text-sm flex items-center justify-center gap-2 ${theme.colors.primary}`}>
               <span className="w-2 h-2 bg-red-500 rounded-full animate-pulse" />
               Recording in progress...
             </p>
@@ -135,7 +137,7 @@ export function VoiceRecorder({ isOpen, onClose, onSend }: VoiceRecorderProps) {
               </button>
               <button
                 onClick={handleCancel}
-                className="px-6 py-3 bg-gray-700 hover:bg-gray-600 text-white rounded-lg transition"
+                className={`px-6 py-3 bg-black/30 border ${theme.colors.border} ${theme.colors.hover} ${theme.colors.text.primary} ${theme.layout.borderRadius} transition`}
               >
                 Cancel
               </button>
@@ -167,7 +169,7 @@ export function VoiceRecorder({ isOpen, onClose, onSend }: VoiceRecorderProps) {
               </button>
               <button
                 onClick={handleCancel}
-                className="px-6 py-3 bg-gray-700 hover:bg-gray-600 text-white rounded-lg transition"
+                className={`px-6 py-3 bg-black/30 border ${theme.colors.border} ${theme.colors.hover} ${theme.colors.text.primary} ${theme.layout.borderRadius} transition`}
               >
                 ✗ Cancel
               </button>
@@ -188,13 +190,13 @@ export function VoiceRecorder({ isOpen, onClose, onSend }: VoiceRecorderProps) {
                 onClick={() => {
                   cancelRecording();
                 }}
-                className="px-6 py-3 bg-gray-700 hover:bg-gray-600 text-white rounded-lg transition"
+                className={`px-6 py-3 bg-black/30 border ${theme.colors.border} ${theme.colors.hover} ${theme.colors.text.primary} ${theme.layout.borderRadius} transition`}
               >
                 🔄 Record Again
               </button>
               <button
                 onClick={handleCancel}
-                className="px-6 py-3 bg-gray-700 hover:bg-gray-600 text-white rounded-lg transition"
+                className={`px-6 py-3 bg-black/30 border ${theme.colors.border} ${theme.colors.hover} ${theme.colors.text.primary} ${theme.layout.borderRadius} transition`}
               >
                 ✗ Cancel
               </button>
@@ -203,8 +205,8 @@ export function VoiceRecorder({ isOpen, onClose, onSend }: VoiceRecorderProps) {
         </div>
 
         {/* Tips */}
-        <div className="mt-6 pt-4 border-t border-gray-700">
-          <p className="text-xs text-gray-400 text-center">
+        <div className={`mt-6 pt-4 border-t ${theme.colors.border}`}>
+          <p className={`text-xs text-center ${theme.colors.text.muted}`}>
             💡 Tip: Speak clearly about your emotions. Include details about what you&apos;re
             feeling, thinking, or experiencing for best analysis.
           </p>

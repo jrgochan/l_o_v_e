@@ -15,6 +15,7 @@
 import React, { useState, useMemo } from "react";
 import { EmotionMappingBadge } from "../emotion-display/EmotionMappingBadge";
 import type { DetectedEmotion } from "@/types/chat";
+import { useAdminTheme } from "@/hooks/admin/useAdminTheme";
 
 interface MultiEmotionTableProps {
   emotions: DetectedEmotion[];
@@ -35,6 +36,7 @@ export function MultiEmotionTable({
   onEmotionClick,
   className = "",
 }: MultiEmotionTableProps) {
+  const theme = useAdminTheme();
   const [sortKey, setSortKey] = useState<SortKey>("prominence");
   const [sortDirection, setSortDirection] = useState<SortDirection>("asc");
   const [prominenceFilter, setProminenceFilter] = useState<ProminenceFilter>("all");
@@ -172,7 +174,7 @@ export function MultiEmotionTable({
   // Get voice alignment indicator
   const getVoiceAlignmentIndicator = (score?: number) => {
     if (score === undefined || score === null) {
-      return <span className="text-gray-500 text-sm">N/A</span>;
+      return <span className={`text-sm ${theme.colors.text.muted}`}>N/A</span>;
     }
 
     let color = "text-red-400";
@@ -195,7 +197,7 @@ export function MultiEmotionTable({
 
   // Render sort indicator
   const renderSortIndicator = (key: SortKey) => {
-    if (sortKey !== key) return <span className="text-gray-600">⇅</span>;
+    if (sortKey !== key) return <span className={theme.colors.text.muted}>⇅</span>;
     return sortDirection === "asc" ? (
       <span className="text-cyan-400">▲</span>
     ) : (
@@ -206,9 +208,9 @@ export function MultiEmotionTable({
   if (emotions.length === 0) {
     return (
       <div
-        className={`bg-gray-800/50 rounded-lg p-8 text-center border border-gray-700 ${className}`}
+        className={`rounded-lg p-8 text-center border ${theme.colors.border} ${theme.colors.background} ${className}`}
       >
-        <p className="text-gray-400">No multi-emotion data available</p>
+        <p className={theme.colors.text.muted}>No multi-emotion data available</p>
       </div>
     );
   }
@@ -218,8 +220,8 @@ export function MultiEmotionTable({
       {/* Header with filters and export */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <h3 className="text-lg font-semibold text-gray-100">Multi-Emotion Analysis</h3>
-          <span className="text-sm text-gray-400">({sortedEmotions.length} emotions)</span>
+          <h3 className={`text-lg font-semibold ${theme.colors.text.primary}`}>Multi-Emotion Analysis</h3>
+          <span className={`text-sm ${theme.colors.text.muted}`}>({sortedEmotions.length} emotions)</span>
         </div>
 
         <div className="flex items-center gap-2">
@@ -228,7 +230,7 @@ export function MultiEmotionTable({
             <select
               value={prominenceFilter}
               onChange={(e) => setProminenceFilter(e.target.value as ProminenceFilter)}
-              className="px-3 py-1.5 bg-gray-700 border border-gray-600 rounded text-sm text-gray-200 focus:outline-none focus:ring-2 focus:ring-cyan-500"
+              className={`px-3 py-1.5 border rounded text-sm focus:outline-none focus:ring-2 focus:ring-cyan-500 ${theme.colors.background} ${theme.colors.border} ${theme.colors.text.secondary}`}
             >
               <option value="all">All Emotions</option>
               <option value="primary">Primary Only</option>
@@ -251,12 +253,12 @@ export function MultiEmotionTable({
       </div>
 
       {/* Table */}
-      <div className="overflow-x-auto border border-gray-700 rounded-lg">
+      <div className={`overflow-x-auto border rounded-lg ${theme.colors.border}`}>
         <table className="w-full text-sm">
-          <thead className="bg-gray-800 border-b border-gray-700">
+          <thead className={`border-b ${theme.colors.background} ${theme.colors.border}`}>
             <tr>
               <th
-                className="px-4 py-3 text-left text-gray-300 font-semibold cursor-pointer hover:bg-gray-750 transition"
+                className="px-4 py-3 text-left font-semibold cursor-pointer transition ${theme.colors.text.secondary} ${theme.colors.hover}"
                 onClick={() => handleSort("emotion")}
               >
                 <div className="flex items-center gap-2">
@@ -265,7 +267,7 @@ export function MultiEmotionTable({
                 </div>
               </th>
               <th
-                className="px-4 py-3 text-center text-gray-300 font-semibold cursor-pointer hover:bg-gray-750 transition"
+                className="px-4 py-3 text-center font-semibold cursor-pointer transition ${theme.colors.text.secondary} ${theme.colors.hover}"
                 onClick={() => handleSort("confidence")}
               >
                 <div className="flex items-center justify-center gap-2">
@@ -274,17 +276,17 @@ export function MultiEmotionTable({
                 </div>
               </th>
               <th
-                className="px-4 py-3 text-center text-gray-300 font-semibold cursor-pointer hover:bg-gray-750 transition"
+                className="px-4 py-3 text-center font-semibold cursor-pointer transition ${theme.colors.text.secondary} ${theme.colors.hover}"
                 onClick={() => handleSort("valence")}
               >
                 <div className="flex items-center justify-center gap-2">
                   <span>VAC Coordinates</span>
-                  <span className="text-gray-600 text-xs">(V, A, C)</span>
+                  <span className={`text-xs ${theme.colors.text.muted}`}>(V, A, C)</span>
                   {renderSortIndicator("valence")}
                 </div>
               </th>
               <th
-                className="px-4 py-3 text-center text-gray-300 font-semibold cursor-pointer hover:bg-gray-750 transition"
+                className="px-4 py-3 text-center font-semibold cursor-pointer transition ${theme.colors.text.secondary} ${theme.colors.hover}"
                 onClick={() => handleSort("voice_alignment")}
               >
                 <div className="flex items-center justify-center gap-2">
@@ -293,7 +295,7 @@ export function MultiEmotionTable({
                 </div>
               </th>
               <th
-                className="px-4 py-3 text-center text-gray-300 font-semibold cursor-pointer hover:bg-gray-750 transition"
+                className="px-4 py-3 text-center font-semibold cursor-pointer transition ${theme.colors.text.secondary} ${theme.colors.hover}"
                 onClick={() => handleSort("prominence")}
               >
                 <div className="flex items-center justify-center gap-2">
@@ -301,10 +303,10 @@ export function MultiEmotionTable({
                   {renderSortIndicator("prominence")}
                 </div>
               </th>
-              <th className="px-4 py-3 text-center text-gray-300 font-semibold">
+              <th className="px-4 py-3 text-center font-semibold ${theme.colors.text.secondary}">
                 <span>Mapping</span>
               </th>
-              <th className="px-4 py-3 text-center text-gray-300 font-semibold">
+              <th className="px-4 py-3 text-center font-semibold ${theme.colors.text.secondary}">
                 <span>Actions</span>
               </th>
             </tr>
@@ -317,17 +319,17 @@ export function MultiEmotionTable({
               return (
                 <React.Fragment key={emotion.id}>
                   <tr
-                    className={`border-b border-gray-700/50 hover:bg-gray-750 transition cursor-pointer ${
-                      isEven ? "bg-gray-850" : "bg-gray-900"
+                    className={`border-b transition cursor-pointer ${theme.colors.border} ${theme.colors.hover} ${
+                      isEven ? theme.colors.background : ""
                     }`}
                     onClick={() => onEmotionClick?.(emotion)}
                   >
                     {/* Emotion Name */}
                     <td className="px-4 py-3">
                       <div className="space-y-1">
-                        <div className="font-medium text-gray-100">{emotion.emotion_name}</div>
+                        <div className={`font-medium ${theme.colors.text.primary}`}>{emotion.emotion_name}</div>
                         {emotion.category && (
-                          <div className="text-xs text-gray-400">{emotion.category}</div>
+                          <div className={`text-xs ${theme.colors.text.muted}`}>{emotion.category}</div>
                         )}
                       </div>
                     </td>
@@ -335,10 +337,10 @@ export function MultiEmotionTable({
                     {/* Confidence */}
                     <td className="px-4 py-3 text-center">
                       <div className="flex flex-col items-center gap-1">
-                        <span className="font-mono font-semibold text-gray-100">
+                        <span className={`font-mono font-semibold ${theme.colors.text.primary}`}>
                           {(emotion.confidence * 100).toFixed(0)}%
                         </span>
-                        <div className="w-16 h-1.5 bg-gray-700 rounded-full overflow-hidden">
+                        <div className={`w-16 h-1.5 rounded-full overflow-hidden ${theme.colors.background}`}>
                           <div
                             className="h-full bg-gradient-to-r from-green-500 to-green-400"
                             style={{ width: `${emotion.confidence * 100}%` }}
@@ -349,9 +351,9 @@ export function MultiEmotionTable({
 
                     {/* VAC Coordinates */}
                     <td className="px-4 py-3">
-                      <div className="font-mono text-xs text-gray-300 space-y-0.5">
+                      <div className={`font-mono text-xs space-y-0.5 ${theme.colors.text.secondary}`}>
                         <div className="flex justify-between gap-2">
-                          <span className="text-gray-500">V:</span>
+                          <span className="${theme.colors.text.muted}">V:</span>
                           <span
                             className={emotion.vac.valence >= 0 ? "text-green-400" : "text-red-400"}
                           >
@@ -360,15 +362,15 @@ export function MultiEmotionTable({
                           </span>
                         </div>
                         <div className="flex justify-between gap-2">
-                          <span className="text-gray-500">A:</span>
-                          <span className="text-gray-200">
+                          <span className="${theme.colors.text.muted}">A:</span>
+                          <span className="${theme.colors.text.secondary}">
                             {emotion.vac.arousal >= 0 ? "+" : ""}
                             {emotion.vac.arousal.toFixed(3)}
                           </span>
                         </div>
                         <div className="flex justify-between gap-2">
-                          <span className="text-gray-500">C:</span>
-                          <span className="text-gray-200">
+                          <span className="${theme.colors.text.muted}">C:</span>
+                          <span className="${theme.colors.text.secondary}">
                             {emotion.vac.connection >= 0 ? "+" : ""}
                             {emotion.vac.connection.toFixed(3)}
                           </span>
@@ -401,7 +403,7 @@ export function MultiEmotionTable({
                             matchConfidence={emotion.match_confidence}
                           />
                         ) : (
-                          <span className="text-xs text-gray-500">Exact</span>
+                          <span className={`text-xs ${theme.colors.text.muted}`}>Exact</span>
                         )}
                       </div>
                     </td>
@@ -414,7 +416,7 @@ export function MultiEmotionTable({
                             e.stopPropagation();
                             toggleExpand(emotion.id);
                           }}
-                          className="px-2 py-1 text-cyan-400 hover:text-cyan-300 hover:bg-gray-700 rounded transition text-xs"
+                          className={`px-2 py-1 text-cyan-400 hover:text-cyan-300 rounded transition text-xs ${theme.colors.hover}`}
                         >
                           {isExpanded ? "⊖ Collapse" : "⊕ Expand"}
                         </button>
@@ -426,11 +428,11 @@ export function MultiEmotionTable({
                   {isExpanded && (
                     <tr
                       key={`${emotion.id}-details`}
-                      className={`${isEven ? "bg-gray-850" : "bg-gray-900"} border-b border-gray-700/50`}
+                      className={`${isEven ? theme.colors.background : ""} border-b ${theme.colors.border}`}
                     >
                       <td colSpan={7} className="px-4 py-4">
-                        <div className="space-y-3 bg-gray-800/50 p-4 rounded border border-gray-700">
-                          <h4 className="text-sm font-semibold text-gray-300 mb-2">
+                        <div className={`space-y-3 p-4 rounded border ${theme.colors.background} ${theme.colors.border}`}>
+                          <h4 className={`text-sm font-semibold mb-2 ${theme.colors.text.secondary}`}>
                             Detailed Analysis
                           </h4>
 
@@ -438,29 +440,29 @@ export function MultiEmotionTable({
                             {/* Left Column */}
                             <div className="space-y-2">
                               <div>
-                                <span className="text-gray-400">Emotion ID:</span>
-                                <span className="ml-2 text-gray-200 font-mono text-xs">
+                                <span className="${theme.colors.text.muted}">Emotion ID:</span>
+                                <span className="ml-2 ${theme.colors.text.secondary} font-mono text-xs">
                                   {emotion.id}
                                 </span>
                               </div>
                               {emotion.original_name && (
                                 <div>
-                                  <span className="text-gray-400">Original Name:</span>
-                                  <span className="ml-2 text-gray-200">
+                                  <span className="${theme.colors.text.muted}">Original Name:</span>
+                                  <span className="ml-2 ${theme.colors.text.secondary}">
                                     {emotion.original_name}
                                   </span>
                                 </div>
                               )}
                               {emotion.match_method && (
                                 <div>
-                                  <span className="text-gray-400">Match Method:</span>
-                                  <span className="ml-2 text-gray-200">{emotion.match_method}</span>
+                                  <span className="${theme.colors.text.muted}">Match Method:</span>
+                                  <span className="ml-2 ${theme.colors.text.secondary}">{emotion.match_method}</span>
                                 </div>
                               )}
                               {emotion.match_confidence !== undefined && (
                                 <div>
-                                  <span className="text-gray-400">Match Confidence:</span>
-                                  <span className="ml-2 text-gray-200 font-mono">
+                                  <span className="${theme.colors.text.muted}">Match Confidence:</span>
+                                  <span className="ml-2 ${theme.colors.text.secondary} font-mono">
                                     {(emotion.match_confidence * 100).toFixed(1)}%
                                   </span>
                                 </div>
@@ -471,21 +473,21 @@ export function MultiEmotionTable({
                             <div className="space-y-2">
                               {emotion.voice_alignment !== undefined && (
                                 <div>
-                                  <span className="text-gray-400">Voice-Content Alignment:</span>
-                                  <span className="ml-2 text-gray-200 font-mono">
+                                  <span className="${theme.colors.text.muted}">Voice-Content Alignment:</span>
+                                  <span className="ml-2 ${theme.colors.text.secondary} font-mono">
                                     {(emotion.voice_alignment * 100).toFixed(1)}%
                                   </span>
                                 </div>
                               )}
                               <div>
-                                <span className="text-gray-400">Detection Confidence:</span>
-                                <span className="ml-2 text-gray-200 font-mono">
+                                <span className="${theme.colors.text.muted}">Detection Confidence:</span>
+                                <span className="ml-2 ${theme.colors.text.secondary} font-mono">
                                   {(emotion.confidence * 100).toFixed(1)}%
                                 </span>
                               </div>
                               <div>
-                                <span className="text-gray-400">Prominence Level:</span>
-                                <span className="ml-2 text-gray-200 capitalize">
+                                <span className="${theme.colors.text.muted}">Prominence Level:</span>
+                                <span className="ml-2 ${theme.colors.text.secondary} capitalize">
                                   {emotion.prominence}
                                 </span>
                               </div>
@@ -493,11 +495,11 @@ export function MultiEmotionTable({
                           </div>
 
                           {/* VAC Analysis */}
-                          <div className="pt-3 border-t border-gray-700">
+                          <div className={`pt-3 border-t ${theme.colors.border}`}>
                             <div className="text-xs text-gray-400 mb-2">VAC Interpretation:</div>
                             <div className="grid grid-cols-3 gap-3 text-xs">
-                              <div className="bg-gray-900 p-2 rounded">
-                                <div className="text-gray-500 mb-1">Valence</div>
+                              <div className={`p-2 rounded ${theme.colors.background}`}>
+                                <div className="mb-1 ${theme.colors.text.muted}">Valence</div>
                                 <div className="text-gray-200">
                                   {emotion.vac.valence > 0.5
                                     ? "Very positive"
@@ -510,8 +512,8 @@ export function MultiEmotionTable({
                                           : "Very negative"}
                                 </div>
                               </div>
-                              <div className="bg-gray-900 p-2 rounded">
-                                <div className="text-gray-500 mb-1">Arousal</div>
+                              <div className={`p-2 rounded ${theme.colors.background}`}>
+                                <div className="mb-1 ${theme.colors.text.muted}">Arousal</div>
                                 <div className="text-gray-200">
                                   {emotion.vac.arousal > 0.5
                                     ? "Very high energy"
@@ -524,8 +526,8 @@ export function MultiEmotionTable({
                                           : "Very low energy"}
                                 </div>
                               </div>
-                              <div className="bg-gray-900 p-2 rounded">
-                                <div className="text-gray-500 mb-1">Connection</div>
+                              <div className={`p-2 rounded ${theme.colors.background}`}>
+                                <div className="mb-1 ${theme.colors.text.muted}">Connection</div>
                                 <div className="text-gray-200">
                                   {emotion.vac.connection > 0.5
                                     ? "Strong connection"
@@ -552,7 +554,7 @@ export function MultiEmotionTable({
       </div>
 
       {/* Footer Summary */}
-      <div className="flex items-center justify-between text-xs text-gray-400 px-2">
+      <div className={`flex items-center justify-between text-xs px-2 ${theme.colors.text.muted}`}>
         <div>
           Displaying {sortedEmotions.length} of {emotions.length} emotions
           {prominenceFilter !== "all" && ` (filtered by ${prominenceFilter})`}

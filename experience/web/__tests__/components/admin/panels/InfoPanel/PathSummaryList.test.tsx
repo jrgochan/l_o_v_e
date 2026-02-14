@@ -94,8 +94,8 @@ describe("PathSummaryList", () => {
       />
     );
     const card = screen.getByText("A → B").closest(".rounded-lg");
-    expect(card).toHaveClass("bg-cyan-900/40");
-    expect(card).toHaveClass("border-cyan-500");
+    // Selected path uses theme.effects.glass (Subtle default: bg-gray-900/90)
+    expect(card).toHaveClass("bg-gray-900/90");
   });
 
   it("shows bridge requirements", () => {

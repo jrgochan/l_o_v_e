@@ -10,12 +10,14 @@
 
 import { useState } from "react";
 import type { VACHistoryPoint } from "@/types/chat";
+import { useAdminTheme } from "@/hooks/admin/useAdminTheme";
 
 interface VACTrajectoryPlotProps {
   vacHistory: VACHistoryPoint[];
 }
 
 export function VACTrajectoryPlot({ vacHistory }: VACTrajectoryPlotProps) {
+  const theme = useAdminTheme();
   const [hoveredPoint, setHoveredPoint] = useState<number | null>(null);
 
   if (vacHistory.length < 2) return null;
@@ -125,14 +127,14 @@ export function VACTrajectoryPlot({ vacHistory }: VACTrajectoryPlotProps) {
   const patterns = detectPatterns();
 
   return (
-    <div className="bg-gray-700/50 rounded-lg p-4 border border-purple-500/30">
+    <div className={`rounded-lg p-4 border border-purple-500/30 ${theme.colors.background}`}>
       <div className="text-sm text-purple-300 mb-2 font-semibold flex items-center justify-between">
         <span>📈 Emotional Journey</span>
-        <span className="text-xs text-gray-400">{vacHistory.length} points</span>
+        <span className={`text-xs ${theme.colors.text.muted}`}>{vacHistory.length} points</span>
       </div>
 
       {/* Trajectory Plot */}
-      <div className="relative w-full aspect-square bg-gray-800 rounded border border-gray-600">
+      <div className={`relative w-full aspect-square rounded border ${theme.colors.background} ${theme.colors.border}`}>
         {/* Quadrant backgrounds */}
         <div className="absolute inset-0 grid grid-cols-2 grid-rows-2">
           <div className="border-r border-b border-gray-600 bg-purple-500/5"></div>
@@ -143,16 +145,16 @@ export function VACTrajectoryPlot({ vacHistory }: VACTrajectoryPlotProps) {
 
         {/* Axis labels */}
         <div className="absolute inset-0 pointer-events-none">
-          <div className="absolute top-1 left-1/2 -translate-x-1/2 text-xs text-gray-500 font-semibold">
+          <div className={`absolute top-1 left-1/2 -translate-x-1/2 text-xs font-semibold ${theme.colors.text.muted}`}>
             High Energy (A+)
           </div>
-          <div className="absolute bottom-1 left-1/2 -translate-x-1/2 text-xs text-gray-500 font-semibold">
+          <div className={`absolute bottom-1 left-1/2 -translate-x-1/2 text-xs font-semibold ${theme.colors.text.muted}`}>
             Low Energy (A-)
           </div>
-          <div className="absolute left-1 top-1/2 -translate-y-1/2 text-xs text-gray-500 font-semibold writing-mode-vertical">
+          <div className={`absolute left-1 top-1/2 -translate-y-1/2 text-xs font-semibold ${theme.colors.text.muted} writing-mode-vertical`}>
             Negative (V-)
           </div>
-          <div className="absolute right-1 top-1/2 -translate-y-1/2 text-xs text-gray-500 font-semibold writing-mode-vertical">
+          <div className={`absolute right-1 top-1/2 -translate-y-1/2 text-xs font-semibold ${theme.colors.text.muted} writing-mode-vertical`}>
             Positive (V+)
           </div>
         </div>
@@ -274,10 +276,10 @@ export function VACTrajectoryPlot({ vacHistory }: VACTrajectoryPlotProps) {
             }}
           >
             <div className="font-semibold">{points[hoveredPoint].emotion}</div>
-            <div className="text-gray-400 text-xs mt-0.5">
+            <div className={`text-xs mt-0.5 ${theme.colors.text.muted}`}>
               {points[hoveredPoint].timestamp.toLocaleTimeString()}
             </div>
-            <div className="text-gray-400 text-xs">
+            <div className={`text-xs ${theme.colors.text.muted}`}>
               V: {vacHistory[hoveredPoint].vac.valence.toFixed(2)}, A:{" "}
               {vacHistory[hoveredPoint].vac.arousal.toFixed(2)}
             </div>
@@ -315,24 +317,24 @@ export function VACTrajectoryPlot({ vacHistory }: VACTrajectoryPlotProps) {
         <div className="flex items-center gap-3">
           <div className="flex items-center gap-1.5">
             <div className="w-2 h-2 rounded-full bg-gray-500"></div>
-            <span className="text-gray-400">Start</span>
+            <span className={theme.colors.text.muted}>Start</span>
           </div>
           <div className="flex items-center gap-1.5">
             <div className="w-2 h-2 rounded-full bg-purple-500"></div>
-            <span className="text-gray-400">Path</span>
+            <span className={theme.colors.text.muted}>Path</span>
           </div>
           <div className="flex items-center gap-1.5">
             <div className="w-3 h-3 rounded-full bg-purple-500 border border-white animate-pulse"></div>
-            <span className="text-gray-400">Current</span>
+            <span className={theme.colors.text.muted}>Current</span>
           </div>
         </div>
-        <div className="text-gray-400">{currentPoint.emotion}</div>
+        <div className={theme.colors.text.muted}>{currentPoint.emotion}</div>
       </div>
 
       {/* Pattern Detection */}
       {patterns.length > 0 && (
-        <div className="mt-3 p-2 bg-gray-800/50 rounded border border-gray-600">
-          <div className="text-xs text-gray-400 mb-1.5 font-semibold">Clinical Patterns</div>
+        <div className={`mt-3 p-2 rounded border ${theme.colors.background} ${theme.colors.border}`}>
+          <div className={`text-xs mb-1.5 font-semibold ${theme.colors.text.muted}`}>Clinical Patterns</div>
           <div className="space-y-1">
             {patterns.map((pattern, index) => (
               <div key={index} className="flex items-center gap-2">
@@ -345,9 +347,9 @@ export function VACTrajectoryPlot({ vacHistory }: VACTrajectoryPlotProps) {
       )}
 
       {/* Summary stats */}
-      <div className="mt-3 pt-3 border-t border-gray-600 grid grid-cols-2 gap-2 text-xs">
+      <div className={`mt-3 pt-3 border-t grid grid-cols-2 gap-2 text-xs ${theme.colors.border}`}>
         <div>
-          <span className="text-gray-400">Valence Change:</span>
+          <span className={theme.colors.text.muted}>Valence Change:</span>
           <span
             className={`ml-2 font-mono ${
               vacHistory[vacHistory.length - 1].vac.valence > vacHistory[0].vac.valence
@@ -362,7 +364,7 @@ export function VACTrajectoryPlot({ vacHistory }: VACTrajectoryPlotProps) {
           </span>
         </div>
         <div>
-          <span className="text-gray-400">Arousal Change:</span>
+          <span className={theme.colors.text.muted}>Arousal Change:</span>
           <span
             className={`ml-2 font-mono ${
               vacHistory[vacHistory.length - 1].vac.arousal > vacHistory[0].vac.arousal
@@ -379,7 +381,7 @@ export function VACTrajectoryPlot({ vacHistory }: VACTrajectoryPlotProps) {
       </div>
 
       {/* Hover instructions */}
-      <div className="mt-2 text-xs text-gray-500 text-center italic">
+      <div className={`mt-2 text-xs text-center italic ${theme.colors.text.muted}`}>
         Hover over points to see emotion details • Larger points = stronger connection
       </div>
     </div>

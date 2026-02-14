@@ -14,6 +14,7 @@
 
 import React from "react";
 import type { ThreeWayAnalysis, VAC, DetectedEmotion } from "@/types/chat";
+import { useAdminTheme } from "@/hooks/admin/useAdminTheme";
 
 interface ThreeWayEmotionData {
   emotions: DetectedEmotion[];
@@ -34,6 +35,7 @@ export function VoiceContentThreeWay({
   onEmotionClick,
   className = "",
 }: VoiceContentThreeWayProps) {
+  const theme = useAdminTheme();
   const { content_only, voice_only, blended, discrepancy } = analysis;
 
   // Helper to render emotion card
@@ -57,7 +59,7 @@ export function VoiceContentThreeWay({
             <span>{icon}</span>
             <span>{title}</span>
           </h3>
-          <p className="text-gray-400 text-sm">No data available</p>
+          <p className={`text-sm ${theme.colors.text.muted}`}>No data available</p>
         </div>
       );
     }
@@ -75,15 +77,15 @@ export function VoiceContentThreeWay({
         {/* Primary Emotion */}
         <div className="mb-4">
           <div className="text-2xl font-bold text-white mb-1">{primaryEmotion.emotion_name}</div>
-          <div className="text-xs text-gray-400 mb-3">{primaryEmotion.category}</div>
+          <div className={`text-xs mb-3 ${theme.colors.text.muted}`}>{primaryEmotion.category}</div>
 
           {/* Confidence Bar */}
           <div className="mb-3">
-            <div className="flex justify-between text-xs text-gray-400 mb-1">
+            <div className={`flex justify-between text-xs mb-1 ${theme.colors.text.muted}`}>
               <span>Confidence</span>
               <span className="font-mono">{(primaryEmotion.confidence * 100).toFixed(0)}%</span>
             </div>
-            <div className="h-2 bg-gray-700 rounded-full overflow-hidden">
+            <div className={`h-2 rounded-full overflow-hidden ${theme.colors.background}`}>
               <div
                 className="h-full bg-gradient-to-r from-green-500 to-green-400 transition-all"
                 style={{ width: `${primaryEmotion.confidence * 100}%` }}
@@ -93,11 +95,11 @@ export function VoiceContentThreeWay({
         </div>
 
         {/* VAC Coordinates */}
-        <div className="bg-gray-900/50 p-3 rounded border border-gray-700 mb-3">
-          <div className="text-xs text-gray-400 mb-2 font-semibold">VAC Coordinates</div>
+        <div className={`p-3 rounded border mb-3 ${theme.colors.background} ${theme.colors.border}`}>
+          <div className={`text-xs mb-2 font-semibold ${theme.colors.text.muted}`}>VAC Coordinates</div>
           <div className="space-y-1 font-mono text-xs">
             <div className="flex justify-between">
-              <span className="text-gray-500">Valence:</span>
+              <span className={theme.colors.text.muted}>Valence:</span>
               <span
                 className={`${data.aggregate_vac.valence >= 0 ? "text-green-400" : "text-red-400"}`}
               >
@@ -106,15 +108,15 @@ export function VoiceContentThreeWay({
               </span>
             </div>
             <div className="flex justify-between">
-              <span className="text-gray-500">Arousal:</span>
-              <span className="text-gray-200">
+              <span className={theme.colors.text.muted}>Arousal:</span>
+              <span className={theme.colors.text.secondary}>
                 {data.aggregate_vac.arousal >= 0 ? "+" : ""}
                 {data.aggregate_vac.arousal.toFixed(3)}
               </span>
             </div>
             <div className="flex justify-between">
-              <span className="text-gray-500">Connection:</span>
-              <span className="text-gray-200">
+              <span className={theme.colors.text.muted}>Connection:</span>
+              <span className={theme.colors.text.secondary}>
                 {data.aggregate_vac.connection >= 0 ? "+" : ""}
                 {data.aggregate_vac.connection.toFixed(3)}
               </span>
@@ -125,14 +127,14 @@ export function VoiceContentThreeWay({
         {/* Additional Metrics */}
         <div className="space-y-2 text-xs mb-3">
           <div className="flex justify-between">
-            <span className="text-gray-400">Complexity:</span>
-            <span className="text-gray-200 font-mono">
+            <span className={theme.colors.text.muted}>Complexity:</span>
+            <span className={`font-mono ${theme.colors.text.secondary}`}>
               {(data.complexity_score * 100).toFixed(0)}%
             </span>
           </div>
           <div className="flex justify-between">
-            <span className="text-gray-400">Clarity:</span>
-            <span className="text-gray-200 font-mono">
+            <span className={theme.colors.text.muted}>Clarity:</span>
+            <span className={`font-mono ${theme.colors.text.secondary}`}>
               {(data.emotional_clarity * 100).toFixed(0)}%
             </span>
           </div>
@@ -152,12 +154,12 @@ export function VoiceContentThreeWay({
 
         {/* Reasoning (collapsible) */}
         {data.reasoning && (
-          <div className="mt-3 pt-3 border-t border-gray-700">
+          <div className={`mt-3 pt-3 border-t ${theme.colors.border}`}>
             <details className="text-xs">
-              <summary className="text-gray-400 cursor-pointer hover:text-gray-300">
+              <summary className={`cursor-pointer ${theme.colors.text.muted}`}>
                 Reasoning
               </summary>
-              <p className="text-gray-300 mt-2 italic">{data.reasoning}</p>
+              <p className={`mt-2 italic ${theme.colors.text.secondary}`}>{data.reasoning}</p>
             </details>
           </div>
         )}
@@ -251,7 +253,7 @@ export function VoiceContentThreeWay({
                     ? "Significant Discrepancy Detected"
                     : "Voice and Content Aligned"}
                 </h4>
-                <p className="text-xs text-gray-400 mt-0.5">
+                <p className={`text-xs mt-0.5 ${theme.colors.text.muted}`}>
                   VAC Distance: {discrepancy.content_voice_distance.toFixed(3)}
                 </p>
               </div>
@@ -259,7 +261,7 @@ export function VoiceContentThreeWay({
 
             {/* Emotion Comparison */}
             <div className="text-right text-xs">
-              <div className="text-gray-400">Detected Emotions:</div>
+              <div className={theme.colors.text.muted}>Detected Emotions:</div>
               <div className="text-white space-y-0.5 mt-1">
                 <div>📝 {discrepancy.content_primary}</div>
                 {discrepancy.voice_primary && <div>🎤 {discrepancy.voice_primary}</div>}
@@ -282,7 +284,7 @@ export function VoiceContentThreeWay({
           {/* Clinical Flags */}
           {discrepancy.flags && discrepancy.flags.length > 0 && (
             <div>
-              <div className="text-xs text-gray-400 mb-2">Clinical Flags:</div>
+              <div className={`text-xs mb-2 ${theme.colors.text.muted}`}>Clinical Flags:</div>
               <div className="flex flex-wrap gap-2">
                 {discrepancy.flags.map((flag, index) => (
                   <span
@@ -298,22 +300,22 @@ export function VoiceContentThreeWay({
           )}
 
           {/* Additional Discrepancy Metrics */}
-          <div className="mt-3 pt-3 border-t border-gray-700">
+          <div className={`mt-3 pt-3 border-t ${theme.colors.border}`}>
             <div className="grid grid-cols-3 gap-3 text-xs">
               <div>
-                <div className="text-gray-500 mb-1">Content ↔ Voice</div>
+                <div className={`mb-1 ${theme.colors.text.muted}`}>Content ↔ Voice</div>
                 <div className="font-mono text-white">
                   {discrepancy.content_voice_distance.toFixed(3)}
                 </div>
               </div>
               <div>
-                <div className="text-gray-500 mb-1">Content ↔ Blended</div>
+                <div className={`mb-1 ${theme.colors.text.muted}`}>Content ↔ Blended</div>
                 <div className="font-mono text-white">
                   {discrepancy.content_blended_distance.toFixed(3)}
                 </div>
               </div>
               <div>
-                <div className="text-gray-500 mb-1">Voice ↔ Blended</div>
+                <div className={`mb-1 ${theme.colors.text.muted}`}>Voice ↔ Blended</div>
                 <div className="font-mono text-white">
                   {discrepancy.voice_blended_distance.toFixed(3)}
                 </div>
@@ -330,12 +332,12 @@ export function VoiceContentThreeWay({
             <span className="text-cyan-400 text-sm">💡</span>
             <div className="flex-1">
               <div className="text-xs font-semibold text-cyan-300 mb-1">Clinical Note</div>
-              <p className="text-xs text-gray-300 leading-relaxed">
+              <p className={`text-xs leading-relaxed ${theme.colors.text.secondary}`}>
                 Significant discrepancies between voice and content may indicate emotional
                 regulation, suppression, or difficulty identifying/expressing emotions. Consider
                 exploring:
               </p>
-              <ul className="text-xs text-gray-400 mt-2 space-y-1 ml-4">
+              <ul className={`text-xs mt-2 space-y-1 ml-4 ${theme.colors.text.muted}`}>
                 <li>• What might be contributing to the disconnect between words and voice?</li>
                 <li>• Are there feelings that are hard to name or express?</li>
                 <li>• Is there a pattern of minimizing or intellectualizing emotions?</li>

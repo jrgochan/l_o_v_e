@@ -7,12 +7,13 @@
  * - Paths without bridge requirements
  * - Trade-off explanations
  *
- * Uses usePathComparison hook for metrics calculation.
+ * Mode-reactive via useAdminTheme.
  */
 
 "use client";
 
 import { usePathComparison } from "@/hooks/admin/usePathComparison";
+import { useAdminTheme } from "@/hooks/admin/useAdminTheme";
 import type { EmotionPath } from "@/types/visualization";
 
 interface PathComparisonProps {
@@ -22,36 +23,37 @@ interface PathComparisonProps {
 export function PathComparison({ paths }: PathComparisonProps) {
   const { shortestDistance, longestDistance, hasEasyPath, noBridgePaths } =
     usePathComparison(paths);
+  const theme = useAdminTheme();
 
   if (paths.length <= 1) return null;
 
   return (
-    <section className="bg-purple-900/20 border border-purple-500/30 rounded-lg p-4 mb-4">
-      <h3 className="text-sm font-bold text-purple-300 mb-3 flex items-center gap-2">
+    <section className={`${theme.effects.glass} ${theme.layout.borderRadius} p-4 mb-4 transition-colors duration-500`}>
+      <h3 className={`text-sm font-bold mb-3 flex items-center gap-2 ${theme.colors.primary}`}>
         ⚖️ Path Comparison ({paths.length} paths)
       </h3>
       <div className="space-y-2 text-xs">
         <div className="grid grid-cols-2 gap-2">
-          <div className="bg-gray-800/50 rounded p-2">
-            <div className="text-gray-400 mb-1">Shortest</div>
-            <div className="text-white font-mono">{shortestDistance.toFixed(2)}</div>
+          <div className={`bg-black/30 ${theme.layout.borderRadius} p-2 border ${theme.colors.border}`}>
+            <div className={`mb-1 ${theme.colors.text.muted}`}>Shortest</div>
+            <div className={`font-mono ${theme.colors.text.primary}`}>{shortestDistance.toFixed(2)}</div>
           </div>
-          <div className="bg-gray-800/50 rounded p-2">
-            <div className="text-gray-400 mb-1">Longest</div>
-            <div className="text-white font-mono">{longestDistance.toFixed(2)}</div>
+          <div className={`bg-black/30 ${theme.layout.borderRadius} p-2 border ${theme.colors.border}`}>
+            <div className={`mb-1 ${theme.colors.text.muted}`}>Longest</div>
+            <div className={`font-mono ${theme.colors.text.primary}`}>{longestDistance.toFixed(2)}</div>
           </div>
-          <div className="bg-gray-800/50 rounded p-2">
-            <div className="text-gray-400 mb-1">Easiest</div>
-            <div className="text-white">{hasEasyPath ? "Available" : "None"}</div>
+          <div className={`bg-black/30 ${theme.layout.borderRadius} p-2 border ${theme.colors.border}`}>
+            <div className={`mb-1 ${theme.colors.text.muted}`}>Easiest</div>
+            <div className={theme.colors.text.primary}>{hasEasyPath ? "Available" : "None"}</div>
           </div>
-          <div className="bg-gray-800/50 rounded p-2">
-            <div className="text-gray-400 mb-1">No Bridges</div>
-            <div className="text-white">
+          <div className={`bg-black/30 ${theme.layout.borderRadius} p-2 border ${theme.colors.border}`}>
+            <div className={`mb-1 ${theme.colors.text.muted}`}>No Bridges</div>
+            <div className={theme.colors.text.primary}>
               {noBridgePaths} {noBridgePaths === 1 ? "path" : "paths"}
             </div>
           </div>
         </div>
-        <p className="text-gray-300 mt-3">
+        <p className={`mt-3 ${theme.colors.text.secondary}`}>
           Each path offers different trade-offs. Shorter isn&apos;t always better—consider
           difficulty and bridge requirements.
         </p>

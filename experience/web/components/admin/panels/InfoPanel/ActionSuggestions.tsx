@@ -2,6 +2,7 @@
 
 import { useVisualizationStore } from "@/stores/useVisualizationStore";
 import { useAmbientAudio } from "@/hooks/useAmbientAudio";
+import { useAdminTheme } from "@/hooks/admin/useAdminTheme";
 import { useMemo } from "react";
 import { Emotion } from "@/types/visualization";
 
@@ -17,6 +18,7 @@ export function ActionSuggestions() {
   const setIsFlying = useVisualizationStore((state) => state.setIsFlying);
 
   const { playClickSound } = useAmbientAudio();
+  const theme = useAdminTheme();
 
   // Helper to find "opposite" emotion (inverse VAC)
   const findOpposite = useMemo(
@@ -135,9 +137,16 @@ export function ActionSuggestions() {
 
   if (suggestions.length === 0) return null;
 
+  // Derive mode-reactive button styles from theme
+  const variantStyles = {
+    primary: `${theme.effects.glass} ${theme.colors.primary} ${theme.colors.hover}`,
+    secondary: `bg-black/20 border ${theme.colors.border} ${theme.colors.text.secondary} ${theme.colors.hover}`,
+    accent: `${theme.effects.glass} ${theme.effects.glow} ${theme.colors.secondary} ${theme.colors.hover}`,
+  };
+
   return (
-    <div className="p-4 bg-gray-900/30 border-b border-gray-800">
-      <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">
+    <div className={`p-4 border-b transition-colors duration-500 bg-black/10 ${theme.colors.border}`}>
+      <h3 className={`text-xs font-semibold uppercase tracking-wider mb-2 ${theme.colors.text.muted}`}>
         Suggested Actions
       </h3>
       <div className="grid grid-cols-1 gap-2">
@@ -149,10 +158,8 @@ export function ActionSuggestions() {
               action.onClick();
             }}
             className={`
-              flex items-center gap-3 px-3 py-2 rounded-md text-sm font-medium transition-all group
-              ${action.variant === "primary" ? "bg-cyan-900/30 text-cyan-200 hover:bg-cyan-900/50 border border-cyan-800/30" : ""}
-              ${action.variant === "secondary" ? "bg-gray-800/40 text-gray-300 hover:bg-gray-800/70 border border-gray-700/30" : ""}
-              ${action.variant === "accent" ? "bg-purple-900/30 text-purple-200 hover:bg-purple-900/50 border border-purple-800/30" : ""}
+              flex items-center gap-3 px-3 py-2 ${theme.layout.borderRadius} text-sm font-medium transition-all duration-500 group
+              ${variantStyles[action.variant]}
             `}
           >
             <span className="text-lg opacity-80 group-hover:scale-110 transition-transform">

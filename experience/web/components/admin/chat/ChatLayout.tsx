@@ -7,6 +7,8 @@
 
 "use client";
 
+import { useAdminTheme } from "@/hooks/admin/useAdminTheme";
+
 interface ChatLayoutProps {
   isExpanded: boolean;
   isFullscreen: boolean;
@@ -26,9 +28,10 @@ export function ChatLayout({
   onToggleExpand,
   onMouseDown,
 }: ChatLayoutProps) {
+  const theme = useAdminTheme();
   return (
     <div
-      className={`fixed ${isFullscreen ? "inset-0 z-50" : "bottom-0 left-0 right-0 z-40"} bg-gray-900/98 backdrop-blur-sm border-t-2 border-cyan-500/50 shadow-[0_-4px_20px_rgba(6,182,212,0.3)] flex flex-col transition-all duration-300`}
+      className={`fixed ${isFullscreen ? "inset-0 z-50" : "bottom-0 left-0 right-0 z-40"} backdrop-blur-sm border-t-2 border-cyan-500/50 shadow-[0_-4px_20px_rgba(6,182,212,0.3)] flex flex-col transition-all duration-300 ${theme.colors.background}`}
       style={{ height: isFullscreen ? "100vh" : `${height}px` }}
     >
       {/* Resize Handle - Only active when expanded */}
@@ -39,7 +42,7 @@ export function ChatLayout({
             isResizing ? "bg-cyan-500/50" : ""
           }`}
         >
-          <div className="w-12 h-1 bg-gray-600 rounded-full" />
+          <div className={`w-12 h-1 rounded-full ${theme.colors.border}`} />
         </div>
       )}
 
@@ -49,7 +52,7 @@ export function ChatLayout({
       ) : (
         <button
           onClick={onToggleExpand}
-          className="flex-1 flex items-center justify-center text-gray-400 hover:text-gray-300 text-sm transition hover:bg-gray-800/50 cursor-pointer"
+          className={`flex-1 flex items-center justify-center text-sm transition cursor-pointer ${theme.colors.text.muted} hover:${theme.colors.text.secondary} ${theme.colors.hover}`}
         >
           <span>Click here or press ▲ to open chat and analyze your emotions</span>
         </button>

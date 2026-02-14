@@ -7,6 +7,7 @@
 "use client";
 
 import type { EmotionRelationship } from "@/types/chat";
+import { useAdminTheme } from "@/hooks/admin/useAdminTheme";
 
 interface RelationshipIndicatorProps {
   relationship: EmotionRelationship;
@@ -21,6 +22,7 @@ export function RelationshipIndicator({
   onClick,
   className = "",
 }: RelationshipIndicatorProps) {
+  const theme = useAdminTheme();
   // Get icon based on relationship type
   const getIcon = () => {
     switch (relationship.type) {
@@ -92,7 +94,7 @@ export function RelationshipIndicator({
         <div className="flex-1 min-w-0">
           {/* Emotion names */}
           <div className="font-medium truncate">
-            <span className="text-white">{relationship.emotion_a}</span>{" "}
+            <span className={theme.colors.text.primary}>{relationship.emotion_a}</span>{" "}
             <span className="opacity-60">
               {relationship.type === "masking" ||
               relationship.type === "amplifying" ||
@@ -100,7 +102,7 @@ export function RelationshipIndicator({
                 ? "→"
                 : "⟷"}
             </span>{" "}
-            <span className="text-white">{relationship.emotion_b}</span>
+            <span className={theme.colors.text.primary}>{relationship.emotion_b}</span>
           </div>
 
           {/* Type label */}
@@ -114,7 +116,7 @@ export function RelationshipIndicator({
           {/* Strength bar */}
           {relationship.strength !== undefined && (
             <div
-              className={`w-full bg-gray-800 rounded-full mt-2 overflow-hidden ${strengthBarHeight[size]}`}
+              className={`w-full bg-black/30 rounded-full mt-2 overflow-hidden ${strengthBarHeight[size]}`}
             >
               <div
                 className="h-full bg-current transition-all duration-300"
@@ -149,6 +151,7 @@ export function RelationshipList({
   onRelationshipClick,
   className = "",
 }: RelationshipListProps) {
+  const theme = useAdminTheme();
   if (!relationships || relationships.length === 0) {
     return null;
   }
@@ -170,7 +173,7 @@ export function RelationshipList({
       <div className={`space-y-4 ${className}`}>
         {Object.entries(grouped).map(([type, rels]) => (
           <div key={type}>
-            <h4 className="text-xs uppercase tracking-wide text-gray-400 mb-2">
+            <h4 className={`text-xs uppercase tracking-wide mb-2 ${theme.colors.text.secondary}`}>
               {type} ({rels.length})
             </h4>
             <div className="space-y-2">

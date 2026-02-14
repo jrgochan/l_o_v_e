@@ -7,13 +7,14 @@
  * - Full journey display for each path
  * - Clickable waypoints
  *
- * Uses usePathSorting hook for sorting and badge calculation.
+ * Mode-reactive via useAdminTheme.
  */
 
 "use client";
 
 import { usePathSorting } from "@/hooks/admin/usePathSorting";
 import { useVisualizationStore } from "@/stores/useVisualizationStore";
+import { useAdminTheme } from "@/hooks/admin/useAdminTheme";
 import { DIFFICULTY_COLORS } from "@/types/visualization";
 import type { EmotionPath, PathWaypoint } from "@/types/visualization";
 
@@ -32,15 +33,16 @@ export function PathSummaryList({
 }: PathSummaryListProps) {
   const sortedPaths = usePathSorting(paths);
   const setSelectedPath = useVisualizationStore((state) => state.setSelectedPath);
+  const theme = useAdminTheme();
 
   if (paths.length === 0) return null;
 
   return (
     <section>
-      <h2 className="text-sm font-semibold text-gray-400 mb-3">Selected Paths ({paths.length})</h2>
+      <h2 className={`text-sm font-semibold mb-3 ${theme.colors.text.secondary}`}>Selected Paths ({paths.length})</h2>
       {isComputingPaths && (
-        <div className="flex items-center gap-2 text-cyan-400 text-sm mb-3">
-          <div className="animate-spin h-4 w-4 border-2 border-cyan-400 border-t-transparent rounded-full" />
+        <div className={`flex items-center gap-2 text-sm mb-3 ${theme.colors.primary}`}>
+          <div className={`animate-spin h-4 w-4 border-2 border-current border-t-transparent rounded-full`} />
           <span>Computing paths...</span>
         </div>
       )}
@@ -53,13 +55,13 @@ export function PathSummaryList({
           return (
             <div
               key={pathId}
-              className={`rounded-lg p-3 text-sm border ${
-                isSelected ? "bg-cyan-900/40 border-cyan-500" : "bg-gray-800 border-gray-700"
+              className={`${theme.layout.borderRadius} p-3 text-sm border transition-colors duration-500 ${
+                isSelected ? `${theme.effects.glass} ${theme.effects.glow}` : `bg-black/20 ${theme.colors.border}`
               }`}
             >
               {/* Path Header */}
               <div className="flex items-center justify-between mb-2">
-                <div className="font-medium text-white">
+                <div className={`font-medium ${theme.colors.text.primary}`}>
                   {badges.isShort && <span className="text-green-400 mr-1">⭐</span>}
                   {path.from.name} → {path.to.name}
                 </div>
@@ -88,7 +90,7 @@ export function PathSummaryList({
               </div>
 
               {/* Path Metrics */}
-              <div className="flex items-center gap-3 mb-2 text-xs text-gray-400">
+              <div className={`flex items-center gap-3 mb-2 text-xs ${theme.colors.text.muted}`}>
                 <span className="font-mono">Dist: {path.total_distance.toFixed(3)}</span>
                 <span className="flex items-center gap-1">
                   <div
@@ -105,16 +107,16 @@ export function PathSummaryList({
               </div>
 
               {/* Full Journey Display */}
-              <div className="mt-3 pt-3 border-t border-gray-700">
-                <div className="text-xs font-semibold text-gray-400 mb-2">
+              <div className={`mt-3 pt-3 border-t ${theme.colors.border}`}>
+                <div className={`text-xs font-semibold mb-2 ${theme.colors.text.secondary}`}>
                   Journey ({path.waypoints.length + 2} steps):
                 </div>
                 <div className="space-y-1.5">
                   {/* Start */}
                   <div className="flex items-center gap-2 text-xs">
-                    <span className="text-blue-400">1.</span>
-                    <span className="text-gray-300">{path.from.name}</span>
-                    <span className="text-blue-400 text-[10px]">(start)</span>
+                    <span className={theme.colors.secondary}>1.</span>
+                    <span className={theme.colors.text.secondary}>{path.from.name}</span>
+                    <span className={`text-[10px] ${theme.colors.secondary}`}>(start)</span>
                   </div>
 
                   {/* Waypoints - Clickable */}
@@ -126,18 +128,18 @@ export function PathSummaryList({
                         setSelectedPath(pathId);
                         onWaypointClick(path, wp, wpIdx);
                       }}
-                      className="w-full flex items-center gap-2 text-xs hover:bg-gray-700 rounded px-1 py-0.5 transition cursor-pointer text-left"
+                      className={`w-full flex items-center gap-2 text-xs ${theme.colors.hover} ${theme.layout.borderRadius} px-1 py-0.5 transition cursor-pointer text-left`}
                     >
-                      <span className="text-cyan-400">{wpIdx + 2}.</span>
-                      <span className="text-white">{wp.emotion}</span>
-                      <span className="text-cyan-400 text-[10px] ml-auto">→ details</span>
+                      <span className={theme.colors.primary}>{wpIdx + 2}.</span>
+                      <span className={theme.colors.text.primary}>{wp.emotion}</span>
+                      <span className={`text-[10px] ml-auto ${theme.colors.primary}`}>→ details</span>
                     </button>
                   ))}
 
                   {/* Goal */}
                   <div className="flex items-center gap-2 text-xs">
                     <span className="text-green-400">{path.waypoints.length + 2}.</span>
-                    <span className="text-gray-300">{path.to.name}</span>
+                    <span className={theme.colors.text.secondary}>{path.to.name}</span>
                     <span className="text-green-400 text-[10px]">(goal)</span>
                   </div>
                 </div>
@@ -145,7 +147,7 @@ export function PathSummaryList({
 
               {/* Bridge Requirement */}
               {path.requires_bridge && path.bridge_emotions && (
-                <div className="mt-2 pt-2 border-t border-gray-700">
+                <div className={`mt-2 pt-2 border-t ${theme.colors.border}`}>
                   <div className="text-xs text-yellow-400">
                     ★ Requires: {path.bridge_emotions.join(", ")}
                   </div>

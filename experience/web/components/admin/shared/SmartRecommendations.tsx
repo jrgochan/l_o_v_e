@@ -15,6 +15,7 @@ import { useVisualizationStore } from "@/stores/useVisualizationStore";
 import { logger } from "@/utils/logger";
 import type { RecommendationsResponse } from "@/types/api-responses";
 import { OBSERVER_URL } from "@/config/environment";
+import { useAdminTheme } from "@/hooks/admin/useAdminTheme";
 
 type ContextType = "exploration" | "healing" | "growth";
 
@@ -30,6 +31,7 @@ export function SmartRecommendations() {
   const selectMultiple = useVisualizationStore((state) => state.selectMultiple);
   const clearSelection = useVisualizationStore((state) => state.clearSelection);
   const updateSetting = useVisualizationStore((state) => state.updateSetting);
+  const theme = useAdminTheme();
 
   const applyJourney = (emotionIds: string[]) => {
     // Temporarily set to always mode if in manual
@@ -82,7 +84,7 @@ export function SmartRecommendations() {
   if (loading && !recommendations) {
     return (
       <div className="p-4 flex items-center justify-center">
-        <div className="animate-spin h-5 w-5 border-2 border-cyan-400 border-t-transparent rounded-full" />
+        <div className={`animate-spin h-5 w-5 border-2 ${theme.colors.primary.replace('text-', 'border-')} border-t-transparent rounded-full`} />
       </div>
     );
   }
@@ -103,30 +105,30 @@ export function SmartRecommendations() {
       <div className="flex gap-2">
         <button
           onClick={() => setContext("exploration")}
-          className={`flex-1 px-3 py-2 text-xs rounded transition ${
+          className={`flex-1 px-3 py-2 text-xs ${theme.layout.borderRadius} transition ${
             context === "exploration"
-              ? "bg-cyan-600 text-white"
-              : "bg-gray-700 text-gray-300 hover:bg-gray-600"
+              ? `${theme.colors.primary} border border-white/10 bg-white/10`
+              : `bg-black/20 border ${theme.colors.border} ${theme.colors.text.secondary} ${theme.colors.hover}`
           }`}
         >
           🔍 Explore
         </button>
         <button
           onClick={() => setContext("healing")}
-          className={`flex-1 px-3 py-2 text-xs rounded transition ${
+          className={`flex-1 px-3 py-2 text-xs ${theme.layout.borderRadius} transition ${
             context === "healing"
-              ? "bg-cyan-600 text-white"
-              : "bg-gray-700 text-gray-300 hover:bg-gray-600"
+              ? `${theme.colors.primary} border border-white/10 bg-white/10`
+              : `bg-black/20 border ${theme.colors.border} ${theme.colors.text.secondary} ${theme.colors.hover}`
           }`}
         >
           💚 Healing
         </button>
         <button
           onClick={() => setContext("growth")}
-          className={`flex-1 px-3 py-2 text-xs rounded transition ${
+          className={`flex-1 px-3 py-2 text-xs ${theme.layout.borderRadius} transition ${
             context === "growth"
-              ? "bg-cyan-600 text-white"
-              : "bg-gray-700 text-gray-300 hover:bg-gray-600"
+              ? `${theme.colors.primary} border border-white/10 bg-white/10`
+              : `bg-black/20 border ${theme.colors.border} ${theme.colors.text.secondary} ${theme.colors.hover}`
           }`}
         >
           🌱 Growth
@@ -136,7 +138,7 @@ export function SmartRecommendations() {
       {/* Curated Journeys */}
       {recommendations?.curated_journeys && recommendations.curated_journeys.length > 0 && (
         <section>
-          <h4 className="text-xs font-semibold text-gray-400 mb-2">
+          <h4 className={`text-xs font-semibold mb-2 ${theme.colors.text.secondary}`}>
             {context === "healing"
               ? "💚 Healing Journeys"
               : context === "growth"
@@ -147,13 +149,13 @@ export function SmartRecommendations() {
             {recommendations.curated_journeys.map((journey) => (
               <div
                 key={journey.id}
-                className="bg-gray-800 hover:bg-gray-750 rounded-lg p-3 cursor-pointer transition border border-gray-700 hover:border-cyan-500"
+                className={`bg-black/20 ${theme.colors.hover} ${theme.layout.borderRadius} p-3 cursor-pointer transition-colors duration-300 border ${theme.colors.border}`}
                 onClick={() => applyJourney(journey.emotion_ids)}
               >
                 <div className="flex items-start justify-between mb-1">
                   <div className="flex items-center gap-2">
                     <span className="text-lg">{journey.icon}</span>
-                    <h5 className="text-sm font-semibold text-white">{journey.name}</h5>
+                    <h5 className={`text-sm font-semibold ${theme.colors.text.primary}`}>{journey.name}</h5>
                   </div>
                   <span
                     className={`text-[10px] px-2 py-0.5 rounded ${
@@ -167,14 +169,14 @@ export function SmartRecommendations() {
                     {journey.difficulty}
                   </span>
                 </div>
-                <p className="text-xs text-gray-300 mb-2">{journey.description}</p>
+                <p className={`text-xs mb-2 ${theme.colors.text.secondary}`}>{journey.description}</p>
                 <div className="flex items-center justify-between text-xs">
-                  <span className="text-gray-400">
+                  <span className={theme.colors.text.muted}>
                     {journey.emotion_count} emotions • {journey.estimated_time}
                   </span>
-                  <span className="text-cyan-400">Click to apply →</span>
+                  <span className={theme.colors.primary}>Click to apply →</span>
                 </div>
-                <p className="text-xs text-gray-500 mt-2 italic">{journey.research}</p>
+                <p className={`text-xs mt-2 italic ${theme.colors.text.muted}`}>{journey.research}</p>
               </div>
             ))}
           </div>
@@ -185,21 +187,21 @@ export function SmartRecommendations() {
       {recommendations?.complementary_suggestions &&
         recommendations.complementary_suggestions.length > 0 && (
           <section>
-            <h4 className="text-xs font-semibold text-gray-400 mb-2">💡 Smart Suggestions</h4>
+            <h4 className={`text-xs font-semibold mb-2 ${theme.colors.text.secondary}`}>💡 Smart Suggestions</h4>
             <div className="space-y-2">
               {recommendations.complementary_suggestions.map((sug, idx: number) => (
                 <button
                   key={idx}
                   onClick={() => selectMultiple([...Array.from(selectedIds), sug.id])}
-                  className="w-full bg-gray-800 hover:bg-gray-750 rounded p-2 text-left transition border border-gray-700 hover:border-purple-500"
+                  className={`w-full bg-black/20 ${theme.colors.hover} ${theme.layout.borderRadius} p-2 text-left transition-colors duration-300 border ${theme.colors.border}`}
                 >
                   <div className="flex items-center justify-between">
-                    <span className="text-sm text-white">{sug.name}</span>
+                    <span className={`text-sm ${theme.colors.text.primary}`}>{sug.name}</span>
                     <span className="text-[10px] px-2 py-0.5 bg-purple-600 text-white rounded">
                       {sug.type}
                     </span>
                   </div>
-                  <p className="text-xs text-gray-400 mt-1">{sug.reason}</p>
+                  <p className={`text-xs mt-1 ${theme.colors.text.muted}`}>{sug.reason}</p>
                 </button>
               ))}
             </div>
@@ -210,8 +212,8 @@ export function SmartRecommendations() {
       {recommendations?.problematic_transitions &&
         recommendations.problematic_transitions.length > 0 && (
           <section>
-            <h4 className="text-xs font-semibold text-gray-400 mb-2">🔬 Research Opportunities</h4>
-            <p className="text-xs text-gray-500 mb-2">Hardest transitions - great for study</p>
+            <h4 className={`text-xs font-semibold mb-2 ${theme.colors.text.secondary}`}>🔬 Research Opportunities</h4>
+            <p className={`text-xs mb-2 ${theme.colors.text.muted}`}>Hardest transitions - great for study</p>
             <div className="space-y-2 max-h-48 overflow-y-auto">
               {recommendations.problematic_transitions.slice(0, 5).map((trans, idx: number) => (
                 <button
@@ -225,7 +227,7 @@ export function SmartRecommendations() {
                   <div className="text-xs text-white font-medium">
                     {trans.from_name} → {trans.to_name}
                   </div>
-                  <div className="flex items-center gap-2 text-[10px] text-gray-400 mt-1">
+                  <div className={`flex items-center gap-2 text-[10px] mt-1 ${theme.colors.text.muted}`}>
                     <span>Dist: {trans.distance}</span>
                     <span>•</span>
                     <span>{trans.waypoint_count} waypoints</span>
@@ -238,7 +240,7 @@ export function SmartRecommendations() {
         )}
 
       {!recommendations && !loading && (
-        <div className="text-xs text-gray-500 text-center py-4">No recommendations available</div>
+        <div className={`text-xs text-center py-4 ${theme.colors.text.muted}`}>No recommendations available</div>
       )}
     </div>
   );

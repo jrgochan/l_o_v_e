@@ -5,6 +5,7 @@ import { ChatMessageList } from "./ChatMessageList";
 import type { DisplayMessage, ToneMode } from "@/types/chat";
 import { logger } from "@/utils/logger";
 import { api } from "@/utils/api";
+import { useAdminTheme } from "@/hooks/admin/useAdminTheme";
 
 interface ThreadViewProps {
   rootMessageId: string;
@@ -14,6 +15,7 @@ interface ThreadViewProps {
 }
 
 export function ThreadView({ rootMessageId, onClose, toneMode, deepFeelingMode }: ThreadViewProps) {
+  const theme = useAdminTheme();
   const [messages, setMessages] = useState<DisplayMessage[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -51,16 +53,16 @@ export function ThreadView({ rootMessageId, onClose, toneMode, deepFeelingMode }
   }, [rootMessageId]);
 
   return (
-    <div className="absolute inset-0 z-50 bg-gray-900/95 backdrop-blur-md flex flex-col animate-in slide-in-from-right duration-300">
+    <div className={`absolute inset-0 z-50 backdrop-blur-md flex flex-col animate-in slide-in-from-right duration-300 ${theme.colors.background}`}>
       {/* Header */}
-      <div className="flex items-center justify-between px-4 py-3 border-b border-gray-700 bg-gray-900">
+      <div className={`flex items-center justify-between px-4 py-3 border-b ${theme.colors.border} ${theme.colors.background}`}>
         <div className="flex items-center gap-2">
           <span className="text-cyan-400">🧵</span>
           <h3 className="text-lg font-semibold text-white">Thread Context</h3>
         </div>
         <button
           onClick={onClose}
-          className="p-2 hover:bg-gray-800 rounded-full text-gray-400 hover:text-white transition"
+          className={`p-2 rounded-full transition ${theme.colors.hover} ${theme.colors.text.muted} hover:${theme.colors.text.primary}`}
         >
           ✕
         </button>

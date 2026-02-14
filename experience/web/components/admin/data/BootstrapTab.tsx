@@ -2,8 +2,10 @@ import { useState, useEffect } from "react";
 import { Plus, Edit2, Trash2, Save, X, RefreshCw } from "lucide-react";
 import { adminApi } from "@/utils/api";
 import { BootstrapData, BootstrapDataCreate } from "@/types/admin";
+import { useAdminTheme } from "@/hooks/admin/useAdminTheme";
 
 export default function BootstrapTab() {
+  const theme = useAdminTheme();
   const [data, setData] = useState<BootstrapData[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -97,13 +99,13 @@ export default function BootstrapTab() {
     return (
       <div className="space-y-6">
         <div className="flex justify-between items-center">
-          <h2 className="text-xl font-bold text-white">
+          <h2 className={`text-xl font-bold ${theme.colors.text.primary}`}>
             {currentEdit.id ? "Edit Item" : "New Item"}
           </h2>
           <div className="flex gap-2">
             <button
               onClick={() => setIsEditing(false)}
-              className="flex items-center gap-2 px-4 py-2 bg-gray-700/50 hover:bg-gray-700 rounded-lg text-white"
+              className={`flex items-center gap-2 px-4 py-2 rounded-lg ${theme.colors.background} ${theme.colors.hover} ${theme.colors.text.primary}`}
               aria-label="Cancel"
             >
               <X className="w-4 h-4" /> Cancel
@@ -126,14 +128,14 @@ export default function BootstrapTab() {
 
         <div className="grid grid-cols-2 gap-4">
           <div>
-            <label htmlFor="type-select" className="block text-sm font-medium text-gray-400 mb-1">
+            <label htmlFor="type-select" className={`block text-sm font-medium mb-1 ${theme.colors.text.muted}`}>
               Data Type
             </label>
             <select
               id="type-select"
               value={currentEdit.data_type}
               onChange={(e) => setCurrentEdit({ ...currentEdit, data_type: e.target.value })}
-              className="w-full bg-gray-800 border border-gray-700 rounded-md p-2 text-white"
+              className={`w-full rounded-md p-2 ${theme.colors.background} border ${theme.colors.border} ${theme.colors.text.primary}`}
             >
               {DATA_TYPES.map((t) => (
                 <option key={t} value={t}>
@@ -143,7 +145,7 @@ export default function BootstrapTab() {
             </select>
           </div>
           <div>
-            <label htmlFor="cat-input" className="block text-sm font-medium text-gray-400 mb-1">
+            <label htmlFor="cat-input" className={`block text-sm font-medium mb-1 ${theme.colors.text.muted}`}>
               Category (Optional)
             </label>
             <input
@@ -151,13 +153,13 @@ export default function BootstrapTab() {
               type="text"
               value={currentEdit.data_category || ""}
               onChange={(e) => setCurrentEdit({ ...currentEdit, data_category: e.target.value })}
-              className="w-full bg-gray-800 border border-gray-700 rounded-md p-2 text-white"
+              className={`w-full rounded-md p-2 ${theme.colors.background} border ${theme.colors.border} ${theme.colors.text.primary}`}
             />
           </div>
         </div>
 
         <div>
-          <label htmlFor="json-input" className="block text-sm font-medium text-gray-400 mb-1">
+          <label htmlFor="json-input" className={`block text-sm font-medium mb-1 ${theme.colors.text.muted}`}>
             JSON Content
           </label>
           <textarea
@@ -174,9 +176,9 @@ export default function BootstrapTab() {
                 // Silent fail on parse error during type (UX improvement needed later)
               }
             }}
-            className="w-full h-96 bg-gray-900 font-mono text-sm text-green-400 p-4 rounded-lg border border-gray-700"
+            className={`w-full h-96 font-mono text-sm text-green-400 p-4 rounded-lg border ${theme.colors.background} ${theme.colors.border}`}
           />
-          <p className="text-xs text-gray-500 mt-2">Must be valid JSON.</p>
+          <p className={`text-xs mt-2 ${theme.colors.text.muted}`}>Must be valid JSON.</p>
         </div>
       </div>
     );
@@ -191,11 +193,11 @@ export default function BootstrapTab() {
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <div className="flex gap-4 items-center">
-          <h2 className="text-xl font-bold text-white">Bootstrap Data</h2>
+          <h2 className={`text-xl font-bold ${theme.colors.text.primary}`}>Bootstrap Data</h2>
           <select
             value={filterType}
             onChange={(e) => setFilterType(e.target.value)}
-            className="bg-gray-800 border border-gray-700 rounded-md px-3 py-1 text-sm text-white"
+            className={`rounded-md px-3 py-1 text-sm ${theme.colors.background} border ${theme.colors.border} ${theme.colors.text.primary}`}
             aria-label="Filter by Type"
           >
             <option value="all">All Types</option>
@@ -209,7 +211,7 @@ export default function BootstrapTab() {
         <div className="flex gap-2">
           <button
             onClick={loadData}
-            className="p-2 bg-gray-800 hover:bg-gray-700 rounded-lg text-gray-400"
+            className={`p-2 rounded-lg ${theme.colors.background} ${theme.colors.hover} ${theme.colors.text.muted}`}
             title="Refresh"
             aria-label="Refresh Data"
           >
@@ -235,7 +237,7 @@ export default function BootstrapTab() {
         {data.map((item) => (
           <div
             key={item.id}
-            className="bg-gray-800/50 border border-gray-700 rounded-lg p-4 hover:border-gray-600 transition-colors"
+            className={`rounded-lg p-4 transition-colors ${theme.colors.background} border ${theme.colors.border} ${theme.colors.hover}`}
           >
             <div className="flex justify-between items-start">
               <div>
@@ -244,22 +246,22 @@ export default function BootstrapTab() {
                     {item.data_type}
                   </span>
                   {item.data_category && (
-                    <span className="px-2 py-0.5 bg-gray-700 text-gray-300 text-xs rounded-full">
+                    <span className={`px-2 py-0.5 text-xs rounded-full ${theme.colors.background} ${theme.colors.text.secondary}`}>
                       {item.data_category}
                     </span>
                   )}
-                  <span className="text-gray-500 text-xs">
+                  <span className={`text-xs ${theme.colors.text.muted}`}>
                     {new Date(item.created_at).toLocaleDateString()}
                   </span>
                 </div>
-                <pre className="text-xs text-gray-400 bg-gray-900/50 p-2 rounded max-h-32 overflow-y-auto w-full max-w-2xl">
+                <pre className={`text-xs p-2 rounded max-h-32 overflow-y-auto w-full max-w-2xl ${theme.colors.background} ${theme.colors.text.muted}`}>
                   {JSON.stringify(item.content, null, 2)}
                 </pre>
               </div>
               <div className="flex gap-2">
                 <button
                   onClick={() => handleEdit(item)}
-                  className="p-1.5 hover:bg-gray-700 rounded text-gray-400 hover:text-white"
+                  className={`p-1.5 ${theme.colors.hover} rounded ${theme.colors.text.muted} hover:${theme.colors.text.primary}`}
                   aria-label={`Edit ${item.id}`}
                   data-testid={`edit-btn-${item.id}`}
                 >
@@ -267,7 +269,7 @@ export default function BootstrapTab() {
                 </button>
                 <button
                   onClick={() => handleDelete(item.id)}
-                  className="p-1.5 hover:bg-gray-700 rounded text-gray-400 hover:text-red-400"
+                  className={`p-1.5 ${theme.colors.hover} rounded ${theme.colors.text.muted} hover:text-red-400`}
                   aria-label={`Delete ${item.id}`}
                   data-testid={`delete-btn-${item.id}`}
                 >
@@ -279,7 +281,7 @@ export default function BootstrapTab() {
         ))}
 
         {data.length === 0 && !loading && (
-          <div className="text-center py-12 text-gray-500">No bootstrap data found.</div>
+          <div className={`text-center py-12 ${theme.colors.text.muted}`}>No bootstrap data found.</div>
         )}
       </div>
     </div>

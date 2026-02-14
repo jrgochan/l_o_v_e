@@ -21,6 +21,7 @@
 
 import { BaseEmotionChip } from "./BaseEmotionChip";
 import type { DetectedEmotion } from "@/types/chat";
+import { useAdminTheme } from "@/hooks/admin/useAdminTheme";
 
 interface EmotionClusterProps {
   emotions: DetectedEmotion[];
@@ -44,8 +45,9 @@ export function EmotionCluster({
   onEmotionClick,
   className = "",
 }: EmotionClusterProps) {
+  const theme = useAdminTheme();
   if (emotions.length === 0) {
-    return <div className="text-sm text-gray-400 italic">No emotions detected</div>;
+    return <div className={`text-sm italic ${theme.colors.text.muted}`}>No emotions detected</div>;
   }
 
   const layoutClass = layout === "grid" ? "grid grid-cols-2 gap-2" : "flex flex-wrap gap-2";
@@ -78,8 +80,9 @@ export function EmotionList({
   emotions: DetectedEmotion[];
   onEmotionClick?: (emotion: DetectedEmotion) => void;
 }) {
+  const theme = useAdminTheme();
   if (emotions.length === 0) {
-    return <div className="text-sm text-gray-400 italic">No emotions detected</div>;
+    return <div className={`text-sm italic ${theme.colors.text.muted}`}>No emotions detected</div>;
   }
 
   return (
@@ -87,7 +90,7 @@ export function EmotionList({
       {emotions.map((emotion, index) => (
         <div
           key={emotion.id || `${emotion.emotion_name}-${index}`}
-          className="flex items-center justify-between bg-gray-800/50 rounded-lg p-2 hover:bg-gray-800 transition"
+          className={`flex items-center justify-between rounded-lg p-2 transition ${theme.colors.background} ${theme.colors.hover}`}
         >
           <BaseEmotionChip
             emotion={emotion.emotion_name}
@@ -97,7 +100,7 @@ export function EmotionList({
             onClick={onEmotionClick ? () => onEmotionClick(emotion) : undefined}
           />
           {emotion.confidence && (
-            <span className="text-xs text-gray-400 font-mono">
+            <span className={`text-xs font-mono ${theme.colors.text.muted}`}>
               {(emotion.confidence * 100).toFixed(0)}%
             </span>
           )}

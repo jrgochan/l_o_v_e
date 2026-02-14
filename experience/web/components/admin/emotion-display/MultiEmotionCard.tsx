@@ -20,6 +20,7 @@ import { AggregateSphere } from "../spheres/AggregateSphere";
 import { EmotionMappingBadge } from "./EmotionMappingBadge";
 import { useVisualizationStore } from "@/stores/useVisualizationStore";
 import type { DetectedEmotion, EmotionRelationship, AggregateState } from "@/types/chat";
+import { useAdminTheme } from "@/hooks/admin/useAdminTheme";
 
 interface MultiEmotionCardProps {
   emotions: DetectedEmotion[];
@@ -36,6 +37,7 @@ export function MultiEmotionCard({
   onEmotionClick,
   className = "",
 }: MultiEmotionCardProps) {
+  const theme = useAdminTheme();
   const [showUnderlying, setShowUnderlying] = useState(false);
   const [showGraph, setShowGraph] = useState(false);
   const [showSphere, setShowSphere] = useState(false);
@@ -56,7 +58,7 @@ export function MultiEmotionCard({
     <div className={`space-y-4 ${className}`}>
       {/* Primary Emotion Card */}
       {primary && (
-        <div className="bg-gray-800 rounded-lg p-4 border-2 border-purple-500/50">
+        <div className={`rounded-lg p-4 border-2 border-purple-500/50 ${theme.colors.background}`}>
           <div className="text-xs text-purple-300 mb-2">PRIMARY EMOTION</div>
           <div className="flex items-start justify-between">
             <div className="flex-1">
@@ -70,7 +72,7 @@ export function MultiEmotionCard({
                   className="mb-2"
                 />
               )}
-              <p className="text-sm text-gray-400 mb-3">{primary.category}</p>
+              <p className={`text-sm mb-3 ${theme.colors.text.muted}`}>{primary.category}</p>
 
               {/* VAC Coordinates */}
               <div className="space-y-1 text-sm">
@@ -94,8 +96,8 @@ export function MultiEmotionCard({
               <div className="text-2xl font-bold text-green-400">
                 {(primary.confidence * 100).toFixed(0)}%
               </div>
-              <div className="text-xs text-gray-400">Confidence</div>
-              <div className="w-24 h-2 bg-gray-700 rounded-full mt-2 overflow-hidden">
+              <div className={`text-xs ${theme.colors.text.muted}`}>Confidence</div>
+              <div className={`w-24 h-2 rounded-full mt-2 overflow-hidden ${theme.colors.background}`}>
                 <div
                   className="h-full bg-gradient-to-r from-green-500 to-green-400"
                   style={{ width: `${primary.confidence * 100}%` }}
@@ -109,11 +111,11 @@ export function MultiEmotionCard({
       {/* Secondary Emotions */}
       {secondary.length > 0 && (
         <div className="space-y-2">
-          <div className="text-xs text-gray-400 uppercase tracking-wide">Secondary Emotions</div>
+          <div className={`text-xs uppercase tracking-wide ${theme.colors.text.muted}`}>Secondary Emotions</div>
           {secondary.map((emo, index) => (
             <div
               key={`secondary-${index}`}
-              className="bg-gray-800/70 rounded-lg p-3 border border-gray-600 hover:border-gray-500 transition cursor-pointer"
+              className={`rounded-lg p-3 border transition cursor-pointer ${theme.colors.background} ${theme.colors.border} ${theme.colors.hover}`}
               onClick={() => onEmotionClick?.(emo.emotion_name)}
             >
               <div className="flex items-center justify-between">
@@ -128,13 +130,13 @@ export function MultiEmotionCard({
                       className="mb-1"
                     />
                   )}
-                  <p className="text-xs text-gray-400">{emo.category}</p>
+                  <p className={`text-xs ${theme.colors.text.muted}`}>{emo.category}</p>
                 </div>
                 <div className="text-right">
-                  <div className="text-sm font-mono text-gray-300">
+                  <div className={`text-sm font-mono ${theme.colors.text.secondary}`}>
                     {(emo.confidence * 100).toFixed(0)}%
                   </div>
-                  <div className="text-xs text-gray-500">
+                  <div className={`text-xs ${theme.colors.text.muted}`}>
                     VAC: ({emo.vac.valence.toFixed(1)}, {emo.vac.arousal.toFixed(1)},{" "}
                     {emo.vac.connection.toFixed(1)})
                   </div>
@@ -150,7 +152,7 @@ export function MultiEmotionCard({
         <div>
           <button
             onClick={() => setShowUnderlying(!showUnderlying)}
-            className="w-full flex items-center justify-between text-sm text-gray-400 hover:text-gray-300 transition"
+            className={`w-full flex items-center justify-between text-sm transition ${theme.colors.text.muted}`}
           >
             <span>
               {showUnderlying ? "⊖" : "⊕"} UNDERLYING EMOTIONS ({underlying.length})
@@ -163,11 +165,11 @@ export function MultiEmotionCard({
               {underlying.map((emo, index) => (
                 <div
                   key={`underlying-${index}`}
-                  className="bg-gray-800/50 rounded-lg p-2 border border-gray-700 opacity-75"
+                  className={`rounded-lg p-2 border opacity-75 ${theme.colors.background} ${theme.colors.border}`}
                 >
                   <div className="flex items-center justify-between text-sm">
                     <span className="text-white">{emo.emotion_name}*</span>
-                    <span className="font-mono text-gray-400">
+                    <span className={`font-mono ${theme.colors.text.muted}`}>
                       {(emo.confidence * 100).toFixed(0)}%
                     </span>
                   </div>
@@ -180,12 +182,12 @@ export function MultiEmotionCard({
 
       {/* Emotion Relationships */}
       {relationships && relationships.length > 0 && (
-        <div className="bg-gray-800/50 rounded-lg p-4 border border-gray-700">
+        <div className={`rounded-lg p-4 border ${theme.colors.background} ${theme.colors.border}`}>
           <div className="flex items-center justify-between mb-3">
             <div className="text-sm font-semibold text-white">🔗 Emotion Relationships</div>
             <button
               onClick={() => setShowGraph(!showGraph)}
-              className="text-xs px-2 py-1 bg-gray-700 hover:bg-gray-600 rounded transition text-cyan-400"
+              className={`text-xs px-2 py-1 rounded transition text-cyan-400 ${theme.colors.background} ${theme.colors.hover}`}
             >
               {showGraph ? "Hide Graph" : "Show Graph"}
             </button>
@@ -218,7 +220,7 @@ export function MultiEmotionCard({
           </div>
 
           {showSphere && (
-            <div className="bg-gray-900 rounded-lg p-4 border border-purple-500/30 flex justify-center">
+            <div className={`rounded-lg p-4 border border-purple-500/30 flex justify-center ${theme.colors.background}`}>
               <AggregateSphere
                 emotions={emotions}
                 aggregate={aggregate}

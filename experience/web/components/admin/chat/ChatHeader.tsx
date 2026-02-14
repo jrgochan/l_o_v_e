@@ -84,7 +84,7 @@ export function ChatHeader({
           {/* Fullscreen Toggle */}
           <button
             onClick={onToggleFullscreen}
-            className="px-3 py-1.5 bg-gray-700 hover:bg-gray-600 text-white rounded text-sm transition"
+            className={`px-3 py-1.5 rounded text-sm transition ${theme.colors.background} ${theme.colors.hover} ${theme.colors.text.primary}`}
             title={isFullscreen ? "Exit fullscreen" : "Fullscreen mode"}
           >
             {isFullscreen ? "⊡" : "⛶"}
@@ -96,7 +96,7 @@ export function ChatHeader({
             className={`px-3 py-1.5 rounded text-sm font-medium transition ${
               chatMode === "voice"
                 ? "bg-purple-600 text-white hover:bg-purple-500"
-                : "bg-gray-700 text-white hover:bg-gray-600"
+                : `${theme.colors.background} ${theme.colors.text.primary} ${theme.colors.hover}`
             }`}
             title={`Switch to ${chatMode === "text" ? "voice" : "text"} mode`}
           >

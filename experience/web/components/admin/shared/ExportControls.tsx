@@ -9,11 +9,13 @@
 import { useVisualizationStore } from "@/stores/useVisualizationStore";
 import { logger } from "@/utils/logger";
 import { BRIDGE_EMOTIONS } from "@/types/visualization";
+import { useAdminTheme } from "@/hooks/admin/useAdminTheme";
 
 export function ExportControls() {
   const allEmotions = useVisualizationStore((state) => state.allEmotions);
   const selectedIds = useVisualizationStore((state) => state.selectedEmotionIds);
   const computedPaths = useVisualizationStore((state) => state.computedPaths);
+  const theme = useAdminTheme();
 
   /**
    * Export selected emotions and paths as JSON
@@ -142,12 +144,12 @@ ${paths.map((p, i) => `${i + 1}. ${p.from.name} → ${p.to.name} (${p.difficulty
 
   return (
     <div className="space-y-2">
-      <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Export</h3>
+      <h3 className={`text-xs font-semibold uppercase tracking-wider ${theme.colors.text.secondary}`}>Export</h3>
 
       <button
         onClick={exportJSON}
         disabled={selectedIds.size === 0}
-        className="w-full px-3 py-2 bg-blue-600 hover:bg-blue-500 disabled:bg-gray-700 disabled:text-gray-500 text-white text-sm rounded transition"
+        className={`w-full px-3 py-2 bg-blue-600 hover:bg-blue-500 disabled:bg-black/30 disabled:${theme.colors.text.muted} text-white text-sm ${theme.layout.borderRadius} transition`}
       >
         📥 Export JSON
       </button>
@@ -155,7 +157,7 @@ ${paths.map((p, i) => `${i + 1}. ${p.from.name} → ${p.to.name} (${p.difficulty
       <button
         onClick={exportCSV}
         disabled={computedPaths.size === 0}
-        className="w-full px-3 py-2 bg-green-600 hover:bg-green-500 disabled:bg-gray-700 disabled:text-gray-500 text-white text-sm rounded transition"
+        className={`w-full px-3 py-2 bg-green-600 hover:bg-green-500 disabled:bg-black/30 disabled:${theme.colors.text.muted} text-white text-sm ${theme.layout.borderRadius} transition`}
       >
         📊 Export CSV
       </button>
@@ -163,7 +165,7 @@ ${paths.map((p, i) => `${i + 1}. ${p.from.name} → ${p.to.name} (${p.difficulty
       <button
         onClick={copyToClipboard}
         disabled={selectedIds.size === 0}
-        className="w-full px-3 py-2 bg-purple-600 hover:bg-purple-500 disabled:bg-gray-700 disabled:text-gray-500 text-white text-sm rounded transition"
+        className={`w-full px-3 py-2 bg-purple-600 hover:bg-purple-500 disabled:bg-black/30 disabled:${theme.colors.text.muted} text-white text-sm ${theme.layout.borderRadius} transition`}
       >
         📋 Copy to Clipboard
       </button>
@@ -171,7 +173,7 @@ ${paths.map((p, i) => `${i + 1}. ${p.from.name} → ${p.to.name} (${p.difficulty
       <button
         onClick={generateShareableURL}
         disabled={selectedIds.size === 0}
-        className="w-full px-3 py-2 bg-orange-600 hover:bg-orange-500 disabled:bg-gray-700 disabled:text-gray-500 text-white text-sm rounded transition"
+        className={`w-full px-3 py-2 bg-orange-600 hover:bg-orange-500 disabled:bg-black/30 disabled:${theme.colors.text.muted} text-white text-sm ${theme.layout.borderRadius} transition`}
       >
         🔗 Copy Share Link
       </button>

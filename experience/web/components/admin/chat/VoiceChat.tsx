@@ -9,6 +9,7 @@
 import { useState, useRef, useEffect } from "react";
 import { usePersonaPlexVoice, type PersonaId } from "@/hooks/usePersonaPlexVoice";
 import { AudioVisualizer } from "./AudioVisualizer";
+import { useAdminTheme } from "@/hooks/admin/useAdminTheme";
 
 interface VoiceChatProps {
   personaId: PersonaId;
@@ -17,6 +18,7 @@ interface VoiceChatProps {
 }
 
 export function VoiceChat({ personaId, personaColor, personaDescription }: VoiceChatProps) {
+  const theme = useAdminTheme();
   const [debugLogs, setDebugLogs] = useState<string[]>([]);
   const addLog = (msg: string) => setDebugLogs((prev) => [...prev.slice(-50), msg]); // Keep more logs
   const logsEndRef = useRef<HTMLDivElement>(null);
@@ -74,8 +76,8 @@ export function VoiceChat({ personaId, personaColor, personaDescription }: Voice
       >
         <div className="flex items-center justify-between">
           <div>
-            <h4 className="text-lg font-semibold text-white">Voice Mode Active</h4>
-            <p className="text-sm text-gray-300 mt-1">{personaDescription}</p>
+            <h4 className={`text-lg font-semibold ${theme.colors.text.primary}`}>Voice Mode Active</h4>
+            <p className={`text-sm mt-1 ${theme.colors.text.secondary}`}>{personaDescription}</p>
           </div>
           <div
             className="w-3 h-3 rounded-full animate-pulse"
@@ -94,18 +96,18 @@ export function VoiceChat({ personaId, personaColor, personaDescription }: Voice
       </div>
 
       {/* Session Status */}
-      <div className="bg-gray-800/50 rounded-lg p-4 space-y-2">
+      <div className={`rounded-lg p-4 space-y-2 ${theme.colors.background}`}>
         <div className="flex items-center justify-between text-sm">
-          <span className="text-gray-400">Status:</span>
-          <span className={isConnected ? "text-green-400" : "text-gray-400"}>
+          <span className={theme.colors.text.muted}>Status:</span>
+          <span className={isConnected ? "text-green-400" : theme.colors.text.muted}>
             {isConnecting ? "Connecting..." : isConnected ? "Connected" : "Disconnected"}
           </span>
         </div>
 
         {latency !== null && (
           <div className="flex items-center justify-between text-sm">
-            <span className="text-gray-400">Latency:</span>
-            <span className="text-gray-300 font-mono">{latency}ms</span>
+            <span className={theme.colors.text.muted}>Latency:</span>
+            <span className={`font-mono ${theme.colors.text.secondary}`}>{latency}ms</span>
           </div>
         )}
 
@@ -149,8 +151,8 @@ export function VoiceChat({ personaId, personaColor, personaDescription }: Voice
             onClick={toggleMute}
             className={`px-6 py-4 rounded-lg font-semibold transition ${
               isMuted
-                ? "bg-gray-700 hover:bg-gray-600 text-gray-300"
-                : "bg-gray-800 hover:bg-gray-700 text-white"
+                ? `${theme.colors.background} ${theme.colors.hover} ${theme.colors.text.secondary}`
+                : `${theme.colors.background} ${theme.colors.hover} ${theme.colors.text.primary}`
             }`}
             title={isMuted ? "Unmute" : "Mute"}
           >
@@ -161,7 +163,7 @@ export function VoiceChat({ personaId, personaColor, personaDescription }: Voice
 
       {/* Instructions */}
       {!isConnected && !error && (
-        <div className="text-center text-gray-400 text-sm space-y-2">
+        <div className={`text-center text-sm space-y-2 ${theme.colors.text.muted}`}>
           <p>Click &quot;Start Voice Session&quot; to begin full-duplex conversation</p>
           <p className="text-xs">
             • Microphone access required • You can interrupt the AI naturally • Audio is processed
@@ -171,7 +173,7 @@ export function VoiceChat({ personaId, personaColor, personaDescription }: Voice
       )}
 
       {/* Debug Logs */}
-      <div className="mt-4 p-2 bg-black/50 rounded text-xs font-mono text-gray-500 overflow-y-auto max-h-32">
+      <div className={`mt-4 p-2 bg-black/50 rounded text-xs font-mono overflow-y-auto max-h-32 ${theme.colors.text.muted}`}>
         {debugLogs.map((log, i) => (
           <div key={i}>{log}</div>
         ))}

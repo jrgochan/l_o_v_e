@@ -20,6 +20,7 @@
 "use client";
 
 import { useEffect } from "react";
+import { useAdminTheme } from "@/hooks/admin/useAdminTheme";
 
 export type ModalSize = "sm" | "md" | "lg" | "xl" | "full";
 
@@ -57,6 +58,7 @@ export function BaseModal({
   children,
   className = "",
 }: BaseModalProps) {
+  const theme = useAdminTheme();
   // Escape key handling
   useEffect(() => {
     if (!isOpen || !closeOnEscape) return;
@@ -98,22 +100,22 @@ export function BaseModal({
       {/* Modal Content */}
       <div
         className={`
-          relative bg-gray-900 border-2 border-cyan-500/50 rounded-lg shadow-2xl
+          relative bg-gray-900 border-2 ${theme.colors.border} ${theme.layout.borderRadius} shadow-2xl
           ${sizeClasses[size]} w-full
           max-h-[90vh] overflow-y-auto
-          animate-scale-in
+          animate-scale-in transition-colors duration-500
           ${className}
         `}
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
         {(title || showCloseButton) && (
-          <div className="sticky top-0 z-10 bg-gray-900 border-b border-gray-700 px-6 py-4 flex items-center justify-between">
-            {title && <h2 className="text-xl font-bold text-white">{title}</h2>}
+          <div className={`sticky top-0 z-10 bg-gray-900 border-b ${theme.colors.border} px-6 py-4 flex items-center justify-between`}>
+            {title && <h2 className={`text-xl font-bold ${theme.colors.text.primary}`}>{title}</h2>}
             {showCloseButton && (
               <button
                 onClick={onClose}
-                className="text-gray-400 hover:text-white transition text-2xl leading-none"
+                className={`${theme.colors.text.secondary} hover:${theme.colors.text.primary} transition text-2xl leading-none`}
                 title="Close (Esc)"
               >
                 ×
@@ -151,6 +153,7 @@ export function ConfirmModal({
   cancelText?: string;
   variant?: "default" | "danger";
 }) {
+  const theme = useAdminTheme();
   const variantClasses = {
     default: "bg-cyan-600 hover:bg-cyan-500",
     danger: "bg-red-600 hover:bg-red-500",
@@ -159,12 +162,12 @@ export function ConfirmModal({
   return (
     <BaseModal isOpen={isOpen} onClose={onClose} title={title} size="sm">
       <div className="space-y-4">
-        <p className="text-gray-300">{message}</p>
+        <p className={theme.colors.text.secondary}>{message}</p>
 
         <div className="flex gap-3 justify-end">
           <button
             onClick={onClose}
-            className="px-4 py-2 bg-gray-700 hover:bg-gray-600 text-white rounded transition"
+            className={`px-4 py-2 bg-black/30 border ${theme.colors.border} ${theme.colors.hover} ${theme.colors.text.primary} ${theme.layout.borderRadius} transition`}
           >
             {cancelText}
           </button>

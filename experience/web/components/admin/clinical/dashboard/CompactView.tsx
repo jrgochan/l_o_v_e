@@ -11,6 +11,7 @@
 "use client";
 
 import type { VAC, ProsodyData } from "@/types/chat";
+import { useAdminTheme } from "@/hooks/admin/useAdminTheme";
 
 interface CompactViewProps {
   emotion: string;
@@ -34,40 +35,41 @@ export function CompactView({
   overallStatus,
   alertCount,
 }: CompactViewProps) {
+  const theme = useAdminTheme();
   return (
     <div className="grid grid-cols-2 gap-3">
       {/* Emotion State Card */}
-      <div className="bg-gray-700/50 rounded-lg p-3 border border-pink-500/30">
+      <div className={`rounded-lg p-3 border border-pink-500/30 ${theme.colors.background}`}>
         <div className="text-xs text-pink-300 mb-1">Emotion</div>
         <div className="font-bold text-white text-sm">{emotion}</div>
-        {category && <div className="text-xs text-gray-400 mt-1">{category}</div>}
+        {category && <div className={`text-xs mt-1 ${theme.colors.text.muted}`}>{category}</div>}
         {confidence !== null && (
           <div className="mt-2 flex items-center gap-2">
-            <div className="flex-1 h-1.5 bg-gray-600 rounded-full overflow-hidden">
+            <div className={`flex-1 h-1.5 rounded-full overflow-hidden ${theme.colors.background}`}>
               <div
                 className="h-full bg-gradient-to-r from-pink-500 to-pink-400 transition-all"
                 style={{ width: `${confidence * 100}%` }}
               />
             </div>
-            <span className="text-xs text-gray-300">{(confidence * 100).toFixed(0)}%</span>
+            <span className={`text-xs ${theme.colors.text.secondary}`}>{(confidence * 100).toFixed(0)}%</span>
           </div>
         )}
       </div>
 
       {/* VAC Summary Card */}
-      <div className="bg-gray-700/50 rounded-lg p-3 border border-purple-500/30">
+      <div className={`rounded-lg p-3 border border-purple-500/30 ${theme.colors.background}`}>
         <div className="text-xs text-purple-300 mb-1">VAC Coordinates</div>
         <div className="space-y-1 text-xs">
           <div className="flex justify-between">
-            <span className="text-gray-400">V:</span>
+            <span className={theme.colors.text.muted}>V:</span>
             <span className="text-white font-mono">{vac.valence.toFixed(2)}</span>
           </div>
           <div className="flex justify-between">
-            <span className="text-gray-400">A:</span>
+            <span className={theme.colors.text.muted}>A:</span>
             <span className="text-white font-mono">{vac.arousal.toFixed(2)}</span>
           </div>
           <div className="flex justify-between">
-            <span className="text-gray-400">C:</span>
+            <span className={theme.colors.text.muted}>C:</span>
             <span className="text-white font-mono">{vac.connection.toFixed(2)}</span>
           </div>
         </div>
@@ -75,7 +77,7 @@ export function CompactView({
 
       {/* Voice Profile Card (if available) */}
       {prosody && (
-        <div className="bg-gray-700/50 rounded-lg p-3 border border-cyan-500/30">
+        <div className={`rounded-lg p-3 border border-cyan-500/30 ${theme.colors.background}`}>
           <div className="flex items-center justify-between mb-1">
             <div className="text-xs text-cyan-300">Voice</div>
             {prosody.voice_quality && (
@@ -99,7 +101,7 @@ export function CompactView({
           <div className="space-y-1 text-xs">
             {prosody.energy && (
               <div className="flex justify-between">
-                <span className="text-gray-400">Energy:</span>
+                <span className={theme.colors.text.muted}>Energy:</span>
                 <span className="text-white font-mono">
                   {prosody.energy > 0.7 ? "High" : prosody.energy < 0.3 ? "Low" : "Med"}
                 </span>
@@ -107,19 +109,19 @@ export function CompactView({
             )}
             {prosody.pitch_mean && (
               <div className="flex justify-between">
-                <span className="text-gray-400">Pitch:</span>
+                <span className={theme.colors.text.muted}>Pitch:</span>
                 <span className="text-white font-mono">{prosody.pitch_mean.toFixed(0)}Hz</span>
               </div>
             )}
             {prosody.rate && (
               <div className="flex justify-between">
-                <span className="text-gray-400">Rate:</span>
+                <span className={theme.colors.text.muted}>Rate:</span>
                 <span className="text-white font-mono">{prosody.rate.toFixed(1)}</span>
               </div>
             )}
             {prosody.hnr && (
               <div className="flex justify-between">
-                <span className="text-gray-400">HNR:</span>
+                <span className={theme.colors.text.muted}>HNR:</span>
                 <span
                   className={`font-mono ${
                     prosody.hnr > 15
@@ -139,7 +141,7 @@ export function CompactView({
 
       {/* Risk Indicator Card */}
       <div
-        className={`bg-gray-700/50 rounded-lg p-3 border ${
+        className={`rounded-lg p-3 border ${theme.colors.background} ${
           overallStatus === "critical"
             ? "border-red-500/30"
             : overallStatus === "warning"
@@ -149,7 +151,7 @@ export function CompactView({
                 : "border-green-500/30"
         }`}
       >
-        <div className="text-xs text-gray-300 mb-1">Status</div>
+        <div className={`text-xs mb-1 ${theme.colors.text.secondary}`}>Status</div>
         <div
           className={`font-bold text-sm ${
             overallStatus === "critical"
@@ -167,7 +169,7 @@ export function CompactView({
           {overallStatus === "stable" && "🟢 Stable"}
         </div>
         {alertCount > 0 && (
-          <div className="text-xs text-gray-400 mt-1">
+          <div className={`text-xs mt-1 ${theme.colors.text.muted}`}>
             {alertCount} alert{alertCount > 1 ? "s" : ""}
           </div>
         )}

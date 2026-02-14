@@ -64,7 +64,7 @@ describe("AnimationModeSelector", () => {
     render(<AnimationModeSelector currentMode="glitch" onModeChange={mockOnModeChange} />);
 
     const subtleButton = screen.getByText(/Subtle/i).closest("button");
-    expect(subtleButton).toHaveClass("bg-gray-800");
-    expect(subtleButton).toHaveClass("text-gray-300");
+    expect(subtleButton).toHaveClass("bg-black/20");
+    expect(subtleButton).toHaveClass("text-gray-400");
   });
 });

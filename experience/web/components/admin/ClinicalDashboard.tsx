@@ -29,6 +29,7 @@ import { VACTrajectoryPlot } from "./clinical/VACTrajectoryPlot";
 import { ProsodyVisualization } from "./clinical/ProsodyVisualization";
 import { MultiEmotionTable } from "./clinical/MultiEmotionTable";
 import { VoiceContentThreeWay } from "./clinical/VoiceContentThreeWay";
+import { useAdminTheme } from "@/hooks/admin/useAdminTheme";
 
 interface ClinicalDashboardProps {
   emotion: string | null;
@@ -70,6 +71,7 @@ export function ClinicalDashboard({
   threeWayAnalysis,
   onEmotionClick,
 }: ClinicalDashboardProps) {
+  const theme = useAdminTheme();
   const isExpanded = expandState !== "normal";
 
   // Get alerts from backend insights (no longer calculating in frontend)
@@ -77,16 +79,16 @@ export function ClinicalDashboard({
   const overallStatus = insights?.overall_status || "stable";
 
   return (
-    <div className="w-full bg-gray-800/80 rounded-lg border border-gray-700 overflow-hidden">
+    <div className={`w-full rounded-lg border overflow-hidden ${theme.colors.background} ${theme.colors.border}`}>
       {/* Priority Alert Bar */}
       {alerts.length > 0 && (
-        <div className="border-b border-gray-700">
+        <div className={`border-b ${theme.colors.border}`}>
           <AlertBadge alerts={alerts} overallStatus={overallStatus} />
         </div>
       )}
 
       {/* Session Metrics Bar */}
-      <div className="border-b border-gray-700">
+      <div className={`border-b ${theme.colors.border}`}>
         <SessionMetricsDisplay sessionMetrics={sessionMetrics} isExpanded={isExpanded} />
       </div>
 
@@ -97,37 +99,37 @@ export function ClinicalDashboard({
           {!isExpanded && (
             <div className="grid grid-cols-2 gap-3">
               {/* Emotion State Card */}
-              <div className="bg-gray-700/50 rounded-lg p-3 border border-pink-500/30">
+              <div className={`rounded-lg p-3 border border-pink-500/30 ${theme.colors.background}`}>
                 <div className="text-xs text-pink-300 mb-1">Emotion</div>
                 <div className="font-bold text-white text-sm">{emotion}</div>
-                {category && <div className="text-xs text-gray-400 mt-1">{category}</div>}
+                {category && <div className={`text-xs mt-1 ${theme.colors.text.muted}`}>{category}</div>}
                 {confidence !== null && (
                   <div className="mt-2 flex items-center gap-2">
-                    <div className="flex-1 h-1.5 bg-gray-600 rounded-full overflow-hidden">
+                    <div className={`flex-1 h-1.5 rounded-full overflow-hidden ${theme.colors.background}`}>
                       <div
                         className="h-full bg-gradient-to-r from-pink-500 to-pink-400 transition-all"
                         style={{ width: `${confidence * 100}%` }}
                       />
                     </div>
-                    <span className="text-xs text-gray-300">{(confidence * 100).toFixed(0)}%</span>
+                    <span className={`text-xs ${theme.colors.text.secondary}`}>{(confidence * 100).toFixed(0)}%</span>
                   </div>
                 )}
               </div>
 
               {/* VAC Summary Card */}
-              <div className="bg-gray-700/50 rounded-lg p-3 border border-purple-500/30">
+              <div className={`rounded-lg p-3 border border-purple-500/30 ${theme.colors.background}`}>
                 <div className="text-xs text-purple-300 mb-1">VAC Coordinates</div>
                 <div className="space-y-1 text-xs">
                   <div className="flex justify-between">
-                    <span className="text-gray-400">V:</span>
+                    <span className={theme.colors.text.muted}>V:</span>
                     <span className="text-white font-mono">{vac.valence.toFixed(2)}</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-gray-400">A:</span>
+                    <span className={theme.colors.text.muted}>A:</span>
                     <span className="text-white font-mono">{vac.arousal.toFixed(2)}</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-gray-400">C:</span>
+                    <span className={theme.colors.text.muted}>C:</span>
                     <span className="text-white font-mono">{vac.connection.toFixed(2)}</span>
                   </div>
                 </div>
@@ -135,7 +137,7 @@ export function ClinicalDashboard({
 
               {/* Voice Profile Card (if available) */}
               {prosody && (
-                <div className="bg-gray-700/50 rounded-lg p-3 border border-cyan-500/30">
+                <div className={`rounded-lg p-3 border border-cyan-500/30 ${theme.colors.background}`}>
                   <div className="flex items-center justify-between mb-1">
                     <div className="text-xs text-cyan-300">Voice</div>
                     {prosody.voice_quality && (
@@ -159,7 +161,7 @@ export function ClinicalDashboard({
                   <div className="space-y-1 text-xs">
                     {prosody.energy && (
                       <div className="flex justify-between">
-                        <span className="text-gray-400">Energy:</span>
+                        <span className={theme.colors.text.muted}>Energy:</span>
                         <span className="text-white font-mono">
                           {prosody.energy > 0.7 ? "High" : prosody.energy < 0.3 ? "Low" : "Med"}
                         </span>
@@ -167,7 +169,7 @@ export function ClinicalDashboard({
                     )}
                     {prosody.pitch_mean && (
                       <div className="flex justify-between">
-                        <span className="text-gray-400">Pitch:</span>
+                        <span className={theme.colors.text.muted}>Pitch:</span>
                         <span className="text-white font-mono">
                           {prosody.pitch_mean.toFixed(0)}Hz
                         </span>
@@ -175,13 +177,13 @@ export function ClinicalDashboard({
                     )}
                     {prosody.rate && (
                       <div className="flex justify-between">
-                        <span className="text-gray-400">Rate:</span>
+                        <span className={theme.colors.text.muted}>Rate:</span>
                         <span className="text-white font-mono">{prosody.rate.toFixed(1)}</span>
                       </div>
                     )}
                     {prosody.hnr && (
                       <div className="flex justify-between">
-                        <span className="text-gray-400">HNR:</span>
+                        <span className={theme.colors.text.muted}>HNR:</span>
                         <span
                           className={`font-mono ${
                             prosody.hnr > 15
@@ -211,7 +213,7 @@ export function ClinicalDashboard({
                         : "border-green-500/30"
                 }`}
               >
-                <div className="text-xs text-gray-300 mb-1">Status</div>
+                <div className={`text-xs mb-1 ${theme.colors.text.secondary}`}>Status</div>
                 <div
                   className={`font-bold text-sm ${
                     overallStatus === "critical"
@@ -229,7 +231,7 @@ export function ClinicalDashboard({
                   {overallStatus === "stable" && "🟢 Stable"}
                 </div>
                 {alerts.length > 0 && (
-                  <div className="text-xs text-gray-400 mt-1">
+                  <div className={`text-xs mt-1 ${theme.colors.text.muted}`}>
                     {alerts.length} alert{alerts.length > 1 ? "s" : ""}
                   </div>
                 )}
@@ -243,12 +245,12 @@ export function ClinicalDashboard({
               {/* Top Row: Emotion + VAC Quadrant + Voice */}
               <div className="grid grid-cols-3 gap-4">
                 {/* Emotion State */}
-                <div className="bg-gray-700/50 rounded-lg p-4 border border-pink-500/30">
+                <div className={`rounded-lg p-4 border border-pink-500/30 ${theme.colors.background}`}>
                   <div className="text-sm text-pink-300 mb-2 font-semibold">Emotional State</div>
                   <div className="space-y-3">
                     <div>
                       <div className="text-xl font-bold text-white">{emotion}</div>
-                      {category && <div className="text-sm text-gray-400 mt-1">{category}</div>}
+                      {category && <div className={`text-sm mt-1 ${theme.colors.text.muted}`}>{category}</div>}
                     </div>
 
                     {confidence !== null && (
@@ -257,7 +259,7 @@ export function ClinicalDashboard({
                           <span>Confidence</span>
                           <span>{(confidence * 100).toFixed(0)}%</span>
                         </div>
-                        <div className="h-2 bg-gray-600 rounded-full overflow-hidden">
+                        <div className={`h-2 rounded-full overflow-hidden ${theme.colors.background}`}>
                           <div
                             className={`h-full transition-all ${
                               confidence >= 0.8
@@ -279,7 +281,7 @@ export function ClinicalDashboard({
 
                 {/* Enhanced Voice Profile */}
                 {prosody && (
-                  <div className="bg-gray-700/50 rounded-lg p-4 border border-cyan-500/30">
+                  <div className={`rounded-lg p-4 border border-cyan-500/30 ${theme.colors.background}`}>
                     <div className="flex items-center justify-between mb-3">
                       <div className="text-sm text-cyan-300 font-semibold">Voice Profile</div>
                       {prosody.voice_quality && (
@@ -304,7 +306,7 @@ export function ClinicalDashboard({
                     <div className="space-y-3">
                       {/* Voice Quality Metrics */}
                       {(prosody.jitter || prosody.shimmer || prosody.hnr) && (
-                        <div className="pb-3 border-b border-gray-600">
+                        <div className="pb-3 border-b ${theme.colors.border}">
                           <div className="text-xs text-gray-400 mb-2 font-semibold">
                             Voice Quality
                           </div>
@@ -363,7 +365,7 @@ export function ClinicalDashboard({
 
                       {/* Pitch Analysis */}
                       {prosody.pitch_mean && (
-                        <div className="pb-3 border-b border-gray-600">
+                        <div className="pb-3 border-b ${theme.colors.border}">
                           <div className="text-xs text-gray-400 mb-2 font-semibold">Pitch</div>
                           <div className="space-y-1.5">
                             <div className="flex justify-between">
@@ -409,7 +411,7 @@ export function ClinicalDashboard({
 
                       {/* Energy Analysis */}
                       {prosody.energy && (
-                        <div className="pb-3 border-b border-gray-600">
+                        <div className="pb-3 border-b ${theme.colors.border}">
                           <div className="text-xs text-gray-400 mb-2 font-semibold">
                             Vocal Energy
                           </div>
@@ -421,7 +423,7 @@ export function ClinicalDashboard({
                                   {prosody.energy.toFixed(3)}
                                 </span>
                               </div>
-                              <div className="h-1.5 bg-gray-600 rounded-full overflow-hidden">
+                              <div className={`h-1.5 rounded-full overflow-hidden ${theme.colors.background}`}>
                                 <div
                                   className={`h-full transition-all ${
                                     prosody.energy > 0.7
@@ -445,7 +447,7 @@ export function ClinicalDashboard({
                             {prosody.energy_std && (
                               <div className="flex justify-between text-xs">
                                 <span className="text-gray-400">Variability</span>
-                                <span className="text-gray-300 font-mono">
+                                <span className={`font-mono ${theme.colors.text.secondary}`}>
                                   ±{prosody.energy_std.toFixed(3)}
                                 </span>
                               </div>
@@ -495,7 +497,7 @@ export function ClinicalDashboard({
 
               {/* 3-Way Voice-Content Analysis */}
               {threeWayAnalysis && (
-                <div className="bg-gray-700/30 rounded-lg p-4 border border-orange-500/30">
+                <div className={`rounded-lg p-4 border border-orange-500/30 ${theme.colors.background}`}>
                   <div className="mb-3">
                     <h3 className="text-sm font-semibold text-orange-300 flex items-center gap-2">
                       <span>🔬</span>
@@ -515,7 +517,7 @@ export function ClinicalDashboard({
 
               {/* Multi-Emotion Clinical Table */}
               {multiEmotionData && multiEmotionData.emotions.length > 0 && (
-                <div className="bg-gray-700/30 rounded-lg p-4 border border-purple-500/30">
+                <div className={`rounded-lg p-4 border border-purple-500/30 ${theme.colors.background}`}>
                   <div className="mb-3">
                     <h3 className="text-sm font-semibold text-purple-300 flex items-center gap-2">
                       <span>🧠</span>
@@ -559,7 +561,7 @@ export function ClinicalDashboard({
 
       {/* Empty State */}
       {!emotion && (
-        <div className="p-6 text-center text-gray-400">
+        <div className={`p-6 text-center ${theme.colors.text.muted}`}>
           <p className="text-sm">Awaiting emotional analysis data...</p>
         </div>
       )}

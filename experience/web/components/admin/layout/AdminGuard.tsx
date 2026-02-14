@@ -5,12 +5,14 @@ import Link from "next/link";
 import { useAuthStore } from "@/stores/authStore";
 import { UserRole } from "@/types/auth";
 import { AuthModal } from "@/components/auth/AuthModal";
+import { useAdminTheme } from "@/hooks/admin/useAdminTheme";
 
 interface AdminGuardProps {
   children: React.ReactNode;
 }
 
 export function AdminGuard({ children }: AdminGuardProps) {
+  const theme = useAdminTheme();
   const { user, isLoading: isAuthLoading, setUser, setToken } = useAuthStore();
   const [isClient, setIsClient] = useState(false);
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
@@ -23,7 +25,7 @@ export function AdminGuard({ children }: AdminGuardProps) {
 
   if (isAuthLoading) {
     return (
-      <div className="min-h-screen bg-gray-950 flex items-center justify-center text-white">
+      <div className={`min-h-screen flex items-center justify-center text-white ${theme.colors.background}`}>
         Loading...
       </div>
     );
@@ -31,13 +33,13 @@ export function AdminGuard({ children }: AdminGuardProps) {
 
   if (!user || user.role !== UserRole.ADMIN) {
     return (
-      <div className="min-h-screen bg-gray-950 flex flex-col items-center justify-center text-white space-y-4">
+      <div className={`min-h-screen flex flex-col items-center justify-center text-white space-y-4 ${theme.colors.background}`}>
         <h1 className="text-2xl font-bold text-cyan-500">Admin Access</h1>
-        <p className="text-gray-400">Please sign in to access the control panel.</p>
+        <p className={theme.colors.text.muted}>Please sign in to access the control panel.</p>
         <div className="flex gap-4">
           <Link
             href="/"
-            className="px-4 py-2 bg-gray-800 hover:bg-gray-700 rounded transition-colors"
+            className={`px-4 py-2 rounded transition-colors ${theme.colors.background} ${theme.colors.hover}`}
           >
             Return Home
           </Link>

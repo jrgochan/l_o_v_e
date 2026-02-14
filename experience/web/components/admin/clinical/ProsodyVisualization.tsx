@@ -11,6 +11,7 @@
 import { useState, useEffect } from "react";
 import { logger } from "@/utils/logger";
 import type { ProsodyData } from "@/types/chat";
+import { useAdminTheme } from "@/hooks/admin/useAdminTheme";
 
 // Extend Window interface for legacy WebKit AudioContext
 declare global {
@@ -25,6 +26,7 @@ interface ProsodyVisualizationProps {
 }
 
 export function ProsodyVisualization({ prosody, audioBlob }: ProsodyVisualizationProps) {
+  const theme = useAdminTheme();
   const [waveformData, setWaveformData] = useState<number[]>([]);
   const [isLoadingAudio, setIsLoadingAudio] = useState(false);
 
@@ -112,7 +114,7 @@ export function ProsodyVisualization({ prosody, audioBlob }: ProsodyVisualizatio
 
   // Determine energy level interpretation
   const getEnergyLevel = () => {
-    if (!energy) return { label: "Unknown", color: "text-gray-400" };
+    if (!energy) return { label: "Unknown", color: theme.colors.text.muted };
     if (energy > 0.7) return { label: "High Energy", color: "text-red-400" };
     if (energy > 0.4) return { label: "Moderate Energy", color: "text-yellow-400" };
     return { label: "Low Energy", color: "text-blue-400" };
@@ -120,7 +122,7 @@ export function ProsodyVisualization({ prosody, audioBlob }: ProsodyVisualizatio
 
   // Determine pitch level
   const getPitchLevel = () => {
-    if (!pitch_mean) return { label: "Unknown", color: "text-gray-400" };
+    if (!pitch_mean) return { label: "Unknown", color: theme.colors.text.muted };
     if (pitch_mean > 250) return { label: "High Pitch", color: "text-purple-400" };
     if (pitch_mean > 150) return { label: "Normal Pitch", color: "text-green-400" };
     return { label: "Low Pitch", color: "text-blue-400" };
@@ -128,7 +130,7 @@ export function ProsodyVisualization({ prosody, audioBlob }: ProsodyVisualizatio
 
   // Determine rate level
   const getRateLevel = () => {
-    if (!rate) return { label: "Unknown", color: "text-gray-400" };
+    if (!rate) return { label: "Unknown", color: theme.colors.text.muted };
     if (rate > 5) return { label: "Fast Speech", color: "text-orange-400" };
     if (rate > 3) return { label: "Normal Pace", color: "text-green-400" };
     return { label: "Slow Speech", color: "text-blue-400" };
@@ -139,17 +141,17 @@ export function ProsodyVisualization({ prosody, audioBlob }: ProsodyVisualizatio
   const rateLevel = getRateLevel();
 
   return (
-    <div className="bg-gray-700/50 rounded-lg p-4 border border-cyan-500/30">
+    <div className={`rounded-lg p-4 border border-cyan-500/30 ${theme.colors.background}`}>
       <div className="text-sm text-cyan-300 mb-3 font-semibold flex items-center justify-between">
         <span>🎵 Voice Prosody Analysis</span>
         <span className={`text-xs ${energyLevel.color}`}>{energyLevel.label}</span>
       </div>
 
       {/* Waveform Visualization */}
-      <div className="bg-gray-800 rounded-lg p-4 mb-4">
+      <div className={`rounded-lg p-4 mb-4 ${theme.colors.background}`}>
         {isLoadingAudio ? (
           <div className="h-24 flex items-center justify-center">
-            <div className="flex items-center gap-2 text-gray-400">
+            <div className={`flex items-center gap-2 ${theme.colors.text.muted}`}>
               <div className="animate-spin h-4 w-4 border-2 border-cyan-400 border-t-transparent rounded-full" />
               <span className="text-xs">Processing audio...</span>
             </div>
@@ -172,7 +174,7 @@ export function ProsodyVisualization({ prosody, audioBlob }: ProsodyVisualizatio
                 />
               ))}
             </div>
-            <div className="mt-2 flex items-center justify-center gap-2 text-xs text-gray-400">
+            <div className={`mt-2 flex items-center justify-center gap-2 text-xs ${theme.colors.text.muted}`}>
               <span>{isRealWaveform ? "🎙️ Real Audio" : "📊 Synthetic"} Waveform</span>
               {isRealWaveform && (
                 <span className="px-1.5 py-0.5 bg-green-500/20 text-green-400 rounded text-xs">
@@ -191,7 +193,7 @@ export function ProsodyVisualization({ prosody, audioBlob }: ProsodyVisualizatio
           <div>
             <div className="flex items-center justify-between mb-1.5">
               <div className="flex items-center gap-2">
-                <span className="text-xs text-gray-400">Pitch</span>
+                <span className={`text-xs ${theme.colors.text.muted}`}>Pitch</span>
                 <span className={`text-xs font-semibold ${pitchLevel.color}`}>
                   {pitchLevel.label}
                 </span>
@@ -201,14 +203,14 @@ export function ProsodyVisualization({ prosody, audioBlob }: ProsodyVisualizatio
                 {pitch_std && ` ±${pitch_std.toFixed(1)}`}
               </span>
             </div>
-            <div className="h-2 bg-gray-600 rounded-full overflow-hidden">
+            <div className={`h-2 rounded-full overflow-hidden ${theme.colors.background}`}>
               <div
                 className="h-full bg-gradient-to-r from-purple-600 to-purple-400"
                 style={{ width: `${Math.min(100, (pitch_mean / 400) * 100)}%` }}
               />
             </div>
             {pitch_std && (
-              <div className="mt-1 text-xs text-gray-500">
+              <div className={`mt-1 text-xs ${theme.colors.text.muted}`}>
                 Variability: {pitch_std > 30 ? "High" : pitch_std > 15 ? "Moderate" : "Low"}
               </div>
             )}
@@ -219,10 +221,10 @@ export function ProsodyVisualization({ prosody, audioBlob }: ProsodyVisualizatio
         {energy && (
           <div>
             <div className="flex items-center justify-between mb-1.5">
-              <span className="text-xs text-gray-400">Vocal Energy</span>
+              <span className={`text-xs ${theme.colors.text.muted}`}>Vocal Energy</span>
               <span className="text-xs font-mono text-white">{(energy * 100).toFixed(1)}%</span>
             </div>
-            <div className="h-2 bg-gray-600 rounded-full overflow-hidden">
+            <div className={`h-2 rounded-full overflow-hidden ${theme.colors.background}`}>
               <div
                 className={`h-full transition-all ${
                   energy > 0.7
@@ -242,14 +244,14 @@ export function ProsodyVisualization({ prosody, audioBlob }: ProsodyVisualizatio
           <div>
             <div className="flex items-center justify-between mb-1.5">
               <div className="flex items-center gap-2">
-                <span className="text-xs text-gray-400">Speech Rate</span>
+                <span className={`text-xs ${theme.colors.text.muted}`}>Speech Rate</span>
                 <span className={`text-xs font-semibold ${rateLevel.color}`}>
                   {rateLevel.label}
                 </span>
               </div>
               <span className="text-xs font-mono text-white">{rate.toFixed(1)} syll/sec</span>
             </div>
-            <div className="h-2 bg-gray-600 rounded-full overflow-hidden">
+            <div className={`h-2 rounded-full overflow-hidden ${theme.colors.background}`}>
               <div
                 className="h-full bg-gradient-to-r from-orange-600 to-orange-400"
                 style={{ width: `${Math.min(100, (rate / 7) * 100)}%` }}
@@ -260,8 +262,8 @@ export function ProsodyVisualization({ prosody, audioBlob }: ProsodyVisualizatio
       </div>
 
       {/* Clinical Interpretation */}
-      <div className="mt-4 pt-3 border-t border-gray-600">
-        <div className="text-xs text-gray-300 space-y-1.5">
+      <div className={`mt-4 pt-3 border-t ${theme.colors.border}`}>
+        <div className={`text-xs space-y-1.5 ${theme.colors.text.secondary}`}>
           <div className="flex items-start gap-2">
             <span className="text-cyan-400 flex-shrink-0">•</span>
             <span>
@@ -301,14 +303,14 @@ export function ProsodyVisualization({ prosody, audioBlob }: ProsodyVisualizatio
 
       {/* Prosody Features (if available) */}
       {prosody.features && Object.keys(prosody.features).length > 0 && (
-        <div className="mt-3 pt-3 border-t border-gray-600">
-          <div className="text-xs text-gray-400 mb-2">Additional Features:</div>
+        <div className={`mt-3 pt-3 border-t ${theme.colors.border}`}>
+          <div className={`text-xs mb-2 ${theme.colors.text.muted}`}>Additional Features:</div>
           <div className="grid grid-cols-2 gap-2 text-xs">
             {Object.entries(prosody.features)
               .slice(0, 4)
               .map(([key, value]) => (
                 <div key={key} className="flex justify-between">
-                  <span className="text-gray-500">{key}:</span>
+                  <span className={theme.colors.text.muted}>{key}:</span>
                   <span className="text-white font-mono">
                     {typeof value === "number" ? value.toFixed(2) : String(value)}
                   </span>

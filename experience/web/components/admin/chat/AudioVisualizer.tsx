@@ -7,6 +7,7 @@
 "use client";
 
 import { useEffect, useRef } from "react";
+import { useAdminTheme } from "@/hooks/admin/useAdminTheme";
 
 interface AudioVisualizerProps {
   audioLevel: number; // 0-1
@@ -15,6 +16,7 @@ interface AudioVisualizerProps {
 }
 
 export function AudioVisualizer({ audioLevel, isActive, personaColor }: AudioVisualizerProps) {
+  const theme = useAdminTheme();
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const animationFrameRef = useRef<number | null>(null);
 
@@ -103,13 +105,13 @@ export function AudioVisualizer({ audioLevel, isActive, personaColor }: AudioVis
   }, [audioLevel, isActive, personaColor]);
 
   return (
-    <div className="relative w-full max-w-2xl h-64 rounded-lg overflow-hidden bg-gray-900/50 backdrop-blur-sm border border-gray-700">
+    <div className={`relative w-full max-w-2xl h-64 rounded-lg overflow-hidden backdrop-blur-sm ${theme.colors.background} border ${theme.colors.border}`}>
       <canvas ref={canvasRef} width={800} height={256} className="w-full h-full" />
 
       {/* Overlay text */}
       <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
         {!isActive && (
-          <p className="text-gray-500 text-sm uppercase tracking-wider">Voice Mode Inactive</p>
+          <p className={`text-sm uppercase tracking-wider ${theme.colors.text.muted}`}>Voice Mode Inactive</p>
         )}
       </div>
     </div>
