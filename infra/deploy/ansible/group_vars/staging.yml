@@ -17,6 +17,8 @@ db_password: "{{ vault_db_password | default('love_staging_pw') }}"
 db_name: love_db
 force_db_reset: false
 seed_level: "enhanced"
+seed_dataset: "goemotions"
+seed_with_bootstrap: true
 
 # --- Resource Scaling ---
 uvicorn_workers_observer: 2

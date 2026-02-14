@@ -147,9 +147,14 @@
   become_user: "{{ app_user }}"
   run_once: true
 
-- name: Seed Database Content (GoEmotions)
+- name: Seed Database Content
   shell: |
-    .venv/bin/python scripts/seed_all.py --dataset=goemotions --level={{ seed_level | default('minimal') }} --force-reseed
+    .venv/bin/python scripts/seed_all.py \
+      --dataset={{ seed_dataset | default('goemotions') }} \
+      --level={{ seed_level | default('enhanced') }} \
+      {% if seed_with_demo | default(false) | bool %}--with-demo {% endif %}\
+      {% if seed_with_bootstrap | default(false) | bool %}--with-bootstrap {% endif %}\
+      --force-reseed
   args:
     chdir: "{{ app_dir }}/observer"
   environment:
@@ -165,7 +170,8 @@
 
 - name: Compute Path Matrix
   shell: |
-    .venv/bin/python scripts/compute_path_matrix.py --collection "GoEmotions"
+    .venv/bin/python scripts/compute_path_matrix.py \
+      --collection "{{ item }}"
   args:
     chdir: "{{ app_dir }}/observer"
   environment:
@@ -178,6 +184,12 @@
     PYTHONPATH: "{{ app_dir }}/observer"
   become_user: "{{ app_user }}"
   run_once: true
+  loop: >-
+    {{
+      ['GoEmotions', 'Plutchik Wheel', 'Unified Affective Lexicon']
+      if (seed_dataset | default('goemotions')) == 'all'
+      else [seed_dataset_collection_map[seed_dataset | default('goemotions')]]
+    }}
 
 # --- Restart ---
 

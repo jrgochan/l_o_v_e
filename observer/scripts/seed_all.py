@@ -145,32 +145,55 @@ def run_seed_script(
         return False, str(e)
 
 
-async def configure_dataset_activation(target_collection: str):
-    """Ensure target collection is active and default, others inactive."""
+async def configure_dataset_activation(
+    target_collection: str, keep_active: list[str] | None = None
+):
+    """Ensure target collection is active and default.
+
+    Args:
+        target_collection: The collection to mark as default.
+        keep_active: Additional collections to keep active (but not default).
+                     If None, only target_collection stays active.
+    """
     print_header(" Configuring Dataset Activation ")
-    print(f"Target: {target_collection}")
+    print(f"Target (default): {target_collection}")
+    if keep_active:
+        print(f"Also active: {', '.join(keep_active)}")
+
+    all_active = {target_collection}
+    if keep_active:
+        all_active.update(keep_active)
 
     async with AsyncSessionLocal() as session:
         try:
-            # 1. Activate target
+            # 1. Deactivate all collections first
             await session.execute(
                 text(
-                    "UPDATE emotion_collections SET is_active = true, is_default = true WHERE name = :name"
+                    "UPDATE emotion_collections SET is_active = false, is_default = false"
                 ),
-                {"name": target_collection},
             )
 
-            # 2. Deactivate others
+            # 2. Activate all requested collections
+            for coll_name in all_active:
+                await session.execute(
+                    text(
+                        "UPDATE emotion_collections SET is_active = true WHERE name = :name"
+                    ),
+                    {"name": coll_name},
+                )
+
+            # 3. Set the target as the sole default
             await session.execute(
                 text(
-                    "UPDATE emotion_collections SET is_active = false, is_default = false WHERE name != :name"
+                    "UPDATE emotion_collections SET is_default = true WHERE name = :name"
                 ),
                 {"name": target_collection},
             )
 
             await session.commit()
             print_success(
-                f"Set '{target_collection}' as exclusive active/default collection"
+                f"Set '{target_collection}' as default; "
+                f"{len(all_active)} collection(s) active"
             )
         except Exception as e:
             print_error(f"Failed to configure activation: {e}")
@@ -333,7 +356,12 @@ def main(
     # PHASE 4: Enforce Activation (Post-seeding fix)
     # Determine target collection name based on dataset arg
     target_collection_name = "GoEmotions"  # Default fallback
-    if dataset.lower() == "goemotions":
+    keep_active_collections = None
+
+    if dataset.lower() == "all":
+        target_collection_name = "GoEmotions"
+        keep_active_collections = ["Plutchik Wheel", "Unified Affective Lexicon"]
+    elif dataset.lower() == "goemotions":
         target_collection_name = "GoEmotions"
     elif dataset.lower() == "brene_brown":
         target_collection_name = "brene_brown"
@@ -344,7 +372,11 @@ def main(
 
     # Only run activation logic if we aren't in dry-run and seeding succeeded so far
     if not dry_run and not failed_steps:
-        asyncio.run(configure_dataset_activation(target_collection_name))
+        asyncio.run(
+            configure_dataset_activation(
+                target_collection_name, keep_active=keep_active_collections
+            )
+        )
 
     # Verification
     if verify and not dry_run and successful_steps:

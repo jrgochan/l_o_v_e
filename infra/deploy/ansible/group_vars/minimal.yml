@@ -19,7 +19,9 @@ db_user: love_user
 db_password: love_password
 db_name: love_db
 force_db_reset: true
-seed_level: "minimal"
+seed_level: "base"
+seed_dataset: "goemotions"
+seed_with_demo: true
 
 # --- Services ---
 enable_ollama: false

@@ -17,6 +17,8 @@ db_password: "{{ vault_db_password | default('love_password') }}"
 db_name: love_db
 force_db_reset: false
 seed_level: "enhanced"
+seed_dataset: "all"
+seed_with_bootstrap: true
 
 # --- Security ---
 jwt_secret_key: "{{ vault_jwt_secret | default(lookup('password', '/dev/null chars=ascii_letters,digits length=64')) }}"

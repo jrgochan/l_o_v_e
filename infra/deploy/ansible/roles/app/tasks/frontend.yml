@@ -37,7 +37,6 @@
     name: love-frontend
     state: restarted
     daemon_reload: yes
-  when: ansible_facts.services['love-frontend.service'] is defined
 
 - name: Enable Frontend Service
   service:

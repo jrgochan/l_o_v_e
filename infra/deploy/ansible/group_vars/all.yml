@@ -47,8 +47,20 @@ redis_maxmemory_policy: "allkeys-lru"
 
 # --- Database Lifecycle ---
 force_db_reset: false
-seed_level: "minimal"
+seed_level: "enhanced"                    # base | enhanced
+seed_dataset: "goemotions"               # brene_brown | plutchik | goemotions | ual | all
+seed_with_demo: false                    # include demo journey data (dev only)
+seed_with_bootstrap: false               # include cold-start bootstrap patterns
 run_migrations: true
+
+# --- Dataset → Collection Name Map ---
+# Used by path matrix computation to resolve the collection name for each dataset.
+seed_dataset_collection_map:
+  goemotions: "GoEmotions"
+  brene_brown: "brene_brown"
+  plutchik: "Plutchik Wheel"
+  ual: "Unified Affective Lexicon"
+  all: "GoEmotions"
 
 # --- SSL ---
 # Options: none | self-signed | letsencrypt-staging | letsencrypt
