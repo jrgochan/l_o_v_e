@@ -4,6 +4,9 @@ import { User, LoginResponse } from "../types/auth";
 import { api } from "../utils/api";
 import { API_URL } from "@/config/environment";
 
+// Singleton promise to deduplicate concurrent refresh attempts
+let _refreshPromise: Promise<boolean> | null = null;
+
 interface AuthState {
   user: User | null;
   token: string | null;
@@ -18,6 +21,7 @@ interface AuthState {
   login: (email: string, password: string) => Promise<void>;
   register: (email: string, password: string, fullName?: string) => Promise<void>;
   fetchUser: () => Promise<void>;
+  refreshToken: () => Promise<boolean>;
 
   // Selectors
   isAuthenticated: () => boolean;
@@ -118,6 +122,45 @@ export const useAuthStore = create<AuthState>()(
       },
 
       isAuthenticated: () => !!get().token,
+
+      refreshToken: async () => {
+        const token = get().token;
+        if (!token) return false;
+
+        // Deduplicate concurrent refresh attempts
+        if (_refreshPromise) return _refreshPromise;
+
+        _refreshPromise = (async () => {
+          try {
+            const response = await fetch(`${API_URL}/auth/refresh`, {
+              method: "POST",
+              headers: { Authorization: `Bearer ${token}` },
+            });
+
+            if (!response.ok) {
+              get().logout();
+              return false;
+            }
+
+            const data: LoginResponse = await response.json();
+            set({ token: data.access_token });
+
+            // Notify other hooks (e.g. WebSocket) that the token changed
+            if (typeof window !== "undefined") {
+              window.dispatchEvent(new CustomEvent("token-refreshed"));
+            }
+
+            return true;
+          } catch {
+            get().logout();
+            return false;
+          } finally {
+            _refreshPromise = null;
+          }
+        })();
+
+        return _refreshPromise;
+      },
 
       hasRole: (role: string) => {
         const user = get().user;

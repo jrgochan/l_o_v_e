@@ -46,7 +46,7 @@ See Also:
 import json
 from typing import List, Literal, Optional
 
-from pydantic import Field
+from pydantic import AliasChoices, Field
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 try:
@@ -142,7 +142,8 @@ class Settings(LoveBaseSettings):  # type: ignore[misc]
 
     # Security
     SECRET_KEY: str = Field(
-        validation_alias="JWT_SECRET_KEY", default="dev-secret-key-change-in-production"
+        validation_alias=AliasChoices("SECRET_KEY", "JWT_SECRET_KEY"),
+        default="dev-secret-key-change-in-production",
     )
     ALGORITHM: str = "HS256"
     ALLOWED_ORIGINS: str = Field(default='["http://localhost:3000", "http://127.0.0.1:3000"]')

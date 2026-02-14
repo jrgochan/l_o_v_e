@@ -28,6 +28,8 @@ const API_URL = API_BASE_URL;
 
 interface RequestOptions extends RequestInit {
   authenticated?: boolean;
+  /** Internal flag to prevent infinite retry loops on 401 */
+  _isRetry?: boolean;
 }
 
 class ApiClient {
@@ -56,7 +58,16 @@ class ApiClient {
 
     if (!response.ok) {
       if (response.status === 401 && authenticated) {
-        // Handle unauthorized (logout)
+        // Attempt a single token refresh before giving up
+        if (!options._isRetry) {
+          const refreshed = await useAuthStore.getState().refreshToken();
+          if (refreshed) {
+            // Retry the original request with the new token
+            return this.request<T>(endpoint, { ...options, _isRetry: true });
+          }
+        }
+
+        // Refresh failed or this was already a retry — log out
         useAuthStore.getState().logout();
         if (typeof window !== "undefined") {
           window.dispatchEvent(new CustomEvent("session-expired"));

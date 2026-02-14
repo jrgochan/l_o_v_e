@@ -11,7 +11,7 @@ from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.api.deps import get_db
+from app.api.deps import get_current_user_for_refresh, get_db
 from app.core.security import create_access_token, get_password_hash, verify_password
 from app.core.settings import settings
 from app.models.user import User
@@ -81,3 +81,21 @@ async def register_user(
     await db.refresh(user)
 
     return user
+
+
+@router.post("/refresh", response_model=Token)
+async def refresh_token(
+    current_user: Annotated[User, Depends(get_current_user_for_refresh)],
+) -> Any:
+    """Issue a fresh access token.
+
+    Accepts tokens expired within a 5-minute grace window so the frontend
+    can recover even if its proactive refresh timer was slightly late.
+    """
+    access_token_expires = timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
+    access_token = create_access_token(
+        data={"sub": current_user.email, "role": current_user.role},
+        expires_delta=access_token_expires,
+    )
+
+    return {"access_token": access_token, "token_type": "bearer"}

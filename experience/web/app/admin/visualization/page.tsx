@@ -42,6 +42,8 @@ import { CommandPalette } from "@/components/CommandPalette";
 import { useCommandPalette } from "@/hooks/useCommandPalette";
 import { PathFlyover } from "@/components/admin/visualization/PathFlyover";
 import { IntroSequence } from "@/components/admin/visualization/IntroSequence";
+import { SceneEffects } from "@/components/admin/visualization/SceneEffects";
+import { SceneEnvironment } from "@/components/admin/visualization/SceneEnvironment";
 import { useAmbientAudio } from "@/hooks/useAmbientAudio";
 import { VACAnimator } from "@/components/VACAnimator";
 import { DebugBroadcaster } from "@/components/DebugBroadcaster";
@@ -439,6 +441,12 @@ const VisualizationAdminContent = () => {
 
                 {/* Intro Sequence */}
                 {isIntroActive && <IntroSequence />}
+
+                {/* Environment Map for PBR Materials */}
+                <SceneEnvironment />
+
+                {/* Post-Processing Effects (mode-reactive) */}
+                <SceneEffects />
               </Canvas>
             </Suspense>
             <div className="absolute inset-0 pointer-events-none">

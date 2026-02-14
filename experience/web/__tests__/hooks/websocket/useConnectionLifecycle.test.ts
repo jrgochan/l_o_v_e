@@ -45,7 +45,7 @@ describe("useConnectionLifecycle", () => {
     jest.clearAllMocks();
     capturedCallbacks = {};
     props = {
-      endpoint: "observer/ws/chat/session-1",
+      endpoint: "ws/chat/session-1",
       enabled: true,
       autoReconnect: true,
       onMessage: jest.fn(),

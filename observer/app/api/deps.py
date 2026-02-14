@@ -4,6 +4,7 @@ Common dependencies for API routes, including database sessions and authenticati
 """
 
 import os
+from datetime import datetime, timezone
 from typing import Annotated, Optional
 
 import jwt
@@ -112,6 +113,62 @@ async def get_current_user_ws(
 
     try:
         payload = jwt.decode(token, settings.SECRET_KEY, algorithms=[settings.ALGORITHM])
+        email: Optional[str] = payload.get("sub")
+        if email is None:
+            raise credentials_exception
+        token_data = TokenData(email=email)
+    except (InvalidTokenError, ValidationError) as e:
+        raise credentials_exception from e
+
+    stmt = select(User).where(User.email == token_data.email)
+    result = await db.execute(stmt)
+    db_user = result.scalars().first()
+
+    if db_user is None:
+        raise credentials_exception
+
+    return db_user
+
+
+# Grace period for token refresh (seconds)
+REFRESH_GRACE_SECONDS = 300  # 5 minutes
+
+
+async def get_current_user_for_refresh(
+    token: Annotated[str, Depends(oauth2_scheme)],
+    db: Annotated[AsyncSession, Depends(get_db)],
+) -> User:
+    """Validate JWT for refresh — allows tokens expired within the grace period.
+
+    This is used exclusively by the /auth/refresh endpoint so users can
+    obtain a fresh token even if the old one just expired (e.g. browser
+    tab was suspended and the proactive timer couldn't fire).
+    """
+    credentials_exception = HTTPException(
+        status_code=status.HTTP_401_UNAUTHORIZED,
+        detail="Could not validate credentials",
+        headers={"WWW-Authenticate": "Bearer"},
+    )
+
+    if token == "dev-token-bypass" and os.getenv("APP_ENV", "development") != "production":
+        return await _get_or_create_dev_user(db)
+
+    try:
+        # Decode WITHOUT verifying expiration
+        payload = jwt.decode(
+            token,
+            settings.SECRET_KEY,
+            algorithms=[settings.ALGORITHM],
+            options={"verify_exp": False},
+        )
+
+        # Manually check grace period
+        exp = payload.get("exp")
+        if exp is not None:
+            now = datetime.now(timezone.utc).timestamp()
+            if now > exp + REFRESH_GRACE_SECONDS:
+                raise credentials_exception  # Too far past expiry
+
         email: Optional[str] = payload.get("sub")
         if email is None:
             raise credentials_exception

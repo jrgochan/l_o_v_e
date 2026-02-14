@@ -701,7 +701,7 @@ describe("Additional Actions & Helpers", () => {
       // Restore
       window.history.pushState({}, "Root", originalPath);
     });
-    it("should log usage in development mode", () => {
+    it("should not spam console.log in partialize (removed to prevent render freeze)", () => {
       const originalEnv = process.env.NODE_ENV;
       Object.defineProperty(process.env, "NODE_ENV", {
         value: "development",
@@ -711,9 +711,11 @@ describe("Additional Actions & Helpers", () => {
 
       // Trigger persistence logic
       const state = useVisualizationStore.getState();
-      visualizationPartialize(state); // Manual call to trigger log
+      visualizationPartialize(state); // Manual call
 
-      expect(consoleSpy).toHaveBeenCalledWith("DEBUG: partialize", expect.anything());
+      // Verify no DEBUG partialize log — it was removed because it floods
+      // the console on every store change and stalls the R3F render loop
+      expect(consoleSpy).not.toHaveBeenCalledWith("DEBUG: partialize", expect.anything());
 
       consoleSpy.mockRestore();
       Object.defineProperty(process.env, "NODE_ENV", {

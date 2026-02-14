@@ -24,6 +24,7 @@ describe("ApiClient", () => {
     (useAuthStore.getState as jest.Mock).mockReturnValue({
       token: "test-token",
       logout: mockLogout,
+      refreshToken: jest.fn().mockResolvedValue(false),
     });
   });
 

@@ -88,12 +88,15 @@ void main() {
 
   // --- MODE SPECIFIC VERTEX DISPLACEMENT ---
 
-  if (uMode == 3) { // Crystalline - Sharp, angular, low-poly look
-      // Displace along normal but stepped to create facets
-      float n = snoise(position * 2.0);
-      float stepVal = floor(n * 5.0) / 5.0; // Faceting
-      displaced += normal * (stepVal * (0.1 + noiseAmp));
-      noiseVal = stepVal;
+  if (uMode == 3) { // Crystalline - Sharp, angular, faceted gem
+      // Multi-octave noise stepped into pronounced facets
+      float n1 = snoise(position * 3.0);
+      float n2 = snoise(position * 6.0 + vec3(17.0)) * 0.3;
+      float combined = n1 + n2;
+      float stepVal = floor(combined * 8.0) / 8.0; // More facets, sharper geometry
+      // Stronger displacement for dramatic angular appearance
+      displaced += normal * (stepVal * (0.15 + noiseAmp * 1.5));
+      noiseVal = combined;
   }
   else if (uMode == 5) { // Liquid - Smooth flowing sine waves
       // Flowing wave motion
@@ -168,12 +171,24 @@ void main() {
   // --- MODE SPECIFIC COLORING ---
 
   if (uMode == 3) { // Crystalline
-       // Refractive / glassy look
-       float sparkle = step(0.9, fract(vNoise * 10.0 + uTime));
-       glowIntensity += sparkle * 2.0;
-       finalColor = mix(baseColor, vec3(0.8, 0.9, 1.0), fresnel * 0.8);
-       finalColor += glowColor * glowIntensity * 0.5;
-       alpha = 0.2 + (fresnel * 0.8); // Very transparent center, opaque edges
+       // Chromatic dispersion — wavelength-dependent refraction through crystal
+       float fresnelR = pow(1.0 - dot(viewDir, normalize(vNormal)), 2.0);
+       float fresnelG = pow(1.0 - dot(viewDir, normalize(vNormal)), 2.5);
+       float fresnelB = pow(1.0 - dot(viewDir, normalize(vNormal)), 3.0);
+       vec3 dispersion = vec3(fresnelR, fresnelG, fresnelB);
+
+       // Facet edge detection — white highlights at crystal face boundaries
+       float facetEdge = abs(fract(vNoise * 8.0) - 0.5) * 2.0;
+       float edgeLine = smoothstep(0.82, 1.0, facetEdge);
+
+       // Soft specular sparkles (pow-based, not binary step)
+       float sparkle = pow(max(fract(vNoise * 12.0 + uTime * 0.5), 0.0), 12.0);
+
+       finalColor = mix(baseColor, dispersion, 0.5);
+       finalColor += vec3(1.0) * edgeLine * 0.25; // White facet edges
+       finalColor += glowColor * sparkle * 1.5;    // Jewel sparkles
+       finalColor += glowColor * glowIntensity * 0.3;
+       alpha = 0.15 + (fresnel * 0.85); // Very transparent center, opaque edges
   }
   else if (uMode == 4) { // Luminous
       // High energy glow

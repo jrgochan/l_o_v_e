@@ -511,9 +511,8 @@ export const visualizationPartialize = (state: VisualizationState) => {
   const isClientViewer =
     typeof window !== "undefined" && !window.location.pathname.startsWith("/admin");
 
-  if (process.env.NODE_ENV === "development") {
-    console.log("DEBUG: partialize", { pathname: window.location.pathname, isClientViewer });
-  }
+  // Note: partialize is called on EVERY store change by Zustand's persist middleware.
+  // Do NOT add console.log here — it will flood the console and stall the render loop.
 
   if (isClientViewer) {
     // Client Viewer should ONLY persist selection state

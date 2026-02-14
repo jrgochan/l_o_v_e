@@ -43,7 +43,7 @@ describe("useWebSocketChat", () => {
       expect.objectContaining({ sessionId: "sess-1" })
     );
     expect(useWebSocketConnection).toHaveBeenCalledWith(
-      expect.objectContaining({ endpoint: "observer/ws/chat/sess-1", onMessage: mockHandleMessage })
+      expect.objectContaining({ endpoint: "ws/chat/sess-1", onMessage: mockHandleMessage })
     );
     expect(useWebSocketSender).toHaveBeenCalled();
 

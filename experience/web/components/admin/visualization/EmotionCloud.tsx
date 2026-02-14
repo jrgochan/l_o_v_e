@@ -19,6 +19,10 @@ import type { Emotion, PathAnimationMode } from "@/types/visualization";
 //
 import { AnimatedEmotionNode } from "../emotions/AnimatedEmotionNode";
 import { MysticalEmotionNode } from "../emotions/MysticalEmotionNode";
+import { CrystallineEmotionNode } from "../emotions/CrystallineEmotionNode";
+import { LuminousEmotionNode } from "../emotions/LuminousEmotionNode";
+import { LiquidEmotionNode } from "../emotions/LiquidEmotionNode";
+import { GlitchEmotionNode } from "../emotions/GlitchEmotionNode";
 import { getEmotionAnimationParams } from "@/utils/emotionAnimationMapper";
 import { getModeConfig } from "@/utils/modeVisualConfigs";
 import { EmotionParticles } from "../particles/EmotionParticles";
@@ -228,6 +232,50 @@ function EmotionSphere({
       {settings.enableAnimations ? (
         settings.pathAnimationMode === "mystical" ? (
           <MysticalEmotionNode
+            emotion={emotion}
+            color={color}
+            size={size}
+            isSelected={isSelected}
+            isHovered={isHovered}
+            onClick={handleClick}
+            onPointerOver={handlePointerOver}
+            onPointerOut={handlePointerOut}
+          />
+        ) : settings.pathAnimationMode === "crystalline" ? (
+          <CrystallineEmotionNode
+            emotion={emotion}
+            color={color}
+            size={size}
+            isSelected={isSelected}
+            isHovered={isHovered}
+            onClick={handleClick}
+            onPointerOver={handlePointerOver}
+            onPointerOut={handlePointerOut}
+          />
+        ) : settings.pathAnimationMode === "luminous" ? (
+          <LuminousEmotionNode
+            emotion={emotion}
+            color={color}
+            size={size}
+            isSelected={isSelected}
+            isHovered={isHovered}
+            onClick={handleClick}
+            onPointerOver={handlePointerOver}
+            onPointerOut={handlePointerOut}
+          />
+        ) : settings.pathAnimationMode === "liquid" ? (
+          <LiquidEmotionNode
+            emotion={emotion}
+            color={color}
+            size={size}
+            isSelected={isSelected}
+            isHovered={isHovered}
+            onClick={handleClick}
+            onPointerOver={handlePointerOver}
+            onPointerOut={handlePointerOut}
+          />
+        ) : settings.pathAnimationMode === "glitch" ? (
+          <GlitchEmotionNode
             emotion={emotion}
             color={color}
             size={size}
