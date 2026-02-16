@@ -145,8 +145,12 @@ export function ActionSuggestions() {
   };
 
   return (
-    <div className={`p-4 border-b transition-colors duration-500 bg-black/10 ${theme.colors.border}`}>
-      <h3 className={`text-xs font-semibold uppercase tracking-wider mb-2 ${theme.colors.text.muted}`}>
+    <div
+      className={`p-4 border-b transition-colors duration-500 bg-black/10 ${theme.colors.border}`}
+    >
+      <h3
+        className={`text-xs font-semibold uppercase tracking-wider mb-2 ${theme.colors.text.muted}`}
+      >
         Suggested Actions
       </h3>
       <div className="grid grid-cols-1 gap-2">

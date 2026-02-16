@@ -317,9 +317,13 @@ export function WaypointDetailModal({
       role="dialog"
       aria-modal="true"
     >
-      <div className={`bg-gray-900 ${theme.layout.borderRadius} shadow-2xl w-full max-w-4xl max-h-[90vh] flex flex-col border-2 ${theme.colors.border} transition-colors duration-500`}>
+      <div
+        className={`bg-gray-900 ${theme.layout.borderRadius} shadow-2xl w-full max-w-4xl max-h-[90vh] flex flex-col border-2 ${theme.colors.border} transition-colors duration-500`}
+      >
         {/* Header - Matches HelpModal Style */}
-        <div className={`flex items-center justify-between p-6 border-b ${theme.colors.border} bg-black/30`}>
+        <div
+          className={`flex items-center justify-between p-6 border-b ${theme.colors.border} bg-black/30`}
+        >
           <div>
             <div className="flex items-center gap-3">
               <h2 className={`text-2xl font-bold max-w-2xl truncate ${theme.colors.text.primary}`}>
@@ -360,7 +364,7 @@ export function WaypointDetailModal({
             aria-selected={activeTab === "why"}
             className={`flex-1 px-6 py-3 text-sm font-medium transition ${
               activeTab === "why"
-                ? `${theme.colors.text.primary} bg-black/20 border-b-2 ${theme.colors.primary.replace('text-', 'border-')}`
+                ? `${theme.colors.text.primary} bg-black/20 border-b-2 ${theme.colors.primary.replace("text-", "border-")}`
                 : `${theme.colors.text.secondary} ${theme.colors.hover}`
             }`}
           >
@@ -372,7 +376,7 @@ export function WaypointDetailModal({
             aria-selected={activeTab === "how"}
             className={`flex-1 px-6 py-3 text-sm font-medium transition ${
               activeTab === "how"
-                ? `${theme.colors.text.primary} bg-black/20 border-b-2 ${theme.colors.primary.replace('text-', 'border-')}`
+                ? `${theme.colors.text.primary} bg-black/20 border-b-2 ${theme.colors.primary.replace("text-", "border-")}`
                 : `${theme.colors.text.secondary} ${theme.colors.hover}`
             }`}
           >
@@ -384,7 +388,7 @@ export function WaypointDetailModal({
             aria-selected={activeTab === "relations"}
             className={`flex-1 px-6 py-3 text-sm font-medium transition ${
               activeTab === "relations"
-                ? `${theme.colors.text.primary} bg-black/20 border-b-2 ${theme.colors.primary.replace('text-', 'border-')}`
+                ? `${theme.colors.text.primary} bg-black/20 border-b-2 ${theme.colors.primary.replace("text-", "border-")}`
                 : `${theme.colors.text.secondary} ${theme.colors.hover}`
             }`}
           >
@@ -398,9 +402,15 @@ export function WaypointDetailModal({
             <div className="space-y-6">
               {/* Psychological Purpose */}
               <section>
-                <h3 className={`text-lg font-semibold mb-3 ${theme.colors.text.primary}`}>Psychological Purpose</h3>
-                <div className={`bg-black/20 ${theme.layout.borderRadius} p-4 border ${theme.colors.border} transition-colors duration-500`}>
-                  <p className={`leading-relaxed font-serif text-lg ${theme.colors.text.secondary}`}>
+                <h3 className={`text-lg font-semibold mb-3 ${theme.colors.text.primary}`}>
+                  Psychological Purpose
+                </h3>
+                <div
+                  className={`bg-black/20 ${theme.layout.borderRadius} p-4 border ${theme.colors.border} transition-colors duration-500`}
+                >
+                  <p
+                    className={`leading-relaxed font-serif text-lg ${theme.colors.text.secondary}`}
+                  >
                     {/* Handle explanation access safely since Start/End use different struct or mocks */}
                     {currentStep.explanation?.psychological_purpose ||
                       currentStep.reasoning ||
@@ -412,14 +422,22 @@ export function WaypointDetailModal({
               {/* VAC Dimensional Analysis - Skip if Start (no shifts) */}
               {currentStep.type !== "start" && (
                 <section>
-                  <h3 className={`text-lg font-semibold mb-3 ${theme.colors.text.primary}`}>VAC Dimensional Shifts</h3>
-                  <div className={`bg-black/20 ${theme.layout.borderRadius} p-4 space-y-4 border ${theme.colors.border} transition-colors duration-500`}>
+                  <h3 className={`text-lg font-semibold mb-3 ${theme.colors.text.primary}`}>
+                    VAC Dimensional Shifts
+                  </h3>
+                  <div
+                    className={`bg-black/20 ${theme.layout.borderRadius} p-4 space-y-4 border ${theme.colors.border} transition-colors duration-500`}
+                  >
                     {/* Using custom colors for V, A, C */}
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                       {/* Valence */}
-                      <div className={`bg-black/30 p-3 ${theme.layout.borderRadius} border ${theme.colors.border}`}>
+                      <div
+                        className={`bg-black/30 p-3 ${theme.layout.borderRadius} border ${theme.colors.border}`}
+                      >
                         <div className="flex items-center justify-between mb-1">
-                          <span className={`text-xs uppercase tracking-wider ${theme.colors.text.muted}`}>
+                          <span
+                            className={`text-xs uppercase tracking-wider ${theme.colors.text.muted}`}
+                          >
                             Valence
                           </span>
                           <span
@@ -445,9 +463,13 @@ export function WaypointDetailModal({
                       </div>
 
                       {/* Arousal */}
-                      <div className={`bg-black/30 p-3 ${theme.layout.borderRadius} border ${theme.colors.border}`}>
+                      <div
+                        className={`bg-black/30 p-3 ${theme.layout.borderRadius} border ${theme.colors.border}`}
+                      >
                         <div className="flex items-center justify-between mb-1">
-                          <span className={`text-xs uppercase tracking-wider ${theme.colors.text.muted}`}>
+                          <span
+                            className={`text-xs uppercase tracking-wider ${theme.colors.text.muted}`}
+                          >
                             Arousal
                           </span>
                           <span
@@ -472,9 +494,13 @@ export function WaypointDetailModal({
                       </div>
 
                       {/* Connection */}
-                      <div className={`bg-black/30 p-3 ${theme.layout.borderRadius} border ${theme.colors.border}`}>
+                      <div
+                        className={`bg-black/30 p-3 ${theme.layout.borderRadius} border ${theme.colors.border}`}
+                      >
                         <div className="flex items-center justify-between mb-1">
-                          <span className={`text-xs uppercase tracking-wider ${theme.colors.text.muted}`}>
+                          <span
+                            className={`text-xs uppercase tracking-wider ${theme.colors.text.muted}`}
+                          >
                             Connection
                           </span>
                           <span
@@ -506,7 +532,9 @@ export function WaypointDetailModal({
               {currentStep.explanation?.research_citations &&
                 currentStep.explanation.research_citations.length > 0 && (
                   <section>
-                    <h3 className={`text-lg font-semibold mb-3 ${theme.colors.text.primary}`}>Research Foundation</h3>
+                    <h3 className={`text-lg font-semibold mb-3 ${theme.colors.text.primary}`}>
+                      Research Foundation
+                    </h3>
                     <div className="space-y-3">
                       {currentStep.explanation.research_citations.map((citation, idx: number) => (
                         <div
@@ -516,8 +544,12 @@ export function WaypointDetailModal({
                           <p className="text-sm font-semibold text-blue-300">
                             {citation.author} ({citation.year})
                           </p>
-                          <p className={`text-xs italic mt-0.5 ${theme.colors.text.muted}`}>{citation.work}</p>
-                          <p className={`text-sm mt-2 ${theme.colors.text.secondary}`}>{citation.key_finding}</p>
+                          <p className={`text-xs italic mt-0.5 ${theme.colors.text.muted}`}>
+                            {citation.work}
+                          </p>
+                          <p className={`text-sm mt-2 ${theme.colors.text.secondary}`}>
+                            {citation.key_finding}
+                          </p>
                           {citation.quote && (
                             <p className="text-xs text-gray-400 mt-3 pl-3 border-l-2 border-blue-500/50 italic">
                               &quot;{citation.quote}&quot;
@@ -531,8 +563,12 @@ export function WaypointDetailModal({
 
               {/* Position in Journey */}
               <section>
-                <h3 className={`text-lg font-semibold mb-3 ${theme.colors.text.primary}`}>Position in Journey</h3>
-                <div className={`bg-black/20 ${theme.layout.borderRadius} p-4 space-y-2 text-sm border ${theme.colors.border} transition-colors duration-500`}>
+                <h3 className={`text-lg font-semibold mb-3 ${theme.colors.text.primary}`}>
+                  Position in Journey
+                </h3>
+                <div
+                  className={`bg-black/20 ${theme.layout.borderRadius} p-4 space-y-2 text-sm border ${theme.colors.border} transition-colors duration-500`}
+                >
                   <div className={`flex justify-between border-b ${theme.colors.border} pb-2`}>
                     <span className={theme.colors.text.secondary}>Progress</span>
                     <span className={`font-mono ${theme.colors.text.primary}`}>
@@ -557,18 +593,26 @@ export function WaypointDetailModal({
                 <h3 className={`text-lg font-semibold mb-3 ${theme.colors.text.primary}`}>
                   Recommended Strategies
                   {displayStrategies.length > 0 && (
-                    <span className={`ml-2 text-sm ${theme.colors.text.muted}`}>({displayStrategies.length})</span>
+                    <span className={`ml-2 text-sm ${theme.colors.text.muted}`}>
+                      ({displayStrategies.length})
+                    </span>
                   )}
                 </h3>
                 {isLoadingStrategies && displayStrategies.length === 0 ? (
-                  <div className={`bg-black/20 ${theme.layout.borderRadius} p-6 border ${theme.colors.border} text-center`}>
+                  <div
+                    className={`bg-black/20 ${theme.layout.borderRadius} p-6 border ${theme.colors.border} text-center`}
+                  >
                     <div className="flex items-center justify-center gap-3">
-                      <div className={`w-5 h-5 border-2 ${theme.colors.primary.replace('text-', 'border-')} border-t-transparent rounded-full animate-spin`} />
+                      <div
+                        className={`w-5 h-5 border-2 ${theme.colors.primary.replace("text-", "border-")} border-t-transparent rounded-full animate-spin`}
+                      />
                       <p className={theme.colors.text.secondary}>Loading strategies...</p>
                     </div>
                   </div>
                 ) : strategyFetchError && displayStrategies.length === 0 ? (
-                  <div className={`bg-black/20 ${theme.layout.borderRadius} p-6 border border-red-900/30 text-center`}>
+                  <div
+                    className={`bg-black/20 ${theme.layout.borderRadius} p-6 border border-red-900/30 text-center`}
+                  >
                     <p className="text-red-400 text-sm">{strategyFetchError}</p>
                     <button
                       className={`mt-3 text-xs underline ${theme.colors.primary}`}
@@ -590,7 +634,9 @@ export function WaypointDetailModal({
                         <summary className="p-5 cursor-pointer list-none">
                           <div className="flex items-start justify-between mb-3">
                             <div className="flex items-center gap-3">
-                              <h4 className={`font-bold text-lg ${theme.colors.text.primary}`}>{strategy.name}</h4>
+                              <h4 className={`font-bold text-lg ${theme.colors.text.primary}`}>
+                                {strategy.name}
+                              </h4>
                               {/* Match reason badge */}
                               {strategy.match_reason && strategy.match_reason !== "universal" && (
                                 <span
@@ -612,18 +658,24 @@ export function WaypointDetailModal({
                                   {strategy.evidence_level}
                                 </span>
                               )}
-                              <span className={`text-xs group-open:rotate-180 transition-transform ${theme.colors.text.muted}`}>
+                              <span
+                                className={`text-xs group-open:rotate-180 transition-transform ${theme.colors.text.muted}`}
+                              >
                                 ▼
                               </span>
                             </div>
                           </div>
 
-                          <p className={`text-sm mb-3 leading-relaxed ${theme.colors.text.secondary}`}>
+                          <p
+                            className={`text-sm mb-3 leading-relaxed ${theme.colors.text.secondary}`}
+                          >
                             {strategy.description}
                           </p>
 
                           {/* Metadata row */}
-                          <div className={`flex flex-wrap items-center gap-3 text-xs ${theme.colors.text.muted}`}>
+                          <div
+                            className={`flex flex-wrap items-center gap-3 text-xs ${theme.colors.text.muted}`}
+                          >
                             {(strategy.time_required || strategy.time_commitment) && (
                               <span>⏱️ {strategy.time_required || strategy.time_commitment}</span>
                             )}
@@ -666,7 +718,9 @@ export function WaypointDetailModal({
                         {/* Expandable step-by-step instructions */}
                         {strategy.steps && strategy.steps.length > 0 && (
                           <div className={`px-5 pb-5 pt-2 border-t ${theme.colors.border}`}>
-                            <h5 className={`text-sm font-semibold mb-3 uppercase tracking-wider ${theme.colors.primary}`}>
+                            <h5
+                              className={`text-sm font-semibold mb-3 uppercase tracking-wider ${theme.colors.primary}`}
+                            >
                               Step-by-Step Guide
                             </h5>
                             <ol className="space-y-2">
@@ -675,7 +729,9 @@ export function WaypointDetailModal({
                                   key={stepIdx}
                                   className={`flex items-start gap-3 text-sm ${theme.colors.text.secondary}`}
                                 >
-                                  <span className={`shrink-0 w-6 h-6 rounded-full bg-black/30 border ${theme.colors.border} flex items-center justify-center text-xs font-bold ${theme.colors.primary}`}>
+                                  <span
+                                    className={`shrink-0 w-6 h-6 rounded-full bg-black/30 border ${theme.colors.border} flex items-center justify-center text-xs font-bold ${theme.colors.primary}`}
+                                  >
                                     {stepIdx + 1}
                                   </span>
                                   <span className="pt-0.5">{step}</span>
@@ -688,7 +744,9 @@ export function WaypointDetailModal({
                     ))}
                   </div>
                 ) : (
-                  <div className={`bg-black/20 ${theme.layout.borderRadius} p-6 border ${theme.colors.border} text-center`}>
+                  <div
+                    className={`bg-black/20 ${theme.layout.borderRadius} p-6 border ${theme.colors.border} text-center`}
+                  >
                     <p className={theme.colors.text.secondary}>
                       {currentStep.type === "start"
                         ? "Begin by acknowledging your current emotional state."
@@ -704,12 +762,17 @@ export function WaypointDetailModal({
               {currentStep.explanation?.readiness_signs &&
                 currentStep.explanation.readiness_signs.length > 0 && (
                   <section>
-                    <h3 className={`text-lg font-semibold mb-3 ${theme.colors.text.primary}`}>✅ Signs of Readiness</h3>
+                    <h3 className={`text-lg font-semibold mb-3 ${theme.colors.text.primary}`}>
+                      ✅ Signs of Readiness
+                    </h3>
                     <div className="bg-green-900/10 border border-green-500/20 rounded-lg p-4">
                       <ul className="space-y-3">
                         {currentStep.explanation.readiness_signs.map(
                           (sign: string, idx: number) => (
-                            <li key={idx} className={`flex items-start gap-3 text-sm ${theme.colors.text.secondary}`}>
+                            <li
+                              key={idx}
+                              className={`flex items-start gap-3 text-sm ${theme.colors.text.secondary}`}
+                            >
                               <span className="text-green-400 mt-0.5 bg-green-900/50 rounded-full w-5 h-5 flex items-center justify-center text-xs">
                                 ✓
                               </span>
@@ -729,15 +792,24 @@ export function WaypointDetailModal({
               {/* Previous Step */}
               {previousEmotion && (
                 <section className={`relative pl-6 border-l-2 ${theme.colors.border}`}>
-                  <div className={`absolute -left-[9px] top-0 w-4 h-4 rounded-full bg-black/50 border-2 ${theme.colors.border}`} />
+                  <div
+                    className={`absolute -left-[9px] top-0 w-4 h-4 rounded-full bg-black/50 border-2 ${theme.colors.border}`}
+                  />
                   <h3 className={`text-lg font-semibold mb-2 ${theme.colors.text.secondary}`}>
-                    From: <span className={theme.colors.text.primary}>{previousEmotion.emotion}</span>
+                    From:{" "}
+                    <span className={theme.colors.text.primary}>{previousEmotion.emotion}</span>
                   </h3>
-                  <div className={`bg-black/20 ${theme.layout.borderRadius} p-4 space-y-3 border ${theme.colors.border} transition-colors duration-500`}>
-                    <h4 className={`text-sm font-semibold uppercase tracking-wide ${theme.colors.primary}`}>
+                  <div
+                    className={`bg-black/20 ${theme.layout.borderRadius} p-4 space-y-3 border ${theme.colors.border} transition-colors duration-500`}
+                  >
+                    <h4
+                      className={`text-sm font-semibold uppercase tracking-wide ${theme.colors.primary}`}
+                    >
                       What Changed
                     </h4>
-                    <ul className={`list-disc list-inside space-y-1 text-sm ${theme.colors.text.secondary}`}>
+                    <ul
+                      className={`list-disc list-inside space-y-1 text-sm ${theme.colors.text.secondary}`}
+                    >
                       {Math.abs(parseFloat(vacShifts.valence.change)) > 0.1 && (
                         <li>Emotional tone: {vacShifts.valence.direction}</li>
                       )}
@@ -759,8 +831,12 @@ export function WaypointDetailModal({
               )}
 
               {/* Current Step (Visual Spacer) */}
-              <div className={`pl-6 border-l-2 py-4 ${theme.colors.primary.replace('text-', 'border-')}`}>
-                <div className={`${theme.effects.glass} p-3 ${theme.layout.borderRadius} text-sm font-bold text-center ${theme.colors.primary}`}>
+              <div
+                className={`pl-6 border-l-2 py-4 ${theme.colors.primary.replace("text-", "border-")}`}
+              >
+                <div
+                  className={`${theme.effects.glass} p-3 ${theme.layout.borderRadius} text-sm font-bold text-center ${theme.colors.primary}`}
+                >
                   Current: {currentStep.emotion}
                 </div>
               </div>
@@ -768,12 +844,18 @@ export function WaypointDetailModal({
               {/* Next Step */}
               {nextEmotion && (
                 <section className={`relative pl-6 border-l-2 ${theme.colors.border}`}>
-                  <div className={`absolute -left-[9px] top-0 w-4 h-4 rounded-full bg-black/50 border-2 ${theme.colors.border}`} />
-                  <div className={`absolute -left-[5px] bottom-0 w-2 h-2 rounded-full bg-black/30`} />
+                  <div
+                    className={`absolute -left-[9px] top-0 w-4 h-4 rounded-full bg-black/50 border-2 ${theme.colors.border}`}
+                  />
+                  <div
+                    className={`absolute -left-[5px] bottom-0 w-2 h-2 rounded-full bg-black/30`}
+                  />
                   <h3 className={`text-lg font-semibold mb-2 ${theme.colors.text.secondary}`}>
                     To: <span className={theme.colors.text.primary}>{nextEmotion.emotion}</span>
                   </h3>
-                  <div className={`bg-black/20 ${theme.layout.borderRadius} p-4 space-y-3 border ${theme.colors.border} transition-colors duration-500`}>
+                  <div
+                    className={`bg-black/20 ${theme.layout.borderRadius} p-4 space-y-3 border ${theme.colors.border} transition-colors duration-500`}
+                  >
                     <h4 className="text-sm font-semibold text-green-400 uppercase tracking-wide">
                       Enables Transition
                     </h4>
@@ -786,7 +868,9 @@ export function WaypointDetailModal({
 
               {/* Full Path Context - Enhanced with Labels */}
               <section>
-                <div className={`bg-black/30 rounded-xl p-6 border ${theme.colors.border} transition-colors duration-500`}>
+                <div
+                  className={`bg-black/30 rounded-xl p-6 border ${theme.colors.border} transition-colors duration-500`}
+                >
                   {/* Centered Path Viz */}
                   <div className="flex flex-wrap items-center gap-2 text-sm justify-center">
                     {/* Render ALL steps using allSteps array */}
@@ -825,7 +909,9 @@ export function WaypointDetailModal({
                         </div>
 
                         {/* Arrow if not last */}
-                        {i < allSteps.length - 1 && <span className={`mx-1 ${theme.colors.text.muted}`}>→</span>}
+                        {i < allSteps.length - 1 && (
+                          <span className={`mx-1 ${theme.colors.text.muted}`}>→</span>
+                        )}
                       </div>
                     ))}
                   </div>
@@ -836,7 +922,9 @@ export function WaypointDetailModal({
         </div>
 
         {/* Footer Navigation */}
-        <div className={`flex items-center justify-between p-4 border-t ${theme.colors.border} bg-black/50 ${theme.effects.backdropBlur}`}>
+        <div
+          className={`flex items-center justify-between p-4 border-t ${theme.colors.border} bg-black/50 ${theme.effects.backdropBlur}`}
+        >
           <>
             <button
               onClick={() => onNavigate?.(waypointIndex - 1)}
@@ -846,13 +934,15 @@ export function WaypointDetailModal({
               ← Previous
             </button>
             <div className="flex flex-col items-center">
-              <span className={`text-xs uppercase tracking-widest ${theme.colors.text.muted}`}>Navigation</span>
+              <span className={`text-xs uppercase tracking-widest ${theme.colors.text.muted}`}>
+                Navigation
+              </span>
               <div className="flex gap-1 mt-1">
                 {allSteps.map((_, i) => (
                   <button
                     key={i}
                     onClick={() => onNavigate?.(i)}
-                    className={`w-2 h-2 rounded-full transition-all ${i === waypointIndex ? `${theme.colors.primary.replace('text-', 'bg-')} scale-125` : `bg-black/30 ${theme.colors.hover}`}`}
+                    className={`w-2 h-2 rounded-full transition-all ${i === waypointIndex ? `${theme.colors.primary.replace("text-", "bg-")} scale-125` : `bg-black/30 ${theme.colors.hover}`}`}
                   />
                 ))}
               </div>

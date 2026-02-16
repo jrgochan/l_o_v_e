@@ -186,7 +186,9 @@ export function StrategiesTab() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h2 className={`text-xl font-semibold mb-1 ${theme.colors.text.primary}`}>Therapeutic Strategies</h2>
+          <h2 className={`text-xl font-semibold mb-1 ${theme.colors.text.primary}`}>
+            Therapeutic Strategies
+          </h2>
           <p className={`text-sm ${theme.colors.text.muted}`}>
             Manage clinical interventions (ACT, CBT, DBT). Used by the AI for recommendations.
           </p>
@@ -227,10 +229,14 @@ export function StrategiesTab() {
         </div>
       )}
 
-      <div className={`rounded-lg overflow-hidden ${theme.colors.background} border ${theme.colors.border}`}>
+      <div
+        className={`rounded-lg overflow-hidden ${theme.colors.background} border ${theme.colors.border}`}
+      >
         <div className="overflow-x-auto">
           <table className="w-full text-left text-sm">
-            <thead className={`border-b uppercase text-xs font-semibold ${theme.colors.background} ${theme.colors.border} ${theme.colors.text.muted}`}>
+            <thead
+              className={`border-b uppercase text-xs font-semibold ${theme.colors.background} ${theme.colors.border} ${theme.colors.text.muted}`}
+            >
               <tr>
                 <th className="px-6 py-4 w-10"></th>
                 <th className="px-6 py-4 w-64">Strategy Name</th>
@@ -263,8 +269,12 @@ export function StrategiesTab() {
                           )}
                         </button>
                       </td>
-                      <td className={`px-6 py-4 font-medium ${theme.colors.text.primary}`}>{strategy.strategy_name}</td>
-                      <td className={`px-6 py-4 ${theme.colors.text.secondary}`}>{strategy.strategy_type}</td>
+                      <td className={`px-6 py-4 font-medium ${theme.colors.text.primary}`}>
+                        {strategy.strategy_name}
+                      </td>
+                      <td className={`px-6 py-4 ${theme.colors.text.secondary}`}>
+                        {strategy.strategy_type}
+                      </td>
                       <td className="px-6 py-4">
                         <span
                           className={`px-2 py-0.5 rounded text-[10px] uppercase font-bold tracking-wider
@@ -291,7 +301,9 @@ export function StrategiesTab() {
                           />
                         </td>
                       ) : (
-                        <td className={`px-6 py-4 text-sm truncate max-w-xs ${theme.colors.text.muted}`}>
+                        <td
+                          className={`px-6 py-4 text-sm truncate max-w-xs ${theme.colors.text.muted}`}
+                        >
                           {strategy.description}
                         </td>
                       )}
@@ -338,17 +350,24 @@ export function StrategiesTab() {
                     {/* Expanded Details Row */}
                     {isExpanded && (
                       <tr className={theme.colors.background}>
-                        <td colSpan={6} className={`px-6 py-4 border-t shadow-inner ${theme.colors.border}`}>
+                        <td
+                          colSpan={6}
+                          className={`px-6 py-4 border-t shadow-inner ${theme.colors.border}`}
+                        >
                           <div className="grid grid-cols-2 gap-8 pl-12">
                             <div>
-                              <h4 className={`text-xs font-bold uppercase mb-2 ${theme.colors.text.muted}`}>
+                              <h4
+                                className={`text-xs font-bold uppercase mb-2 ${theme.colors.text.muted}`}
+                              >
                                 Detailed Steps
                               </h4>
                               {isEditing ? (
                                 <div className="space-y-2">
                                   {editForm.detailed_steps!.map((step, idx) => (
                                     <div key={idx} className="flex gap-2">
-                                      <span className={`text-xs w-4 pt-1 ${theme.colors.text.muted}`}>
+                                      <span
+                                        className={`text-xs w-4 pt-1 ${theme.colors.text.muted}`}
+                                      >
                                         {idx + 1}.
                                       </span>
                                       <input
@@ -374,7 +393,9 @@ export function StrategiesTab() {
                                   </button>
                                 </div>
                               ) : (
-                                <ol className={`list-decimal list-outside text-sm space-y-1 ml-4 ${theme.colors.text.secondary}`}>
+                                <ol
+                                  className={`list-decimal list-outside text-sm space-y-1 ml-4 ${theme.colors.text.secondary}`}
+                                >
                                   {(strategy.detailed_steps || []).map((step, idx) => (
                                     <li key={idx} className="pl-1">
                                       {step}
@@ -386,7 +407,9 @@ export function StrategiesTab() {
                             <div className="space-y-4">
                               <div className="grid grid-cols-2 gap-4">
                                 <div>
-                                  <h4 className={`text-xs font-bold uppercase mb-1 ${theme.colors.text.muted}`}>
+                                  <h4
+                                    className={`text-xs font-bold uppercase mb-1 ${theme.colors.text.muted}`}
+                                  >
                                     Time Required
                                   </h4>
                                   {isEditing ? (
@@ -404,7 +427,9 @@ export function StrategiesTab() {
                                   )}
                                 </div>
                                 <div>
-                                  <h4 className={`text-xs font-bold uppercase mb-1 ${theme.colors.text.muted}`}>
+                                  <h4
+                                    className={`text-xs font-bold uppercase mb-1 ${theme.colors.text.muted}`}
+                                  >
                                     Difficulty (1-5)
                                   </h4>
                                   {isEditing ? (
@@ -439,7 +464,9 @@ export function StrategiesTab() {
                               </div>
 
                               <div>
-                                <h4 className={`text-xs font-bold uppercase mb-1 ${theme.colors.text.muted}`}>
+                                <h4
+                                  className={`text-xs font-bold uppercase mb-1 ${theme.colors.text.muted}`}
+                                >
                                   Contraindications
                                 </h4>
                                 {isEditing ? (

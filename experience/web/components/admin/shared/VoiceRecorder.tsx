@@ -89,13 +89,19 @@ export function VoiceRecorder({ isOpen, onClose, onSend }: VoiceRecorderProps) {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm">
-      <div className={`bg-gray-900 ${theme.layout.borderRadius} border-2 ${theme.colors.border} ${theme.effects.glow} p-6 max-w-2xl w-full mx-4 transition-colors duration-500`}>
+      <div
+        className={`bg-gray-900 ${theme.layout.borderRadius} border-2 ${theme.colors.border} ${theme.effects.glow} p-6 max-w-2xl w-full mx-4 transition-colors duration-500`}
+      >
         {/* Header */}
         <div className="flex items-center justify-between mb-6">
-          <h3 className={`text-xl font-semibold flex items-center gap-2 ${theme.colors.text.primary}`}>
+          <h3
+            className={`text-xl font-semibold flex items-center gap-2 ${theme.colors.text.primary}`}
+          >
             🎤 Voice Recording
           </h3>
-          <div className={`text-2xl font-mono ${theme.colors.primary}`}>{formatDuration(duration)}</div>
+          <div className={`text-2xl font-mono ${theme.colors.primary}`}>
+            {formatDuration(duration)}
+          </div>
         </div>
 
         {/* Visualizer */}
@@ -109,7 +115,9 @@ export function VoiceRecorder({ isOpen, onClose, onSend }: VoiceRecorderProps) {
         {/* Status */}
         <div className="mt-4 text-center">
           {!isRecording && !audioBlob && (
-            <p className={`text-sm ${theme.colors.text.secondary}`}>Click &quot;Start Recording&quot; to begin</p>
+            <p className={`text-sm ${theme.colors.text.secondary}`}>
+              Click &quot;Start Recording&quot; to begin
+            </p>
           )}
           {isRecording && !isPaused && (
             <p className={`text-sm flex items-center justify-center gap-2 ${theme.colors.primary}`}>

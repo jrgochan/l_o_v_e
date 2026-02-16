@@ -53,9 +53,13 @@ export function ThreadView({ rootMessageId, onClose, toneMode, deepFeelingMode }
   }, [rootMessageId]);
 
   return (
-    <div className={`absolute inset-0 z-50 backdrop-blur-md flex flex-col animate-in slide-in-from-right duration-300 ${theme.colors.background}`}>
+    <div
+      className={`absolute inset-0 z-50 backdrop-blur-md flex flex-col animate-in slide-in-from-right duration-300 ${theme.colors.background}`}
+    >
       {/* Header */}
-      <div className={`flex items-center justify-between px-4 py-3 border-b ${theme.colors.border} ${theme.colors.background}`}>
+      <div
+        className={`flex items-center justify-between px-4 py-3 border-b ${theme.colors.border} ${theme.colors.background}`}
+      >
         <div className="flex items-center gap-2">
           <span className="text-cyan-400">🧵</span>
           <h3 className="text-lg font-semibold text-white">Thread Context</h3>

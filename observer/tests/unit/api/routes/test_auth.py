@@ -3,7 +3,7 @@ from unittest.mock import AsyncMock, MagicMock, patch
 import pytest
 from fastapi import HTTPException
 
-from app.api.routes.auth import login_for_access_token, register_user
+from app.api.routes.auth import login_for_access_token, refresh_token, register_user
 from app.schemas.user import UserCreate
 
 
@@ -106,3 +106,15 @@ async def test_register_duplicate(mock_db, mock_user):
     with pytest.raises(HTTPException) as exc:
         await register_user(user_in, mock_db)
     assert exc.value.status_code == 400
+
+
+@pytest.mark.asyncio
+async def test_refresh_token_success(mock_user):
+    """Test refresh endpoint returns a new token (lines 95-101)."""
+    mock_user.role = "user"
+
+    with patch("app.api.routes.auth.create_access_token", return_value="refreshed_token"):
+        response = await refresh_token(mock_user)
+
+    assert response["access_token"] == "refreshed_token"
+    assert response["token_type"] == "bearer"

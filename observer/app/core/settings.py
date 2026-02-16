@@ -11,7 +11,7 @@ from pydantic_settings import SettingsConfigDict
 
 try:
     from settings import LoveBaseSettings
-except ImportError:
+except ImportError:  # pragma: no cover
     # pylint: disable=ungrouped-imports
     from pydantic_settings import BaseSettings as LoveBaseSettings
 
@@ -37,7 +37,7 @@ class Settings(LoveBaseSettings):  # type: ignore
     @model_validator(mode="after")
     def assemble_db_connection(self) -> "Settings":
         """Build DATABASE_URL from components if not explicitly set."""
-        if not self.DATABASE_URL:
+        if not self.DATABASE_URL:  # pragma: no branch
             self.DATABASE_URL = (
                 f"postgresql+asyncpg://{self.POSTGRES_USER}:{self.POSTGRES_PASSWORD}"
                 f"@{self.POSTGRES_HOST}:{self.POSTGRES_PORT}/{self.POSTGRES_DB}"

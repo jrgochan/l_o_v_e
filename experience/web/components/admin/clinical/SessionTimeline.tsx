@@ -57,9 +57,13 @@ export function SessionTimeline({ emotionTimeline }: SessionTimelineProps) {
 
   return (
     <div className={`rounded-lg p-4 border ${theme.colors.background} ${theme.colors.border}`}>
-      <div className={`text-sm mb-3 font-semibold flex items-center justify-between ${theme.colors.text.secondary}`}>
+      <div
+        className={`text-sm mb-3 font-semibold flex items-center justify-between ${theme.colors.text.secondary}`}
+      >
         <span>🕐 Session Timeline</span>
-        <span className={`text-xs ${theme.colors.text.muted}`}>{emotionTimeline.length} events</span>
+        <span className={`text-xs ${theme.colors.text.muted}`}>
+          {emotionTimeline.length} events
+        </span>
       </div>
 
       {/* Timeline */}
@@ -70,7 +74,11 @@ export function SessionTimeline({ emotionTimeline }: SessionTimelineProps) {
           return (
             <div key={index} className="relative">
               {/* Timeline connector line */}
-              {!isLast && <div className={`absolute left-3 top-8 bottom-0 w-px ${theme.colors.background}`}></div>}
+              {!isLast && (
+                <div
+                  className={`absolute left-3 top-8 bottom-0 w-px ${theme.colors.background}`}
+                ></div>
+              )}
 
               {/* Event card */}
               <div className="flex gap-3">
@@ -101,7 +109,9 @@ export function SessionTimeline({ emotionTimeline }: SessionTimelineProps) {
                           <span className="text-xs">{getAlertIcon(event.alertLevel)}</span>
                         )}
                       </div>
-                      <div className={`text-xs mb-1 ${theme.colors.text.muted}`}>{event.category}</div>
+                      <div className={`text-xs mb-1 ${theme.colors.text.muted}`}>
+                        {event.category}
+                      </div>
 
                       {/* VAC preview */}
                       <div className="flex gap-3 text-xs font-mono mt-1.5">

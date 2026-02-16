@@ -76,7 +76,9 @@ export function VoiceChat({ personaId, personaColor, personaDescription }: Voice
       >
         <div className="flex items-center justify-between">
           <div>
-            <h4 className={`text-lg font-semibold ${theme.colors.text.primary}`}>Voice Mode Active</h4>
+            <h4 className={`text-lg font-semibold ${theme.colors.text.primary}`}>
+              Voice Mode Active
+            </h4>
             <p className={`text-sm mt-1 ${theme.colors.text.secondary}`}>{personaDescription}</p>
           </div>
           <div
@@ -173,7 +175,9 @@ export function VoiceChat({ personaId, personaColor, personaDescription }: Voice
       )}
 
       {/* Debug Logs */}
-      <div className={`mt-4 p-2 bg-black/50 rounded text-xs font-mono overflow-y-auto max-h-32 ${theme.colors.text.muted}`}>
+      <div
+        className={`mt-4 p-2 bg-black/50 rounded text-xs font-mono overflow-y-auto max-h-32 ${theme.colors.text.muted}`}
+      >
         {debugLogs.map((log, i) => (
           <div key={i}>{log}</div>
         ))}

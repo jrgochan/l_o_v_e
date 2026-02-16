@@ -34,8 +34,14 @@ export function EmotionDetails({ emotion, isHovered = false, animationMode }: Em
   return (
     <section>
       <div className="flex items-center gap-2 mb-3">
-        {isHovered && <div className={`w-2 h-2 rounded-full ${theme.colors.primary.replace("text-", "bg-")} animate-pulse`} />}
-        <h2 className={`text-xs font-semibold uppercase tracking-wider ${theme.colors.text.secondary}`}>
+        {isHovered && (
+          <div
+            className={`w-2 h-2 rounded-full ${theme.colors.primary.replace("text-", "bg-")} animate-pulse`}
+          />
+        )}
+        <h2
+          className={`text-xs font-semibold uppercase tracking-wider ${theme.colors.text.secondary}`}
+        >
           {isHovered ? "👁️ Hovering Over" : "📍 Selected Emotion"}
         </h2>
       </div>
@@ -81,31 +87,43 @@ export function EmotionDetails({ emotion, isHovered = false, animationMode }: Em
 
         {/* Definition */}
         <div className={`pt-3 border-t ${theme.colors.border}`}>
-          <h4 className={`text-xs font-semibold uppercase tracking-wider mb-2 ${theme.colors.text.muted}`}>
+          <h4
+            className={`text-xs font-semibold uppercase tracking-wider mb-2 ${theme.colors.text.muted}`}
+          >
             Definition
           </h4>
-          <p className={`text-sm leading-relaxed ${theme.colors.text.secondary}`}>{emotion.definition}</p>
+          <p className={`text-sm leading-relaxed ${theme.colors.text.secondary}`}>
+            {emotion.definition}
+          </p>
         </div>
 
         {/* VAC Coordinates */}
         <div className={`pt-3 border-t ${theme.colors.border}`}>
-          <h4 className={`text-xs font-semibold uppercase tracking-wider mb-2 ${theme.colors.text.muted}`}>
+          <h4
+            className={`text-xs font-semibold uppercase tracking-wider mb-2 ${theme.colors.text.muted}`}
+          >
             VAC Coordinates
           </h4>
           <div className="grid grid-cols-3 gap-3">
-            <div className={`bg-black/30 ${theme.layout.borderRadius} p-2 border ${theme.colors.border}`}>
+            <div
+              className={`bg-black/30 ${theme.layout.borderRadius} p-2 border ${theme.colors.border}`}
+            >
               <div className={`text-xs mb-0.5 ${theme.colors.text.muted}`}>Valence</div>
               <div className={`text-sm font-mono font-semibold ${theme.colors.primary}`}>
                 {emotion.vac[0].toFixed(3)}
               </div>
             </div>
-            <div className={`bg-black/30 ${theme.layout.borderRadius} p-2 border ${theme.colors.border}`}>
+            <div
+              className={`bg-black/30 ${theme.layout.borderRadius} p-2 border ${theme.colors.border}`}
+            >
               <div className={`text-xs mb-0.5 ${theme.colors.text.muted}`}>Arousal</div>
               <div className={`text-sm font-mono font-semibold ${theme.colors.primary}`}>
                 {emotion.vac[1].toFixed(3)}
               </div>
             </div>
-            <div className={`bg-black/30 ${theme.layout.borderRadius} p-2 border ${theme.colors.border}`}>
+            <div
+              className={`bg-black/30 ${theme.layout.borderRadius} p-2 border ${theme.colors.border}`}
+            >
               <div className={`text-xs mb-0.5 ${theme.colors.text.muted}`}>Connection</div>
               <div className={`text-sm font-mono font-semibold ${theme.colors.primary}`}>
                 {emotion.vac[2].toFixed(3)}

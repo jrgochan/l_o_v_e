@@ -79,7 +79,9 @@ export function ExpandedView({
           <div className="space-y-3">
             <div>
               <div className="text-xl font-bold text-white">{emotion}</div>
-              {category && <div className={`text-sm mt-1 ${theme.colors.text.muted}`}>{category}</div>}
+              {category && (
+                <div className={`text-sm mt-1 ${theme.colors.text.muted}`}>{category}</div>
+              )}
             </div>
 
             {confidence !== null && (
@@ -136,7 +138,9 @@ export function ExpandedView({
               {/* Voice Quality Metrics */}
               {(prosody.jitter || prosody.shimmer || prosody.hnr) && (
                 <div className={`pb-3 border-b ${theme.colors.border}`}>
-                  <div className={`text-xs mb-2 font-semibold ${theme.colors.text.muted}`}>Voice Quality</div>
+                  <div className={`text-xs mb-2 font-semibold ${theme.colors.text.muted}`}>
+                    Voice Quality
+                  </div>
                   <div className="space-y-1.5">
                     {prosody.hnr && (
                       <div className="flex justify-between items-center">
@@ -193,7 +197,9 @@ export function ExpandedView({
               {/* Pitch Analysis */}
               {prosody.pitch_mean && (
                 <div className={`pb-3 border-b ${theme.colors.border}`}>
-                  <div className={`text-xs mb-2 font-semibold ${theme.colors.text.muted}`}>Pitch</div>
+                  <div className={`text-xs mb-2 font-semibold ${theme.colors.text.muted}`}>
+                    Pitch
+                  </div>
                   <div className="space-y-1.5">
                     <div className="flex justify-between">
                       <span className={`text-xs ${theme.colors.text.muted}`}>Mean</span>
@@ -239,14 +245,18 @@ export function ExpandedView({
               {/* Energy Analysis */}
               {prosody.energy && (
                 <div className={`pb-3 border-b ${theme.colors.border}`}>
-                  <div className={`text-xs mb-2 font-semibold ${theme.colors.text.muted}`}>Vocal Energy</div>
+                  <div className={`text-xs mb-2 font-semibold ${theme.colors.text.muted}`}>
+                    Vocal Energy
+                  </div>
                   <div className="space-y-1.5">
                     <div>
                       <div className="flex justify-between text-xs mb-1">
                         <span className={theme.colors.text.muted}>Average</span>
                         <span className="text-white font-mono">{prosody.energy.toFixed(3)}</span>
                       </div>
-                      <div className={`h-1.5 rounded-full overflow-hidden ${theme.colors.background}`}>
+                      <div
+                        className={`h-1.5 rounded-full overflow-hidden ${theme.colors.background}`}
+                      >
                         <div
                           className={`h-full transition-all ${
                             prosody.energy > 0.7
@@ -281,7 +291,9 @@ export function ExpandedView({
 
               {/* Temporal Analysis */}
               <div>
-                <div className={`text-xs mb-2 font-semibold ${theme.colors.text.muted}`}>Speech Patterns</div>
+                <div className={`text-xs mb-2 font-semibold ${theme.colors.text.muted}`}>
+                  Speech Patterns
+                </div>
                 <div className="space-y-1.5">
                   {prosody.rate && (
                     <div className="flex justify-between">

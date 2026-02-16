@@ -32,8 +32,12 @@ export function SphereDebugOverlay({
   const currentVAC = useExperienceStore((state) => state.currentVAC);
 
   return (
-    <div className={`absolute top-20 left-4 z-50 p-4 text-xs font-mono rounded shadow-xl backdrop-blur max-w-sm ${theme.colors.background} border ${theme.colors.border}`}>
-      <h3 className={`text-white font-bold mb-2 border-b pb-1 ${theme.colors.border}`}>Sync Diagnostics</h3>
+    <div
+      className={`absolute top-20 left-4 z-50 p-4 text-xs font-mono rounded shadow-xl backdrop-blur max-w-sm ${theme.colors.background} border ${theme.colors.border}`}
+    >
+      <h3 className={`text-white font-bold mb-2 border-b pb-1 ${theme.colors.border}`}>
+        Sync Diagnostics
+      </h3>
 
       <div className={`grid grid-cols-2 gap-x-4 gap-y-1 ${theme.colors.text.secondary}`}>
         <div>Status:</div>
@@ -167,7 +171,9 @@ function RawStorageMonitor() {
                 : "No VAC"}
             </div>
             <div>Age: {age}s ago</div>
-            <div className={`text-[9px] truncate ${theme.colors.text.muted}`}>{data.raw.substring(0, 40)}...</div>
+            <div className={`text-[9px] truncate ${theme.colors.text.muted}`}>
+              {data.raw.substring(0, 40)}...
+            </div>
           </div>
         ) : (
           <div className="text-red-400 mt-1 font-bold">{data.raw}</div>

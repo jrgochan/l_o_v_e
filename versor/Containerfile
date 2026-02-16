@@ -1,4 +1,5 @@
-FROM python:3.12-bookworm
+# pin: python – https://hub.docker.com/_/python
+FROM python:3.12.8-bookworm
 
 WORKDIR /app
 

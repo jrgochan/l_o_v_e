@@ -134,7 +134,9 @@ export function VACTrajectoryPlot({ vacHistory }: VACTrajectoryPlotProps) {
       </div>
 
       {/* Trajectory Plot */}
-      <div className={`relative w-full aspect-square rounded border ${theme.colors.background} ${theme.colors.border}`}>
+      <div
+        className={`relative w-full aspect-square rounded border ${theme.colors.background} ${theme.colors.border}`}
+      >
         {/* Quadrant backgrounds */}
         <div className="absolute inset-0 grid grid-cols-2 grid-rows-2">
           <div className="border-r border-b border-gray-600 bg-purple-500/5"></div>
@@ -145,16 +147,24 @@ export function VACTrajectoryPlot({ vacHistory }: VACTrajectoryPlotProps) {
 
         {/* Axis labels */}
         <div className="absolute inset-0 pointer-events-none">
-          <div className={`absolute top-1 left-1/2 -translate-x-1/2 text-xs font-semibold ${theme.colors.text.muted}`}>
+          <div
+            className={`absolute top-1 left-1/2 -translate-x-1/2 text-xs font-semibold ${theme.colors.text.muted}`}
+          >
             High Energy (A+)
           </div>
-          <div className={`absolute bottom-1 left-1/2 -translate-x-1/2 text-xs font-semibold ${theme.colors.text.muted}`}>
+          <div
+            className={`absolute bottom-1 left-1/2 -translate-x-1/2 text-xs font-semibold ${theme.colors.text.muted}`}
+          >
             Low Energy (A-)
           </div>
-          <div className={`absolute left-1 top-1/2 -translate-y-1/2 text-xs font-semibold ${theme.colors.text.muted} writing-mode-vertical`}>
+          <div
+            className={`absolute left-1 top-1/2 -translate-y-1/2 text-xs font-semibold ${theme.colors.text.muted} writing-mode-vertical`}
+          >
             Negative (V-)
           </div>
-          <div className={`absolute right-1 top-1/2 -translate-y-1/2 text-xs font-semibold ${theme.colors.text.muted} writing-mode-vertical`}>
+          <div
+            className={`absolute right-1 top-1/2 -translate-y-1/2 text-xs font-semibold ${theme.colors.text.muted} writing-mode-vertical`}
+          >
             Positive (V+)
           </div>
         </div>
@@ -333,8 +343,12 @@ export function VACTrajectoryPlot({ vacHistory }: VACTrajectoryPlotProps) {
 
       {/* Pattern Detection */}
       {patterns.length > 0 && (
-        <div className={`mt-3 p-2 rounded border ${theme.colors.background} ${theme.colors.border}`}>
-          <div className={`text-xs mb-1.5 font-semibold ${theme.colors.text.muted}`}>Clinical Patterns</div>
+        <div
+          className={`mt-3 p-2 rounded border ${theme.colors.background} ${theme.colors.border}`}
+        >
+          <div className={`text-xs mb-1.5 font-semibold ${theme.colors.text.muted}`}>
+            Clinical Patterns
+          </div>
           <div className="space-y-1">
             {patterns.map((pattern, index) => (
               <div key={index} className="flex items-center gap-2">

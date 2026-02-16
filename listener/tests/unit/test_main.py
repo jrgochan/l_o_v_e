@@ -16,7 +16,8 @@ def test_root_endpoint() -> None:
 
 def test_startup_shutdown_events() -> None:
     # TestClient context manager triggers startup and shutdown events
-    with patch("app.main.logger") as mock_logger:
+    # Logger lives in app.core.factory (lifespan context manager)
+    with patch("app.core.factory.logger") as mock_logger:
         with TestClient(app) as _:
             # Startup should have run
             pass
@@ -51,3 +52,23 @@ def test_routes_exist() -> None:
     assert "/health" in routes
     assert "/listener/ingest" in routes
     assert "/listener/ai/models/local" in routes
+
+
+def test_main_block_calls_uvicorn(monkeypatch: "pytest.MonkeyPatch") -> None:
+    """Cover the ``if __name__ == '__main__'`` block (line 42)."""
+    import importlib
+    from unittest.mock import MagicMock
+
+    mock_run = MagicMock()
+    monkeypatch.setattr("uvicorn.run", mock_run)
+
+    spec = importlib.util.find_spec("app.main")
+    assert spec is not None and spec.origin is not None
+    source = open(spec.origin).read()  # noqa: SIM115
+    code = compile(source, spec.origin, "exec")
+    fake_globals: dict = {"__name__": "__main__", "__file__": spec.origin}
+    exec(code, fake_globals)  # noqa: S102
+
+    mock_run.assert_called_once()
+    call_kwargs = mock_run.call_args
+    assert call_kwargs[1]["port"] == 8002

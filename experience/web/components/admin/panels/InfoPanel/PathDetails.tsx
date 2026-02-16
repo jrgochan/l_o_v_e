@@ -32,7 +32,9 @@ export function PathDetails({ path, onWaypointClick, onShowDetails }: PathDetail
   return (
     <section>
       <h2 className={`text-sm font-semibold mb-3 ${theme.colors.text.secondary}`}>Path Details</h2>
-      <div className={`${theme.layout.borderRadius} p-4 space-y-3 bg-black/20 border ${theme.colors.border} transition-colors duration-500`}>
+      <div
+        className={`${theme.layout.borderRadius} p-4 space-y-3 bg-black/20 border ${theme.colors.border} transition-colors duration-500`}
+      >
         {/* Path Header */}
         <div className="flex justify-between items-start">
           <h3 className={`text-sm font-bold ${theme.colors.text.primary}`}>
@@ -68,7 +70,9 @@ export function PathDetails({ path, onWaypointClick, onShowDetails }: PathDetail
         <div className="grid grid-cols-2 gap-3">
           <div>
             <h4 className={`text-xs ${theme.colors.text.muted}`}>Distance</h4>
-            <p className={`text-sm font-mono ${theme.colors.text.primary}`}>{path.total_distance.toFixed(2)}</p>
+            <p className={`text-sm font-mono ${theme.colors.text.primary}`}>
+              {path.total_distance.toFixed(2)}
+            </p>
           </div>
           <div>
             <h4 className={`text-xs ${theme.colors.text.muted}`}>Time</h4>
@@ -87,7 +91,9 @@ export function PathDetails({ path, onWaypointClick, onShowDetails }: PathDetail
                   DIFFICULTY_COLORS[path.difficulty as keyof typeof DIFFICULTY_COLORS] || "#888888",
               }}
             />
-            <span className={`text-sm capitalize ${theme.colors.text.primary}`}>{path.difficulty}</span>
+            <span className={`text-sm capitalize ${theme.colors.text.primary}`}>
+              {path.difficulty}
+            </span>
           </div>
         </div>
 
@@ -140,7 +146,9 @@ export function PathDetails({ path, onWaypointClick, onShowDetails }: PathDetail
                       <span className={`text-xs ${theme.colors.primary}`}>Click for details →</span>
                     </div>
                     {wp.reasoning && (
-                      <div className={`text-xs ml-5 mt-1 ${theme.colors.text.secondary}`}>💡 {wp.reasoning}</div>
+                      <div className={`text-xs ml-5 mt-1 ${theme.colors.text.secondary}`}>
+                        💡 {wp.reasoning}
+                      </div>
                     )}
                     {wp.estimated_time && (
                       <div className={`text-xs ml-5 mt-1 ${theme.colors.text.muted}`}>
@@ -157,7 +165,9 @@ export function PathDetails({ path, onWaypointClick, onShowDetails }: PathDetail
                             <li key={si}>{strategy.name}</li>
                           ))}
                           {wp.strategies.length > 2 && (
-                            <li className={theme.colors.primary}>+{wp.strategies.length - 2} more...</li>
+                            <li className={theme.colors.primary}>
+                              +{wp.strategies.length - 2} more...
+                            </li>
                           )}
                         </ul>
                       </div>
@@ -189,7 +199,9 @@ export function PathDetails({ path, onWaypointClick, onShowDetails }: PathDetail
 
         {/* Bridge Requirement */}
         {path.requires_bridge && path.bridge_emotions && (
-          <div className={`bg-yellow-900/30 border-2 border-yellow-500/50 ${theme.layout.borderRadius} p-3`}>
+          <div
+            className={`bg-yellow-900/30 border-2 border-yellow-500/50 ${theme.layout.borderRadius} p-3`}
+          >
             <div className="flex items-center gap-2 mb-2">
               <span className="text-yellow-400 text-lg">★</span>
               <h4 className="text-sm font-bold text-yellow-300">Bridge Emotions Required</h4>

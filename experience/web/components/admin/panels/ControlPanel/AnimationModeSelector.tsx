@@ -21,14 +21,62 @@ interface AnimationModeSelectorProps {
   onModeChange: (mode: PathAnimationMode) => void;
 }
 
-const MODES: { key: PathAnimationMode; icon: string; label: string; desc: string; activeColor: string }[] = [
-  { key: "subtle", icon: "😌", label: "Subtle Elegant", desc: "Therapeutic calm • Default", activeColor: "bg-blue-600 ring-2 ring-blue-400" },
-  { key: "dynamic", icon: "😊", label: "Dynamic Playful", desc: "Engaging flow • Energetic", activeColor: "bg-orange-600 ring-2 ring-orange-400" },
-  { key: "mystical", icon: "🔮", label: "Mystical Ethereal", desc: "Quantum dreams • Magical", activeColor: "bg-purple-600 ring-2 ring-purple-400" },
-  { key: "crystalline", icon: "💎", label: "Crystalline", desc: "Structural Clarity • Faceted", activeColor: "bg-cyan-600 ring-2 ring-cyan-400" },
-  { key: "luminous", icon: "✨", label: "Luminous", desc: "Energetic Spirit • Glowing", activeColor: "bg-yellow-600 ring-2 ring-yellow-400" },
-  { key: "liquid", icon: "🌊", label: "Liquid", desc: "Deep Immersion • Flowing", activeColor: "bg-blue-500 ring-2 ring-blue-300" },
-  { key: "glitch", icon: "👾", label: "Glitch", desc: "Digital Reality • Chaotic", activeColor: "bg-green-700 ring-2 ring-green-500 font-mono" },
+const MODES: {
+  key: PathAnimationMode;
+  icon: string;
+  label: string;
+  desc: string;
+  activeColor: string;
+}[] = [
+  {
+    key: "subtle",
+    icon: "😌",
+    label: "Subtle Elegant",
+    desc: "Therapeutic calm • Default",
+    activeColor: "bg-blue-600 ring-2 ring-blue-400",
+  },
+  {
+    key: "dynamic",
+    icon: "😊",
+    label: "Dynamic Playful",
+    desc: "Engaging flow • Energetic",
+    activeColor: "bg-orange-600 ring-2 ring-orange-400",
+  },
+  {
+    key: "mystical",
+    icon: "🔮",
+    label: "Mystical Ethereal",
+    desc: "Quantum dreams • Magical",
+    activeColor: "bg-purple-600 ring-2 ring-purple-400",
+  },
+  {
+    key: "crystalline",
+    icon: "💎",
+    label: "Crystalline",
+    desc: "Structural Clarity • Faceted",
+    activeColor: "bg-cyan-600 ring-2 ring-cyan-400",
+  },
+  {
+    key: "luminous",
+    icon: "✨",
+    label: "Luminous",
+    desc: "Energetic Spirit • Glowing",
+    activeColor: "bg-yellow-600 ring-2 ring-yellow-400",
+  },
+  {
+    key: "liquid",
+    icon: "🌊",
+    label: "Liquid",
+    desc: "Deep Immersion • Flowing",
+    activeColor: "bg-blue-500 ring-2 ring-blue-300",
+  },
+  {
+    key: "glitch",
+    icon: "👾",
+    label: "Glitch",
+    desc: "Digital Reality • Chaotic",
+    activeColor: "bg-green-700 ring-2 ring-green-500 font-mono",
+  },
 ];
 
 /**
@@ -54,10 +102,16 @@ export function AnimationModeSelector({ currentMode, onModeChange }: AnimationMo
             }`}
           >
             <div className="flex items-center justify-between">
-              <span className="font-medium">{icon} {label}</span>
+              <span className="font-medium">
+                {icon} {label}
+              </span>
               {currentMode === key && <span className="text-xs">✓</span>}
             </div>
-            <div className={`text-xs mt-0.5 ${currentMode === key ? "text-white/70" : theme.colors.text.muted}`}>{desc}</div>
+            <div
+              className={`text-xs mt-0.5 ${currentMode === key ? "text-white/70" : theme.colors.text.muted}`}
+            >
+              {desc}
+            </div>
           </button>
         ))}
       </div>

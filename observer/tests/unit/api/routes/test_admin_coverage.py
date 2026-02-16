@@ -26,7 +26,7 @@ def mock_admin_user():
 @pytest.mark.asyncio
 async def test_import_visualization_data_generic_exception(mock_db, mock_admin_user):
     """Test generic 500 error when AdminService.import_atlas_emotions fails."""
-    with patch("app.api.routes.admin.AdminService") as MockService:
+    with patch("app.api.routes.admin.visualization.AdminService") as MockService:
         service_instance = MockService.return_value
         service_instance.import_atlas_emotions.side_effect = Exception("Unexpected Failure")
 

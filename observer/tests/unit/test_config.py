@@ -45,3 +45,38 @@ def test_get_settings_helper():
 
     s = get_settings()
     assert isinstance(s, Settings)
+
+
+def test_assemble_db_connection_builds_url():
+    """Cover line 41 — DATABASE_URL assembled from components when not set."""
+    s = Settings(DATABASE_URL=None)
+    assert s.DATABASE_URL is not None
+    assert "postgresql+asyncpg://" in s.DATABASE_URL
+    assert "love_user" in s.DATABASE_URL
+
+
+def test_love_base_settings_fallback():
+    """Cover lines 14-16 — ImportError fallback to BaseSettings."""
+    import importlib
+    import sys
+
+    from pydantic_settings import BaseSettings as _BaseSettings
+
+    saved_settings = sys.modules.pop("settings", None)
+    saved_config = sys.modules.pop("app.core.settings", None)
+    try:
+        sys.modules["settings"] = None  # type: ignore[assignment]
+        import app.core.settings as reloaded  # noqa: F811
+
+        assert reloaded.LoveBaseSettings is _BaseSettings
+        instance = reloaded.Settings()
+        assert instance.APP_NAME == "L.O.V.E. Observer API"
+    finally:
+        sys.modules.pop("settings", None)
+        sys.modules.pop("app.core.settings", None)
+        if saved_settings is not None:
+            sys.modules["settings"] = saved_settings
+        if saved_config is not None:
+            sys.modules["app.core.settings"] = saved_config
+        else:
+            importlib.import_module("app.core.settings")

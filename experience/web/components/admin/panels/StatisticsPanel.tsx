@@ -44,7 +44,9 @@ export function StatisticsPanel() {
   if (!stats || stats.total_cached === 0) {
     return (
       <div className="p-4">
-        <div className={`${theme.layout.borderRadius} p-4 bg-black/20 border ${theme.colors.border}`}>
+        <div
+          className={`${theme.layout.borderRadius} p-4 bg-black/20 border ${theme.colors.border}`}
+        >
           <p className={theme.colors.text.secondary}>
             No paths computed yet. Use &quot;Compute All Paths&quot; in the Path Matrix or select
             emotions to begin.
@@ -58,12 +60,18 @@ export function StatisticsPanel() {
     <div className="p-4 space-y-6">
       <div>
         <h2 className={`text-lg font-bold mb-1 ${theme.colors.text.primary}`}>Path Statistics</h2>
-        <p className={`text-sm ${theme.colors.text.secondary}`}>Real-time metrics from backend cache</p>
+        <p className={`text-sm ${theme.colors.text.secondary}`}>
+          Real-time metrics from backend cache
+        </p>
       </div>
 
       {/* Overall Progress */}
-      <section className={`bg-black/20 border ${theme.colors.border} ${theme.layout.borderRadius} p-4 transition-colors duration-500`}>
-        <h3 className={`text-sm font-semibold mb-3 ${theme.colors.text.secondary}`}>Computation Progress</h3>
+      <section
+        className={`bg-black/20 border ${theme.colors.border} ${theme.layout.borderRadius} p-4 transition-colors duration-500`}
+      >
+        <h3 className={`text-sm font-semibold mb-3 ${theme.colors.text.secondary}`}>
+          Computation Progress
+        </h3>
         <div className="space-y-2">
           <div className="flex justify-between text-sm">
             <span className={theme.colors.text.secondary}>Paths Computed:</span>
@@ -73,7 +81,9 @@ export function StatisticsPanel() {
           </div>
           <div className="flex justify-between text-sm">
             <span className={theme.colors.text.secondary}>Completion:</span>
-            <span className={`font-bold ${theme.colors.primary}`}>{stats.completion_percentage}%</span>
+            <span className={`font-bold ${theme.colors.primary}`}>
+              {stats.completion_percentage}%
+            </span>
           </div>
           <div className={`w-full bg-black/30 rounded-full h-2 mt-2 border ${theme.colors.border}`}>
             <div
@@ -86,8 +96,12 @@ export function StatisticsPanel() {
 
       {/* Performance Metrics */}
       {loadTime > 0 && (
-        <section className={`bg-black/20 border ${theme.colors.border} ${theme.layout.borderRadius} p-4 transition-colors duration-500`}>
-          <h3 className={`text-sm font-semibold mb-3 ${theme.colors.text.secondary}`}>Cache Performance</h3>
+        <section
+          className={`bg-black/20 border ${theme.colors.border} ${theme.layout.borderRadius} p-4 transition-colors duration-500`}
+        >
+          <h3 className={`text-sm font-semibold mb-3 ${theme.colors.text.secondary}`}>
+            Cache Performance
+          </h3>
           <div className="space-y-2 text-sm">
             <div className="flex justify-between">
               <span className={theme.colors.text.secondary}>Cache Load Time:</span>
@@ -103,8 +117,12 @@ export function StatisticsPanel() {
       )}
 
       {/* Difficulty Distribution */}
-      <section className={`bg-black/20 border ${theme.colors.border} ${theme.layout.borderRadius} p-4 transition-colors duration-500`}>
-        <h3 className={`text-sm font-semibold mb-3 ${theme.colors.text.secondary}`}>Difficulty Distribution</h3>
+      <section
+        className={`bg-black/20 border ${theme.colors.border} ${theme.layout.borderRadius} p-4 transition-colors duration-500`}
+      >
+        <h3 className={`text-sm font-semibold mb-3 ${theme.colors.text.secondary}`}>
+          Difficulty Distribution
+        </h3>
         <div className="space-y-2">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
@@ -114,7 +132,9 @@ export function StatisticsPanel() {
               />
               <span className={`text-sm ${theme.colors.text.secondary}`}>Easy</span>
             </div>
-            <span className={`font-mono ${theme.colors.text.primary}`}>{stats.difficulty_distribution?.easy || 0}</span>
+            <span className={`font-mono ${theme.colors.text.primary}`}>
+              {stats.difficulty_distribution?.easy || 0}
+            </span>
           </div>
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
@@ -144,12 +164,18 @@ export function StatisticsPanel() {
       </section>
 
       {/* Distance Metrics */}
-      <section className={`bg-black/20 border ${theme.colors.border} ${theme.layout.borderRadius} p-4 transition-colors duration-500`}>
-        <h3 className={`text-sm font-semibold mb-3 ${theme.colors.text.secondary}`}>Distance Metrics</h3>
+      <section
+        className={`bg-black/20 border ${theme.colors.border} ${theme.layout.borderRadius} p-4 transition-colors duration-500`}
+      >
+        <h3 className={`text-sm font-semibold mb-3 ${theme.colors.text.secondary}`}>
+          Distance Metrics
+        </h3>
         <div className="space-y-2 text-sm">
           <div className="flex justify-between">
             <span className={theme.colors.text.secondary}>Average:</span>
-            <span className={`font-mono ${theme.colors.text.primary}`}>{stats.distance_stats?.avg || "0"}</span>
+            <span className={`font-mono ${theme.colors.text.primary}`}>
+              {stats.distance_stats?.avg || "0"}
+            </span>
           </div>
           <div className="flex justify-between">
             <span className={theme.colors.text.secondary}>Minimum:</span>
@@ -163,8 +189,12 @@ export function StatisticsPanel() {
       </section>
 
       {/* Bridge Paths */}
-      <section className={`bg-black/20 border ${theme.colors.border} ${theme.layout.borderRadius} p-4 transition-colors duration-500`}>
-        <h3 className={`text-sm font-semibold mb-3 ${theme.colors.text.secondary}`}>Bridge Requirements</h3>
+      <section
+        className={`bg-black/20 border ${theme.colors.border} ${theme.layout.borderRadius} p-4 transition-colors duration-500`}
+      >
+        <h3 className={`text-sm font-semibold mb-3 ${theme.colors.text.secondary}`}>
+          Bridge Requirements
+        </h3>
         <div className="space-y-2 mb-3">
           <div className="flex justify-between text-sm">
             <span className={theme.colors.text.secondary}>Paths Requiring Bridges:</span>
@@ -174,19 +204,29 @@ export function StatisticsPanel() {
       </section>
 
       {/* Waypoint Statistics */}
-      <section className={`bg-black/20 border ${theme.colors.border} ${theme.layout.borderRadius} p-4 transition-colors duration-500`}>
-        <h3 className={`text-sm font-semibold mb-3 ${theme.colors.text.secondary}`}>Waypoint Statistics</h3>
+      <section
+        className={`bg-black/20 border ${theme.colors.border} ${theme.layout.borderRadius} p-4 transition-colors duration-500`}
+      >
+        <h3 className={`text-sm font-semibold mb-3 ${theme.colors.text.secondary}`}>
+          Waypoint Statistics
+        </h3>
         <div className="space-y-2 text-sm">
           <div className="flex justify-between">
             <span className={theme.colors.text.secondary}>Average Waypoints:</span>
-            <span className={`font-mono ${theme.colors.text.primary}`}>{stats.avg_waypoints || "0"}</span>
+            <span className={`font-mono ${theme.colors.text.primary}`}>
+              {stats.avg_waypoints || "0"}
+            </span>
           </div>
         </div>
       </section>
 
       {/* Cache Management */}
-      <section className={`bg-black/20 border ${theme.colors.border} ${theme.layout.borderRadius} p-4 transition-colors duration-500`}>
-        <h3 className={`text-sm font-semibold mb-3 ${theme.colors.text.secondary}`}>Cache Management</h3>
+      <section
+        className={`bg-black/20 border ${theme.colors.border} ${theme.layout.borderRadius} p-4 transition-colors duration-500`}
+      >
+        <h3 className={`text-sm font-semibold mb-3 ${theme.colors.text.secondary}`}>
+          Cache Management
+        </h3>
         <div className="space-y-3">
           <div className="flex justify-between text-sm">
             <span className={theme.colors.text.secondary}>Cache Age:</span>

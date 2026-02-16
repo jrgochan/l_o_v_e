@@ -41,7 +41,9 @@ export function VACQuadrantViz({ vac }: VACQuadrantVizProps) {
       <div className="text-sm text-purple-300 mb-2 font-semibold">VAC Analysis</div>
 
       {/* 2D Plot */}
-      <div className={`relative w-full aspect-square rounded border ${theme.colors.background} ${theme.colors.border}`}>
+      <div
+        className={`relative w-full aspect-square rounded border ${theme.colors.background} ${theme.colors.border}`}
+      >
         {/* Quadrant backgrounds */}
         <div className="absolute inset-0 grid grid-cols-2 grid-rows-2">
           <div className="border-r border-b border-gray-600 bg-purple-500/5"></div>
@@ -53,15 +55,29 @@ export function VACQuadrantViz({ vac }: VACQuadrantVizProps) {
         {/* Axis labels */}
         <div className="absolute inset-0 pointer-events-none">
           {/* Top (Arousal +) */}
-          <div className={`absolute top-1 left-1/2 -translate-x-1/2 text-xs ${theme.colors.text.muted}`}>A+</div>
+          <div
+            className={`absolute top-1 left-1/2 -translate-x-1/2 text-xs ${theme.colors.text.muted}`}
+          >
+            A+
+          </div>
           {/* Bottom (Arousal -) */}
-          <div className={`absolute bottom-1 left-1/2 -translate-x-1/2 text-xs ${theme.colors.text.muted}`}>
+          <div
+            className={`absolute bottom-1 left-1/2 -translate-x-1/2 text-xs ${theme.colors.text.muted}`}
+          >
             A-
           </div>
           {/* Left (Valence -) */}
-          <div className={`absolute left-1 top-1/2 -translate-y-1/2 text-xs ${theme.colors.text.muted}`}>V-</div>
+          <div
+            className={`absolute left-1 top-1/2 -translate-y-1/2 text-xs ${theme.colors.text.muted}`}
+          >
+            V-
+          </div>
           {/* Right (Valence +) */}
-          <div className={`absolute right-1 top-1/2 -translate-y-1/2 text-xs ${theme.colors.text.muted}`}>V+</div>
+          <div
+            className={`absolute right-1 top-1/2 -translate-y-1/2 text-xs ${theme.colors.text.muted}`}
+          >
+            V+
+          </div>
         </div>
 
         {/* Center crosshair */}
@@ -76,7 +92,9 @@ export function VACQuadrantViz({ vac }: VACQuadrantVizProps) {
             top: `${y}%`,
           }}
         >
-          <div className={`absolute -top-6 left-1/2 -translate-x-1/2 whitespace-nowrap text-xs text-white px-1.5 py-0.5 rounded border border-purple-500 ${theme.colors.background}`}>
+          <div
+            className={`absolute -top-6 left-1/2 -translate-x-1/2 whitespace-nowrap text-xs text-white px-1.5 py-0.5 rounded border border-purple-500 ${theme.colors.background}`}
+          >
             ({vac.valence.toFixed(2)}, {vac.arousal.toFixed(2)})
           </div>
         </div>

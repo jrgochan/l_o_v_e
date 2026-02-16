@@ -150,7 +150,9 @@ export function EmotionsTab() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h2 className={`text-xl font-semibold mb-1 ${theme.colors.text.primary}`}>Emotion Definitions</h2>
+          <h2 className={`text-xl font-semibold mb-1 ${theme.colors.text.primary}`}>
+            Emotion Definitions
+          </h2>
           <p className={`text-sm ${theme.colors.text.muted}`}>
             Manage the canonical emotions. Changes affect the entire platform.
           </p>
@@ -191,10 +193,14 @@ export function EmotionsTab() {
         </div>
       )}
 
-      <div className={`rounded-lg overflow-hidden ${theme.colors.background} border ${theme.colors.border}`}>
+      <div
+        className={`rounded-lg overflow-hidden ${theme.colors.background} border ${theme.colors.border}`}
+      >
         <div className="overflow-x-auto">
           <table className="w-full text-left text-sm">
-            <thead className={`border-b uppercase text-xs font-semibold ${theme.colors.background} ${theme.colors.border} ${theme.colors.text.muted}`}>
+            <thead
+              className={`border-b uppercase text-xs font-semibold ${theme.colors.background} ${theme.colors.border} ${theme.colors.text.muted}`}
+            >
               <tr>
                 <th className="px-6 py-4 w-32">Emotion</th>
                 <th className="px-6 py-4 w-48">Category</th>
@@ -206,7 +212,9 @@ export function EmotionsTab() {
             <tbody className={`divide-y ${theme.colors.border}`}>
               {emotions.map((emotion) => (
                 <tr key={emotion.id} className={`${theme.colors.hover} group`}>
-                  <td className={`px-6 py-4 font-medium ${theme.colors.text.primary}`}>{emotion.emotion_name}</td>
+                  <td className={`px-6 py-4 font-medium ${theme.colors.text.primary}`}>
+                    {emotion.emotion_name}
+                  </td>
 
                   {/* Editing State */}
                   {editingId === emotion.id ? (
@@ -277,11 +285,15 @@ export function EmotionsTab() {
                   ) : (
                     /* View State */
                     <>
-                      <td className={`px-6 py-4 text-sm ${theme.colors.text.secondary}`}>{emotion.category}</td>
+                      <td className={`px-6 py-4 text-sm ${theme.colors.text.secondary}`}>
+                        {emotion.category}
+                      </td>
                       <td className="px-6 py-4 font-mono text-xs text-cyan-300">
                         [{(emotion.vac_vector || [0, 0, 0]).join(", ")}]
                       </td>
-                      <td className={`px-6 py-4 text-sm ${theme.colors.text.muted}`}>{emotion.definition}</td>
+                      <td className={`px-6 py-4 text-sm ${theme.colors.text.muted}`}>
+                        {emotion.definition}
+                      </td>
                       <td className="px-6 py-4 text-right">
                         <button
                           onClick={() => handleEdit(emotion)}

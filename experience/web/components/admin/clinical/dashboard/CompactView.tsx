@@ -51,7 +51,9 @@ export function CompactView({
                 style={{ width: `${confidence * 100}%` }}
               />
             </div>
-            <span className={`text-xs ${theme.colors.text.secondary}`}>{(confidence * 100).toFixed(0)}%</span>
+            <span className={`text-xs ${theme.colors.text.secondary}`}>
+              {(confidence * 100).toFixed(0)}%
+            </span>
           </div>
         )}
       </div>

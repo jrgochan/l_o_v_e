@@ -73,7 +73,9 @@ export default function AiModelsTab() {
 
   return (
     <div className="space-y-6">
-      <div className={`flex justify-between items-center p-4 rounded-lg border ${theme.colors.background} ${theme.colors.border}`}>
+      <div
+        className={`flex justify-between items-center p-4 rounded-lg border ${theme.colors.background} ${theme.colors.border}`}
+      >
         <div>
           <h2 className={`text-xl font-bold flex items-center gap-2 ${theme.colors.text.primary}`}>
             <Cpu className="w-5 h-5 text-purple-400" />
@@ -100,10 +102,14 @@ export default function AiModelsTab() {
         </div>
       )}
 
-      <div className={`rounded-lg overflow-hidden ${theme.colors.background} border ${theme.colors.border}`}>
+      <div
+        className={`rounded-lg overflow-hidden ${theme.colors.background} border ${theme.colors.border}`}
+      >
         <table className="w-full text-left border-collapse">
           <thead>
-            <tr className={`text-xs uppercase tracking-wider ${theme.colors.background} ${theme.colors.text.muted}`}>
+            <tr
+              className={`text-xs uppercase tracking-wider ${theme.colors.background} ${theme.colors.text.muted}`}
+            >
               <th className="p-4 font-semibold">Function</th>
               <th className="p-4 font-semibold">Assigned Model</th>
               <th className="p-4 font-semibold text-right">Avg Latency</th>
@@ -136,7 +142,9 @@ export default function AiModelsTab() {
                     </div>
                   ) : (
                     <div className="flex items-center gap-2">
-                      <span className={`text-sm px-2 py-1 rounded ${theme.colors.text.secondary} ${theme.colors.background}`}>
+                      <span
+                        className={`text-sm px-2 py-1 rounded ${theme.colors.text.secondary} ${theme.colors.background}`}
+                      >
                         {model.ai_model_name}
                       </span>
                     </div>

@@ -3,12 +3,12 @@ import { render, screen, fireEvent } from "@testing-library/react";
 import { PathExplanationPanel } from "../../components/PathExplanationPanel";
 
 // Mock dependencies
-jest.mock("../../components/PathfindingInsights", () => ({
+jest.mock("../../components/journey/PathfindingInsights", () => ({
   PathfindingInsights: () => <div data-testid="pathfinding-insights">Insights Mock</div>,
 }));
 
 // Mock StepAlternativeSelector (dynamically loaded often, but here imported directly)
-jest.mock("../../components/StepAlternativeSelector", () => ({
+jest.mock("../../components/journey/StepAlternativeSelector", () => ({
   StepAlternativeSelector: () => <div data-testid="step-alternative-selector">Selector Mock</div>,
 }));
 

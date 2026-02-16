@@ -27,7 +27,9 @@ export function StrategyCard({ strategies, onSelect }: StrategyCardProps) {
             </span>
           </div>
 
-          <p className={`text-sm mb-4 ${theme.colors.text.muted}`}>&quot;{strategy.description}&quot;</p>
+          <p className={`text-sm mb-4 ${theme.colors.text.muted}`}>
+            &quot;{strategy.description}&quot;
+          </p>
 
           <div className="text-xs text-amber-400/60 italic border-t border-amber-500/10 pt-2 mt-1">
             &quot;{strategy.rationale}&quot;

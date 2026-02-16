@@ -25,7 +25,9 @@ export function SessionMetricsDisplay({ sessionMetrics, isExpanded }: SessionMet
   if (!isExpanded) {
     // Compact display
     return (
-      <div className={`px-4 py-2 flex items-center justify-between text-xs ${theme.colors.background}`}>
+      <div
+        className={`px-4 py-2 flex items-center justify-between text-xs ${theme.colors.background}`}
+      >
         <div className="flex items-center gap-4">
           <div className="flex items-center gap-1.5">
             <span className={theme.colors.text.muted}>⏱️</span>
@@ -78,7 +80,9 @@ export function SessionMetricsDisplay({ sessionMetrics, isExpanded }: SessionMet
                 : "--"}
             </div>
             {sessionMetrics.averageConfidence > 0 && (
-              <div className={`flex-1 h-1.5 rounded-full overflow-hidden ${theme.colors.background}`}>
+              <div
+                className={`flex-1 h-1.5 rounded-full overflow-hidden ${theme.colors.background}`}
+              >
                 <div
                   className={`h-full transition-all ${
                     sessionMetrics.averageConfidence >= 0.8
@@ -104,7 +108,9 @@ export function SessionMetricsDisplay({ sessionMetrics, isExpanded }: SessionMet
       {(sessionMetrics.alertCount.critical > 0 ||
         sessionMetrics.alertCount.warning > 0 ||
         sessionMetrics.alertCount.attention > 0) && (
-        <div className={`mt-3 pt-3 border-t flex items-center gap-3 text-xs ${theme.colors.border}`}>
+        <div
+          className={`mt-3 pt-3 border-t flex items-center gap-3 text-xs ${theme.colors.border}`}
+        >
           <span className={theme.colors.text.muted}>Session Alerts:</span>
           {sessionMetrics.alertCount.critical > 0 && (
             <span className="text-red-400">🔴 {sessionMetrics.alertCount.critical} Critical</span>

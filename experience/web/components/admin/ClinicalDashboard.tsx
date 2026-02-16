@@ -79,7 +79,9 @@ export function ClinicalDashboard({
   const overallStatus = insights?.overall_status || "stable";
 
   return (
-    <div className={`w-full rounded-lg border overflow-hidden ${theme.colors.background} ${theme.colors.border}`}>
+    <div
+      className={`w-full rounded-lg border overflow-hidden ${theme.colors.background} ${theme.colors.border}`}
+    >
       {/* Priority Alert Bar */}
       {alerts.length > 0 && (
         <div className={`border-b ${theme.colors.border}`}>
@@ -99,25 +101,35 @@ export function ClinicalDashboard({
           {!isExpanded && (
             <div className="grid grid-cols-2 gap-3">
               {/* Emotion State Card */}
-              <div className={`rounded-lg p-3 border border-pink-500/30 ${theme.colors.background}`}>
+              <div
+                className={`rounded-lg p-3 border border-pink-500/30 ${theme.colors.background}`}
+              >
                 <div className="text-xs text-pink-300 mb-1">Emotion</div>
                 <div className="font-bold text-white text-sm">{emotion}</div>
-                {category && <div className={`text-xs mt-1 ${theme.colors.text.muted}`}>{category}</div>}
+                {category && (
+                  <div className={`text-xs mt-1 ${theme.colors.text.muted}`}>{category}</div>
+                )}
                 {confidence !== null && (
                   <div className="mt-2 flex items-center gap-2">
-                    <div className={`flex-1 h-1.5 rounded-full overflow-hidden ${theme.colors.background}`}>
+                    <div
+                      className={`flex-1 h-1.5 rounded-full overflow-hidden ${theme.colors.background}`}
+                    >
                       <div
                         className="h-full bg-gradient-to-r from-pink-500 to-pink-400 transition-all"
                         style={{ width: `${confidence * 100}%` }}
                       />
                     </div>
-                    <span className={`text-xs ${theme.colors.text.secondary}`}>{(confidence * 100).toFixed(0)}%</span>
+                    <span className={`text-xs ${theme.colors.text.secondary}`}>
+                      {(confidence * 100).toFixed(0)}%
+                    </span>
                   </div>
                 )}
               </div>
 
               {/* VAC Summary Card */}
-              <div className={`rounded-lg p-3 border border-purple-500/30 ${theme.colors.background}`}>
+              <div
+                className={`rounded-lg p-3 border border-purple-500/30 ${theme.colors.background}`}
+              >
                 <div className="text-xs text-purple-300 mb-1">VAC Coordinates</div>
                 <div className="space-y-1 text-xs">
                   <div className="flex justify-between">
@@ -137,7 +149,9 @@ export function ClinicalDashboard({
 
               {/* Voice Profile Card (if available) */}
               {prosody && (
-                <div className={`rounded-lg p-3 border border-cyan-500/30 ${theme.colors.background}`}>
+                <div
+                  className={`rounded-lg p-3 border border-cyan-500/30 ${theme.colors.background}`}
+                >
                   <div className="flex items-center justify-between mb-1">
                     <div className="text-xs text-cyan-300">Voice</div>
                     {prosody.voice_quality && (
@@ -245,12 +259,16 @@ export function ClinicalDashboard({
               {/* Top Row: Emotion + VAC Quadrant + Voice */}
               <div className="grid grid-cols-3 gap-4">
                 {/* Emotion State */}
-                <div className={`rounded-lg p-4 border border-pink-500/30 ${theme.colors.background}`}>
+                <div
+                  className={`rounded-lg p-4 border border-pink-500/30 ${theme.colors.background}`}
+                >
                   <div className="text-sm text-pink-300 mb-2 font-semibold">Emotional State</div>
                   <div className="space-y-3">
                     <div>
                       <div className="text-xl font-bold text-white">{emotion}</div>
-                      {category && <div className={`text-sm mt-1 ${theme.colors.text.muted}`}>{category}</div>}
+                      {category && (
+                        <div className={`text-sm mt-1 ${theme.colors.text.muted}`}>{category}</div>
+                      )}
                     </div>
 
                     {confidence !== null && (
@@ -259,7 +277,9 @@ export function ClinicalDashboard({
                           <span>Confidence</span>
                           <span>{(confidence * 100).toFixed(0)}%</span>
                         </div>
-                        <div className={`h-2 rounded-full overflow-hidden ${theme.colors.background}`}>
+                        <div
+                          className={`h-2 rounded-full overflow-hidden ${theme.colors.background}`}
+                        >
                           <div
                             className={`h-full transition-all ${
                               confidence >= 0.8
@@ -281,7 +301,9 @@ export function ClinicalDashboard({
 
                 {/* Enhanced Voice Profile */}
                 {prosody && (
-                  <div className={`rounded-lg p-4 border border-cyan-500/30 ${theme.colors.background}`}>
+                  <div
+                    className={`rounded-lg p-4 border border-cyan-500/30 ${theme.colors.background}`}
+                  >
                     <div className="flex items-center justify-between mb-3">
                       <div className="text-sm text-cyan-300 font-semibold">Voice Profile</div>
                       {prosody.voice_quality && (
@@ -423,7 +445,9 @@ export function ClinicalDashboard({
                                   {prosody.energy.toFixed(3)}
                                 </span>
                               </div>
-                              <div className={`h-1.5 rounded-full overflow-hidden ${theme.colors.background}`}>
+                              <div
+                                className={`h-1.5 rounded-full overflow-hidden ${theme.colors.background}`}
+                              >
                                 <div
                                   className={`h-full transition-all ${
                                     prosody.energy > 0.7
@@ -497,7 +521,9 @@ export function ClinicalDashboard({
 
               {/* 3-Way Voice-Content Analysis */}
               {threeWayAnalysis && (
-                <div className={`rounded-lg p-4 border border-orange-500/30 ${theme.colors.background}`}>
+                <div
+                  className={`rounded-lg p-4 border border-orange-500/30 ${theme.colors.background}`}
+                >
                   <div className="mb-3">
                     <h3 className="text-sm font-semibold text-orange-300 flex items-center gap-2">
                       <span>🔬</span>
@@ -517,7 +543,9 @@ export function ClinicalDashboard({
 
               {/* Multi-Emotion Clinical Table */}
               {multiEmotionData && multiEmotionData.emotions.length > 0 && (
-                <div className={`rounded-lg p-4 border border-purple-500/30 ${theme.colors.background}`}>
+                <div
+                  className={`rounded-lg p-4 border border-purple-500/30 ${theme.colors.background}`}
+                >
                   <div className="mb-3">
                     <h3 className="text-sm font-semibold text-purple-300 flex items-center gap-2">
                       <span>🧠</span>

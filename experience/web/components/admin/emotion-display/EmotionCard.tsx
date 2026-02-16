@@ -101,7 +101,9 @@ export function EmotionCard({
           {/* Confidence */}
           {confidence !== undefined && (
             <div className="mb-3">
-              <div className={`flex items-center justify-between text-xs mb-1 ${theme.colors.text.muted}`}>
+              <div
+                className={`flex items-center justify-between text-xs mb-1 ${theme.colors.text.muted}`}
+              >
                 <span>Confidence</span>
                 <span className="font-mono text-white">{(confidence * 100).toFixed(0)}%</span>
               </div>
@@ -138,7 +140,9 @@ export function EmotionCard({
           {/* Definition */}
           {showDefinition && emotion.definition && (
             <div className={`mt-3 pt-3 border-t ${theme.colors.border}`}>
-              <p className={`text-sm leading-relaxed ${theme.colors.text.secondary}`}>{emotion.definition}</p>
+              <p className={`text-sm leading-relaxed ${theme.colors.text.secondary}`}>
+                {emotion.definition}
+              </p>
             </div>
           )}
         </div>

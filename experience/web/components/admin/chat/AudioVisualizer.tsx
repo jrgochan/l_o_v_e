@@ -105,13 +105,17 @@ export function AudioVisualizer({ audioLevel, isActive, personaColor }: AudioVis
   }, [audioLevel, isActive, personaColor]);
 
   return (
-    <div className={`relative w-full max-w-2xl h-64 rounded-lg overflow-hidden backdrop-blur-sm ${theme.colors.background} border ${theme.colors.border}`}>
+    <div
+      className={`relative w-full max-w-2xl h-64 rounded-lg overflow-hidden backdrop-blur-sm ${theme.colors.background} border ${theme.colors.border}`}
+    >
       <canvas ref={canvasRef} width={800} height={256} className="w-full h-full" />
 
       {/* Overlay text */}
       <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
         {!isActive && (
-          <p className={`text-sm uppercase tracking-wider ${theme.colors.text.muted}`}>Voice Mode Inactive</p>
+          <p className={`text-sm uppercase tracking-wider ${theme.colors.text.muted}`}>
+            Voice Mode Inactive
+          </p>
         )}
       </div>
     </div>

@@ -174,7 +174,9 @@ export function ProsodyVisualization({ prosody, audioBlob }: ProsodyVisualizatio
                 />
               ))}
             </div>
-            <div className={`mt-2 flex items-center justify-center gap-2 text-xs ${theme.colors.text.muted}`}>
+            <div
+              className={`mt-2 flex items-center justify-center gap-2 text-xs ${theme.colors.text.muted}`}
+            >
               <span>{isRealWaveform ? "🎙️ Real Audio" : "📊 Synthetic"} Waveform</span>
               {isRealWaveform && (
                 <span className="px-1.5 py-0.5 bg-green-500/20 text-green-400 rounded text-xs">

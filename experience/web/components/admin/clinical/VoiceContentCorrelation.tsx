@@ -71,7 +71,11 @@ export function VoiceContentCorrelation({ correlation }: VoiceContentCorrelation
         {/* Discrepancy Indicator */}
         <div className={`pt-2 border-t ${theme.colors.border}`}>
           <div className="flex justify-between text-xs mb-1.5">
-            <span className={discrepancy > 0.5 ? "text-orange-300 font-medium" : theme.colors.text.muted}>
+            <span
+              className={
+                discrepancy > 0.5 ? "text-orange-300 font-medium" : theme.colors.text.muted
+              }
+            >
               Discrepancy Level
             </span>
             <span
@@ -100,7 +104,9 @@ export function VoiceContentCorrelation({ correlation }: VoiceContentCorrelation
       {/* Clinical interpretation */}
       {interpretation && (
         <div className={`mt-3 pt-3 border-t ${theme.colors.border}`}>
-          <div className={`text-xs italic leading-relaxed ${theme.colors.text.secondary}`}>{interpretation}</div>
+          <div className={`text-xs italic leading-relaxed ${theme.colors.text.secondary}`}>
+            {interpretation}
+          </div>
         </div>
       )}
 

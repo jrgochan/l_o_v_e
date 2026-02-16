@@ -110,7 +110,9 @@ export function BaseModal({
       >
         {/* Header */}
         {(title || showCloseButton) && (
-          <div className={`sticky top-0 z-10 bg-gray-900 border-b ${theme.colors.border} px-6 py-4 flex items-center justify-between`}>
+          <div
+            className={`sticky top-0 z-10 bg-gray-900 border-b ${theme.colors.border} px-6 py-4 flex items-center justify-between`}
+          >
             {title && <h2 className={`text-xl font-bold ${theme.colors.text.primary}`}>{title}</h2>}
             {showCloseButton && (
               <button

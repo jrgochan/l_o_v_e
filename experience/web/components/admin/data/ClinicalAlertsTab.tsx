@@ -46,7 +46,9 @@ export default function ClinicalAlertsTab() {
 
   return (
     <div className="space-y-6">
-      <div className={`flex justify-between items-center p-4 rounded-lg border ${theme.colors.background} ${theme.colors.border}`}>
+      <div
+        className={`flex justify-between items-center p-4 rounded-lg border ${theme.colors.background} ${theme.colors.border}`}
+      >
         <div>
           <h2 className={`text-xl font-bold flex items-center gap-2 ${theme.colors.text.primary}`}>
             <Activity className="w-5 h-5 text-red-400" />
@@ -57,7 +59,9 @@ export default function ClinicalAlertsTab() {
           </p>
         </div>
         <div className="flex items-center gap-4">
-          <div className={`flex items-center gap-2 rounded px-3 py-1.5 ${theme.colors.background} border ${theme.colors.border}`}>
+          <div
+            className={`flex items-center gap-2 rounded px-3 py-1.5 ${theme.colors.background} border ${theme.colors.border}`}
+          >
             <Filter className={`w-4 h-4 ${theme.colors.text.muted}`} />
             <select
               value={filterLevel}
@@ -127,7 +131,9 @@ export default function ClinicalAlertsTab() {
             ))
           )}
           {alerts.length === 0 && !loading && (
-            <div className={`text-center p-8 border rounded-lg dashed ${theme.colors.text.muted} ${theme.colors.border}`}>
+            <div
+              className={`text-center p-8 border rounded-lg dashed ${theme.colors.text.muted} ${theme.colors.border}`}
+            >
               No alerts found matching filter.
             </div>
           )}
@@ -136,15 +142,21 @@ export default function ClinicalAlertsTab() {
         {/* Detail View */}
         <div className="lg:col-span-1">
           {selectedAlert ? (
-            <div className={`rounded-lg p-6 sticky top-6 ${theme.colors.background} border ${theme.colors.border}`}>
-              <h3 className={`text-lg font-bold mb-4 flex items-center gap-2 ${theme.colors.text.primary}`}>
+            <div
+              className={`rounded-lg p-6 sticky top-6 ${theme.colors.background} border ${theme.colors.border}`}
+            >
+              <h3
+                className={`text-lg font-bold mb-4 flex items-center gap-2 ${theme.colors.text.primary}`}
+              >
                 <AlertTriangle className="w-5 h-5 text-yellow-500" />
                 Alert Details
               </h3>
 
               <div className="space-y-6">
                 <div>
-                  <label className={`text-xs uppercase font-bold ${theme.colors.text.muted}`}>Session ID</label>
+                  <label className={`text-xs uppercase font-bold ${theme.colors.text.muted}`}>
+                    Session ID
+                  </label>
                   <div className="text-sm font-mono text-cyan-400 truncate">
                     {selectedAlert.session_id}
                   </div>
@@ -154,7 +166,9 @@ export default function ClinicalAlertsTab() {
                   <label className={`text-xs uppercase font-bold ${theme.colors.text.muted}`}>
                     Trigger Values
                   </label>
-                  <pre className={`mt-1 p-3 rounded text-xs text-green-400 font-mono overflow-auto ${theme.colors.background}`}>
+                  <pre
+                    className={`mt-1 p-3 rounded text-xs text-green-400 font-mono overflow-auto ${theme.colors.background}`}
+                  >
                     {JSON.stringify(selectedAlert.triggered_by, null, 2)}
                   </pre>
                 </div>
@@ -163,7 +177,9 @@ export default function ClinicalAlertsTab() {
                   <label className={`text-xs uppercase font-bold ${theme.colors.text.muted}`}>
                     Thresholds Used
                   </label>
-                  <pre className={`mt-1 p-3 rounded text-xs font-mono overflow-auto ${theme.colors.background} ${theme.colors.text.muted}`}>
+                  <pre
+                    className={`mt-1 p-3 rounded text-xs font-mono overflow-auto ${theme.colors.background} ${theme.colors.text.muted}`}
+                  >
                     {JSON.stringify(selectedAlert.threshold_used, null, 2)}
                   </pre>
                 </div>
@@ -180,7 +196,9 @@ export default function ClinicalAlertsTab() {
               </div>
             </div>
           ) : (
-            <div className={`rounded-lg p-8 text-center ${theme.colors.background} border ${theme.colors.border} ${theme.colors.text.muted}`}>
+            <div
+              className={`rounded-lg p-8 text-center ${theme.colors.background} border ${theme.colors.border} ${theme.colors.text.muted}`}
+            >
               Select an alert to view full trigger details and thresholds.
             </div>
           )}

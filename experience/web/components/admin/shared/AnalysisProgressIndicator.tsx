@@ -204,7 +204,9 @@ export function AnalysisProgressIndicator({
         </div>
 
         {/* Steps and Percentage */}
-        <div className={`flex justify-between items-center text-[10px] font-mono mb-2 ${theme.colors.text.muted}`}>
+        <div
+          className={`flex justify-between items-center text-[10px] font-mono mb-2 ${theme.colors.text.muted}`}
+        >
           <span>0%</span>
           <span className={isComplete ? "text-emerald-400" : "text-cyan-400"}>
             {displayPercentage}%

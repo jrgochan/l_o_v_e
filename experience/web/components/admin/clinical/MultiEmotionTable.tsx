@@ -220,8 +220,12 @@ export function MultiEmotionTable({
       {/* Header with filters and export */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <h3 className={`text-lg font-semibold ${theme.colors.text.primary}`}>Multi-Emotion Analysis</h3>
-          <span className={`text-sm ${theme.colors.text.muted}`}>({sortedEmotions.length} emotions)</span>
+          <h3 className={`text-lg font-semibold ${theme.colors.text.primary}`}>
+            Multi-Emotion Analysis
+          </h3>
+          <span className={`text-sm ${theme.colors.text.muted}`}>
+            ({sortedEmotions.length} emotions)
+          </span>
         </div>
 
         <div className="flex items-center gap-2">
@@ -327,9 +331,13 @@ export function MultiEmotionTable({
                     {/* Emotion Name */}
                     <td className="px-4 py-3">
                       <div className="space-y-1">
-                        <div className={`font-medium ${theme.colors.text.primary}`}>{emotion.emotion_name}</div>
+                        <div className={`font-medium ${theme.colors.text.primary}`}>
+                          {emotion.emotion_name}
+                        </div>
                         {emotion.category && (
-                          <div className={`text-xs ${theme.colors.text.muted}`}>{emotion.category}</div>
+                          <div className={`text-xs ${theme.colors.text.muted}`}>
+                            {emotion.category}
+                          </div>
                         )}
                       </div>
                     </td>
@@ -340,7 +348,9 @@ export function MultiEmotionTable({
                         <span className={`font-mono font-semibold ${theme.colors.text.primary}`}>
                           {(emotion.confidence * 100).toFixed(0)}%
                         </span>
-                        <div className={`w-16 h-1.5 rounded-full overflow-hidden ${theme.colors.background}`}>
+                        <div
+                          className={`w-16 h-1.5 rounded-full overflow-hidden ${theme.colors.background}`}
+                        >
                           <div
                             className="h-full bg-gradient-to-r from-green-500 to-green-400"
                             style={{ width: `${emotion.confidence * 100}%` }}
@@ -351,7 +361,9 @@ export function MultiEmotionTable({
 
                     {/* VAC Coordinates */}
                     <td className="px-4 py-3">
-                      <div className={`font-mono text-xs space-y-0.5 ${theme.colors.text.secondary}`}>
+                      <div
+                        className={`font-mono text-xs space-y-0.5 ${theme.colors.text.secondary}`}
+                      >
                         <div className="flex justify-between gap-2">
                           <span className="${theme.colors.text.muted}">V:</span>
                           <span
@@ -431,8 +443,12 @@ export function MultiEmotionTable({
                       className={`${isEven ? theme.colors.background : ""} border-b ${theme.colors.border}`}
                     >
                       <td colSpan={7} className="px-4 py-4">
-                        <div className={`space-y-3 p-4 rounded border ${theme.colors.background} ${theme.colors.border}`}>
-                          <h4 className={`text-sm font-semibold mb-2 ${theme.colors.text.secondary}`}>
+                        <div
+                          className={`space-y-3 p-4 rounded border ${theme.colors.background} ${theme.colors.border}`}
+                        >
+                          <h4
+                            className={`text-sm font-semibold mb-2 ${theme.colors.text.secondary}`}
+                          >
                             Detailed Analysis
                           </h4>
 
@@ -456,12 +472,16 @@ export function MultiEmotionTable({
                               {emotion.match_method && (
                                 <div>
                                   <span className="${theme.colors.text.muted}">Match Method:</span>
-                                  <span className="ml-2 ${theme.colors.text.secondary}">{emotion.match_method}</span>
+                                  <span className="ml-2 ${theme.colors.text.secondary}">
+                                    {emotion.match_method}
+                                  </span>
                                 </div>
                               )}
                               {emotion.match_confidence !== undefined && (
                                 <div>
-                                  <span className="${theme.colors.text.muted}">Match Confidence:</span>
+                                  <span className="${theme.colors.text.muted}">
+                                    Match Confidence:
+                                  </span>
                                   <span className="ml-2 ${theme.colors.text.secondary} font-mono">
                                     {(emotion.match_confidence * 100).toFixed(1)}%
                                   </span>
@@ -473,20 +493,26 @@ export function MultiEmotionTable({
                             <div className="space-y-2">
                               {emotion.voice_alignment !== undefined && (
                                 <div>
-                                  <span className="${theme.colors.text.muted}">Voice-Content Alignment:</span>
+                                  <span className="${theme.colors.text.muted}">
+                                    Voice-Content Alignment:
+                                  </span>
                                   <span className="ml-2 ${theme.colors.text.secondary} font-mono">
                                     {(emotion.voice_alignment * 100).toFixed(1)}%
                                   </span>
                                 </div>
                               )}
                               <div>
-                                <span className="${theme.colors.text.muted}">Detection Confidence:</span>
+                                <span className="${theme.colors.text.muted}">
+                                  Detection Confidence:
+                                </span>
                                 <span className="ml-2 ${theme.colors.text.secondary} font-mono">
                                   {(emotion.confidence * 100).toFixed(1)}%
                                 </span>
                               </div>
                               <div>
-                                <span className="${theme.colors.text.muted}">Prominence Level:</span>
+                                <span className="${theme.colors.text.muted}">
+                                  Prominence Level:
+                                </span>
                                 <span className="ml-2 ${theme.colors.text.secondary} capitalize">
                                   {emotion.prominence}
                                 </span>

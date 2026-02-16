@@ -16,6 +16,22 @@ except ImportError:
         """Dummy rate limiting setup for when security module is missing."""
 
 
+try:
+    from exceptions import register_error_handlers
+except ImportError:
+
+    def register_error_handlers(_app: FastAPI) -> None:
+        """Dummy error handler setup for when exceptions module is missing."""
+
+
+try:
+    from tracing import configure_tracing
+except ImportError:
+
+    def configure_tracing(_app: FastAPI, **_kwargs: str) -> None:
+        """Dummy tracing setup for when tracing module is missing."""
+
+
 from app.api.routes import (
     admin,
     ai_settings,
@@ -98,6 +114,12 @@ def create_app() -> FastAPI:
 
     # Rate limiting
     setup_rate_limiting(app)
+
+    # Error handlers
+    register_error_handlers(app)
+
+    # Distributed tracing
+    configure_tracing(app, service_name="observer")
 
     # Routers
     app.include_router(health.router, tags=["Health"])

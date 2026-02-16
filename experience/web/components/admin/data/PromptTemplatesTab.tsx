@@ -161,7 +161,10 @@ export function PromptTemplatesTab() {
             </div>
           )}
           <div>
-            <label htmlFor="func-select" className={`block text-sm font-medium mb-1 ${theme.colors.text.muted}`}>
+            <label
+              htmlFor="func-select"
+              className={`block text-sm font-medium mb-1 ${theme.colors.text.muted}`}
+            >
               Function
             </label>
             <select
@@ -181,7 +184,10 @@ export function PromptTemplatesTab() {
             </select>
           </div>
           <div>
-            <label htmlFor="version-input" className={`block text-sm font-medium mb-1 ${theme.colors.text.muted}`}>
+            <label
+              htmlFor="version-input"
+              className={`block text-sm font-medium mb-1 ${theme.colors.text.muted}`}
+            >
               Version
             </label>
             <input
@@ -196,7 +202,10 @@ export function PromptTemplatesTab() {
         </div>
 
         <div className="mb-6">
-          <label htmlFor="desc-input" className={`block text-sm font-medium mb-1 ${theme.colors.text.muted}`}>
+          <label
+            htmlFor="desc-input"
+            className={`block text-sm font-medium mb-1 ${theme.colors.text.muted}`}
+          >
             Description
           </label>
           <input
@@ -209,9 +218,14 @@ export function PromptTemplatesTab() {
         </div>
 
         <div className="mb-6">
-          <label htmlFor="content-input" className={`block text-sm font-medium mb-1 ${theme.colors.text.muted}`}>
+          <label
+            htmlFor="content-input"
+            className={`block text-sm font-medium mb-1 ${theme.colors.text.muted}`}
+          >
             Template Content
-            <span className={`ml-2 text-xs ${theme.colors.text.muted}`}>(Use {"{variable}"} syntax)</span>
+            <span className={`ml-2 text-xs ${theme.colors.text.muted}`}>
+              (Use {"{variable}"} syntax)
+            </span>
           </label>
           <textarea
             id="content-input"
@@ -224,7 +238,10 @@ export function PromptTemplatesTab() {
         </div>
 
         <div className="mb-6">
-          <label htmlFor="vars-input" className={`block text-sm font-medium mb-1 ${theme.colors.text.muted}`}>
+          <label
+            htmlFor="vars-input"
+            className={`block text-sm font-medium mb-1 ${theme.colors.text.muted}`}
+          >
             Input Variables (comma separated)
           </label>
           <input
@@ -270,7 +287,9 @@ export function PromptTemplatesTab() {
             </button>
           </div>
           {testResult && (
-            <div className={`p-4 rounded font-mono text-xs whitespace-pre-wrap ${theme.colors.background} border ${theme.colors.border} ${theme.colors.text.secondary}`}>
+            <div
+              className={`p-4 rounded font-mono text-xs whitespace-pre-wrap ${theme.colors.background} border ${theme.colors.border} ${theme.colors.text.secondary}`}
+            >
               {testResult}
             </div>
           )}
@@ -339,14 +358,20 @@ export function PromptTemplatesTab() {
           <div
             key={prompt.id}
             className={`rounded-lg p-4 transition-colors border ${theme.colors.background} ${
-              prompt.is_active ? "border-purple-500/50" : `${theme.colors.border} ${theme.colors.hover}`
+              prompt.is_active
+                ? "border-purple-500/50"
+                : `${theme.colors.border} ${theme.colors.hover}`
             }`}
           >
             <div className="flex justify-between items-start">
               <div>
                 <div className="flex items-center gap-2 mb-1">
-                  <h3 className={`font-medium ${theme.colors.text.primary}`}>{prompt.function_name}</h3>
-                  <span className={`px-2 py-0.5 rounded text-xs ${theme.colors.background} ${theme.colors.text.muted}`}>
+                  <h3 className={`font-medium ${theme.colors.text.primary}`}>
+                    {prompt.function_name}
+                  </h3>
+                  <span
+                    className={`px-2 py-0.5 rounded text-xs ${theme.colors.background} ${theme.colors.text.muted}`}
+                  >
                     v{prompt.version}
                   </span>
                   {prompt.is_active && (
@@ -377,7 +402,9 @@ export function PromptTemplatesTab() {
         ))}
 
         {prompts.length === 0 && !loading && (
-          <div className={`text-center py-12 rounded-lg border border-dashed ${theme.colors.text.muted} ${theme.colors.background} ${theme.colors.border}`}>
+          <div
+            className={`text-center py-12 rounded-lg border border-dashed ${theme.colors.text.muted} ${theme.colors.background} ${theme.colors.border}`}
+          >
             No templates found. Create one to get started.
           </div>
         )}

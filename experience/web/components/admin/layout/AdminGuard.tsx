@@ -25,7 +25,9 @@ export function AdminGuard({ children }: AdminGuardProps) {
 
   if (isAuthLoading) {
     return (
-      <div className={`min-h-screen flex items-center justify-center text-white ${theme.colors.background}`}>
+      <div
+        className={`min-h-screen flex items-center justify-center text-white ${theme.colors.background}`}
+      >
         Loading...
       </div>
     );
@@ -33,7 +35,9 @@ export function AdminGuard({ children }: AdminGuardProps) {
 
   if (!user || user.role !== UserRole.ADMIN) {
     return (
-      <div className={`min-h-screen flex flex-col items-center justify-center text-white space-y-4 ${theme.colors.background}`}>
+      <div
+        className={`min-h-screen flex flex-col items-center justify-center text-white space-y-4 ${theme.colors.background}`}
+      >
         <h1 className="text-2xl font-bold text-cyan-500">Admin Access</h1>
         <p className={theme.colors.text.muted}>Please sign in to access the control panel.</p>
         <div className="flex gap-4">

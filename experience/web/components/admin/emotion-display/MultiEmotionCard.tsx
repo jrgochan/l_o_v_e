@@ -97,7 +97,9 @@ export function MultiEmotionCard({
                 {(primary.confidence * 100).toFixed(0)}%
               </div>
               <div className={`text-xs ${theme.colors.text.muted}`}>Confidence</div>
-              <div className={`w-24 h-2 rounded-full mt-2 overflow-hidden ${theme.colors.background}`}>
+              <div
+                className={`w-24 h-2 rounded-full mt-2 overflow-hidden ${theme.colors.background}`}
+              >
                 <div
                   className="h-full bg-gradient-to-r from-green-500 to-green-400"
                   style={{ width: `${primary.confidence * 100}%` }}
@@ -111,7 +113,9 @@ export function MultiEmotionCard({
       {/* Secondary Emotions */}
       {secondary.length > 0 && (
         <div className="space-y-2">
-          <div className={`text-xs uppercase tracking-wide ${theme.colors.text.muted}`}>Secondary Emotions</div>
+          <div className={`text-xs uppercase tracking-wide ${theme.colors.text.muted}`}>
+            Secondary Emotions
+          </div>
           {secondary.map((emo, index) => (
             <div
               key={`secondary-${index}`}
@@ -220,7 +224,9 @@ export function MultiEmotionCard({
           </div>
 
           {showSphere && (
-            <div className={`rounded-lg p-4 border border-purple-500/30 flex justify-center ${theme.colors.background}`}>
+            <div
+              className={`rounded-lg p-4 border border-purple-500/30 flex justify-center ${theme.colors.background}`}
+            >
               <AggregateSphere
                 emotions={emotions}
                 aggregate={aggregate}

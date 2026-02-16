@@ -27,3 +27,30 @@ def test_allowed_origins_list_csv_fallback() -> None:
         settings = Settings()
         result = settings.allowed_origins_list
         assert result == ["http://a.com", "http://b.com"]
+
+
+def test_fallback_to_base_settings_when_shared_missing() -> None:
+    """Cover the ImportError fallback on lines 54-55 of config.py."""
+    import importlib
+    import sys
+
+    from pydantic_settings import BaseSettings as _BaseSettings
+
+    saved_settings = sys.modules.pop("settings", None)
+    saved_config = sys.modules.pop("app.config", None)
+    try:
+        sys.modules["settings"] = None  # type: ignore[assignment]
+        import app.config as reloaded_config  # noqa: F811
+
+        assert reloaded_config.LoveBaseSettings is _BaseSettings
+        instance = reloaded_config.Settings()
+        assert instance.PORT == 8002
+    finally:
+        sys.modules.pop("settings", None)
+        sys.modules.pop("app.config", None)
+        if saved_settings is not None:
+            sys.modules["settings"] = saved_settings
+        if saved_config is not None:
+            sys.modules["app.config"] = saved_config
+        else:
+            importlib.import_module("app.config")

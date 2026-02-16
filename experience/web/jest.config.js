@@ -13,6 +13,7 @@ const customJestConfig = {
     "^@/(.*)$": "<rootDir>/$1",
     "^@love/experience-shared$": "<rootDir>/../shared/src/index.ts",
     "^d3$": "<rootDir>/__mocks__/d3.js",
+    "^three/examples/jsm/(.*)$": "<rootDir>/__mocks__/three-examples.js",
   },
   testEnvironment: "jest-environment-jsdom",
   testMatch: ["**/__tests__/**/*.test.ts", "**/__tests__/**/*.test.tsx"],

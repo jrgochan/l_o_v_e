@@ -20,14 +20,15 @@ jest.mock("@react-three/fiber", () => ({
     scene: {},
     viewport: { width: 100, height: 100 },
   })),
+  extend: jest.fn(),
 }));
 
 // Mock Components with Prop Capture
-jest.mock("@/components/OrbitControls", () => ({
+jest.mock("@/components/viewer/OrbitControls", () => ({
   OrbitControls: ({ enabled }: any) => <div data-testid="orbit-controls" data-enabled={enabled} />,
 }));
 
-jest.mock("@/components/SoulSphere", () => ({
+jest.mock("@/components/viewer/SoulSphere", () => ({
   SoulSphere: () => <div data-testid="soul-sphere" />,
 }));
 

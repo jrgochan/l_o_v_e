@@ -6,13 +6,23 @@ Pytest fixtures and configuration for testing.
 from __future__ import annotations
 
 import logging
+import sys
 from pathlib import Path
 from typing import TYPE_CHECKING, Any, Callable, Generator
 
-import pytest
+# Make shared infra modules (exceptions, security, etc.) importable in tests,
+# matching the PYTHONPATH setup used in containers.
+INFRA_LIB = str(Path(__file__).resolve().parents[2] / "infra" / "lib" / "python")
+if INFRA_LIB not in sys.path:
+    sys.path.insert(0, INFRA_LIB)
 
-from app.api.deps import get_current_user, get_current_user_ws
-from app.main import app
+import pytest  # noqa: E402  # pylint: disable=wrong-import-position
+
+from app.api.deps import (  # noqa: E402  # pylint: disable=wrong-import-position
+    get_current_user,
+    get_current_user_ws,
+)
+from app.main import app  # noqa: E402  # pylint: disable=wrong-import-position
 
 if TYPE_CHECKING:
     from app.models.multi_emotion_response import MultiEmotionAnalysisResponse  # noqa: F401

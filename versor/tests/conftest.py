@@ -1,11 +1,19 @@
 """Test configuration for Versor module."""
 
+import sys
+from pathlib import Path
 from typing import Generator
 
 import pytest
 
-from app.api.deps import get_current_user
-from app.main import app
+# Make shared infra modules (exceptions, security, etc.) importable in tests,
+# matching the PYTHONPATH setup used in containers.
+INFRA_LIB = str(Path(__file__).resolve().parents[2] / "infra" / "lib" / "python")
+if INFRA_LIB not in sys.path:
+    sys.path.insert(0, INFRA_LIB)
+
+from app.api.deps import get_current_user  # noqa: E402  # pylint: disable=wrong-import-position
+from app.main import app  # noqa: E402  # pylint: disable=wrong-import-position
 
 
 @pytest.fixture(autouse=True)

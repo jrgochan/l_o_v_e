@@ -23,6 +23,11 @@ dependencies = [
     "structlog>=24.1.0",
     "asgi-correlation-id>=4.3.0",
     "slowapi>=0.1.9",
+    # Observability — OpenTelemetry
+    "opentelemetry-api>=1.25.0",
+    "opentelemetry-sdk>=1.25.0",
+    "opentelemetry-instrumentation-fastapi>=0.46b0",
+    "opentelemetry-exporter-otlp-proto-grpc>=1.25.0",
 ]
 
 [project.optional-dependencies]
@@ -199,8 +204,10 @@ python_files = ["test_*.py"]
 python_classes = ["Test*"]
 python_functions = ["test_*"]
 asyncio_mode = "auto"
+asyncio_default_fixture_loop_scope = "function"
 addopts = [
     "-v",
+    "--tb=short",
     "--strict-markers",
     "--cov=app",
     "--cov-report=html",
@@ -216,3 +223,17 @@ markers = [
     "requires_ollama: Tests requiring Ollama",
     "requires_redis: Tests requiring Redis",
 ]
+filterwarnings = [
+    "ignore::DeprecationWarning",
+    "ignore::PendingDeprecationWarning",
+    "ignore::pytest.PytestDeprecationWarning",
+]
+
+[tool.coverage.run]
+source = ["app"]
+omit = ["*/tests/*", "*/migrations/*", "*/__init__.py"]
+
+[tool.coverage.report]
+precision = 2
+skip_empty = true
+

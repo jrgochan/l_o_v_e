@@ -95,8 +95,12 @@ export function VoiceContentThreeWay({
         </div>
 
         {/* VAC Coordinates */}
-        <div className={`p-3 rounded border mb-3 ${theme.colors.background} ${theme.colors.border}`}>
-          <div className={`text-xs mb-2 font-semibold ${theme.colors.text.muted}`}>VAC Coordinates</div>
+        <div
+          className={`p-3 rounded border mb-3 ${theme.colors.background} ${theme.colors.border}`}
+        >
+          <div className={`text-xs mb-2 font-semibold ${theme.colors.text.muted}`}>
+            VAC Coordinates
+          </div>
           <div className="space-y-1 font-mono text-xs">
             <div className="flex justify-between">
               <span className={theme.colors.text.muted}>Valence:</span>
@@ -156,9 +160,7 @@ export function VoiceContentThreeWay({
         {data.reasoning && (
           <div className={`mt-3 pt-3 border-t ${theme.colors.border}`}>
             <details className="text-xs">
-              <summary className={`cursor-pointer ${theme.colors.text.muted}`}>
-                Reasoning
-              </summary>
+              <summary className={`cursor-pointer ${theme.colors.text.muted}`}>Reasoning</summary>
               <p className={`mt-2 italic ${theme.colors.text.secondary}`}>{data.reasoning}</p>
             </details>
           </div>

@@ -84,7 +84,9 @@ export function SmartRecommendations() {
   if (loading && !recommendations) {
     return (
       <div className="p-4 flex items-center justify-center">
-        <div className={`animate-spin h-5 w-5 border-2 ${theme.colors.primary.replace('text-', 'border-')} border-t-transparent rounded-full`} />
+        <div
+          className={`animate-spin h-5 w-5 border-2 ${theme.colors.primary.replace("text-", "border-")} border-t-transparent rounded-full`}
+        />
       </div>
     );
   }
@@ -155,7 +157,9 @@ export function SmartRecommendations() {
                 <div className="flex items-start justify-between mb-1">
                   <div className="flex items-center gap-2">
                     <span className="text-lg">{journey.icon}</span>
-                    <h5 className={`text-sm font-semibold ${theme.colors.text.primary}`}>{journey.name}</h5>
+                    <h5 className={`text-sm font-semibold ${theme.colors.text.primary}`}>
+                      {journey.name}
+                    </h5>
                   </div>
                   <span
                     className={`text-[10px] px-2 py-0.5 rounded ${
@@ -169,14 +173,18 @@ export function SmartRecommendations() {
                     {journey.difficulty}
                   </span>
                 </div>
-                <p className={`text-xs mb-2 ${theme.colors.text.secondary}`}>{journey.description}</p>
+                <p className={`text-xs mb-2 ${theme.colors.text.secondary}`}>
+                  {journey.description}
+                </p>
                 <div className="flex items-center justify-between text-xs">
                   <span className={theme.colors.text.muted}>
                     {journey.emotion_count} emotions • {journey.estimated_time}
                   </span>
                   <span className={theme.colors.primary}>Click to apply →</span>
                 </div>
-                <p className={`text-xs mt-2 italic ${theme.colors.text.muted}`}>{journey.research}</p>
+                <p className={`text-xs mt-2 italic ${theme.colors.text.muted}`}>
+                  {journey.research}
+                </p>
               </div>
             ))}
           </div>
@@ -187,7 +195,9 @@ export function SmartRecommendations() {
       {recommendations?.complementary_suggestions &&
         recommendations.complementary_suggestions.length > 0 && (
           <section>
-            <h4 className={`text-xs font-semibold mb-2 ${theme.colors.text.secondary}`}>💡 Smart Suggestions</h4>
+            <h4 className={`text-xs font-semibold mb-2 ${theme.colors.text.secondary}`}>
+              💡 Smart Suggestions
+            </h4>
             <div className="space-y-2">
               {recommendations.complementary_suggestions.map((sug, idx: number) => (
                 <button
@@ -212,8 +222,12 @@ export function SmartRecommendations() {
       {recommendations?.problematic_transitions &&
         recommendations.problematic_transitions.length > 0 && (
           <section>
-            <h4 className={`text-xs font-semibold mb-2 ${theme.colors.text.secondary}`}>🔬 Research Opportunities</h4>
-            <p className={`text-xs mb-2 ${theme.colors.text.muted}`}>Hardest transitions - great for study</p>
+            <h4 className={`text-xs font-semibold mb-2 ${theme.colors.text.secondary}`}>
+              🔬 Research Opportunities
+            </h4>
+            <p className={`text-xs mb-2 ${theme.colors.text.muted}`}>
+              Hardest transitions - great for study
+            </p>
             <div className="space-y-2 max-h-48 overflow-y-auto">
               {recommendations.problematic_transitions.slice(0, 5).map((trans, idx: number) => (
                 <button
@@ -227,7 +241,9 @@ export function SmartRecommendations() {
                   <div className="text-xs text-white font-medium">
                     {trans.from_name} → {trans.to_name}
                   </div>
-                  <div className={`flex items-center gap-2 text-[10px] mt-1 ${theme.colors.text.muted}`}>
+                  <div
+                    className={`flex items-center gap-2 text-[10px] mt-1 ${theme.colors.text.muted}`}
+                  >
                     <span>Dist: {trans.distance}</span>
                     <span>•</span>
                     <span>{trans.waypoint_count} waypoints</span>
@@ -240,7 +256,9 @@ export function SmartRecommendations() {
         )}
 
       {!recommendations && !loading && (
-        <div className={`text-xs text-center py-4 ${theme.colors.text.muted}`}>No recommendations available</div>
+        <div className={`text-xs text-center py-4 ${theme.colors.text.muted}`}>
+          No recommendations available
+        </div>
       )}
     </div>
   );

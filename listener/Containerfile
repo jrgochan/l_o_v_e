@@ -1,5 +1,7 @@
-FROM python:3.12-bookworm
-COPY --from=ghcr.io/astral-sh/uv:latest /uv /bin/uv
+# pin: python – https://hub.docker.com/_/python
+FROM python:3.12.8-bookworm
+# pin: uv – https://github.com/astral-sh/uv/pkgs/container/uv
+COPY --from=ghcr.io/astral-sh/uv:0.5 /uv /bin/uv
 
 WORKDIR /app
 

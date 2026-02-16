@@ -28,25 +28,39 @@ export function PathComparison({ paths }: PathComparisonProps) {
   if (paths.length <= 1) return null;
 
   return (
-    <section className={`${theme.effects.glass} ${theme.layout.borderRadius} p-4 mb-4 transition-colors duration-500`}>
+    <section
+      className={`${theme.effects.glass} ${theme.layout.borderRadius} p-4 mb-4 transition-colors duration-500`}
+    >
       <h3 className={`text-sm font-bold mb-3 flex items-center gap-2 ${theme.colors.primary}`}>
         ⚖️ Path Comparison ({paths.length} paths)
       </h3>
       <div className="space-y-2 text-xs">
         <div className="grid grid-cols-2 gap-2">
-          <div className={`bg-black/30 ${theme.layout.borderRadius} p-2 border ${theme.colors.border}`}>
+          <div
+            className={`bg-black/30 ${theme.layout.borderRadius} p-2 border ${theme.colors.border}`}
+          >
             <div className={`mb-1 ${theme.colors.text.muted}`}>Shortest</div>
-            <div className={`font-mono ${theme.colors.text.primary}`}>{shortestDistance.toFixed(2)}</div>
+            <div className={`font-mono ${theme.colors.text.primary}`}>
+              {shortestDistance.toFixed(2)}
+            </div>
           </div>
-          <div className={`bg-black/30 ${theme.layout.borderRadius} p-2 border ${theme.colors.border}`}>
+          <div
+            className={`bg-black/30 ${theme.layout.borderRadius} p-2 border ${theme.colors.border}`}
+          >
             <div className={`mb-1 ${theme.colors.text.muted}`}>Longest</div>
-            <div className={`font-mono ${theme.colors.text.primary}`}>{longestDistance.toFixed(2)}</div>
+            <div className={`font-mono ${theme.colors.text.primary}`}>
+              {longestDistance.toFixed(2)}
+            </div>
           </div>
-          <div className={`bg-black/30 ${theme.layout.borderRadius} p-2 border ${theme.colors.border}`}>
+          <div
+            className={`bg-black/30 ${theme.layout.borderRadius} p-2 border ${theme.colors.border}`}
+          >
             <div className={`mb-1 ${theme.colors.text.muted}`}>Easiest</div>
             <div className={theme.colors.text.primary}>{hasEasyPath ? "Available" : "None"}</div>
           </div>
-          <div className={`bg-black/30 ${theme.layout.borderRadius} p-2 border ${theme.colors.border}`}>
+          <div
+            className={`bg-black/30 ${theme.layout.borderRadius} p-2 border ${theme.colors.border}`}
+          >
             <div className={`mb-1 ${theme.colors.text.muted}`}>No Bridges</div>
             <div className={theme.colors.text.primary}>
               {noBridgePaths} {noBridgePaths === 1 ? "path" : "paths"}

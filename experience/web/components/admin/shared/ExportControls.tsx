@@ -144,7 +144,11 @@ ${paths.map((p, i) => `${i + 1}. ${p.from.name} → ${p.to.name} (${p.difficulty
 
   return (
     <div className="space-y-2">
-      <h3 className={`text-xs font-semibold uppercase tracking-wider ${theme.colors.text.secondary}`}>Export</h3>
+      <h3
+        className={`text-xs font-semibold uppercase tracking-wider ${theme.colors.text.secondary}`}
+      >
+        Export
+      </h3>
 
       <button
         onClick={exportJSON}

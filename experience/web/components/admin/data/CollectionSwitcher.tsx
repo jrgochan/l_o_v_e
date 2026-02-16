@@ -82,7 +82,9 @@ export function CollectionSwitcher() {
             >
               <div className="flex-1">
                 <div className="flex items-center gap-3 mb-1">
-                  <h4 className={`text-base font-semibold ${theme.colors.text.primary}`}>{collection.name}</h4>
+                  <h4 className={`text-base font-semibold ${theme.colors.text.primary}`}>
+                    {collection.name}
+                  </h4>
                   {collection.is_default && (
                     <span className="px-2 py-0.5 text-xs font-medium bg-purple-500/20 text-purple-300 rounded-full border border-purple-500/30">
                       Active
@@ -92,7 +94,9 @@ export function CollectionSwitcher() {
                 <p className={`text-sm ${theme.colors.text.muted}`}>
                   {collection.description || "No description provided."}
                 </p>
-                <div className={`mt-2 text-xs font-mono ${theme.colors.text.muted}`}>ID: {collection.id}</div>
+                <div className={`mt-2 text-xs font-mono ${theme.colors.text.muted}`}>
+                  ID: {collection.id}
+                </div>
               </div>
 
               <div className="ml-4">

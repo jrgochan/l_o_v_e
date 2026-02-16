@@ -128,7 +128,10 @@ export default function BootstrapTab() {
 
         <div className="grid grid-cols-2 gap-4">
           <div>
-            <label htmlFor="type-select" className={`block text-sm font-medium mb-1 ${theme.colors.text.muted}`}>
+            <label
+              htmlFor="type-select"
+              className={`block text-sm font-medium mb-1 ${theme.colors.text.muted}`}
+            >
               Data Type
             </label>
             <select
@@ -145,7 +148,10 @@ export default function BootstrapTab() {
             </select>
           </div>
           <div>
-            <label htmlFor="cat-input" className={`block text-sm font-medium mb-1 ${theme.colors.text.muted}`}>
+            <label
+              htmlFor="cat-input"
+              className={`block text-sm font-medium mb-1 ${theme.colors.text.muted}`}
+            >
               Category (Optional)
             </label>
             <input
@@ -159,7 +165,10 @@ export default function BootstrapTab() {
         </div>
 
         <div>
-          <label htmlFor="json-input" className={`block text-sm font-medium mb-1 ${theme.colors.text.muted}`}>
+          <label
+            htmlFor="json-input"
+            className={`block text-sm font-medium mb-1 ${theme.colors.text.muted}`}
+          >
             JSON Content
           </label>
           <textarea
@@ -246,7 +255,9 @@ export default function BootstrapTab() {
                     {item.data_type}
                   </span>
                   {item.data_category && (
-                    <span className={`px-2 py-0.5 text-xs rounded-full ${theme.colors.background} ${theme.colors.text.secondary}`}>
+                    <span
+                      className={`px-2 py-0.5 text-xs rounded-full ${theme.colors.background} ${theme.colors.text.secondary}`}
+                    >
                       {item.data_category}
                     </span>
                   )}
@@ -254,7 +265,9 @@ export default function BootstrapTab() {
                     {new Date(item.created_at).toLocaleDateString()}
                   </span>
                 </div>
-                <pre className={`text-xs p-2 rounded max-h-32 overflow-y-auto w-full max-w-2xl ${theme.colors.background} ${theme.colors.text.muted}`}>
+                <pre
+                  className={`text-xs p-2 rounded max-h-32 overflow-y-auto w-full max-w-2xl ${theme.colors.background} ${theme.colors.text.muted}`}
+                >
                   {JSON.stringify(item.content, null, 2)}
                 </pre>
               </div>
@@ -281,7 +294,9 @@ export default function BootstrapTab() {
         ))}
 
         {data.length === 0 && !loading && (
-          <div className={`text-center py-12 ${theme.colors.text.muted}`}>No bootstrap data found.</div>
+          <div className={`text-center py-12 ${theme.colors.text.muted}`}>
+            No bootstrap data found.
+          </div>
         )}
       </div>
     </div>

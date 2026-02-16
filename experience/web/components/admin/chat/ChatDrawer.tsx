@@ -232,7 +232,9 @@ export function ChatDrawer({ isOpen, onToggle, sessionId }: ChatDrawerProps) {
       </div>
 
       {/* Header */}
-      <div className={`flex items-center justify-between px-4 py-3 border-b ${theme.colors.border}`}>
+      <div
+        className={`flex items-center justify-between px-4 py-3 border-b ${theme.colors.border}`}
+      >
         <div className="flex items-center gap-3">
           <h3 className={`text-lg font-semibold ${theme.colors.text.primary}`}>Emotional Chat</h3>
 
@@ -380,7 +382,9 @@ export function ChatDrawer({ isOpen, onToggle, sessionId }: ChatDrawerProps) {
 
             {isProcessing && (
               <div className="flex justify-start">
-                <div className={`rounded-lg px-4 py-3 flex items-center gap-2 ${theme.colors.background}`}>
+                <div
+                  className={`rounded-lg px-4 py-3 flex items-center gap-2 ${theme.colors.background}`}
+                >
                   <div className="animate-spin h-4 w-4 border-2 border-cyan-400 border-t-transparent rounded-full" />
                   <span className={`text-sm ${theme.colors.text.secondary}`}>Analyzing...</span>
                 </div>

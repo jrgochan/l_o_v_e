@@ -38,7 +38,9 @@ export function EmotionList({
   if (emotions.length === 0) {
     return (
       <section>
-        <h2 className={`text-xs font-semibold uppercase tracking-wider mb-3 ${theme.colors.text.muted}`}>
+        <h2
+          className={`text-xs font-semibold uppercase tracking-wider mb-3 ${theme.colors.text.muted}`}
+        >
           Selected Emotions
         </h2>
         <p className={`text-sm ${theme.colors.text.muted}`}>
@@ -54,7 +56,9 @@ export function EmotionList({
         <h2 className={`text-xs font-semibold uppercase tracking-wider ${theme.colors.text.muted}`}>
           Selected Emotions
         </h2>
-        <span className={`text-xs px-2 py-0.5 rounded-full border bg-black/20 ${theme.colors.text.muted} ${theme.colors.border}`}>
+        <span
+          className={`text-xs px-2 py-0.5 rounded-full border bg-black/20 ${theme.colors.text.muted} ${theme.colors.border}`}
+        >
           {emotions.length}
         </span>
       </div>
@@ -76,7 +80,9 @@ export function EmotionList({
               {/* Emotion Info */}
               <div className="flex-1 min-w-0">
                 <div className="flex justify-between items-start">
-                  <div className={`font-semibold text-sm mb-1 ${theme.colors.text.primary}`}>{emotion.name}</div>
+                  <div className={`font-semibold text-sm mb-1 ${theme.colors.text.primary}`}>
+                    {emotion.name}
+                  </div>
                   {onRemove && (
                     <button
                       onClick={(e) => {
@@ -98,7 +104,9 @@ export function EmotionList({
                 </div>
 
                 {emotion.definition && (
-                  <div className={`text-xs italic mb-3 leading-relaxed ${theme.colors.text.secondary}`}>
+                  <div
+                    className={`text-xs italic mb-3 leading-relaxed ${theme.colors.text.secondary}`}
+                  >
                     &quot;{emotion.definition}&quot;
                   </div>
                 )}

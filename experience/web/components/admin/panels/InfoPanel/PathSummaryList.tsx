@@ -39,10 +39,14 @@ export function PathSummaryList({
 
   return (
     <section>
-      <h2 className={`text-sm font-semibold mb-3 ${theme.colors.text.secondary}`}>Selected Paths ({paths.length})</h2>
+      <h2 className={`text-sm font-semibold mb-3 ${theme.colors.text.secondary}`}>
+        Selected Paths ({paths.length})
+      </h2>
       {isComputingPaths && (
         <div className={`flex items-center gap-2 text-sm mb-3 ${theme.colors.primary}`}>
-          <div className={`animate-spin h-4 w-4 border-2 border-current border-t-transparent rounded-full`} />
+          <div
+            className={`animate-spin h-4 w-4 border-2 border-current border-t-transparent rounded-full`}
+          />
           <span>Computing paths...</span>
         </div>
       )}
@@ -56,7 +60,9 @@ export function PathSummaryList({
             <div
               key={pathId}
               className={`${theme.layout.borderRadius} p-3 text-sm border transition-colors duration-500 ${
-                isSelected ? `${theme.effects.glass} ${theme.effects.glow}` : `bg-black/20 ${theme.colors.border}`
+                isSelected
+                  ? `${theme.effects.glass} ${theme.effects.glow}`
+                  : `bg-black/20 ${theme.colors.border}`
               }`}
             >
               {/* Path Header */}
@@ -132,7 +138,9 @@ export function PathSummaryList({
                     >
                       <span className={theme.colors.primary}>{wpIdx + 2}.</span>
                       <span className={theme.colors.text.primary}>{wp.emotion}</span>
-                      <span className={`text-[10px] ml-auto ${theme.colors.primary}`}>→ details</span>
+                      <span className={`text-[10px] ml-auto ${theme.colors.primary}`}>
+                        → details
+                      </span>
                     </button>
                   ))}
 
