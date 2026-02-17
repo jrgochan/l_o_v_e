@@ -21,7 +21,7 @@ describe("AdminLayout", () => {
     // Check the mock call arguments directly
     const lastCall = (AuthGuard as jest.Mock).mock.lastCall;
     expect(lastCall[0]).toMatchObject({
-      requiredRole: UserRole.ADMIN,
+      requiredRole: [UserRole.ADMIN, UserRole.CLINICIAN],
     });
   });
 });

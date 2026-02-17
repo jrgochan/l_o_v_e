@@ -18,6 +18,7 @@ import { QuickActions } from "./QuickActions";
 import { CategoryBrowser } from "./CategoryBrowser";
 import { AnimationModeSelector } from "./AnimationModeSelector";
 import { LayerControls } from "./LayerControls";
+import { VisualSettingsPanel } from "./VisualSettingsPanel";
 import { useAdminTheme } from "@/hooks/admin/useAdminTheme";
 
 type TabType = "explore" | "view";
@@ -172,6 +173,11 @@ export function ControlPanel() {
               onUpdateSetting={updateSetting}
               onToggleLayer={toggleLayer}
             />
+
+            {/* Soul Sphere DJ Controls */}
+            <div className={`pt-4 border-t ${theme.colors.border}`}>
+              <VisualSettingsPanel />
+            </div>
           </div>
         )}
       </div>

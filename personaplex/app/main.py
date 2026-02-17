@@ -10,12 +10,13 @@ import logging
 import sentencepiece
 import structlog
 import torch
-from app.config import PERSONA_CONFIG, settings
-from app.routes import health, persona, voice  # noqa: E402
 from asgi_correlation_id import CorrelationIdMiddleware
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from huggingface_hub import hf_hub_download
+
+from app.config import PERSONA_CONFIG, settings
+from app.routes import health, persona, voice  # noqa: E402
 
 # Import Moshi components
 try:

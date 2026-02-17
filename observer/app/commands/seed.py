@@ -11,6 +11,7 @@ from sqlalchemy import select
 from sqlalchemy.exc import SQLAlchemyError
 
 from app.core.security import get_password_hash
+from app.core.settings import settings
 from app.database import AsyncSessionLocal
 from app.models.user import User, UserRole
 
@@ -20,9 +21,9 @@ app = typer.Typer(help="Seed database with initial data.")
 
 USERS_TO_SEED: List[Dict[str, Any]] = [
     {
-        "email": "admin@admin.com",
-        "password": "lovelove",
-        "full_name": "System Admin",
+        "email": settings.ADMIN_EMAIL,
+        "password": settings.ADMIN_PASSWORD,
+        "full_name": settings.ADMIN_FULL_NAME,
         "role": UserRole.ADMIN,
     },
     {

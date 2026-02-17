@@ -48,9 +48,7 @@ def upgrade() -> None:
     # 5. Fix self_assessment (ensure JSONB, if it was missing or different)
     # fix_schema.py added it, but 4a8b... says it was JSONB, so it should be fine.
     # Just in case it was missing in some envs:
-    op.execute(
-        "ALTER TABLE journey_waypoints ADD COLUMN IF NOT EXISTS self_assessment JSONB"
-    )
+    op.execute("ALTER TABLE journey_waypoints ADD COLUMN IF NOT EXISTS self_assessment JSONB")
 
 
 def downgrade() -> None:

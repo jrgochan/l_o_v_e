@@ -7,7 +7,7 @@ import { UserRole } from "@/types/auth";
 
 interface AuthGuardProps {
   children: React.ReactNode;
-  requiredRole?: UserRole;
+  requiredRole?: UserRole | UserRole[];
   fallback?: React.ReactNode;
 }
 
@@ -18,8 +18,11 @@ export function AuthGuard({ children, requiredRole, fallback }: AuthGuardProps) 
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated());
   const [mounted, setMounted] = useState(false);
 
-  // Derived state (no useState needed)
-  const isAuthorized = !requiredRole || user?.role === requiredRole;
+  // Derived state — supports single role or array of allowed roles
+  const isAuthorized = !requiredRole
+    || (Array.isArray(requiredRole)
+      ? requiredRole.includes(user?.role as UserRole)
+      : user?.role === requiredRole);
 
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect

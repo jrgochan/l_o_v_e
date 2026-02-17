@@ -14,6 +14,36 @@ PROJECT_ROOT="$(cd "$SCRIPT_DIR/../.." && pwd)"
 . "$PROJECT_ROOT/infra/lib/service-manager.sh"
 . "$PROJECT_ROOT/infra/lib/common.sh"
 
+# Help message
+show_help() {
+    print_header "Start L.O.V.E. Stack Setup"
+    echo "Usage: $0 [options]"
+    echo ""
+    echo "Options:"
+    echo "  -h, --help           Show this help message"
+    echo "  --skip-seed          Skip database seeding"
+    echo "  --with-demo          Includes demo data (DEV ONLY)"
+    echo "  --with-bootstrap     Includes bootstrap data"
+    echo "  --force-reseed       Force clearing and reseeding data"
+    echo "  --dataset <name>     Select dataset (goemotions, brene_brown, etc.)"
+    echo ""
+}
+
+# Parse arguments
+args=()
+while [[ $# -gt 0 ]]; do
+    case $1 in
+        -h|--help)
+            show_help
+            exit 0
+            ;;
+        *)
+            args+=("$1")
+            shift
+            ;;
+    esac
+done
+
 print_header "🚀 Setting up L.O.V.E. Stack"
 
 # 1. Install uv for dependency management
@@ -61,7 +91,7 @@ fi
 print_header "🗄️  Database Setup"
 if command -v psql &> /dev/null; then
     # Use the existing shell script
-    ./infra/scripts/db/init-database.sh || print_warning "Database init script skipped or failed"
+    ./infra/scripts/db/init-database.sh "${args[@]}" || print_warning "Database init script skipped or failed"
 else
     print_warning "PostgreSQL client (psql) not found. Skipping DB check."
 fi

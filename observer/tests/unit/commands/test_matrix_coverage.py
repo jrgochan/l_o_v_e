@@ -1,6 +1,7 @@
 from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
+import typer
 
 from app.commands.matrix import compute, compute_matrix_logic
 from app.models.emotion_definition import EmotionCollection
@@ -126,5 +127,5 @@ def test_compute_command():
         return False
 
     with patch("app.commands.matrix.asyncio.run", side_effect=mock_run_fail):
-        with pytest.raises(Exception):  # typer.Exit
+        with pytest.raises(typer.Exit):
             compute()

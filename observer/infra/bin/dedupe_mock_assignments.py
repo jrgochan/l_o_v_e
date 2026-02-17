@@ -20,8 +20,7 @@ def dedupe_file(filepath):
 
         # Check for target patterns
         is_target = (
-            "mock_db.add = MagicMock" in stripped
-            or "mock_db.delete = MagicMock" in stripped
+            "mock_db.add = MagicMock" in stripped or "mock_db.delete = MagicMock" in stripped
         )
 
         if is_target:

@@ -65,7 +65,7 @@ sudo dnf install -y postgresql15-server postgresql15-contrib --nobest --skip-bro
 # Initialize DB (PGDG style)
 if [ ! -f /var/lib/pgsql/15/data/PG_VERSION ]; then
     echo "-> Initializing PostgreSQL database..."
-    
+
     # Check for existing data that might be blocking init (e.g. from failed runs)
     if [ -d "/var/lib/pgsql/15/data" ] && [ "$(sudo ls -A /var/lib/pgsql/15/data)" ]; then
         echo "   Warning: Data directory exists but PG_VERSION missing. Backing up and clearing..."

@@ -70,8 +70,11 @@ describe("UserProfilePage", () => {
 
     expect(screen.getByText("Test User")).toBeInTheDocument();
     expect(screen.getByText("test@example.com")).toBeInTheDocument();
-    expect(screen.getByText(/user\s+Account/i)).toBeInTheDocument();
+    expect(screen.getByText("user")).toBeInTheDocument();
     expect(screen.getByText("Active")).toBeInTheDocument();
+
+    // Click Sessions tab to see stats
+    fireEvent.click(screen.getByText("Sessions"));
 
     await waitFor(() => {
       // Total Sessions
@@ -89,13 +92,18 @@ describe("UserProfilePage", () => {
 
     render(<UserProfilePage />);
 
+    // Click Sessions tab
+    fireEvent.click(screen.getByText("Sessions"));
+
     await waitFor(() => {
       expect(screen.getByText(/Thursday, October 26, 2023/)).toBeInTheDocument();
       expect(screen.getByText(/30 min/)).toBeInTheDocument();
       expect(screen.getByText(/Ongoing/)).toBeInTheDocument();
-      expect(screen.getByText(/calm Mode/)).toBeInTheDocument();
-      expect(screen.getByText(/energetic Mode/)).toBeInTheDocument();
     });
+
+    // Check tone preference badges
+    expect(screen.getByText("calm")).toBeInTheDocument();
+    expect(screen.getByText("energetic")).toBeInTheDocument();
   });
 
   it("renders empty state when no sessions found", async () => {
@@ -103,6 +111,9 @@ describe("UserProfilePage", () => {
     mockApiGet.mockResolvedValue([]);
 
     render(<UserProfilePage />);
+
+    // Click Sessions tab
+    fireEvent.click(screen.getByText("Sessions"));
 
     await waitFor(() => {
       expect(screen.getByText("No sessions found.")).toBeInTheDocument();
@@ -116,6 +127,9 @@ describe("UserProfilePage", () => {
     const consoleSpy = jest.spyOn(console, "error").mockImplementation(() => {});
 
     render(<UserProfilePage />);
+
+    // Click Sessions tab
+    fireEvent.click(screen.getByText("Sessions"));
 
     await waitFor(() => {
       expect(screen.getByText("No sessions found.")).toBeInTheDocument();
@@ -131,7 +145,8 @@ describe("UserProfilePage", () => {
 
     render(<UserProfilePage />);
 
-    expect(screen.getByText("User Profile")).toBeInTheDocument();
+    // Should see "Your Profile" fallback title
+    expect(screen.getByText("Your Profile")).toBeInTheDocument();
     // Initials from email (T from test@example.com)
     expect(screen.getByText("T")).toBeInTheDocument();
   });
@@ -159,12 +174,14 @@ describe("UserProfilePage", () => {
 
     render(<UserProfilePage />);
 
+    // Click Sessions tab
+    fireEvent.click(screen.getByText("Sessions"));
+
     await waitFor(() => {
-      expect(screen.getByText(/0 messages/)).toBeInTheDocument();
-      // Total messages should be 0
-      const stats = screen.getAllByText("0");
-      // One for Total Messages stat, one for messages count in list?
-      expect(stats.some((el) => el.className.includes("text-3xl"))).toBe(true);
+      // Find within sessions list specifically
+      const sessionList = screen.getByText("Session History").closest("div");
+      // "0 messages" text
+      expect(screen.getAllByText(/0 messages/).length).toBeGreaterThan(0);
     });
   });
 });

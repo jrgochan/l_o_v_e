@@ -41,7 +41,7 @@ class VulnerabilityBridgeRule(HarmonicRule):
                 c = emotion.vac_vector[2]
 
                 # Vulnerability signature: neutral valence, medium arousal, positive connection
-                if (abs(v) < 0.2) and (0.2 < a) and (a < 0.5) and (c > 0.5):
+                if abs(v) < 0.2 < a < 0.5 and c > 0.5:  # pylint: disable=chained-comparison
                     return path, False  # Already have it
 
             # Add it

@@ -86,9 +86,7 @@ class AssociationEngine:
 
     async def _get_user_id(self, session_id: UUID, db_session: AsyncSession) -> Optional[UUID]:
         """Get user_id from chat session."""
-        from app.models.chat_session import (  # pylint: disable=import-outside-toplevel
-            ChatSession,
-        )
+        from app.models.chat_session import ChatSession  # pylint: disable=import-outside-toplevel
 
         stmt = select(ChatSession.user_id).where(ChatSession.id == session_id)
         result = await db_session.execute(stmt)
@@ -101,9 +99,7 @@ class AssociationEngine:
         self, message: ChatMessage, user_id: UUID, session: AsyncSession
     ) -> List[MessageRelationship]:
         """Find similar messages and create links."""
-        from app.models.chat_session import (  # pylint: disable=import-outside-toplevel
-            ChatSession,
-        )
+        from app.models.chat_session import ChatSession  # pylint: disable=import-outside-toplevel
 
         distance_threshold = 1.0 - self.similarity_threshold
 

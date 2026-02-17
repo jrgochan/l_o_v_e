@@ -18,10 +18,12 @@ from pathlib import Path
 # Add parent directory to path for imports
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
+from sqlalchemy import select  # noqa: E402
+
 from app.core.security import get_password_hash  # noqa: E402
+from app.core.settings import settings  # noqa: E402
 from app.database import AsyncSessionLocal  # noqa: E402
 from app.models.user import User, UserRole  # noqa: E402
-from sqlalchemy import select  # noqa: E402
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -35,9 +37,9 @@ async def seed_users():
 
     users_to_seed = [
         {
-            "email": "admin@admin.com",
-            "password": "lovelove",
-            "full_name": "System Admin",
+            "email": settings.ADMIN_EMAIL,
+            "password": settings.ADMIN_PASSWORD,
+            "full_name": settings.ADMIN_FULL_NAME,
             "role": UserRole.ADMIN,
         },
         {
@@ -60,9 +62,7 @@ async def seed_users():
 
                 if existing_user:
                     logger.info(f"User {user_data['email']} exists - updating password")
-                    existing_user.password_hash = get_password_hash(
-                        user_data["password"]
-                    )
+                    existing_user.password_hash = get_password_hash(user_data["password"])
                     seeded_count += 1
                     continue
 

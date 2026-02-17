@@ -22,10 +22,11 @@ from typing import Optional
 # Add parent directory to path for imports
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
+from sqlalchemy import delete, select, text
+
 from app.database import AsyncSessionLocal
 from app.models.emotion_definition import EmotionCollection, EmotionDefinition
 from app.services import get_embedding_service, get_quaternion_builder
-from sqlalchemy import delete, select, text
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -69,9 +70,7 @@ def load_emotions_data(file_path: str) -> list:
         # Validate VAC coordinates
         vac = emotion["vac"]
         if not isinstance(vac, list) or len(vac) != 3:
-            raise ValueError(
-                f"Emotion {emotion['emotion_name']}: VAC must be array of 3 numbers"
-            )
+            raise ValueError(f"Emotion {emotion['emotion_name']}: VAC must be array of 3 numbers")
 
     logger.info(f"✓ Validated {len(data['emotions'])} emotions from {json_path}")
     return data["emotions"]
@@ -127,9 +126,7 @@ async def get_or_create_collection(
         logger.info(
             f"Creating new collection: '{name}' (Active: {is_active}, Default: {is_default})"
         )
-        collection = EmotionCollection(
-            name=name, is_active=is_active, is_default=is_default
-        )
+        collection = EmotionCollection(name=name, is_active=is_active, is_default=is_default)
         session.add(collection)
         await session.commit()
         await session.refresh(collection)
@@ -199,9 +196,7 @@ async def seed_emotions(
                 return False
 
             # 2. Check existing emotions in this collection
-            stmt = select(EmotionDefinition).where(
-                EmotionDefinition.collection_id == collection.id
-            )
+            stmt = select(EmotionDefinition).where(EmotionDefinition.collection_id == collection.id)
             result = await session.execute(stmt)
             existing = result.scalars().all()
 
@@ -211,13 +206,9 @@ async def seed_emotions(
                 )
 
                 if force_reseed:
-                    logger.info(
-                        "Force reseed enabled - clearing existing data for this collection"
-                    )
+                    logger.info("Force reseed enabled - clearing existing data for this collection")
                 else:
-                    response = input(
-                        f"Clear and re-seed '{collection_name}'? (yes/no): "
-                    )
+                    response = input(f"Clear and re-seed '{collection_name}'? (yes/no): ")
                     if response.lower() != "yes":
                         logger.info("Aborted by user")
                         return False
@@ -274,12 +265,8 @@ async def seed_emotions(
                     )
 
                     # Generate embedding
-                    text_for_embedding = (
-                        f"{emotion['emotion_name']}: {emotion['definition']}"
-                    )
-                    embedding = await embedding_service.generate_embedding(
-                        text_for_embedding
-                    )
+                    text_for_embedding = f"{emotion['emotion_name']}: {emotion['definition']}"
+                    embedding = await embedding_service.generate_embedding(text_for_embedding)
 
                     # Calculate quaternion
                     quaternion = await quaternion_builder.from_vac(emotion["vac"])
@@ -351,9 +338,7 @@ if __name__ == "__main__":
         action="store_true",
         help="Seed collection as inactive (not enabled by default)",
     )
-    parser.add_argument(
-        "--default", action="store_true", help="Set as default collection"
-    )
+    parser.add_argument("--default", action="store_true", help="Set as default collection")
 
     args = parser.parse_args()
 

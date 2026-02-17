@@ -146,9 +146,7 @@ def validate_all_data(strict: bool = False) -> bool:
     print(f"{Colors.BOLD}{'='*70}{Colors.ENDC}\n")
 
     if not HAS_JSONSCHEMA:
-        print(
-            f"{Colors.YELLOW}⚠️  jsonschema not installed - skipping validation{Colors.ENDC}"
-        )
+        print(f"{Colors.YELLOW}⚠️  jsonschema not installed - skipping validation{Colors.ENDC}")
         print("   Install with: pip install jsonschema\n")
         return not strict
 

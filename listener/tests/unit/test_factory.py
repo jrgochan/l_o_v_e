@@ -3,13 +3,13 @@
 import importlib
 import sys
 
+from app.core.factory import create_app
+
 
 class TestCreateApp:
     """Verify the factory produces a working FastAPI application."""
 
     def test_create_app_returns_fastapi(self) -> None:
-        from app.core.factory import create_app
-
         application = create_app()
         assert application is not None
         assert "listener" in application.title.lower() or application.title != ""
@@ -32,7 +32,7 @@ class TestImportFallbacks:
             sys.modules["exceptions"] = None  # type: ignore[assignment]
             sys.modules["tracing"] = None  # type: ignore[assignment]
             # Fresh import to hit the fallback definitions
-            import app.core.factory as factory_mod  # noqa: F811
+            import app.core.factory as factory_mod  # noqa: F811 # pylint: disable=import-outside-toplevel
 
             app = factory_mod.create_app()
             assert app is not None

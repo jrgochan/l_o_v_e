@@ -2,18 +2,23 @@
 # =============================================================================
 # Tier 3 — Production (Live)
 # =============================================================================
-# Target: 8+ vCPU, 16+ GB RAM, optional GPU
-# Purpose: Live deployment at jrgochan.io
+# COPY THIS FILE TO: group_vars/production/vars.yml
+# AND EDIT WITH YOUR DETAILS.
 
 deployment_tier: "production"
 
 # --- Identity ---
-domain_name: love.jrgochan.io
-admin_email: admin@jrgochan.io
+domain_name: love.your-domain.com
+admin_email: admin@your-domain.com
+admin_password: "{{ vault_admin_password }}"
+
+# --- Cloudflare Tunnel ---
+# Get this token from Cloudflare Zero Trust Dashboard
+cloudflare_tunnel_token: "{{ vault_cloudflare_tunnel_token }}"
 
 # --- Database ---
 db_user: love_user
-db_password: "{{ vault_db_password | default('love_password') }}"
+db_password: "{{ vault_db_password }}"
 db_name: love_db
 force_db_reset: false
 seed_level: "enhanced"
@@ -21,7 +26,7 @@ seed_dataset: "all"
 seed_with_bootstrap: true
 
 # --- Security ---
-jwt_secret_key: "{{ vault_jwt_secret | default(lookup('password', '/dev/null chars=ascii_letters,digits length=64')) }}"
+jwt_secret_key: "{{ vault_jwt_secret }}"
 
 # --- Resource Scaling ---
 uvicorn_workers_observer: 4

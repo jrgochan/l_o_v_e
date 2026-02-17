@@ -238,13 +238,15 @@ async def get_strategy_effectiveness(
     useful for new users without personalized data.
     """
     try:
-        query = text("""
+        query = text(
+            """
             SELECT content
             FROM bootstrap_data
             WHERE data_type = 'strategy_effectiveness'
             ORDER BY created_at DESC
             LIMIT 1
-        """)
+        """
+        )
         result = await db.execute(query)
         row = result.fetchone()
 
@@ -285,12 +287,14 @@ async def get_path_templates(
     aggregate user data and research-backed sequences.
     """
     try:
-        query = text("""
+        query = text(
+            """
             SELECT content
             FROM bootstrap_data
             WHERE data_type = 'path_template'
             ORDER BY created_at DESC
-        """)
+        """
+        )
         result = await db.execute(query)
         rows = result.fetchall()
 
@@ -428,12 +432,14 @@ async def get_context_recommendations(
     and user experience level to provide maximally relevant suggestions.
     """
     try:
-        query = text("""
+        query = text(
+            """
             SELECT content
             FROM bootstrap_data
             WHERE data_type = 'context_modifier'
             ORDER BY created_at DESC
-        """)
+        """
+        )
         result = await db.execute(query)
         rows = result.fetchall()
 
@@ -496,12 +502,14 @@ async def get_challenge_patterns(
     (e.g., anxiety, shame, anger) with progressive difficulty strategies.
     """
     try:
-        query = text("""
+        query = text(
+            """
             SELECT content
             FROM bootstrap_data
             WHERE data_type = 'challenge_pattern'
             ORDER BY created_at DESC
-        """)
+        """
+        )
         result = await db.execute(query)
         rows = result.fetchall()
 
@@ -543,11 +551,13 @@ async def get_all_bootstrap_data(db: Annotated[AsyncSession, Depends(get_db)]) -
     Useful for initial app load to cache bootstrap data on the client.
     """
     try:
-        query = text("""
+        query = text(
+            """
             SELECT data_type, data_category, content, created_at
             FROM bootstrap_data
             ORDER BY data_type, data_category, created_at DESC
-        """)
+        """
+        )
         result = await db.execute(query)
         rows = result.fetchall()
 

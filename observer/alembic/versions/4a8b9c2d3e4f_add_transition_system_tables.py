@@ -59,12 +59,8 @@ def upgrade() -> None:
     )
 
     op.execute("CREATE INDEX idx_strategy_type ON transition_strategies(strategy_type)")
-    op.execute(
-        "CREATE INDEX idx_strategy_difficulty ON transition_strategies(difficulty_level)"
-    )
-    op.execute(
-        "CREATE INDEX idx_strategy_evidence ON transition_strategies(evidence_level)"
-    )
+    op.execute("CREATE INDEX idx_strategy_difficulty ON transition_strategies(difficulty_level)")
+    op.execute("CREATE INDEX idx_strategy_evidence ON transition_strategies(evidence_level)")
 
     op.execute(
         "COMMENT ON TABLE transition_strategies IS "
@@ -120,9 +116,7 @@ def upgrade() -> None:
     """
     )
 
-    op.execute(
-        "CREATE INDEX idx_pattern_strategies_pattern ON pattern_strategies(pattern_id)"
-    )
+    op.execute("CREATE INDEX idx_pattern_strategies_pattern ON pattern_strategies(pattern_id)")
     op.execute(
         "CREATE INDEX idx_pattern_strategies_order ON pattern_strategies(pattern_id, recommendation_order)"
     )
@@ -162,9 +156,7 @@ def upgrade() -> None:
     op.execute("CREATE INDEX idx_user_journeys_user_id ON user_journeys(user_id)")
     op.execute("CREATE INDEX idx_user_journeys_status ON user_journeys(status)")
     op.execute("CREATE INDEX idx_user_journeys_started ON user_journeys(started_at)")
-    op.execute(
-        "CREATE INDEX idx_user_journeys_user_status ON user_journeys(user_id, status)"
-    )
+    op.execute("CREATE INDEX idx_user_journeys_user_status ON user_journeys(user_id, status)")
 
     op.execute(
         "COMMENT ON TABLE user_journeys IS 'User emotional transition attempts and progress tracking'"
@@ -267,12 +259,8 @@ def upgrade() -> None:
     """
     )
 
-    op.execute(
-        "CREATE INDEX idx_category_trans_from ON category_transitions(from_category)"
-    )
-    op.execute(
-        "CREATE INDEX idx_category_trans_to ON category_transitions(to_category)"
-    )
+    op.execute("CREATE INDEX idx_category_trans_from ON category_transitions(from_category)")
+    op.execute("CREATE INDEX idx_category_trans_to ON category_transitions(to_category)")
     op.execute(
         "CREATE INDEX idx_category_trans_difficulty ON category_transitions(difficulty_score)"
     )
@@ -441,18 +429,12 @@ def upgrade() -> None:
 
 def downgrade() -> None:
     """Drop transition system tables, views, functions, and triggers."""
-    op.execute(
-        "DROP TRIGGER IF EXISTS trigger_check_journey_completion ON journey_waypoints"
-    )
-    op.execute(
-        "DROP TRIGGER IF EXISTS trigger_update_journey_timestamp ON user_journeys"
-    )
+    op.execute("DROP TRIGGER IF EXISTS trigger_check_journey_completion ON journey_waypoints")
+    op.execute("DROP TRIGGER IF EXISTS trigger_update_journey_timestamp ON user_journeys")
     op.execute("DROP FUNCTION IF EXISTS check_journey_completion()")
     op.execute("DROP FUNCTION IF EXISTS update_journey_timestamp()")
     op.execute("DROP FUNCTION IF EXISTS get_user_top_strategies(UUID, INT)")
-    op.execute(
-        "DROP FUNCTION IF EXISTS calculate_transition_success_probability(UUID, UUID, UUID)"
-    )
+    op.execute("DROP FUNCTION IF EXISTS calculate_transition_success_probability(UUID, UUID, UUID)")
     op.execute("DROP VIEW IF EXISTS global_strategy_effectiveness")
     op.execute("DROP VIEW IF EXISTS user_strategy_effectiveness")
     op.execute("DROP VIEW IF EXISTS user_transition_success_rates")

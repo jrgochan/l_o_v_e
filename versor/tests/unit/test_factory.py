@@ -3,24 +3,22 @@
 import importlib
 import sys
 
-from fastapi.testclient import TestClient
+from app.core.factory import create_app
 
 
 class TestCreateApp:
     """Verify the factory produces a working FastAPI application."""
 
     def test_create_app_returns_fastapi(self) -> None:
-        from app.core.factory import create_app
-
         application = create_app()
         assert application is not None
         assert application.title == "L.O.V.E. Versor Engine"
 
     def test_app_has_cors_middleware(self) -> None:
-        from app.core.factory import create_app
-
         application = create_app()
-        middleware_classes = [m.cls.__name__ for m in application.user_middleware]
+        middleware_classes = [
+            getattr(m.cls, "__name__", str(m.cls)) for m in application.user_middleware
+        ]
         assert "CORSMiddleware" in middleware_classes
 
 
@@ -38,7 +36,7 @@ class TestImportFallbacks:
             sys.modules["security"] = None  # type: ignore[assignment]
             sys.modules["tracing"] = None  # type: ignore[assignment]
             # Fresh import to hit the fallback definitions
-            import app.core.factory as factory_mod  # noqa: F811
+            import app.core.factory as factory_mod  # noqa: F811, E501 # pylint: disable=import-outside-toplevel
 
             app = factory_mod.create_app()
             assert app is not None

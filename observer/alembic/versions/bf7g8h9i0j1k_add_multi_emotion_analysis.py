@@ -58,25 +58,15 @@ def upgrade() -> None:
     )
 
     # Indexes for multi_emotion_analyses
-    op.execute(
-        "CREATE INDEX idx_multi_emotion_message "
-        "ON multi_emotion_analyses(message_id)"
-    )
+    op.execute("CREATE INDEX idx_multi_emotion_message " "ON multi_emotion_analyses(message_id)")
+
+    op.execute("CREATE INDEX idx_multi_emotion_session " "ON multi_emotion_analyses(session_id)")
 
     op.execute(
-        "CREATE INDEX idx_multi_emotion_session "
-        "ON multi_emotion_analyses(session_id)"
+        "CREATE INDEX idx_multi_emotion_three_way " "ON multi_emotion_analyses(three_way_enabled)"
     )
 
-    op.execute(
-        "CREATE INDEX idx_multi_emotion_three_way "
-        "ON multi_emotion_analyses(three_way_enabled)"
-    )
-
-    op.execute(
-        "CREATE INDEX idx_multi_emotion_created "
-        "ON multi_emotion_analyses(created_at)"
-    )
+    op.execute("CREATE INDEX idx_multi_emotion_created " "ON multi_emotion_analyses(created_at)")
 
     # Create detected_emotions table WITH CASCADE on atlas_definitions
     op.execute(
@@ -96,19 +86,11 @@ def upgrade() -> None:
     )
 
     # Indexes for detected_emotions
-    op.execute(
-        "CREATE INDEX idx_detected_emotions_analysis "
-        "ON detected_emotions(analysis_id)"
-    )
+    op.execute("CREATE INDEX idx_detected_emotions_analysis " "ON detected_emotions(analysis_id)")
 
-    op.execute(
-        "CREATE INDEX idx_detected_emotions_emotion " "ON detected_emotions(emotion_id)"
-    )
+    op.execute("CREATE INDEX idx_detected_emotions_emotion " "ON detected_emotions(emotion_id)")
 
-    op.execute(
-        "CREATE INDEX idx_detected_emotions_prominence "
-        "ON detected_emotions(prominence)"
-    )
+    op.execute("CREATE INDEX idx_detected_emotions_prominence " "ON detected_emotions(prominence)")
 
     # Create emotion_relationships table
     op.execute(
@@ -127,14 +109,9 @@ def upgrade() -> None:
     )
 
     # Indexes for emotion_relationships
-    op.execute(
-        "CREATE INDEX idx_emotion_rel_analysis " "ON emotion_relationships(analysis_id)"
-    )
+    op.execute("CREATE INDEX idx_emotion_rel_analysis " "ON emotion_relationships(analysis_id)")
 
-    op.execute(
-        "CREATE INDEX idx_emotion_rel_type "
-        "ON emotion_relationships(relationship_type)"
-    )
+    op.execute("CREATE INDEX idx_emotion_rel_type " "ON emotion_relationships(relationship_type)")
 
     # Create emotion_goals table WITH CASCADE on atlas_definitions
     op.execute(

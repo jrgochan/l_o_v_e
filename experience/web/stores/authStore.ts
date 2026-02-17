@@ -12,6 +12,8 @@ interface AuthState {
   token: string | null;
   isLoading: boolean;
   error: string | null;
+  consentRequired: boolean;
+  outstandingPolicies: Array<{ key: string; title: string; description: string; required: boolean; version: string }>;
 
   setToken: (token: string) => void;
   setUser: (user: User) => void;
@@ -19,9 +21,15 @@ interface AuthState {
 
   // Async actions
   login: (email: string, password: string) => Promise<void>;
-  register: (email: string, password: string, fullName?: string) => Promise<void>;
+  register: (email: string, password: string, fullName?: string, consents?: string[]) => Promise<void>;
   fetchUser: () => Promise<void>;
   refreshToken: () => Promise<boolean>;
+
+  // Self-service account management
+  updateProfile: (data: { full_name?: string; email?: string }) => Promise<void>;
+  changePassword: (currentPassword: string, newPassword: string) => Promise<void>;
+  deleteAccount: () => Promise<void>;
+  exportData: () => Promise<void>;
 
   // Selectors
   isAuthenticated: () => boolean;
@@ -33,8 +41,11 @@ export const useAuthStore = create<AuthState>()(
     (set, get) => ({
       user: null,
       token: null,
+
       isLoading: false,
       error: null,
+      consentRequired: false,
+      outstandingPolicies: [],
 
       setToken: (token: string) => set({ token }),
       setUser: (user: User) => set({ user }),
@@ -63,7 +74,11 @@ export const useAuthStore = create<AuthState>()(
           }
 
           const data: LoginResponse = await response.json();
-          set({ token: data.access_token });
+          set({
+            token: data.access_token,
+            consentRequired: !!data.consent_required,
+            outstandingPolicies: data.outstanding_policies || []
+          });
 
           // Fetch user details immediately after login
           await get().fetchUser();
@@ -76,7 +91,7 @@ export const useAuthStore = create<AuthState>()(
         }
       },
 
-      register: async (email, password, fullName) => {
+      register: async (email, password, fullName, consents = []) => {
         set({ isLoading: true, error: null });
         try {
           await api.post(
@@ -87,6 +102,7 @@ export const useAuthStore = create<AuthState>()(
               full_name: fullName,
               role: "user", // Default role for self-registration
               is_active: true,
+              consents: consents,
             },
             false
           ); // false = unauthenticated request
@@ -166,10 +182,85 @@ export const useAuthStore = create<AuthState>()(
         const user = get().user;
         return !!user && user.role === role;
       },
+
+      // === Self-Service Account Management ===
+
+      updateProfile: async (data) => {
+        set({ isLoading: true, error: null });
+        try {
+          const updatedUser = await api.put<User>("/users/me", data);
+          set({ user: updatedUser });
+        } catch (error: unknown) {
+          const message = error instanceof Error ? error.message : "Failed to update profile";
+          set({ error: message });
+          throw error;
+        } finally {
+          set({ isLoading: false });
+        }
+      },
+
+      changePassword: async (currentPassword, newPassword) => {
+        set({ isLoading: true, error: null });
+        try {
+          await api.put("/users/me/password", {
+            current_password: currentPassword,
+            new_password: newPassword,
+          });
+        } catch (error: unknown) {
+          const message = error instanceof Error ? error.message : "Failed to change password";
+          set({ error: message });
+          throw error;
+        } finally {
+          set({ isLoading: false });
+        }
+      },
+
+      deleteAccount: async () => {
+        set({ isLoading: true, error: null });
+        try {
+          await api.del("/users/me");
+          // After deletion, log the user out
+          get().logout();
+        } catch (error: unknown) {
+          const message = error instanceof Error ? error.message : "Failed to delete account";
+          set({ error: message });
+          throw error;
+        } finally {
+          set({ isLoading: false });
+        }
+      },
+
+      exportData: async () => {
+        set({ isLoading: true, error: null });
+        try {
+          const data = await api.get<Record<string, unknown>>("/users/me/export");
+          // Trigger browser download of the JSON data
+          const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement("a");
+          a.href = url;
+          a.download = `love-data-export-${new Date().toISOString().split("T")[0]}.json`;
+          document.body.appendChild(a);
+          a.click();
+          document.body.removeChild(a);
+          URL.revokeObjectURL(url);
+        } catch (error: unknown) {
+          const message = error instanceof Error ? error.message : "Failed to export data";
+          set({ error: message });
+          throw error;
+        } finally {
+          set({ isLoading: false });
+        }
+      },
     }),
     {
       name: "auth-storage",
-      partialize: (state) => ({ token: state.token, user: state.user }), // Persist token and user
+      partialize: (state) => ({
+        token: state.token,
+        user: state.user,
+        consentRequired: state.consentRequired,
+        outstandingPolicies: state.outstandingPolicies
+      }), // Persist token, user, and consent status
     }
   )
 );

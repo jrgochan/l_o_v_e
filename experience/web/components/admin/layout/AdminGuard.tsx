@@ -33,14 +33,14 @@ export function AdminGuard({ children }: AdminGuardProps) {
     );
   }
 
-  if (!user || user.role !== UserRole.ADMIN) {
+  if (!user || (user.role !== UserRole.ADMIN && user.role !== UserRole.CLINICIAN)) {
     return (
       <div
         className={`min-h-screen flex flex-col items-center justify-center text-white space-y-4 ${theme.colors.background}`}
       >
-        <h1 className="text-2xl font-bold text-cyan-500">Admin Access</h1>
-        <p className={theme.colors.text.muted}>Please sign in to access the control panel.</p>
-        <div className="flex gap-4">
+        <h1 className="text-2xl font-bold text-cyan-500">Clinical Access</h1>
+        <p className={theme.colors.text.muted}>Please sign in to access the portal.</p>
+        <div className="flex gap-4 flex-wrap justify-center">
           <Link
             href="/"
             className={`px-4 py-2 rounded transition-colors ${theme.colors.background} ${theme.colors.hover}`}
@@ -63,7 +63,25 @@ export function AdminGuard({ children }: AdminGuardProps) {
             className="px-4 py-2 bg-purple-900/50 hover:bg-purple-800/50 text-purple-200 border border-purple-700/50 rounded transition-colors text-sm"
             title="Sets a fake admin session for UI testing"
           >
-            🧙 Dev Login
+            🧙 Dev Admin
+          </button>
+          <button
+            onClick={() => {
+              setUser({
+                id: "dev-clinician-id",
+                email: "dev@clinician.com",
+                full_name: "Dev Clinician",
+                role: UserRole.CLINICIAN,
+                is_active: true,
+                created_at: new Date().toISOString(),
+                updated_at: new Date().toISOString(),
+              });
+              setToken("dev-token-bypass");
+            }}
+            className="px-4 py-2 bg-teal-900/50 hover:bg-teal-800/50 text-teal-200 border border-teal-700/50 rounded transition-colors text-sm"
+            title="Sets a fake clinician session for UI testing"
+          >
+            🩺 Dev Clinician
           </button>
           <button
             onClick={() => setIsAuthModalOpen(true)}

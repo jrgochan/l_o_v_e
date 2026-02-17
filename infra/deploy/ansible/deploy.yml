@@ -57,5 +57,9 @@
     - role: nginx
       tags: setup
 
+    - role: cloudflared
+      tags: setup
+      when: cloudflare_tunnel_token is defined
+
     - role: app
       tags: deploy

@@ -21,9 +21,7 @@ depends_on: Union[str, Sequence[str], None] = None
 def upgrade() -> None:
     op.add_column(
         "chat_sessions",
-        sa.Column(
-            "deep_feeling_mode", sa.Boolean(), server_default="false", nullable=False
-        ),
+        sa.Column("deep_feeling_mode", sa.Boolean(), server_default="false", nullable=False),
     )
 
 

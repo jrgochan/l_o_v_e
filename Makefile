@@ -258,4 +258,3 @@ docs: ## Serve documentation locally
 .PHONY: docs-build
 docs-build: ## Build documentation
 	@cd docs && mkdocs build
-

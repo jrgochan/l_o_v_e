@@ -80,9 +80,11 @@ async def get_current_user(
 
 
 async def get_current_active_user(current_user: Annotated[User, Depends(get_current_user)]) -> User:
-    """Ensure the current user is active."""
+    """Ensure the current user is active and not soft-deleted."""
     if not current_user.is_active:
         raise HTTPException(status_code=400, detail="Inactive user")
+    if current_user.deleted_at is not None:
+        raise HTTPException(status_code=400, detail="Account has been deleted")
     return current_user
 
 
@@ -98,6 +100,21 @@ async def get_current_admin(
     return current_user
 
 
+async def get_current_clinician(
+    current_user: Annotated[User, Depends(get_current_active_user)],
+) -> User:
+    """Ensure the current user is a clinician or admin.
+
+    Admins are granted clinician-level access for oversight purposes.
+    """
+    if current_user.role not in (UserRole.CLINICIAN, UserRole.ADMIN):
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Clinician or admin privileges required",
+        )
+    return current_user
+
+
 async def get_current_user_ws(
     token: Annotated[str, Query()],
     db: Annotated[AsyncSession, Depends(get_db)],
@@ -108,7 +125,7 @@ async def get_current_user_ws(
         reason="Could not validate credentials",
     )
 
-    if token == "dev-token-bypass":
+    if token == "dev-token-bypass" and settings.APP_ENV != "production":
         return await _get_or_create_dev_user(db)
 
     try:

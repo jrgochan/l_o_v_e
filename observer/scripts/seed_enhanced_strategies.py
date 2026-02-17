@@ -28,9 +28,10 @@ import sys
 from pathlib import Path
 from typing import Any, Dict
 
+from sqlalchemy import select  # noqa: E402
+
 from app.database import AsyncSessionLocal  # noqa: E402
 from app.models.transition_strategy import TransitionStrategy  # noqa: E402
-from sqlalchemy import select  # noqa: E402
 
 # Add parent directory to path to import app modules
 sys.path.append(str(Path(__file__).parent.parent))
@@ -75,9 +76,7 @@ async def check_existing_strategies(session) -> Dict[str, int]:
 
 async def strategy_exists(session, strategy_name: str) -> bool:
     """Check if a strategy with this name already exists."""
-    stmt = select(TransitionStrategy).where(
-        TransitionStrategy.strategy_name == strategy_name
-    )
+    stmt = select(TransitionStrategy).where(TransitionStrategy.strategy_name == strategy_name)
     result = await session.execute(stmt)
     return result.scalar_one_or_none() is not None
 
@@ -255,9 +254,7 @@ async def main(dry_run: bool = False, verify_only: bool = False):
             print("✅ SUCCESS: Enhanced strategy library seeded!")
             print(f"{'='*60}")
             print("\nNext steps:")
-            print(
-                "1. Verify strategies: python scripts/seed_enhanced_strategies.py --verify-only"
-            )
+            print("1. Verify strategies: python scripts/seed_enhanced_strategies.py --verify-only")
             print("2. Test with transition system: python test_transition_api.py")
             print("3. Proceed to Phase 2: Expanded transition patterns")
         else:

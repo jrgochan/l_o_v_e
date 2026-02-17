@@ -4,22 +4,24 @@ Handles both offline and online migration modes with async support.
 """
 
 import asyncio
+import os
+import sys
 from logging.config import fileConfig
 
 from alembic import context
 
-import sys
-import os
-
 # Add parent directory to path so we can import app
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
+from sqlalchemy import pool  # noqa: E402
+from sqlalchemy.engine import Connection  # noqa: E402
+from sqlalchemy.ext.asyncio import async_engine_from_config  # noqa: E402
+
+import app.models  # noqa: F401, E402 — ensures all models register with Base.metadata
+
 # Import the app config and models
-from app.core.settings import settings
-from app.database import Base
-from sqlalchemy import pool
-from sqlalchemy.engine import Connection
-from sqlalchemy.ext.asyncio import async_engine_from_config
+from app.core.settings import settings  # noqa: E402
+from app.database import Base  # noqa: E402
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.

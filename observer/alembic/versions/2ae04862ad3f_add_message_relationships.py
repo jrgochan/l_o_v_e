@@ -32,15 +32,9 @@ def upgrade() -> None:
             postgresql.JSONB(astext_type=sa.Text()),
             nullable=True,
         ),
-        sa.Column(
-            "created_at", sa.DateTime(), server_default=sa.text("now()"), nullable=False
-        ),
-        sa.ForeignKeyConstraint(
-            ["source_message_id"], ["chat_messages.id"], ondelete="CASCADE"
-        ),
-        sa.ForeignKeyConstraint(
-            ["target_message_id"], ["chat_messages.id"], ondelete="CASCADE"
-        ),
+        sa.Column("created_at", sa.DateTime(), server_default=sa.text("now()"), nullable=False),
+        sa.ForeignKeyConstraint(["source_message_id"], ["chat_messages.id"], ondelete="CASCADE"),
+        sa.ForeignKeyConstraint(["target_message_id"], ["chat_messages.id"], ondelete="CASCADE"),
         sa.PrimaryKeyConstraint("id"),
     )
     op.create_index(

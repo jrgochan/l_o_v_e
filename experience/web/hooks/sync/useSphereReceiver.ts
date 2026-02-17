@@ -1,7 +1,9 @@
 import { useCallback, useRef, useEffect, useState } from "react";
 import { useExperienceStore } from "@/stores/useExperienceStore";
+import { useSettingsStore } from "@/stores/useSettingsStore";
 import { logger } from "@/utils/logger";
 import { SphereStateMessage, SyncMode, STALE_THRESHOLD } from "./types";
+import type { PathAnimationMode } from "@/types/visualization";
 
 export function useSphereReceiver(
   mode: SyncMode,
@@ -32,6 +34,20 @@ export function useSphereReceiver(
           useExperienceStore.getState().setShowPath(message.showPath);
         }
         logger.debug("websocket", "[SYNC] Received path update", { hasPath: !!message.path });
+      }
+
+      // Apply visual settings from Admin broadcaster
+      if (message.type === "sphere_update" && message.visualSettings) {
+        const vs = message.visualSettings;
+        const store = useSettingsStore.getState();
+        store.setSphereOpacity(1 - vs.sphereTransparency);
+        store.setAnimationSpeed(vs.animationSpeed);
+        store.setRenderQuality(vs.renderQuality);
+        if (vs.autoRotate !== store.autoRotate) {
+          store.toggleAutoRotate();
+        }
+        store.updateVisualSetting("pathAnimationMode", vs.pathAnimationMode as PathAnimationMode);
+        logger.debug("websocket", "[SYNC] Applied visual settings from Admin");
       }
 
       if (message.type === "heartbeat") {

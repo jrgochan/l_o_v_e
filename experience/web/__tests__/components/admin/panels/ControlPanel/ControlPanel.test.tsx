@@ -79,7 +79,7 @@ describe("ControlPanel", () => {
         ["Positive", { name: "Positive", enabled: true }],
         ["Negative", { name: "Negative", enabled: false }],
       ]),
-      settings: { pathAnimationMode: "default" },
+      settings: { pathAnimationMode: "default", animationSpeed: 1.0 },
       layers: {},
       toggleEmotion: jest.fn(),
       toggleCategory: jest.fn(),
@@ -110,11 +110,27 @@ describe("ControlPanel", () => {
     );
     (useSettingsStore as unknown as jest.Mock).mockImplementation(() => ({
       pathAnimationMode: "default",
+      animationSpeed: 1.0,
+      sphereOpacity: 0.8,
       updateVisualSetting: mockStore.updateSetting,
+      setSphereOpacity: jest.fn(),
+      setAnimationSpeed: jest.fn(),
+      setRenderQuality: jest.fn(),
+      toggleAutoRotate: jest.fn(),
+      renderQuality: "high",
+      autoRotate: true,
     }));
     (useSettingsStore as any).getState = jest.fn(() => ({
       pathAnimationMode: "default",
+      animationSpeed: 1.0,
+      sphereOpacity: 0.8,
       updateVisualSetting: mockStore.updateSetting,
+      setSphereOpacity: jest.fn(),
+      setAnimationSpeed: jest.fn(),
+      setRenderQuality: jest.fn(),
+      toggleAutoRotate: jest.fn(),
+      renderQuality: "high",
+      autoRotate: true,
     }));
     (useEmotionSearch as jest.Mock).mockReturnValue(mockSearchHook);
     (useCategoryState as jest.Mock).mockReturnValue(mockCategoryHook);

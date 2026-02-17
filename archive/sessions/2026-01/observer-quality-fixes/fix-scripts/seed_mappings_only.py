@@ -5,10 +5,11 @@ Run this after patterns and strategies are already seeded.
 
 import asyncio
 
-from app.config import settings
-from app.models.transition_strategy import PatternStrategy, TransitionPattern, TransitionStrategy
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import async_sessionmaker, create_async_engine
+
+from app.config import settings
+from app.models.transition_strategy import PatternStrategy, TransitionPattern, TransitionStrategy
 
 
 async def seed_mappings():

@@ -74,3 +74,7 @@ infra/backups/
 
 # Misc
 .vercel
+
+# Ansible User-Specific Config (never commit secrets or server info)
+infra/deploy/ansible/group_vars/production/
+infra/deploy/ansible/inventory/production.ini

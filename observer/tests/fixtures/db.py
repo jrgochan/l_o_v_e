@@ -88,8 +88,17 @@ async def cleanup_test_data(request):
 
         # Chat tables
         await _test_db.execute(text("DELETE FROM session_analytics"))
+        await _test_db.execute(
+            text("DELETE FROM alert_acknowledgments")
+        )  # Depends on clinical_alerts
+        await _test_db.execute(text("DELETE FROM clinical_notes"))  # Depends on users + sessions
+        await _test_db.execute(text("DELETE FROM clinical_alerts"))  # New
         await _test_db.execute(text("DELETE FROM chat_messages"))
         await _test_db.execute(text("DELETE FROM chat_sessions"))
+
+        # New Feature Tables
+        await _test_db.execute(text("DELETE FROM consent_records"))  # New
+        await _test_db.execute(text("DELETE FROM audit_log"))  # New
 
         # Parent tables last
         await _test_db.execute(text("DELETE FROM emotion_definitions"))

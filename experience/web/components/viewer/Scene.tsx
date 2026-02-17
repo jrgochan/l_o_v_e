@@ -30,8 +30,8 @@ export function Scene() {
   const activeJourney = useExperienceStore((state) => state.activeJourney);
   const isFlying = useExperienceStore((state) => state.isFlying);
 
-  // Layer visibility from settings
-  const { layers } = useSettingsStore();
+  // Layer visibility and other settings
+  const { layers, autoRotate, renderQuality, animationSpeed } = useSettingsStore();
 
   // Tooltip state
   // const [hoveredWaypoint, setHoveredWaypoint] = useState<{
@@ -41,12 +41,16 @@ export function Scene() {
   //   state: string;
   // } | null>(null);
 
+  // Derive dpr from renderQuality
+  const dpr: number | [number, number] = renderQuality === "low" ? 1 : renderQuality === "high" ? [1, 3] : [1, 2];
+
   // Debug logging
   logger.debug("rendering", "Scene render", {
     showPath,
     hasPath: !!transitionPath,
     pathWaypoints: transitionPath?.waypoints?.length,
     willRenderPath: showPath && transitionPath,
+    autoRotate,
   });
 
   // Simple tooltip handler - shows in corner for now
@@ -69,11 +73,11 @@ export function Scene() {
       <Canvas
         camera={{ position: [0, 0, 5], fov: 45 }}
         gl={{
-          antialias: true,
+          antialias: renderQuality !== "low",
           alpha: true,
           powerPreference: "high-performance",
         }}
-        dpr={[1, 2]} // Support high DPI displays
+        dpr={dpr} // Dynamic DPI based on settings
       >
         {/* Helper Systems */}
         <VACAnimator />
@@ -119,9 +123,12 @@ export function Scene() {
           minDistance={3}
           maxDistance={10}
           enabled={!isFlying}
+          autoRotate={autoRotate && !isFlying} // Connect autoRotate setting
+          autoRotateSpeed={animationSpeed * 0.5} // Scale rotation speed with global speed
         />
 
         {/* 3D Axis Labels (Helper) */}
+        {/* Visibility logic moved inside component to use layers.vacDisplay */}
         <VACAxisLabels3D />
       </Canvas>
 

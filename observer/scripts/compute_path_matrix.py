@@ -55,12 +55,11 @@ async def compute_matrix(collection_name: str = None):
     async with AsyncSessionLocal() as session:
         # Get collection ID first
         if collection_name:
-            from app.models.emotion_definition import EmotionCollection
             from sqlalchemy import select
 
-            stmt = select(EmotionCollection).where(
-                EmotionCollection.name == collection_name
-            )
+            from app.models.emotion_definition import EmotionCollection
+
+            stmt = select(EmotionCollection).where(EmotionCollection.name == collection_name)
             result = await session.execute(stmt)
             collection = result.scalar_one_or_none()
 
@@ -127,9 +126,7 @@ if __name__ == "__main__":
     import argparse
 
     parser = argparse.ArgumentParser(description="Pre-compute path matrix")
-    parser.add_argument(
-        "--collection", type=str, help="Name of collection to compute paths for"
-    )
+    parser.add_argument("--collection", type=str, help="Name of collection to compute paths for")
 
     args = parser.parse_args()
 

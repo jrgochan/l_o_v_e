@@ -263,15 +263,15 @@ run_migrations() {
 
     cd "$OBSERVER_DIR"
 
-    # Check for virtual environment
-    if [ ! -d ".venv" ]; then
-        print_error "Virtual environment not found in .venv. Run setup-love-stack.sh first"
+    # Check for virtual environment in project root (unified)
+    if [ ! -d "$PROJECT_ROOT/.venv" ]; then
+        print_error "Virtual environment not found in $PROJECT_ROOT/.venv. Run setup-love-stack.sh first"
         cd - > /dev/null
         return 1
     fi
 
     # Activate venv
-    . .venv/bin/activate
+    . "$PROJECT_ROOT/.venv/bin/activate"
 
     print_info "Running Alembic migrations..."
 
@@ -366,17 +366,17 @@ validate_json_data() {
 
     cd "$OBSERVER_DIR"
 
-    if [ ! -d ".venv" ]; then
-        print_error "Virtual environment not found in .venv"
+    if [ ! -d "$PROJECT_ROOT/.venv" ]; then
+        print_error "Virtual environment not found in $PROJECT_ROOT/.venv"
         cd - > /dev/null
         return 1
     fi
 
-    . .venv/bin/activate
+    . "$PROJECT_ROOT/.venv/bin/activate"
 
     print_info "Validating canonical data files..."
 
-    if python scripts/validate_data.py; then
+    if PYTHONPATH=. python scripts/validate_data.py; then
         print_success "All JSON data validated successfully"
         deactivate
         cd - > /dev/null
@@ -404,9 +404,9 @@ seed_database() {
     print_info "Checking Versor availability..."
     VERSOR_DIR="$PROJECT_ROOT/versor"
 
-    if [ ! -d "$VERSOR_DIR/.venv" ]; then
-        print_error "Versor virtual environment not found in .venv"
-        print_info "Run setup-love-stack.sh first to set up Versor"
+    if [ ! -d "$PROJECT_ROOT/.venv" ]; then
+        print_error "Virtual environment not found in $PROJECT_ROOT/.venv"
+        print_info "Run setup-love-stack.sh first to set up env"
         return 1
     fi
 
@@ -414,7 +414,7 @@ seed_database() {
     if ! curl -s http://localhost:8080/health > /dev/null 2>&1; then
         print_info "Starting Versor API (required for Atlas seeding)..."
         cd "$VERSOR_DIR"
-        . .venv/bin/activate
+        . "$PROJECT_ROOT/.venv/bin/activate"
         nohup uvicorn app.main:app --host 0.0.0.0 --port 8080 > /tmp/versor.log 2>&1 &
         VERSOR_PID=$!
 
@@ -444,13 +444,13 @@ seed_database() {
 
     cd "$OBSERVER_DIR"
 
-    if [ ! -d ".venv" ]; then
-        print_error "Virtual environment not found in .venv"
+    if [ ! -d "$PROJECT_ROOT/.venv" ]; then
+        print_error "Virtual environment not found in $PROJECT_ROOT/.venv"
         cd - > /dev/null
         return 1
     fi
 
-    . .venv/bin/activate
+    . "$PROJECT_ROOT/.venv/bin/activate"
 
     # Check if already seeded
     if [ "$FORCE_RESEED" = false ]; then
@@ -495,7 +495,7 @@ seed_database() {
     echo ""
 
     # Run seed_all.py
-    if python scripts/seed_all.py "${seed_args[@]}"; then
+    if PYTHONPATH=. python scripts/seed_all.py "${seed_args[@]}"; then
         echo ""
         print_success "Database seeding completed"
         deactivate
@@ -521,13 +521,13 @@ compute_path_matrix() {
 
     cd "$OBSERVER_DIR"
 
-    if [ ! -d ".venv" ]; then
-        print_error "Virtual environment not found in .venv"
+    if [ ! -d "$PROJECT_ROOT/.venv" ]; then
+        print_error "Virtual environment not found in $PROJECT_ROOT/.venv"
         cd - > /dev/null
         return 1
     fi
 
-    . .venv/bin/activate
+    . "$PROJECT_ROOT/.venv/bin/activate"
 
     print_info "Pre-computing transition paths..."
     print_warning "This will take significantly longer for multiple datasets"
@@ -557,7 +557,7 @@ compute_path_matrix() {
 
     for collection in "${collections_to_process[@]}"; do
         print_info "Processing collection: $collection"
-        if python scripts/compute_path_matrix.py --collection "$collection"; then
+        if PYTHONPATH=. python scripts/compute_path_matrix.py --collection "$collection"; then
             print_success "Path matrix computed for $collection"
         else
             print_error "Path matrix computation failed for $collection"

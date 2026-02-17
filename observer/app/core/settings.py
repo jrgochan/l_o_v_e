@@ -32,6 +32,14 @@ class Settings(LoveBaseSettings):  # type: ignore
     POSTGRES_HOST: str = Field(default="localhost")
     POSTGRES_PORT: int = Field(default=5432)
 
+    # ============================================================================
+    # ADMIN CONFIGURATION
+    # ============================================================================
+    ADMIN_EMAIL: str = Field(default="admin@admin.com")
+    ADMIN_PASSWORD: str = Field(default="lovelove")
+    ADMIN_FULL_NAME: str = Field(default="System Admin")
+    REGISTRATION_ENABLED: bool = Field(default=True)
+
     DATABASE_URL: str | None = None
 
     @model_validator(mode="after")
@@ -137,6 +145,7 @@ class Settings(LoveBaseSettings):  # type: ignore
     # APPLICATION SETTINGS
     # ============================================================================
 
+    APP_ENV: str = Field(default="development")
     API_VERSION: str = Field(default="v1")
     APP_NAME: str = Field(default="L.O.V.E. Observer API")
     APP_DESCRIPTION: str = Field(default="Emotional state persistence and context retrieval")

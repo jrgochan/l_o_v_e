@@ -26,9 +26,7 @@ def upgrade() -> None:
     """Create clinical alerts table with ENUM types."""
 
     # Create ENUM types
-    op.execute(
-        "CREATE TYPE alert_level AS ENUM ('critical', 'warning', 'attention', 'stable')"
-    )
+    op.execute("CREATE TYPE alert_level AS ENUM ('critical', 'warning', 'attention', 'stable')")
 
     op.execute(
         "CREATE TYPE alert_type AS ENUM ("
@@ -57,13 +55,9 @@ def upgrade() -> None:
     )
 
     # Create indexes
-    op.execute(
-        "CREATE INDEX idx_clinical_alerts_session " "ON clinical_alerts(session_id)"
-    )
+    op.execute("CREATE INDEX idx_clinical_alerts_session " "ON clinical_alerts(session_id)")
 
-    op.execute(
-        "CREATE INDEX idx_clinical_alerts_timestamp " "ON clinical_alerts(timestamp)"
-    )
+    op.execute("CREATE INDEX idx_clinical_alerts_timestamp " "ON clinical_alerts(timestamp)")
 
     op.execute("CREATE INDEX idx_clinical_alerts_level " "ON clinical_alerts(level)")
 

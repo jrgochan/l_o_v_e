@@ -15,7 +15,15 @@ describe("VisualSettings", () => {
     dataVisualizationMode: false,
     pathOpacity: 0.6,
     emotionSize: 1.0,
+    animationSpeed: 1.0,
     updateVisualSetting: mockUpdateVisualSetting,
+    sphereOpacity: 0.8,
+    renderQuality: "high",
+    autoRotate: true,
+    setSphereOpacity: jest.fn(),
+    setAnimationSpeed: jest.fn(),
+    setRenderQuality: jest.fn(),
+    toggleAutoRotate: jest.fn(),
   };
 
   beforeEach(() => {

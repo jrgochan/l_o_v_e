@@ -22,6 +22,8 @@ interface OrbitControlsProps {
   minDistance?: number;
   maxDistance?: number;
   enabled?: boolean;
+  autoRotate?: boolean;
+  autoRotateSpeed?: number;
 }
 
 export function OrbitControls({
@@ -32,6 +34,8 @@ export function OrbitControls({
   minDistance = 3,
   maxDistance = 10,
   enabled = true,
+  autoRotate = false,
+  autoRotateSpeed = 2.0,
 }: OrbitControlsProps) {
   const { camera, gl } = useThree();
   const controlsRef = useRef<OrbitControlsImpl>(null);
@@ -47,11 +51,23 @@ export function OrbitControls({
     controls.enableZoom = enableZoom;
     controls.minDistance = minDistance;
     controls.maxDistance = maxDistance;
+    controls.autoRotate = autoRotate;
+    controls.autoRotateSpeed = autoRotateSpeed;
 
     return () => {
       controls.dispose();
     };
-  }, [enableDamping, dampingFactor, enablePan, enableZoom, minDistance, maxDistance, enabled]);
+  }, [
+    enableDamping,
+    dampingFactor,
+    enablePan,
+    enableZoom,
+    minDistance,
+    maxDistance,
+    enabled,
+    autoRotate,
+    autoRotateSpeed,
+  ]);
 
   useFrame(() => {
     if (controlsRef.current && enableDamping && enabled) {

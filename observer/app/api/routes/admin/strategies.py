@@ -100,7 +100,7 @@ async def import_strategies(
             # Dynamic lookup: tests patch app.api.routes.admin._process_strategy_import
             # so we look up on the parent package to honor that patch.
             _admin_pkg = sys.modules.get("app.api.routes.admin", sys.modules[__name__])
-            process_fn = getattr(_admin_pkg, "_process_strategy_import")
+            process_fn = _admin_pkg._process_strategy_import
             is_updated = await process_fn(db, strategy_data)
             if is_updated:
                 updated_count += 1

@@ -160,7 +160,7 @@ export default function ZenExperience() {
 
       {/* Helper UI */}
       {settings.layers.viewerShortcuts && <ViewerShortcuts />}
-      {settings.layers.vacDisplay && <LiveVACDisplay />}
+      <LiveVACDisplay />
 
       {/* Header UI (Settings only) */}
       <Header showAuth={true} />

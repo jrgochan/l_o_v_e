@@ -277,7 +277,8 @@ class WaypointExplainer:
 
         Tries exact emotion match first, then category-level patterns.
         """
-        stmt = text("""
+        stmt = text(
+            """
             SELECT
                 psychological_purpose,
                 why_this_order,
@@ -295,7 +296,8 @@ class WaypointExplainer:
               AND waypoint_emotion_id = :waypoint_id
             ORDER BY priority DESC
             LIMIT 1
-        """)
+        """
+        )
 
         result = await self.session.execute(
             stmt, {"from_id": from_id, "to_id": to_id, "waypoint_id": waypoint_id}

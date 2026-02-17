@@ -42,14 +42,14 @@ fi
 setup_python_service() {
     local service_dir="$1"
     local service_name="$2"
-    
+
     echo "-> Setting up $service_name ($service_dir)..."
     cd "$APP_DIR/$service_dir"
-    
+
     if [ ! -d ".venv" ]; then
         python3.12 -m venv .venv
     fi
-    
+
     # shellcheck disable=SC1091  # venv activate script exists at runtime
     source .venv/bin/activate
     pip install -U pip setuptools wheel

@@ -46,3 +46,8 @@ def create_access_token(data: Dict[str, Any], expires_delta: Optional[timedelta]
     to_encode.update({"exp": expire})
     encoded_jwt: str = jwt.encode(to_encode, settings.SECRET_KEY, algorithm=settings.ALGORITHM)
     return str(encoded_jwt)
+
+
+def setup_rate_limiting(_app: Any) -> None:
+    """Configure rate limiting for the application."""
+    # TODO: Implement actual rate limiting using slowapi or similar

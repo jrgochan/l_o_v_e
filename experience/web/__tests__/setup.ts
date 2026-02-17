@@ -149,13 +149,15 @@ const originalWarn = console.warn;
 beforeAll(() => {
   console.error = jest.fn((...args) => {
     // Allow through specific errors we want to see
+    const msg = args[0]?.toString() || "";
     if (
-      args[0]?.includes?.("Not implemented: HTMLFormElement.prototype.requestSubmit") ||
-      args[0]?.includes?.("Not implemented: HTMLCanvasElement.prototype.getContext") ||
-      args[0]?.includes?.("The tag <") || // R3F/JSDOM unrecognized tag warning
-      args[0]?.includes?.("is using incorrect casing") || // R3F casing warning
-      args[0]?.includes?.("React does not recognize the") || // R3F prop warning generic
-      args[0]?.includes?.("for a non-boolean attribute") // R3F boolean prop warning generic
+      msg.includes("Not implemented: HTMLFormElement.prototype.requestSubmit") ||
+      msg.includes("Not implemented: HTMLCanvasElement.prototype.getContext") ||
+      msg.includes("Not implemented: navigation") ||
+      msg.includes("The tag <") || // R3F/JSDOM unrecognized tag warning
+      msg.includes("is using incorrect casing") || // R3F casing warning
+      msg.includes("React does not recognize the") || // R3F prop warning generic
+      msg.includes("for a non-boolean attribute") // R3F boolean prop warning generic
     ) {
       return;
     }
@@ -164,7 +166,11 @@ beforeAll(() => {
 
   console.warn = jest.fn((...args) => {
     // Filter out known warnings
-    if (args[0]?.includes?.("ReactDOM.render")) {
+    const msg = args[0]?.toString() || "";
+    if (
+      msg.includes("ReactDOM.render") ||
+      msg.includes("Headless UI has polyfilled")
+    ) {
       return;
     }
     originalWarn(...args);

@@ -15,6 +15,7 @@ export function AuthModal({ isOpen, onClose }: AuthModalProps) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [fullName, setFullName] = useState("");
+  const [consents, setConsents] = useState<string[]>([]);
 
   const login = useAuthStore((state) => state.login);
   const register = useAuthStore((state) => state.register);
@@ -27,7 +28,7 @@ export function AuthModal({ isOpen, onClose }: AuthModalProps) {
       if (mode === "login") {
         await login(email, password);
       } else {
-        await register(email, password, fullName);
+        await register(email, password, fullName, consents);
       }
       onClose();
     } catch {
@@ -126,9 +127,44 @@ export function AuthModal({ isOpen, onClose }: AuthModalProps) {
             />
           </div>
 
+          {mode === "register" && (
+            <div className="space-y-3 pt-2">
+              <div className="flex items-start">
+                <input
+                  id="consent-tos"
+                  type="checkbox"
+                  checked={consents.includes("terms_of_service")}
+                  onChange={() => {
+                    const key = "terms_of_service";
+                    setConsents(prev => prev.includes(key) ? prev.filter(k => k !== key) : [...prev, key]);
+                  }}
+                  className="mt-1 h-4 w-4 rounded border-gray-300 text-cyan-600 focus:ring-cyan-500"
+                />
+                <label htmlFor="consent-tos" className="ml-2 text-xs text-gray-400">
+                  I agree to the <a href="#" className="text-cyan-400 hover:underline">Terms of Service</a>
+                </label>
+              </div>
+              <div className="flex items-start">
+                <input
+                  id="consent-privacy"
+                  type="checkbox"
+                  checked={consents.includes("privacy_policy")}
+                  onChange={() => {
+                    const key = "privacy_policy";
+                    setConsents(prev => prev.includes(key) ? prev.filter(k => k !== key) : [...prev, key]);
+                  }}
+                  className="mt-1 h-4 w-4 rounded border-gray-300 text-cyan-600 focus:ring-cyan-500"
+                />
+                <label htmlFor="consent-privacy" className="ml-2 text-xs text-gray-400">
+                  I agree to the <a href="#" className="text-cyan-400 hover:underline">Privacy Policy</a>
+                </label>
+              </div>
+            </div>
+          )}
+
           <button
             type="submit"
-            disabled={isLoading}
+            disabled={isLoading || (mode === "register" && (!consents.includes("terms_of_service") || !consents.includes("privacy_policy")))}
             className="w-full bg-cyan-600 hover:bg-cyan-500 text-white font-medium py-2 rounded transition-colors mt-2 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {isLoading ? "Loading..." : mode === "login" ? "Sign In" : "Create Account"}

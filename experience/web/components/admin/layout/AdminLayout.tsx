@@ -23,12 +23,20 @@ function AdminLayoutContent({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const theme = useAdminTheme();
 
-  const navItems = [
-    { label: "Users", href: "/admin/users", icon: "👥" },
-    { label: "Sessions", href: "/admin/sessions", icon: "💬" },
-    { label: "Atlas Visualization", href: "/admin/visualization", icon: "🌌" },
-    { label: "Data Management", href: "/admin/data", icon: "💾" },
-  ];
+  const isClinician = user?.role === "clinician";
+
+  // Full nav for admins; clinicians only see Clinical
+  const navItems = isClinician
+    ? [
+        { label: "Clinical Portal", href: "/admin/clinical", icon: "🩺" },
+      ]
+    : [
+        { label: "Clinical Portal", href: "/admin/clinical", icon: "🩺" },
+        { label: "Users", href: "/admin/users", icon: "👥" },
+        { label: "Sessions", href: "/admin/sessions", icon: "💬" },
+        { label: "Atlas Visualization", href: "/admin/visualization", icon: "🌌" },
+        { label: "Data Management", href: "/admin/data", icon: "💾" },
+      ];
 
   return (
     <div className={`min-h-screen flex transition-colors duration-500 ${theme.colors.background}`}>
@@ -38,7 +46,7 @@ function AdminLayoutContent({ children }: { children: React.ReactNode }) {
       >
         <div className={`p-6 border-b ${theme.colors.border}`}>
           <h1 className={`text-xl font-bold flex items-center gap-2 ${theme.colors.text.primary}`}>
-            <span>⚡</span> Admin
+            <span>{isClinician ? "🩺" : "⚡"}</span> {isClinician ? "Clinical" : "Admin"}
           </h1>
         </div>
 

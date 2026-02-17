@@ -1,8 +1,9 @@
 import { useCallback, useEffect, useRef } from "react";
 import { useExperienceStore } from "@/stores/useExperienceStore";
 import { useVisualizationStore } from "@/stores/useVisualizationStore";
+import { useSettingsStore } from "@/stores/useSettingsStore";
 import { logger } from "@/utils/logger";
-import { HEARTBEAT_INTERVAL, SphereStateMessage, SyncMode } from "./types";
+import { HEARTBEAT_INTERVAL, SphereStateMessage, SyncMode, VisualSettingsPayload } from "./types";
 
 export function useSphereSender(mode: SyncMode, sendMessage: (msg: SphereStateMessage) => void) {
   const heartbeatRef = useRef<NodeJS.Timeout | null>(null);
@@ -12,6 +13,16 @@ export function useSphereSender(mode: SyncMode, sendMessage: (msg: SphereStateMe
     const selectedIds = useVisualizationStore.getState().selectedEmotionIds;
     const transitionPath = useExperienceStore.getState().transitionPath;
     const showPath = useExperienceStore.getState().showPath;
+
+    // Capture visual settings for remote sync
+    const settingsState = useSettingsStore.getState();
+    const visualSettings: VisualSettingsPayload = {
+      sphereTransparency: 1 - settingsState.sphereOpacity,
+      animationSpeed: settingsState.animationSpeed,
+      renderQuality: settingsState.renderQuality,
+      autoRotate: settingsState.autoRotate,
+      pathAnimationMode: settingsState.pathAnimationMode,
+    };
 
     let safePath = null;
     try {
@@ -28,6 +39,7 @@ export function useSphereSender(mode: SyncMode, sendMessage: (msg: SphereStateMe
       selectedEmotionIds: Array.from(selectedIds),
       path: safePath,
       showPath: showPath,
+      visualSettings,
       timestamp: Date.now(),
     };
 

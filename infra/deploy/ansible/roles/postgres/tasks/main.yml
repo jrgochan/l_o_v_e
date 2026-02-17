@@ -94,8 +94,8 @@
 
 - name: Create database user
   community.postgresql.postgresql_user:
-    name: love_user
-    password: love_password
+    name: "{{ db_user }}"
+    password: "{{ db_password }}"
     role_attr_flags: CREATEDB,NOSUPERUSER
     login_user: postgres
     login_unix_socket: "{{ pg_socket_dir | default('/tmp') }}"
@@ -136,8 +136,8 @@
 
 - name: Create database
   community.postgresql.postgresql_db:
-    name: love_db
-    owner: love_user
+    name: "{{ db_name }}"
+    owner: "{{ db_user }}"
     login_user: postgres
     login_unix_socket: "{{ pg_socket_dir | default('/tmp') }}"
   become: true
@@ -171,7 +171,7 @@
 - name: Enable PostgreSQL extensions
   community.postgresql.postgresql_ext:
     name: "{{ item }}"
-    login_db: love_db
+    login_db: "{{ db_name }}"
     login_user: postgres
     login_unix_socket: "{{ pg_socket_dir | default('/tmp') }}"
   become: true
@@ -207,4 +207,3 @@
     group: postgres
     mode: '0644'
   notify: Restart PostgreSQL
-

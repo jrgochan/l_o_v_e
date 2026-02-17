@@ -1,43 +1,21 @@
 """Application Factory."""
 
 from contextlib import asynccontextmanager
-from typing import AsyncGenerator
+from typing import Any, AsyncGenerator
 
 import structlog
 from asgi_correlation_id import CorrelationIdMiddleware
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-try:
-    from security import setup_rate_limiting
-except ImportError:
-
-    def setup_rate_limiting(_app: FastAPI) -> None:
-        """Dummy rate limiting setup for when security module is missing."""
-
-
-try:
-    from exceptions import register_error_handlers
-except ImportError:
-
-    def register_error_handlers(_app: FastAPI) -> None:
-        """Dummy error handler setup for when exceptions module is missing."""
-
-
-try:
-    from tracing import configure_tracing
-except ImportError:
-
-    def configure_tracing(_app: FastAPI, **_kwargs: str) -> None:
-        """Dummy tracing setup for when tracing module is missing."""
-
-
 from app.api.routes import (
     admin,
     ai_settings,
     auth,
     bootstrap,
+    clinician,
     collections,
+    consent,
     current,
     emotions,
     health,
@@ -51,6 +29,30 @@ from app.api.routes import (
 )
 from app.api.sockets.router import router as socket_router
 from app.core.settings import settings
+
+try:
+    from app.core.security import setup_rate_limiting
+except ImportError:
+
+    def setup_rate_limiting(_app: Any) -> None:
+        """Set up dummy rate limiting for when security module is missing."""
+
+
+try:
+    from exceptions import register_error_handlers
+except ImportError:
+
+    def register_error_handlers(_app: FastAPI) -> None:
+        """Set up dummy error handlers for when exceptions module is missing."""
+
+
+try:
+    from tracing import configure_tracing
+except ImportError:
+
+    def configure_tracing(_app: FastAPI, **_kwargs: str) -> None:
+        """Set up dummy tracing for when tracing module is missing."""
+
 
 # Configure structlog
 structlog.configure(
@@ -76,8 +78,15 @@ structlog.configure(
 async def lifespan(_app_instance: FastAPI) -> AsyncGenerator[None, None]:
     """Application lifespan manager."""
     # Startup — lazy imports avoid circular dependency issues
+    # Register domain event subscribers
+    from app.core.events import event_bus  # pylint: disable=import-outside-toplevel
     from app.database import close_db  # pylint: disable=import-outside-toplevel
     from app.db_init import init_db  # pylint: disable=import-outside-toplevel
+    from app.services.audit_subscriber import (  # pylint: disable=import-outside-toplevel
+        audit_log_handler,
+    )
+
+    event_bus.subscribe_all(audit_log_handler)
 
     # Startup
     logger = structlog.get_logger()
@@ -91,14 +100,18 @@ async def lifespan(_app_instance: FastAPI) -> AsyncGenerator[None, None]:
 
 def create_app() -> FastAPI:
     """Create and configure the FastAPI application."""
+    docs_url = "/docs" if settings.APP_ENV != "production" else None
+    redoc_url = "/redoc" if settings.APP_ENV != "production" else None
+    openapi_url = "/openapi.json" if settings.APP_ENV != "production" else None
+
     app = FastAPI(
         title=settings.APP_NAME,
         description=settings.APP_DESCRIPTION,
         version=settings.API_VERSION,
         lifespan=lifespan,
-        docs_url="/docs",
-        redoc_url="/redoc",
-        openapi_url="/openapi.json",
+        docs_url=docs_url,
+        redoc_url=redoc_url,
+        openapi_url=openapi_url,
     )
 
     # Middleware
@@ -137,6 +150,8 @@ def create_app() -> FastAPI:
     app.include_router(auth.router, prefix="/auth", tags=["Authentication"])
     app.include_router(users.router, prefix="/users", tags=["Users"])
     app.include_router(admin.router, prefix="/admin", tags=["Admin"])
+    app.include_router(clinician.router, prefix="/clinician", tags=["Clinician"])
+    app.include_router(consent.router, prefix="/consent", tags=["Consent"])
     app.include_router(prompts.router, prefix="/observer", tags=["AI Prompts"])
 
     @app.get("/", tags=["Root"])

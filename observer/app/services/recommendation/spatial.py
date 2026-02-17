@@ -19,7 +19,8 @@ class SpatialAnalyzer:
 
     async def get_similar_emotions(self, emotion_id: UUID, limit: int = 5) -> List[Dict[str, Any]]:
         """Find emotions similar in VAC space."""
-        stmt = text("""
+        stmt = text(
+            """
             SELECT
                 e.id,
                 e.emotion_name as name,
@@ -32,7 +33,8 @@ class SpatialAnalyzer:
             WHERE e.id != :emotion_id
             ORDER BY distance ASC
             LIMIT :limit
-        """)
+        """
+        )
 
         result = await self.session.execute(stmt, {"emotion_id": emotion_id, "limit": limit})
 

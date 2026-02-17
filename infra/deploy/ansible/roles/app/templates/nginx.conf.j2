@@ -2,19 +2,9 @@ server {
     listen 80;
     server_name {{ domain_name }};
 
-    # Redirect HTTP to HTTPS
-    return 301 https://$host$request_uri;
-}
-
-
-
-server {
-    listen 443 ssl http2;
-    server_name {{ domain_name }};
-
-    ssl_certificate /etc/nginx/ssl/server.crt;
-    ssl_certificate_key /etc/nginx/ssl/server.key;
-    include /etc/nginx/conf.d/ssl-params.conf;
+    # Cloudflare Tunnel connects to this local port.
+    # SSL is terminated at Cloudflare Edge.
+    # We trust the tunnel to be secure.
 
     # Security Headers
     add_header X-Content-Type-Options "nosniff" always;
@@ -82,7 +72,7 @@ server {
         proxy_set_header X-Real-IP $remote_addr;
         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
         proxy_set_header X-Forwarded-Proto $scheme;
-        
+
         # Increase body size for audio uploads
         client_max_body_size 50M;
     }

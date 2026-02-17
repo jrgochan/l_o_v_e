@@ -295,7 +295,8 @@ class EmotionResolver:
     async def _execute_vac_query(self, valence: float, arousal: float, connection: float) -> Any:
         """Execute the VAC distance query."""
         # Use raw SQL for pgvector distance query, filtered by collection
-        query = text("""
+        query = text(
+            """
             SELECT
                 id, emotion_name, category, vac_vector,
                 vac_vector <-> CAST(:vac_input AS vector) as distance
@@ -304,7 +305,8 @@ class EmotionResolver:
                 AND vac_vector IS NOT NULL
             ORDER BY distance ASC
             LIMIT 1
-        """)
+        """
+        )
 
         vac_vector_str = f"[{valence},{arousal},{connection}]"
         result = await self.db.execute(

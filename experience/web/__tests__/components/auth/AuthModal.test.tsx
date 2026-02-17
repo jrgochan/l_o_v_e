@@ -103,11 +103,16 @@ describe("AuthModal", () => {
     await user.type(screen.getByRole("textbox", { name: "Full Name" }), "New User");
     await user.type(screen.getByLabelText("Password"), "securepass");
 
-    // Now click submit "Create Account". It is the second one.
-    const buttons = screen.getAllByRole("button", { name: "Create Account" });
-    await user.click(buttons[1]);
+    // Check consents
+    await user.click(screen.getByLabelText(/Terms of Service/i));
+    await user.click(screen.getByLabelText(/Privacy Policy/i));
 
-    expect(mockRegister).toHaveBeenCalledWith("new@example.com", "securepass", "New User");
+    // Now click submit "Create Account".
+    // Re-query buttons to ensure we get the enabled one (though waitFor/disabled check handled by userEvent usually)
+    const submitBtn = screen.getAllByRole("button", { name: "Create Account" })[1];
+    await user.click(submitBtn);
+
+    expect(mockRegister).toHaveBeenCalledWith("new@example.com", "securepass", "New User", ["terms_of_service", "privacy_policy"]);
     expect(mockOnClose).toHaveBeenCalled();
   });
 

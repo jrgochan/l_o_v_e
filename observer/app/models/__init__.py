@@ -1,9 +1,13 @@
 """SQLAlchemy ORM models."""
 
+from app.models.alert_acknowledgment import AlertAcknowledgment
+from app.models.audit_log import AuditLog
 from app.models.bootstrap_data import BootstrapData
 from app.models.chat_message import ChatMessage
 from app.models.chat_session import ChatSession
 from app.models.clinical_alert import ClinicalAlert
+from app.models.clinical_note import ClinicalNote
+from app.models.consent_record import ConsentRecord
 from app.models.emotion_definition import EmotionCollection, EmotionDefinition
 from app.models.message_relationship import MessageRelationship
 from app.models.model_assignment import ModelAssignment
@@ -28,6 +32,10 @@ from app.models.user import User
 from app.models.user_trajectory import UserTrajectory
 
 __all__ = [
+    "AlertAcknowledgment",
+    "AuditLog",
+    "ClinicalNote",
+    "ConsentRecord",
     "EmotionCollection",
     "EmotionDefinition",
     "BootstrapData",

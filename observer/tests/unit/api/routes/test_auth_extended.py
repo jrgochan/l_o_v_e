@@ -100,7 +100,7 @@ async def test_register_existing_user(mock_db, mock_user):
     result.scalars.return_value.first.return_value = mock_user
     mock_db.execute.return_value = result
 
-    user_in = UserCreate(email="test@example.com", password="secret123", full_name="Test User")
+    user_in = UserCreate(email="test@example.com", password="Secret123!", full_name="Test User")
 
     with pytest.raises(HTTPException) as exc:
         await auth.register_user(user_in, mock_db)

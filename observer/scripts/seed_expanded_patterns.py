@@ -29,9 +29,10 @@ from typing import Any, Dict
 # Add parent directory to path to import app modules
 sys.path.append(str(Path(__file__).parent.parent))
 
+from sqlalchemy import select  # noqa: E402
+
 from app.database import AsyncSessionLocal  # noqa: E402
 from app.models.transition_strategy import TransitionPattern  # noqa: E402
-from sqlalchemy import select  # noqa: E402
 
 # Pattern data file paths
 PATTERN_FILES = {
@@ -65,9 +66,7 @@ async def check_existing_patterns(session) -> Dict[str, int]:
 
 async def pattern_exists(session, pattern_name: str) -> bool:
     """Check if a pattern with this name already exists."""
-    stmt = select(TransitionPattern).where(
-        TransitionPattern.pattern_name == pattern_name
-    )
+    stmt = select(TransitionPattern).where(TransitionPattern.pattern_name == pattern_name)
     result = await session.execute(stmt)
     return result.scalar_one_or_none() is not None
 
@@ -121,9 +120,7 @@ async def seed_patterns_from_file(
         )
 
         session.add(pattern)
-        print(
-            f"  ✅ ADD: '{pattern_name}' (difficulty: {pattern.difficulty_score:.1f})"
-        )
+        print(f"  ✅ ADD: '{pattern_name}' (difficulty: {pattern.difficulty_score:.1f})")
         added += 1
 
     if not dry_run and added > 0:
@@ -241,9 +238,7 @@ async def main(dry_run: bool = False, verify_only: bool = False):
             print("✅ SUCCESS: Expanded pattern library seeded!")
             print(f"{'='*60}")
             print("\nNext steps:")
-            print(
-                "1. Verify patterns: python scripts/seed_expanded_patterns.py --verify-only"
-            )
+            print("1. Verify patterns: python scripts/seed_expanded_patterns.py --verify-only")
             print("2. Map patterns to strategies (Phase 4)")
             print("3. Proceed to Phase 3: Bridge emotion system")
         else:
@@ -259,9 +254,7 @@ if __name__ == "__main__":
         action="store_true",
         help="Show what would be imported without importing",
     )
-    parser.add_argument(
-        "--verify-only", action="store_true", help="Only verify existing patterns"
-    )
+    parser.add_argument("--verify-only", action="store_true", help="Only verify existing patterns")
 
     args = parser.parse_args()
 

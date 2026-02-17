@@ -44,8 +44,7 @@ def upgrade() -> None:
 
     # Create index
     op.execute(
-        "CREATE INDEX idx_model_assignments_model_name "
-        "ON model_assignments(ai_model_name)"
+        "CREATE INDEX idx_model_assignments_model_name " "ON model_assignments(ai_model_name)"
     )
 
     # Add comments

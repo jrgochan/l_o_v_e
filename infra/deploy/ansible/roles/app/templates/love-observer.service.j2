@@ -6,7 +6,7 @@ After=network.target postgresql-{{ postgresql_version }}.service redis.service
 User={{ app_user }}
 Group={{ app_group }}
 WorkingDirectory={{ app_dir }}/observer
-ExecStart={{ app_dir }}/observer/.venv/bin/uvicorn app.main:app --host 0.0.0.0 --port {{ port_observer }} --workers {{ uvicorn_workers_observer }}
+ExecStart={{ app_dir }}/observer/.venv/bin/uvicorn app.main:app --host 127.0.0.1 --port {{ port_observer }} --workers {{ uvicorn_workers_observer }}
 Restart=always
 EnvironmentFile={{ app_dir }}/infra/deploy/configs/env/production.env
 

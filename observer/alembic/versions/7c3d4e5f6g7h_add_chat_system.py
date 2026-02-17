@@ -47,14 +47,11 @@ def upgrade() -> None:
     # Create indexes for chat_sessions
     op.execute("CREATE INDEX idx_chat_sessions_user_id " "ON chat_sessions(user_id)")
 
-    op.execute(
-        "CREATE INDEX idx_chat_sessions_started_at " "ON chat_sessions(started_at DESC)"
-    )
+    op.execute("CREATE INDEX idx_chat_sessions_started_at " "ON chat_sessions(started_at DESC)")
 
     # Add comment
     op.execute(
-        "COMMENT ON TABLE chat_sessions IS "
-        "'Chat sessions for emotional analysis chat interface'"
+        "COMMENT ON TABLE chat_sessions IS " "'Chat sessions for emotional analysis chat interface'"
     )
 
     # Create chat_messages table
@@ -84,17 +81,11 @@ def upgrade() -> None:
     )
 
     # Create indexes for chat_messages
-    op.execute(
-        "CREATE INDEX idx_chat_messages_session_id " "ON chat_messages(session_id)"
-    )
+    op.execute("CREATE INDEX idx_chat_messages_session_id " "ON chat_messages(session_id)")
 
-    op.execute(
-        "CREATE INDEX idx_chat_messages_timestamp " "ON chat_messages(timestamp DESC)"
-    )
+    op.execute("CREATE INDEX idx_chat_messages_timestamp " "ON chat_messages(timestamp DESC)")
 
-    op.execute(
-        "CREATE INDEX idx_chat_messages_emotion_id " "ON chat_messages(emotion_id)"
-    )
+    op.execute("CREATE INDEX idx_chat_messages_emotion_id " "ON chat_messages(emotion_id)")
 
     # Add comments
     op.execute(

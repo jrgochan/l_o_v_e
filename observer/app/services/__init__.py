@@ -8,10 +8,7 @@ from app.services.ai.embeddings import (
 )
 from app.services.analytics.metrics import MetricsCalculator
 from app.services.emotions.mapper import EmotionMapper
-from app.services.math.quaternion_builder import (
-    QuaternionBuilder,
-    get_quaternion_builder,
-)
+from app.services.math.quaternion_builder import QuaternionBuilder, get_quaternion_builder
 from app.services.recommendation.engine import RecommendationEngine
 from app.services.recommendation.strategies import StrategyRecommender
 

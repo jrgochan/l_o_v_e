@@ -24,12 +24,8 @@ def upgrade() -> None:
         "chat_messages",
         sa.Column("original_emotion_name", sa.String(length=100), nullable=True),
     )
-    op.add_column(
-        "chat_messages", sa.Column("match_method", sa.String(length=50), nullable=True)
-    )
-    op.add_column(
-        "chat_messages", sa.Column("match_confidence", sa.Float(), nullable=True)
-    )
+    op.add_column("chat_messages", sa.Column("match_method", sa.String(length=50), nullable=True))
+    op.add_column("chat_messages", sa.Column("match_confidence", sa.Float(), nullable=True))
 
     op.add_column(
         "detected_emotions",
@@ -39,9 +35,7 @@ def upgrade() -> None:
         "detected_emotions",
         sa.Column("match_method", sa.String(length=50), nullable=True),
     )
-    op.add_column(
-        "detected_emotions", sa.Column("match_confidence", sa.Float(), nullable=True)
-    )
+    op.add_column("detected_emotions", sa.Column("match_confidence", sa.Float(), nullable=True))
     # ### end Alembic commands ###
 
 

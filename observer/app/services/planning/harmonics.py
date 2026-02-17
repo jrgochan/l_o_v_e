@@ -6,10 +6,7 @@ from typing import List
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.models.emotion_definition import EmotionDefinition
-from app.services.planning.rules.definitions import (
-    ArousalRegulationRule,
-    VulnerabilityBridgeRule,
-)
+from app.services.planning.rules.definitions import ArousalRegulationRule, VulnerabilityBridgeRule
 
 logger = logging.getLogger(__name__)
 

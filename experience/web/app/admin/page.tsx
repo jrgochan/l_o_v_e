@@ -2,15 +2,21 @@
 
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
+import { useAuthStore } from "@/stores/authStore";
 import { AdminLayout } from "@/components/admin/layout/AdminLayout";
 
 export default function AdminPage() {
   const router = useRouter();
+  const user = useAuthStore((state) => state.user);
 
   useEffect(() => {
-    // Redirect to users page by default
-    router.replace("/admin/users");
-  }, [router]);
+    // Clinicians go to Clinical Portal; admins go to Users by default
+    if (user?.role === "clinician") {
+      router.replace("/admin/clinical");
+    } else {
+      router.replace("/admin/users");
+    }
+  }, [router, user?.role]);
 
   return (
     <AdminLayout>

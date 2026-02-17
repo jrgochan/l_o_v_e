@@ -33,9 +33,7 @@ def upgrade() -> None:
         sa.Column("definition", sa.Text(), nullable=False),
         sa.Column("vac_vector", pgvector.sqlalchemy.Vector(dim=3), nullable=False),
         sa.Column("q_constant", pgvector.sqlalchemy.Vector(dim=4), nullable=False),
-        sa.Column(
-            "semantic_embedding", pgvector.sqlalchemy.Vector(dim=384), nullable=False
-        ),
+        sa.Column("semantic_embedding", pgvector.sqlalchemy.Vector(dim=384), nullable=False),
         sa.Column("haptic_pattern_id", sa.String(length=50), nullable=True),
         sa.Column("color_hint", sa.String(length=7), nullable=True),
         sa.Column(
@@ -71,19 +69,13 @@ def upgrade() -> None:
         sa.Column("session_id", sa.UUID(), nullable=False),
         sa.Column("timestamp", sa.DateTime(timezone=True), nullable=False),
         sa.Column("input_transcription", sa.Text(), nullable=True),
-        sa.Column(
-            "input_embedding", pgvector.sqlalchemy.Vector(dim=384), nullable=True
-        ),
+        sa.Column("input_embedding", pgvector.sqlalchemy.Vector(dim=384), nullable=True),
         sa.Column("vac_values", pgvector.sqlalchemy.Vector(dim=3), nullable=False),
-        sa.Column(
-            "quaternion_state", pgvector.sqlalchemy.Vector(dim=4), nullable=False
-        ),
+        sa.Column("quaternion_state", pgvector.sqlalchemy.Vector(dim=4), nullable=False),
         sa.Column("dominant_emotion_id", sa.UUID(), nullable=True),
         sa.Column("elasticity_metric", sa.Float(), nullable=False),
         sa.Column("rigidity_score", sa.Float(), nullable=False),
-        sa.Column(
-            "context_metadata", postgresql.JSONB(astext_type=sa.Text()), nullable=False
-        ),
+        sa.Column("context_metadata", postgresql.JSONB(astext_type=sa.Text()), nullable=False),
         sa.ForeignKeyConstraint(
             ["dominant_emotion_id"],
             ["atlas_definitions.id"],
@@ -119,13 +111,9 @@ def downgrade() -> None:
     op.drop_index(op.f("ix_user_trajectory_user_id"), table_name="user_trajectory")
     op.drop_index(op.f("ix_user_trajectory_timestamp"), table_name="user_trajectory")
     op.drop_index(op.f("ix_user_trajectory_session_id"), table_name="user_trajectory")
-    op.drop_index(
-        op.f("ix_user_trajectory_dominant_emotion_id"), table_name="user_trajectory"
-    )
+    op.drop_index(op.f("ix_user_trajectory_dominant_emotion_id"), table_name="user_trajectory")
     op.drop_table("user_trajectory")
-    op.drop_index(
-        op.f("ix_atlas_definitions_emotion_name"), table_name="atlas_definitions"
-    )
+    op.drop_index(op.f("ix_atlas_definitions_emotion_name"), table_name="atlas_definitions")
     op.drop_index(op.f("ix_atlas_definitions_category"), table_name="atlas_definitions")
     op.drop_table("atlas_definitions")
     # ### end Alembic commands ###

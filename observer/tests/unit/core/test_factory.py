@@ -35,3 +35,41 @@ class TestImportFallbacks:
                 sys.modules["app.core.factory"] = saved_factory
             else:
                 importlib.import_module("app.core.factory")
+
+    def test_fallback_when_security_missing(self) -> None:
+        """When ``app.core.security`` cannot be imported, the dummy fallback
+        should be defined and used."""
+        saved_factory = sys.modules.pop("app.core.factory", None)
+        saved_security = sys.modules.pop("app.core.security", None)
+
+        try:
+            # Block security module
+            sys.modules["app.core.security"] = None  # type: ignore[assignment]
+
+            # Fresh import
+            import app.core.factory as factory_mod
+
+            # Verify fallback is used
+            # We can check __doc__ or compare against expected dummy
+            assert (
+                factory_mod.setup_rate_limiting.__doc__  # type: ignore[attr-defined]
+                == "Set up dummy rate limiting for when security module is missing."
+            )
+
+            # Ensure app creation still works
+            app = factory_mod.create_app()
+            assert app is not None
+
+        finally:
+            # Cleanup
+            sys.modules.pop("app.core.factory", None)
+            sys.modules.pop("app.core.security", None)
+
+            # Restore
+            if saved_security is not None:
+                sys.modules["app.core.security"] = saved_security
+
+            if saved_factory is not None:
+                sys.modules["app.core.factory"] = saved_factory
+            else:
+                importlib.import_module("app.core.factory")

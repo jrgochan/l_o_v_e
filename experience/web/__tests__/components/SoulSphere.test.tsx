@@ -134,9 +134,10 @@ describe("SoulSphere", () => {
     mockGetState.mockReturnValue({
       currentVAC: [0, 0, 0],
     });
-    mockUseSettingsStore.mockImplementation((selector: any) =>
-      selector({ pathAnimationMode: "subtle" })
-    );
+    mockUseSettingsStore.mockImplementation((selector: any) => {
+      const state = { pathAnimationMode: "subtle", sphereOpacity: 1.0, animationSpeed: 1.0 };
+      return selector ? selector(state) : state;
+    });
     // Default: No selection
     mockUseAtlasAdminStore.mockImplementation((selector: any) => {
       const state = {
@@ -293,9 +294,10 @@ describe("SoulSphere", () => {
   ] as const;
 
   it.each(modes)("should update uniform for mode %s (index %d)", (mode, index) => {
-    mockUseSettingsStore.mockImplementation((selector: any) =>
-      selector({ pathAnimationMode: mode })
-    );
+    mockUseSettingsStore.mockImplementation((selector: any) => {
+      const state = { pathAnimationMode: mode, sphereOpacity: 1.0, animationSpeed: 1.0 };
+      return selector ? selector(state) : state;
+    });
     const { container } = render(<SoulSphere />);
 
     const shaderMaterial = container.querySelector("shaderMaterial");
@@ -311,6 +313,7 @@ describe("SoulSphere", () => {
       uCameraPosition: { value: { copy: jest.fn() } },
       uColorNeg: { value: { copy: jest.fn() } },
       uColorPos: { value: { copy: jest.fn() } },
+      uOpacity: { value: 1.0 },
     };
     (shaderMaterial as any).uniforms = mockUniforms;
 
@@ -332,9 +335,10 @@ describe("SoulSphere", () => {
 
   it("should update mode uniform when ref exists in frame loop", () => {
     // This targets lines 270-272 specifically
-    mockUseSettingsStore.mockImplementation((selector: any) =>
-      selector({ pathAnimationMode: "dynamic" })
-    );
+    mockUseSettingsStore.mockImplementation((selector: any) => {
+      const state = { pathAnimationMode: "dynamic", sphereOpacity: 1.0, animationSpeed: 1.0 };
+      return selector ? selector(state) : state;
+    });
     const { container } = render(<SoulSphere />);
 
     const shaderMaterial = container.querySelector("shaderMaterial");
@@ -423,6 +427,7 @@ describe("SoulSphere", () => {
       uArousal: { value: 0 },
       uConnection: { value: 0 },
       uCameraPosition: { value: { copy: jest.fn() } },
+      uOpacity: { value: 1.0 },
     };
 
     (shaderMaterial as any).uniforms = domUniforms;

@@ -8,10 +8,11 @@ Foundation for secure access to the Observer platform.
 
 from datetime import datetime
 from enum import Enum
-from typing import TYPE_CHECKING, List, Optional
+from typing import TYPE_CHECKING, Any, Dict, List, Optional
 from uuid import UUID, uuid4
 
-from sqlalchemy import Boolean, String, func
+from sqlalchemy import Boolean, DateTime, ForeignKey, Index, String, func
+from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.database import Base
@@ -44,6 +45,24 @@ class User(Base):
     # Status
     is_active: Mapped[bool] = mapped_column(Boolean, default=True)
 
+    # Soft delete — when set, the user is considered "deleted" but data is retained
+    # for recovery, compliance (HIPAA: 6-year retention), or legal holds.
+    deleted_at: Mapped[Optional[datetime]] = mapped_column(
+        DateTime(timezone=True), nullable=True, default=None
+    )
+
+    # Extensible user preferences (theme, tone, notification settings, etc.)
+    # JSONB allows schema-flexible storage — no migrations needed for new prefs.
+    preferences: Mapped[Dict[str, Any]] = mapped_column(
+        JSONB, default=dict, server_default="{}", nullable=False
+    )
+
+    # Clinician assignment — links a user to their supervising clinician.
+    # Enables clinician-scoped queries without granting system-wide read access.
+    assigned_clinician_id: Mapped[Optional[UUID]] = mapped_column(
+        ForeignKey("users.id", ondelete="SET NULL"), nullable=True, default=None
+    )
+
     created_at: Mapped[datetime] = mapped_column(server_default=func.now())
     updated_at: Mapped[datetime] = mapped_column(server_default=func.now(), onupdate=func.now())
 
@@ -51,6 +70,24 @@ class User(Base):
     # Link to sessions (One-to-Many)
     sessions: Mapped[List["ChatSession"]] = relationship(
         back_populates="user", cascade="all, delete-orphan"
+    )
+
+    # Self-referential: clinician → their assigned clients
+    clients: Mapped[List["User"]] = relationship(
+        back_populates="assigned_clinician",
+        foreign_keys=[assigned_clinician_id],
+    )
+    assigned_clinician: Mapped[Optional["User"]] = relationship(
+        back_populates="clients",
+        remote_side="User.id",
+        foreign_keys=[assigned_clinician_id],
+    )
+
+    # Index for efficient clinician → clients lookup (excluding soft-deleted)
+    __table_args__ = (
+        Index(
+            "idx_users_clinician", "assigned_clinician_id", postgresql_where=deleted_at.is_(None)
+        ),
     )
 
     def __repr__(self) -> str:

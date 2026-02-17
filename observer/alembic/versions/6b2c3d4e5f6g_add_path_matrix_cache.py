@@ -51,31 +51,19 @@ def upgrade() -> None:
     )
 
     # Create indexes for common queries
-    op.execute(
-        "CREATE INDEX idx_path_matrix_from " "ON path_matrix_cache(from_emotion_id)"
-    )
+    op.execute("CREATE INDEX idx_path_matrix_from " "ON path_matrix_cache(from_emotion_id)")
 
     op.execute("CREATE INDEX idx_path_matrix_to " "ON path_matrix_cache(to_emotion_id)")
 
-    op.execute(
-        "CREATE INDEX idx_path_matrix_difficulty " "ON path_matrix_cache(difficulty)"
-    )
+    op.execute("CREATE INDEX idx_path_matrix_difficulty " "ON path_matrix_cache(difficulty)")
 
-    op.execute(
-        "CREATE INDEX idx_path_matrix_distance " "ON path_matrix_cache(distance)"
-    )
+    op.execute("CREATE INDEX idx_path_matrix_distance " "ON path_matrix_cache(distance)")
 
-    op.execute(
-        "CREATE INDEX idx_path_matrix_bridge " "ON path_matrix_cache(requires_bridge)"
-    )
+    op.execute("CREATE INDEX idx_path_matrix_bridge " "ON path_matrix_cache(requires_bridge)")
 
-    op.execute(
-        "CREATE INDEX idx_path_matrix_computed_at " "ON path_matrix_cache(computed_at)"
-    )
+    op.execute("CREATE INDEX idx_path_matrix_computed_at " "ON path_matrix_cache(computed_at)")
 
-    op.execute(
-        "CREATE INDEX idx_path_matrix_vac_hash " "ON path_matrix_cache(vac_hash)"
-    )
+    op.execute("CREATE INDEX idx_path_matrix_vac_hash " "ON path_matrix_cache(vac_hash)")
 
     # Composite index for common filter combinations
     op.execute(
@@ -126,13 +114,10 @@ def upgrade() -> None:
     """
     )
 
-    op.execute(
-        "CREATE INDEX idx_computation_jobs_status " "ON path_computation_jobs(status)"
-    )
+    op.execute("CREATE INDEX idx_computation_jobs_status " "ON path_computation_jobs(status)")
 
     op.execute(
-        "CREATE INDEX idx_computation_jobs_started_at "
-        "ON path_computation_jobs(started_at)"
+        "CREATE INDEX idx_computation_jobs_started_at " "ON path_computation_jobs(started_at)"
     )
 
     op.execute(

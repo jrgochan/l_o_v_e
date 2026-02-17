@@ -186,3 +186,64 @@ async def get_session_details(
     data["messages"] = [m.to_dict() for m in messages]
 
     return data
+
+
+# ---------------------------------------------------------------------------
+# Audit log viewer
+# ---------------------------------------------------------------------------
+
+
+@router.get("/audit-log")
+async def list_audit_log(
+    db: Annotated[AsyncSession, Depends(get_db)],
+    _current_admin: Annotated[User, Depends(get_current_admin)],
+    skip: int = 0,
+    limit: int = 50,
+    event_type: str | None = None,
+    actor_id: UUID | None = None,
+) -> Any:
+    """Paginated view of the system audit log.
+
+    Supports filtering by event_type and/or actor_id.
+    """
+    from sqlalchemy import func as sa_func  # pylint: disable=import-outside-toplevel
+
+    from app.models.audit_log import AuditLog  # pylint: disable=import-outside-toplevel
+
+    # Count
+    count_stmt = select(sa_func.count(AuditLog.id))  # pylint: disable=not-callable
+    if event_type:
+        count_stmt = count_stmt.where(AuditLog.event_type == event_type)
+    if actor_id:
+        count_stmt = count_stmt.where(AuditLog.actor_id == actor_id)
+
+    total = (await db.execute(count_stmt)).scalar() or 0
+
+    # Data
+    stmt = select(AuditLog).order_by(AuditLog.timestamp.desc())
+    if event_type:
+        stmt = stmt.where(AuditLog.event_type == event_type)
+    if actor_id:
+        stmt = stmt.where(AuditLog.actor_id == actor_id)
+    stmt = stmt.offset(skip).limit(limit)
+
+    result = await db.execute(stmt)
+    entries = result.scalars().all()
+
+    return {
+        "total": total,
+        "items": [
+            {
+                "id": str(e.id),
+                "event_type": e.event_type,
+                "actor_id": str(e.actor_id) if e.actor_id else None,
+                "target_id": str(e.target_id) if e.target_id else None,
+                "metadata": e.metadata_,
+                "ip_address": e.ip_address,
+                "timestamp": e.timestamp.isoformat() if e.timestamp else None,
+            }
+            for e in entries
+        ],
+        "skip": skip,
+        "limit": limit,
+    }

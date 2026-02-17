@@ -153,7 +153,11 @@ async def test_read_own_sessions(mock_db):
     with patch("app.api.routes.users.ChatService") as MockService:
         service_instance = AsyncMock()
         MockService.return_value = service_instance
-        service_instance.get_user_sessions.return_value = ["session1", "session2"]
+        s1 = MagicMock()
+        s1.to_dict.return_value = "session1"
+        s2 = MagicMock()
+        s2.to_dict.return_value = "session2"
+        service_instance.get_user_sessions.return_value = [s1, s2]
 
         response = await users.read_own_sessions(
             current_user=current_user, db=mock_db, limit=10, offset=5

@@ -46,7 +46,7 @@ async def test_update_user_password_hashing(mock_db, mock_admin, mock_user_obj):
     result.scalars.return_value.first.return_value = mock_user_obj
     mock_db.execute.return_value = result
 
-    user_update = UserUpdate(password="new_secret_password")
+    user_update = UserUpdate(password="New_secret_password1!")
 
     # Patch where it is DEFINED because it is imported locally inside the function
     with patch("app.core.security.get_password_hash") as mock_hash:
@@ -54,7 +54,8 @@ async def test_update_user_password_hashing(mock_db, mock_admin, mock_user_obj):
 
         await admin.update_user(user_id, user_update, mock_db, mock_admin)
 
-        mock_hash.assert_called_with("new_secret_password")
+        # Verify password was hashed
+        mock_hash.assert_called_once_with("New_secret_password1!")
         assert mock_user_obj.password_hash == "hashed_secret"
         mock_db.commit.assert_awaited()
 

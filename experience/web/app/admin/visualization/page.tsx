@@ -20,6 +20,7 @@ import { useAdminSphereSync } from "@/hooks/useAdminSphereSync";
 import { useSettingsSync } from "@/hooks/useSettingsSync";
 import { useSphereSync } from "@/hooks/useSphereSync";
 import { useVisualizationStore } from "@/stores/useVisualizationStore";
+import { useSettingsStore } from "@/stores/useSettingsStore";
 import { useExperienceStore } from "@/stores/useExperienceStore";
 import { VisualizationScene } from "@/components/admin/visualization/VisualizationScene";
 import { OBSERVER_URL } from "@/config/environment";
@@ -119,6 +120,11 @@ const VisualizationAdminContent = () => {
     (state) => state.settings.dataVisualizationMode
   );
   const updateSetting = useVisualizationStore((state) => state.updateSetting);
+
+  // Reactive settings for scene controls
+  const autoRotate = useSettingsStore((state) => state.autoRotate);
+  const renderQuality = useSettingsStore((state) => state.renderQuality);
+  const dpr: [number, number] = renderQuality === "high" ? [1, 2] : renderQuality === "medium" ? [1, 1.5] : [1, 1];
 
   // Broadcast sphere state changes to Zen viewer
   const selectedEmotionIds = useVisualizationStore((state) => state.selectedEmotionIds);
@@ -396,6 +402,7 @@ const VisualizationAdminContent = () => {
               <Canvas
                 camera={{ position: [0, 0, 5], fov: 50 }}
                 gl={{ antialias: true, alpha: true }}
+                dpr={dpr}
               >
                 {/* Lighting */}
                 <ambientLight intensity={0.4} />
@@ -434,6 +441,8 @@ const VisualizationAdminContent = () => {
                   minDistance={2}
                   maxDistance={15}
                   enabled={!isFlying && !isIntroActive}
+                  autoRotate={autoRotate && !isFlying && !isIntroActive}
+                  autoRotateSpeed={0.5}
                 />
 
                 {/* Cinematic Flyover */}

@@ -6,8 +6,9 @@ Health check and readiness probe endpoints for PersonaPlex service.
 import logging
 from typing import Any, Dict
 
-from app.config import settings
 from fastapi import APIRouter, HTTPException
+
+from app.config import settings
 
 logger = logging.getLogger(__name__)
 router = APIRouter()

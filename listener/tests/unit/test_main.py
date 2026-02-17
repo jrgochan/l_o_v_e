@@ -1,5 +1,7 @@
-from unittest.mock import patch
+import importlib
+from unittest.mock import MagicMock, patch
 
+import pytest
 from fastapi.testclient import TestClient
 
 from app.main import app
@@ -56,18 +58,16 @@ def test_routes_exist() -> None:
 
 def test_main_block_calls_uvicorn(monkeypatch: "pytest.MonkeyPatch") -> None:
     """Cover the ``if __name__ == '__main__'`` block (line 42)."""
-    import importlib
-    from unittest.mock import MagicMock
-
     mock_run = MagicMock()
     monkeypatch.setattr("uvicorn.run", mock_run)
 
     spec = importlib.util.find_spec("app.main")
     assert spec is not None and spec.origin is not None
-    source = open(spec.origin).read()  # noqa: SIM115
+    with open(spec.origin, encoding="utf-8") as f:
+        source = f.read()
     code = compile(source, spec.origin, "exec")
-    fake_globals: dict = {"__name__": "__main__", "__file__": spec.origin}
-    exec(code, fake_globals)  # noqa: S102
+    fake_globals: dict[str, object] = {"__name__": "__main__", "__file__": spec.origin}
+    exec(code, fake_globals)  # noqa: S102 # pylint: disable=exec-used # nosec
 
     mock_run.assert_called_once()
     call_kwargs = mock_run.call_args

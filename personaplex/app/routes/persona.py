@@ -7,9 +7,10 @@ to PersonaPlex voice and prompt configurations.
 import logging
 from typing import Any, Dict, List
 
-from app.config import AVAILABLE_VOICES, PERSONA_CONFIG
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel, Field
+
+from app.config import AVAILABLE_VOICES, PERSONA_CONFIG
 
 logger = logging.getLogger(__name__)
 router = APIRouter()

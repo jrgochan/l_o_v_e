@@ -101,7 +101,7 @@ class AdminService:
     async def _update_emotion(
         self, emotion: EmotionDefinition, item: Dict[str, Any], es: Any, qb: Any
     ) -> None:
-        """Helper to update a single emotion and trigger recalculations."""
+        """Update a single emotion and trigger recalculations."""
         needs_embed_update = False
         needs_quat_update = False
 

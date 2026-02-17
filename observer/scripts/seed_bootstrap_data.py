@@ -31,8 +31,9 @@ from uuid import uuid4
 # Add parent directory to path to import app modules
 sys.path.append(str(Path(__file__).parent.parent))
 
-from app.database import AsyncSessionLocal
 from sqlalchemy import text
+
+from app.database import AsyncSessionLocal
 
 BOOTSTRAP_FILE = "data/bootstrap_patterns.json"
 
@@ -119,9 +120,7 @@ async def insert_or_update_bootstrap_data(
     """Insert or update bootstrap data record."""
     try:
         if dry_run:
-            print(
-                f"    🔍 DRY RUN: Would upsert {data_type}/{data_category or 'default'}"
-            )
+            print(f"    🔍 DRY RUN: Would upsert {data_type}/{data_category or 'default'}")
             return True, "Dry run"
 
         # Upsert using ON CONFLICT
@@ -360,9 +359,7 @@ async def main(dry_run: bool = False, verify_only: bool = False):
         print(f"  Common challenges: {len(data['common_challenges']['challenges'])}")
 
         # Seed all bootstrap data
-        success_count, fail_count = await seed_bootstrap_patterns(
-            session, data, dry_run=dry_run
-        )
+        success_count, fail_count = await seed_bootstrap_patterns(session, data, dry_run=dry_run)
 
         # Summary
         print(f"\n{'='*60}")
@@ -380,14 +377,10 @@ async def main(dry_run: bool = False, verify_only: bool = False):
             print("✅ SUCCESS: Bootstrap pattern data seeded!")
             print(f"{'='*60}")
             print("\nNext steps:")
-            print(
-                "1. Verify bootstrap data: python scripts/seed_bootstrap_data.py --verify-only"
-            )
+            print("1. Verify bootstrap data: python scripts/seed_bootstrap_data.py --verify-only")
             print("2. Integrate with strategy recommender service")
             print("3. Test with new user (no history) scenarios")
-            print(
-                "\nNOTE: Bootstrap data provides baseline recommendations for cold-start users."
-            )
+            print("\nNOTE: Bootstrap data provides baseline recommendations for cold-start users.")
         else:
             print(f"\n🔍 Dry run complete. Run without --dry-run to actually seed.")
 

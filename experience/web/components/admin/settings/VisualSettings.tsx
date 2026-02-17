@@ -208,6 +208,98 @@ export function VisualSettings() {
           </div>
         </div>
       </section>
+
+      {/* Soul Sphere Controls */}
+      <section>
+        <h2 className="text-lg font-semibold text-white mb-4">Soul Sphere Controls</h2>
+        <p className="text-sm text-gray-400 mb-4">
+          Adjust the appearance and behavior of the central Soul Sphere visualization.
+        </p>
+
+        <div className="space-y-6">
+          {/* Sphere Transparency — inverted logic matching Zen Settings */}
+          <div>
+            <label className="flex justify-between text-sm text-gray-300 mb-2">
+              <span>Sphere Transparency</span>
+              <span className="font-mono text-white">
+                {((1 - settings.sphereOpacity) * 100).toFixed(0)}%
+              </span>
+            </label>
+            <p className="text-xs text-gray-500 mb-2">
+              0% = Fully solid · 100% = Invisible
+            </p>
+            <input
+              type="range"
+              min="0"
+              max="1"
+              step="0.05"
+              value={1 - settings.sphereOpacity}
+              onChange={(e) =>
+                settings.setSphereOpacity(1 - parseFloat(e.target.value))
+              }
+              className="w-full h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer accent-purple-500"
+            />
+          </div>
+
+          {/* Animation Speed */}
+          <div>
+            <label className="flex justify-between text-sm text-gray-300 mb-2">
+              <span>Animation Speed</span>
+              <span className="font-mono text-white">
+                {settings.animationSpeed.toFixed(1)}x
+              </span>
+            </label>
+            <p className="text-xs text-gray-500 mb-2">
+              Controls the speed of sphere shader animations
+            </p>
+            <input
+              type="range"
+              min="0.1"
+              max="3.0"
+              step="0.1"
+              value={settings.animationSpeed}
+              onChange={(e) =>
+                settings.setAnimationSpeed(parseFloat(e.target.value))
+              }
+              className="w-full h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer accent-purple-500"
+            />
+          </div>
+
+          {/* Render Quality */}
+          <div>
+            <label className="block text-sm text-gray-300 mb-2">Render Quality</label>
+            <p className="text-xs text-gray-500 mb-3">
+              Higher quality uses more GPU resources
+            </p>
+            <div className="grid grid-cols-3 gap-2">
+              {(["low", "medium", "high"] as const).map((quality) => (
+                <button
+                  key={quality}
+                  onClick={() => settings.setRenderQuality(quality)}
+                  className={`px-3 py-2 rounded-lg border text-sm font-medium transition capitalize ${
+                    settings.renderQuality === quality
+                      ? "bg-purple-900/40 border-purple-500 text-purple-200 shadow-lg shadow-purple-500/10"
+                      : "bg-gray-800 border-gray-700 text-gray-400 hover:border-gray-600 hover:text-gray-300"
+                  }`}
+                >
+                  {quality}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Auto-Rotate */}
+          <Toggle
+            checked={settings.autoRotate}
+            onChange={() => settings.toggleAutoRotate()}
+            leftLabel="Auto-Rotate Off"
+            rightLabel="Auto-Rotate On"
+          />
+          <p className="text-sm text-gray-400 -mt-2 ml-1">
+            Slowly rotate the camera around the Soul Sphere
+          </p>
+        </div>
+      </section>
     </div>
   );
 }

@@ -10,9 +10,10 @@ import logging
 
 import numpy as np  # Added for audio processing
 import torch
-from app.config import PERSONA_CONFIG
 from fastapi import APIRouter, WebSocket
 from starlette.websockets import WebSocketState
+
+from app.config import PERSONA_CONFIG
 
 logger = logging.getLogger(__name__)
 router = APIRouter()

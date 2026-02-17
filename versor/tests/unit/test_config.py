@@ -2,9 +2,10 @@
 
 import importlib
 import sys
-from unittest.mock import patch
 
-from app.config import Settings, settings
+from pydantic_settings import BaseSettings as _BaseSettings
+
+from app.config import settings
 
 
 class TestSettingsDefaults:
@@ -44,7 +45,6 @@ class TestLoveBaseSettingsFallback:
     def test_fallback_to_base_settings_when_shared_missing(self) -> None:
         """When ``settings`` module is absent, Settings should still work
         by falling back to plain ``BaseSettings``."""
-        from pydantic_settings import BaseSettings as _BaseSettings
 
         # Remove 'settings' from sys.modules and block it
         saved_settings = sys.modules.pop("settings", None)
@@ -53,10 +53,10 @@ class TestLoveBaseSettingsFallback:
             # Blocking the module: setting to None causes ImportError on import
             sys.modules["settings"] = None  # type: ignore[assignment]
             # Re-import app.config from scratch so the try/except runs fresh
-            import app.config as reloaded_config  # noqa: F811
+            import app.config as reloaded_config  # noqa: F811, E501 # pylint: disable=import-outside-toplevel
 
             # The fallback should have set LoveBaseSettings = BaseSettings
-            assert reloaded_config.LoveBaseSettings is _BaseSettings
+            assert reloaded_config.LoveBaseSettings is _BaseSettings  # type: ignore[attr-defined]
             instance = reloaded_config.Settings()
             assert instance.EPSILON == 1e-6
         finally:

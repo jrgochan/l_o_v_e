@@ -34,15 +34,12 @@ from pathlib import Path
 from typing import Any, Dict, Optional
 from uuid import UUID, uuid4
 
+from sqlalchemy import func, select  # noqa: E402
+
 from app.database import AsyncSessionLocal  # noqa: E402
 from app.models.emotion_definition import EmotionDefinition  # noqa: E402
-from app.models.transition_strategy import (
-    JourneyWaypoint,  # noqa: E402
-    StrategyAttempt,
-    TransitionStrategy,
-    UserJourney,
-)
-from sqlalchemy import func, select  # noqa: E402
+from app.models.transition_strategy import JourneyWaypoint  # noqa: E402
+from app.models.transition_strategy import StrategyAttempt, TransitionStrategy, UserJourney
 
 # Add parent directory to path to import app modules
 sys.path.append(str(Path(__file__).parent.parent))
@@ -75,9 +72,7 @@ def load_demo_journeys() -> Dict[str, Any]:
 
 async def get_emotion_id(session, emotion_name: str) -> Optional[UUID]:
     """Look up emotion ID from emotion_definitions by name."""
-    stmt = select(EmotionDefinition).where(
-        EmotionDefinition.emotion_name == emotion_name
-    )
+    stmt = select(EmotionDefinition).where(EmotionDefinition.emotion_name == emotion_name)
     result = await session.execute(stmt)
     emotion = result.scalars().first()  # Use first() to handle duplicates if any
     return emotion.id if emotion else None
@@ -89,9 +84,7 @@ async def get_strategy_id(session, strategy_name: str) -> Optional[UUID]:
 
     Uses .first() instead of .scalar_one_or_none() to handle potential duplicates.
     """
-    stmt = select(TransitionStrategy).where(
-        TransitionStrategy.strategy_name == strategy_name
-    )
+    stmt = select(TransitionStrategy).where(TransitionStrategy.strategy_name == strategy_name)
     result = await session.execute(stmt)
     strategy = result.scalars().first()  # Get first match to handle duplicates
     return strategy.id if strategy else None
@@ -163,9 +156,7 @@ async def seed_journey(
         journey_id = uuid4()
 
         # Calculate timestamps
-        started_at = datetime.utcnow() - timedelta(
-            minutes=journey_data["duration_minutes"]
-        )
+        started_at = datetime.utcnow() - timedelta(minutes=journey_data["duration_minutes"])
 
         completed_at = None
         abandoned_at = None
@@ -362,9 +353,7 @@ async def verify_demo_data(session) -> Dict[str, Any]:
     }
 
 
-async def main(
-    dev_only: bool = False, dry_run: bool = False, verify_only: bool = False
-):
+async def main(dev_only: bool = False, dry_run: bool = False, verify_only: bool = False):
     """Main seeding function."""
     print("=" * 60)
     print("DEMO JOURNEY DATA SEEDING")
@@ -406,9 +395,7 @@ async def main(
         fail_count = 0
 
         for journey_data in journeys:
-            success, message = await seed_journey(
-                session, journey_data, dry_run=dry_run
-            )
+            success, message = await seed_journey(session, journey_data, dry_run=dry_run)
             if success:
                 success_count += 1
             else:
@@ -430,9 +417,7 @@ async def main(
             print("✅ SUCCESS: Demo journey data seeded!")
             print(f"{'='*60}")
             print("\nNext steps:")
-            print(
-                "1. Verify demo data: python scripts/seed_demo_data.py --dev-only --verify-only"
-            )
+            print("1. Verify demo data: python scripts/seed_demo_data.py --dev-only --verify-only")
             print("2. Test journey queries via API")
             print("3. Use demo data for UX testing and demonstrations")
             print("\nIMPORTANT: This data should NEVER be seeded to production!")
@@ -455,9 +440,7 @@ if __name__ == "__main__":
         action="store_true",
         help="Show what would be imported without importing",
     )
-    parser.add_argument(
-        "--verify-only", action="store_true", help="Only verify existing demo data"
-    )
+    parser.add_argument("--verify-only", action="store_true", help="Only verify existing demo data")
 
     args = parser.parse_args()
 

@@ -42,4 +42,3 @@ export DB_USER="love_user"
 # ==========================================
 export VENV_DIR=".venv"
 export LOG_DIR="$APP_DIR/infra/logs"
-

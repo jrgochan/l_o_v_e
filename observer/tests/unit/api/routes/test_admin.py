@@ -116,7 +116,7 @@ async def test_update_user(mock_db, mock_admin_user):
     # Mock password hash
     with patch("app.core.security.get_password_hash", return_value="hashed"):
         # Password must be min 8 chars
-        update_in = UserUpdate(is_active=False, password="newpassword123")
+        update_in = UserUpdate(is_active=False, password="NewPassword123!")
         res = await admin.update_user(target.id, update_in, mock_db, mock_admin_user)
 
         assert res.is_active is False
@@ -247,6 +247,18 @@ async def test_get_session_details(mock_db, mock_admin_user):
 
 
 @pytest.mark.asyncio
+async def test_get_session_details_not_found(mock_db, mock_admin_user):
+    """Test session not found 404."""
+    mock_res = MagicMock()
+    mock_res.scalars.return_value.first.return_value = None
+    mock_db.execute.return_value = mock_res
+
+    with pytest.raises(HTTPException) as exc:
+        await admin.get_session_details(uuid.uuid4(), mock_db, mock_admin_user)
+    assert exc.value.status_code == 404
+
+
+@pytest.mark.asyncio
 async def test_admin_update_user_password(mock_db, mock_admin_user):
     """Test updating user password (covers password hash import)."""
     target_user = User(id=uuid.uuid4(), email="target@example.com")
@@ -255,7 +267,7 @@ async def test_admin_update_user_password(mock_db, mock_admin_user):
     mock_res.scalars.return_value.first.return_value = target_user
     mock_db.execute.return_value = mock_res
 
-    update = UserUpdate(password="newsecret123")
+    update = UserUpdate(password="NewSecret123!")
 
     with patch("app.core.security.get_password_hash") as mock_hash:
         mock_hash.return_value = "hashed_secret"

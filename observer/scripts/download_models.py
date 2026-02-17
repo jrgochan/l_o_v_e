@@ -32,9 +32,7 @@ def download_models():
             # List contents to confirm
             logger.info(f"Contents: {os.listdir(cache_folder)}")
         else:
-            logger.warning(
-                "HF_HOME not set or path missing, but download completed successfully."
-            )
+            logger.warning("HF_HOME not set or path missing, but download completed successfully.")
 
     except Exception as e:
         logger.error(f"Failed to download model: {e}")

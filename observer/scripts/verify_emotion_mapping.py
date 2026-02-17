@@ -22,9 +22,7 @@ async def verify_mapping_storage():
 
         # 1. Create a test session
         logger.info("Creating test session...")
-        session = await service.create_session(
-            user_id="test_verifier", tone_preference="warm"
-        )
+        session = await service.create_session(user_id="test_verifier", tone_preference="warm")
 
         try:
             # 2. Test Single Analysis Message
@@ -54,9 +52,7 @@ async def verify_mapping_storage():
                 msg.original_emotion_name == original_emotion
             ), f"Expected {original_emotion}, got {msg.original_emotion_name}"
             assert msg.match_method is not None, "Match method should not be None"
-            assert (
-                msg.match_confidence is not None
-            ), "Match confidence should not be None"
+            assert msg.match_confidence is not None, "Match confidence should not be None"
 
             logger.info("✅ Single analysis message verification passed!")
 
@@ -102,9 +98,7 @@ async def verify_mapping_storage():
             # But let's fetch fresh from DB to be sure
             from sqlalchemy import select
 
-            stmt = select(MultiEmotionAnalysis).where(
-                MultiEmotionAnalysis.id == analysis.id
-            )
+            stmt = select(MultiEmotionAnalysis).where(MultiEmotionAnalysis.id == analysis.id)
             result = await db.execute(stmt)
             fetched_analysis = result.scalar_one()
 

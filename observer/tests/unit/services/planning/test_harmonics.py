@@ -5,10 +5,7 @@ import pytest
 
 from app.models.emotion_definition import EmotionDefinition
 from app.services.planning.harmonics import PathHarmonizer
-from app.services.planning.rules.definitions import (
-    ArousalRegulationRule,
-    VulnerabilityBridgeRule,
-)
+from app.services.planning.rules.definitions import ArousalRegulationRule, VulnerabilityBridgeRule
 
 
 @pytest.fixture

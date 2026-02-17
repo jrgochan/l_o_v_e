@@ -154,7 +154,7 @@ for module in "${MODULES[@]}"; do
     # === 6. pydocstyle (Docstring Standards) ===
     print_info "Running pydocstyle (docstring checker)..."
     # pydocstyle might be too noisy for tests, but user asked for "lint test files"
-    # We can exclude D100,D101,D102 (missing docstrings) for tests if needed, 
+    # We can exclude D100,D101,D102 (missing docstrings) for tests if needed,
     # but for now let's apply globally and see.
     if run_in_module "$module" "pydocstyle $TARGETS --convention=google 2>/dev/null"; then
         print_success "pydocstyle: Docstrings comply with Google style"
@@ -170,19 +170,19 @@ for module in "${MODULES[@]}"; do
     # Construct command:
     # bandit -r app/ tests/ -ll -q -s B101 (skip assert check)
     # But strictly speaking app/ shouldn't assert.
-    # So we might want to run separate bandit for app and tests? 
+    # So we might want to run separate bandit for app and tests?
     # Or just skip B101 globally? No, asserts in app are bad.
     # Let's run bandit on app/ strict, and tests/ relaxed?
     # For now, simply running on both. Users usually exclude tests from bandit config.
-    # Let's try to pass -s B101 only for tests? 
-    # Simpler: Just run on targets. If assert fails, we fix or ignore. 
-    # Actually, B101 is "assert_used". Pytest uses asserts. 
+    # Let's try to pass -s B101 only for tests?
+    # Simpler: Just run on targets. If assert fails, we fix or ignore.
+    # Actually, B101 is "assert_used". Pytest uses asserts.
     # So running bandit on tests WILL fail.
     # Let's SKIP bandit for tests/ to avoid noise, or exclude B101.
-    # User request: "lint test files". 
+    # User request: "lint test files".
     # I'll include it. If it fails on B101, user will see it.
-    
-    # We need to handle the assert issue. 
+
+    # We need to handle the assert issue.
     # One way: run bandit on app/, then bandit on tests/ with skip B101.
     if run_in_module "$module" "bandit -r app/ -ll -q 2>/dev/null"; then
         print_success "bandit (app): No security issues found"
@@ -190,7 +190,7 @@ for module in "${MODULES[@]}"; do
         print_error "bandit (app): Security issues detected"
         total_failures=$((total_failures + 1))
     fi
-    
+
     if [ -d "$module/tests" ]; then
         # Skip B101 (assert) for tests
         if run_in_module "$module" "bandit -r tests/ -ll -q -s B101 2>/dev/null"; then

@@ -3,11 +3,7 @@
 from typing import Any, Dict, List, Optional
 
 from app.services.insights.prosody import generate_voice_metrics_clinical
-from app.services.insights.utils import (
-    interpret_arousal,
-    interpret_connection,
-    interpret_valence,
-)
+from app.services.insights.utils import interpret_arousal, interpret_connection, interpret_valence
 
 
 def generate_clinical_opening(emotion_name: str, confidence: float, category: str) -> str:

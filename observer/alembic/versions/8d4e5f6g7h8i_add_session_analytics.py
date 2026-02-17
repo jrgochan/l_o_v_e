@@ -53,18 +53,13 @@ def upgrade() -> None:
 
     # Create indexes
     op.execute(
-        "CREATE UNIQUE INDEX idx_session_analytics_session "
-        "ON session_analytics(session_id)"
+        "CREATE UNIQUE INDEX idx_session_analytics_session " "ON session_analytics(session_id)"
     )
 
-    op.execute(
-        "CREATE INDEX idx_session_analytics_start_time "
-        "ON session_analytics(start_time)"
-    )
+    op.execute("CREATE INDEX idx_session_analytics_start_time " "ON session_analytics(start_time)")
 
     op.execute(
-        "CREATE INDEX idx_session_analytics_emotion_count "
-        "ON session_analytics(emotion_count)"
+        "CREATE INDEX idx_session_analytics_emotion_count " "ON session_analytics(emotion_count)"
     )
 
     op.execute(

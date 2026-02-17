@@ -61,8 +61,7 @@ def upgrade() -> None:
     )
 
     op.execute(
-        "CREATE INDEX idx_waypoint_templates_to "
-        "ON waypoint_explanation_templates(to_emotion_id)"
+        "CREATE INDEX idx_waypoint_templates_to " "ON waypoint_explanation_templates(to_emotion_id)"
     )
 
     op.execute(

@@ -57,15 +57,17 @@ def test_assemble_db_connection_builds_url():
 
 def test_love_base_settings_fallback():
     """Cover lines 14-16 — ImportError fallback to BaseSettings."""
-    import importlib
-    import sys
+    import importlib  # pylint: disable=import-outside-toplevel
+    import sys  # pylint: disable=import-outside-toplevel
 
+    # pylint: disable=import-outside-toplevel
     from pydantic_settings import BaseSettings as _BaseSettings
 
     saved_settings = sys.modules.pop("settings", None)
     saved_config = sys.modules.pop("app.core.settings", None)
     try:
-        sys.modules["settings"] = None  # type: ignore[assignment]
+        sys.modules["settings"] = None
+        # pylint: disable=import-outside-toplevel
         import app.core.settings as reloaded  # noqa: F811
 
         assert reloaded.LoveBaseSettings is _BaseSettings

@@ -65,18 +65,14 @@ def upgrade() -> None:
     if "chat_sessions" in tables:
         columns = [c["name"] for c in inspector.get_columns("chat_sessions")]
         if "auth_user_id" not in columns:
-            op.add_column(
-                "chat_sessions", sa.Column("auth_user_id", sa.Uuid(), nullable=True)
-            )
+            op.add_column("chat_sessions", sa.Column("auth_user_id", sa.Uuid(), nullable=True))
             op.create_index(
                 op.f("ix_chat_sessions_auth_user_id"),
                 "chat_sessions",
                 ["auth_user_id"],
                 unique=False,
             )
-            op.create_foreign_key(
-                None, "chat_sessions", "users", ["auth_user_id"], ["id"]
-            )
+            op.create_foreign_key(None, "chat_sessions", "users", ["auth_user_id"], ["id"])
 
 
 def downgrade() -> None:
@@ -96,11 +92,9 @@ def downgrade() -> None:
                     "chat_sessions",
                     type_="foreignkey",
                 )
-            except:
+            except Exception:
                 pass
-            op.drop_index(
-                op.f("ix_chat_sessions_auth_user_id"), table_name="chat_sessions"
-            )
+            op.drop_index(op.f("ix_chat_sessions_auth_user_id"), table_name="chat_sessions")
             op.drop_column("chat_sessions", "auth_user_id")
 
     if "users" in tables:

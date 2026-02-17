@@ -184,11 +184,11 @@ max-line-length = 100
 
 [[tool.mypy.overrides]]
 module = [
-    "tests.*", 
-    "*.tests.*", 
-    "observer.tests.*", 
-    "listener.tests.*", 
-    "versor.tests.*", 
+    "tests.*",
+    "*.tests.*",
+    "observer.tests.*",
+    "listener.tests.*",
+    "versor.tests.*",
     "observer.scripts.*",
     "scripts.*"
 ]
@@ -217,8 +217,11 @@ addopts = [
 ]
 markers = [
     "unit: Unit tests",
-    "integration: Integration tests",
-    "semantic: Semantic validation tests",
+    "integration: marks tests as integration tests (slow)",
+    "no_db_cleanup: skip database cleanup after test",
+    "no_auth_override: skip automatic authentication override",
+    "semantic: marks tests for semantic analysis",
+    "unit: marks tests as unit tests",
     "slow: Slow-running tests",
     "requires_ollama: Tests requiring Ollama",
     "requires_redis: Tests requiring Redis",
@@ -236,4 +239,3 @@ omit = ["*/tests/*", "*/migrations/*", "*/__init__.py"]
 [tool.coverage.report]
 precision = 2
 skip_empty = true
-

@@ -2,6 +2,7 @@ import json
 from unittest.mock import AsyncMock, MagicMock, mock_open, patch
 
 import pytest
+import typer
 from sqlalchemy.exc import SQLAlchemyError
 
 from app.commands.seed import seed_bootstrap_logic, seed_users_logic, users
@@ -92,7 +93,7 @@ def test_users_command():
 
     # Test failure exit
     with patch("app.commands.seed.asyncio.run", return_value=False):
-        with pytest.raises(Exception):  # typer.Exit logic
+        with pytest.raises(typer.Exit):
             users()
 
 

@@ -142,4 +142,3 @@ async def test_refresh_token_without_exp_claim(mock_db, mock_user):
 
     user = await get_current_user_for_refresh(token, mock_db)
     assert user.email == "test@example.com"
-

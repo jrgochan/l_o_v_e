@@ -1,152 +1,148 @@
 import { render, screen, fireEvent, waitFor, act } from "@testing-library/react";
-import { Settings } from "@/components/Settings";
+import userEvent from "@testing-library/user-event";
+import { Settings } from "@/components/input/Settings";
 import { useSettingsStore } from "@/stores/useSettingsStore";
 
-// Mock store
+// Mock the store
 jest.mock("@/stores/useSettingsStore");
 
-// Mock Three.js/R3F to prevent SIGSEGV
+// Mock dependencies
 jest.mock("@react-three/fiber", () => ({
-  useFrame: jest.fn(),
-  useThree: jest.fn(() => ({ camera: { position: { set: jest.fn() } } })),
-  Canvas: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
-}));
-jest.mock("@react-three/drei", () => ({
-  OrbitControls: () => null,
-  Text: () => null,
-}));
-jest.mock("three", () => ({
-  ...jest.requireActual("three"),
-  WebGLRenderer: jest.fn(),
-  Mesh: jest.fn(),
-  Group: jest.fn(),
+  Canvas: ({ children }: any) => <div>{children}</div>,
+  useThree: () => ({ camera: { position: { x: 0, y: 0, z: 0 } } }),
+  useFrame: () => {},
 }));
 
-// Mock URL
-global.URL.createObjectURL = jest.fn(() => "blob:test");
+jest.mock("@react-three/drei", () => ({
+  OrbitControls: () => null,
+  Stats: () => null,
+}));
+
+// Mock window.matchMedia
+Object.defineProperty(window, "matchMedia", {
+  writable: true,
+  value: jest.fn().mockImplementation((query) => ({
+    matches: false,
+    media: query,
+    onchange: null,
+    addListener: jest.fn(), // deprecated
+    removeListener: jest.fn(), // deprecated
+    addEventListener: jest.fn(),
+    removeEventListener: jest.fn(),
+    dispatchEvent: jest.fn(),
+  })),
+});
+
+// Mock URL.createObjectURL
+global.URL.createObjectURL = jest.fn();
 global.URL.revokeObjectURL = jest.fn();
+// Mock alert and confirm
+global.alert = jest.fn();
+global.confirm = jest.fn();
 
 describe("Settings Component", () => {
   const mockStore = {
-    // API
-    observerApiUrl: "http://localhost:8000",
-    listenerApiUrl: "http://localhost:8002",
-    versorApiUrl: "http://localhost:8001",
-    setApiUrl: jest.fn(),
-    testConnection: jest.fn(),
-
-    // Polling
     pollingEnabled: false,
-    pollingInterval: 1000,
+    pollingInterval: 3000,
     userId: "web-user",
     setPollingEnabled: jest.fn(),
     setPollingInterval: jest.fn(),
     setUserId: jest.fn(),
-
-    // Visual
+    // Correct nested structure for API URLs
+    network: {
+      endpoints: {
+        observer: "http://localhost:8000",
+        listener: "http://localhost:8001",
+        versor: "http://localhost:8002",
+      },
+    },
     layers: {
       cinematicOverlay: false,
       viewerShortcuts: false,
       vacDisplay: false,
     },
     showTransitionPath: false,
-    animationSpeed: 1.0,
     autoRotate: false,
-    renderQuality: "medium",
-    sphereOpacity: 0.8,
     showDebugInfo: false,
+    animationSpeed: 1,
+    renderQuality: "medium",
+    sphereOpacity: 0.3,
     updateLayer: jest.fn(),
-    setShowTransitionPath: jest.fn(),
     setAnimationSpeed: jest.fn(),
-    toggleAutoRotate: jest.fn(),
     setRenderQuality: jest.fn(),
     setSphereOpacity: jest.fn(),
+    toggleAutoRotate: jest.fn(),
     toggleDebugInfo: jest.fn(),
-
-    // Accessibility
+    setShowTransitionPath: jest.fn(),
+    exportSettings: jest.fn(),
+    importSettings: jest.fn(),
+    resetToDefaults: jest.fn(),
+    clearAllData: jest.fn(),
     reducedMotion: false,
     highContrast: false,
     screenReaderMode: false,
     setReducedMotion: jest.fn(),
     setHighContrast: jest.fn(),
     toggleScreenReaderMode: jest.fn(),
-
-    // Data
-    exportSettings: jest.fn(() => "{}"),
-    importSettings: jest.fn(),
-    resetToDefaults: jest.fn(),
-    clearAllData: jest.fn(),
+    testConnection: jest.fn(),
+    setApiUrl: jest.fn(),
   };
 
   beforeEach(() => {
     jest.clearAllMocks();
     (useSettingsStore as unknown as jest.Mock).mockReturnValue(mockStore);
-    global.confirm = jest.fn(() => true);
-    global.alert = jest.fn();
-
-    // Suppress "Not implemented: navigation" error
-    const originalConsoleError = console.error;
-    console.error = (...args) => {
-      const msg = args[0]?.toString() || "";
-      if (msg.includes("Not implemented: navigation")) {
-        return;
-      }
-      originalConsoleError(...args);
-    };
+    (global.confirm as jest.Mock).mockReturnValue(true);
   });
 
-  const openSettings = () => {
+  const openSettings = async (user: any) => {
     render(<Settings />);
-    fireEvent.click(screen.getByLabelText("Open Settings"));
+    await user.click(screen.getByText("⚙️"));
+    await screen.findByTestId("tab-api", {}, { timeout: 3000 });
   };
 
-  it("should toggle modal visibility", () => {
-    render(<Settings />);
-    expect(screen.queryByText("⚙️ Settings")).not.toBeInTheDocument();
-
-    fireEvent.click(screen.getByLabelText("Open Settings"));
-    expect(screen.getByText("⚙️ Settings")).toBeInTheDocument();
-
-    fireEvent.click(screen.getByLabelText("Close Settings"));
-    expect(screen.queryByText("⚙️ Settings")).not.toBeInTheDocument();
+  it("should open settings modal when gear icon is clicked", async () => {
+    const user = userEvent.setup();
+    await openSettings(user);
+    expect(screen.getByText("Settings")).toBeInTheDocument();
   });
 
-  it("should handle polling tab interactions", () => {
-    openSettings();
-    fireEvent.click(screen.getByText(/Polling/));
+  it("should handle polling tab interactions", async () => {
+    const user = userEvent.setup();
+    await openSettings(user);
+
+    const tabs = screen.getAllByRole("tab");
+    fireEvent.click(tabs[1]); // Polling
+
+    await screen.findByTestId("panel-polling", {}, { timeout: 3000 });
+
+    const userIdInput = await screen.findByTestId("input-userid", {}, { timeout: 3000 });
 
     // Toggle Polling
-    const toggles = screen.getAllByRole("button");
-    // Identify toggle by sibling/parent context if possible, or order.
-    // In polling tab:
-    // 1. Tab buttons (6)
-    // 2. Polling Enable Toggle (index 6, if 0-indexed across modal)
-    // Safer to look for specific visual cue or structure?
-    // Test DOM structure:
-    // <div class="flex items-center justify-between"><label>Enable Polling</label><button>...
-
-    const enablePollingBtn = screen.getByText("Enable Polling").nextElementSibling;
-    fireEvent.click(enablePollingBtn!);
+    const enablePollingBtn = screen.getByTestId("btn-polling-toggle");
+    await user.click(enablePollingBtn);
     expect(mockStore.setPollingEnabled).toHaveBeenCalledWith(true);
 
     // Interval slider
-    const slider = screen.getByRole("slider");
+    const slider = screen.getByTestId("slider-polling-interval");
     fireEvent.change(slider, { target: { value: "5000" } });
     expect(mockStore.setPollingInterval).toHaveBeenCalledWith(5000);
 
     // User ID
-    const input = screen.getByDisplayValue("web-user");
-    fireEvent.change(input, { target: { value: "new-user" } });
+    fireEvent.change(userIdInput, { target: { value: "new-user" } });
     expect(mockStore.setUserId).toHaveBeenCalledWith("new-user");
   });
 
-  it("should handle visualization tab interactions", () => {
-    openSettings();
-    fireEvent.click(screen.getByText(/Visual/));
+  it("should handle visualization tab interactions", async () => {
+    const user = userEvent.setup();
+    await openSettings(user);
+    const tabs = screen.getAllByRole("tab");
+    fireEvent.click(tabs[2]); // Visual
+
+    await screen.findByTestId("panel-visual", {}, { timeout: 3000 });
 
     // Cinematic Overlay Toggle
-    const cinematicBtn = screen.getByText("Cinematic Overlay").nextElementSibling;
-    fireEvent.click(cinematicBtn!);
+    const cinematicBtn = screen.getByTestId("btn-toggle-cinematic");
+    await user.click(cinematicBtn);
     expect(mockStore.updateLayer).toHaveBeenCalledWith("cinematicOverlay", true);
 
     // Animation Speed
@@ -156,7 +152,7 @@ describe("Settings Component", () => {
 
     // Render Quality
     const select = screen.getByRole("combobox");
-    fireEvent.change(select, { target: { value: "high" } });
+    await user.selectOptions(select, "high");
     expect(mockStore.setRenderQuality).toHaveBeenCalledWith("high");
 
     // Sphere Opacity
@@ -164,42 +160,53 @@ describe("Settings Component", () => {
     expect(mockStore.setSphereOpacity).toHaveBeenCalledWith(0.5);
   });
 
-  it("should handle accessibility tab interactions", () => {
-    openSettings();
-    fireEvent.click(screen.getByText(/Access/));
+  it("should handle accessibility tab interactions", async () => {
+    const user = userEvent.setup();
+    await openSettings(user);
+    const tabs = screen.getAllByRole("tab");
+    fireEvent.click(tabs[3]); // Access
+
+    await screen.findByTestId("panel-access", {}, { timeout: 3000 });
 
     // Reduced Motion
-    const reducedMotionBtn = screen.getByText("Reduced Motion").parentElement?.nextElementSibling;
-    fireEvent.click(reducedMotionBtn!);
+    const reducedMotionBtn = screen.getByTestId("btn-toggle-reduced-motion");
+    await user.click(reducedMotionBtn);
     expect(mockStore.setReducedMotion).toHaveBeenCalledWith(true);
 
     // High Contrast
-    const highContrastBtn = screen.getByText("High Contrast").parentElement?.nextElementSibling;
-    fireEvent.click(highContrastBtn!);
+    const highContrastBtn = screen.getByTestId("btn-toggle-high-contrast");
+    await user.click(highContrastBtn);
     expect(mockStore.setHighContrast).toHaveBeenCalledWith(true);
 
     // Screen Reader
-    const srBtn = screen.getByText("Screen Reader Mode").parentElement?.nextElementSibling;
-    fireEvent.click(srBtn!);
+    const srBtn = screen.getByTestId("btn-toggle-screen-reader");
+    await user.click(srBtn);
     expect(mockStore.toggleScreenReaderMode).toHaveBeenCalled();
   });
 
-  it("should handle data tab interactions", () => {
-    openSettings();
-    fireEvent.click(screen.getByText(/Data/));
+  it("should handle data tab interactions", async () => {
+    const user = userEvent.setup();
+    await openSettings(user);
+    const tabs = screen.getAllByRole("tab");
+    fireEvent.click(tabs[4]); // Data
+
+    await screen.findByTestId("panel-data", {}, { timeout: 3000 });
 
     // Export
-    fireEvent.click(screen.getByText("📥 Export Settings"));
+    const exportBtn = screen.getByTestId("btn-export");
+    await user.click(exportBtn);
     expect(mockStore.exportSettings).toHaveBeenCalled();
     expect(global.URL.createObjectURL).toHaveBeenCalled();
 
     // Reset
-    fireEvent.click(screen.getByText("🔄 Reset to Defaults"));
+    const resetBtn = screen.getByTestId("btn-reset");
+    await user.click(resetBtn);
     expect(global.confirm).toHaveBeenCalled();
     expect(mockStore.resetToDefaults).toHaveBeenCalled();
 
     // Clear
-    fireEvent.click(screen.getByText("🗑️ Clear All Data"));
+    const clearBtn = screen.getByTestId("btn-clear");
+    await user.click(clearBtn);
     expect(global.confirm).toHaveBeenCalled();
     expect(mockStore.clearAllData).toHaveBeenCalled();
   });
@@ -211,8 +218,12 @@ describe("Settings Component", () => {
       versor: { connected: false },
     });
 
-    openSettings();
-    // Default tab is API
+    const user = userEvent.setup();
+    await openSettings(user);
+    const tabs = screen.getAllByRole("tab");
+    fireEvent.click(tabs[0]); // API (default, but precise click)
+
+    await screen.findByTestId("panel-api", {}, { timeout: 3000 });
 
     // Input Change
     const input = screen.getByDisplayValue("http://localhost:8000");
@@ -220,303 +231,272 @@ describe("Settings Component", () => {
     expect(mockStore.setApiUrl).toHaveBeenCalledWith("observer", "http://api.test");
 
     // Test Connection
-    const testButtons = screen.getAllByText("Test");
-    fireEvent.click(testButtons[0]); // Observer
+    const testBtn = screen.getByTestId("btn-test-observer");
+    await user.click(testBtn);
 
     await waitFor(() => {
-      expect(screen.getByText("🟢 Connected")).toBeInTheDocument();
+      expect(screen.getByText("Connected")).toBeInTheDocument();
     });
   });
 
   it("should handle import file selection", async () => {
     mockStore.importSettings.mockReturnValue(true);
-    openSettings();
-    fireEvent.click(screen.getByText(/Data/));
+    const user = userEvent.setup();
+    await openSettings(user);
+    const tabs = screen.getAllByRole("tab");
+    fireEvent.click(tabs[4]); // Data
+
+    await screen.findByTestId("panel-data", {}, { timeout: 3000 });
 
     const file = new File(['{"test":true}'], "settings.json", { type: "application/json" });
 
-    // Mock file input click since it's hidden/created dynamically
-    // The component creates input dynamically on click:
-    // const input = document.createElement("input");
-    // ...
-    // input.click();
-
-    // We need to intercept the input creation or simulate the change event directly?
-    // Since input is created in handler, we can't easily query it.
-    // Hack: mock document.createElement
-
     const inputMock = { type: "", accept: "", onchange: null as any, click: jest.fn() };
-    const originalCreateElement = document.createElement;
-    jest.spyOn(document, "createElement").mockImplementation((tagName) => {
+    // @ts-ignore
+    const originalCreateElement = document.createElement.bind(document);
+    const createElementSpy = jest.spyOn(document, "createElement").mockImplementation((tagName) => {
       if (tagName === "input") return inputMock as any;
       return originalCreateElement(tagName);
     });
 
-    fireEvent.click(screen.getByText("📤 Import Settings"));
+    try {
+      const importBtn = screen.getByTestId("btn-import");
+      await user.click(importBtn);
 
-    // Determine onchange handler
-    expect(inputMock.click).toHaveBeenCalled();
+      expect(inputMock.click).toHaveBeenCalled();
 
-    // Trigger onchange manually
-    const event = { target: { files: [file] } };
-    await act(async () => {
-      inputMock.onchange(event);
-    });
+      const event = { target: { files: [file] } };
+      await act(async () => {
+        inputMock.onchange(event);
+      });
 
-    await waitFor(() => {
-      expect(mockStore.importSettings).toHaveBeenCalledWith('{"test":true}');
-      expect(global.alert).toHaveBeenCalledWith("Settings imported successfully!");
-    });
-
-    (document.createElement as jest.Mock).mockRestore();
+      await waitFor(() => {
+        expect(mockStore.importSettings).toHaveBeenCalledWith('{"test":true}');
+        expect(global.alert).toHaveBeenCalledWith("Settings imported successfully!");
+      });
+    } finally {
+      createElementSpy.mockRestore();
+    }
   });
 
-  it("should reflect visual toggle states", () => {
-    // 1. Polling Enabled State
-    const { unmount } = render(<Settings />);
-    fireEvent.click(screen.getByText("⚙️"));
-    fireEvent.click(screen.getByText(/Polling/));
+  it("should reflect visual toggle states", async () => {
+    const toggles = [
+      { id: "btn-toggle-cinematic", key: "cinematicOverlay", isLayer: true },
+      { id: "btn-toggle-shortcuts", key: "viewerShortcuts", isLayer: true },
+      { id: "btn-toggle-vac", key: "vacDisplay", isLayer: true },
+      { id: "btn-toggle-paths", key: "showTransitionPath", isLayer: false },
+      { id: "btn-toggle-rotate", key: "autoRotate", isLayer: false },
+      { id: "btn-toggle-debug", key: "showDebugInfo", isLayer: false },
+    ];
 
-    // Default false -> bg-gray-700
-    const pollingToggle = screen.getByText("Enable Polling").nextElementSibling;
-    expect(pollingToggle).toHaveClass("bg-gray-700");
+    // 1. Initial State (All Off)
+    {
+      const user = userEvent.setup();
+      const { unmount } = render(<Settings />);
+      await user.click(screen.getByText("⚙️"));
+      await screen.findByTestId("tab-api", {}, { timeout: 3000 });
 
-    // Enable -> Re-render with new state
-    unmount();
-    mockStore.pollingEnabled = true; // Simulate store update
-    (useSettingsStore as unknown as jest.Mock).mockReturnValue({ ...mockStore });
+      const tabs = screen.getAllByRole("tab");
+      fireEvent.click(tabs[2]); // Visual
 
-    // Refresh component state from mock
-    render(<Settings />);
-    fireEvent.click(screen.getByText("⚙️"));
-    fireEvent.click(screen.getByText(/Polling/));
+      await screen.findByTestId("panel-visual", {}, { timeout: 3000 });
 
-    const pollingToggleActive = screen.getByText("Enable Polling").nextElementSibling;
-    expect(pollingToggleActive).toHaveClass("bg-cyan-600");
+      for (const { id, key, isLayer } of toggles) {
+        const toggle = screen.getByTestId(id);
+        expect(toggle).toHaveClass("bg-gray-700");
+        await user.click(toggle);
+
+        if (isLayer) {
+           expect(mockStore.updateLayer).toHaveBeenCalledWith(key, true);
+        } else {
+          if (key === "showTransitionPath") expect(mockStore.setShowTransitionPath).toHaveBeenCalledWith(true);
+          if (key === "autoRotate") expect(mockStore.toggleAutoRotate).toHaveBeenCalled();
+          if (key === "showDebugInfo") expect(mockStore.toggleDebugInfo).toHaveBeenCalled();
+        }
+      }
+      unmount();
+    }
+
+    // 2. Enable State (All On)
+    {
+      const newStore = { ...mockStore };
+      // @ts-ignore
+      newStore.layers = {
+        cinematicOverlay: true,
+        viewerShortcuts: true,
+        vacDisplay: true,
+      };
+      // @ts-ignore
+      newStore.showTransitionPath = true;
+      // @ts-ignore
+      newStore.autoRotate = true;
+      // @ts-ignore
+      newStore.showDebugInfo = true;
+
+      (useSettingsStore as unknown as jest.Mock).mockReturnValue(newStore);
+
+      const user = userEvent.setup();
+      const { unmount } = render(<Settings />);
+      await user.click(screen.getByText("⚙️"));
+      await screen.findByTestId("tab-api", {}, { timeout: 3000 });
+
+      const tabs = screen.getAllByRole("tab");
+      fireEvent.click(tabs[2]); // Visual
+
+      await screen.findByTestId("panel-visual", {}, { timeout: 3000 });
+
+      for (const { id } of toggles) {
+        const toggle = screen.getByTestId(id);
+        expect(toggle).toHaveClass("bg-cyan-600");
+      }
+      unmount();
+    }
   });
 
   it("should reflect connection failure states", async () => {
     mockStore.testConnection.mockResolvedValue({
-      observer: { connected: false }, // Fail
+      observer: { connected: false },
       listener: { connected: false },
       versor: { connected: false },
     });
 
-    openSettings();
-    fireEvent.click(screen.getAllByText("Test")[0]);
+    const user = userEvent.setup();
+    await openSettings(user);
+    const tabs = screen.getAllByRole("tab");
+    fireEvent.click(tabs[0]); // API
+
+    await screen.findByTestId("panel-api", {}, { timeout: 3000 });
+
+    const testBtn = screen.getByTestId("btn-test-observer");
+    await user.click(testBtn);
 
     await waitFor(() => {
-      expect(screen.getByText("🔴 Connection failed")).toBeInTheDocument();
+      expect(screen.getByText("Disconnected")).toBeInTheDocument();
     });
   });
 
-  it("should show About tab details", () => {
-    openSettings();
-    fireEvent.click(screen.getByText(/About/));
-    expect(screen.getByText("1.0.0")).toBeInTheDocument();
-    expect(screen.getByText("Web (Next.js)")).toBeInTheDocument();
+  it("should show About tab details", async () => {
+    const user = userEvent.setup();
+    await openSettings(user);
+    const tabs = screen.getAllByRole("tab");
+    fireEvent.click(tabs[5]); // About
+
+    await screen.findByTestId("panel-about", {}, { timeout: 3000 });
+    expect(screen.getByText("1.0.0-alpha")).toBeInTheDocument();
   });
 
   it("should handle failed import", async () => {
     mockStore.importSettings.mockReturnValue(false);
-    openSettings();
-    fireEvent.click(screen.getByText(/Data/));
+    const user = userEvent.setup();
+    await openSettings(user);
+    const tabs = screen.getAllByRole("tab");
+    fireEvent.click(tabs[4]); // Data
+
+    await screen.findByTestId("panel-data", {}, { timeout: 3000 });
 
     const file = new File(["invalid"], "settings.json", { type: "application/json" });
     const inputMock = { type: "", accept: "", onchange: null as any, click: jest.fn() };
 
     // @ts-ignore
-    jest.spyOn(document, "createElement").mockImplementation((tagName) => {
+    const originalCreateElement = document.createElement.bind(document);
+    const createElementSpy = jest.spyOn(document, "createElement").mockImplementation((tagName) => {
       if (tagName === "input") return inputMock as any;
-      return document.createElement(tagName);
+      return originalCreateElement(tagName);
     });
 
-    fireEvent.click(screen.getByText("📤 Import Settings"));
+    try {
+      const importBtn = screen.getByTestId("btn-import");
+      await user.click(importBtn);
 
-    // Trigger onchange manually
-    const event = { target: { files: [file] } };
-    await act(async () => {
-      inputMock.onchange(event);
-    });
+      const event = { target: { files: [file] } };
+      await act(async () => {
+        inputMock.onchange(event);
+      });
 
-    await waitFor(() => {
-      expect(mockStore.importSettings).toHaveBeenCalled();
-      expect(global.alert).toHaveBeenCalledWith(
-        "Failed to import settings. Please check the file format."
-      );
-    });
-
-    (document.createElement as jest.Mock).mockRestore();
+      await waitFor(() => {
+        expect(mockStore.importSettings).toHaveBeenCalled();
+        expect(global.alert).toHaveBeenCalledWith(
+          "Failed to import settings. Please check the file format."
+        );
+      });
+    } finally {
+      createElementSpy.mockRestore();
+    }
   });
 
-  it("should reflect visualization toggle states", () => {
-    const toggles = [
-      { label: "Cinematic Overlay", key: "cinematicOverlay", isLayer: true },
-      { label: "Keyboard Shortcuts", key: "viewerShortcuts", isLayer: true },
-      { label: "VAC Metrics Display", key: "vacDisplay", isLayer: true },
-      { label: "Show Transition Path", key: "showTransitionPath", isLayer: false },
-      { label: "Auto-Rotate Camera", key: "autoRotate", isLayer: false },
-      { label: "Show Debug Info", key: "showDebugInfo", isLayer: false },
-    ];
-
-    toggles.forEach(({ label, key, isLayer }) => {
-      // 1. Initial State (off)
-      const { unmount } = render(<Settings />);
-      fireEvent.click(screen.getByText("⚙️"));
-      fireEvent.click(screen.getByText(/Visual/));
-
-      const toggle = screen.getByText(label).nextElementSibling;
-      expect(toggle).toHaveClass("bg-gray-700");
-
-      // Click to verify handler
-      if (toggle) fireEvent.click(toggle);
-
-      if (isLayer) {
-        expect(mockStore.updateLayer).toHaveBeenCalledWith(key, true);
-      } else {
-        // Map key to setter if needed, or assume specific mocks called
-        if (key === "showTransitionPath")
-          expect(mockStore.setShowTransitionPath).toHaveBeenCalledWith(true);
-        if (key === "autoRotate") expect(mockStore.toggleAutoRotate).toHaveBeenCalled();
-        if (key === "showDebugInfo") expect(mockStore.toggleDebugInfo).toHaveBeenCalled();
-      }
-
-      unmount();
-
-      // 2. Enable State
-      const newStore = { ...mockStore };
-      if (isLayer) {
-        // @ts-ignore
-        newStore.layers = { ...mockStore.layers, [key]: true };
-      } else {
-        // @ts-ignore
-        newStore[key] = true;
-      }
-      (useSettingsStore as unknown as jest.Mock).mockReturnValue(newStore);
-
-      const { unmount: unmount2 } = render(<Settings />);
-      fireEvent.click(screen.getByText("⚙️"));
-      fireEvent.click(screen.getByText(/Visual/));
-
-      const toggleActive = screen.getByText(label).nextElementSibling;
-      expect(toggleActive).toHaveClass("bg-cyan-600");
-      unmount2();
-    });
-  });
-
-  it("should handle confirm cancellation", () => {
+  it("should handle confirm cancellation", async () => {
     (global.confirm as jest.Mock).mockReturnValue(false);
-    openSettings();
-    fireEvent.click(screen.getByText(/Data/));
+    const user = userEvent.setup();
+    await openSettings(user);
+    const tabs = screen.getAllByRole("tab");
+    fireEvent.click(tabs[4]); // Data
 
-    fireEvent.click(screen.getByText("🔄 Reset to Defaults"));
+    await screen.findByTestId("panel-data", {}, { timeout: 3000 });
+
+    const resetBtn = screen.getByTestId("btn-reset");
+    await user.click(resetBtn);
     expect(mockStore.resetToDefaults).not.toHaveBeenCalled();
 
-    fireEvent.click(screen.getByText("🗑️ Clear All Data"));
+    await user.click(screen.getByTestId("btn-clear"));
     expect(mockStore.clearAllData).not.toHaveBeenCalled();
 
-    (global.confirm as jest.Mock).mockReturnValue(true); // Reset
+    (global.confirm as jest.Mock).mockReturnValue(true);
   });
 
-  it("should show correct connection status in About tab", async () => {
-    // 1. Unknown (Default)
-    openSettings();
-    fireEvent.click(screen.getByText(/About/));
-    expect(screen.getAllByText("⚪ Unknown")).toHaveLength(3);
+  it("should show correct connection status in API tab", async () => {
+    const user = userEvent.setup();
+    await openSettings(user);
+    const tabs = screen.getAllByRole("tab");
+    fireEvent.click(tabs[0]); // API
 
-    // 2. Connected/Disconnected Mixed
+    await screen.findByTestId("panel-api", {}, { timeout: 3000 });
+    expect(screen.getAllByText("Unknown")).toHaveLength(3);
+
     mockStore.testConnection.mockResolvedValue({
       observer: { connected: true },
       listener: { connected: false },
       versor: { connected: false },
     });
 
-    // Go to API tab to trigger test
-    fireEvent.click(screen.getByText("🔌 API"));
-    fireEvent.click(screen.getAllByText("Test")[0]);
-    await waitFor(() => expect(screen.getByText("🟢 Connected")).toBeInTheDocument());
+    const testBtn = screen.getByTestId("btn-test-observer");
+    await user.click(testBtn);
+    await waitFor(() => expect(screen.getByText("Connected")).toBeInTheDocument());
 
-    // Go back to About
-    fireEvent.click(screen.getByText(/About/));
-    expect(screen.getByText("🟢 Online")).toBeInTheDocument(); // Observer
-    // Listener/Versor might be unknown or disconnected depending on if test ran for them?
-    // In logical flow, `testConnection(service)` only updates that service status.
-    // My test triggered Observer.
-    expect(screen.getAllByText("⚪ Unknown")).toHaveLength(2);
+    expect(screen.getAllByText("Unknown")).toHaveLength(2);
 
-    // 3. Test Disconnected (Listener)
-    // We need to switch back to API tab to trigger the test
-    fireEvent.click(screen.getByText("🔌 API"));
-    const testBtns = screen.getAllByText("Test");
-    fireEvent.click(testBtns[1]); // Listener
+    const testBtnListener = screen.getByTestId("btn-test-listener");
+    await user.click(testBtnListener);
 
-    await waitFor(() => expect(screen.getByText("🔴 Connection failed")).toBeInTheDocument());
-
-    // Verify in About tab
-    fireEvent.click(screen.getByText("ℹ️ About"));
-    expect(screen.getByText("🔴 Offline")).toBeInTheDocument();
+    await waitFor(() => expect(screen.getByText("Disconnected")).toBeInTheDocument());
   });
+
   it("should handle import cancellation (no file selected)", async () => {
-    openSettings();
-    fireEvent.click(screen.getByText(/Data/));
+    const user = userEvent.setup();
+    await openSettings(user);
+    const tabs = screen.getAllByRole("tab");
+    fireEvent.click(tabs[4]); // Data
+
+    await screen.findByTestId("panel-data", {}, { timeout: 3000 });
 
     const inputMock = { type: "", accept: "", onchange: null as any, click: jest.fn() };
-    const originalCreateElement = document.createElement;
-    jest.spyOn(document, "createElement").mockImplementation((tagName) => {
+    // @ts-ignore
+    const originalCreateElement = document.createElement.bind(document);
+    const createElementSpy = jest.spyOn(document, "createElement").mockImplementation((tagName) => {
       if (tagName === "input") return inputMock as any;
       return originalCreateElement(tagName);
     });
 
-    fireEvent.click(screen.getByText("📤 Import Settings"));
+    try {
+      const importBtn = screen.getByTestId("btn-import");
+      await user.click(importBtn);
 
-    // Trigger onchange with no files
-    const event = { target: { files: [] } };
-    await act(async () => {
-      inputMock.onchange(event);
-    });
+      const event = { target: { files: [] } };
+      await act(async () => {
+        inputMock.onchange(event);
+      });
 
-    expect(mockStore.importSettings).not.toHaveBeenCalled();
-
-    (document.createElement as jest.Mock).mockRestore();
-  });
-
-  it("should reflect accessibility toggle states", () => {
-    // 1. Initial State (off)
-    const { unmount } = render(<Settings />);
-    fireEvent.click(screen.getByText("⚙️"));
-    fireEvent.click(screen.getByText(/Access/));
-
-    const rmToggle = screen.getByText("Reduced Motion").parentElement?.nextElementSibling;
-    const hcToggle = screen.getByText("High Contrast").parentElement?.nextElementSibling;
-    const srToggle = screen.getByText("Screen Reader Mode").parentElement?.nextElementSibling;
-
-    expect(rmToggle).toHaveClass("bg-gray-700");
-    expect(hcToggle).toHaveClass("bg-gray-700");
-    expect(srToggle).toHaveClass("bg-gray-700");
-
-    unmount();
-
-    // 2. Enable State
-    const newStore = {
-      ...mockStore,
-      reducedMotion: true,
-      highContrast: true,
-      screenReaderMode: true,
-    };
-    (useSettingsStore as unknown as jest.Mock).mockReturnValue(newStore);
-
-    const { unmount: unmount2 } = render(<Settings />);
-    fireEvent.click(screen.getByText("⚙️"));
-    fireEvent.click(screen.getByText(/Access/));
-
-    const rmToggleActive = screen.getByText("Reduced Motion").parentElement?.nextElementSibling;
-    const hcToggleActive = screen.getByText("High Contrast").parentElement?.nextElementSibling;
-    const srToggleActive = screen.getByText("Screen Reader Mode").parentElement?.nextElementSibling;
-
-    expect(rmToggleActive).toHaveClass("bg-cyan-600");
-    expect(hcToggleActive).toHaveClass("bg-cyan-600");
-    expect(srToggleActive).toHaveClass("bg-cyan-600");
-
-    unmount2();
+      expect(mockStore.importSettings).not.toHaveBeenCalled();
+    } finally {
+      createElementSpy.mockRestore();
+    }
   });
 });

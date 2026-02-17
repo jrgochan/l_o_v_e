@@ -6,10 +6,7 @@ import pytest
 from app.api.schemas.common import VACVector
 from app.api.schemas.state import StateInput
 from app.models.emotion_definition import EmotionDefinition
-from app.services.observer.pipeline import (
-    StateProcessingPipeline,
-    StateProcessingResult,
-)
+from app.services.observer.pipeline import StateProcessingPipeline, StateProcessingResult
 
 
 @pytest.mark.asyncio

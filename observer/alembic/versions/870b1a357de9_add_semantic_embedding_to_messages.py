@@ -22,9 +22,7 @@ depends_on: Union[str, Sequence[str], None] = None
 def upgrade() -> None:
     # Add semantic_embedding column
     # We use 384 as the default dimension for all-MiniLM-L6-v2
-    op.add_column(
-        "chat_messages", sa.Column("semantic_embedding", Vector(384), nullable=True)
-    )
+    op.add_column("chat_messages", sa.Column("semantic_embedding", Vector(384), nullable=True))
 
     # Create IVFFlat index for fast similarity search
     # lists=100 is a reasonable default for small to medium datasets

@@ -51,7 +51,7 @@ async def test_find_transition_path(
 @pytest.mark.integration
 @pytest.mark.asyncio
 async def test_start_journey(
-    test_db: AsyncSession, seeded_test_atlas, seeded_test_user, test_user_id
+    test_db: AsyncSession, seeded_test_atlas, seeded_user, test_user_id
 ):  # pylint: disable=unused-argument
     """Test starting a therapeutic journey."""
     async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as client:
@@ -71,7 +71,7 @@ async def test_start_journey(
 @pytest.mark.integration
 @pytest.mark.asyncio
 async def test_mark_waypoint_reached(
-    test_db: AsyncSession, seeded_test_user, test_user_id, seeded_test_atlas
+    test_db: AsyncSession, seeded_user, test_user_id, seeded_test_atlas
 ):  # pylint: disable=unused-argument
     """Test marking a waypoint as reached."""
 
@@ -122,7 +122,7 @@ async def test_mark_waypoint_reached(
 @pytest.mark.integration
 @pytest.mark.asyncio
 async def test_get_journey_status(
-    test_db: AsyncSession, seeded_test_user, test_user_id
+    test_db: AsyncSession, seeded_user, test_user_id
 ):  # pylint: disable=unused-argument
     """Test getting journey status."""
 
@@ -151,7 +151,7 @@ async def test_get_journey_status(
 @pytest.mark.integration
 @pytest.mark.asyncio
 async def test_user_journey_history(
-    test_db: AsyncSession, seeded_test_user, test_user_id
+    test_db: AsyncSession, seeded_user, test_user_id
 ):  # pylint: disable=unused-argument
     """Test user journey history."""
 

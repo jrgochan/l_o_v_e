@@ -1,0 +1,6 @@
+# COPY THIS FILE TO: inventory/production.ini
+# AND EDIT WITH YOUR SERVER DETAILS.
+
+[production]
+# Replace with your server's IP and SSH user
+myserver ansible_host=1.2.3.4 ansible_user=root

@@ -1,0 +1,23 @@
+---
+- name: Add Cloudflare repository
+  get_url:
+    url: https://pkg.cloudflare.com/cloudflared-ascii.repo
+    dest: /etc/yum.repos.d/cloudflared.repo
+    mode: '0644'
+
+- name: Install cloudflared
+  dnf:
+    name: cloudflared
+    state: present
+
+- name: Configure cloudflared service
+  command: cloudflared service install {{ cloudflare_tunnel_token }}
+  args:
+    creates: /etc/systemd/system/cloudflared.service
+  notify: Restart cloudflared
+
+- name: Start and enable cloudflared
+  service:
+    name: cloudflared
+    state: started
+    enabled: yes

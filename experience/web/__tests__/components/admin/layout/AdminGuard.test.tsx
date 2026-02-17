@@ -89,11 +89,11 @@ describe("AdminGuard", () => {
     );
 
     await waitFor(() => {
-      expect(screen.getByText("Admin Access")).toBeInTheDocument();
+      expect(screen.getByText("Clinical Access")).toBeInTheDocument();
     });
 
     expect(screen.queryByText("Secret")).not.toBeInTheDocument();
-    expect(screen.getByText("Please sign in to access the control panel.")).toBeInTheDocument();
+    expect(screen.getByText("Please sign in to access the portal.")).toBeInTheDocument();
   });
 
   it("allows dev login bypass", async () => {
@@ -111,10 +111,10 @@ describe("AdminGuard", () => {
     );
 
     await waitFor(() => {
-      expect(screen.getByText("🧙 Dev Login")).toBeInTheDocument();
+      expect(screen.getByText("🧙 Dev Admin")).toBeInTheDocument();
     });
 
-    fireEvent.click(screen.getByText("🧙 Dev Login"));
+    fireEvent.click(screen.getByText("🧙 Dev Admin"));
 
     expect(mockSetUser).toHaveBeenCalledWith(
       expect.objectContaining({

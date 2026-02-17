@@ -40,8 +40,9 @@ from datetime import datetime
 from pathlib import Path
 from typing import List, Tuple
 
-from app.database import AsyncSessionLocal
 from sqlalchemy import text
+
+from app.database import AsyncSessionLocal
 
 
 # Color codes for terminal output
@@ -118,9 +119,7 @@ def run_seed_script(
     try:
         # Use longer timeout for Atlas seeding (can take 10+ minutes)
         # For other scripts, 5 minutes is sufficient
-        timeout_seconds = (
-            1800 if "seed_atlas" in script_name else 300
-        )  # 30 min vs 5 min
+        timeout_seconds = 1800 if "seed_atlas" in script_name else 300  # 30 min vs 5 min
 
         # Stream output in real-time for better UX (especially for long-running Atlas seeding)
         # This allows users to see progress instead of waiting in silence
@@ -168,32 +167,25 @@ async def configure_dataset_activation(
         try:
             # 1. Deactivate all collections first
             await session.execute(
-                text(
-                    "UPDATE emotion_collections SET is_active = false, is_default = false"
-                ),
+                text("UPDATE emotion_collections SET is_active = false, is_default = false"),
             )
 
             # 2. Activate all requested collections
             for coll_name in all_active:
                 await session.execute(
-                    text(
-                        "UPDATE emotion_collections SET is_active = true WHERE name = :name"
-                    ),
+                    text("UPDATE emotion_collections SET is_active = true WHERE name = :name"),
                     {"name": coll_name},
                 )
 
             # 3. Set the target as the sole default
             await session.execute(
-                text(
-                    "UPDATE emotion_collections SET is_default = true WHERE name = :name"
-                ),
+                text("UPDATE emotion_collections SET is_default = true WHERE name = :name"),
                 {"name": target_collection},
             )
 
             await session.commit()
             print_success(
-                f"Set '{target_collection}' as default; "
-                f"{len(all_active)} collection(s) active"
+                f"Set '{target_collection}' as default; " f"{len(all_active)} collection(s) active"
             )
         except Exception as e:
             print_error(f"Failed to configure activation: {e}")
@@ -431,12 +423,8 @@ def main(
     else:
         if dry_run:
             print(f"\n{Colors.OKCYAN}{'='*70}{Colors.ENDC}")
-            print(
-                f"{Colors.OKCYAN}{Colors.BOLD}DRY RUN COMPLETE - No changes made{Colors.ENDC}"
-            )
-            print(
-                f"{Colors.OKCYAN}Run without --dry-run to actually seed data{Colors.ENDC}"
-            )
+            print(f"{Colors.OKCYAN}{Colors.BOLD}DRY RUN COMPLETE - No changes made{Colors.ENDC}")
+            print(f"{Colors.OKCYAN}Run without --dry-run to actually seed data{Colors.ENDC}")
             print(f"{Colors.OKCYAN}{'='*70}{Colors.ENDC}")
         else:
             print(f"\n{Colors.OKGREEN}{'='*70}{Colors.ENDC}")
@@ -480,9 +468,7 @@ if __name__ == "__main__":
         action="store_true",
         help="Include bootstrap patterns for cold-start users",
     )
-    parser.add_argument(
-        "--verify", action="store_true", help="Run verification after seeding"
-    )
+    parser.add_argument("--verify", action="store_true", help="Run verification after seeding")
     parser.add_argument(
         "--dry-run",
         action="store_true",

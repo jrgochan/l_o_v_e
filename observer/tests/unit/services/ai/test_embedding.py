@@ -101,7 +101,7 @@ async def test_openai_provider_error(mock_settings, mock_openai):
     client.embeddings.create.side_effect = Exception("API Error")
 
     provider = OpenAIEmbeddingProvider()
-    with pytest.raises(Exception):
+    with pytest.raises(Exception, match="API Error"):
         await provider.generate_embedding("text")
 
 

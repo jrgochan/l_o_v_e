@@ -1,6 +1,10 @@
 """Unit tests for config module."""
 
+import importlib
+import sys
 from unittest.mock import patch
+
+from pydantic_settings import BaseSettings as _BaseSettings
 
 from app.config import Settings
 
@@ -31,18 +35,13 @@ def test_allowed_origins_list_csv_fallback() -> None:
 
 def test_fallback_to_base_settings_when_shared_missing() -> None:
     """Cover the ImportError fallback on lines 54-55 of config.py."""
-    import importlib
-    import sys
-
-    from pydantic_settings import BaseSettings as _BaseSettings
-
     saved_settings = sys.modules.pop("settings", None)
     saved_config = sys.modules.pop("app.config", None)
     try:
         sys.modules["settings"] = None  # type: ignore[assignment]
-        import app.config as reloaded_config  # noqa: F811
+        import app.config as reloaded_config  # noqa: F811 # pylint: disable=import-outside-toplevel
 
-        assert reloaded_config.LoveBaseSettings is _BaseSettings
+        assert reloaded_config.LoveBaseSettings is _BaseSettings  # type: ignore[attr-defined]
         instance = reloaded_config.Settings()
         assert instance.PORT == 8002
     finally:

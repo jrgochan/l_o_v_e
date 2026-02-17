@@ -145,6 +145,7 @@ uniform float uConnection;
 uniform int uMode; // 0:Subtle, 1:Dynamic, 2:Mystical, 3:Crystalline, 4:Luminous, 5:Liquid, 6:Glitch
 uniform vec3 uColorNeg;
 uniform vec3 uColorPos;
+uniform float uOpacity;
 uniform vec3 uCameraPosition;
 uniform float uTime;
 
@@ -232,7 +233,7 @@ void main() {
   vec3 diffuseColor = finalColor * diffuse * 0.7;
   vec3 litColor = ambient + diffuseColor;
 
-  gl_FragColor = vec4(litColor, alpha);
+  gl_FragColor = vec4(litColor, alpha * uOpacity);
 }
 `;
 
@@ -241,7 +242,7 @@ export function SoulSphere() {
   const materialRef = useRef<THREE.ShaderMaterial>(null);
 
   // Get settings for visual mode
-  const pathAnimationMode = useSettingsStore((state) => state.pathAnimationMode);
+  const { pathAnimationMode, sphereOpacity, animationSpeed } = useSettingsStore();
 
   // Map mode string to integer for shader
   const modeInt = useMemo(() => {
@@ -343,6 +344,7 @@ export function SoulSphere() {
         uColorNeg: { value: new THREE.Color("#FF4444") }, // Will be overridden
         uColorPos: { value: new THREE.Color("#44FF44") }, // Will be overridden
         uCameraPosition: { value: new THREE.Vector3(0, 0, 5) },
+        uOpacity: { value: 1.0 }, // Added opacity uniform
       },
     });
   }, []);
@@ -365,12 +367,16 @@ export function SoulSphere() {
     // Direct store access for 60fps performance without re-renders
     const currentVAC = useExperienceStore.getState().currentVAC;
 
-    materialRef.current.uniforms.uTime.value += delta;
+    // Scale time by animation speed
+    materialRef.current.uniforms.uTime.value += delta * animationSpeed;
 
     // Update uniforms from store for ANIMATION (noise, pulse), not color
     materialRef.current.uniforms.uValence.value = currentVAC[0];
     materialRef.current.uniforms.uArousal.value = currentVAC[1];
     materialRef.current.uniforms.uConnection.value = currentVAC[2];
+
+    // Update opacity
+    materialRef.current.uniforms.uOpacity.value = sphereOpacity;
 
     // Update camera position for Fresnel effect
     materialRef.current.uniforms.uCameraPosition.value.copy(state.camera.position);

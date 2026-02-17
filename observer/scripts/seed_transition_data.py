@@ -23,14 +23,11 @@ from pathlib import Path
 # Add parent directory to path
 sys.path.append(str(Path(__file__).parent.parent))
 
-from app.database import AsyncSessionLocal  # noqa: E402
-from app.models.transition_strategy import (
-    CategoryTransition,  # noqa: E402
-    PatternStrategy,
-    TransitionPattern,
-    TransitionStrategy,
-)
 from sqlalchemy import select  # noqa: E402
+
+from app.database import AsyncSessionLocal  # noqa: E402
+from app.models.transition_strategy import CategoryTransition  # noqa: E402
+from app.models.transition_strategy import PatternStrategy, TransitionPattern, TransitionStrategy
 
 
 def load_json_data(filepath: str):
@@ -55,9 +52,7 @@ def load_json_data(filepath: str):
         raise ValueError(f"{filepath}: Invalid JSON - {e}")
 
 
-async def seed_category_transitions(
-    dataset: str = "brene_brown", force_reseed: bool = False
-):
+async def seed_category_transitions(dataset: str = "brene_brown", force_reseed: bool = False):
     """Seed the category_transitions table from JSON."""
     print(f"Seeding category transitions for dataset: {dataset}...")
 
@@ -158,13 +153,15 @@ async def seed_category_transitions(
                 if from_idx == to_idx:
                     rationale = "Same category - natural progression"
                 elif difficulty >= 0.9:
-                    rationale = "Psychologically invalid direct transition - requires bridge emotions"
-                elif difficulty >= 0.6:
-                    rationale = "Difficult transition - requires significant work or external support"
-                elif difficulty >= 0.3:
                     rationale = (
-                        "Moderate difficulty - achievable with appropriate strategies"
+                        "Psychologically invalid direct transition - requires bridge emotions"
                     )
+                elif difficulty >= 0.6:
+                    rationale = (
+                        "Difficult transition - requires significant work or external support"
+                    )
+                elif difficulty >= 0.3:
+                    rationale = "Moderate difficulty - achievable with appropriate strategies"
                 else:
                     rationale = "Relatively easy transition"
 
@@ -219,9 +216,7 @@ async def seed_strategies(force_reseed: bool = False):
 
         if len(existing) > 0:
             if force_reseed:
-                print(
-                    f"  🔄 Force reseed - clearing {len(existing)} existing strategies"
-                )
+                print(f"  🔄 Force reseed - clearing {len(existing)} existing strategies")
                 from sqlalchemy import delete
 
                 await session.execute(delete(TransitionStrategy))
@@ -305,9 +300,7 @@ async def seed_pattern_strategy_mappings(force_reseed: bool = False):
 
         if len(existing_mappings) > 0:
             if force_reseed:
-                print(
-                    f"  🔄 Force reseed - clearing {len(existing_mappings)} existing mappings"
-                )
+                print(f"  🔄 Force reseed - clearing {len(existing_mappings)} existing mappings")
                 from sqlalchemy import delete
 
                 await session.execute(delete(PatternStrategy))
@@ -326,9 +319,7 @@ async def seed_pattern_strategy_mappings(force_reseed: bool = False):
         strategies_result = await session.execute(strategies_stmt)
 
         patterns_dict = {p.pattern_name: p for p in patterns_result.scalars().all()}
-        strategies_dict = {
-            s.strategy_name: s for s in strategies_result.scalars().all()
-        }
+        strategies_dict = {s.strategy_name: s for s in strategies_result.scalars().all()}
 
         # Create mappings
         for mapping in mappings:
@@ -402,9 +393,7 @@ async def main(force_reseed: bool = False, dataset: str = "brene_brown"):
                 await session.execute(delete(CategoryTransition))
                 await session.commit()
 
-        await seed_category_transitions(
-            dataset, force_reseed=False
-        )  # Handled clear above
+        await seed_category_transitions(dataset, force_reseed=False)  # Handled clear above
         await seed_strategies(force_reseed)
         await seed_patterns(force_reseed)
         await seed_pattern_strategy_mappings(force_reseed)
@@ -421,9 +410,7 @@ async def main(force_reseed: bool = False, dataset: str = "brene_brown"):
 if __name__ == "__main__":
     import argparse
 
-    parser = argparse.ArgumentParser(
-        description="Seed transition system data from JSON"
-    )
+    parser = argparse.ArgumentParser(description="Seed transition system data from JSON")
     parser.add_argument(
         "--force-reseed", action="store_true", help="Clear existing data before seeding"
     )

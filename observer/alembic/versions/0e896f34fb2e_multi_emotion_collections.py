@@ -8,6 +8,7 @@ Create Date: 2026-01-20 14:46:04.119293
 
 from typing import Sequence, Union
 
+import pgvector  # noqa: F401
 import sqlalchemy as sa
 from alembic import op
 from sqlalchemy.dialects import postgresql
@@ -28,12 +29,8 @@ def upgrade() -> None:
         sa.Column("description", sa.Text(), nullable=True),
         sa.Column("is_default", sa.Boolean(), nullable=False),
         sa.Column("is_active", sa.Boolean(), nullable=False),
-        sa.Column(
-            "created_at", sa.DateTime(), server_default=sa.text("now()"), nullable=False
-        ),
-        sa.Column(
-            "updated_at", sa.DateTime(), server_default=sa.text("now()"), nullable=False
-        ),
+        sa.Column("created_at", sa.DateTime(), server_default=sa.text("now()"), nullable=False),
+        sa.Column("updated_at", sa.DateTime(), server_default=sa.text("now()"), nullable=False),
         sa.PrimaryKeyConstraint("id"),
     )
     op.create_index(
@@ -47,16 +44,14 @@ def upgrade() -> None:
     op.rename_table("atlas_definitions", "emotion_definitions")
 
     # 2. Add collection_id column (nullable first)
-    op.add_column(
-        "emotion_definitions", sa.Column("collection_id", sa.Uuid(), nullable=True)
-    )
+    op.add_column("emotion_definitions", sa.Column("collection_id", sa.Uuid(), nullable=True))
 
     # 3. Data Migration: Create default collection and link existing emotions
     op.execute(
-        "INSERT INTO emotion_collections (id, name, is_default, is_active, created_at, updated_at) VALUES (gen_random_uuid(), 'Atlas of the Heart', true, true, now(), now())"
+        "INSERT INTO emotion_collections (id, name, is_default, is_active, created_at, updated_at) VALUES (gen_random_uuid(), 'Atlas of the Heart', true, true, now(), now())"  # noqa: E501
     )
     op.execute(
-        "UPDATE emotion_definitions SET collection_id = (SELECT id FROM emotion_collections WHERE name = 'Atlas of the Heart' LIMIT 1)"
+        "UPDATE emotion_definitions SET collection_id = (SELECT id FROM emotion_collections WHERE name = 'Atlas of the Heart' LIMIT 1)"  # noqa: E501
     )
 
     # 4. Enforce constraints
@@ -203,12 +198,8 @@ def upgrade() -> None:
     op.create_index(
         op.f("ix_chat_messages_timestamp"), "chat_messages", ["timestamp"], unique=False
     )
-    op.drop_constraint(
-        "chat_messages_emotion_id_fkey", "chat_messages", type_="foreignkey"
-    )
-    op.create_foreign_key(
-        None, "chat_messages", "emotion_definitions", ["emotion_id"], ["id"]
-    )
+    op.drop_constraint("chat_messages_emotion_id_fkey", "chat_messages", type_="foreignkey")
+    op.create_foreign_key(None, "chat_messages", "emotion_definitions", ["emotion_id"], ["id"])
     op.drop_table_comment(
         "chat_messages",
         existing_comment="Individual messages within chat sessions with analysis data",
@@ -264,9 +255,7 @@ def upgrade() -> None:
         ["started_at"],
         unique=False,
     )
-    op.create_index(
-        op.f("ix_chat_sessions_user_id"), "chat_sessions", ["user_id"], unique=False
-    )
+    op.create_index(op.f("ix_chat_sessions_user_id"), "chat_sessions", ["user_id"], unique=False)
     op.drop_table_comment(
         "chat_sessions",
         existing_comment="Chat sessions for emotional analysis chat interface",
@@ -345,9 +334,7 @@ def upgrade() -> None:
     op.drop_index("idx_clinical_alerts_session", table_name="clinical_alerts")
     op.drop_index("idx_clinical_alerts_timestamp", table_name="clinical_alerts")
     op.drop_index("idx_clinical_alerts_type", table_name="clinical_alerts")
-    op.create_index(
-        op.f("ix_clinical_alerts_level"), "clinical_alerts", ["level"], unique=False
-    )
+    op.create_index(op.f("ix_clinical_alerts_level"), "clinical_alerts", ["level"], unique=False)
     op.create_index(
         op.f("ix_clinical_alerts_session_id"),
         "clinical_alerts",
@@ -360,15 +347,9 @@ def upgrade() -> None:
         ["timestamp"],
         unique=False,
     )
-    op.create_index(
-        op.f("ix_clinical_alerts_type"), "clinical_alerts", ["type"], unique=False
-    )
-    op.drop_constraint(
-        "clinical_alerts_session_id_fkey", "clinical_alerts", type_="foreignkey"
-    )
-    op.create_foreign_key(
-        None, "clinical_alerts", "chat_sessions", ["session_id"], ["id"]
-    )
+    op.create_index(op.f("ix_clinical_alerts_type"), "clinical_alerts", ["type"], unique=False)
+    op.drop_constraint("clinical_alerts_session_id_fkey", "clinical_alerts", type_="foreignkey")
+    op.create_foreign_key(None, "clinical_alerts", "chat_sessions", ["session_id"], ["id"])
     op.drop_table_comment(
         "clinical_alerts",
         existing_comment="Stores clinical alert evaluations for emotional analysis sessions with audit trail",
@@ -419,12 +400,8 @@ def upgrade() -> None:
         ["prominence"],
         unique=False,
     )
-    op.drop_constraint(
-        "detected_emotions_emotion_id_fkey", "detected_emotions", type_="foreignkey"
-    )
-    op.create_foreign_key(
-        None, "detected_emotions", "emotion_definitions", ["emotion_id"], ["id"]
-    )
+    op.drop_constraint("detected_emotions_emotion_id_fkey", "detected_emotions", type_="foreignkey")
+    op.create_foreign_key(None, "detected_emotions", "emotion_definitions", ["emotion_id"], ["id"])
     op.drop_table_comment(
         "detected_emotions",
         existing_comment="Individual emotions (1-3) detected in multi-emotion analysis",
@@ -483,18 +460,10 @@ def upgrade() -> None:
         ["session_id"],
         unique=False,
     )
-    op.create_index(
-        op.f("ix_emotion_goals_status"), "emotion_goals", ["status"], unique=False
-    )
-    op.create_index(
-        op.f("ix_emotion_goals_user_id"), "emotion_goals", ["user_id"], unique=False
-    )
-    op.drop_constraint(
-        "emotion_goals_goal_emotion_id_fkey", "emotion_goals", type_="foreignkey"
-    )
-    op.create_foreign_key(
-        None, "emotion_goals", "emotion_definitions", ["goal_emotion_id"], ["id"]
-    )
+    op.create_index(op.f("ix_emotion_goals_status"), "emotion_goals", ["status"], unique=False)
+    op.create_index(op.f("ix_emotion_goals_user_id"), "emotion_goals", ["user_id"], unique=False)
+    op.drop_constraint("emotion_goals_goal_emotion_id_fkey", "emotion_goals", type_="foreignkey")
+    op.create_foreign_key(None, "emotion_goals", "emotion_definitions", ["goal_emotion_id"], ["id"])
     op.drop_table_comment(
         "emotion_goals",
         existing_comment="User-defined emotion goals for transition pathfinding",
@@ -579,12 +548,8 @@ def upgrade() -> None:
         "journey_waypoints",
         type_="unique",
     )
-    op.drop_constraint(
-        "journey_waypoints_emotion_id_fkey", "journey_waypoints", type_="foreignkey"
-    )
-    op.drop_constraint(
-        "journey_waypoints_journey_id_fkey", "journey_waypoints", type_="foreignkey"
-    )
+    op.drop_constraint("journey_waypoints_emotion_id_fkey", "journey_waypoints", type_="foreignkey")
+    op.drop_constraint("journey_waypoints_journey_id_fkey", "journey_waypoints", type_="foreignkey")
     op.drop_table_comment(
         "journey_waypoints",
         existing_comment="Individual waypoints within a journey with progress tracking",
@@ -791,27 +756,19 @@ def upgrade() -> None:
         existing_comment="Aggregated VAC statistics: {valence_avg, arousal_avg, connection_avg, ...}",
         existing_nullable=False,
     )
-    op.drop_index(
-        "idx_session_analytics_dominant_category", table_name="session_analytics"
-    )
+    op.drop_index("idx_session_analytics_dominant_category", table_name="session_analytics")
     op.drop_index("idx_session_analytics_emotion_count", table_name="session_analytics")
     op.drop_index("idx_session_analytics_session", table_name="session_analytics")
     op.drop_index("idx_session_analytics_start_time", table_name="session_analytics")
-    op.drop_constraint(
-        "session_analytics_session_id_key", "session_analytics", type_="unique"
-    )
+    op.drop_constraint("session_analytics_session_id_key", "session_analytics", type_="unique")
     op.create_index(
         op.f("ix_session_analytics_session_id"),
         "session_analytics",
         ["session_id"],
         unique=True,
     )
-    op.drop_constraint(
-        "session_analytics_session_id_fkey", "session_analytics", type_="foreignkey"
-    )
-    op.create_foreign_key(
-        None, "session_analytics", "chat_sessions", ["session_id"], ["id"]
-    )
+    op.drop_constraint("session_analytics_session_id_fkey", "session_analytics", type_="foreignkey")
+    op.create_foreign_key(None, "session_analytics", "chat_sessions", ["session_id"], ["id"])
     op.drop_table_comment(
         "session_analytics",
         existing_comment="Real-time aggregated metrics for emotional analysis sessions",
@@ -875,9 +832,7 @@ def upgrade() -> None:
     op.drop_constraint(
         "strategy_attempts_strategy_id_fkey", "strategy_attempts", type_="foreignkey"
     )
-    op.drop_constraint(
-        "strategy_attempts_journey_id_fkey", "strategy_attempts", type_="foreignkey"
-    )
+    op.drop_constraint("strategy_attempts_journey_id_fkey", "strategy_attempts", type_="foreignkey")
     op.drop_table_comment(
         "strategy_attempts",
         existing_comment="Records of strategy usage and user-reported effectiveness",
@@ -986,12 +941,8 @@ def upgrade() -> None:
     op.drop_index("idx_user_journeys_status", table_name="user_journeys")
     op.drop_index("idx_user_journeys_user_id", table_name="user_journeys")
     op.drop_index("idx_user_journeys_user_status", table_name="user_journeys")
-    op.drop_constraint(
-        "user_journeys_goal_emotion_id_fkey", "user_journeys", type_="foreignkey"
-    )
-    op.drop_constraint(
-        "user_journeys_start_emotion_id_fkey", "user_journeys", type_="foreignkey"
-    )
+    op.drop_constraint("user_journeys_goal_emotion_id_fkey", "user_journeys", type_="foreignkey")
+    op.drop_constraint("user_journeys_start_emotion_id_fkey", "user_journeys", type_="foreignkey")
     op.drop_table_comment(
         "user_journeys",
         existing_comment="User emotional transition attempts and progress tracking",
@@ -1088,15 +1039,9 @@ def downgrade() -> None:
         ["user_id", "status"],
         unique=False,
     )
-    op.create_index(
-        "idx_user_journeys_user_id", "user_journeys", ["user_id"], unique=False
-    )
-    op.create_index(
-        "idx_user_journeys_status", "user_journeys", ["status"], unique=False
-    )
-    op.create_index(
-        "idx_user_journeys_started", "user_journeys", ["started_at"], unique=False
-    )
+    op.create_index("idx_user_journeys_user_id", "user_journeys", ["user_id"], unique=False)
+    op.create_index("idx_user_journeys_status", "user_journeys", ["status"], unique=False)
+    op.create_index("idx_user_journeys_started", "user_journeys", ["started_at"], unique=False)
     op.alter_column(
         "user_journeys",
         "updated_at",
@@ -1176,9 +1121,7 @@ def downgrade() -> None:
         existing_comment=None,
         schema=None,
     )
-    op.create_index(
-        "idx_strategy_type", "transition_strategies", ["strategy_type"], unique=False
-    )
+    op.create_index("idx_strategy_type", "transition_strategies", ["strategy_type"], unique=False)
     op.create_index(
         "idx_strategy_evidence",
         "transition_strategies",
@@ -1282,15 +1225,9 @@ def downgrade() -> None:
         ["strategy_id", "helpful_rating"],
         unique=False,
     )
-    op.create_index(
-        "idx_attempts_strategy", "strategy_attempts", ["strategy_id"], unique=False
-    )
-    op.create_index(
-        "idx_attempts_journey", "strategy_attempts", ["journey_id"], unique=False
-    )
-    op.create_index(
-        "idx_attempts_helpful", "strategy_attempts", ["helpful_rating"], unique=False
-    )
+    op.create_index("idx_attempts_strategy", "strategy_attempts", ["strategy_id"], unique=False)
+    op.create_index("idx_attempts_journey", "strategy_attempts", ["journey_id"], unique=False)
+    op.create_index("idx_attempts_helpful", "strategy_attempts", ["helpful_rating"], unique=False)
     op.alter_column(
         "strategy_attempts",
         "created_at",
@@ -1357,9 +1294,7 @@ def downgrade() -> None:
         ["id"],
         ondelete="CASCADE",
     )
-    op.drop_index(
-        op.f("ix_session_analytics_session_id"), table_name="session_analytics"
-    )
+    op.drop_index(op.f("ix_session_analytics_session_id"), table_name="session_analytics")
     op.create_unique_constraint(
         "session_analytics_session_id_key",
         "session_analytics",
@@ -1653,18 +1588,14 @@ def downgrade() -> None:
         ["journey_id", "waypoint_index"],
         postgresql_nulls_not_distinct=False,
     )
-    op.create_index(
-        "idx_waypoints_reached", "journey_waypoints", ["reached"], unique=False
-    )
+    op.create_index("idx_waypoints_reached", "journey_waypoints", ["reached"], unique=False)
     op.create_index(
         "idx_waypoints_journey_order",
         "journey_waypoints",
         ["journey_id", "waypoint_index"],
         unique=False,
     )
-    op.create_index(
-        "idx_waypoints_journey", "journey_waypoints", ["journey_id"], unique=False
-    )
+    op.create_index("idx_waypoints_journey", "journey_waypoints", ["journey_id"], unique=False)
     op.alter_column(
         "journey_waypoints",
         "created_at",
@@ -1711,9 +1642,7 @@ def downgrade() -> None:
         op.f("ix_emotion_relationships_relationship_type"),
         table_name="emotion_relationships",
     )
-    op.drop_index(
-        op.f("ix_emotion_relationships_analysis_id"), table_name="emotion_relationships"
-    )
+    op.drop_index(op.f("ix_emotion_relationships_analysis_id"), table_name="emotion_relationships")
     op.create_index(
         "idx_emotion_rel_type",
         "emotion_relationships",
@@ -1759,15 +1688,9 @@ def downgrade() -> None:
     op.drop_index(op.f("ix_emotion_goals_user_id"), table_name="emotion_goals")
     op.drop_index(op.f("ix_emotion_goals_status"), table_name="emotion_goals")
     op.drop_index(op.f("ix_emotion_goals_session_id"), table_name="emotion_goals")
-    op.create_index(
-        "idx_emotion_goals_user", "emotion_goals", ["user_id"], unique=False
-    )
-    op.create_index(
-        "idx_emotion_goals_status", "emotion_goals", ["status"], unique=False
-    )
-    op.create_index(
-        "idx_emotion_goals_session", "emotion_goals", ["session_id"], unique=False
-    )
+    op.create_index("idx_emotion_goals_user", "emotion_goals", ["user_id"], unique=False)
+    op.create_index("idx_emotion_goals_status", "emotion_goals", ["status"], unique=False)
+    op.create_index("idx_emotion_goals_session", "emotion_goals", ["session_id"], unique=False)
     op.alter_column(
         "emotion_goals",
         "updated_at",
@@ -1827,15 +1750,9 @@ def downgrade() -> None:
         ["id"],
         ondelete="CASCADE",
     )
-    op.drop_index(
-        op.f("ix_detected_emotions_prominence"), table_name="detected_emotions"
-    )
-    op.drop_index(
-        op.f("ix_detected_emotions_emotion_id"), table_name="detected_emotions"
-    )
-    op.drop_index(
-        op.f("ix_detected_emotions_analysis_id"), table_name="detected_emotions"
-    )
+    op.drop_index(op.f("ix_detected_emotions_prominence"), table_name="detected_emotions")
+    op.drop_index(op.f("ix_detected_emotions_emotion_id"), table_name="detected_emotions")
+    op.drop_index(op.f("ix_detected_emotions_analysis_id"), table_name="detected_emotions")
     op.create_index(
         "idx_detected_emotions_prominence",
         "detected_emotions",
@@ -1905,18 +1822,10 @@ def downgrade() -> None:
     op.drop_index(op.f("ix_clinical_alerts_timestamp"), table_name="clinical_alerts")
     op.drop_index(op.f("ix_clinical_alerts_session_id"), table_name="clinical_alerts")
     op.drop_index(op.f("ix_clinical_alerts_level"), table_name="clinical_alerts")
-    op.create_index(
-        "idx_clinical_alerts_type", "clinical_alerts", ["type"], unique=False
-    )
-    op.create_index(
-        "idx_clinical_alerts_timestamp", "clinical_alerts", ["timestamp"], unique=False
-    )
-    op.create_index(
-        "idx_clinical_alerts_session", "clinical_alerts", ["session_id"], unique=False
-    )
-    op.create_index(
-        "idx_clinical_alerts_level", "clinical_alerts", ["level"], unique=False
-    )
+    op.create_index("idx_clinical_alerts_type", "clinical_alerts", ["type"], unique=False)
+    op.create_index("idx_clinical_alerts_timestamp", "clinical_alerts", ["timestamp"], unique=False)
+    op.create_index("idx_clinical_alerts_session", "clinical_alerts", ["session_id"], unique=False)
+    op.create_index("idx_clinical_alerts_level", "clinical_alerts", ["level"], unique=False)
     op.alter_column(
         "clinical_alerts",
         "version",
@@ -1971,9 +1880,7 @@ def downgrade() -> None:
         "clinical_alerts",
         "level",
         existing_type=sa.String(length=20),
-        type_=postgresql.ENUM(
-            "critical", "warning", "attention", "stable", name="alert_level"
-        ),
+        type_=postgresql.ENUM("critical", "warning", "attention", "stable", name="alert_level"),
         existing_nullable=False,
     )
     op.alter_column(
@@ -1991,9 +1898,7 @@ def downgrade() -> None:
     )
     op.drop_index(op.f("ix_chat_sessions_user_id"), table_name="chat_sessions")
     op.drop_index(op.f("ix_chat_sessions_started_at"), table_name="chat_sessions")
-    op.create_index(
-        "idx_chat_sessions_user_id", "chat_sessions", ["user_id"], unique=False
-    )
+    op.create_index("idx_chat_sessions_user_id", "chat_sessions", ["user_id"], unique=False)
     op.create_index(
         "idx_chat_sessions_started_at",
         "chat_sessions",
@@ -2074,12 +1979,8 @@ def downgrade() -> None:
         [sa.text("timestamp DESC")],
         unique=False,
     )
-    op.create_index(
-        "idx_chat_messages_session_id", "chat_messages", ["session_id"], unique=False
-    )
-    op.create_index(
-        "idx_chat_messages_emotion_id", "chat_messages", ["emotion_id"], unique=False
-    )
+    op.create_index("idx_chat_messages_session_id", "chat_messages", ["session_id"], unique=False)
+    op.create_index("idx_chat_messages_emotion_id", "chat_messages", ["emotion_id"], unique=False)
     op.alter_column(
         "chat_messages",
         "created_at",
@@ -2114,9 +2015,7 @@ def downgrade() -> None:
         existing_comment=None,
         schema=None,
     )
-    op.create_index(
-        "idx_category_trans_to", "category_transitions", ["to_category"], unique=False
-    )
+    op.create_index("idx_category_trans_to", "category_transitions", ["to_category"], unique=False)
     op.create_index(
         "idx_category_trans_from",
         "category_transitions",
@@ -2174,12 +2073,8 @@ def downgrade() -> None:
     op.create_table(
         "atlas_definitions",
         sa.Column("id", sa.UUID(), autoincrement=False, nullable=False),
-        sa.Column(
-            "emotion_name", sa.VARCHAR(length=100), autoincrement=False, nullable=False
-        ),
-        sa.Column(
-            "category", sa.VARCHAR(length=100), autoincrement=False, nullable=False
-        ),
+        sa.Column("emotion_name", sa.VARCHAR(length=100), autoincrement=False, nullable=False),
+        sa.Column("category", sa.VARCHAR(length=100), autoincrement=False, nullable=False),
         sa.Column("definition", sa.TEXT(), autoincrement=False, nullable=False),
         sa.Column(
             "vac_vector",
@@ -2205,9 +2100,7 @@ def downgrade() -> None:
             autoincrement=False,
             nullable=True,
         ),
-        sa.Column(
-            "color_hint", sa.VARCHAR(length=7), autoincrement=False, nullable=True
-        ),
+        sa.Column("color_hint", sa.VARCHAR(length=7), autoincrement=False, nullable=True),
         sa.Column(
             "created_at",
             postgresql.TIMESTAMP(timezone=True),
@@ -2233,15 +2126,9 @@ def downgrade() -> None:
     op.create_index(
         "ix_atlas_definitions_category", "atlas_definitions", ["category"], unique=False
     )
-    op.drop_index(
-        op.f("ix_emotion_definitions_emotion_name"), table_name="emotion_definitions"
-    )
-    op.drop_index(
-        op.f("ix_emotion_definitions_collection_id"), table_name="emotion_definitions"
-    )
-    op.drop_index(
-        op.f("ix_emotion_definitions_category"), table_name="emotion_definitions"
-    )
+    op.drop_index(op.f("ix_emotion_definitions_emotion_name"), table_name="emotion_definitions")
+    op.drop_index(op.f("ix_emotion_definitions_collection_id"), table_name="emotion_definitions")
+    op.drop_index(op.f("ix_emotion_definitions_category"), table_name="emotion_definitions")
     op.drop_table("emotion_definitions")
     op.drop_index(op.f("ix_emotion_collections_name"), table_name="emotion_collections")
     op.drop_table("emotion_collections")
