@@ -236,8 +236,8 @@ const DEFAULT_VALUES = {
 
   // Visual Extras
   autoRotate: true,
-  renderQuality: "medium" as const,
-  sphereOpacity: 0.9,
+  renderQuality: "high" as const,
+  sphereOpacity: 1.0,
   showDebugInfo: false,
   showTransitionPath: true,
   animationSpeed: 1.0,

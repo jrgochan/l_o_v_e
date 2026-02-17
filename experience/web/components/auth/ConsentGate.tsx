@@ -17,14 +17,14 @@ import { Fragment } from "react";
 import { ChevronDown } from "lucide-react";
 
 export default function ConsentGate({ children }: { children: React.ReactNode }) {
-  const { consentRequired, outstandingPolicies } = useAuthStore();
+  const { consentRequired, outstandingPolicies, token } = useAuthStore();
   const [isOpen, setIsOpen] = useState(false);
   const [selectedPolicies, setSelectedPolicies] = useState<string[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    if (consentRequired) {
+    if (consentRequired && token) {
       setIsOpen(true);
       // Pre-select required policies?
       // outstandingPolicies has "required" field.
@@ -33,7 +33,7 @@ export default function ConsentGate({ children }: { children: React.ReactNode })
     } else {
       setIsOpen(false);
     }
-  }, [consentRequired, outstandingPolicies]);
+  }, [consentRequired, outstandingPolicies, token]);
 
   const handleToggle = (key: string) => {
     setSelectedPolicies((prev) =>
@@ -72,7 +72,7 @@ export default function ConsentGate({ children }: { children: React.ReactNode })
     }
   };
 
-  if (!consentRequired) {
+  if (!consentRequired || !token) {
     return <>{children}</>;
   }
 
