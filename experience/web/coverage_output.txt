@@ -1,0 +1,844 @@
+
+> web@0.1.0 test:coverage
+> jest --coverage
+
+watchman warning: Recrawled this watch 1 time, most recently because:
+MustScanSubDirs UserDroppedTo resolve, please review the information on
+https://facebook.github.io/watchman/docs/troubleshooting.html#recrawl
+To clear this warning, run:
+`watchman watch-del '/Users/jrgochan/code/github.com/jrgochan/l_o_v_e' ; watchman watch-project '/Users/jrgochan/code/github.com/jrgochan/l_o_v_e'`
+
+PASS __tests__/hooks/useEmotionData.test.ts
+PASS __tests__/components/EmotionalControls.test.tsx
+PASS __tests__/components/admin/settings/AIModelsSettings.test.tsx
+PASS __tests__/components/auth/AuthModal.test.tsx
+PASS __tests__/components/admin/clinical/ClinicalPortal.test.tsx
+  ● Console
+
+    console.log
+      [AlertCard] Acknowledged alert alert-1
+
+      at log (components/admin/clinical/ClinicalPortal.tsx:934:13)
+
+PASS __tests__/components/admin/clinical/MultiEmotionTable.test.tsx
+PASS __tests__/components/GoalSetting.test.tsx
+PASS __tests__/components/admin/data/StrategiesTab.test.tsx
+PASS __tests__/components/admin/data/BootstrapTab.test.tsx
+PASS __tests__/hooks/admin/useStatistics.test.ts
+PASS __tests__/hooks/useLoadCachedPaths.test.ts
+PASS __tests__/app/users/profile/page.test.tsx
+PASS __tests__/components/admin/data/EmotionsTab.test.tsx
+PASS __tests__/components/admin/shared/WaypointDetailModal.test.tsx
+PASS __tests__/components/admin/visualization/EmotionCloud.test.tsx
+PASS __tests__/components/Scene.test.tsx
+PASS __tests__/indices.test.ts
+PASS __tests__/components/admin/chat/ChatDrawer.test.tsx
+PASS __tests__/components/auth/AuthGuard.test.tsx
+PASS __tests__/components/command-palette/PaletteResults.test.tsx
+PASS __tests__/components/admin/visualizations/PathMatrix/index.test.tsx
+PASS __tests__/components/CommandPalette.test.tsx
+PASS __tests__/components/admin/data/CollectionSwitcher.test.tsx
+PASS __tests__/components/auth/ConsentGate.test.tsx
+PASS __tests__/components/admin/panels/ControlPanel/ControlPanel.test.tsx
+PASS __tests__/components/admin/panels/EmotionHistoryPanel.test.tsx
+PASS __tests__/components/strategy/StrategyLibraryBrowser.test.tsx
+PASS __tests__/app/admin/visualization/page.test.tsx
+PASS __tests__/app/admin/sessions/page.test.tsx
+PASS __tests__/components/admin/settings/PullModelDialog.test.tsx
+PASS __tests__/components/admin/panels/InfoPanel/index.test.tsx
+PASS __tests__/app/admin/settings/page.test.tsx
+PASS __tests__/components/EmotionalInput.test.tsx
+PASS __tests__/components/admin/data/PromptTemplatesTab.test.tsx
+PASS __tests__/components/admin/settings/NetworkSettings.test.tsx
+PASS __tests__/components/admin/visualizations/DataVisualizationOverlay.test.tsx
+PASS __tests__/components/admin/data/ClinicalAlertsTab.test.tsx
+PASS __tests__/components/Settings.test.tsx
+PASS __tests__/components/ContextualRecommendations.test.tsx
+PASS __tests__/components/admin/ChatPanel.test.tsx
+PASS __tests__/components/admin/clinical/VoiceContentThreeWay.test.tsx
+PASS __tests__/components/JourneyProgress.test.tsx
+PASS __tests__/components/admin/data/AiModelsTab.test.tsx
+PASS __tests__/app/admin/sessions/[id]/page.test.tsx
+PASS __tests__/components/admin/panels/InfoPanel/InfoPanel.test.tsx
+PASS __tests__/components/admin/settings/VisualSettings.test.tsx
+PASS __tests__/hooks/usePersonaPlexVoice.test.ts
+  ● Console
+
+    console.log
+      PersonaPlex WebSocket closed
+
+      at Object.log [as onclose] (hooks/usePersonaPlexVoice.ts:257:17)
+
+PASS __tests__/components/admin/panels/InfoPanel/PathDetails.test.tsx
+PASS __tests__/components/admin/shared/ExportControls.test.tsx
+PASS __tests__/components/admin/clinical/ClinicalDashboard.test.tsx
+PASS __tests__/components/admin/panels/StatisticsPanel.test.tsx
+PASS __tests__/components/admin/layout/AdminGuard.test.tsx
+PASS __tests__/components/admin/panels/ControlPanel/LayerControls.test.tsx
+PASS __tests__/app/admin/users/[id]/page.test.tsx
+PASS __tests__/components/admin/ClinicalDashboard.test.tsx
+PASS __tests__/components/admin/visualizations/PathMatrix/PathMatrix.test.tsx
+PASS __tests__/components/GoalSettingLogic.test.tsx
+PASS __tests__/components/admin/panels/AnalysisPanel.test.tsx
+PASS __tests__/components/admin/debug/SphereDebugOverlay.test.tsx
+PASS __tests__/components/admin/settings/ModelCard.test.tsx
+PASS __tests__/components/admin/clinical/ProsodyVisualization.test.tsx
+PASS __tests__/components/admin/visualizations/PathAnimator.test.tsx
+PASS __tests__/components/admin/settings/BehaviorSettings.test.tsx
+PASS __tests__/components/command-palette/PaletteHelp.test.tsx
+PASS __tests__/components/StepAlternativeSelector.test.tsx
+PASS __tests__/components/admin/panels/ControlPanel/VisualSettingsPanel.test.tsx
+PASS __tests__/hooks/chat/useSessionMetrics.test.ts
+PASS __tests__/hooks/admin/useEmotionSearch.test.ts
+PASS __tests__/components/StrategyFeedbackModal.test.tsx
+PASS __tests__/components/admin/state-display/EmotionHistoryCard.test.tsx
+PASS __tests__/components/admin/spheres/MiniSoulSphere.test.tsx
+PASS __tests__/components/admin/paths/AdvancedPath.test.tsx
+PASS __tests__/components/admin/clinical/VACTrajectoryPlot.test.tsx
+PASS __tests__/components/admin/shared/SmartRecommendations.test.tsx
+PASS __tests__/components/ui/Toggle.test.tsx
+PASS __tests__/components/admin/emotions/LuminousEmotionNode.test.tsx
+PASS __tests__/components/admin/settings/RecommendationsPanel.test.tsx
+PASS __tests__/components/WaypointTooltip.test.tsx
+PASS __tests__/components/command-palette/ActiveJourneyStatus.test.tsx
+PASS __tests__/hooks/sync/useSyncTransport.test.ts
+PASS __tests__/utils/audio/audioFactory.test.ts
+PASS __tests__/components/admin/layout/AdminLayout.test.tsx
+PASS __tests__/components/PathDetailsOverlay.test.tsx
+PASS __tests__/components/AxisLabels.test.tsx
+PASS __tests__/components/DebugBroadcaster.test.tsx
+PASS __tests__/hooks/visualization/matrix/useMatrixProcessing.test.ts
+PASS __tests__/components/admin/settings/DevelopmentSettings.test.tsx
+PASS __tests__/hooks/chat/progress/useHeartbeatProgress.test.ts
+PASS __tests__/components/admin/shared/VoiceRecorder.test.tsx
+PASS __tests__/app/page.test.tsx
+PASS __tests__/components/admin/visualizations/PathMatrix/MatrixGrid.test.tsx
+PASS __tests__/components/admin/emotions/EmotionNodes.test.tsx
+PASS __tests__/components/admin/spheres/UtilityUnits.test.tsx
+PASS __tests__/components/admin/emotion-display/EmotionBadge.test.tsx
+PASS __tests__/components/admin/clinical/SessionTimeline.test.tsx
+PASS __tests__/components/admin/shared/InsightCard.test.tsx
+PASS __tests__/hooks/interaction/useZenKeyboardShortcuts.test.ts
+PASS __tests__/components/admin/panels/ControlPanel/AnimationModeSelector.test.tsx
+PASS __tests__/components/admin/emotion-display/MultiEmotionCard.test.tsx
+PASS __tests__/hooks/ollama/useOllamaCRUD.test.ts
+PASS __tests__/components/JourneyHistory.test.tsx
+PASS __tests__/components/TransitionPathRenderer.test.tsx
+PASS __tests__/components/admin/settings/ChatSettings.test.tsx
+PASS __tests__/components/admin/paths/PathCurveAnimated.test.tsx
+PASS __tests__/components/admin/chat/ThreadView.test.tsx
+PASS __tests__/app/admin/users/page.test.tsx
+PASS __tests__/hooks/websocket/useConnectionLifecycle.test.ts
+PASS __tests__/components/admin/emotion-display/BaseEmotionChip.test.tsx
+PASS __tests__/components/admin/clinical/EmergencyStop.test.tsx
+PASS __tests__/components/admin/visualizations/PathParticles.test.tsx
+PASS __tests__/hooks/navigation/useEmotionResolution.test.ts
+PASS __tests__/components/admin/visualizations/EmotionTimeline.test.tsx
+PASS __tests__/app/admin/data/page.test.tsx
+PASS __tests__/components/admin/panels/ControlPanel/QuickActions.test.tsx
+PASS __tests__/components/admin/emotions/AnimatedEmotionNode.test.tsx
+PASS __tests__/hooks/voice/useMediaRecorder.test.ts
+PASS __tests__/components/admin/modals/HelpModal/index.test.tsx
+PASS __tests__/components/CinematicOverlay.test.tsx
+PASS __tests__/hooks/command-palette/actions/useEmotionActions.test.ts
+PASS __tests__/components/SoulSphere.test.tsx
+PASS __tests__/components/admin/clinical/dashboard/ExpandedView.test.tsx
+PASS __tests__/components/journey/PathComparisonView.test.tsx
+PASS __tests__/components/admin/state-display/AggregateVACHeaderDisplay.test.tsx
+PASS __tests__/components/admin/shared/AnalysisProgressIndicator.test.tsx
+PASS __tests__/hooks/audio/useAudioModulation.test.ts
+PASS __tests__/hooks/sync/useSphereReceiver.test.ts
+PASS __tests__/components/admin/particles/EmotionParticles.test.tsx
+PASS __tests__/components/admin/panels/ControlPanel/EmotionSearch.test.tsx
+PASS __tests__/components/admin/spheres/PreviewSphere.test.tsx
+PASS __tests__/app/layout.test.tsx
+PASS __tests__/components/admin/panels/ControlPanel/CategoryBrowser.test.tsx
+PASS __tests__/hooks/utils/tokenRefreshUtils.test.ts
+PASS __tests__/components/admin/emotion-display/EmotionCard.test.tsx
+PASS __tests__/components/admin/chat/ChatLayout.test.tsx
+PASS __tests__/components/admin/spheres/BaseSphere.test.tsx
+PASS __tests__/components/PersonalStrategies.test.tsx
+PASS __tests__/hooks/shortcuts/useSiteActionMap.test.ts
+PASS __tests__/hooks/shortcuts/useSiteShortcuts.test.ts
+PASS __tests__/hooks/useEmotionNavigation.test.ts
+PASS __tests__/components/admin/chat/ChatInput.test.tsx
+PASS __tests__/hooks/pathfinding/useSinglePath.test.ts
+PASS __tests__/hooks/sync/useSphereSender.test.ts
+PASS __tests__/components/admin/emotions/MysticalEmotionNode.test.tsx
+PASS __tests__/hooks/useHistorySphereSync.test.ts
+PASS __tests__/components/admin/chat/ChatMessageList.test.tsx
+PASS __tests__/stores/authStore.ssr.test.ts
+  ● Console
+
+    console.warn
+      [zustand persist middleware] Unable to update item 'auth-storage', the given storage is currently unavailable.
+
+      180 |       return;
+      181 |     }
+    > 182 |     originalWarn(...args);
+          |     ^
+      183 |   });
+      184 | });
+      185 |
+
+      at console.originalWarn (__tests__/setup.ts:182:5)
+      at ../node_modules/zustand/middleware.js:347:17
+      at Object.set [as logout] (stores/authStore.ts:54:9)
+      at Object.logout (__tests__/stores/authStore.ssr.test.ts:24:33)
+
+    console.warn
+      [zustand persist middleware] Unable to update item 'auth-storage', the given storage is currently unavailable.
+
+      180 |       return;
+      181 |     }
+    > 182 |     originalWarn(...args);
+          |     ^
+      183 |   });
+      184 | });
+      185 |
+
+      at console.originalWarn (__tests__/setup.ts:182:5)
+      at ../node_modules/zustand/middleware.js:347:17
+      at set (stores/authStore.ts:162:13)
+      at __tests__/stores/authStore.ssr.test.ts:42:23
+
+PASS __tests__/components/input/ConceptTooltip.test.tsx
+PASS __tests__/components/Settings.test.ts
+PASS __tests__/components/admin/layout/BaseModal.test.tsx
+PASS __tests__/components/admin/chat/StrategyCard.test.tsx
+PASS __tests__/components/admin/clinical/dashboard/CompactView.test.tsx
+PASS __tests__/components/admin/visualization/WaypointMarker.test.tsx
+PASS __tests__/components/admin/visualization/EmotionLabelOverlay.test.tsx
+PASS __tests__/components/journey/PathExplanationPanel.test.tsx
+PASS __tests__/components/admin/state-display/AggregateStateCard.test.tsx
+PASS __tests__/components/admin/emotions/LiquidEmotionNode.test.tsx
+PASS __tests__/hooks/command-palette/actions/useTemplateActions.test.ts
+PASS __tests__/hooks/command-palette/actions/useJourneyCommands.test.ts
+PASS __tests__/stores/useEmotionHistoryStore.test.ts
+PASS __tests__/components/admin/chat/VoiceChat.test.tsx
+  ● Console
+
+    console.log
+      Voice session started
+
+      at Object.log [as onSessionStart] (components/admin/chat/VoiceChat.tsx:44:15)
+
+    console.log
+      Voice session ended
+
+      at Object.log [as onSessionEnd] (components/admin/chat/VoiceChat.tsx:48:15)
+
+    console.error
+      Voice session error: Some Error
+
+      168 |       return;
+      169 |     }
+    > 170 |     originalError(...args);
+          |     ^
+      171 |   });
+      172 |
+      173 |   console.warn = jest.fn((...args) => {
+
+      at console.originalError (__tests__/setup.ts:170:5)
+      at Object.error [as onError] (components/admin/chat/VoiceChat.tsx:52:15)
+      at onError (__tests__/components/admin/chat/VoiceChat.test.tsx:257:19)
+      at Object.process.env.NODE_ENV.exports.act (../node_modules/react/cjs/react.development.js:814:22)
+      at Object.act (__tests__/components/admin/chat/VoiceChat.test.tsx:256:13)
+
+PASS __tests__/components/ViewerShortcuts.test.tsx
+PASS __tests__/components/viewer/CinematicOverlay.test.tsx
+PASS __tests__/hooks/visualization/matrix/useMatrixStats.test.ts
+PASS __tests__/components/admin/emotions/CrystallineEmotionNode.test.tsx
+PASS __tests__/components/admin/panels/InfoPanel/ActionSuggestions.test.tsx
+PASS __tests__/components/admin/paths/MysticalEtherealPath.test.tsx
+PASS __tests__/components/admin/settings/PerformancePanel.test.tsx
+PASS __tests__/components/admin/panels/InfoPanel/EmotionDetails.test.tsx
+PASS __tests__/hooks/chat/progress/constantsCoverage.test.ts
+PASS __tests__/components/admin/visualization/AtlasScene.test.tsx
+PASS __tests__/hooks/admin/useInfoPanelState.test.ts
+PASS __tests__/components/admin/visualization/ZenHUD.test.tsx
+PASS __tests__/components/admin/chat/ChatToggleFAB.test.tsx
+PASS __tests__/stores/useVisualizationStore.test.ts
+PASS __tests__/hooks/useSettingsSync.test.ts
+PASS __tests__/hooks/pathfinding/useBatchPaths.test.ts
+PASS __tests__/components/admin/visualization/PathFlyover.test.tsx
+PASS __tests__/hooks/websocket/useWebSocketMessageHandler.test.ts
+PASS __tests__/hooks/useAdminSphereSync.test.ts
+PASS __tests__/components/admin/visualizations/PathMatrix/MatrixHeader.test.tsx
+PASS __tests__/components/admin/spheres/CharacterSphere.test.tsx
+PASS __tests__/stores/authStore.test.ts
+PASS __tests__/components/admin/settings/ConfirmDialog.test.tsx
+PASS __tests__/hooks/chat/useChatPanelState.test.ts
+PASS __tests__/components/WaypointArrivalOverlay.test.tsx
+PASS __tests__/components/VACDisplay.test.tsx
+PASS __tests__/hooks/pathfinding/useBatchJob.test.ts
+PASS __tests__/components/admin/settings/AccessibilitySettings.test.tsx
+PASS __tests__/hooks/useVoiceRecording.test.ts
+PASS __tests__/components/VACAnimator.test.tsx
+PASS __tests__/hooks/useLoggerInit.test.ts
+PASS __tests__/hooks/chat/layout/useChatResize.test.ts
+PASS __tests__/hooks/shortcuts/useLayerActionMap.test.ts
+PASS __tests__/hooks/navigation/actions/useFocusActions.test.ts
+PASS __tests__/stores/usePathExplorerStore.test.ts
+PASS __tests__/hooks/websocket/useWebSocketConnection.test.ts
+PASS __tests__/stores/useSettingsStore.test.ts
+PASS __tests__/components/admin/clinical/SessionMetrics.test.tsx
+PASS __tests__/components/admin/panels/InfoPanel/PathSummaryList.test.tsx
+PASS __tests__/hooks/command-palette/useCommandPaletteState.test.ts
+PASS __tests__/hooks/visualizations/useGraphSimulation.test.ts
+PASS __tests__/hooks/command-palette/actions/useWaypointCommands.test.ts
+PASS __tests__/hooks/command-palette/useCommandPaletteFilter.test.ts
+PASS __tests__/components/layout/Header.test.tsx
+PASS __tests__/hooks/useModelAssignments.test.ts
+PASS __tests__/hooks/useWebSocketChat.test.ts
+PASS __tests__/components/admin/emotion-display/EmotionChipCluster.test.tsx
+PASS __tests__/components/admin/visualization/LegendOverlay.test.tsx
+PASS __tests__/hooks/navigation/actions/useSelectionActions.test.ts
+PASS __tests__/hooks/chat/layout/useChatShortcuts.test.ts
+PASS __tests__/components/admin/paths/SubtleElegantPath.test.tsx
+PASS __tests__/hooks/ollama/useOllamaPull.test.ts
+PASS __tests__/components/admin/clinical/VACQuadrantViz.test.tsx
+PASS __tests__/components/admin/emotion-display/EmotionCluster.test.tsx
+PASS __tests__/hooks/admin/useCategoryState.test.ts
+PASS __tests__/unit/stores/useExperienceStore.test.ts
+PASS __tests__/components/admin/emotions/GlitchEmotionNode.test.tsx
+PASS __tests__/components/PathfindingInsights.test.tsx
+PASS __tests__/hooks/command-palette/useCommandPaletteActions.test.ts
+PASS __tests__/hooks/useObserverPolling.test.ts
+PASS __tests__/components/admin/visualization/PathNetwork.test.tsx
+PASS __tests__/hooks/shortcuts/useNavigationShortcuts.test.ts
+PASS __tests__/hooks/useAnimationModeTransition.test.ts
+PASS __tests__/components/admin/chat/ChatHeader.test.tsx
+PASS __tests__/components/admin/shared/RelationshipIndicator.test.tsx
+PASS __tests__/hooks/voice/useVoiceVisualizer.test.ts
+PASS __tests__/components/VACAxisLabels3D.test.tsx
+PASS __tests__/unit/hooks/useObserverPolling.test.ts
+PASS __tests__/components/admin/visualization/IntroSequence.test.tsx
+PASS __tests__/components/admin/panels/InfoPanel/PathComparison.test.tsx
+PASS __tests__/components/SimpleAxisLabels.test.tsx
+PASS __tests__/app/admin/layout.test.tsx
+PASS __tests__/hooks/command-palette/actions/useQuickActions.test.ts
+PASS __tests__/hooks/useCommandPalette.test.ts
+PASS __tests__/components/strategy/StrategyDetailsModal.test.tsx
+PASS __tests__/components/PathExplanationPanel.test.tsx
+PASS __tests__/hooks/navigation/useViewActions.test.ts
+PASS __tests__/hooks/audio/useAudioSfx.test.ts
+PASS __tests__/components/admin/visualizations/PathMatrix/MatrixTooltip.test.tsx
+PASS __tests__/components/admin/visualizations/EmotionRelationshipGraph.test.tsx
+PASS __tests__/components/admin/panels/InfoPanel/EmotionList.test.tsx
+PASS __tests__/hooks/command-palette/actions/useJourneyActions.test.ts
+PASS __tests__/hooks/usePathCalculator.test.ts
+PASS __tests__/hooks/chat/useChatMessages.test.ts
+PASS __tests__/components/admin/state-display/AggregateVACDisplay.test.tsx
+PASS __tests__/components/admin/users/TrajectoryChart.test.tsx
+PASS __tests__/components/admin/spheres/AggregateSphere.test.tsx
+PASS __tests__/hooks/shortcuts/useLayerShortcuts.test.ts
+PASS __tests__/components/admin/visualization/EmotionLabelTracker.test.tsx
+PASS __tests__/components/admin/chat/ChatMessages.test.tsx
+PASS __tests__/components/performance/FPSDisplay.test.tsx
+PASS __tests__/hooks/sync/usePathSync.test.ts
+PASS __tests__/components/admin/paths/DynamicPlayfulPath.test.tsx
+PASS __tests__/hooks/admin/usePathSorting.test.ts
+PASS __tests__/hooks/voice/useVoiceTransport.test.ts
+PASS __tests__/hooks/useSphereSync.test.ts
+PASS __tests__/components/OrbitControls.test.tsx
+PASS __tests__/components/admin/spheres/InnerCharacterSphere.test.tsx
+PASS __tests__/utils/logger.test.ts
+PASS __tests__/hooks/chat/progress/useProgressSimulation.test.ts
+PASS __tests__/hooks/performance/usePerformanceMonitor.test.tsx
+PASS __tests__/hooks/useKeyboardShortcuts.test.ts
+PASS __tests__/hooks/navigation/actions/useViewActions.test.ts
+PASS __tests__/hooks/useComputeAllPaths.test.ts
+PASS __tests__/hooks/navigation/useNavigationActions.test.ts
+PASS __tests__/components/ZenSessionIndicator.test.tsx
+PASS __tests__/hooks/chat/useChatProgress.test.ts
+PASS __tests__/components/admin/emotion-display/EmotionMappingBadge.test.tsx
+PASS __tests__/hooks/chat/useChatLayout.test.ts
+PASS __tests__/hooks/chat/useAnalysisState.test.ts
+PASS __tests__/components/admin/chat/AutoLinkIndicator.test.tsx
+PASS __tests__/components/admin/clinical/VoiceContentCorrelation.test.tsx
+PASS __tests__/app/admin/clinical/page.test.tsx
+PASS __tests__/hooks/useTokenRefresh.test.ts
+PASS __tests__/hooks/visualizations/useGraphData.test.ts
+PASS __tests__/hooks/voice/utils/audioUtils.test.ts
+PASS __tests__/hooks/command-palette/useCommandPaletteData.ssr.test.ts
+PASS __tests__/hooks/voice/useVoiceState.test.ts
+PASS __tests__/hooks/admin/usePathComparison.test.ts
+PASS __tests__/components/admin/visualizations/AudioVisualizer.test.tsx
+PASS __tests__/stores/useExperienceStore.test.ts
+PASS __tests__/hooks/command-palette/actions/useSessionActions.test.ts
+PASS __tests__/hooks/command-palette/actions/useLocalQuickActions.test.ts
+PASS __tests__/hooks/command-palette/useCommandPaletteData.test.ts
+PASS __tests__/stores/useStrategyBrowserStore.test.ts
+PASS __tests__/hooks/websocket/useWebSocketSender.test.ts
+PASS __tests__/components/admin/chat/AudioVisualizer.test.tsx
+PASS __tests__/hooks/chat/analysis/useCurrentAnalysisState.test.ts
+PASS __tests__/components/admin/visualizations/PathMatrix/MatrixLegend.test.tsx
+PASS __tests__/components/admin/visualizations/graph/GraphLegend.test.tsx
+PASS __tests__/utils/modeVisualConfigs.test.ts
+PASS __tests__/hooks/chat/analysis/useMultiEmotionState.test.ts
+PASS __tests__/components/ViewerPathFlyover.test.tsx
+PASS __tests__/components/LoggerProvider.test.tsx
+PASS __tests__/components/admin/clinical/AlertBadge.test.tsx
+PASS __tests__/hooks/chat/useChatSessionState.test.ts
+PASS __tests__/utils/api.test.ts
+PASS __tests__/app/users/layout.test.tsx
+PASS __tests__/hooks/command-palette/useCommandPaletteNavigation.test.ts
+PASS __tests__/services/aiService.test.ts
+PASS __tests__/hooks/visualization/useMatrixData.test.ts
+PASS __tests__/hooks/sync/useSelectionSync.test.ts
+PASS __tests__/stores/useExperienceStore.ssr.test.ts
+PASS __tests__/hooks/audio/AudioEngineState.test.ts
+PASS __tests__/services/visualizationService.test.ts
+PASS __tests__/components/admin/visualizations/graph/GraphNodeDetails.test.tsx
+PASS __tests__/components/admin/layout/BasePanel.test.tsx
+PASS __tests__/hooks/chat/useChatAnalysisState.test.ts
+PASS __tests__/components/admin/visualization/useWaypointPulse.test.tsx
+PASS __tests__/utils/modelPresets.test.ts
+PASS __tests__/hooks/websocket/utils/messageDispatcher.test.ts
+PASS __tests__/hooks/useOllamaModels.test.ts
+PASS __tests__/hooks/chat/metrics/metricsUtils.test.ts
+PASS __tests__/utils/settingsPresets.test.ts
+PASS __tests__/utils/emotionAnimationMapper.test.ts
+PASS __tests__/hooks/websocket/utils/socketHelpers.test.ts
+PASS __tests__/hooks/shortcuts/useShortcutUtils.test.ts
+PASS __tests__/hooks/useAmbientAudio.test.ts
+PASS __tests__/utils/performance/quality.test.ts
+PASS __tests__/utils/ollamaModels.test.ts
+PASS __tests__/app/admin/page.test.tsx
+--------------------------------------------|---------|----------|---------|---------|----------------------------------------------------------------------------------------
+File                                        | % Stmts | % Branch | % Funcs | % Lines | Uncovered Line #s
+--------------------------------------------|---------|----------|---------|---------|----------------------------------------------------------------------------------------
+All files                                   |   99.45 |    98.64 |   99.77 |    99.9 |
+ app                                        |     100 |      100 |     100 |     100 |
+  layout.tsx                                |     100 |      100 |     100 |     100 |
+  page.tsx                                  |     100 |      100 |     100 |     100 |
+ app/admin                                  |   93.33 |       50 |     100 |   92.85 |
+  layout.tsx                                |     100 |      100 |     100 |     100 |
+  page.tsx                                  |   91.66 |       50 |     100 |    90.9 | 15
+ app/admin/clinical                         |     100 |      100 |     100 |     100 |
+  page.tsx                                  |     100 |      100 |     100 |     100 |
+ app/admin/data                             |     100 |      100 |     100 |     100 |
+  page.tsx                                  |     100 |      100 |     100 |     100 |
+ app/admin/sessions                         |     100 |      100 |     100 |     100 |
+  page.tsx                                  |     100 |      100 |     100 |     100 |
+ app/admin/sessions/detail                  |      96 |    96.55 |     100 |     100 |
+  page.tsx                                  |      96 |    96.55 |     100 |     100 | 21
+ app/admin/settings                         |     100 |      100 |     100 |     100 |
+  page.tsx                                  |     100 |      100 |     100 |     100 |
+ app/admin/users                            |     100 |      100 |     100 |     100 |
+  page.tsx                                  |     100 |      100 |     100 |     100 |
+ app/admin/users/detail                     |     100 |    97.61 |     100 |     100 |
+  page.tsx                                  |     100 |    97.61 |     100 |     100 | 97
+ app/admin/visualization                    |     100 |      100 |     100 |     100 |
+  page.tsx                                  |     100 |      100 |     100 |     100 |
+ app/users                                  |     100 |      100 |     100 |     100 |
+  layout.tsx                                |     100 |      100 |     100 |     100 |
+ app/users/profile                          |     100 |      100 |     100 |     100 |
+  page.tsx                                  |     100 |      100 |     100 |     100 |
+ components                                 |   93.24 |      100 |     100 |   94.59 |
+  AxisLabels.ts                             |     100 |      100 |     100 |     100 |
+  CinematicOverlay.ts                       |     100 |      100 |     100 |     100 |
+  CommandPalette.ts                         |     100 |      100 |     100 |     100 |
+  ConceptTooltip.ts                         |      50 |      100 |     100 |     100 |
+  ConsentGate.ts                            |     100 |      100 |     100 |     100 |
+  ContextualRecommendations.ts              |     100 |      100 |     100 |     100 |
+  DebugBroadcaster.ts                       |     100 |      100 |     100 |     100 |
+  EmotionalControls.ts                      |     100 |      100 |     100 |     100 |
+  EmotionalInput.ts                         |     100 |      100 |     100 |     100 |
+  GoalSetting.ts                            |     100 |      100 |     100 |     100 |
+  GoalSettingLogic.ts                       |     100 |      100 |     100 |     100 |
+  JourneyHistory.ts                         |     100 |      100 |     100 |     100 |
+  JourneyProgress.ts                        |     100 |      100 |     100 |     100 |
+  LoggerProvider.ts                         |     100 |      100 |     100 |     100 |
+  OrbitControls.ts                          |     100 |      100 |     100 |     100 |
+  PathComparisonView.ts                     |     100 |      100 |     100 |     100 |
+  PathDetailsOverlay.ts                     |     100 |      100 |     100 |     100 |
+  PathExplanationPanel.ts                   |     100 |      100 |     100 |     100 |
+  PathfindingInsights.ts                    |     100 |      100 |     100 |     100 |
+  PersonalStrategies.ts                     |     100 |      100 |     100 |     100 |
+  Scene.ts                                  |     100 |      100 |     100 |     100 |
+  Settings.ts                               |     100 |      100 |     100 |     100 |
+  SimpleAxisLabels.ts                       |     100 |      100 |     100 |     100 |
+  SoulSphere.ts                             |     100 |      100 |     100 |     100 |
+  StepAlternativeSelector.ts                |     100 |      100 |     100 |     100 |
+  StrategyDetailsModal.ts                   |       0 |      100 |     100 |       0 | 1
+  StrategyFeedbackModal.ts                  |     100 |      100 |     100 |     100 |
+  StrategyLibraryBrowser.ts                 |       0 |      100 |     100 |       0 | 1
+  TransitionPathRenderer.ts                 |     100 |      100 |     100 |     100 |
+  VACAnimator.ts                            |     100 |      100 |     100 |     100 |
+  VACAxisLabels3D.ts                        |     100 |      100 |     100 |     100 |
+  VACDisplay.ts                             |     100 |      100 |     100 |     100 |
+  ViewerPathFlyover.ts                      |     100 |      100 |     100 |     100 |
+  ViewerShortcuts.ts                        |     100 |      100 |     100 |     100 |
+  WaypointArrivalOverlay.ts                 |     100 |      100 |     100 |     100 |
+  WaypointTooltip.ts                        |     100 |      100 |     100 |     100 |
+  ZenSessionIndicator.ts                    |     100 |      100 |     100 |     100 |
+ components/admin                           |    99.4 |    99.08 |     100 |   99.34 |
+  ChatPanel.tsx                             |   99.34 |     97.7 |     100 |   99.27 | 68
+  ClinicalDashboard.tsx                     |     100 |      100 |     100 |     100 |
+ components/admin/chat                      |    98.8 |    95.72 |     100 |   99.58 |
+  AudioVisualizer.tsx                       |   96.49 |    66.66 |     100 |     100 | 25-28,101
+  AutoLinkIndicator.tsx                     |     100 |      100 |     100 |     100 |
+  ChatDrawer.tsx                            |   98.88 |     97.1 |     100 |   98.83 | 131
+  ChatHeader.tsx                            |     100 |    84.21 |     100 |     100 | 97-103
+  ChatInput.tsx                             |     100 |      100 |     100 |     100 |
+  ChatLayout.tsx                            |     100 |      100 |     100 |     100 |
+  ChatMessageList.tsx                       |     100 |      100 |     100 |     100 |
+  ChatMessages.tsx                          |     100 |      100 |     100 |     100 |
+  ChatToggleFAB.tsx                         |     100 |      100 |     100 |     100 |
+  StrategyCard.tsx                          |     100 |      100 |     100 |     100 |
+  ThreadView.tsx                            |     100 |      100 |     100 |     100 |
+  VoiceChat.tsx                             |     100 |      100 |     100 |     100 |
+ components/admin/clinical                  |   99.38 |    93.27 |   98.58 |     100 |
+  AlertBadge.tsx                            |     100 |      100 |     100 |     100 |
+  ClinicalPortal.tsx                        |   98.63 |    79.56 |   96.92 |     100 | 104,144,170,379-393,414,508-516,544,592-612,688,706-714,754,787,834-841,1094-1148,1190
+  EmergencyStop.tsx                         |   94.44 |    83.33 |     100 |     100 | 33-40
+  MultiEmotionTable.tsx                     |     100 |      100 |     100 |     100 |
+  ProsodyVisualization.tsx                  |     100 |      100 |     100 |     100 |
+  SessionMetrics.tsx                        |     100 |      100 |     100 |     100 |
+  SessionTimeline.tsx                       |     100 |    90.32 |     100 |     100 | 164-171
+  VACQuadrantViz.tsx                        |     100 |      100 |     100 |     100 |
+  VACTrajectoryPlot.tsx                     |     100 |      100 |     100 |     100 |
+  VoiceContentCorrelation.tsx               |     100 |      100 |     100 |     100 |
+  VoiceContentThreeWay.tsx                  |     100 |      100 |     100 |     100 |
+ components/admin/clinical/dashboard        |     100 |      100 |     100 |     100 |
+  CompactView.tsx                           |     100 |      100 |     100 |     100 |
+  ExpandedView.tsx                          |     100 |      100 |     100 |     100 |
+ components/admin/data                      |     100 |      100 |     100 |     100 |
+  AiModelsTab.tsx                           |     100 |      100 |     100 |     100 |
+  BootstrapTab.tsx                          |     100 |      100 |     100 |     100 |
+  ClinicalAlertsTab.tsx                     |     100 |      100 |     100 |     100 |
+  CollectionSwitcher.tsx                    |     100 |      100 |     100 |     100 |
+  EmotionsTab.tsx                           |     100 |      100 |     100 |     100 |
+  PromptTemplatesTab.tsx                    |     100 |      100 |     100 |     100 |
+  StrategiesTab.tsx                         |     100 |      100 |     100 |     100 |
+ components/admin/debug                     |     100 |      100 |     100 |     100 |
+  SphereDebugOverlay.tsx                    |     100 |      100 |     100 |     100 |
+ components/admin/emotion-display           |     100 |      100 |     100 |     100 |
+  BaseEmotionChip.tsx                       |     100 |      100 |     100 |     100 |
+  EmotionBadge.tsx                          |     100 |      100 |     100 |     100 |
+  EmotionCard.tsx                           |     100 |      100 |     100 |     100 |
+  EmotionChipCluster.tsx                    |     100 |      100 |     100 |     100 |
+  EmotionCluster.tsx                        |     100 |      100 |     100 |     100 |
+  EmotionMappingBadge.tsx                   |     100 |      100 |     100 |     100 |
+  MultiEmotionCard.tsx                      |     100 |      100 |     100 |     100 |
+ components/admin/emotions                  |   99.36 |    71.18 |     100 |     100 |
+  AnimatedEmotionNode.tsx                   |     100 |      100 |     100 |     100 |
+  CrystallineEmotionNode.tsx                |   97.91 |    73.07 |     100 |     100 | 81-123
+  GlitchEmotionNode.tsx                     |   98.27 |    65.21 |     100 |     100 | 71-86,90-109
+  LiquidEmotionNode.tsx                     |     100 |    56.25 |     100 |     100 | 82-172
+  LuminousEmotionNode.tsx                   |     100 |    55.55 |     100 |     100 | 72-120
+  MysticalEmotionNode.tsx                   |     100 |      100 |     100 |     100 |
+ components/admin/layout                    |     100 |    94.91 |     100 |     100 |
+  AdminGuard.tsx                            |     100 |      100 |     100 |     100 |
+  AdminLayout.tsx                           |     100 |     62.5 |     100 |     100 | 29-49
+  BaseModal.tsx                             |     100 |      100 |     100 |     100 |
+  BasePanel.tsx                             |     100 |      100 |     100 |     100 |
+ components/admin/modals/HelpModal          |     100 |      100 |     100 |     100 |
+  index.tsx                                 |     100 |      100 |     100 |     100 |
+ components/admin/panels                    |     100 |      100 |     100 |     100 |
+  AnalysisPanel.tsx                         |     100 |      100 |     100 |     100 |
+  EmotionHistoryPanel.tsx                   |     100 |      100 |     100 |     100 |
+  StatisticsPanel.tsx                       |     100 |      100 |     100 |     100 |
+ components/admin/panels/ControlPanel       |     100 |      100 |     100 |     100 |
+  AnimationModeSelector.tsx                 |     100 |      100 |     100 |     100 |
+  CategoryBrowser.tsx                       |     100 |      100 |     100 |     100 |
+  EmotionSearch.tsx                         |     100 |      100 |     100 |     100 |
+  LayerControls.tsx                         |     100 |      100 |     100 |     100 |
+  QuickActions.tsx                          |     100 |      100 |     100 |     100 |
+  VisualSettingsPanel.tsx                   |     100 |      100 |     100 |     100 |
+  index.tsx                                 |     100 |      100 |     100 |     100 |
+ components/admin/panels/InfoPanel          |     100 |      100 |     100 |     100 |
+  ActionSuggestions.tsx                     |     100 |      100 |     100 |     100 |
+  EmotionDetails.tsx                        |     100 |      100 |     100 |     100 |
+  EmotionList.tsx                           |     100 |      100 |     100 |     100 |
+  PathComparison.tsx                        |     100 |      100 |     100 |     100 |
+  PathDetails.tsx                           |     100 |      100 |     100 |     100 |
+  PathSummaryList.tsx                       |     100 |      100 |     100 |     100 |
+  index.tsx                                 |     100 |      100 |     100 |     100 |
+ components/admin/particles                 |     100 |      100 |     100 |     100 |
+  EmotionParticles.tsx                      |     100 |      100 |     100 |     100 |
+ components/admin/paths                     |     100 |      100 |     100 |     100 |
+  AdvancedPath.tsx                          |     100 |      100 |     100 |     100 |
+  DynamicPlayfulPath.tsx                    |     100 |      100 |     100 |     100 |
+  MysticalEtherealPath.tsx                  |     100 |      100 |     100 |     100 |
+  PathCurveAnimated.tsx                     |     100 |      100 |     100 |     100 |
+  SubtleElegantPath.tsx                     |     100 |      100 |     100 |     100 |
+ components/admin/settings                  |   99.05 |      100 |   97.27 |   98.95 |
+  AIModelsSettings.tsx                      |     100 |      100 |     100 |     100 |
+  AccessibilitySettings.tsx                 |     100 |      100 |     100 |     100 |
+  BehaviorSettings.tsx                      |     100 |      100 |     100 |     100 |
+  ChatSettings.tsx                          |     100 |      100 |     100 |     100 |
+  ConfirmDialog.tsx                         |     100 |      100 |     100 |     100 |
+  DevelopmentSettings.tsx                   |     100 |      100 |     100 |     100 |
+  ModelCard.tsx                             |     100 |      100 |     100 |     100 |
+  NetworkSettings.tsx                       |     100 |      100 |     100 |     100 |
+  PerformancePanel.tsx                      |     100 |      100 |     100 |     100 |
+  PullModelDialog.tsx                       |     100 |      100 |     100 |     100 |
+  RecommendationsPanel.tsx                  |     100 |      100 |     100 |     100 |
+  VisualSettings.tsx                        |   78.94 |      100 |      75 |   78.94 | 238-262,278-294
+ components/admin/shared                    |     100 |      100 |     100 |     100 |
+  AnalysisProgressIndicator.tsx             |     100 |      100 |     100 |     100 |
+  ExportControls.tsx                        |     100 |      100 |     100 |     100 |
+  InsightCard.tsx                           |     100 |      100 |     100 |     100 |
+  RelationshipIndicator.tsx                 |     100 |      100 |     100 |     100 |
+  SmartRecommendations.tsx                  |     100 |      100 |     100 |     100 |
+  VoiceRecorder.tsx                         |     100 |      100 |     100 |     100 |
+  WaypointDetailModal.tsx                   |     100 |      100 |     100 |     100 |
+ components/admin/spheres                   |     100 |      100 |     100 |     100 |
+  AggregateSphere.tsx                       |     100 |      100 |     100 |     100 |
+  BaseSphere.tsx                            |     100 |      100 |     100 |     100 |
+  CharacterSphere.tsx                       |     100 |      100 |     100 |     100 |
+  InnerCharacterSphere.tsx                  |     100 |      100 |     100 |     100 |
+  MiniSoulSphere.tsx                        |     100 |      100 |     100 |     100 |
+  PreviewSphere.tsx                         |     100 |      100 |     100 |     100 |
+ components/admin/state-display             |     100 |      100 |     100 |     100 |
+  AggregateStateCard.tsx                    |     100 |      100 |     100 |     100 |
+  AggregateVACDisplay.tsx                   |     100 |      100 |     100 |     100 |
+  AggregateVACHeaderDisplay.tsx             |     100 |      100 |     100 |     100 |
+  EmotionHistoryCard.tsx                    |     100 |      100 |     100 |     100 |
+ components/admin/users                     |     100 |      100 |     100 |     100 |
+  TrajectoryChart.tsx                       |     100 |      100 |     100 |     100 |
+ components/admin/visualization             |     100 |      100 |     100 |     100 |
+  EmotionCloud.tsx                          |     100 |      100 |     100 |     100 |
+  EmotionLabelOverlay.tsx                   |     100 |      100 |     100 |     100 |
+  EmotionLabelTracker.tsx                   |     100 |      100 |     100 |     100 |
+  IntroSequence.tsx                         |     100 |      100 |     100 |     100 |
+  LegendOverlay.tsx                         |     100 |      100 |     100 |     100 |
+  PathFlyover.tsx                           |     100 |      100 |     100 |     100 |
+  PathNetwork.tsx                           |     100 |      100 |     100 |     100 |
+  SceneEffects.tsx                          |     100 |      100 |     100 |     100 |
+  SceneEnvironment.tsx                      |     100 |      100 |     100 |     100 |
+  VisualizationScene.tsx                    |     100 |      100 |     100 |     100 |
+  WaypointMarker.tsx                        |     100 |      100 |     100 |     100 |
+  ZenHUD.tsx                                |     100 |      100 |     100 |     100 |
+  useWaypointPulse.ts                       |     100 |      100 |     100 |     100 |
+ components/admin/visualizations            |     100 |      100 |     100 |     100 |
+  AudioVisualizer.tsx                       |     100 |      100 |     100 |     100 |
+  DataVisualizationOverlay.tsx              |     100 |      100 |     100 |     100 |
+  EmotionRelationshipGraph.tsx              |     100 |      100 |     100 |     100 |
+  EmotionTimeline.tsx                       |     100 |      100 |     100 |     100 |
+  PathAnimator.tsx                          |     100 |      100 |     100 |     100 |
+  PathParticles.tsx                         |     100 |      100 |     100 |     100 |
+ components/admin/visualizations/PathMatrix |     100 |      100 |     100 |     100 |
+  MatrixGrid.tsx                            |     100 |      100 |     100 |     100 |
+  MatrixHeader.tsx                          |     100 |      100 |     100 |     100 |
+  MatrixLegend.tsx                          |     100 |      100 |     100 |     100 |
+  MatrixTooltip.tsx                         |     100 |      100 |     100 |     100 |
+  index.tsx                                 |     100 |      100 |     100 |     100 |
+ components/admin/visualizations/graph      |     100 |      100 |     100 |     100 |
+  GraphLegend.tsx                           |     100 |      100 |     100 |     100 |
+  GraphNodeDetails.tsx                      |     100 |      100 |     100 |     100 |
+ components/auth                            |     100 |      100 |     100 |     100 |
+  AuthGuard.tsx                             |     100 |      100 |     100 |     100 |
+  AuthModal.tsx                             |     100 |      100 |     100 |     100 |
+  ConsentGate.tsx                           |     100 |      100 |     100 |     100 |
+ components/command-palette                 |   97.75 |      100 |     100 |     100 |
+  ActiveJourneyStatus.tsx                   |     100 |      100 |     100 |     100 |
+  CommandPalette.tsx                        |     100 |      100 |     100 |     100 |
+  PaletteHelp.tsx                           |     100 |      100 |     100 |     100 |
+  PaletteResults.tsx                        |     100 |      100 |     100 |     100 |
+  index.ts                                  |      50 |      100 |     100 |     100 |
+ components/input                           |   97.05 |      100 |     100 |     100 |
+  ConceptTooltip.tsx                        |     100 |      100 |     100 |     100 |
+  EmotionalControls.tsx                     |     100 |      100 |     100 |     100 |
+  EmotionalInput.tsx                        |     100 |      100 |     100 |     100 |
+  Settings.tsx                              |     100 |      100 |     100 |     100 |
+  index.ts                                  |      50 |      100 |     100 |     100 |
+ components/journey                         |   97.67 |      100 |     100 |     100 |
+  JourneyHistory.tsx                        |     100 |      100 |     100 |     100 |
+  JourneyProgress.tsx                       |     100 |      100 |     100 |     100 |
+  PathComparisonView.tsx                    |     100 |      100 |     100 |     100 |
+  PathDetailsOverlay.tsx                    |     100 |      100 |     100 |     100 |
+  PathExplanationPanel.tsx                  |     100 |      100 |     100 |     100 |
+  PathfindingInsights.tsx                   |     100 |      100 |     100 |     100 |
+  StepAlternativeSelector.tsx               |     100 |      100 |     100 |     100 |
+  TransitionPathRenderer.tsx                |     100 |      100 |     100 |     100 |
+  WaypointArrivalOverlay.tsx                |     100 |      100 |     100 |     100 |
+  WaypointTooltip.tsx                       |     100 |      100 |     100 |     100 |
+  index.ts                                  |      50 |      100 |     100 |     100 |
+ components/layout                          |     100 |      100 |     100 |     100 |
+  Header.tsx                                |     100 |      100 |     100 |     100 |
+ components/performance                     |     100 |      100 |     100 |     100 |
+  FPSDisplay.tsx                            |     100 |      100 |     100 |     100 |
+ components/strategy                        |   97.61 |      100 |     100 |     100 |
+  ContextualRecommendations.tsx             |     100 |      100 |     100 |     100 |
+  GoalSetting.tsx                           |     100 |      100 |     100 |     100 |
+  GoalSettingLogic.ts                       |     100 |      100 |     100 |     100 |
+  PersonalStrategies.tsx                    |     100 |      100 |     100 |     100 |
+  StrategyDetailsModal.tsx                  |     100 |      100 |     100 |     100 |
+  StrategyFeedbackModal.tsx                 |     100 |      100 |     100 |     100 |
+  StrategyLibraryBrowser.tsx                |     100 |      100 |     100 |     100 |
+  index.ts                                  |      50 |      100 |     100 |     100 |
+ components/ui                              |     100 |      100 |     100 |     100 |
+  Toggle.tsx                                |     100 |      100 |     100 |     100 |
+ components/viewer                          |   96.41 |      100 |     100 |     100 |
+  AxisLabels.tsx                            |     100 |      100 |     100 |     100 |
+  CinematicOverlay.tsx                      |     100 |      100 |     100 |     100 |
+  DebugBroadcaster.tsx                      |     100 |      100 |     100 |     100 |
+  LoggerProvider.tsx                        |     100 |      100 |     100 |     100 |
+  OrbitControls.tsx                         |     100 |      100 |     100 |     100 |
+  Scene.tsx                                 |     100 |      100 |     100 |     100 |
+  SimpleAxisLabels.tsx                      |     100 |      100 |     100 |     100 |
+  SoulSphere.tsx                            |     100 |      100 |     100 |     100 |
+  VACAnimator.tsx                           |     100 |      100 |     100 |     100 |
+  VACAxisLabels3D.tsx                       |     100 |      100 |     100 |     100 |
+  VACDisplay.tsx                            |     100 |      100 |     100 |     100 |
+  ViewerPathFlyover.tsx                     |     100 |      100 |     100 |     100 |
+  ViewerShortcuts.tsx                       |     100 |      100 |     100 |     100 |
+  ZenSessionIndicator.tsx                   |     100 |      100 |     100 |     100 |
+  index.ts                                  |      50 |      100 |     100 |     100 |
+ hooks                                      |     100 |      100 |     100 |     100 |
+  useAdminSphereSync.ts                     |     100 |      100 |     100 |     100 |
+  useAmbientAudio.ts                        |     100 |      100 |     100 |     100 |
+  useAnimationModeTransition.ts             |     100 |      100 |     100 |     100 |
+  useCommandPalette.ts                      |     100 |      100 |     100 |     100 |
+  useComputeAllPaths.ts                     |     100 |      100 |     100 |     100 |
+  useEmotionData.ts                         |     100 |      100 |     100 |     100 |
+  useEmotionNavigation.ts                   |     100 |      100 |     100 |     100 |
+  useHistorySphereSync.ts                   |     100 |      100 |     100 |     100 |
+  useKeyboardShortcuts.ts                   |     100 |      100 |     100 |     100 |
+  useLoadCachedPaths.ts                     |     100 |      100 |     100 |     100 |
+  useLoggerInit.ts                          |     100 |      100 |     100 |     100 |
+  useModelAssignments.ts                    |     100 |      100 |     100 |     100 |
+  useObserverPolling.ts                     |     100 |      100 |     100 |     100 |
+  useOllamaModels.ts                        |     100 |      100 |     100 |     100 |
+  usePathCalculator.ts                      |     100 |      100 |     100 |     100 |
+  usePersonaPlexVoice.ts                    |     100 |      100 |     100 |     100 |
+  useSettingsSync.ts                        |     100 |      100 |     100 |     100 |
+  useSphereSync.ts                          |     100 |      100 |     100 |     100 |
+  useTokenRefresh.ts                        |     100 |      100 |     100 |     100 |
+  useVoiceRecording.ts                      |     100 |      100 |     100 |     100 |
+  useWebSocketChat.ts                       |     100 |      100 |     100 |     100 |
+ hooks/admin                                |     100 |      100 |     100 |     100 |
+  useAdminTheme.ts                          |     100 |      100 |     100 |     100 |
+  useCategoryState.ts                       |     100 |      100 |     100 |     100 |
+  useEmotionSearch.ts                       |     100 |      100 |     100 |     100 |
+  useInfoPanelState.ts                      |     100 |      100 |     100 |     100 |
+  usePathComparison.ts                      |     100 |      100 |     100 |     100 |
+  usePathSorting.ts                         |     100 |      100 |     100 |     100 |
+  useStatistics.ts                          |     100 |      100 |     100 |     100 |
+ hooks/audio                                |     100 |      100 |     100 |     100 |
+  AudioEngineState.ts                       |     100 |      100 |     100 |     100 |
+  useAudioModulation.ts                     |     100 |      100 |     100 |     100 |
+  useAudioSfx.ts                            |     100 |      100 |     100 |     100 |
+ hooks/chat                                 |     100 |      100 |     100 |     100 |
+  useAnalysisState.ts                       |     100 |      100 |     100 |     100 |
+  useChatAnalysisState.ts                   |     100 |      100 |     100 |     100 |
+  useChatLayout.ts                          |     100 |      100 |     100 |     100 |
+  useChatMessages.ts                        |     100 |      100 |     100 |     100 |
+  useChatPanelState.ts                      |     100 |      100 |     100 |     100 |
+  useChatProgress.ts                        |     100 |      100 |     100 |     100 |
+  useChatSessionState.ts                    |     100 |      100 |     100 |     100 |
+  useHeartbeatProgress.ts                   |     100 |      100 |     100 |     100 |
+  useSessionMetrics.ts                      |     100 |      100 |     100 |     100 |
+ hooks/chat/analysis                        |     100 |      100 |     100 |     100 |
+  useCurrentAnalysisState.ts                |     100 |      100 |     100 |     100 |
+  useMultiEmotionState.ts                   |     100 |      100 |     100 |     100 |
+ hooks/chat/layout                          |     100 |      100 |     100 |     100 |
+  useChatResize.ts                          |     100 |      100 |     100 |     100 |
+  useChatShortcuts.ts                       |     100 |      100 |     100 |     100 |
+ hooks/chat/metrics                         |     100 |      100 |     100 |     100 |
+  metricsUtils.ts                           |     100 |      100 |     100 |     100 |
+ hooks/chat/progress                        |     100 |      100 |     100 |     100 |
+  constants.ts                              |     100 |      100 |     100 |     100 |
+  useProgressSimulation.ts                  |     100 |      100 |     100 |     100 |
+ hooks/command-palette                      |     100 |      100 |     100 |     100 |
+  useCommandPaletteActions.ts               |     100 |      100 |     100 |     100 |
+  useCommandPaletteData.ts                  |     100 |      100 |     100 |     100 |
+  useCommandPaletteFilter.ts                |     100 |      100 |     100 |     100 |
+  useCommandPaletteNavigation.ts            |     100 |      100 |     100 |     100 |
+  useCommandPaletteState.ts                 |     100 |      100 |     100 |     100 |
+ hooks/command-palette/actions              |     100 |      100 |     100 |     100 |
+  useEmotionActions.ts                      |     100 |      100 |     100 |     100 |
+  useJourneyActions.ts                      |     100 |      100 |     100 |     100 |
+  useJourneyCommands.ts                     |     100 |      100 |     100 |     100 |
+  useLocalQuickActions.ts                   |     100 |      100 |     100 |     100 |
+  useQuickActions.ts                        |     100 |      100 |     100 |     100 |
+  useSessionActions.ts                      |     100 |      100 |     100 |     100 |
+  useTemplateActions.ts                     |     100 |      100 |     100 |     100 |
+  useWaypointCommands.ts                    |     100 |      100 |     100 |     100 |
+ hooks/interaction                          |     100 |      100 |     100 |     100 |
+  useZenKeyboardShortcuts.ts                |     100 |      100 |     100 |     100 |
+ hooks/navigation                           |     100 |      100 |     100 |     100 |
+  useEmotionResolution.ts                   |     100 |      100 |     100 |     100 |
+  useNavigationActions.ts                   |     100 |      100 |     100 |     100 |
+ hooks/navigation/actions                   |     100 |      100 |     100 |     100 |
+  useFocusActions.ts                        |     100 |      100 |     100 |     100 |
+  useSelectionActions.ts                    |     100 |      100 |     100 |     100 |
+  useViewActions.ts                         |     100 |      100 |     100 |     100 |
+ hooks/ollama                               |     100 |      100 |     100 |     100 |
+  useOllamaCRUD.ts                          |     100 |      100 |     100 |     100 |
+  useOllamaPull.ts                          |     100 |      100 |     100 |     100 |
+ hooks/pathfinding                          |     100 |      100 |     100 |     100 |
+  useBatchJob.ts                            |     100 |      100 |     100 |     100 |
+  useBatchPaths.ts                          |     100 |      100 |     100 |     100 |
+  useSinglePath.ts                          |     100 |      100 |     100 |     100 |
+ hooks/performance                          |     100 |      100 |     100 |     100 |
+  usePerformanceMonitor.tsx                 |     100 |      100 |     100 |     100 |
+ hooks/shortcuts                            |     100 |      100 |     100 |     100 |
+  useLayerActionMap.ts                      |     100 |      100 |     100 |     100 |
+  useLayerShortcuts.ts                      |     100 |      100 |     100 |     100 |
+  useNavigationShortcuts.ts                 |     100 |      100 |     100 |     100 |
+  useShortcutUtils.ts                       |     100 |      100 |     100 |     100 |
+  useSiteActionMap.ts                       |     100 |      100 |     100 |     100 |
+  useSiteShortcuts.ts                       |     100 |      100 |     100 |     100 |
+ hooks/sync                                 |     100 |      100 |     100 |     100 |
+  types.ts                                  |     100 |      100 |     100 |     100 |
+  usePathSync.ts                            |     100 |      100 |     100 |     100 |
+  useSelectionSync.ts                       |     100 |      100 |     100 |     100 |
+  useSphereReceiver.ts                      |     100 |      100 |     100 |     100 |
+  useSphereSender.ts                        |     100 |      100 |     100 |     100 |
+  useSyncTransport.ts                       |     100 |      100 |     100 |     100 |
+ hooks/utils                                |     100 |      100 |     100 |     100 |
+  tokenRefreshUtils.ts                      |     100 |      100 |     100 |     100 |
+ hooks/visualization                        |     100 |      100 |     100 |     100 |
+  useMatrixData.ts                          |     100 |      100 |     100 |     100 |
+ hooks/visualization/matrix                 |     100 |      100 |     100 |     100 |
+  useMatrixProcessing.ts                    |     100 |      100 |     100 |     100 |
+  useMatrixStats.ts                         |     100 |      100 |     100 |     100 |
+ hooks/visualizations                       |     100 |      100 |     100 |     100 |
+  useGraphData.ts                           |     100 |      100 |     100 |     100 |
+  useGraphSimulation.ts                     |     100 |      100 |     100 |     100 |
+ hooks/voice                                |     100 |      100 |     100 |     100 |
+  useMediaRecorder.ts                       |     100 |      100 |     100 |     100 |
+  useVoiceState.ts                          |     100 |      100 |     100 |     100 |
+  useVoiceTransport.ts                      |     100 |      100 |     100 |     100 |
+  useVoiceVisualizer.ts                     |     100 |      100 |     100 |     100 |
+ hooks/voice/utils                          |     100 |      100 |     100 |     100 |
+  audioUtils.ts                             |     100 |      100 |     100 |     100 |
+ hooks/websocket                            |     100 |      100 |     100 |     100 |
+  useConnectionLifecycle.ts                 |     100 |      100 |     100 |     100 |
+  useWebSocketConnection.ts                 |     100 |      100 |     100 |     100 |
+  useWebSocketMessageHandler.ts             |     100 |      100 |     100 |     100 |
+  useWebSocketSender.ts                     |     100 |      100 |     100 |     100 |
+ hooks/websocket/utils                      |     100 |      100 |     100 |     100 |
+  messageDispatcher.ts                      |     100 |      100 |     100 |     100 |
+  socketHelpers.ts                          |     100 |      100 |     100 |     100 |
+ stores                                     |     100 |      100 |     100 |     100 |
+  authStore.ts                              |     100 |      100 |     100 |     100 |
+  useEmotionHistoryStore.ts                 |     100 |      100 |     100 |     100 |
+  useExperienceStore.ts                     |     100 |      100 |     100 |     100 |
+  usePathExplorerStore.ts                   |     100 |      100 |     100 |     100 |
+  useSettingsStore.ts                       |     100 |      100 |     100 |     100 |
+  useStrategyBrowserStore.ts                |     100 |      100 |     100 |     100 |
+  useVisualizationStore.ts                  |     100 |      100 |     100 |     100 |
+--------------------------------------------|---------|----------|---------|---------|----------------------------------------------------------------------------------------
+Jest: "global" coverage threshold for statements (100%) not met: 99.45%
+Jest: "global" coverage threshold for branches (100%) not met: 98.64%
+Jest: "global" coverage threshold for lines (100%) not met: 99.9%
+Jest: "global" coverage threshold for functions (100%) not met: 99.77%
+
+Test Suites: 321 passed, 321 total
+Tests:       2769 passed, 2769 total
+Snapshots:   0 total
+Time:        6.587 s
+Ran all test suites.
+npm error Lifecycle script `test:coverage` failed with error:
+npm error code 1
+npm error path /Users/jrgochan/code/github.com/jrgochan/l_o_v_e/experience/web
+npm error workspace web@0.1.0
+npm error location /Users/jrgochan/code/github.com/jrgochan/l_o_v_e/experience/web
+npm error command failed
+npm error command sh -c jest --coverage

@@ -8,25 +8,7 @@
 
 import { useEffect, useRef, useCallback } from "react";
 import { useAuthStore } from "@/stores/authStore";
-import { logger } from "@/utils/logger";
-
-/** Buffer before expiry to trigger refresh (ms). */
-const REFRESH_BUFFER_MS = 2 * 60 * 1000; // 2 minutes
-
-/**
- * Decode the `exp` claim from a JWT without verifying the signature.
- * Returns the expiry as a Unix timestamp (seconds), or null if invalid.
- */
-function getTokenExpiry(token: string): number | null {
-  try {
-    const parts = token.split(".");
-    if (parts.length !== 3) return null;
-    const payload = JSON.parse(atob(parts[1]));
-    return typeof payload.exp === "number" ? payload.exp : null;
-  } catch {
-    return null;
-  }
-}
+import { checkAndScheduleRefresh, safeDispatchEvent } from "./utils/tokenRefreshUtils";
 
 /**
  * Mount once at the app root to enable automatic token refresh.
@@ -42,7 +24,7 @@ export function useTokenRefresh() {
   const token = useAuthStore((s) => s.token);
   const refreshToken = useAuthStore((s) => s.refreshToken);
   const logout = useAuthStore((s) => s.logout);
-  const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const timerRef = useRef<NodeJS.Timeout | number | null>(null);
 
   const clearTimer = useCallback(() => {
     if (timerRef.current) {
@@ -54,43 +36,10 @@ export function useTokenRefresh() {
   const scheduleRefresh = useCallback(() => {
     clearTimer();
 
-    if (!token) return;
-
-    const exp = getTokenExpiry(token);
-    if (exp === null) return;
-
-    const now = Date.now();
-    const expiresAt = exp * 1000; // convert to ms
-    const refreshAt = expiresAt - REFRESH_BUFFER_MS;
-    const delay = refreshAt - now;
-
-    if (delay <= 0) {
-      // Token is already near or past expiry — refresh immediately
-      logger.info("api", "Token near expiry, refreshing immediately");
-      refreshToken().then((ok) => {
-        if (!ok) {
-          logger.error("api", "Token refresh failed — logging out");
-          logout();
-          if (typeof window !== "undefined") {
-            window.dispatchEvent(new CustomEvent("session-expired"));
-          }
-        }
-      });
-      return;
-    }
-
-    logger.info("api", `Scheduling token refresh in ${Math.round(delay / 1000)}s`);
-    timerRef.current = setTimeout(() => {
-      refreshToken().then((ok) => {
-        if (!ok) {
-          logger.error("api", "Scheduled token refresh failed — logging out");
-          logout();
-          if (typeof window !== "undefined") {
-            window.dispatchEvent(new CustomEvent("session-expired"));
-          }
-        }
-      });
-    }, delay);
+    timerRef.current = checkAndScheduleRefresh(
+      { token, refreshToken, logout, dispatchEvent: safeDispatchEvent },
+      setTimeout
+    );
   }, [token, refreshToken, logout, clearTimer]);
 
   // Schedule whenever the token changes (login, refresh, etc.)

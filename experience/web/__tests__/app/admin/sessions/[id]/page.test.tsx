@@ -83,6 +83,9 @@ describe("AdminSessionDetailPage", () => {
       }
       originalConsoleError(...args);
     };
+
+    // Reset default search params
+    (mockSearchParams.get as jest.Mock).mockReturnValue("session-123");
   });
 
   it("renders loading state initially", async () => {
@@ -258,5 +261,24 @@ describe("AdminSessionDetailPage", () => {
       // Check for cyan class (else branch)
       expect(toneBadge.className).toContain("bg-cyan-900/30");
     });
+  });
+  it("does not fetch session if id is missing", async () => {
+    (mockSearchParams.get as jest.Mock).mockReturnValue(null);
+
+    render(<AdminSessionDetailPage />);
+
+    // Should remain in loading state (or whatever default behavior is when no ID)
+    // The useEffect returns early, so fetch is never called.
+    // The loading state is true by default.
+    // So distinct behavior: API not called.
+    expect(adminApi.getSessionDetails).not.toHaveBeenCalled();
+
+    // It will show loader
+    const loader = document.querySelector(".animate-spin"); // or query by role if available
+    // Since we are mocking everything, we can just check if getSessionDetails is not called.
+    // But let's wait a tick to ensure useEffect would have fired.
+    await waitFor(() => {});
+
+    expect(adminApi.getSessionDetails).not.toHaveBeenCalled();
   });
 });

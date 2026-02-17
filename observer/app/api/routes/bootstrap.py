@@ -217,11 +217,10 @@ import logging
 from dataclasses import dataclass
 from typing import Annotated, Any, Dict, List, Optional
 
+from app.database import get_db
 from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy import text
 from sqlalchemy.ext.asyncio import AsyncSession
-
-from app.database import get_db
 
 logger = logging.getLogger(__name__)
 
@@ -251,7 +250,9 @@ async def get_strategy_effectiveness(
         row = result.fetchone()
 
         if not row:
-            raise HTTPException(status_code=404, detail="No strategy effectiveness data found")
+            raise HTTPException(
+                status_code=404, detail="No strategy effectiveness data found"
+            )
 
         content = row[0]
 
@@ -262,7 +263,9 @@ async def get_strategy_effectiveness(
         return {
             "success": True,
             "data_type": "strategy_effectiveness",
-            "ratings": (content.get("ratings", []) if isinstance(content, dict) else content),
+            "ratings": (
+                content.get("ratings", []) if isinstance(content, dict) else content
+            ),
         }
 
     except HTTPException:
@@ -275,8 +278,12 @@ async def get_strategy_effectiveness(
 @router.get("/path-templates", tags=["Bootstrap"])
 async def get_path_templates(
     db: Annotated[AsyncSession, Depends(get_db)],
-    from_emotion: Annotated[Optional[str], Query(description="Filter by starting emotion")] = None,
-    to_emotion: Annotated[Optional[str], Query(description="Filter by goal emotion")] = None,
+    from_emotion: Annotated[
+        Optional[str], Query(description="Filter by starting emotion")
+    ] = None,
+    to_emotion: Annotated[
+        Optional[str], Query(description="Filter by goal emotion")
+    ] = None,
     max_difficulty: Annotated[
         Optional[float], Query(description="Maximum difficulty (0-1)")
     ] = None,
@@ -314,16 +321,22 @@ async def get_path_templates(
 
         if from_emotion:
             filtered = [
-                t for t in filtered if t.get("from_emotion", "").lower() == from_emotion.lower()
+                t
+                for t in filtered
+                if t.get("from_emotion", "").lower() == from_emotion.lower()
             ]
 
         if to_emotion:
             filtered = [
-                t for t in filtered if t.get("to_emotion", "").lower() == to_emotion.lower()
+                t
+                for t in filtered
+                if t.get("to_emotion", "").lower() == to_emotion.lower()
             ]
 
         if max_difficulty is not None:
-            filtered = [t for t in filtered if t.get("difficulty", 1.0) <= max_difficulty]
+            filtered = [
+                t for t in filtered if t.get("difficulty", 1.0) <= max_difficulty
+            ]
 
         return {
             "success": True,
@@ -366,7 +379,9 @@ def _apply_context_filter(
             context_data.get("recommended_strategies", [])
         )
         if "avoid_strategies" in context_data:
-            recommendations["avoid_strategies"].extend(context_data.get("avoid_strategies", []))
+            recommendations["avoid_strategies"].extend(
+                context_data.get("avoid_strategies", [])
+            )
 
 
 def _fetch_context_modifiers(db_rows: Any) -> list[Any]:
@@ -410,8 +425,12 @@ class ContextRecommendationsParams:
         Optional[str],
         Query(description="Time: morning, afternoon, evening, late_night"),
     ] = None
-    energy_level: Annotated[Optional[str], Query(description="Energy: high, moderate, low")] = None
-    location: Annotated[Optional[str], Query(description="Location: home, work, public")] = None
+    energy_level: Annotated[
+        Optional[str], Query(description="Energy: high, moderate, low")
+    ] = None
+    location: Annotated[
+        Optional[str], Query(description="Location: home, work, public")
+    ] = None
     available_time: Annotated[
         Optional[str],
         Query(description="Time: 5_minutes, 15_minutes, 30_minutes, 60_plus_minutes"),
@@ -444,7 +463,9 @@ async def get_context_recommendations(
         rows = result.fetchall()
 
         if not rows:
-            raise HTTPException(status_code=404, detail="No context modifier data found")
+            raise HTTPException(
+                status_code=404, detail="No context modifier data found"
+            )
 
         # Parse modifiers
         modifiers = _fetch_context_modifiers(rows)
@@ -460,9 +481,15 @@ async def get_context_recommendations(
 
         # Apply each context filter
         for modifier in modifiers:
-            _apply_context_filter(modifier, "time_of_day", params.time_of_day, recommendations)
-            _apply_context_filter(modifier, "energy_level", params.energy_level, recommendations)
-            _apply_context_filter(modifier, "location", params.location, recommendations)
+            _apply_context_filter(
+                modifier, "time_of_day", params.time_of_day, recommendations
+            )
+            _apply_context_filter(
+                modifier, "energy_level", params.energy_level, recommendations
+            )
+            _apply_context_filter(
+                modifier, "location", params.location, recommendations
+            )
             _apply_context_filter(
                 modifier, "available_time", params.available_time, recommendations
             )
@@ -474,7 +501,9 @@ async def get_context_recommendations(
         recommendations["recommended_strategies"] = list(
             set(recommendations["recommended_strategies"])
         )
-        recommendations["avoid_strategies"] = list(set(recommendations["avoid_strategies"]))
+        recommendations["avoid_strategies"] = list(
+            set(recommendations["avoid_strategies"])
+        )
 
         return {
             "success": True,
@@ -527,7 +556,9 @@ async def get_challenge_patterns(
         # Filter if specific challenge requested
         if challenge_name:
             patterns = [
-                p for p in patterns if p.get("challenge_name", "").lower() == challenge_name.lower()
+                p
+                for p in patterns
+                if p.get("challenge_name", "").lower() == challenge_name.lower()
             ]
 
         return {
@@ -545,7 +576,9 @@ async def get_challenge_patterns(
 
 
 @router.get("/all", tags=["Bootstrap"])
-async def get_all_bootstrap_data(db: Annotated[AsyncSession, Depends(get_db)]) -> Dict[str, Any]:
+async def get_all_bootstrap_data(
+    db: Annotated[AsyncSession, Depends(get_db)],
+) -> Dict[str, Any]:
     """Get all bootstrap data in one call.
 
     Useful for initial app load to cache bootstrap data on the client.

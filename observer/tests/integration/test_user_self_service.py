@@ -26,7 +26,10 @@ async def test_change_password(client: AsyncClient, user_token: str):
     headers = {"Authorization": f"Bearer {user_token}"}
 
     # 1. Wrong current password
-    payload = {"current_password": "WrongPassword", "new_password": "NewStrongPassword1!"}
+    payload = {
+        "current_password": "WrongPassword",
+        "new_password": "NewStrongPassword1!",
+    }
     res = await client.put("/users/me/password", json=payload, headers=headers)
     assert res.status_code == 400
 

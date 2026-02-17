@@ -136,12 +136,17 @@ export function AuthModal({ isOpen, onClose }: AuthModalProps) {
                   checked={consents.includes("terms_of_service")}
                   onChange={() => {
                     const key = "terms_of_service";
-                    setConsents(prev => prev.includes(key) ? prev.filter(k => k !== key) : [...prev, key]);
+                    setConsents((prev) =>
+                      prev.includes(key) ? prev.filter((k) => k !== key) : [...prev, key]
+                    );
                   }}
                   className="mt-1 h-4 w-4 rounded border-gray-300 text-cyan-600 focus:ring-cyan-500"
                 />
                 <label htmlFor="consent-tos" className="ml-2 text-xs text-gray-400">
-                  I agree to the <a href="#" className="text-cyan-400 hover:underline">Terms of Service</a>
+                  I agree to the{" "}
+                  <a href="#" className="text-cyan-400 hover:underline">
+                    Terms of Service
+                  </a>
                 </label>
               </div>
               <div className="flex items-start">
@@ -151,12 +156,17 @@ export function AuthModal({ isOpen, onClose }: AuthModalProps) {
                   checked={consents.includes("privacy_policy")}
                   onChange={() => {
                     const key = "privacy_policy";
-                    setConsents(prev => prev.includes(key) ? prev.filter(k => k !== key) : [...prev, key]);
+                    setConsents((prev) =>
+                      prev.includes(key) ? prev.filter((k) => k !== key) : [...prev, key]
+                    );
                   }}
                   className="mt-1 h-4 w-4 rounded border-gray-300 text-cyan-600 focus:ring-cyan-500"
                 />
                 <label htmlFor="consent-privacy" className="ml-2 text-xs text-gray-400">
-                  I agree to the <a href="#" className="text-cyan-400 hover:underline">Privacy Policy</a>
+                  I agree to the{" "}
+                  <a href="#" className="text-cyan-400 hover:underline">
+                    Privacy Policy
+                  </a>
                 </label>
               </div>
             </div>
@@ -164,7 +174,11 @@ export function AuthModal({ isOpen, onClose }: AuthModalProps) {
 
           <button
             type="submit"
-            disabled={isLoading || (mode === "register" && (!consents.includes("terms_of_service") || !consents.includes("privacy_policy")))}
+            disabled={
+              isLoading ||
+              (mode === "register" &&
+                (!consents.includes("terms_of_service") || !consents.includes("privacy_policy")))
+            }
             className="w-full bg-cyan-600 hover:bg-cyan-500 text-white font-medium py-2 rounded transition-colors mt-2 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {isLoading ? "Loading..." : mode === "login" ? "Sign In" : "Create Account"}

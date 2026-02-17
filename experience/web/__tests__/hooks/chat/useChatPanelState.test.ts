@@ -64,6 +64,23 @@ describe("useChatPanelState", () => {
       result.current.handleToggleAnalysisExpansion();
     });
     expect(result.current.analysisExpandState).toBe("normal");
+    expect(result.current.analysisExpandState).toBe("normal");
+  });
+
+  it("should toggle chat mode", () => {
+    const { result } = renderHook(() => useChatPanelState());
+
+    expect(result.current.chatMode).toBe("text");
+
+    act(() => {
+      result.current.toggleChatMode();
+    });
+    expect(result.current.chatMode).toBe("voice");
+
+    act(() => {
+      result.current.toggleChatMode();
+    });
+    expect(result.current.chatMode).toBe("text");
   });
 
   it("should toggle tone mode", () => {

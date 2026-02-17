@@ -77,8 +77,10 @@ describe("AdminUserDetailsPage", () => {
   it("handles missing id parameter", async () => {
     mockSearchParams.get.mockReturnValue(null); // No ID
     render(<AdminUserDetailsPage />);
-    // If no ID, effect doesn't run, stays loading
-    expect(screen.getByText("Loading user details...")).toBeInTheDocument();
+
+    // Should show error state, not loading
+    expect(screen.queryByText("Loading user details...")).not.toBeInTheDocument();
+    expect(screen.getByText("User not found")).toBeInTheDocument();
     expect(api.get).not.toHaveBeenCalled();
   });
 

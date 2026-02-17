@@ -122,9 +122,9 @@ export function LiquidEmotionNode({
   });
 
   return (
-    <group>
+    <group data-testid="liquid-group">
       {/* Subsurface core glow */}
-      <mesh ref={coreRef}>
+      <mesh ref={coreRef} data-testid="liquid-core">
         <sphereGeometry args={[1, 16, 16]} />
         <meshBasicMaterial
           color={coreColor}
@@ -141,6 +141,7 @@ export function LiquidEmotionNode({
         onClick={onClick}
         onPointerOver={onPointerOver}
         onPointerOut={onPointerOut}
+        data-testid="liquid-body"
       >
         <sphereGeometry args={[1, 48, 48]} />
         <meshPhysicalMaterial
@@ -159,12 +160,13 @@ export function LiquidEmotionNode({
           sheenColor={enhancedColor}
           envMapIntensity={1.5}
           side={THREE.FrontSide}
+          data-testid="liquid-material"
         />
       </mesh>
 
       {/* Reflection/environment halo */}
       {(isSelected || isHovered) && (
-        <mesh>
+        <mesh data-testid="liquid-halo">
           <sphereGeometry args={[size * 1.8, 16, 16]} />
           <meshBasicMaterial
             color={enhancedColor}

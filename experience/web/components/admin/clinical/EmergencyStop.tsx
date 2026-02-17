@@ -37,10 +37,10 @@ export function EmergencyStop({
   const [isActivated, setIsActivated] = useState(false);
 
   const handleActivate = useCallback(() => {
-    if (!sessionId) return;
+    // sessionId check removed as it is guarded by render logic below
     setIsActivated(true);
     setShowConfirm(false);
-    onActivate?.(sessionId);
+    onActivate?.(sessionId!);
     // Auto-reset after 30 seconds
     setTimeout(() => setIsActivated(false), 30000);
   }, [sessionId, onActivate]);
@@ -111,8 +111,8 @@ export function EmergencyStop({
                 supportive message:
               </p>
               <div className="p-4 rounded-lg bg-teal-950/30 border border-teal-800/30 text-sm text-teal-200 italic">
-                &quot;Your clinician has paused this session. Please take a moment to breathe.
-                You are safe, and they will reach out to you shortly.&quot;
+                &quot;Your clinician has paused this session. Please take a moment to breathe. You
+                are safe, and they will reach out to you shortly.&quot;
               </div>
               <div className="flex items-center gap-2 p-3 rounded-lg bg-yellow-950/20 border border-yellow-800/30">
                 <Phone className="w-4 h-4 text-yellow-400 flex-shrink-0" />

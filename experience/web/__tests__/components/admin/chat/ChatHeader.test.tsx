@@ -119,4 +119,15 @@ describe("ChatHeader", () => {
     fireEvent.click(deepToggle!);
     expect(onDeepFeelingModeChange).toHaveBeenCalledWith(true);
   });
+  it("renders correctly in voice mode", () => {
+    const onChatModeChange = jest.fn();
+    render(<ChatHeader {...defaultProps} chatMode="voice" onChatModeChange={onChatModeChange} />);
+
+    const voiceButton = screen.getByTitle("Switch to text mode");
+    expect(voiceButton).toHaveTextContent("🎙️ Voice");
+    expect(voiceButton).toHaveClass("bg-purple-600");
+
+    fireEvent.click(voiceButton);
+    expect(onChatModeChange).toHaveBeenCalled();
+  });
 });

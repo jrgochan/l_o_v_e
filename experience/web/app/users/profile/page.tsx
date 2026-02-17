@@ -18,7 +18,15 @@ interface Session {
 type ProfileTab = "profile" | "security" | "privacy" | "history";
 
 export default function UserProfilePage() {
-  const { user, isLoading: isAuthLoading, updateProfile, changePassword, deleteAccount, exportData, error } = useAuthStore();
+  const {
+    user,
+    isLoading: isAuthLoading,
+    updateProfile,
+    changePassword,
+    deleteAccount,
+    exportData,
+    error,
+  } = useAuthStore();
   const router = useRouter();
   const [sessions, setSessions] = useState<Session[]>([]);
   const [isLoadingSessions, setIsLoadingSessions] = useState(true);
@@ -28,6 +36,7 @@ export default function UserProfilePage() {
   const [editName, setEditName] = useState("");
   const [editEmail, setEditEmail] = useState("");
   const [profileSaved, setProfileSaved] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
 
   // Password change state
   const [currentPassword, setCurrentPassword] = useState("");
@@ -35,20 +44,22 @@ export default function UserProfilePage() {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [passwordChanged, setPasswordChanged] = useState(false);
   const [passwordError, setPasswordError] = useState("");
+  const [isChangingPassword, setIsChangingPassword] = useState(false);
 
   // Delete account state
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [deleteConfirmText, setDeleteConfirmText] = useState("");
+  const [isDeleting, setIsDeleting] = useState(false);
 
   // Export state
   const [isExporting, setIsExporting] = useState(false);
 
-interface Consent {
-  key: string;
-  name: string;
-  version: string;
-  granted_at: string;
-}
+  interface Consent {
+    key: string;
+    name: string;
+    version: string;
+    granted_at: string;
+  }
 
   // Consent state
   const [consents, setConsents] = useState<Consent[]>([]);
@@ -85,14 +96,16 @@ interface Consent {
   useEffect(() => {
     if (activeTab === "privacy") {
       setLoadingConsents(true);
-      api.get<{ granted: Consent[] }>("/consent/me")
-        .then(data => setConsents(data.granted || []))
+      api
+        .get<{ granted: Consent[] }>("/consent/me")
+        .then((data) => setConsents(data.granted || []))
         .catch(console.error)
         .finally(() => setLoadingConsents(false));
     }
   }, [activeTab]);
 
   const handleProfileSave = async () => {
+    setIsSaving(true);
     try {
       setProfileSaved(false);
       await updateProfile({
@@ -103,6 +116,8 @@ interface Consent {
       setTimeout(() => setProfileSaved(false), 3000);
     } catch {
       // Error shown by store
+    } finally {
+      setIsSaving(false);
     }
   };
 
@@ -112,6 +127,7 @@ interface Consent {
       setPasswordError("Passwords do not match");
       return;
     }
+    setIsChangingPassword(true);
     try {
       setPasswordChanged(false);
       await changePassword(currentPassword, newPassword);
@@ -122,15 +138,19 @@ interface Consent {
       setTimeout(() => setPasswordChanged(false), 3000);
     } catch (err: unknown) {
       setPasswordError(err instanceof Error ? err.message : "Failed to change password");
+    } finally {
+      setIsChangingPassword(false);
     }
   };
 
   const handleDeleteAccount = async () => {
+    setIsDeleting(true);
     try {
       await deleteAccount();
       router.push("/");
     } catch {
       // Error shown by store
+      setIsDeleting(false); // Only unset if failed, otherwise we are navigating away
     }
   };
 
@@ -229,7 +249,10 @@ interface Consent {
               <h2 className="text-xl font-bold text-white mb-6">Edit Profile</h2>
               <div className="space-y-5 max-w-md">
                 <div>
-                  <label htmlFor="editName" className="block text-xs font-medium text-gray-400 mb-1.5 uppercase tracking-wider">
+                  <label
+                    htmlFor="editName"
+                    className="block text-xs font-medium text-gray-400 mb-1.5 uppercase tracking-wider"
+                  >
                     Full Name
                   </label>
                   <input
@@ -241,7 +264,10 @@ interface Consent {
                   />
                 </div>
                 <div>
-                  <label htmlFor="editEmail" className="block text-xs font-medium text-gray-400 mb-1.5 uppercase tracking-wider">
+                  <label
+                    htmlFor="editEmail"
+                    className="block text-xs font-medium text-gray-400 mb-1.5 uppercase tracking-wider"
+                  >
                     Email Address
                   </label>
                   <input
@@ -255,13 +281,15 @@ interface Consent {
                 <div className="flex items-center gap-3 pt-2">
                   <button
                     onClick={handleProfileSave}
-                    disabled={isAuthLoading}
+                    disabled={isSaving}
                     className="px-6 py-2.5 bg-cyan-600 hover:bg-cyan-500 text-white font-medium rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-sm"
                   >
-                    {isAuthLoading ? "Saving..." : "Save Changes"}
+                    {isSaving ? "Saving..." : "Save Changes"}
                   </button>
                   {profileSaved && (
-                    <span className="text-green-400 text-sm animate-fade-in">✓ Profile updated</span>
+                    <span className="text-green-400 text-sm animate-fade-in">
+                      ✓ Profile updated
+                    </span>
                   )}
                 </div>
               </div>
@@ -273,11 +301,15 @@ interface Consent {
             <div className="bg-gray-900/30 border border-gray-800/50 rounded-2xl p-8 backdrop-blur-md">
               <h2 className="text-xl font-bold text-white mb-2">Change Password</h2>
               <p className="text-gray-400 text-sm mb-6">
-                Password must be at least 8 characters with uppercase, lowercase, digit, and special character.
+                Password must be at least 8 characters with uppercase, lowercase, digit, and special
+                character.
               </p>
               <div className="space-y-4 max-w-md">
                 <div>
-                  <label htmlFor="currentPassword" className="block text-xs font-medium text-gray-400 mb-1.5 uppercase tracking-wider">
+                  <label
+                    htmlFor="currentPassword"
+                    className="block text-xs font-medium text-gray-400 mb-1.5 uppercase tracking-wider"
+                  >
                     Current Password
                   </label>
                   <input
@@ -289,7 +321,10 @@ interface Consent {
                   />
                 </div>
                 <div>
-                  <label htmlFor="newPassword" className="block text-xs font-medium text-gray-400 mb-1.5 uppercase tracking-wider">
+                  <label
+                    htmlFor="newPassword"
+                    className="block text-xs font-medium text-gray-400 mb-1.5 uppercase tracking-wider"
+                  >
                     New Password
                   </label>
                   <input
@@ -302,7 +337,10 @@ interface Consent {
                   />
                 </div>
                 <div>
-                  <label htmlFor="confirmPassword" className="block text-xs font-medium text-gray-400 mb-1.5 uppercase tracking-wider">
+                  <label
+                    htmlFor="confirmPassword"
+                    className="block text-xs font-medium text-gray-400 mb-1.5 uppercase tracking-wider"
+                  >
                     Confirm New Password
                   </label>
                   <input
@@ -322,13 +360,17 @@ interface Consent {
                 <div className="flex items-center gap-3 pt-2">
                   <button
                     onClick={handlePasswordChange}
-                    disabled={isAuthLoading || !currentPassword || !newPassword || !confirmPassword}
+                    disabled={
+                      isChangingPassword || !currentPassword || !newPassword || !confirmPassword
+                    }
                     className="px-6 py-2.5 bg-cyan-600 hover:bg-cyan-500 text-white font-medium rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-sm"
                   >
-                    {isAuthLoading ? "Changing..." : "Change Password"}
+                    {isChangingPassword ? "Changing..." : "Change Password"}
                   </button>
                   {passwordChanged && (
-                    <span className="text-green-400 text-sm animate-fade-in">✓ Password changed</span>
+                    <span className="text-green-400 text-sm animate-fade-in">
+                      ✓ Password changed
+                    </span>
                   )}
                 </div>
               </div>
@@ -342,7 +384,8 @@ interface Consent {
               <div className="bg-gray-900/30 border border-gray-800/50 rounded-2xl p-8 backdrop-blur-md">
                 <h2 className="text-xl font-bold text-white mb-2">My Consents</h2>
                 <p className="text-gray-400 text-sm mb-6">
-                  Review the policies you have agreed to. Revoking required consents may restrict access to the application.
+                  Review the policies you have agreed to. Revoking required consents may restrict
+                  access to the application.
                 </p>
 
                 {loadingConsents ? (
@@ -352,15 +395,20 @@ interface Consent {
                 ) : (
                   <div className="space-y-3">
                     {consents.map((c) => (
-                       <div key={c.key} className="flex items-center justify-between p-3 bg-gray-800/30 rounded-lg border border-gray-700/50">
-                         <div>
-                           <div className="font-medium text-white text-sm">{c.name}</div>
-                           <div className="text-xs text-gray-500">v{c.version} • Granted: {new Date(c.granted_at).toLocaleDateString()}</div>
-                         </div>
-                         <div className="text-xs px-2 py-1 rounded bg-green-900/30 text-green-400 border border-green-800/30">
-                           Active
-                         </div>
-                       </div>
+                      <div
+                        key={c.key}
+                        className="flex items-center justify-between p-3 bg-gray-800/30 rounded-lg border border-gray-700/50"
+                      >
+                        <div>
+                          <div className="font-medium text-white text-sm">{c.name}</div>
+                          <div className="text-xs text-gray-500">
+                            v{c.version} • Granted: {new Date(c.granted_at).toLocaleDateString()}
+                          </div>
+                        </div>
+                        <div className="text-xs px-2 py-1 rounded bg-green-900/30 text-green-400 border border-green-800/30">
+                          Active
+                        </div>
+                      </div>
                     ))}
                   </div>
                 )}
@@ -400,7 +448,9 @@ interface Consent {
                 ) : (
                   <div className="space-y-4 max-w-md">
                     <p className="text-red-300 text-sm font-medium">
-                      Type <span className="font-mono bg-red-900/30 px-1.5 py-0.5 rounded">DELETE</span> to confirm:
+                      Type{" "}
+                      <span className="font-mono bg-red-900/30 px-1.5 py-0.5 rounded">DELETE</span>{" "}
+                      to confirm:
                     </p>
                     <input
                       type="text"
@@ -412,13 +462,16 @@ interface Consent {
                     <div className="flex gap-3">
                       <button
                         onClick={handleDeleteAccount}
-                        disabled={deleteConfirmText !== "DELETE" || isAuthLoading}
+                        disabled={deleteConfirmText !== "DELETE" || isDeleting}
                         className="px-6 py-2.5 bg-red-600 hover:bg-red-500 text-white font-medium rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-sm"
                       >
-                        {isAuthLoading ? "Deleting..." : "Permanently Delete"}
+                        {isDeleting ? "Deleting..." : "Permanently Delete"}
                       </button>
                       <button
-                        onClick={() => { setShowDeleteConfirm(false); setDeleteConfirmText(""); }}
+                        onClick={() => {
+                          setShowDeleteConfirm(false);
+                          setDeleteConfirmText("");
+                        }}
                         className="px-6 py-2.5 bg-gray-800 hover:bg-gray-700 text-gray-300 font-medium rounded-lg transition-colors text-sm"
                       >
                         Cancel
@@ -480,7 +533,10 @@ interface Consent {
                 ) : (
                   <div className="divide-y divide-gray-800/50">
                     {sessions.map((session) => (
-                      <div key={session.id} className="px-8 py-5 hover:bg-gray-800/20 transition-colors">
+                      <div
+                        key={session.id}
+                        className="px-8 py-5 hover:bg-gray-800/20 transition-colors"
+                      >
                         <div className="flex items-start justify-between">
                           <div>
                             <div className="flex items-center gap-3 mb-1">

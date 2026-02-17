@@ -112,8 +112,39 @@ describe("AuthModal", () => {
     const submitBtn = screen.getAllByRole("button", { name: "Create Account" })[1];
     await user.click(submitBtn);
 
-    expect(mockRegister).toHaveBeenCalledWith("new@example.com", "securepass", "New User", ["terms_of_service", "privacy_policy"]);
+    expect(mockRegister).toHaveBeenCalledWith("new@example.com", "securepass", "New User", [
+      "terms_of_service",
+      "privacy_policy",
+    ]);
     expect(mockOnClose).toHaveBeenCalled();
+  });
+
+  it("toggles consent checkboxes correctly", async () => {
+    const user = userEvent.setup();
+    render(<AuthModal isOpen={true} onClose={mockOnClose} />);
+
+    // Switch to register
+    await user.click(screen.getByRole("button", { name: "Create Account" }));
+
+    const tosCheckbox = screen.getByLabelText(/Terms of Service/i);
+    const privacyCheckbox = screen.getByLabelText(/Privacy Policy/i);
+    const submitBtn = screen.getAllByRole("button", { name: "Create Account" })[1];
+
+    // Initially disabled
+    expect(submitBtn).toBeDisabled();
+
+    // Check both
+    await user.click(tosCheckbox);
+    await user.click(privacyCheckbox);
+    expect(submitBtn).toBeEnabled();
+
+    // Uncheck TOS
+    await user.click(tosCheckbox);
+    expect(submitBtn).toBeDisabled();
+
+    // Uncheck Privacy
+    await user.click(privacyCheckbox);
+    expect(submitBtn).toBeDisabled();
   });
 
   it("displays error message from store", () => {

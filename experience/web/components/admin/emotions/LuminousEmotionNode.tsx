@@ -122,9 +122,9 @@ export function LuminousEmotionNode({
   });
 
   return (
-    <group>
+    <group data-testid="luminous-group">
       {/* Outer halo — large soft glow */}
-      <mesh ref={outerGlowRef}>
+      <mesh ref={outerGlowRef} data-testid="luminous-outer">
         <sphereGeometry args={[1, 16, 16]} />
         <meshBasicMaterial
           ref={outerGlowMatRef}
@@ -143,6 +143,7 @@ export function LuminousEmotionNode({
         onClick={onClick}
         onPointerOver={onPointerOver}
         onPointerOut={onPointerOut}
+        data-testid="luminous-inner"
       >
         <sphereGeometry args={[1, 24, 24]} />
         <meshBasicMaterial
@@ -156,14 +157,14 @@ export function LuminousEmotionNode({
       </mesh>
 
       {/* Core — small, bright, opaque center */}
-      <mesh ref={coreRef}>
+      <mesh ref={coreRef} data-testid="luminous-core">
         <sphereGeometry args={[1, 16, 16]} />
         <meshBasicMaterial color={brightColor} transparent opacity={0.95} />
       </mesh>
 
       {/* Selection indicator */}
       {isSelected && (
-        <mesh>
+        <mesh data-testid="luminous-selected">
           <sphereGeometry args={[size * 2.5, 16, 16]} />
           <meshBasicMaterial
             color={enhancedColor}

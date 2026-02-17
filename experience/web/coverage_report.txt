@@ -1,0 +1,423 @@
+
+> web@0.1.0 test
+> jest --coverage
+
+--------------------------------------------|---------|----------|---------|---------|---------------------------------------------------------------------------------
+File                                        | % Stmts | % Branch | % Funcs | % Lines | Uncovered Line #s
+--------------------------------------------|---------|----------|---------|---------|---------------------------------------------------------------------------------
+All files                                   |    95.6 |    94.19 |   94.66 |   96.02 |
+ app                                        |     100 |      100 |     100 |     100 |
+  layout.tsx                                |     100 |      100 |     100 |     100 |
+  page.tsx                                  |     100 |      100 |     100 |     100 |
+ app/admin                                  |   93.33 |       50 |     100 |   92.85 |
+  layout.tsx                                |     100 |      100 |     100 |     100 |
+  page.tsx                                  |   91.66 |       50 |     100 |    90.9 | 15
+ app/admin/clinical                         |     100 |      100 |     100 |     100 |
+  page.tsx                                  |     100 |      100 |     100 |     100 |
+ app/admin/data                             |     100 |      100 |     100 |     100 |
+  page.tsx                                  |     100 |      100 |     100 |     100 |
+ app/admin/sessions                         |     100 |      100 |     100 |     100 |
+  page.tsx                                  |     100 |      100 |     100 |     100 |
+ app/admin/sessions/detail                  |      96 |    96.55 |     100 |     100 |
+  page.tsx                                  |      96 |    96.55 |     100 |     100 | 21
+ app/admin/settings                         |     100 |      100 |     100 |     100 |
+  page.tsx                                  |     100 |      100 |     100 |     100 |
+ app/admin/users                            |     100 |      100 |     100 |     100 |
+  page.tsx                                  |     100 |      100 |     100 |     100 |
+ app/admin/users/detail                     |     100 |    97.61 |     100 |     100 |
+  page.tsx                                  |     100 |    97.61 |     100 |     100 | 97
+ app/admin/visualization                    |   98.94 |    98.14 |   95.65 |   98.85 |
+  page.tsx                                  |   98.94 |    98.14 |   95.65 |   98.85 | 363,518
+ app/users                                  |     100 |      100 |     100 |     100 |
+  layout.tsx                                |     100 |      100 |     100 |     100 |
+ app/users/profile                          |   56.38 |    56.71 |   37.03 |   57.77 |
+  page.tsx                                  |   56.38 |    56.71 |   37.03 |   57.77 | 87-91,96-103,110-124,129-131,138-144,239-421
+ components                                 |   94.59 |      100 |     100 |   97.29 |
+  AxisLabels.ts                             |     100 |      100 |     100 |     100 |
+  CinematicOverlay.ts                       |     100 |      100 |     100 |     100 |
+  CommandPalette.ts                         |     100 |      100 |     100 |     100 |
+  ConceptTooltip.ts                         |      50 |      100 |     100 |     100 |
+  ConsentGate.ts                            |     100 |      100 |     100 |     100 |
+  ContextualRecommendations.ts              |     100 |      100 |     100 |     100 |
+  DebugBroadcaster.ts                       |     100 |      100 |     100 |     100 |
+  EmotionalControls.ts                      |     100 |      100 |     100 |     100 |
+  EmotionalInput.ts                         |     100 |      100 |     100 |     100 |
+  GoalSetting.ts                            |     100 |      100 |     100 |     100 |
+  GoalSettingLogic.ts                       |     100 |      100 |     100 |     100 |
+  JourneyHistory.ts                         |     100 |      100 |     100 |     100 |
+  JourneyProgress.ts                        |     100 |      100 |     100 |     100 |
+  LoggerProvider.ts                         |     100 |      100 |     100 |     100 |
+  OrbitControls.ts                          |     100 |      100 |     100 |     100 |
+  PathComparisonView.ts                     |     100 |      100 |     100 |     100 |
+  PathDetailsOverlay.ts                     |     100 |      100 |     100 |     100 |
+  PathExplanationPanel.ts                   |     100 |      100 |     100 |     100 |
+  PathfindingInsights.ts                    |     100 |      100 |     100 |     100 |
+  PersonalStrategies.ts                     |     100 |      100 |     100 |     100 |
+  Scene.ts                                  |     100 |      100 |     100 |     100 |
+  Settings.ts                               |     100 |      100 |     100 |     100 |
+  SimpleAxisLabels.ts                       |     100 |      100 |     100 |     100 |
+  SoulSphere.ts                             |     100 |      100 |     100 |     100 |
+  StepAlternativeSelector.ts                |     100 |      100 |     100 |     100 |
+  StrategyDetailsModal.ts                   |       0 |      100 |     100 |       0 | 1
+  StrategyFeedbackModal.ts                  |     100 |      100 |     100 |     100 |
+  StrategyLibraryBrowser.ts                 |      50 |      100 |     100 |     100 |
+  TransitionPathRenderer.ts                 |     100 |      100 |     100 |     100 |
+  VACAnimator.ts                            |     100 |      100 |     100 |     100 |
+  VACAxisLabels3D.ts                        |     100 |      100 |     100 |     100 |
+  VACDisplay.ts                             |     100 |      100 |     100 |     100 |
+  ViewerPathFlyover.ts                      |     100 |      100 |     100 |     100 |
+  ViewerShortcuts.ts                        |     100 |      100 |     100 |     100 |
+  WaypointArrivalOverlay.ts                 |     100 |      100 |     100 |     100 |
+  WaypointTooltip.ts                        |     100 |      100 |     100 |     100 |
+  ZenSessionIndicator.ts                    |     100 |      100 |     100 |     100 |
+ components/admin                           |    99.4 |    99.08 |     100 |   99.34 |
+  ChatPanel.tsx                             |   99.34 |     97.7 |     100 |   99.27 | 68
+  ClinicalDashboard.tsx                     |     100 |      100 |     100 |     100 |
+ components/admin/chat                      |   87.25 |       77 |   81.25 |   89.12 |
+  AudioVisualizer.tsx                       |   96.49 |    66.66 |     100 |     100 | 25-28,101
+  AutoLinkIndicator.tsx                     |     100 |      100 |     100 |     100 |
+  ChatDrawer.tsx                            |   91.11 |     85.5 |   88.88 |   93.02 | 129-131,135-140,262
+  ChatHeader.tsx                            |     100 |    84.21 |     100 |     100 | 97-103
+  ChatInput.tsx                             |     100 |      100 |     100 |     100 |
+  ChatLayout.tsx                            |     100 |      100 |     100 |     100 |
+  ChatMessageList.tsx                       |     100 |      100 |     100 |     100 |
+  ChatMessages.tsx                          |     100 |      100 |     100 |     100 |
+  ChatToggleFAB.tsx                         |     100 |      100 |     100 |     100 |
+  StrategyCard.tsx                          |     100 |      100 |     100 |     100 |
+  ThreadView.tsx                            |     100 |      100 |     100 |     100 |
+  VoiceChat.tsx                             |   15.38 |        0 |       0 |   16.66 | 20-182
+ components/admin/clinical                  |   86.15 |    85.19 |   73.42 |   87.21 |
+  AlertBadge.tsx                            |     100 |      100 |     100 |     100 |
+  ClinicalPortal.tsx                        |   57.23 |    51.07 |   46.26 |   59.12 | 127,151,264-267,377-391,500,588-590,599,664-724,749-903,938-1009,1032,1076-1192
+  EmergencyStop.tsx                         |   83.33 |    83.33 |   66.66 |   93.33 | 98
+  MultiEmotionTable.tsx                     |     100 |      100 |     100 |     100 |
+  ProsodyVisualization.tsx                  |     100 |      100 |     100 |     100 |
+  SessionMetrics.tsx                        |     100 |      100 |     100 |     100 |
+  SessionTimeline.tsx                       |     100 |    90.32 |     100 |     100 | 164-171
+  VACQuadrantViz.tsx                        |     100 |      100 |     100 |     100 |
+  VACTrajectoryPlot.tsx                     |     100 |      100 |     100 |     100 |
+  VoiceContentCorrelation.tsx               |     100 |      100 |     100 |     100 |
+  VoiceContentThreeWay.tsx                  |     100 |      100 |     100 |     100 |
+ components/admin/clinical/dashboard        |     100 |      100 |     100 |     100 |
+  CompactView.tsx                           |     100 |      100 |     100 |     100 |
+  ExpandedView.tsx                          |     100 |      100 |     100 |     100 |
+ components/admin/data                      |     100 |      100 |     100 |     100 |
+  AiModelsTab.tsx                           |     100 |      100 |     100 |     100 |
+  BootstrapTab.tsx                          |     100 |      100 |     100 |     100 |
+  ClinicalAlertsTab.tsx                     |     100 |      100 |     100 |     100 |
+  CollectionSwitcher.tsx                    |     100 |      100 |     100 |     100 |
+  EmotionsTab.tsx                           |     100 |      100 |     100 |     100 |
+  PromptTemplatesTab.tsx                    |     100 |      100 |     100 |     100 |
+  StrategiesTab.tsx                         |     100 |      100 |     100 |     100 |
+ components/admin/debug                     |     100 |      100 |     100 |     100 |
+  SphereDebugOverlay.tsx                    |     100 |      100 |     100 |     100 |
+ components/admin/emotion-display           |     100 |      100 |     100 |     100 |
+  BaseEmotionChip.tsx                       |     100 |      100 |     100 |     100 |
+  EmotionBadge.tsx                          |     100 |      100 |     100 |     100 |
+  EmotionCard.tsx                           |     100 |      100 |     100 |     100 |
+  EmotionChipCluster.tsx                    |     100 |      100 |     100 |     100 |
+  EmotionCluster.tsx                        |     100 |      100 |     100 |     100 |
+  EmotionMappingBadge.tsx                   |     100 |      100 |     100 |     100 |
+  MultiEmotionCard.tsx                      |     100 |      100 |     100 |     100 |
+ components/admin/emotions                  |   38.73 |    22.03 |   30.55 |   39.47 |
+  AnimatedEmotionNode.tsx                   |     100 |      100 |     100 |     100 |
+  CrystallineEmotionNode.tsx                |    8.33 |        0 |       0 |    8.69 | 37-130
+  GlitchEmotionNode.tsx                     |    6.89 |        0 |       0 |    7.27 | 34-137
+  LiquidEmotionNode.tsx                     |    8.33 |        0 |       0 |    8.51 | 33-116
+  LuminousEmotionNode.tsx                   |    7.27 |        0 |       0 |    7.69 | 33-120
+  MysticalEmotionNode.tsx                   |     100 |      100 |     100 |     100 |
+ components/admin/layout                    |   97.33 |    93.22 |   95.45 |   97.14 |
+  AdminGuard.tsx                            |   91.66 |    88.88 |   85.71 |    90.9 | 70-79
+  AdminLayout.tsx                           |     100 |     62.5 |     100 |     100 | 29-49
+  BaseModal.tsx                             |     100 |      100 |     100 |     100 |
+  BasePanel.tsx                             |     100 |      100 |     100 |     100 |
+ components/admin/modals/HelpModal          |     100 |      100 |     100 |     100 |
+  index.tsx                                 |     100 |      100 |     100 |     100 |
+ components/admin/panels                    |     100 |      100 |     100 |     100 |
+  AnalysisPanel.tsx                         |     100 |      100 |     100 |     100 |
+  EmotionHistoryPanel.tsx                   |     100 |      100 |     100 |     100 |
+  StatisticsPanel.tsx                       |     100 |      100 |     100 |     100 |
+ components/admin/panels/ControlPanel       |   96.74 |    97.64 |   92.72 |   96.29 |
+  AnimationModeSelector.tsx                 |     100 |      100 |     100 |     100 |
+  CategoryBrowser.tsx                       |     100 |      100 |     100 |     100 |
+  EmotionSearch.tsx                         |     100 |      100 |     100 |     100 |
+  LayerControls.tsx                         |     100 |      100 |     100 |     100 |
+  QuickActions.tsx                          |     100 |      100 |     100 |     100 |
+  VisualSettingsPanel.tsx                   |      60 |    66.66 |   33.33 |      60 | 43-62,74-89
+  index.tsx                                 |     100 |      100 |     100 |     100 |
+ components/admin/panels/InfoPanel          |     100 |      100 |     100 |     100 |
+  ActionSuggestions.tsx                     |     100 |      100 |     100 |     100 |
+  EmotionDetails.tsx                        |     100 |      100 |     100 |     100 |
+  EmotionList.tsx                           |     100 |      100 |     100 |     100 |
+  PathComparison.tsx                        |     100 |      100 |     100 |     100 |
+  PathDetails.tsx                           |     100 |      100 |     100 |     100 |
+  PathSummaryList.tsx                       |     100 |      100 |     100 |     100 |
+  index.tsx                                 |     100 |      100 |     100 |     100 |
+ components/admin/particles                 |     100 |      100 |     100 |     100 |
+  EmotionParticles.tsx                      |     100 |      100 |     100 |     100 |
+ components/admin/paths                     |     100 |      100 |     100 |     100 |
+  AdvancedPath.tsx                          |     100 |      100 |     100 |     100 |
+  DynamicPlayfulPath.tsx                    |     100 |      100 |     100 |     100 |
+  MysticalEtherealPath.tsx                  |     100 |      100 |     100 |     100 |
+  PathCurveAnimated.tsx                     |     100 |      100 |     100 |     100 |
+  SubtleElegantPath.tsx                     |     100 |      100 |     100 |     100 |
+ components/admin/settings                  |   99.05 |      100 |   97.27 |   98.95 |
+  AIModelsSettings.tsx                      |     100 |      100 |     100 |     100 |
+  AccessibilitySettings.tsx                 |     100 |      100 |     100 |     100 |
+  BehaviorSettings.tsx                      |     100 |      100 |     100 |     100 |
+  ChatSettings.tsx                          |     100 |      100 |     100 |     100 |
+  ConfirmDialog.tsx                         |     100 |      100 |     100 |     100 |
+  DevelopmentSettings.tsx                   |     100 |      100 |     100 |     100 |
+  ModelCard.tsx                             |     100 |      100 |     100 |     100 |
+  NetworkSettings.tsx                       |     100 |      100 |     100 |     100 |
+  PerformancePanel.tsx                      |     100 |      100 |     100 |     100 |
+  PullModelDialog.tsx                       |     100 |      100 |     100 |     100 |
+  RecommendationsPanel.tsx                  |     100 |      100 |     100 |     100 |
+  VisualSettings.tsx                        |   78.94 |      100 |      75 |   78.94 | 238-262,278-294
+ components/admin/shared                    |   96.08 |    93.56 |   96.77 |   97.11 |
+  AnalysisProgressIndicator.tsx             |     100 |      100 |     100 |     100 |
+  ExportControls.tsx                        |     100 |      100 |     100 |     100 |
+  InsightCard.tsx                           |     100 |      100 |     100 |     100 |
+  RelationshipIndicator.tsx                 |     100 |      100 |     100 |     100 |
+  SmartRecommendations.tsx                  |     100 |      100 |     100 |     100 |
+  VoiceRecorder.tsx                         |     100 |      100 |     100 |     100 |
+  WaypointDetailModal.tsx                   |    87.9 |    85.09 |   88.23 |   90.65 | 173,178-187,620-621,690-728
+ components/admin/spheres                   |     100 |      100 |     100 |     100 |
+  AggregateSphere.tsx                       |     100 |      100 |     100 |     100 |
+  BaseSphere.tsx                            |     100 |      100 |     100 |     100 |
+  CharacterSphere.tsx                       |     100 |      100 |     100 |     100 |
+  InnerCharacterSphere.tsx                  |     100 |      100 |     100 |     100 |
+  MiniSoulSphere.tsx                        |     100 |      100 |     100 |     100 |
+  PreviewSphere.tsx                         |     100 |      100 |     100 |     100 |
+ components/admin/state-display             |     100 |      100 |     100 |     100 |
+  AggregateStateCard.tsx                    |     100 |      100 |     100 |     100 |
+  AggregateVACDisplay.tsx                   |     100 |      100 |     100 |     100 |
+  AggregateVACHeaderDisplay.tsx             |     100 |      100 |     100 |     100 |
+  EmotionHistoryCard.tsx                    |     100 |      100 |     100 |     100 |
+ components/admin/users                     |     100 |      100 |     100 |     100 |
+  TrajectoryChart.tsx                       |     100 |      100 |     100 |     100 |
+ components/admin/visualization             |     100 |    98.53 |     100 |     100 |
+  EmotionCloud.tsx                          |     100 |    94.02 |     100 |     100 | 244-277
+  EmotionLabelOverlay.tsx                   |     100 |      100 |     100 |     100 |
+  EmotionLabelTracker.tsx                   |     100 |      100 |     100 |     100 |
+  IntroSequence.tsx                         |     100 |      100 |     100 |     100 |
+  LegendOverlay.tsx                         |     100 |      100 |     100 |     100 |
+  PathFlyover.tsx                           |     100 |      100 |     100 |     100 |
+  PathNetwork.tsx                           |     100 |      100 |     100 |     100 |
+  SceneEffects.tsx                          |     100 |      100 |     100 |     100 |
+  SceneEnvironment.tsx                      |     100 |      100 |     100 |     100 |
+  VisualizationScene.tsx                    |     100 |      100 |     100 |     100 |
+  WaypointMarker.tsx                        |     100 |      100 |     100 |     100 |
+  ZenHUD.tsx                                |     100 |      100 |     100 |     100 |
+  useWaypointPulse.ts                       |     100 |      100 |     100 |     100 |
+ components/admin/visualizations            |     100 |      100 |     100 |     100 |
+  AudioVisualizer.tsx                       |     100 |      100 |     100 |     100 |
+  DataVisualizationOverlay.tsx              |     100 |      100 |     100 |     100 |
+  EmotionRelationshipGraph.tsx              |     100 |      100 |     100 |     100 |
+  EmotionTimeline.tsx                       |     100 |      100 |     100 |     100 |
+  PathAnimator.tsx                          |     100 |      100 |     100 |     100 |
+  PathParticles.tsx                         |     100 |      100 |     100 |     100 |
+ components/admin/visualizations/PathMatrix |     100 |      100 |     100 |     100 |
+  MatrixGrid.tsx                            |     100 |      100 |     100 |     100 |
+  MatrixHeader.tsx                          |     100 |      100 |     100 |     100 |
+  MatrixLegend.tsx                          |     100 |      100 |     100 |     100 |
+  MatrixTooltip.tsx                         |     100 |      100 |     100 |     100 |
+  index.tsx                                 |     100 |      100 |     100 |     100 |
+ components/admin/visualizations/graph      |     100 |      100 |     100 |     100 |
+  GraphLegend.tsx                           |     100 |      100 |     100 |     100 |
+  GraphNodeDetails.tsx                      |     100 |      100 |     100 |     100 |
+ components/auth                            |   78.43 |    68.18 |    64.7 |   78.26 |
+  AuthGuard.tsx                             |     100 |    95.23 |     100 |     100 | 23
+  AuthModal.tsx                             |   94.73 |       92 |   88.23 |     100 | 139-154
+  ConsentGate.tsx                           |   45.94 |       10 |   16.66 |   45.94 | 20-26,33-35,41-68,126-167
+ components/command-palette                 |   97.75 |      100 |     100 |     100 |
+  ActiveJourneyStatus.tsx                   |     100 |      100 |     100 |     100 |
+  CommandPalette.tsx                        |     100 |      100 |     100 |     100 |
+  PaletteHelp.tsx                           |     100 |      100 |     100 |     100 |
+  PaletteResults.tsx                        |     100 |      100 |     100 |     100 |
+  index.ts                                  |      50 |      100 |     100 |     100 |
+ components/input                           |   97.05 |      100 |     100 |     100 |
+  ConceptTooltip.tsx                        |     100 |      100 |     100 |     100 |
+  EmotionalControls.tsx                     |     100 |      100 |     100 |     100 |
+  EmotionalInput.tsx                        |     100 |      100 |     100 |     100 |
+  Settings.tsx                              |     100 |      100 |     100 |     100 |
+  index.ts                                  |      50 |      100 |     100 |     100 |
+ components/journey                         |    97.2 |     98.1 |   98.03 |   99.45 |
+  JourneyHistory.tsx                        |     100 |      100 |     100 |     100 |
+  JourneyProgress.tsx                       |     100 |      100 |     100 |     100 |
+  PathComparisonView.tsx                    |     100 |      100 |     100 |     100 |
+  PathDetailsOverlay.tsx                    |     100 |      100 |     100 |     100 |
+  PathExplanationPanel.tsx                  |    87.5 |       80 |   66.66 |   85.71 | 20,95
+  PathfindingInsights.tsx                   |     100 |      100 |     100 |     100 |
+  StepAlternativeSelector.tsx               |     100 |    85.71 |     100 |     100 | 28
+  TransitionPathRenderer.tsx                |     100 |      100 |     100 |     100 |
+  WaypointArrivalOverlay.tsx                |     100 |      100 |     100 |     100 |
+  WaypointTooltip.tsx                       |     100 |      100 |     100 |     100 |
+  index.ts                                  |      50 |      100 |     100 |     100 |
+ components/layout                          |     100 |      100 |     100 |     100 |
+  Header.tsx                                |     100 |      100 |     100 |     100 |
+ components/performance                     |     100 |      100 |     100 |     100 |
+  FPSDisplay.tsx                            |     100 |      100 |     100 |     100 |
+ components/strategy                        |   85.66 |    70.88 |   77.38 |   89.01 |
+  ContextualRecommendations.tsx             |     100 |      100 |     100 |     100 |
+  GoalSetting.tsx                           |     100 |      100 |     100 |     100 |
+  GoalSettingLogic.ts                       |   98.85 |    91.66 |     100 |   98.76 | 115
+  PersonalStrategies.tsx                    |     100 |      100 |     100 |     100 |
+  StrategyDetailsModal.tsx                  |    12.5 |        0 |       0 |   15.38 | 13-104
+  StrategyFeedbackModal.tsx                 |     100 |      100 |     100 |     100 |
+  StrategyLibraryBrowser.tsx                |      20 |        0 |       0 |   21.73 | 19-141,148-156
+  index.ts                                  |      50 |      100 |     100 |     100 |
+ components/ui                              |     100 |      100 |     100 |     100 |
+  Toggle.tsx                                |     100 |      100 |     100 |     100 |
+ components/viewer                          |   94.62 |    96.17 |   97.53 |    98.2 |
+  AxisLabels.tsx                            |     100 |      100 |     100 |     100 |
+  CinematicOverlay.tsx                      |      80 |    90.62 |      80 |   80.64 | 42-49
+  DebugBroadcaster.tsx                      |     100 |      100 |     100 |     100 |
+  LoggerProvider.tsx                        |     100 |      100 |     100 |     100 |
+  OrbitControls.tsx                         |     100 |      100 |     100 |     100 |
+  Scene.tsx                                 |     100 |    76.92 |     100 |     100 | 45,126
+  SimpleAxisLabels.tsx                      |     100 |      100 |     100 |     100 |
+  SoulSphere.tsx                            |     100 |      100 |     100 |     100 |
+  VACAnimator.tsx                           |     100 |      100 |     100 |     100 |
+  VACAxisLabels3D.tsx                       |     100 |      100 |     100 |     100 |
+  VACDisplay.tsx                            |     100 |      100 |     100 |     100 |
+  ViewerPathFlyover.tsx                     |     100 |      100 |     100 |     100 |
+  ViewerShortcuts.tsx                       |     100 |      100 |     100 |     100 |
+  ZenSessionIndicator.tsx                   |     100 |      100 |     100 |     100 |
+  index.ts                                  |      50 |      100 |     100 |     100 |
+ hooks                                      |     100 |      100 |     100 |     100 |
+  useAdminSphereSync.ts                     |     100 |      100 |     100 |     100 |
+  useAmbientAudio.ts                        |     100 |      100 |     100 |     100 |
+  useAnimationModeTransition.ts             |     100 |      100 |     100 |     100 |
+  useCommandPalette.ts                      |     100 |      100 |     100 |     100 |
+  useComputeAllPaths.ts                     |     100 |      100 |     100 |     100 |
+  useEmotionData.ts                         |     100 |      100 |     100 |     100 |
+  useEmotionNavigation.ts                   |     100 |      100 |     100 |     100 |
+  useHistorySphereSync.ts                   |     100 |      100 |     100 |     100 |
+  useKeyboardShortcuts.ts                   |     100 |      100 |     100 |     100 |
+  useLoadCachedPaths.ts                     |     100 |      100 |     100 |     100 |
+  useLoggerInit.ts                          |     100 |      100 |     100 |     100 |
+  useModelAssignments.ts                    |     100 |      100 |     100 |     100 |
+  useObserverPolling.ts                     |     100 |      100 |     100 |     100 |
+  useOllamaModels.ts                        |     100 |      100 |     100 |     100 |
+  usePathCalculator.ts                      |     100 |      100 |     100 |     100 |
+  usePersonaPlexVoice.ts                    |     100 |      100 |     100 |     100 |
+  useSettingsSync.ts                        |     100 |      100 |     100 |     100 |
+  useSphereSync.ts                          |     100 |      100 |     100 |     100 |
+  useTokenRefresh.ts                        |     100 |      100 |     100 |     100 |
+  useVoiceRecording.ts                      |     100 |      100 |     100 |     100 |
+  useWebSocketChat.ts                       |     100 |      100 |     100 |     100 |
+ hooks/admin                                |     100 |      100 |     100 |     100 |
+  useAdminTheme.ts                          |     100 |      100 |     100 |     100 |
+  useCategoryState.ts                       |     100 |      100 |     100 |     100 |
+  useEmotionSearch.ts                       |     100 |      100 |     100 |     100 |
+  useInfoPanelState.ts                      |     100 |      100 |     100 |     100 |
+  usePathComparison.ts                      |     100 |      100 |     100 |     100 |
+  usePathSorting.ts                         |     100 |      100 |     100 |     100 |
+  useStatistics.ts                          |     100 |      100 |     100 |     100 |
+ hooks/audio                                |     100 |      100 |     100 |     100 |
+  AudioEngineState.ts                       |     100 |      100 |     100 |     100 |
+  useAudioModulation.ts                     |     100 |      100 |     100 |     100 |
+  useAudioSfx.ts                            |     100 |      100 |     100 |     100 |
+ hooks/chat                                 |     100 |      100 |     100 |     100 |
+  useAnalysisState.ts                       |     100 |      100 |     100 |     100 |
+  useChatAnalysisState.ts                   |     100 |      100 |     100 |     100 |
+  useChatLayout.ts                          |     100 |      100 |     100 |     100 |
+  useChatMessages.ts                        |     100 |      100 |     100 |     100 |
+  useChatPanelState.ts                      |     100 |      100 |     100 |     100 |
+  useChatProgress.ts                        |     100 |      100 |     100 |     100 |
+  useChatSessionState.ts                    |     100 |      100 |     100 |     100 |
+  useHeartbeatProgress.ts                   |     100 |      100 |     100 |     100 |
+  useSessionMetrics.ts                      |     100 |      100 |     100 |     100 |
+ hooks/chat/analysis                        |     100 |      100 |     100 |     100 |
+  useCurrentAnalysisState.ts                |     100 |      100 |     100 |     100 |
+  useMultiEmotionState.ts                   |     100 |      100 |     100 |     100 |
+ hooks/chat/layout                          |     100 |      100 |     100 |     100 |
+  useChatResize.ts                          |     100 |      100 |     100 |     100 |
+  useChatShortcuts.ts                       |     100 |      100 |     100 |     100 |
+ hooks/chat/metrics                         |     100 |      100 |     100 |     100 |
+  metricsUtils.ts                           |     100 |      100 |     100 |     100 |
+ hooks/chat/progress                        |     100 |      100 |     100 |     100 |
+  constants.ts                              |     100 |      100 |     100 |     100 |
+  useProgressSimulation.ts                  |     100 |      100 |     100 |     100 |
+ hooks/command-palette                      |     100 |      100 |     100 |     100 |
+  useCommandPaletteActions.ts               |     100 |      100 |     100 |     100 |
+  useCommandPaletteData.ts                  |     100 |      100 |     100 |     100 |
+  useCommandPaletteFilter.ts                |     100 |      100 |     100 |     100 |
+  useCommandPaletteNavigation.ts            |     100 |      100 |     100 |     100 |
+  useCommandPaletteState.ts                 |     100 |      100 |     100 |     100 |
+ hooks/command-palette/actions              |     100 |      100 |     100 |     100 |
+  useEmotionActions.ts                      |     100 |      100 |     100 |     100 |
+  useJourneyActions.ts                      |     100 |      100 |     100 |     100 |
+  useJourneyCommands.ts                     |     100 |      100 |     100 |     100 |
+  useLocalQuickActions.ts                   |     100 |      100 |     100 |     100 |
+  useQuickActions.ts                        |     100 |      100 |     100 |     100 |
+  useSessionActions.ts                      |     100 |      100 |     100 |     100 |
+  useTemplateActions.ts                     |     100 |      100 |     100 |     100 |
+  useWaypointCommands.ts                    |     100 |      100 |     100 |     100 |
+ hooks/interaction                          |     100 |      100 |     100 |     100 |
+  useZenKeyboardShortcuts.ts                |     100 |      100 |     100 |     100 |
+ hooks/navigation                           |     100 |      100 |     100 |     100 |
+  useEmotionResolution.ts                   |     100 |      100 |     100 |     100 |
+  useNavigationActions.ts                   |     100 |      100 |     100 |     100 |
+ hooks/navigation/actions                   |     100 |      100 |     100 |     100 |
+  useFocusActions.ts                        |     100 |      100 |     100 |     100 |
+  useSelectionActions.ts                    |     100 |      100 |     100 |     100 |
+  useViewActions.ts                         |     100 |      100 |     100 |     100 |
+ hooks/ollama                               |     100 |      100 |     100 |     100 |
+  useOllamaCRUD.ts                          |     100 |      100 |     100 |     100 |
+  useOllamaPull.ts                          |     100 |      100 |     100 |     100 |
+ hooks/pathfinding                          |     100 |      100 |     100 |     100 |
+  useBatchJob.ts                            |     100 |      100 |     100 |     100 |
+  useBatchPaths.ts                          |     100 |      100 |     100 |     100 |
+  useSinglePath.ts                          |     100 |      100 |     100 |     100 |
+ hooks/performance                          |     100 |      100 |     100 |     100 |
+  usePerformanceMonitor.tsx                 |     100 |      100 |     100 |     100 |
+ hooks/shortcuts                            |     100 |      100 |     100 |     100 |
+  useLayerActionMap.ts                      |     100 |      100 |     100 |     100 |
+  useLayerShortcuts.ts                      |     100 |      100 |     100 |     100 |
+  useNavigationShortcuts.ts                 |     100 |      100 |     100 |     100 |
+  useShortcutUtils.ts                       |     100 |      100 |     100 |     100 |
+  useSiteActionMap.ts                       |     100 |      100 |     100 |     100 |
+  useSiteShortcuts.ts                       |     100 |      100 |     100 |     100 |
+ hooks/sync                                 |     100 |      100 |     100 |     100 |
+  types.ts                                  |     100 |      100 |     100 |     100 |
+  usePathSync.ts                            |     100 |      100 |     100 |     100 |
+  useSelectionSync.ts                       |     100 |      100 |     100 |     100 |
+  useSphereReceiver.ts                      |     100 |      100 |     100 |     100 |
+  useSphereSender.ts                        |     100 |      100 |     100 |     100 |
+  useSyncTransport.ts                       |     100 |      100 |     100 |     100 |
+ hooks/utils                                |   97.43 |      100 |     100 |   97.14 |
+  tokenRefreshUtils.ts                      |   97.43 |      100 |     100 |   97.14 | 11
+ hooks/visualization                        |     100 |      100 |     100 |     100 |
+  useMatrixData.ts                          |     100 |      100 |     100 |     100 |
+ hooks/visualization/matrix                 |     100 |      100 |     100 |     100 |
+  useMatrixProcessing.ts                    |     100 |      100 |     100 |     100 |
+  useMatrixStats.ts                         |     100 |      100 |     100 |     100 |
+ hooks/visualizations                       |     100 |      100 |     100 |     100 |
+  useGraphData.ts                           |     100 |      100 |     100 |     100 |
+  useGraphSimulation.ts                     |     100 |      100 |     100 |     100 |
+ hooks/voice                                |     100 |      100 |     100 |     100 |
+  useMediaRecorder.ts                       |     100 |      100 |     100 |     100 |
+  useVoiceState.ts                          |     100 |      100 |     100 |     100 |
+  useVoiceTransport.ts                      |     100 |      100 |     100 |     100 |
+  useVoiceVisualizer.ts                     |     100 |      100 |     100 |     100 |
+ hooks/voice/utils                          |     100 |      100 |     100 |     100 |
+  audioUtils.ts                             |     100 |      100 |     100 |     100 |
+ hooks/websocket                            |     100 |      100 |     100 |     100 |
+  useConnectionLifecycle.ts                 |     100 |      100 |     100 |     100 |
+  useWebSocketConnection.ts                 |     100 |      100 |     100 |     100 |
+  useWebSocketMessageHandler.ts             |     100 |      100 |     100 |     100 |
+  useWebSocketSender.ts                     |     100 |      100 |     100 |     100 |
+ hooks/websocket/utils                      |     100 |      100 |     100 |     100 |
+  messageDispatcher.ts                      |     100 |      100 |     100 |     100 |
+  socketHelpers.ts                          |     100 |      100 |     100 |     100 |
+ stores                                     |     100 |      100 |     100 |     100 |
+  authStore.ts                              |     100 |      100 |     100 |     100 |
+  useEmotionHistoryStore.ts                 |     100 |      100 |     100 |     100 |
+  useExperienceStore.ts                     |     100 |      100 |     100 |     100 |
+  usePathExplorerStore.ts                   |     100 |      100 |     100 |     100 |
+  useSettingsStore.ts                       |     100 |      100 |     100 |     100 |
+  useStrategyBrowserStore.ts                |     100 |      100 |     100 |     100 |
+  useVisualizationStore.ts                  |     100 |      100 |     100 |     100 |
+--------------------------------------------|---------|----------|---------|---------|---------------------------------------------------------------------------------

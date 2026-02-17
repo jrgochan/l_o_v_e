@@ -1,5 +1,7 @@
 import { render, screen, fireEvent, act } from "@testing-library/react";
 import { CommandPalette } from "@/components/CommandPalette";
+import * as CommandPaletteIndex from "@/components/command-palette";
+import { ActiveJourneyStatus, PaletteHelp, PaletteResults } from "@/components/command-palette";
 import { useCommandPalette } from "@/hooks/useCommandPalette";
 import { useCommandPaletteFilter } from "@/hooks/command-palette/useCommandPaletteFilter";
 import { useVisualizationStore } from "@/stores/useVisualizationStore";
@@ -559,5 +561,11 @@ describe("CommandPalette", () => {
     render(<CommandPalette />);
     expect(screen.getByTestId("qa-/template list")).toBeInTheDocument();
     expect(screen.getByTestId("qa-/template calm")).toBeInTheDocument();
+  });
+  it("exports all components from barrel file", () => {
+    expect(CommandPaletteIndex.CommandPalette).toBeDefined();
+    expect(CommandPaletteIndex.ActiveJourneyStatus).toBeDefined();
+    expect(CommandPaletteIndex.PaletteHelp).toBeDefined();
+    expect(CommandPaletteIndex.PaletteResults).toBeDefined();
   });
 });

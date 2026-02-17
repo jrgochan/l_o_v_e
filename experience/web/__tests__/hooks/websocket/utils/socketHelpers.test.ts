@@ -18,6 +18,11 @@ describe("socketHelpers", () => {
       const url = getWebSocketUrl("/test/endpoint", "abc");
       expect(url).toContain("?token=abc");
     });
+
+    it("should add leading slash if missing", () => {
+      const url = getWebSocketUrl("test/endpoint");
+      expect(url).toContain("/test/endpoint");
+    });
   });
 
   describe("scheduleReconnect", () => {

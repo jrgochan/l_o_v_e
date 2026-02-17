@@ -1,240 +1,410 @@
-import { renderHook, act } from "@testing-library/react";
-import { useAuthStore } from "../../stores/authStore";
-import { api } from "../../utils/api";
+import { act } from "@testing-library/react";
+import { useAuthStore } from "@/stores/authStore";
+import { api } from "@/utils/api";
+import { UserRole } from "@/types/auth"; // Import UserRole
 
-// Mock dependencies
-jest.mock("../../utils/api", () => ({
+// Mock api utils
+jest.mock("@/utils/api", () => ({
   api: {
     get: jest.fn(),
     post: jest.fn(),
+    put: jest.fn(),
+    del: jest.fn(),
   },
 }));
 
-// Mock fetch for login
-global.fetch = jest.fn();
+// Mock API_URL
+jest.mock("@/config/environment", () => ({
+  API_URL: "http://test-api.com",
+}));
 
-describe("useAuthStore", () => {
+describe("authStore", () => {
+  const mockUser = {
+    id: "user-1",
+    email: "test@example.com",
+    role: UserRole.USER, // Use enum
+    full_name: "Test User",
+    is_active: true,
+    created_at: "2023-01-01",
+    updated_at: "2023-01-01",
+  };
+
   beforeEach(() => {
+    useAuthStore.getState().logout();
     jest.clearAllMocks();
-    // Reset store state
-    useAuthStore.setState({
-      user: null,
-      token: null,
-      isLoading: false,
-      error: null,
+    (global.fetch as jest.Mock).mockClear();
+  });
+
+  it("initial state is unauthenticated", () => {
+    expect(useAuthStore.getState().user).toBeNull();
+    expect(useAuthStore.getState().token).toBeNull();
+    expect(useAuthStore.getState().isAuthenticated()).toBe(false);
+  });
+
+  it("login success sets token and fetches user", async () => {
+    (global.fetch as jest.Mock).mockResolvedValueOnce({
+      ok: true,
+      json: async () => ({ access_token: "fake-token" }),
     });
+    (api.get as jest.Mock).mockResolvedValueOnce(mockUser);
+
+    await act(async () => {
+      await useAuthStore.getState().login("test@example.com", "password");
+    });
+
+    expect(useAuthStore.getState().token).toBe("fake-token");
+    expect(useAuthStore.getState().user).toEqual(mockUser);
+    expect(useAuthStore.getState().isAuthenticated()).toBe(true);
+    expect(api.get).toHaveBeenCalledWith("/users/me");
   });
 
-  it("should initialize with default state", () => {
-    const { result } = renderHook(() => useAuthStore());
-    expect(result.current.user).toBeNull();
-    expect(result.current.token).toBeNull();
-    expect(result.current.isLoading).toBe(false);
-    expect(result.current.error).toBeNull();
+  it("login failure sets error", async () => {
+    (global.fetch as jest.Mock).mockResolvedValueOnce({
+      ok: false,
+      status: 401,
+      statusText: "Unauthorized",
+    });
+
+    await act(async () => {
+      try {
+        await useAuthStore.getState().login("test@example.com", "wrong");
+      } catch (e) {
+        expect(e).toBeDefined();
+      }
+    });
+
+    expect(useAuthStore.getState().token).toBeNull();
+    expect(useAuthStore.getState().error).toBe("Login failed");
   });
 
-  describe("login", () => {
-    it("should handle successful login", async () => {
-      const { result } = renderHook(() => useAuthStore());
+  it("login failure with non-Error object sets default error", async () => {
+    (global.fetch as jest.Mock).mockRejectedValueOnce("Network error string");
 
-      // Mock fetch response for login
+    await act(async () => {
+      try {
+        await useAuthStore.getState().login("test@example.com", "wrong");
+      } catch (e) {
+        expect(e).toBeDefined();
+      }
+    });
+
+    expect(useAuthStore.getState().error).toBe("Login failed");
+  });
+
+  it("logout clears state", () => {
+    useAuthStore.setState({ token: "token", user: mockUser });
+    expect(useAuthStore.getState().isAuthenticated()).toBe(true);
+
+    act(() => {
+      useAuthStore.getState().logout();
+    });
+
+    expect(useAuthStore.getState().token).toBeNull();
+    expect(useAuthStore.getState().user).toBeNull();
+  });
+
+  it("register calls api and then logs in", async () => {
+    (api.post as jest.Mock).mockResolvedValueOnce({});
+    (global.fetch as jest.Mock).mockResolvedValueOnce({
+      ok: true,
+      json: async () => ({ access_token: "fake-token" }),
+    });
+    (api.get as jest.Mock).mockResolvedValueOnce(mockUser);
+
+    await act(async () => {
+      await useAuthStore.getState().register("new@example.com", "password", "New User");
+    });
+
+    expect(api.post).toHaveBeenCalledWith("/auth/register", expect.any(Object), false);
+    expect(useAuthStore.getState().token).toBe("fake-token");
+  });
+
+  it("register failure sets error", async () => {
+    (api.post as jest.Mock).mockRejectedValueOnce(new Error("Register failed"));
+
+    await act(async () => {
+      try {
+        await useAuthStore.getState().register("fail@test.com", "pw");
+      } catch {}
+    });
+
+    expect(useAuthStore.getState().error).toBe("Register failed");
+  });
+
+  it("register failure with non-Error object", async () => {
+    (api.post as jest.Mock).mockRejectedValueOnce("Some string error");
+
+    await act(async () => {
+      try {
+        await useAuthStore.getState().register("fail@test.com", "pw");
+      } catch {}
+    });
+
+    expect(useAuthStore.getState().error).toBe("Registration failed");
+  });
+
+  describe("refreshToken", () => {
+    it("refreshes token successfully and dispatches event", async () => {
+      useAuthStore.setState({ token: "old-token" });
       (global.fetch as jest.Mock).mockResolvedValueOnce({
         ok: true,
-        json: async () => ({ access_token: "test-token" }),
+        json: async () => ({ access_token: "new-token" }),
       });
 
-      // Mock api.get response for fetchUser
-      (api.get as jest.Mock).mockResolvedValueOnce({ id: "1", email: "test@example.com" });
+      const dispatchSpy = jest.spyOn(window, "dispatchEvent");
 
+      let result;
       await act(async () => {
-        await result.current.login("test@example.com", "password");
+        result = await useAuthStore.getState().refreshToken();
       });
 
-      expect(result.current.token).toBe("test-token");
-      expect(result.current.user).toEqual({ id: "1", email: "test@example.com" });
-      expect(result.current.isLoading).toBe(false);
-      expect(result.current.error).toBeNull();
+      expect(result).toBe(true);
+      expect(useAuthStore.getState().token).toBe("new-token");
+      expect(dispatchSpy).toHaveBeenCalledWith(expect.any(CustomEvent));
+      dispatchSpy.mockRestore();
     });
 
-    it("should handle login failure", async () => {
-      const { result } = renderHook(() => useAuthStore());
-
+    it("logs out on refresh failure", async () => {
+      useAuthStore.setState({ token: "old-token" });
       (global.fetch as jest.Mock).mockResolvedValueOnce({
         ok: false,
-        statusText: "Unauthorized",
       });
 
+      let result;
       await act(async () => {
-        try {
-          await result.current.login("test@example.com", "wrong-password");
-        } catch (e) {
-          // Expected error
-        }
+        result = await useAuthStore.getState().refreshToken();
       });
 
-      expect(result.current.token).toBeNull();
-      expect(result.current.error).toBe("Login failed");
-      expect(result.current.isLoading).toBe(false);
+      expect(result).toBe(false);
+      expect(useAuthStore.getState().token).toBeNull();
     });
-  });
 
-  describe("register", () => {
-    it("should handle successful registration and auto-login", async () => {
-      const { result } = renderHook(() => useAuthStore());
+    it("returns false if no token", async () => {
+      useAuthStore.setState({ token: null });
+      const result = await useAuthStore.getState().refreshToken();
+      expect(result).toBe(false);
+    });
 
-      // Mock api.post for register
-      (api.post as jest.Mock).mockResolvedValueOnce({});
+    it("handles network error", async () => {
+      useAuthStore.setState({ token: "old-token" });
+      (global.fetch as jest.Mock).mockRejectedValueOnce(new Error("Network error"));
 
-      // Mock fetch for auto-login
+      let result;
+      await act(async () => {
+        result = await useAuthStore.getState().refreshToken();
+      });
+
+      expect(result).toBe(false);
+      expect(useAuthStore.getState().token).toBeNull();
+    });
+
+    it("deduplicates concurrent calls", async () => {
+      useAuthStore.setState({ token: "old-token" });
+
+      let resolveRequest: (v: any) => void;
+      const requestPromise = new Promise((resolve) => {
+        resolveRequest = resolve;
+      });
+
+      (global.fetch as jest.Mock).mockReturnValue(requestPromise);
+
+      const p1 = useAuthStore.getState().refreshToken();
+      const p2 = useAuthStore.getState().refreshToken();
+
+      // expect(p1).toBe(p2); // Removed because async function wraps return in new promise
+
+      resolveRequest!({ ok: true, json: async () => ({ access_token: "new" }) });
+      await p1;
+      expect(global.fetch).toHaveBeenCalledTimes(1);
+    });
+    it("does not dispatch event if window is undefined", async () => {
+      useAuthStore.setState({ token: "old-token" });
       (global.fetch as jest.Mock).mockResolvedValueOnce({
         ok: true,
-        json: async () => ({ access_token: "test-token" }),
+        json: async () => ({ access_token: "new-token" }),
       });
 
-      // Mock api.get for fetchUser
-      (api.get as jest.Mock).mockResolvedValueOnce({ id: "1", email: "new@example.com" });
+      const originalWindow = global.window;
+      // @ts-ignore
+      delete global.window;
 
       await act(async () => {
-        await result.current.register("new@example.com", "password", "New User");
+        await useAuthStore.getState().refreshToken();
       });
 
-      expect(api.post).toHaveBeenCalledWith(
-        "/auth/register",
-        expect.objectContaining({ email: "new@example.com", is_active: true }),
-        false
-      );
-      expect(result.current.token).toBe("test-token");
+      // Restore window
+      global.window = originalWindow;
+
+      // No assertion needed other than no crash, but coverage should pick it up.
+      expect(useAuthStore.getState().token).toBe("new-token");
     });
   });
 
-  describe("logout", () => {
-    it("should clear state on logout", () => {
-      const { result } = renderHook(() => useAuthStore());
+  describe("Account Management", () => {
+    it("hasRole checks user role", () => {
+      useAuthStore.setState({ user: { ...mockUser, role: UserRole.ADMIN } });
+      expect(useAuthStore.getState().hasRole(UserRole.ADMIN)).toBe(true);
+      expect(useAuthStore.getState().hasRole(UserRole.USER)).toBe(false);
+    });
 
-      act(() => {
-        useAuthStore.setState({
-          token: "token",
-          user: { id: "1", email: "test" } as any,
-        });
+    it("updateProfile updates user", async () => {
+      const updatedUser = { ...mockUser, full_name: "Updated" };
+      (api.put as jest.Mock).mockResolvedValueOnce(updatedUser);
+
+      await act(async () => {
+        await useAuthStore.getState().updateProfile({ full_name: "Updated" });
       });
 
-      act(() => {
-        result.current.logout();
+      expect(api.put).toHaveBeenCalledWith("/users/me", { full_name: "Updated" });
+      expect(useAuthStore.getState().user).toEqual(updatedUser);
+    });
+
+    it("updateProfile failure", async () => {
+      (api.put as jest.Mock).mockRejectedValueOnce(new Error("Update failed"));
+      try {
+        await act(async () => await useAuthStore.getState().updateProfile({}));
+      } catch {}
+      expect(useAuthStore.getState().error).toBe("Update failed");
+    });
+
+    it("updateProfile failure with non-Error", async () => {
+      (api.put as jest.Mock).mockRejectedValueOnce("fail");
+      try {
+        await act(async () => await useAuthStore.getState().updateProfile({}));
+      } catch {}
+      expect(useAuthStore.getState().error).toBe("Failed to update profile");
+    });
+
+    it("changePassword calls api", async () => {
+      (api.put as jest.Mock).mockResolvedValueOnce({});
+      await act(async () => {
+        await useAuthStore.getState().changePassword("old", "new");
+      });
+      expect(api.put).toHaveBeenCalledWith("/users/me/password", {
+        current_password: "old",
+        new_password: "new",
+      });
+    });
+
+    it("changePassword failure", async () => {
+      (api.put as jest.Mock).mockRejectedValueOnce(new Error("Password fail"));
+      try {
+        await act(async () => await useAuthStore.getState().changePassword("old", "new"));
+      } catch {}
+      expect(useAuthStore.getState().error).toBe("Password fail");
+    });
+
+    it("changePassword failure with non-Error", async () => {
+      (api.put as jest.Mock).mockRejectedValueOnce("fail");
+      try {
+        await act(async () => await useAuthStore.getState().changePassword("old", "new"));
+      } catch {}
+      expect(useAuthStore.getState().error).toBe("Failed to change password");
+    });
+
+    it("deleteAccount calls api and logs out", async () => {
+      (api.del as jest.Mock).mockResolvedValueOnce({});
+      useAuthStore.setState({ token: "token" });
+
+      await act(async () => {
+        await useAuthStore.getState().deleteAccount();
       });
 
-      expect(result.current.token).toBeNull();
-      expect(result.current.user).toBeNull();
+      expect(api.del).toHaveBeenCalledWith("/users/me");
+      expect(useAuthStore.getState().token).toBeNull();
+    });
+
+    it("deleteAccount failure", async () => {
+      (api.del as jest.Mock).mockRejectedValueOnce(new Error("Delete fail"));
+      try {
+        await act(async () => await useAuthStore.getState().deleteAccount());
+      } catch {}
+      expect(useAuthStore.getState().error).toBe("Delete fail");
+    });
+
+    it("deleteAccount failure with non-Error", async () => {
+      (api.del as jest.Mock).mockRejectedValueOnce("fail");
+      try {
+        await act(async () => await useAuthStore.getState().deleteAccount());
+      } catch {}
+      expect(useAuthStore.getState().error).toBe("Failed to delete account");
+    });
+
+    it("exportData triggers download", async () => {
+      const data = { foo: "bar" };
+      (api.get as jest.Mock).mockResolvedValueOnce(data);
+
+      // Mock DOM dependencies
+      const mockUrl = "blob:url";
+      global.URL.createObjectURL = jest.fn(() => mockUrl);
+      global.URL.revokeObjectURL = jest.fn();
+
+      const mockAnchor = { click: jest.fn(), href: "", download: "" };
+      const createElementSpy = jest
+        .spyOn(document, "createElement")
+        .mockReturnValue(mockAnchor as any);
+      const appendChildSpy = jest.spyOn(document.body, "appendChild").mockImplementation();
+      const removeChildSpy = jest.spyOn(document.body, "removeChild").mockImplementation();
+
+      await act(async () => {
+        await useAuthStore.getState().exportData();
+      });
+
+      expect(api.get).toHaveBeenCalledWith("/users/me/export");
+      expect(global.URL.createObjectURL).toHaveBeenCalled();
+      expect(mockAnchor.click).toHaveBeenCalled();
+      expect(global.URL.revokeObjectURL).toHaveBeenCalledWith(mockUrl);
+
+      createElementSpy.mockRestore();
+      appendChildSpy.mockRestore();
+      removeChildSpy.mockRestore();
+    });
+
+    it("exportData failure", async () => {
+      (api.get as jest.Mock).mockRejectedValueOnce(new Error("Export fail"));
+      try {
+        await act(async () => await useAuthStore.getState().exportData());
+      } catch {} // Expected
+      expect(useAuthStore.getState().error).toBe("Export fail");
+    });
+
+    it("exportData failure with non-Error", async () => {
+      (api.get as jest.Mock).mockRejectedValueOnce("fail");
+      try {
+        await act(async () => await useAuthStore.getState().exportData());
+      } catch {} // Expected
+      expect(useAuthStore.getState().error).toBe("Failed to export data");
     });
   });
-  describe("fetchUser", () => {
-    it("should return early if no token", async () => {
-      const { result } = renderHook(() => useAuthStore());
 
-      await act(async () => {
-        await result.current.fetchUser();
-      });
-
-      expect(api.get).not.toHaveBeenCalled();
-      expect(result.current.isLoading).toBe(false);
-    });
-
-    it("should handle fetch error", async () => {
-      const { result } = renderHook(() => useAuthStore());
-
-      act(() => {
-        result.current.setToken("existing-token");
-      });
-
-      // Mock console.error
-      const mockError = jest.spyOn(console, "error").mockImplementation(() => {});
-      (api.get as jest.Mock).mockRejectedValueOnce(new Error("Network"));
-
-      await act(async () => {
-        await result.current.fetchUser();
-      });
-
-      expect(result.current.user).toBeNull();
-      expect(mockError).toHaveBeenCalled();
-      expect(result.current.isLoading).toBe(false);
-      mockError.mockRestore();
-    });
+  it("setUser sets user directly", () => {
+    act(() => useAuthStore.getState().setUser(mockUser));
+    expect(useAuthStore.getState().user).toEqual(mockUser);
   });
 
-  describe("direct setters", () => {
-    it("should update token and user directly", () => {
-      const { result } = renderHook(() => useAuthStore());
-
-      act(() => {
-        result.current.setToken("manual-token");
-        result.current.setUser({ id: "99", email: "manual" } as any);
-      });
-
-      expect(result.current.token).toBe("manual-token");
-      expect(result.current.user?.id).toBe("99");
-    });
+  it("setToken sets token directly", () => {
+    act(() => useAuthStore.getState().setToken("direct-token"));
+    expect(useAuthStore.getState().token).toBe("direct-token");
   });
 
-  describe("failures", () => {
-    it("should handle registration failure", async () => {
-      const { result } = renderHook(() => useAuthStore());
-      (api.post as jest.Mock).mockRejectedValueOnce(new Error("Email taken"));
+  it("fetchUser handles error gracefully", async () => {
+    useAuthStore.setState({ token: "token" });
+    const consoleSpy = jest.spyOn(console, "error").mockImplementation();
+    (api.get as jest.Mock).mockRejectedValueOnce(new Error("Fetch fail"));
 
-      await act(async () => {
-        try {
-          await result.current.register("taken@example.com", "pass");
-        } catch (e) {
-          expect(e).toEqual(new Error("Email taken"));
-        }
-      });
-
-      expect(result.current.error).toBe("Email taken");
-      expect(result.current.isLoading).toBe(false);
+    await act(async () => {
+      await useAuthStore.getState().fetchUser();
     });
 
-    it("should handle login with non-Error object", async () => {
-      const { result } = renderHook(() => useAuthStore());
-      (global.fetch as jest.Mock).mockRejectedValueOnce("String Error");
-
-      await act(async () => {
-        try {
-          await result.current.login("test", "pass");
-        } catch (e) {
-          expect(e).toBe("String Error");
-        }
-      });
-      expect(result.current.error).toBe("Login failed");
-    });
-
-    it("should handle registration with non-Error object", async () => {
-      const { result } = renderHook(() => useAuthStore());
-      (api.post as jest.Mock).mockRejectedValueOnce("String Error");
-
-      await act(async () => {
-        try {
-          await result.current.register("test", "pass");
-        } catch (e) {
-          expect(e).toBe("String Error");
-        }
-      });
-      expect(result.current.error).toBe("Registration failed");
-    });
+    expect(consoleSpy).toHaveBeenCalled();
+    consoleSpy.mockRestore();
   });
-  describe("selectors", () => {
-    it("should check authentication", () => {
-      const { result } = renderHook(() => useAuthStore());
-      expect(result.current.isAuthenticated()).toBe(false);
 
-      act(() => result.current.setToken("token"));
-      expect(result.current.isAuthenticated()).toBe(true);
+  it("fetchUser returns early if no token", async () => {
+    useAuthStore.setState({ token: null });
+    await act(async () => {
+      await useAuthStore.getState().fetchUser();
     });
-
-    it("should check role", () => {
-      const { result } = renderHook(() => useAuthStore());
-      expect(result.current.hasRole("admin")).toBe(false);
-
-      act(() => result.current.setUser({ role: "user" } as any));
-      expect(result.current.hasRole("user")).toBe(true);
-      expect(result.current.hasRole("admin")).toBe(false);
-    });
+    expect(api.get).not.toHaveBeenCalled();
   });
 });

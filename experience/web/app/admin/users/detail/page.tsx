@@ -28,7 +28,10 @@ export default function AdminUserDetailsPage() {
   const [isActive, setIsActive] = useState(true);
 
   useEffect(() => {
-    if (!id) return;
+    if (!id) {
+      setIsLoading(false);
+      return;
+    }
 
     async function fetchData() {
       setIsLoading(true);

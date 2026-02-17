@@ -307,4 +307,65 @@ describe("useGoalSettingLogic", () => {
     });
     expect(result.current.expandedStrategy).toBeNull();
   });
+
+  it("handles multiple alternative paths", async () => {
+    const mockPaths = [
+      { path_id: "p1", waypoints: [] },
+      { path_id: "p2", waypoints: [] },
+    ];
+    // Mock the therapeutic service for this specific test
+    const { therapeuticService } = require("@/services/therapeuticService");
+    therapeuticService.findAlternativePaths.mockResolvedValue({ paths: mockPaths });
+
+    // We also need generateTransitionPath to resolve for the fallback call
+    mockGenerateTransitionPath.mockResolvedValue(mockPaths[0]);
+
+    const { result } = renderHook(() => useGoalSettingLogic());
+
+    act(() => {
+      result.current.handleSelectGoal({
+        id: "joy",
+        name: "Joy",
+        vac: [1, 1, 1],
+        category: "cat",
+      } as any);
+    });
+
+    await act(async () => {
+      await result.current.handleGeneratePath();
+    });
+
+    // Check if the primary path is set in the store (we can't easily check store state here without more mocks,
+    // but we can check if the generatedPath state was updated ultimately)
+    expect(result.current.generatedPath).toEqual(mockPaths[0]);
+
+    // Verify logger was called for multiple paths
+    const { logger } = require("@/utils/logger");
+    expect(logger.info).toHaveBeenCalledWith("api", "Found 2 alternative paths");
+  });
+
+  it("handles no alternative paths", async () => {
+    // Mock service returning empty paths
+    const { therapeuticService } = require("@/services/therapeuticService");
+    therapeuticService.findAlternativePaths.mockResolvedValue({ paths: [] });
+
+    const { result } = renderHook(() => useGoalSettingLogic());
+
+    act(() => {
+      result.current.handleSelectGoal({
+        id: "joy",
+        name: "Joy",
+        vac: [1, 1, 1],
+        category: "cat",
+      } as any);
+    });
+
+    await act(async () => {
+      await result.current.handleGeneratePath();
+    });
+
+    // Should not set generated path (remains null or previous value cleared)
+    expect(result.current.generatedPath).toBeNull();
+    // And should definitely not throw
+  });
 });

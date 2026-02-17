@@ -1,5 +1,6 @@
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import { JourneyHistory } from "@/components/JourneyHistory";
+import * as JourneyIndex from "@/components/journey";
 import { getObserverClient } from "@love/experience-shared";
 
 // Mock shared library
@@ -197,5 +198,17 @@ describe("JourneyHistory", () => {
 
     // Should NOT show "Progress: Waypoint X"
     expect(screen.queryByText(/Progress: Waypoint/)).not.toBeInTheDocument();
+  });
+  it("exports all components from barrel file", () => {
+    expect(JourneyIndex.JourneyHistory).toBeDefined();
+    expect(JourneyIndex.JourneyProgress).toBeDefined();
+    expect(JourneyIndex.PathComparisonView).toBeDefined();
+    expect(JourneyIndex.PathDetailsOverlay).toBeDefined();
+    expect(JourneyIndex.PathExplanationPanel).toBeDefined();
+    expect(JourneyIndex.PathfindingInsights).toBeDefined();
+    expect(JourneyIndex.StepAlternativeSelector).toBeDefined();
+    expect(JourneyIndex.TransitionPathRenderer).toBeDefined();
+    expect(JourneyIndex.WaypointArrivalOverlay).toBeDefined();
+    expect(JourneyIndex.WaypointTooltip).toBeDefined();
   });
 });

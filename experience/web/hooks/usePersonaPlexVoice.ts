@@ -94,7 +94,9 @@ export function usePersonaPlexVoice({
 
     // Close Audio Context
     if (audioContextRef.current) {
-      audioContextRef.current.close().catch(console.error);
+      if (audioContextRef.current.state !== "closed") {
+        audioContextRef.current.close().catch(console.error);
+      }
       audioContextRef.current = null;
     }
 
@@ -181,7 +183,6 @@ export function usePersonaPlexVoice({
           // For now, quick RMS.
           // data is Float32Array (128 length usually)
 
-          // CRITICAL FIX: Use ws.readyState to check connection (local scope)
           // and isMutedRef for mute state (stable ref) to avoid stale closure issues.
           if (ws.readyState === WebSocket.OPEN && !isMutedRef.current) {
             ws.send(data); // Send raw float32

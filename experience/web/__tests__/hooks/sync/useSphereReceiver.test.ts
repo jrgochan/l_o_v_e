@@ -5,6 +5,8 @@ import { SphereStateMessage } from "@/hooks/sync/types";
 
 // Mock store
 jest.mock("@/stores/useExperienceStore");
+jest.mock("@/stores/useSettingsStore");
+import { useSettingsStore } from "@/stores/useSettingsStore";
 jest.mock("@/utils/logger", () => ({
   logger: {
     debug: jest.fn(),
@@ -29,6 +31,16 @@ describe("useSphereReceiver", () => {
       setTarget,
       setTransitionPath,
       setShowPath,
+    });
+
+    // Mock settings store
+    (useSettingsStore.getState as jest.Mock) = jest.fn().mockReturnValue({
+      setSphereOpacity: jest.fn(),
+      setAnimationSpeed: jest.fn(),
+      setRenderQuality: jest.fn(),
+      toggleAutoRotate: jest.fn(),
+      updateVisualSetting: jest.fn(),
+      autoRotate: false,
     });
   });
 
@@ -178,5 +190,64 @@ describe("useSphereReceiver", () => {
     });
 
     expect(onSync).toHaveBeenCalledWith(message);
+  });
+
+  it("should apply visual settings from sphere_update", () => {
+    const { result } = renderHook(() => useSphereReceiver("listener", 0));
+
+    const visualSettings = {
+      sphereTransparency: 0.2, // opacity 0.8
+      animationSpeed: 1.5,
+      renderQuality: "high",
+      autoRotate: true,
+      pathAnimationMode: "flow",
+    };
+
+    const message: any = {
+      type: "sphere_update",
+      vac: [0, 0, 0],
+      visualSettings,
+      timestamp: 123,
+    };
+
+    const store = useSettingsStore.getState();
+
+    act(() => {
+      result.current.handleMessage(message);
+    });
+
+    expect(store.setSphereOpacity).toHaveBeenCalledWith(0.8);
+    expect(store.setAnimationSpeed).toHaveBeenCalledWith(1.5);
+    expect(store.setRenderQuality).toHaveBeenCalledWith("high");
+    expect(store.toggleAutoRotate).toHaveBeenCalled(); // Because autoRotate was false in mock
+    expect(store.updateVisualSetting).toHaveBeenCalledWith("pathAnimationMode", "flow");
+  });
+
+  it("should NOT toggle autoRotate if setting matches", () => {
+    const { result } = renderHook(() => useSphereReceiver("listener", 0));
+    const store = useSettingsStore.getState();
+    // @ts-ignore
+    store.autoRotate = true; // Match the incoming true
+
+    const visualSettings = {
+      sphereTransparency: 0.2,
+      animationSpeed: 1.5,
+      renderQuality: "high",
+      autoRotate: true, // Matches store
+      pathAnimationMode: "flow",
+    };
+
+    const message: any = {
+      type: "sphere_update",
+      vac: [0, 0, 0],
+      visualSettings,
+      timestamp: 123,
+    };
+
+    act(() => {
+      result.current.handleMessage(message);
+    });
+
+    expect(store.toggleAutoRotate).not.toHaveBeenCalled();
   });
 });

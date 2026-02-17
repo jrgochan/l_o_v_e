@@ -13,7 +13,13 @@ interface AuthState {
   isLoading: boolean;
   error: string | null;
   consentRequired: boolean;
-  outstandingPolicies: Array<{ key: string; title: string; description: string; required: boolean; version: string }>;
+  outstandingPolicies: Array<{
+    key: string;
+    title: string;
+    description: string;
+    required: boolean;
+    version: string;
+  }>;
 
   setToken: (token: string) => void;
   setUser: (user: User) => void;
@@ -21,7 +27,12 @@ interface AuthState {
 
   // Async actions
   login: (email: string, password: string) => Promise<void>;
-  register: (email: string, password: string, fullName?: string, consents?: string[]) => Promise<void>;
+  register: (
+    email: string,
+    password: string,
+    fullName?: string,
+    consents?: string[]
+  ) => Promise<void>;
   fetchUser: () => Promise<void>;
   refreshToken: () => Promise<boolean>;
 
@@ -77,7 +88,7 @@ export const useAuthStore = create<AuthState>()(
           set({
             token: data.access_token,
             consentRequired: !!data.consent_required,
-            outstandingPolicies: data.outstanding_policies || []
+            outstandingPolicies: data.outstanding_policies || [],
           });
 
           // Fetch user details immediately after login
@@ -259,7 +270,7 @@ export const useAuthStore = create<AuthState>()(
         token: state.token,
         user: state.user,
         consentRequired: state.consentRequired,
-        outstandingPolicies: state.outstandingPolicies
+        outstandingPolicies: state.outstandingPolicies,
       }), // Persist token, user, and consent status
     }
   )

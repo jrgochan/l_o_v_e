@@ -78,6 +78,9 @@ jest.mock("@/components/admin/panels/AnalysisPanel", () => ({
 jest.mock("@/components/admin/panels/EmotionHistoryPanel", () => ({
   EmotionHistoryPanel: () => <div data-testid="history-panel">History Panel</div>,
 }));
+jest.mock("@/components/admin/chat/VoiceChat", () => ({
+  VoiceChat: (props: any) => <div data-testid="voice-chat" data-props={JSON.stringify(props)} />,
+}));
 
 import { useChatPanelState } from "@/hooks/chat/useChatPanelState";
 import { useChatSessionState } from "@/hooks/chat/useChatSessionState";
@@ -644,6 +647,61 @@ describe("ChatPanel", () => {
 
     expect(mockSetIsExpanded).toHaveBeenCalledWith(false);
     expect(mockSetHeight).toHaveBeenCalledWith(60);
+  });
+
+  it("uses Clinical Persona (Logos) when tone is clinical", () => {
+    (useChatPanelState as jest.Mock).mockReturnValue({
+      ...defaultChatPanelState,
+      isExpanded: true,
+      chatMode: "voice",
+      toneMode: "clinical",
+      deepFeelingMode: false,
+    });
+
+    render(<ChatPanel sessionId="sess1" />);
+
+    const voiceChat = screen.getByTestId("voice-chat");
+    const props = JSON.parse(voiceChat.getAttribute("data-props") || "{}");
+
+    expect(props).toEqual(
+      expect.objectContaining({
+        personaId: "logos",
+        personaColor: "#06B6D4",
+      })
+    );
+  });
+
+  it("uses Clinical Persona (Logos) when tone is clinical", () => {
+    // Mock state to render VoiceChat with clinical tone
+    (useChatPanelState as jest.Mock).mockReturnValue({
+      ...defaultChatPanelState,
+      isExpanded: true,
+      chatMode: "voice", // Render VoiceChat
+      toneMode: "clinical", // Trigger getActivePersona branch
+      deepFeelingMode: false,
+    });
+
+    // We need to mock VoiceChat to inspect props, or check if it renders with specific props
+    // We already mocked it in the top of the file:
+    // jest.mock("@/components/admin/chat/VoiceChat", () => ({ ... }))
+    // But we didn't include it in the initial file view content's mocks section (lines 46-75).
+    // Wait, I missed VoiceChat mock in the file view?
+    // Let me check the file content again or just assume it needs mocking/updating.
+    // Lines 627-633 use VoiceChat.
+    // Lines 34 imports it.
+    // The previous file view showed mocks for ChatHeader, ChatInput, ChatMessages, AnalysisPanel...
+    // I don't see VoiceChat mocked in lines 46-80 of the view.
+    // It might be using the real component or I missed the mock.
+    // Let's check if VoiceChat is mocked. If not, I should mock it to verify props.
+    // Actually, I should just assume I can mock it now if it's not present, or use the real one if it is simple.
+    // However, `getActivePersona` passes `personaId`, `personaColor`, `personaDescription` to `VoiceChat`.
+    // I want to verify these props.
+    // I will add a mock for VoiceChat to the test file if it's not there, or update it.
+    // But I can't easily see if it's there without scrolling up?
+    // I reviewed lines 1-800.
+    // Lines 46-81 show mocks. VoiceChat is NOT mocked there.
+    // So it might be using real component which implies deep dependencies.
+    // I should mock it to capture props.
   });
 
   it("handles WebSocket callbacks: onProsody", async () => {

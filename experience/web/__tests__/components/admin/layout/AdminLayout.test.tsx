@@ -58,4 +58,32 @@ describe("AdminLayout", () => {
     const dataLink = screen.getByRole("link", { name: /data management/i });
     expect(dataLink.className).toContain("text-cyan-400");
   });
+
+  it("renders restricted navigation for clinician role", () => {
+    (useAuthStore as unknown as jest.Mock).mockReturnValue({
+      user: { ...mockUser, role: "clinician" },
+    });
+    render(<AdminLayout>Content</AdminLayout>);
+
+    // Should see Clinical Portal
+    expect(screen.getByRole("link", { name: /clinical portal/i })).toBeInTheDocument();
+
+    // Should NOT see Admin-only links
+    expect(screen.queryByRole("link", { name: /users/i })).not.toBeInTheDocument();
+    expect(screen.queryByRole("link", { name: /data management/i })).not.toBeInTheDocument();
+
+    // Header should say Clinical
+    expect(screen.getByText("Clinical")).toBeInTheDocument();
+  });
+
+  it("handles missing user gracefully", () => {
+    (useAuthStore as unknown as jest.Mock).mockReturnValue({ user: undefined });
+    render(<AdminLayout>Content</AdminLayout>);
+
+    // Should still render layout but no user email
+    expect(screen.getByTestId("admin-guard")).toBeInTheDocument();
+    // Email area is usually empty or doesn't throw
+    const emailDefaults = screen.queryByText("admin@example.com");
+    expect(emailDefaults).not.toBeInTheDocument();
+  });
 });

@@ -140,10 +140,7 @@ export function ClinicalPortal() {
   const filteredClients = clients.filter((c) => {
     if (!searchQuery) return true;
     const q = searchQuery.toLowerCase();
-    return (
-      (c.full_name?.toLowerCase().includes(q) ?? false) ||
-      c.email.toLowerCase().includes(q)
-    );
+    return (c.full_name?.toLowerCase().includes(q) ?? false) || c.email.toLowerCase().includes(q);
   });
 
   const filteredAlerts = alerts.filter((a) => {
@@ -152,7 +149,6 @@ export function ClinicalPortal() {
   });
 
   const criticalAlerts = alerts.filter((a) => a.level === "critical");
-
 
   // --- Render ---
   return (
@@ -167,7 +163,8 @@ export function ClinicalPortal() {
             <div>
               <h1 className="text-lg font-bold text-white">Clinical Portal</h1>
               <p className="text-xs text-gray-400">
-                {user?.full_name || "Clinician"} · {clients.length} client{clients.length !== 1 ? "s" : ""}
+                {user?.full_name || "Clinician"} · {clients.length} client
+                {clients.length !== 1 ? "s" : ""}
               </p>
             </div>
           </div>
@@ -260,21 +257,10 @@ export function ClinicalPortal() {
                 filterLevel={alertFilter}
                 onFilterChange={setAlertFilter}
                 allAlerts={alerts}
-                onViewClient={(clientId) => {
-                  const client = clients.find((c) => c.id === clientId);
-                  if (client) {
-                    setActiveTab("clients");
-                    openClientDetail(client);
-                  }
-                }}
               />
             )}
             {activeTab === "analytics" && (
-              <AnalyticsTab
-                clients={clients}
-                alerts={alerts}
-                alertSummary={alertSummary}
-              />
+              <AnalyticsTab clients={clients} alerts={alerts} alertSummary={alertSummary} />
             )}
           </>
         )}
@@ -430,9 +416,7 @@ function OverviewTab({
             </div>
           ))}
           {alerts.length === 0 && (
-            <div className="px-5 py-8 text-center text-gray-600 text-sm">
-              No recent activity
-            </div>
+            <div className="px-5 py-8 text-center text-gray-600 text-sm">No recent activity</div>
           )}
         </div>
       </div>
@@ -458,9 +442,7 @@ function StatCard({
     <div className="rounded-xl border border-gray-800 bg-gray-900/50 p-5">
       <div className="flex items-center gap-3 mb-3">
         {icon}
-        <span className="text-xs font-medium text-gray-500 uppercase tracking-wider">
-          {label}
-        </span>
+        <span className="text-xs font-medium text-gray-500 uppercase tracking-wider">{label}</span>
       </div>
       <p className="text-3xl font-bold text-white">{value}</p>
     </div>
@@ -508,40 +490,38 @@ function ClientsTab({
       {/* Client Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {clients.map((client) => (
-            <button
-              key={client.id}
-              onClick={() => onSelectClient(client)}
-              className="text-left p-5 rounded-xl border border-gray-800 bg-gray-900/50 hover:border-teal-700 hover:bg-teal-950/10 transition-all group"
-              aria-label={`View details for ${client.full_name || client.email}`}
-            >
-              <div className="flex items-start gap-3">
-                <div className="w-10 h-10 rounded-full bg-gradient-to-br from-purple-600 to-pink-600 flex items-center justify-center flex-shrink-0">
-                  <User className="w-5 h-5 text-white" />
-                </div>
-                <div className="flex-1 min-w-0">
-                  <p className="font-medium text-white text-sm truncate">
-                    {client.full_name || "Unknown"}
-                  </p>
-                  <p className="text-xs text-gray-500 truncate">{client.email}</p>
-                </div>
-                <span
-                  className={`px-2 py-0.5 rounded-full text-xs font-medium ${
-                    client.is_active
-                      ? "bg-green-900/30 text-green-400"
-                      : "bg-gray-800 text-gray-500"
-                  }`}
-                >
-                  {client.is_active ? "Active" : "Inactive"}
-                </span>
+          <button
+            key={client.id}
+            onClick={() => onSelectClient(client)}
+            className="text-left p-5 rounded-xl border border-gray-800 bg-gray-900/50 hover:border-teal-700 hover:bg-teal-950/10 transition-all group"
+            aria-label={`View details for ${client.full_name || client.email}`}
+          >
+            <div className="flex items-start gap-3">
+              <div className="w-10 h-10 rounded-full bg-gradient-to-br from-purple-600 to-pink-600 flex items-center justify-center flex-shrink-0">
+                <User className="w-5 h-5 text-white" />
               </div>
-              <div className="mt-3 flex items-center gap-4 text-xs text-gray-500">
-                <span className="flex items-center gap-1">
-                  <Clock className="w-3 h-3" />
-                  Joined {new Date(client.created_at).toLocaleDateString()}
-                </span>
+              <div className="flex-1 min-w-0">
+                <p className="font-medium text-white text-sm truncate">
+                  {client.full_name || "Unknown"}
+                </p>
+                <p className="text-xs text-gray-500 truncate">{client.email}</p>
               </div>
-            </button>
-          ))}
+              <span
+                className={`px-2 py-0.5 rounded-full text-xs font-medium ${
+                  client.is_active ? "bg-green-900/30 text-green-400" : "bg-gray-800 text-gray-500"
+                }`}
+              >
+                {client.is_active ? "Active" : "Inactive"}
+              </span>
+            </div>
+            <div className="mt-3 flex items-center gap-4 text-xs text-gray-500">
+              <span className="flex items-center gap-1">
+                <Clock className="w-3 h-3" />
+                Joined {new Date(client.created_at).toLocaleDateString()}
+              </span>
+            </div>
+          </button>
+        ))}
       </div>
 
       {clients.length === 0 && (
@@ -615,9 +595,7 @@ function ClientDetailView({
             <User className="w-6 h-6 text-white" />
           </div>
           <div>
-            <h2 className="text-lg font-bold text-white">
-              {client.full_name || "Unknown Client"}
-            </h2>
+            <h2 className="text-lg font-bold text-white">{client.full_name || "Unknown Client"}</h2>
             <p className="text-sm text-gray-500">{client.email}</p>
           </div>
         </div>
@@ -634,13 +612,13 @@ function ClientDetailView({
           <p className="text-xs text-gray-500">Data Points</p>
         </div>
         <div className="rounded-lg border border-gray-800 bg-gray-900/50 p-3 text-center">
-          <p className="text-2xl font-bold text-white">
-            {latestEmotion?.emotion_name || "—"}
-          </p>
+          <p className="text-2xl font-bold text-white">{latestEmotion?.emotion_name || "—"}</p>
           <p className="text-xs text-gray-500">Latest Emotion</p>
         </div>
         <div className="rounded-lg border border-gray-800 bg-gray-900/50 p-3 text-center">
-          <p className={`text-2xl font-bold ${avgValence >= 0 ? "text-green-400" : "text-red-400"}`}>
+          <p
+            className={`text-2xl font-bold ${avgValence >= 0 ? "text-green-400" : "text-red-400"}`}
+          >
             {avgValence.toFixed(2)}
           </p>
           <p className="text-xs text-gray-500">Avg. Valence</p>
@@ -648,20 +626,23 @@ function ClientDetailView({
       </div>
 
       {/* Detail tabs */}
-      <div className="flex gap-1 border-b border-gray-800" role="tablist" aria-label="Client detail tabs">
-        {(
-          [
-            { id: "sessions" as const, label: "Sessions", count: sessions.length },
-            { id: "trajectory" as const, label: "Trajectory", count: trajectory.length },
-            { id: "alerts" as const, label: "Alerts", count: alerts.length },
-            { id: "notes" as const, label: "Notes", count: null },
-          ]
-        ).map((tab) => (
+      <div
+        className="flex gap-1 border-b border-gray-800"
+        role="tablist"
+        aria-label="Client detail tabs"
+      >
+        {[
+          { id: "sessions" as const, label: "Sessions", count: sessions.length },
+          { id: "trajectory" as const, label: "Trajectory", count: trajectory.length },
+          { id: "alerts" as const, label: "Alerts", count: alerts.length },
+          { id: "notes" as const, label: "Notes", count: null },
+        ].map((tab) => (
           <button
             key={tab.id}
             role="tab"
             aria-selected={detailTab === tab.id}
             onClick={() => setDetailTab(tab.id)}
+            data-testid={`client-detail-tab-${tab.id}`}
             className={`px-4 py-2 text-sm font-medium border-b-2 transition flex items-center gap-1.5 ${
               detailTab === tab.id
                 ? "border-teal-500 text-teal-400"
@@ -670,9 +651,7 @@ function ClientDetailView({
           >
             {tab.id === "notes" && <StickyNote className="w-3.5 h-3.5" />}
             {tab.label}
-            {tab.count !== null && (
-              <span className="text-xs text-gray-600">({tab.count})</span>
-            )}
+            {tab.count !== null && <span className="text-xs text-gray-600">({tab.count})</span>}
           </button>
         ))}
       </div>
@@ -683,12 +662,8 @@ function ClientDetailView({
         </div>
       ) : (
         <>
-          {detailTab === "sessions" && (
-            <SessionsList sessions={sessions} />
-          )}
-          {detailTab === "trajectory" && (
-            <TrajectoryView trajectory={trajectory} />
-          )}
+          {detailTab === "sessions" && <SessionsList sessions={sessions} />}
+          {detailTab === "trajectory" && <TrajectoryView trajectory={trajectory} />}
           {detailTab === "alerts" && (
             <div className="space-y-3">
               {alerts.length === 0 ? (
@@ -697,9 +672,7 @@ function ClientDetailView({
                   <p className="text-sm">No alerts for this client</p>
                 </div>
               ) : (
-                alerts.map((alert) => (
-                  <AlertCard key={alert.id} alert={alert} />
-                ))
+                alerts.map((alert) => <AlertCard key={alert.id} alert={alert} />)
               )}
             </div>
           )}
@@ -764,9 +737,7 @@ function SessionsList({ sessions }: { sessions: ClientSession[] }) {
               <span className="capitalize">Tone: {session.tone_preference}</span>
             </div>
           </div>
-          <div className="text-xs text-gray-600 font-mono">
-            {session.id.slice(0, 8)}...
-          </div>
+          <div className="text-xs text-gray-600 font-mono">{session.id.slice(0, 8)}...</div>
         </div>
       ))}
     </div>
@@ -814,9 +785,7 @@ function TrajectoryView({ trajectory }: { trajectory: TrajectoryPoint[] }) {
                     style={{ width: `${pct}%` }}
                   />
                 </div>
-                <span className="text-xs text-gray-500 w-12 text-right">
-                  {pct.toFixed(0)}%
-                </span>
+                <span className="text-xs text-gray-500 w-12 text-right">{pct.toFixed(0)}%</span>
               </div>
             );
           })}
@@ -844,7 +813,8 @@ function TrajectoryView({ trajectory }: { trajectory: TrajectoryPoint[] }) {
                 {point.emotion_name || "Unknown"}
               </span>
               <span className="text-xs text-gray-600 font-mono">
-                V:{(point.valence ?? 0).toFixed(1)} A:{(point.arousal ?? 0).toFixed(1)} C:{(point.connection ?? 0).toFixed(1)}
+                V:{(point.valence ?? 0).toFixed(1)} A:{(point.arousal ?? 0).toFixed(1)} C:
+                {(point.connection ?? 0).toFixed(1)}
               </span>
               <span className="text-xs text-gray-600 whitespace-nowrap">
                 {new Date(point.timestamp).toLocaleDateString()}
@@ -908,7 +878,8 @@ function ClinicalNotesTab({
 
       <p className="text-xs text-gray-600 flex items-center gap-1.5">
         <StickyNote className="w-3 h-3" />
-        Notes are saved locally. They will sync to the server once the clinical notes backend is connected.
+        Notes are saved locally. They will sync to the server once the clinical notes backend is
+        connected.
       </p>
     </div>
   );
@@ -937,11 +908,13 @@ function AlertCard({ alert }: { alert: ClinicalAlertItem }) {
   const handleAcknowledge = () => {
     setAcknowledged(true);
     // TODO: POST to backend /clinician/alerts/:id/acknowledge when endpoint exists
-    console.log(`[AlertCard] Acknowledged alert ${alert.id}`);
   };
 
   return (
-    <div className={`p-4 rounded-lg border ${severityStyles[alert.level]} ${acknowledged ? "opacity-60" : ""} transition-opacity`}>
+    <div
+      data-testid={`alert-card-${alert.id}`}
+      className={`p-4 rounded-lg border ${severityStyles[alert.level]} ${acknowledged ? "opacity-60" : ""} transition-opacity`}
+    >
       <div className="flex items-center justify-between mb-2">
         <div className="flex items-center gap-2">
           <span
@@ -971,9 +944,7 @@ function AlertCard({ alert }: { alert: ClinicalAlertItem }) {
         </div>
       </div>
       <p className="text-sm text-white font-medium">{alert.message}</p>
-      {alert.suggestion && (
-        <p className="text-xs text-gray-400 mt-1">{alert.suggestion}</p>
-      )}
+      {alert.suggestion && <p className="text-xs text-gray-400 mt-1">{alert.suggestion}</p>}
     </div>
   );
 }
@@ -992,7 +963,6 @@ function AlertsTab({
   filterLevel: string;
   onFilterChange: (level: string) => void;
   allAlerts: ClinicalAlertItem[];
-  onViewClient: (clientId: string) => void;
 }) {
   return (
     <div className="space-y-4">
@@ -1194,7 +1164,10 @@ function AnalyticsTab({
               <div className="w-full rounded-t-md bg-gray-800 relative" style={{ height: "100%" }}>
                 <div
                   className="absolute bottom-0 left-0 right-0 rounded-t-md bg-gradient-to-t from-teal-600 to-cyan-500 transition-all"
-                  style={{ height: `${(day.count / maxDailyAlerts) * 100}%`, minHeight: day.count > 0 ? "4px" : "0" }}
+                  style={{
+                    height: `${(day.count / maxDailyAlerts) * 100}%`,
+                    minHeight: day.count > 0 ? "4px" : "0",
+                  }}
                 />
               </div>
               <span className="text-xs text-gray-600">{day.day}</span>

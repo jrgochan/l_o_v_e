@@ -27,9 +27,7 @@ function AdminLayoutContent({ children }: { children: React.ReactNode }) {
 
   // Full nav for admins; clinicians only see Clinical
   const navItems = isClinician
-    ? [
-        { label: "Clinical Portal", href: "/admin/clinical", icon: "🩺" },
-      ]
+    ? [{ label: "Clinical Portal", href: "/admin/clinical", icon: "🩺" }]
     : [
         { label: "Clinical Portal", href: "/admin/clinical", icon: "🩺" },
         { label: "Users", href: "/admin/users", icon: "👥" },

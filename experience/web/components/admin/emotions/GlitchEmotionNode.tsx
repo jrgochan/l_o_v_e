@@ -137,9 +137,9 @@ export function GlitchEmotionNode({
   const channelOpacity = 0.45;
 
   return (
-    <group ref={groupRef}>
+    <group ref={groupRef} data-testid="glitch-group">
       {/* Red channel cube */}
-      <mesh ref={redRef}>
+      <mesh ref={redRef} data-testid="glitch-red">
         <boxGeometry args={[1, 1, 1]} />
         <meshBasicMaterial
           color="#FF0000"
@@ -156,6 +156,7 @@ export function GlitchEmotionNode({
         onClick={onClick}
         onPointerOver={onPointerOver}
         onPointerOut={onPointerOut}
+        data-testid="glitch-green"
       >
         <boxGeometry args={[1, 1, 1]} />
         <meshBasicMaterial
@@ -168,7 +169,7 @@ export function GlitchEmotionNode({
       </mesh>
 
       {/* Blue channel cube */}
-      <mesh ref={blueRef}>
+      <mesh ref={blueRef} data-testid="glitch-blue">
         <boxGeometry args={[1, 1, 1]} />
         <meshBasicMaterial
           color="#0066FF"
@@ -181,7 +182,7 @@ export function GlitchEmotionNode({
 
       {/* Selection glitch aura */}
       {isSelected && (
-        <mesh>
+        <mesh data-testid="glitch-aura">
           <boxGeometry args={[size * 2.5, size * 2.5, size * 2.5]} />
           <meshBasicMaterial
             color="#00FF41"

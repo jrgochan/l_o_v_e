@@ -42,7 +42,8 @@ export function Scene() {
   // } | null>(null);
 
   // Derive dpr from renderQuality
-  const dpr: number | [number, number] = renderQuality === "low" ? 1 : renderQuality === "high" ? [1, 3] : [1, 2];
+  const dpr: number | [number, number] =
+    renderQuality === "low" ? 1 : renderQuality === "high" ? [1, 3] : [1, 2];
 
   // Debug logging
   logger.debug("rendering", "Scene render", {

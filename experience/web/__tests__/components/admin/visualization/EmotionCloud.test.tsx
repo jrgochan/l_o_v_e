@@ -25,6 +25,50 @@ jest.mock("../../../../components/admin/emotions/MysticalEmotionNode", () => ({
   ),
 }));
 
+jest.mock("../../../../components/admin/emotions/CrystallineEmotionNode", () => ({
+  CrystallineEmotionNode: (props: any) => (
+    <mesh
+      data-testid="crystalline-node"
+      onClick={props.onClick}
+      onPointerOver={props.onPointerOver}
+      onPointerOut={props.onPointerOut}
+    />
+  ),
+}));
+
+jest.mock("../../../../components/admin/emotions/LuminousEmotionNode", () => ({
+  LuminousEmotionNode: (props: any) => (
+    <mesh
+      data-testid="luminous-node"
+      onClick={props.onClick}
+      onPointerOver={props.onPointerOver}
+      onPointerOut={props.onPointerOut}
+    />
+  ),
+}));
+
+jest.mock("../../../../components/admin/emotions/LiquidEmotionNode", () => ({
+  LiquidEmotionNode: (props: any) => (
+    <mesh
+      data-testid="liquid-node"
+      onClick={props.onClick}
+      onPointerOver={props.onPointerOver}
+      onPointerOut={props.onPointerOut}
+    />
+  ),
+}));
+
+jest.mock("../../../../components/admin/emotions/GlitchEmotionNode", () => ({
+  GlitchEmotionNode: (props: any) => (
+    <mesh
+      data-testid="glitch-node"
+      onClick={props.onClick}
+      onPointerOver={props.onPointerOver}
+      onPointerOut={props.onPointerOut}
+    />
+  ),
+}));
+
 jest.mock("../../../../components/admin/particles/EmotionParticles", () => ({
   EmotionParticles: () => <group data-testid="emotion-particles" />,
 }));
@@ -542,5 +586,56 @@ describe("EmotionCloud", () => {
     expect(container).toBeDefined();
     // This will render the <mesh> block (lines 253-268) instead of AnimatedEmotionNode
     // And with the 3 emotions, we cover all ternary branches of emissive/opacity
+  });
+  it("should use crystalline node when mode is crystalline", () => {
+    mockUseSettingsStore.mockReturnValue({
+      layers: { emotionPoints: true },
+      pathAnimationMode: "crystalline",
+      focusMode: false,
+      enableAnimations: true,
+      emotionSize: 1,
+    });
+
+    const { getAllByTestId } = render(<EmotionCloud />);
+    expect(getAllByTestId("crystalline-node")).toHaveLength(2);
+  });
+
+  it("should use luminous node when mode is luminous", () => {
+    mockUseSettingsStore.mockReturnValue({
+      layers: { emotionPoints: true },
+      pathAnimationMode: "luminous",
+      focusMode: false,
+      enableAnimations: true,
+      emotionSize: 1,
+    });
+
+    const { getAllByTestId } = render(<EmotionCloud />);
+    expect(getAllByTestId("luminous-node")).toHaveLength(2);
+  });
+
+  it("should use liquid node when mode is liquid", () => {
+    mockUseSettingsStore.mockReturnValue({
+      layers: { emotionPoints: true },
+      pathAnimationMode: "liquid",
+      focusMode: false,
+      enableAnimations: true,
+      emotionSize: 1,
+    });
+
+    const { getAllByTestId } = render(<EmotionCloud />);
+    expect(getAllByTestId("liquid-node")).toHaveLength(2);
+  });
+
+  it("should use glitch node when mode is glitch", () => {
+    mockUseSettingsStore.mockReturnValue({
+      layers: { emotionPoints: true },
+      pathAnimationMode: "glitch",
+      focusMode: false,
+      enableAnimations: true,
+      emotionSize: 1,
+    });
+
+    const { getAllByTestId } = render(<EmotionCloud />);
+    expect(getAllByTestId("glitch-node")).toHaveLength(2);
   });
 });

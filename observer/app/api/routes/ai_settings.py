@@ -243,12 +243,11 @@ References:
 import logging
 from typing import Annotated, Any, Dict
 
+from app.database import get_db
+from app.services.ai.models import AIModelService
 from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel
 from sqlalchemy.ext.asyncio import AsyncSession
-
-from app.database import get_db
-from app.services.ai.models import AIModelService
 
 logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/ai", tags=["AI Settings"])
@@ -278,7 +277,9 @@ class AssignModelResponse(BaseModel):
 
 
 @router.get("/assignments")
-async def get_model_assignments(db: Annotated[AsyncSession, Depends(get_db)]) -> Dict[str, Any]:
+async def get_model_assignments(
+    db: Annotated[AsyncSession, Depends(get_db)],
+) -> Dict[str, Any]:
     """Get current model assigned to each AI function.
 
     Returns:
@@ -295,7 +296,9 @@ async def get_model_assignments(db: Annotated[AsyncSession, Depends(get_db)]) ->
         }
     except Exception as e:
         logger.error("Failed to get model assignments: %s", e)
-        raise HTTPException(status_code=500, detail=f"Failed to get assignments: {str(e)}") from e
+        raise HTTPException(
+            status_code=500, detail=f"Failed to get assignments: {str(e)}"
+        ) from e
 
 
 @router.post("/assignments", response_model=AssignModelResponse)
@@ -324,7 +327,9 @@ async def assign_model(
         raise HTTPException(status_code=400, detail=str(e)) from e
     except Exception as e:
         logger.error("Failed to assign model: %s", e)
-        raise HTTPException(status_code=500, detail=f"Failed to assign model: {str(e)}") from e
+        raise HTTPException(
+            status_code=500, detail=f"Failed to assign model: {str(e)}"
+        ) from e
 
 
 @router.get("/recommendations")
@@ -357,7 +362,9 @@ async def get_model_recommendations(
 
 
 @router.get("/performance")
-async def get_performance_stats(db: Annotated[AsyncSession, Depends(get_db)]) -> Dict[str, Any]:
+async def get_performance_stats(
+    db: Annotated[AsyncSession, Depends(get_db)],
+) -> Dict[str, Any]:
     """Get performance statistics for all model assignments.
 
     Includes:
@@ -378,7 +385,9 @@ async def get_performance_stats(db: Annotated[AsyncSession, Depends(get_db)]) ->
         }
     except Exception as e:
         logger.error("Failed to get performance stats: %s", e)
-        raise HTTPException(status_code=500, detail=f"Failed to get stats: {str(e)}") from e
+        raise HTTPException(
+            status_code=500, detail=f"Failed to get stats: {str(e)}"
+        ) from e
 
 
 @router.get("/functions")

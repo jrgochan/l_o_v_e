@@ -16,6 +16,8 @@ interface SessionTimelineProps {
 
 export function SessionTimeline({ emotionTimeline }: SessionTimelineProps) {
   const theme = useAdminTheme();
+  const { colors } = theme;
+  const { muted: mutedText } = colors.text;
   if (emotionTimeline.length === 0) return null;
 
   const getAlertColor = (level?: "critical" | "warning" | "attention" | "stable") => {
@@ -61,9 +63,7 @@ export function SessionTimeline({ emotionTimeline }: SessionTimelineProps) {
         className={`text-sm mb-3 font-semibold flex items-center justify-between ${theme.colors.text.secondary}`}
       >
         <span>🕐 Session Timeline</span>
-        <span className={`text-xs ${theme.colors.text.muted}`}>
-          {emotionTimeline.length} events
-        </span>
+        <span className={`text-xs ${mutedText}`}>{emotionTimeline.length} events</span>
       </div>
 
       {/* Timeline */}
@@ -109,9 +109,7 @@ export function SessionTimeline({ emotionTimeline }: SessionTimelineProps) {
                           <span className="text-xs">{getAlertIcon(event.alertLevel)}</span>
                         )}
                       </div>
-                      <div className={`text-xs mb-1 ${theme.colors.text.muted}`}>
-                        {event.category}
-                      </div>
+                      <div className={`text-xs mb-1 ${mutedText}`}>{event.category}</div>
 
                       {/* VAC preview */}
                       <div className="flex gap-3 text-xs font-mono mt-1.5">
@@ -132,10 +130,10 @@ export function SessionTimeline({ emotionTimeline }: SessionTimelineProps) {
 
                     {/* Timestamp and confidence */}
                     <div className="flex-shrink-0 text-right">
-                      <div className={`text-xs font-mono ${theme.colors.text.muted}`}>
+                      <div className={`text-xs font-mono ${mutedText}`}>
                         {formatRelativeTime(event.timestamp)}
                       </div>
-                      <div className={`text-xs mt-0.5 ${theme.colors.text.muted}`}>
+                      <div className={`text-xs mt-0.5 ${mutedText}`}>
                         {(event.confidence * 100).toFixed(0)}%
                       </div>
                     </div>
@@ -160,15 +158,15 @@ export function SessionTimeline({ emotionTimeline }: SessionTimelineProps) {
       </div>
 
       {/* Legend */}
-      <div className={`mt-4 pt-3 border-t flex items-center gap-4 text-xs ${theme.colors.border}`}>
-        <span className={theme.colors.text.muted}>Alert Levels:</span>
+      <div className={`mt-4 pt-3 border-t flex items-center gap-4 text-xs ${colors.border}`}>
+        <span className={`${mutedText}`}>Alert Levels:</span>
         <div className="flex items-center gap-1">
           <div className="w-2 h-2 rounded-full bg-green-500"></div>
-          <span className={theme.colors.text.muted}>Stable</span>
+          <span className={`${mutedText}`}>Stable</span>
         </div>
         <div className="flex items-center gap-1">
           <div className="w-2 h-2 rounded-full bg-orange-500"></div>
-          <span className={theme.colors.text.muted}>Attention</span>
+          <span className={`${mutedText}`}>Attention</span>
         </div>
         <div className="flex items-center gap-1">
           <div className="w-2 h-2 rounded-full bg-yellow-500"></div>

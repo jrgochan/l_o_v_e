@@ -116,4 +116,52 @@ describe("useSinglePath", () => {
       })
     );
   });
+
+  it("should handle AbortError silently", async () => {
+    const mockFrom = { id: "e1", name: "Joy", vac: { v: 1 } };
+    const mockTo = { id: "e2", name: "Trust", vac: { v: 0.8 } };
+
+    const abortError = new Error("Aborted");
+    abortError.name = "AbortError";
+    (global.fetch as any).mockRejectedValue(abortError);
+
+    const { result } = renderHook(() => useSinglePath());
+
+    await act(async () => {
+      await result.current.computePath(mockFrom as any, mockTo as any);
+    });
+
+    // Should not throw and should not add path
+    expect(mockAddComputedPath).not.toHaveBeenCalled();
+  });
+
+  it("should abort previous pending request", async () => {
+    const mockFrom = { id: "e1", vac: {} };
+    const mockTo = { id: "e2", vac: {} };
+
+    let abortSignal: AbortSignal | undefined;
+    (global.fetch as any).mockImplementation((url: string, options: any) => {
+      if (options.signal) {
+        abortSignal = options.signal;
+      }
+      return new Promise(() => {}); // Never resolves
+    });
+
+    const { result } = renderHook(() => useSinglePath());
+
+    // First call
+    act(() => {
+      result.current.computePath(mockFrom as any, mockTo as any);
+    });
+
+    const firstSignal = abortSignal;
+    expect(firstSignal?.aborted).toBe(false);
+
+    // Second call - should abort first
+    act(() => {
+      result.current.computePath(mockFrom as any, mockTo as any);
+    });
+
+    expect(firstSignal?.aborted).toBe(true);
+  });
 });

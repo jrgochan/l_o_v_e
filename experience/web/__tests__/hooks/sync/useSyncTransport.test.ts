@@ -152,6 +152,34 @@ describe("useSyncTransport", () => {
     });
     expect(onMessage).toHaveBeenCalledTimes(1); // Should not increase
   });
+
+  it("should ignore older messages from BroadcastChannel", () => {
+    const onMessage = jest.fn();
+    let channelInstance: any;
+
+    global.BroadcastChannel = jest.fn().mockImplementation(() => {
+      channelInstance = {
+        postMessage: jest.fn(),
+        close: jest.fn(),
+        onmessage: null,
+      };
+      return channelInstance;
+    }) as any;
+
+    renderHook(() => useSyncTransport({ mode: "listener", onMessage }));
+
+    // First valid message
+    act(() => {
+      channelInstance.onmessage({ data: { type: "t", timestamp: 2000 } });
+    });
+    expect(onMessage).toHaveBeenCalledTimes(1);
+
+    // Older message
+    act(() => {
+      channelInstance.onmessage({ data: { type: "t", timestamp: 1000 } });
+    });
+    expect(onMessage).toHaveBeenCalledTimes(1);
+  });
   it("should handle transmit failure", () => {
     // Mock BroadcastChannel to throw
     const mockPostMessage = jest.fn().mockImplementation(() => {

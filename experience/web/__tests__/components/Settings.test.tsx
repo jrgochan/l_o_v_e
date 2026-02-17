@@ -1,10 +1,12 @@
 import { render, screen, fireEvent, waitFor, act } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { Settings } from "@/components/input/Settings";
+import { Settings, ConceptTooltip, EmotionalControls, EmotionalInput } from "@/components/input";
 import { useSettingsStore } from "@/stores/useSettingsStore";
+import { useVisualizationStore } from "@/stores/useVisualizationStore";
 
-// Mock the store
+// Mock the stores
 jest.mock("@/stores/useSettingsStore");
+jest.mock("@/stores/useVisualizationStore");
 
 // Mock dependencies
 jest.mock("@react-three/fiber", () => ({
@@ -41,7 +43,7 @@ global.alert = jest.fn();
 global.confirm = jest.fn();
 
 describe("Settings Component", () => {
-  const mockStore = {
+  const mockSettingsStore = {
     pollingEnabled: false,
     pollingInterval: 3000,
     userId: "web-user",
@@ -88,9 +90,16 @@ describe("Settings Component", () => {
     setApiUrl: jest.fn(),
   };
 
+  const mockVisualizationStore = {
+    collections: [],
+    activeCollectionId: null,
+    setActiveCollection: jest.fn(),
+  };
+
   beforeEach(() => {
     jest.clearAllMocks();
-    (useSettingsStore as unknown as jest.Mock).mockReturnValue(mockStore);
+    (useSettingsStore as unknown as jest.Mock).mockReturnValue(mockSettingsStore);
+    (useVisualizationStore as unknown as jest.Mock).mockReturnValue(mockVisualizationStore);
     (global.confirm as jest.Mock).mockReturnValue(true);
   });
 
@@ -120,16 +129,16 @@ describe("Settings Component", () => {
     // Toggle Polling
     const enablePollingBtn = screen.getByTestId("btn-polling-toggle");
     await user.click(enablePollingBtn);
-    expect(mockStore.setPollingEnabled).toHaveBeenCalledWith(true);
+    expect(mockSettingsStore.setPollingEnabled).toHaveBeenCalledWith(true);
 
     // Interval slider
     const slider = screen.getByTestId("slider-polling-interval");
     fireEvent.change(slider, { target: { value: "5000" } });
-    expect(mockStore.setPollingInterval).toHaveBeenCalledWith(5000);
+    expect(mockSettingsStore.setPollingInterval).toHaveBeenCalledWith(5000);
 
     // User ID
     fireEvent.change(userIdInput, { target: { value: "new-user" } });
-    expect(mockStore.setUserId).toHaveBeenCalledWith("new-user");
+    expect(mockSettingsStore.setUserId).toHaveBeenCalledWith("new-user");
   });
 
   it("should handle visualization tab interactions", async () => {
@@ -143,21 +152,21 @@ describe("Settings Component", () => {
     // Cinematic Overlay Toggle
     const cinematicBtn = screen.getByTestId("btn-toggle-cinematic");
     await user.click(cinematicBtn);
-    expect(mockStore.updateLayer).toHaveBeenCalledWith("cinematicOverlay", true);
+    expect(mockSettingsStore.updateLayer).toHaveBeenCalledWith("cinematicOverlay", true);
 
     // Animation Speed
     const sliders = screen.getAllByRole("slider");
     fireEvent.change(sliders[0], { target: { value: "1.5" } });
-    expect(mockStore.setAnimationSpeed).toHaveBeenCalledWith(1.5);
+    expect(mockSettingsStore.setAnimationSpeed).toHaveBeenCalledWith(1.5);
 
     // Render Quality
     const select = screen.getByRole("combobox");
     await user.selectOptions(select, "high");
-    expect(mockStore.setRenderQuality).toHaveBeenCalledWith("high");
+    expect(mockSettingsStore.setRenderQuality).toHaveBeenCalledWith("high");
 
     // Sphere Opacity
     fireEvent.change(sliders[1], { target: { value: "0.5" } });
-    expect(mockStore.setSphereOpacity).toHaveBeenCalledWith(0.5);
+    expect(mockSettingsStore.setSphereOpacity).toHaveBeenCalledWith(0.5);
   });
 
   it("should handle accessibility tab interactions", async () => {
@@ -171,17 +180,17 @@ describe("Settings Component", () => {
     // Reduced Motion
     const reducedMotionBtn = screen.getByTestId("btn-toggle-reduced-motion");
     await user.click(reducedMotionBtn);
-    expect(mockStore.setReducedMotion).toHaveBeenCalledWith(true);
+    expect(mockSettingsStore.setReducedMotion).toHaveBeenCalledWith(true);
 
     // High Contrast
     const highContrastBtn = screen.getByTestId("btn-toggle-high-contrast");
     await user.click(highContrastBtn);
-    expect(mockStore.setHighContrast).toHaveBeenCalledWith(true);
+    expect(mockSettingsStore.setHighContrast).toHaveBeenCalledWith(true);
 
     // Screen Reader
     const srBtn = screen.getByTestId("btn-toggle-screen-reader");
     await user.click(srBtn);
-    expect(mockStore.toggleScreenReaderMode).toHaveBeenCalled();
+    expect(mockSettingsStore.toggleScreenReaderMode).toHaveBeenCalled();
   });
 
   it("should handle data tab interactions", async () => {
@@ -195,24 +204,24 @@ describe("Settings Component", () => {
     // Export
     const exportBtn = screen.getByTestId("btn-export");
     await user.click(exportBtn);
-    expect(mockStore.exportSettings).toHaveBeenCalled();
+    expect(mockSettingsStore.exportSettings).toHaveBeenCalled();
     expect(global.URL.createObjectURL).toHaveBeenCalled();
 
     // Reset
     const resetBtn = screen.getByTestId("btn-reset");
     await user.click(resetBtn);
     expect(global.confirm).toHaveBeenCalled();
-    expect(mockStore.resetToDefaults).toHaveBeenCalled();
+    expect(mockSettingsStore.resetToDefaults).toHaveBeenCalled();
 
     // Clear
     const clearBtn = screen.getByTestId("btn-clear");
     await user.click(clearBtn);
     expect(global.confirm).toHaveBeenCalled();
-    expect(mockStore.clearAllData).toHaveBeenCalled();
+    expect(mockSettingsStore.clearAllData).toHaveBeenCalled();
   });
 
   it("should handle API tab interactions", async () => {
-    mockStore.testConnection.mockResolvedValue({
+    mockSettingsStore.testConnection.mockResolvedValue({
       observer: { connected: true },
       listener: { connected: false },
       versor: { connected: false },
@@ -228,7 +237,7 @@ describe("Settings Component", () => {
     // Input Change
     const input = screen.getByDisplayValue("http://localhost:8000");
     fireEvent.change(input, { target: { value: "http://api.test" } });
-    expect(mockStore.setApiUrl).toHaveBeenCalledWith("observer", "http://api.test");
+    expect(mockSettingsStore.setApiUrl).toHaveBeenCalledWith("observer", "http://api.test");
 
     // Test Connection
     const testBtn = screen.getByTestId("btn-test-observer");
@@ -240,7 +249,7 @@ describe("Settings Component", () => {
   });
 
   it("should handle import file selection", async () => {
-    mockStore.importSettings.mockReturnValue(true);
+    mockSettingsStore.importSettings.mockReturnValue(true);
     const user = userEvent.setup();
     await openSettings(user);
     const tabs = screen.getAllByRole("tab");
@@ -270,7 +279,7 @@ describe("Settings Component", () => {
       });
 
       await waitFor(() => {
-        expect(mockStore.importSettings).toHaveBeenCalledWith('{"test":true}');
+        expect(mockSettingsStore.importSettings).toHaveBeenCalledWith('{"test":true}');
         expect(global.alert).toHaveBeenCalledWith("Settings imported successfully!");
       });
     } finally {
@@ -306,11 +315,12 @@ describe("Settings Component", () => {
         await user.click(toggle);
 
         if (isLayer) {
-           expect(mockStore.updateLayer).toHaveBeenCalledWith(key, true);
+          expect(mockSettingsStore.updateLayer).toHaveBeenCalledWith(key, true);
         } else {
-          if (key === "showTransitionPath") expect(mockStore.setShowTransitionPath).toHaveBeenCalledWith(true);
-          if (key === "autoRotate") expect(mockStore.toggleAutoRotate).toHaveBeenCalled();
-          if (key === "showDebugInfo") expect(mockStore.toggleDebugInfo).toHaveBeenCalled();
+          if (key === "showTransitionPath")
+            expect(mockSettingsStore.setShowTransitionPath).toHaveBeenCalledWith(true);
+          if (key === "autoRotate") expect(mockSettingsStore.toggleAutoRotate).toHaveBeenCalled();
+          if (key === "showDebugInfo") expect(mockSettingsStore.toggleDebugInfo).toHaveBeenCalled();
         }
       }
       unmount();
@@ -318,7 +328,7 @@ describe("Settings Component", () => {
 
     // 2. Enable State (All On)
     {
-      const newStore = { ...mockStore };
+      const newStore = { ...mockSettingsStore };
       // @ts-ignore
       newStore.layers = {
         cinematicOverlay: true,
@@ -353,7 +363,7 @@ describe("Settings Component", () => {
   });
 
   it("should reflect connection failure states", async () => {
-    mockStore.testConnection.mockResolvedValue({
+    mockSettingsStore.testConnection.mockResolvedValue({
       observer: { connected: false },
       listener: { connected: false },
       versor: { connected: false },
@@ -385,7 +395,7 @@ describe("Settings Component", () => {
   });
 
   it("should handle failed import", async () => {
-    mockStore.importSettings.mockReturnValue(false);
+    mockSettingsStore.importSettings.mockReturnValue(false);
     const user = userEvent.setup();
     await openSettings(user);
     const tabs = screen.getAllByRole("tab");
@@ -413,7 +423,7 @@ describe("Settings Component", () => {
       });
 
       await waitFor(() => {
-        expect(mockStore.importSettings).toHaveBeenCalled();
+        expect(mockSettingsStore.importSettings).toHaveBeenCalled();
         expect(global.alert).toHaveBeenCalledWith(
           "Failed to import settings. Please check the file format."
         );
@@ -434,10 +444,10 @@ describe("Settings Component", () => {
 
     const resetBtn = screen.getByTestId("btn-reset");
     await user.click(resetBtn);
-    expect(mockStore.resetToDefaults).not.toHaveBeenCalled();
+    expect(mockSettingsStore.resetToDefaults).not.toHaveBeenCalled();
 
     await user.click(screen.getByTestId("btn-clear"));
-    expect(mockStore.clearAllData).not.toHaveBeenCalled();
+    expect(mockSettingsStore.clearAllData).not.toHaveBeenCalled();
 
     (global.confirm as jest.Mock).mockReturnValue(true);
   });
@@ -451,7 +461,7 @@ describe("Settings Component", () => {
     await screen.findByTestId("panel-api", {}, { timeout: 3000 });
     expect(screen.getAllByText("Unknown")).toHaveLength(3);
 
-    mockStore.testConnection.mockResolvedValue({
+    mockSettingsStore.testConnection.mockResolvedValue({
       observer: { connected: true },
       listener: { connected: false },
       versor: { connected: false },
@@ -494,9 +504,125 @@ describe("Settings Component", () => {
         inputMock.onchange(event);
       });
 
-      expect(mockStore.importSettings).not.toHaveBeenCalled();
+      expect(mockSettingsStore.importSettings).not.toHaveBeenCalled();
     } finally {
       createElementSpy.mockRestore();
     }
+  });
+
+  it("closes settings modal", async () => {
+    const user = userEvent.setup();
+    render(<Settings />);
+    await user.click(screen.getByText("⚙️"));
+    await screen.findByTestId("tab-api");
+
+    // Find close button by lookin for the X icon or just the button in header
+    const closeBtn = screen.getAllByRole("button").find((btn) => btn.querySelector("svg"));
+    await user.click(closeBtn!);
+
+    await waitFor(() => {
+      expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
+    });
+  });
+
+  it("closes settings modal on escape key", async () => {
+    const user = userEvent.setup();
+    render(<Settings />);
+    await user.click(screen.getByText("⚙️"));
+    await screen.findByTestId("tab-api");
+
+    await user.keyboard("{Escape}");
+
+    await waitFor(() => {
+      expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
+    });
+  });
+
+  it("handles collection selection", async () => {
+    const collections = [
+      { id: "col1", name: "Collection 1", description: "Desc 1" },
+      { id: "col2", name: "Collection 2", description: "Desc 2" },
+    ];
+    mockVisualizationStore.collections = collections as any;
+    mockVisualizationStore.activeCollectionId = "col1";
+
+    (useVisualizationStore as unknown as jest.Mock).mockReturnValue(mockVisualizationStore);
+
+    const user = userEvent.setup();
+    await openSettings(user);
+    const tabs = screen.getAllByRole("tab");
+    fireEvent.click(tabs[4]); // Data Data is index 4
+
+    await screen.findByTestId("panel-data", {}, { timeout: 3000 });
+
+    expect(screen.getByText("Collection 1")).toBeInTheDocument();
+    expect(screen.getByText("Collection 2")).toBeInTheDocument();
+    expect(screen.getByText("Active")).toBeInTheDocument(); // For col1
+
+    // Click col2
+    await user.click(screen.getByText("Collection 2"));
+    expect(mockVisualizationStore.setActiveCollection).toHaveBeenCalledWith("col2");
+
+    // Click col1 (already active) -> should not call setActiveCollection again with col1
+    mockVisualizationStore.setActiveCollection.mockClear();
+    await user.click(screen.getByText("Collection 1"));
+    // Since col1 is active in mock state (we didn't update the actual store behavior, just the mock return),
+    // the component sees it as active.
+    expect(mockVisualizationStore.setActiveCollection).not.toHaveBeenCalled();
+  });
+
+  it("renders toggles in disabled/off states correctly", async () => {
+    // Only need to verify classes for "false" states, which are defaults in mockStore
+    const user = userEvent.setup();
+    render(<Settings />);
+    await user.click(screen.getByText("⚙️"));
+
+    const tabs = screen.getAllByRole("tab");
+
+    // Polling
+    fireEvent.click(tabs[1]);
+    await screen.findByTestId("panel-polling");
+    const pollingBtn = screen.getByTestId("btn-polling-toggle");
+    expect(pollingBtn).toHaveClass("bg-gray-700"); // false state
+
+    // Accessibility
+    fireEvent.click(tabs[3]);
+    await screen.findByTestId("panel-access");
+    const reducedMotionBtn = screen.getByTestId("btn-toggle-reduced-motion");
+    expect(reducedMotionBtn).toHaveClass("bg-gray-700");
+  });
+
+  it("renders toggles in enabled/on states correctly", async () => {
+    const newStore = { ...mockSettingsStore };
+    // @ts-ignore
+    newStore.pollingEnabled = true;
+    // @ts-ignore
+    newStore.reducedMotion = true;
+
+    (useSettingsStore as unknown as jest.Mock).mockReturnValue(newStore);
+
+    const user = userEvent.setup();
+    render(<Settings />);
+    await user.click(screen.getByText("⚙️"));
+
+    const tabs = screen.getAllByRole("tab");
+
+    // Polling
+    fireEvent.click(tabs[1]);
+    await screen.findByTestId("panel-polling");
+    const pollingBtn = screen.getByTestId("btn-polling-toggle");
+    expect(pollingBtn).toHaveClass("bg-cyan-600"); // true state
+
+    // Accessibility
+    fireEvent.click(tabs[3]);
+    await screen.findByTestId("panel-access");
+    const reducedMotionBtn = screen.getByTestId("btn-toggle-reduced-motion");
+    expect(reducedMotionBtn).toHaveClass("bg-cyan-600");
+  });
+  it("exports all components from barrel file", () => {
+    expect(Settings).toBeDefined();
+    expect(ConceptTooltip).toBeDefined();
+    expect(EmotionalControls).toBeDefined();
+    expect(EmotionalInput).toBeDefined();
   });
 });

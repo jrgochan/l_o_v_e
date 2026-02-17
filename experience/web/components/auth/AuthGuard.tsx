@@ -19,8 +19,9 @@ export function AuthGuard({ children, requiredRole, fallback }: AuthGuardProps) 
   const [mounted, setMounted] = useState(false);
 
   // Derived state — supports single role or array of allowed roles
-  const isAuthorized = !requiredRole
-    || (Array.isArray(requiredRole)
+  const isAuthorized =
+    !requiredRole ||
+    (Array.isArray(requiredRole)
       ? requiredRole.includes(user?.role as UserRole)
       : user?.role === requiredRole);
 

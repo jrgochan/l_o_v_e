@@ -1,7 +1,6 @@
 from unittest.mock import AsyncMock
 
 import pytest
-
 from app.core.events import DomainEvent, EventBus
 
 
@@ -17,7 +16,10 @@ class TestEventBus:
         bus.subscribe("test.event", handler)
 
         event = DomainEvent(
-            event_type="test.event", actor_id=None, target_id=None, metadata={"foo": "bar"}
+            event_type="test.event",
+            actor_id=None,
+            target_id=None,
+            metadata={"foo": "bar"},
         )
 
         await bus.emit(event)

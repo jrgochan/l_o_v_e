@@ -51,7 +51,7 @@ import { DebugBroadcaster } from "@/components/DebugBroadcaster";
 import { PathDetailsOverlay } from "@/components/PathDetailsOverlay";
 import { useAdminTheme } from "@/hooks/admin/useAdminTheme";
 import { WaypointArrivalOverlay } from "@/components/WaypointArrivalOverlay";
-import { StrategyLibraryBrowser } from "@/components/StrategyLibraryBrowser";
+import { StrategyLibraryBrowser } from "@/components/strategy/StrategyLibraryBrowser";
 
 const VisualizationAdminContent = () => {
   // Load emotions and set up path calculator
@@ -124,7 +124,8 @@ const VisualizationAdminContent = () => {
   // Reactive settings for scene controls
   const autoRotate = useSettingsStore((state) => state.autoRotate);
   const renderQuality = useSettingsStore((state) => state.renderQuality);
-  const dpr: [number, number] = renderQuality === "high" ? [1, 2] : renderQuality === "medium" ? [1, 1.5] : [1, 1];
+  const dpr: [number, number] =
+    renderQuality === "high" ? [1, 2] : renderQuality === "medium" ? [1, 1.5] : [1, 1];
 
   // Broadcast sphere state changes to Zen viewer
   const selectedEmotionIds = useVisualizationStore((state) => state.selectedEmotionIds);

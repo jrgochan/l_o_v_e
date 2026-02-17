@@ -6,11 +6,6 @@ from datetime import datetime, timezone
 from typing import Annotated, Any, Dict, List
 from uuid import UUID
 
-from fastapi import APIRouter, Depends, HTTPException
-from sqlalchemy import select
-from sqlalchemy.exc import SQLAlchemyError
-from sqlalchemy.ext.asyncio import AsyncSession
-
 from app.api.deps import get_current_admin
 from app.database import get_db
 from app.models.model_assignment import ModelAssignment
@@ -19,6 +14,10 @@ from app.models.user import User
 from app.schemas.ai_models import ModelAssignmentResponse, ModelAssignmentUpdate
 from app.schemas.strategies import StrategyResponse, StrategyUpdate
 from app.services.admin.service import AdminService
+from fastapi import APIRouter, Depends, HTTPException
+from sqlalchemy import select
+from sqlalchemy.exc import SQLAlchemyError
+from sqlalchemy.ext.asyncio import AsyncSession
 
 logger = logging.getLogger(__name__)
 
@@ -80,7 +79,9 @@ async def import_strategies(
 ) -> Dict[str, Any]:
     """Import strategies from JSON."""
     if "strategies" not in data:
-        raise HTTPException(status_code=400, detail="Invalid format: 'strategies' key missing")
+        raise HTTPException(
+            status_code=400, detail="Invalid format: 'strategies' key missing"
+        )
 
     strategies_list = data["strategies"]
     updated_count = 0
@@ -97,10 +98,11 @@ async def import_strategies(
             if "name" not in strategy_data and "strategy_name" in strategy_data:
                 strategy_data["name"] = strategy_data["strategy_name"]
 
-            # Dynamic lookup: tests patch app.api.routes.admin._process_strategy_import
             # so we look up on the parent package to honor that patch.
             _admin_pkg = sys.modules.get("app.api.routes.admin", sys.modules[__name__])
-            process_fn = _admin_pkg._process_strategy_import
+            process_fn = (
+                _admin_pkg._process_strategy_import
+            )  # pylint: disable=protected-access
             is_updated = await process_fn(db, strategy_data)
             if is_updated:
                 updated_count += 1
@@ -124,7 +126,9 @@ async def import_strategies(
     }
 
 
-async def _process_strategy_import(db: AsyncSession, strategy_data: Dict[str, Any]) -> bool:
+async def _process_strategy_import(
+    db: AsyncSession, strategy_data: Dict[str, Any]
+) -> bool:
     """Process a single strategy for import."""
     stmt = select(TransitionStrategy).where(
         TransitionStrategy.strategy_name == strategy_data["name"]
@@ -174,7 +178,9 @@ async def update_ai_model(
     current_admin: Annotated[User, Depends(get_current_admin)],
 ) -> Any:
     """Update the AI model assigned to a specific function."""
-    result = await db.execute(select(ModelAssignment).where(ModelAssignment.function == function))
+    result = await db.execute(
+        select(ModelAssignment).where(ModelAssignment.function == function)
+    )
     assignment = result.scalar_one_or_none()
 
     if not assignment:

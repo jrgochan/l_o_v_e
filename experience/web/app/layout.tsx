@@ -31,9 +31,7 @@ export default function RootLayout({
         suppressHydrationWarning
       >
         <LoggerProvider>
-          <ConsentGate>
-            {children}
-          </ConsentGate>
+          <ConsentGate>{children}</ConsentGate>
         </LoggerProvider>
       </body>
     </html>

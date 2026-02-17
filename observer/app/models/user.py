@@ -11,11 +11,10 @@ from enum import Enum
 from typing import TYPE_CHECKING, Any, Dict, List, Optional
 from uuid import UUID, uuid4
 
+from app.database import Base
 from sqlalchemy import Boolean, DateTime, ForeignKey, Index, String, func
 from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.orm import Mapped, mapped_column, relationship
-
-from app.database import Base
 
 if TYPE_CHECKING:
     from app.models.chat_session import ChatSession
@@ -64,7 +63,9 @@ class User(Base):
     )
 
     created_at: Mapped[datetime] = mapped_column(server_default=func.now())
-    updated_at: Mapped[datetime] = mapped_column(server_default=func.now(), onupdate=func.now())
+    updated_at: Mapped[datetime] = mapped_column(
+        server_default=func.now(), onupdate=func.now()
+    )
 
     # Relationships
     # Link to sessions (One-to-Many)
@@ -86,7 +87,9 @@ class User(Base):
     # Index for efficient clinician → clients lookup (excluding soft-deleted)
     __table_args__ = (
         Index(
-            "idx_users_clinician", "assigned_clinician_id", postgresql_where=deleted_at.is_(None)
+            "idx_users_clinician",
+            "assigned_clinician_id",
+            postgresql_where=deleted_at.is_(None),
         ),
     )
 

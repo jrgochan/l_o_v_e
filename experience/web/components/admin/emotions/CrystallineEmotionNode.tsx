@@ -130,9 +130,9 @@ export function CrystallineEmotionNode({
   const edgeOpacity = isSelected ? 0.5 : isHovered ? 0.35 : 0.15;
 
   return (
-    <group>
+    <group data-testid="crystal-group">
       {/* Inner core — pure glowing light */}
-      <mesh ref={coreRef}>
+      <mesh ref={coreRef} data-testid="crystal-core">
         <icosahedronGeometry args={[1, 0]} />
         <meshBasicMaterial
           color={coreColor}
@@ -149,6 +149,7 @@ export function CrystallineEmotionNode({
         onClick={onClick}
         onPointerOver={onPointerOver}
         onPointerOut={onPointerOut}
+        data-testid="crystal-body"
       >
         <icosahedronGeometry args={[1, 1]} />
         <meshPhysicalMaterial
@@ -172,7 +173,7 @@ export function CrystallineEmotionNode({
       </mesh>
 
       {/* Edge wireframe — sharp crystalline facet lines */}
-      <lineSegments ref={edgesRef} geometry={edgesGeometry}>
+      <lineSegments ref={edgesRef} geometry={edgesGeometry} data-testid="crystal-edges">
         <lineBasicMaterial
           color={isSelected ? "#FFFFFF" : "#C0D8FF"}
           transparent
@@ -183,7 +184,7 @@ export function CrystallineEmotionNode({
 
       {/* Selection glow ring */}
       {(isSelected || isHovered) && (
-        <mesh>
+        <mesh data-testid="crystal-aura">
           <sphereGeometry args={[size * 2.0, 16, 16]} />
           <meshBasicMaterial
             color={enhancedColor}

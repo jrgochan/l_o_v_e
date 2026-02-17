@@ -58,6 +58,12 @@ if (typeof HTMLCanvasElement !== "undefined") {
         getImageData: jest.fn(),
         putImageData: jest.fn(),
         createImageData: jest.fn(),
+        createLinearGradient: jest.fn(() => ({
+          addColorStop: jest.fn(),
+        })),
+        createRadialGradient: jest.fn(() => ({
+          addColorStop: jest.fn(),
+        })),
         setTransform: jest.fn(),
         drawImage: jest.fn(),
         save: jest.fn(),
@@ -145,6 +151,7 @@ if (!global.fetch) {
 // Suppress console errors and warnings in tests (unless explicitly needed)
 const originalError = console.error;
 const originalWarn = console.warn;
+const originalLog = console.log;
 
 beforeAll(() => {
   console.error = jest.fn((...args) => {
@@ -169,17 +176,30 @@ beforeAll(() => {
     const msg = args[0]?.toString() || "";
     if (
       msg.includes("ReactDOM.render") ||
-      msg.includes("Headless UI has polyfilled")
+      msg.includes("Headless UI has polyfilled") ||
+      msg.includes("Unable to update item 'auth-storage'") // Zustand persist middleware in SSR
     ) {
       return;
     }
     originalWarn(...args);
+  });
+
+  console.log = jest.fn((...args) => {
+    // Filter out known logs
+    const msg = args[0]?.toString() || "";
+    if (
+      msg.includes("PersonaPlex WebSocket closed") // Expected during test teardown
+    ) {
+      return;
+    }
+    originalLog(...args);
   });
 });
 
 afterAll(() => {
   console.error = originalError;
   console.warn = originalWarn;
+  console.log = originalLog;
 });
 
 // Clear mocks between tests

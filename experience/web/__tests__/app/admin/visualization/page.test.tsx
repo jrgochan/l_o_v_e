@@ -3,6 +3,7 @@ import VisualizationAdminPage from "@/app/admin/visualization/page";
 import { useAmbientAudio } from "@/hooks/useAmbientAudio";
 import { useSphereSync } from "@/hooks/useSphereSync";
 import { useVisualizationStore } from "@/stores/useVisualizationStore";
+import { useSettingsStore } from "@/stores/useSettingsStore";
 import { useExperienceStore } from "@/stores/useExperienceStore";
 import { useEmotionData } from "@/hooks/useEmotionData";
 import { useAdminTheme } from "@/hooks/admin/useAdminTheme";
@@ -79,6 +80,9 @@ jest.mock("@/components/DebugBroadcaster", () => ({
 jest.mock("@/components/PathDetailsOverlay", () => ({
   PathDetailsOverlay: () => <div data-testid="path-details" />,
 }));
+jest.mock("@/components/strategy/StrategyLibraryBrowser", () => ({
+  StrategyLibraryBrowser: () => <div data-testid="strategy-library" />,
+}));
 
 // Mock Next Link
 jest.mock("next/link", () => ({
@@ -138,6 +142,9 @@ jest.mock("@/hooks/admin/useAdminTheme", () => ({
 // --- MOCK STORES ---
 jest.mock("@/stores/useVisualizationStore", () => ({
   useVisualizationStore: jest.fn(),
+}));
+jest.mock("@/stores/useSettingsStore", () => ({
+  useSettingsStore: jest.fn(),
 }));
 jest.mock("@/stores/useExperienceStore", () => ({
   useExperienceStore: jest.fn((selector) => selector({ isFlying: false })),
@@ -622,5 +629,45 @@ describe("VisualizationAdminPage", () => {
     render(<VisualizationAdminPage />);
     const header = screen.getByText("Soul Sphere").closest("header");
     expect(header).toHaveStyle({ fontFamily: "monospace" });
+  });
+
+  it("toggles Strategy Library", () => {
+    render(<VisualizationAdminPage />);
+
+    // Open Library
+    const libraryBtn = screen.getByText(/Library/i);
+    fireEvent.click(libraryBtn);
+
+    // Check if library is displayed (we didn't mock StrategyLibraryBrowser content explicitly in the top mocks, let's check)
+    // We mocked it as <div data-testid="strategy-library" />
+    expect(screen.getByTestId("strategy-library")).toBeInTheDocument();
+
+    // Close Library
+    const closeBtn = screen.getByText("✕ Close Library");
+    fireEvent.click(closeBtn);
+    expect(screen.queryByText("✕ Close Library")).not.toBeInTheDocument();
+  });
+
+  it("handles medium render quality", () => {
+    (useSettingsStore as unknown as jest.Mock).mockImplementation((selector: any) =>
+      selector({
+        autoRotate: false,
+        renderQuality: "medium", // Triggers branch
+      })
+    );
+    render(<VisualizationAdminPage />);
+    // Indirectly verifies dpr calculation doesn't crash
+    expect(screen.getByTestId("canvas")).toBeInTheDocument();
+  });
+
+  it("handles high render quality and autoRotate", () => {
+    (useSettingsStore as unknown as jest.Mock).mockImplementation((selector: any) =>
+      selector({
+        autoRotate: true,
+        renderQuality: "high", // Triggers branch
+      })
+    );
+    render(<VisualizationAdminPage />);
+    expect(screen.getByTestId("canvas")).toBeInTheDocument();
   });
 });

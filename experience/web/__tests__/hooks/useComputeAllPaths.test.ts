@@ -193,4 +193,30 @@ describe("useComputeAllPaths", () => {
       })
     );
   });
+
+  it("should handle error loading cached paths", async () => {
+    let capturedOnComplete: () => Promise<void>;
+    (useBatchJob as jest.Mock).mockImplementation((onComplete) => {
+      capturedOnComplete = onComplete;
+      return {
+        startJob: mockStartJob,
+        isComputing: false,
+        progress: {},
+        setProgress: mockSetProgress,
+      };
+    });
+
+    (visualizationService.getCachedPaths as jest.Mock).mockRejectedValue(
+      new Error("Cache Load Failed")
+    );
+
+    renderHook(() => useComputeAllPaths());
+
+    // Trigger completion, which triggers load
+    await capturedOnComplete!();
+
+    expect(window.alert).toHaveBeenCalledWith(
+      expect.stringContaining("Computation succeeded but failed to load results")
+    );
+  });
 });

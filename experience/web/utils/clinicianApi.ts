@@ -108,25 +108,15 @@ export const clinicianApi = {
   /**
    * Get recent chat sessions for an assigned client.
    */
-  async getClientSessions(
-    clientId: string,
-    limit = 20
-  ): Promise<ClientSession[]> {
-    return api.get<ClientSession[]>(
-      `/clinician/clients/${clientId}/sessions?limit=${limit}`
-    );
+  async getClientSessions(clientId: string, limit = 20): Promise<ClientSession[]> {
+    return api.get<ClientSession[]>(`/clinician/clients/${clientId}/sessions?limit=${limit}`);
   },
 
   /**
    * Get emotional trajectory data for an assigned client.
    */
-  async getClientTrajectory(
-    clientId: string,
-    limit = 100
-  ): Promise<TrajectoryPoint[]> {
-    return api.get<TrajectoryPoint[]>(
-      `/clinician/clients/${clientId}/trajectory?limit=${limit}`
-    );
+  async getClientTrajectory(clientId: string, limit = 100): Promise<TrajectoryPoint[]> {
+    return api.get<TrajectoryPoint[]>(`/clinician/clients/${clientId}/trajectory?limit=${limit}`);
   },
 
   /**
@@ -172,18 +162,11 @@ export const clinicianApi = {
   /**
    * Update a clinical note.
    */
-  async updateNote(
-    noteId: string,
-    content?: string,
-    category?: string
-  ): Promise<ClinicalNoteItem> {
+  async updateNote(noteId: string, content?: string, category?: string): Promise<ClinicalNoteItem> {
     const params = new URLSearchParams();
     if (content !== undefined) params.set("content", content);
     if (category !== undefined) params.set("category", category);
-    return api.put<ClinicalNoteItem>(
-      `/clinician/notes/${noteId}?${params.toString()}`,
-      {}
-    );
+    return api.put<ClinicalNoteItem>(`/clinician/notes/${noteId}?${params.toString()}`, {});
   },
 
   /**

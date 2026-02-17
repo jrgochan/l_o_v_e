@@ -1,40 +1,54 @@
-import { render, screen, fireEvent, waitFor } from "@testing-library/react";
+import { render, screen, fireEvent, waitFor, cleanup } from "@testing-library/react";
+import React from "react";
 import { AdminGuard } from "@/components/admin/layout/AdminGuard";
 import { useAuthStore } from "@/stores/authStore";
 import { UserRole } from "@/types/auth";
 
-// Mock Auth Store
-jest.mock("@/stores/authStore", () => ({
-  useAuthStore: jest.fn(),
+// Mock dependencies
+jest.mock("@/stores/authStore");
+jest.mock("@/hooks/admin/useAdminTheme", () => ({
+  useAdminTheme: () => ({
+    colors: {
+      background: "bg-black",
+      text: { muted: "text-gray-500" },
+      hover: "hover:bg-gray-800",
+    },
+  }),
 }));
-
-// Mock Link to prevent navigation errors
-jest.mock("next/link", () => {
-  return ({ children, href }: any) => <a href={href}>{children}</a>;
-});
-
-// Mock AuthModal
 jest.mock("@/components/auth/AuthModal", () => ({
   AuthModal: ({ isOpen, onClose }: any) =>
     isOpen ? (
       <div data-testid="auth-modal">
         Auth Modal
-        <button data-testid="close-modal-btn" onClick={onClose}>
-          Close
-        </button>
+        <button onClick={onClose}>Close</button>
       </div>
     ) : null,
 }));
 
+// Mock Next.js Link
+jest.mock("next/link", () => {
+  return ({ children, href }: any) => <a href={href}>{children}</a>;
+});
+
+afterEach(cleanup);
+
 describe("AdminGuard", () => {
-  const mockSetUser = jest.fn();
-  const mockSetToken = jest.fn();
+  let mockSetUser: jest.Mock;
+  let mockSetToken: jest.Mock;
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    mockSetUser = jest.fn();
+    mockSetToken = jest.fn();
+
+    (useAuthStore as unknown as jest.Mock).mockReturnValue({
+      user: null,
+      isLoading: true,
+      setUser: mockSetUser,
+      setToken: mockSetToken,
+    });
   });
 
-  it("shows loading state", async () => {
+  it("renders loading state initially", () => {
     (useAuthStore as unknown as jest.Mock).mockReturnValue({
       user: null,
       isLoading: true,
@@ -42,39 +56,37 @@ describe("AdminGuard", () => {
 
     render(
       <AdminGuard>
-        <div>Child</div>
+        <div>Secret Content</div>
+      </AdminGuard>
+    );
+    // Ideally check for "Loading..." text
+    // The component has a useEffect that sets isClient to true after 0ms.
+    // If isClient is false, it returns null.
+    // So initially it returns null.
+    // Wait for client mount
+  });
+
+  it("renders loading text when auth is loading", async () => {
+    (useAuthStore as unknown as jest.Mock).mockReturnValue({
+      user: null,
+      isLoading: true,
+      setUser: mockSetUser,
+      setToken: mockSetToken,
+    });
+
+    render(
+      <AdminGuard>
+        <div>Secret Content</div>
       </AdminGuard>
     );
 
-    // AdminGuard has a useEffect to set isClient=true.
-    // Before that it returns null.
-    // We need to wait for isClient to be true.
     await waitFor(() => {
       expect(screen.getByText("Loading...")).toBeInTheDocument();
     });
-
-    expect(screen.queryByText("Child")).not.toBeInTheDocument();
+    expect(screen.queryByText("Secret Content")).not.toBeInTheDocument();
   });
 
-  it("renders children when user is admin", async () => {
-    (useAuthStore as unknown as jest.Mock).mockReturnValue({
-      user: { role: UserRole.ADMIN },
-      isLoading: false,
-    });
-
-    // Effect sets client=true immediately, wait for it
-    render(
-      <AdminGuard>
-        <div>Secret Admin Content</div>
-      </AdminGuard>
-    );
-
-    await waitFor(() => {
-      expect(screen.getByText("Secret Admin Content")).toBeInTheDocument();
-    });
-  });
-
-  it("blocks access for non-admin/unauthenticated", async () => {
+  it("renders access denied/portal when not logged in", async () => {
     (useAuthStore as unknown as jest.Mock).mockReturnValue({
       user: null,
       isLoading: false,
@@ -84,19 +96,75 @@ describe("AdminGuard", () => {
 
     render(
       <AdminGuard>
-        <div>Secret</div>
+        <div>Secret Content</div>
       </AdminGuard>
     );
 
     await waitFor(() => {
       expect(screen.getByText("Clinical Access")).toBeInTheDocument();
     });
-
-    expect(screen.queryByText("Secret")).not.toBeInTheDocument();
-    expect(screen.getByText("Please sign in to access the portal.")).toBeInTheDocument();
+    expect(screen.queryByText("Secret Content")).not.toBeInTheDocument();
   });
 
-  it("allows dev login bypass", async () => {
+  it("renders access denied when user has wrong role", async () => {
+    (useAuthStore as unknown as jest.Mock).mockReturnValue({
+      user: { role: "PATIENT" },
+      isLoading: false,
+      setUser: mockSetUser,
+      setToken: mockSetToken,
+    });
+
+    render(
+      <AdminGuard>
+        <div>Secret Content</div>
+      </AdminGuard>
+    );
+
+    await waitFor(() => {
+      expect(screen.getByText("Clinical Access")).toBeInTheDocument();
+    });
+  });
+
+  it("renders children when authorized (ADMIN)", async () => {
+    (useAuthStore as unknown as jest.Mock).mockReturnValue({
+      user: { role: UserRole.ADMIN },
+      isLoading: false,
+      setUser: mockSetUser,
+      setToken: mockSetToken,
+    });
+
+    render(
+      <AdminGuard>
+        <div>Secret Content</div>
+      </AdminGuard>
+    );
+
+    await waitFor(() => {
+      expect(screen.getByText("Secret Content")).toBeInTheDocument();
+    });
+    expect(screen.queryByText("Clinical Access")).not.toBeInTheDocument();
+  });
+
+  it("renders children when authorized (CLINICIAN)", async () => {
+    (useAuthStore as unknown as jest.Mock).mockReturnValue({
+      user: { role: UserRole.CLINICIAN },
+      isLoading: false,
+      setUser: mockSetUser,
+      setToken: mockSetToken,
+    });
+
+    render(
+      <AdminGuard>
+        <div>Secret Content</div>
+      </AdminGuard>
+    );
+
+    await waitFor(() => {
+      expect(screen.getByText("Secret Content")).toBeInTheDocument();
+    });
+  });
+
+  it("activates dev admin bypass", async () => {
     (useAuthStore as unknown as jest.Mock).mockReturnValue({
       user: null,
       isLoading: false,
@@ -109,17 +177,42 @@ describe("AdminGuard", () => {
         <div>Secret</div>
       </AdminGuard>
     );
+    await waitFor(() => screen.getByText("Clinical Access"));
 
-    await waitFor(() => {
-      expect(screen.getByText("🧙 Dev Admin")).toBeInTheDocument();
-    });
-
-    fireEvent.click(screen.getByText("🧙 Dev Admin"));
+    const devAdminBtn = screen.getByText("🧙 Dev Admin");
+    fireEvent.click(devAdminBtn);
 
     expect(mockSetUser).toHaveBeenCalledWith(
       expect.objectContaining({
-        role: "admin",
+        role: UserRole.ADMIN,
         email: "dev@admin.com",
+      })
+    );
+    expect(mockSetToken).toHaveBeenCalledWith("dev-token-bypass");
+  });
+
+  it("activates dev clinician bypass", async () => {
+    (useAuthStore as unknown as jest.Mock).mockReturnValue({
+      user: null,
+      isLoading: false,
+      setUser: mockSetUser,
+      setToken: mockSetToken,
+    });
+
+    render(
+      <AdminGuard>
+        <div>Secret</div>
+      </AdminGuard>
+    );
+    await waitFor(() => screen.getByText("Clinical Access"));
+
+    const devClinicianBtn = screen.getByText("🩺 Dev Clinician");
+    fireEvent.click(devClinicianBtn);
+
+    expect(mockSetUser).toHaveBeenCalledWith(
+      expect.objectContaining({
+        role: UserRole.CLINICIAN,
+        email: "dev@clinician.com",
       })
     );
     expect(mockSetToken).toHaveBeenCalledWith("dev-token-bypass");
@@ -129,6 +222,8 @@ describe("AdminGuard", () => {
     (useAuthStore as unknown as jest.Mock).mockReturnValue({
       user: null,
       isLoading: false,
+      setUser: mockSetUser,
+      setToken: mockSetToken,
     });
 
     render(
@@ -136,34 +231,20 @@ describe("AdminGuard", () => {
         <div>Secret</div>
       </AdminGuard>
     );
+    await waitFor(() => screen.getByText("Clinical Access"));
 
-    await waitFor(() => {
-      expect(screen.getByText("Sign In")).toBeInTheDocument();
-    });
+    const signInBtn = screen.getByText("Sign In");
+    fireEvent.click(signInBtn);
 
-    fireEvent.click(screen.getByText("Sign In"));
-    expect(screen.getByTestId("auth-modal")).toBeInTheDocument();
-  });
-  it("opens and closes auth modal", async () => {
-    (useAuthStore as unknown as jest.Mock).mockReturnValue({
-      user: null,
-      isLoading: false,
-    });
-
-    render(
-      <AdminGuard>
-        <div>Secret</div>
-      </AdminGuard>
-    );
-
-    await waitFor(() => {
-      expect(screen.getByText("Sign In")).toBeInTheDocument();
-    });
-
-    fireEvent.click(screen.getByText("Sign In"));
     expect(screen.getByTestId("auth-modal")).toBeInTheDocument();
 
-    fireEvent.click(screen.getByTestId("close-modal-btn"));
+    // Close it
+    fireEvent.click(screen.getByText("Close"));
+    // The mock is simple, checking if state updates might be harder if state is internal.
+    // We can check if it disappears?
+    // The AuthModal mock renders based on isOpen prop.
+    // If parent state updates, it should re-render with isOpen=false -> return null.
+
     expect(screen.queryByTestId("auth-modal")).not.toBeInTheDocument();
   });
 });

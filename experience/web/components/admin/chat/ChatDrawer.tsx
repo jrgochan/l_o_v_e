@@ -126,9 +126,8 @@ export function ChatDrawer({ isOpen, onToggle, sessionId }: ChatDrawerProps) {
 
   // Map current tone mode to PersonaPlex persona
   const getPersonaId = (): "lumina" | "logos" | "metis" => {
-    if (toneMode === "warm") return "lumina";
     if (toneMode === "clinical") return "logos";
-    return "metis"; // Default fallback
+    return "lumina";
   };
 
   const getPersonaConfig = () => {

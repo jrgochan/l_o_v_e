@@ -118,6 +118,22 @@ describe("AuthGuard", () => {
     expect(screen.getByText("Admin Content")).toBeInTheDocument();
   });
 
+  it("renders children if user has one of the required roles (array)", () => {
+    (useAuthStore as unknown as jest.Mock).mockReturnValue({
+      user: { id: "1", role: UserRole.CLINICIAN },
+      token: "valid-token",
+      isLoading: false,
+    });
+
+    render(
+      <AuthGuard requiredRole={[UserRole.ADMIN, UserRole.CLINICIAN]}>
+        <div>Therapist Content</div>
+      </AuthGuard>
+    );
+
+    expect(screen.getByText("Therapist Content")).toBeInTheDocument();
+  });
+
   it("redirects to home when not authenticated and not loading", () => {
     (useAuthStore as unknown as jest.Mock).mockImplementation((selector: any) => {
       if (selector) {

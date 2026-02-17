@@ -225,18 +225,14 @@ export function VisualSettings() {
                 {((1 - settings.sphereOpacity) * 100).toFixed(0)}%
               </span>
             </label>
-            <p className="text-xs text-gray-500 mb-2">
-              0% = Fully solid · 100% = Invisible
-            </p>
+            <p className="text-xs text-gray-500 mb-2">0% = Fully solid · 100% = Invisible</p>
             <input
               type="range"
               min="0"
               max="1"
               step="0.05"
               value={1 - settings.sphereOpacity}
-              onChange={(e) =>
-                settings.setSphereOpacity(1 - parseFloat(e.target.value))
-              }
+              onChange={(e) => settings.setSphereOpacity(1 - parseFloat(e.target.value))}
               className="w-full h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer accent-purple-500"
             />
           </div>
@@ -245,9 +241,7 @@ export function VisualSettings() {
           <div>
             <label className="flex justify-between text-sm text-gray-300 mb-2">
               <span>Animation Speed</span>
-              <span className="font-mono text-white">
-                {settings.animationSpeed.toFixed(1)}x
-              </span>
+              <span className="font-mono text-white">{settings.animationSpeed.toFixed(1)}x</span>
             </label>
             <p className="text-xs text-gray-500 mb-2">
               Controls the speed of sphere shader animations
@@ -258,9 +252,7 @@ export function VisualSettings() {
               max="3.0"
               step="0.1"
               value={settings.animationSpeed}
-              onChange={(e) =>
-                settings.setAnimationSpeed(parseFloat(e.target.value))
-              }
+              onChange={(e) => settings.setAnimationSpeed(parseFloat(e.target.value))}
               className="w-full h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer accent-purple-500"
             />
           </div>
@@ -268,9 +260,7 @@ export function VisualSettings() {
           {/* Render Quality */}
           <div>
             <label className="block text-sm text-gray-300 mb-2">Render Quality</label>
-            <p className="text-xs text-gray-500 mb-3">
-              Higher quality uses more GPU resources
-            </p>
+            <p className="text-xs text-gray-500 mb-3">Higher quality uses more GPU resources</p>
             <div className="grid grid-cols-3 gap-2">
               {(["low", "medium", "high"] as const).map((quality) => (
                 <button

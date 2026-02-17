@@ -11,8 +11,9 @@ jest.mock("@/utils/logger", () => ({
   },
 }));
 
+const mockUseAuthStore = jest.fn();
 jest.mock("@/stores/authStore", () => ({
-  useAuthStore: jest.fn(() => ({ token: "test-token" })),
+  useAuthStore: () => mockUseAuthStore(),
 }));
 
 // Mock socket helpers
@@ -54,6 +55,7 @@ describe("useConnectionLifecycle", () => {
       setIsConnected: jest.fn(),
       setIsConnecting: jest.fn(),
     };
+    mockUseAuthStore.mockReturnValue({ token: "test-token" });
   });
 
   it("should connect when enabled is true", () => {
@@ -67,6 +69,19 @@ describe("useConnectionLifecycle", () => {
     renderHook(() => useConnectionLifecycle(props));
 
     expect(createWebSocketConnection).not.toHaveBeenCalled();
+    expect(createWebSocketConnection).not.toHaveBeenCalled();
+  });
+
+  it("should connect without token", () => {
+    mockUseAuthStore.mockReturnValue({ token: null });
+    renderHook(() => useConnectionLifecycle(props));
+
+    expect(createWebSocketConnection).toHaveBeenCalled();
+    // Verify getWebSocketUrl was called with undefined token
+    expect(require("@/hooks/websocket/utils/socketHelpers").getWebSocketUrl).toHaveBeenCalledWith(
+      expect.any(String),
+      undefined
+    );
   });
 
   it("should handle successful connection (onOpen)", () => {

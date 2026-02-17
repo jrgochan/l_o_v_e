@@ -6,13 +6,18 @@
 
 import { render, act, fireEvent } from "@testing-library/react";
 import { Scene } from "@/components/Scene";
+import * as ViewerIndex from "@/components/viewer";
 import { useExperienceStore } from "@/stores/useExperienceStore";
 import { useSettingsStore } from "@/stores/useSettingsStore";
 import { mockTransitionPath, mockJourney } from "../utils/fixtures";
 
 // Mock Three.js/R3F
 jest.mock("@react-three/fiber", () => ({
-  Canvas: ({ children }: any) => <div data-testid="r3f-canvas">{children}</div>,
+  Canvas: ({ children, dpr }: any) => (
+    <div data-testid="r3f-canvas" data-dpr={JSON.stringify(dpr)}>
+      {children}
+    </div>
+  ),
   useFrame: jest.fn(),
   useThree: jest.fn(() => ({
     camera: { position: { copy: jest.fn(), set: jest.fn() }, lookAt: jest.fn() },
@@ -25,7 +30,9 @@ jest.mock("@react-three/fiber", () => ({
 
 // Mock Components with Prop Capture
 jest.mock("@/components/viewer/OrbitControls", () => ({
-  OrbitControls: ({ enabled }: any) => <div data-testid="orbit-controls" data-enabled={enabled} />,
+  OrbitControls: ({ enabled, autoRotate }: any) => (
+    <div data-testid="orbit-controls" data-enabled={enabled} data-autorotate={autoRotate} />
+  ),
 }));
 
 jest.mock("@/components/viewer/SoulSphere", () => ({
@@ -209,5 +216,67 @@ describe("Scene", () => {
       const controls = getByTestId("orbit-controls");
       expect(controls).toHaveAttribute("data-enabled", "true");
     });
+  });
+
+  describe("Settings Integration", () => {
+    it("adjusts dpr based on renderQuality", () => {
+      // Default (high) -> [1, 2] usually in our logic it is [1, 2] for default/medium?
+      // Logic: const dpr = renderQuality === "low" ? 1 : renderQuality === "high" ? [1, 3] : [1, 2];
+
+      // Test "low"
+      (useSettingsStore as any).setState({ renderQuality: "low" });
+      const { getByTestId, rerender } = render(<Scene />);
+      expect(getByTestId("r3f-canvas")).toHaveAttribute("data-dpr", "1");
+
+      // Test "high"
+      (useSettingsStore as any).setState({ renderQuality: "high" });
+      rerender(<Scene />);
+      expect(getByTestId("r3f-canvas")).toHaveAttribute("data-dpr", "[1,3]");
+
+      // Test "medium" (default fallback)
+      (useSettingsStore as any).setState({ renderQuality: "medium" });
+      rerender(<Scene />);
+      expect(getByTestId("r3f-canvas")).toHaveAttribute("data-dpr", "[1,2]");
+    });
+
+    it("passes autoRotate to OrbitControls based on settings", () => {
+      // 1. Enabled in settings, not flying -> Auto Rotate ON
+      (useSettingsStore as any).setState({ autoRotate: true });
+      act(() => {
+        useExperienceStore.setState({ isFlying: false });
+      });
+
+      const { getByTestId, rerender } = render(<Scene />);
+      expect(getByTestId("orbit-controls")).toHaveAttribute("data-autorotate", "true");
+
+      // 2. Disabled in settings, not flying -> Auto Rotate OFF
+      (useSettingsStore as any).setState({ autoRotate: false });
+      rerender(<Scene />);
+      expect(getByTestId("orbit-controls")).toHaveAttribute("data-autorotate", "false");
+
+      // 3. Enabled in settings, BUT flying -> Auto Rotate OFF
+      (useSettingsStore as any).setState({ autoRotate: true });
+      act(() => {
+        useExperienceStore.setState({ isFlying: true });
+      });
+      rerender(<Scene />);
+      expect(getByTestId("orbit-controls")).toHaveAttribute("data-autorotate", "false");
+    });
+  });
+  it("exports all components from barrel file", () => {
+    expect(ViewerIndex.Scene).toBeDefined();
+    expect(ViewerIndex.AxisLabels).toBeDefined();
+    expect(ViewerIndex.CinematicOverlay).toBeDefined();
+    expect(ViewerIndex.DebugBroadcaster).toBeDefined();
+    expect(ViewerIndex.LoggerProvider).toBeDefined();
+    expect(ViewerIndex.OrbitControls).toBeDefined();
+    expect(ViewerIndex.SimpleAxisLabels).toBeDefined();
+    expect(ViewerIndex.SoulSphere).toBeDefined();
+    expect(ViewerIndex.VACAnimator).toBeDefined();
+    expect(ViewerIndex.VACAxisLabels3D).toBeDefined();
+    expect(ViewerIndex.VACDisplay).toBeDefined();
+    expect(ViewerIndex.ViewerPathFlyover).toBeDefined();
+    expect(ViewerIndex.ViewerShortcuts).toBeDefined();
+    expect(ViewerIndex.ZenSessionIndicator).toBeDefined();
   });
 });

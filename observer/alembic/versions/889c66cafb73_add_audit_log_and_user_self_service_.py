@@ -34,7 +34,9 @@ def upgrade() -> None:
         )
     """
     )
-    op.execute("CREATE INDEX IF NOT EXISTS ix_audit_log_event_type ON audit_log (event_type)")
+    op.execute(
+        "CREATE INDEX IF NOT EXISTS ix_audit_log_event_type ON audit_log (event_type)"
+    )
     op.execute(
         "CREATE INDEX IF NOT EXISTS idx_audit_log_actor_time ON audit_log (actor_id, timestamp DESC)"
     )
@@ -43,7 +45,9 @@ def upgrade() -> None:
     )
 
     # --- Users table: new columns for self-service ---
-    op.add_column("users", sa.Column("deleted_at", sa.DateTime(timezone=True), nullable=True))
+    op.add_column(
+        "users", sa.Column("deleted_at", sa.DateTime(timezone=True), nullable=True)
+    )
     op.add_column(
         "users",
         sa.Column(
@@ -75,7 +79,9 @@ def downgrade() -> None:
     # --- Users table ---
     op.drop_constraint("fk_users_assigned_clinician", "users", type_="foreignkey")
     op.drop_index(
-        "idx_users_clinician", table_name="users", postgresql_where=sa.text("deleted_at IS NULL")
+        "idx_users_clinician",
+        table_name="users",
+        postgresql_where=sa.text("deleted_at IS NULL"),
     )
     op.drop_column("users", "assigned_clinician_id")
     op.drop_column("users", "preferences")

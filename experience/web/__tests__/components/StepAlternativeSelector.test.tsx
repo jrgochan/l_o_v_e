@@ -110,4 +110,18 @@ describe("StepAlternativeSelector", () => {
 
     expect(defaultProps.onClose).toHaveBeenCalled();
   });
+
+  it("handles response without alternatives property", async () => {
+    (therapeuticService.getStepAlternatives as jest.Mock).mockResolvedValue({});
+
+    render(<StepAlternativeSelector {...defaultProps} />);
+
+    await waitFor(() => {
+      expect(screen.queryByText("Finding valid paths...")).toBeNull();
+    });
+
+    expect(
+      screen.getByText("No valid alternatives found for this specific transition.")
+    ).toBeInTheDocument();
+  });
 });

@@ -42,6 +42,15 @@ jest.mock("@/components/admin/chat/ThreadView", () => ({
   ),
 }));
 
+jest.mock("@/components/admin/chat/VoiceChat", () => ({
+  VoiceChat: ({ personaId, personaColor }: any) => (
+    <div data-testid="voice-chat">
+      Persona: {personaId}
+      Color: {personaColor}
+    </div>
+  ),
+}));
+
 describe("ChatDrawer", () => {
   const mockOnToggle = jest.fn();
   const mockSendMessage = jest.fn();
@@ -408,5 +417,55 @@ describe("ChatDrawer", () => {
     expect(screen.queryByText(/View Thread/)).not.toBeInTheDocument();
 
     jest.useRealTimers();
+  });
+
+  it("toggles between Text and Voice modes", () => {
+    render(<ChatDrawer isOpen={true} onToggle={mockOnToggle} sessionId="session-123" />);
+
+    // Default is Text mode
+    expect(screen.getByText("💬 Text")).toBeInTheDocument();
+
+    // Click to switch to Voice
+    fireEvent.click(screen.getByText("💬 Text"));
+
+    // Should now show VoiceChat (mocked) and button text should change
+    const voiceChat = screen.getByTestId("voice-chat");
+    expect(voiceChat).toBeInTheDocument();
+    expect(screen.getByText("🎙️ Voice")).toBeInTheDocument();
+
+    // Check default persona (warm -> lumina)
+    expect(voiceChat).toHaveTextContent("Persona: lumina");
+    expect(voiceChat).toHaveTextContent("Color: #F59E0B");
+
+    // Click to switch back to Text
+    fireEvent.click(screen.getByText("🎙️ Voice"));
+
+    // Should be back to Text mode
+    expect(screen.getByText("💬 Text")).toBeInTheDocument();
+    expect(screen.queryByTestId("voice-chat")).not.toBeInTheDocument();
+    expect(screen.getByPlaceholderText(/How are you feeling/i)).toBeInTheDocument();
+  });
+
+  it("toggles Tone Mode and updates VoiceChat persona", () => {
+    const { updateTonePreference } = useWebSocketChat({ sessionId: "123", enabled: true });
+
+    render(<ChatDrawer isOpen={true} onToggle={mockOnToggle} sessionId="session-123" />);
+
+    // Default is Warm
+    expect(screen.getByText("💗 Warm")).toBeInTheDocument();
+
+    // Switch to Clinical
+    fireEvent.click(screen.getByText("💗 Warm"));
+
+    expect(screen.getByText("🔬 Clinical")).toBeInTheDocument();
+    expect(updateTonePreference).toHaveBeenCalledWith("clinical");
+
+    // Switch to Voice Mode to verify persona change
+    fireEvent.click(screen.getByText("💬 Text"));
+
+    const voiceChat = screen.getByTestId("voice-chat");
+    expect(voiceChat).toBeInTheDocument();
+    expect(voiceChat).toHaveTextContent("Persona: logos");
+    expect(voiceChat).toHaveTextContent("Color: #06B6D4");
   });
 });

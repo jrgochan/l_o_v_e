@@ -32,6 +32,23 @@ describe("SessionTimeline", () => {
     },
   ];
 
+  // Mock the hook to return predictable theme classes
+  beforeAll(() => {
+    jest.mock("@/hooks/admin/useAdminTheme", () => ({
+      useAdminTheme: () => ({
+        colors: {
+          background: "bg-test-dark",
+          text: {
+            primary: "text-test-primary",
+            secondary: "text-test-secondary",
+            muted: "text-test-muted",
+          },
+          border: "border-test-color",
+        },
+      }),
+    }));
+  });
+
   it("renders nothing when timeline is empty", () => {
     const { container } = render(<SessionTimeline emotionTimeline={[]} />);
     expect(container).toBeEmptyDOMElement();
@@ -123,5 +140,13 @@ describe("SessionTimeline", () => {
     // Should NOT have "+" sign
     expect(screen.getByText((content) => content.includes("V: -0.50"))).toBeInTheDocument();
     expect(screen.queryByText((content) => content.includes("V: +"))).not.toBeInTheDocument();
+  });
+  it("renders the legend correctly", () => {
+    render(<SessionTimeline emotionTimeline={mockEvents} />);
+    expect(screen.getByText("Alert Levels:")).toBeInTheDocument();
+    expect(screen.getByText("Stable")).toBeInTheDocument();
+    expect(screen.getByText("Attention")).toBeInTheDocument();
+    expect(screen.getByText("Warning")).toBeInTheDocument();
+    expect(screen.getByText("Critical")).toBeInTheDocument();
   });
 });

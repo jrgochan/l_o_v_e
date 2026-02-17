@@ -3,7 +3,6 @@ from unittest.mock import AsyncMock, MagicMock, patch
 from uuid import uuid4
 
 import pytest
-
 from app.core.security import get_password_hash
 from app.models.user import User
 from app.services.user_service import UserService
@@ -49,7 +48,9 @@ async def test_update_profile_success(user_service, mock_db, mock_user):
 
     with patch("app.services.user_service.event_bus") as mock_bus:
         mock_bus.emit = AsyncMock()
-        await user_service.update_profile(mock_user, full_name="New Name", email="new@example.com")
+        await user_service.update_profile(
+            mock_user, full_name="New Name", email="new@example.com"
+        )
 
         assert mock_user.full_name == "New Name"
         assert mock_user.email == "new@example.com"
@@ -97,7 +98,9 @@ async def test_change_password_success(user_service, mock_db, mock_user):
             with patch("app.services.user_service.event_bus") as mock_bus:
                 mock_bus.emit = AsyncMock()
                 await user_service.change_password(
-                    mock_user, current_password="OldPassword123!", new_password="NewPassword123!"
+                    mock_user,
+                    current_password="OldPassword123!",
+                    new_password="NewPassword123!",
                 )
 
                 assert mock_user.password_hash == "new_hashed_secret"

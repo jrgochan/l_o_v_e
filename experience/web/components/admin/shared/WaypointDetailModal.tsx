@@ -146,8 +146,6 @@ export function WaypointDetailModal({
     async (stepIndex: number) => {
       if (fetchedIndicesRef.current.has(stepIndex)) return;
       const step = allSteps[stepIndex];
-      if (!step || step.type === "start" || step.type === "end") return;
-      if (step.strategies && step.strategies.length > 0) return;
 
       // Get previous step's VAC for the from_vac parameter
       const prevStep = allSteps[Math.max(0, stepIndex - 1)];
@@ -274,6 +272,14 @@ export function WaypointDetailModal({
     }
     const prev = previousEmotion.vac;
     const current = currentStep.vac;
+
+    if (!prev || !current) {
+      return {
+        valence: { change: "0.000", rawDelta: 0, direction: "Data Unavailable" },
+        arousal: { change: "0.000", rawDelta: 0, direction: "Data Unavailable" },
+        connection: { change: "0.000", rawDelta: 0, direction: "Data Unavailable" },
+      };
+    }
 
     return {
       valence: {
@@ -690,7 +696,7 @@ export function WaypointDetailModal({
                                     <span
                                       key={level}
                                       className={`w-3 h-1.5 rounded-sm ${
-                                        level <= (strategy.difficulty_level ?? 0)
+                                        level <= (strategy.difficulty_level as number)
                                           ? level <= 2
                                             ? "bg-green-500"
                                             : level <= 3
