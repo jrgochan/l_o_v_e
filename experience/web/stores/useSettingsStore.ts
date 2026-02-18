@@ -177,7 +177,7 @@ const DEFAULT_VALUES = {
   pathAnimationMode: "subtle" as PathAnimationMode,
   emotionDisplayMode: "simple" as const,
   showMotionIndicators: true,
-  showAxisLabels: true,
+  showAxisLabels: false,
   colorScheme: "category" as const,
   pathOpacity: 0.6,
   emotionSize: 1.0,
