@@ -5,7 +5,7 @@
 ### System Requirements
 
 - **Python:** 3.12+
-- **PostgreSQL:** 14+ (auto-detects version)
+- **PostgreSQL:** 18+ (with pgvector extension)
 - **pgvector:** 0.5.0+
 - **Redis:** 6.0+
 - **Node.js:** 18.0+
@@ -24,19 +24,16 @@
 
 ```bash
 # Install dependencies
-brew install postgresql pgvector redis ollama ffmpeg node python@3.11
+brew install postgresql pgvector redis ollama ffmpeg node python@3.12
 
-# Clone repository
+# Clone the monorepo
 cd ~/code
-git clone git@gitlab.com:l_o_v_e/infra.git
-git clone git@gitlab.com:l_o_v_e/observer.git
-git clone git@gitlab.com:l_o_v_e/versor.git
-git clone git@gitlab.com:l_o_v_e/listener.git
-git clone git@gitlab.com:l_o_v_e/experience.git
+git clone git@github.com:jrgochan/l_o_v_e.git
+cd l_o_v_e
 
 # Run setup
 cd infra
-./setup-love-stack.sh
+./bin/setup-love-stack.sh
 ```
 
 ### Ubuntu/Debian
@@ -44,7 +41,7 @@ cd infra
 ```bash
 # Install dependencies
 sudo apt update
-sudo apt install postgresql redis-server ffmpeg nodejs npm python3.11
+sudo apt install postgresql redis-server ffmpeg nodejs npm python3.12
 
 # Install pgvector (see infra/PGVECTOR_SETUP.md)
 
@@ -71,8 +68,8 @@ The L.O.V.E. Stack uses a multi-repository structure:
 
 ```bash
 cd infra
-./setup-love-stack.sh --help  # See all options
-./setup-love-stack.sh         # Interactive setup
+./bin/setup-love-stack.sh --help  # See all options
+./bin/setup-love-stack.sh         # Interactive setup
 ```
 
 The setup script will:
@@ -89,16 +86,16 @@ The setup script will:
 
 ```bash
 # Fastest re-run (if already setup)
-./setup-love-stack.sh --minimal
+./bin/setup-love-stack.sh --minimal
 
 # CI/CD automated
-./setup-love-stack.sh --yes
+./bin/setup-love-stack.sh --yes
 
 # Skip large downloads
-./setup-love-stack.sh --skip-ollama
+./bin/setup-love-stack.sh --skip-ollama
 
 # Fresh complete install
-./setup-love-stack.sh --clean
+./bin/setup-love-stack.sh --clean
 ```
 
 ## Troubleshooting
@@ -107,11 +104,11 @@ The setup script will:
 
 ```bash
 # macOS
-brew install python@3.11
+brew install python@3.12
 
 # Ubuntu
 sudo add-apt-repository ppa:deadsnakes/ppa
-sudo apt install python3.11
+sudo apt install python3.12
 ```
 
 ### pgvector not available
@@ -127,16 +124,13 @@ See `infra/PGVECTOR_SETUP.md` for detailed installation guide.
 ## Verification
 
 ```bash
-# Test the setup
-cd infra
-./test-love-stack.sh
-
 # Check database
 psql -U love_user -d love_db -c "SELECT COUNT(*) FROM atlas_definitions;"
 # Should return 87
 
 # Start the stack
-./run-love-stack.sh
+cd infra
+./bin/run-love-stack.sh
 ```
 
 ## Next Steps

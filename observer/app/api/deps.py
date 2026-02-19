@@ -8,19 +8,18 @@ from datetime import datetime, timezone
 from typing import Annotated, Optional
 
 import jwt
-from app.core.security import get_password_hash
-from app.core.settings import settings
-from app.database import (
-    get_db as get_db,  # re-export  # pylint: disable=useless-import-alias
-)
-from app.models.user import User, UserRole
-from app.schemas.user import TokenData
 from fastapi import Depends, HTTPException, Query, WebSocketException, status
 from fastapi.security import OAuth2PasswordBearer
 from jwt.exceptions import InvalidTokenError
 from pydantic import ValidationError
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
+
+from app.core.security import get_password_hash
+from app.core.settings import settings
+from app.database import get_db as get_db  # re-export  # pylint: disable=useless-import-alias
+from app.models.user import User, UserRole
+from app.schemas.user import TokenData
 
 # OAuth2 scheme for token extraction
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="auth/login")
@@ -58,16 +57,11 @@ async def get_current_user(
         headers={"WWW-Authenticate": "Bearer"},
     )
 
-    if (
-        token == "dev-token-bypass"
-        and os.getenv("APP_ENV", "development") != "production"
-    ):
+    if token == "dev-token-bypass" and os.getenv("APP_ENV", "development") != "production":
         return await _get_or_create_dev_user(db)
 
     try:
-        payload = jwt.decode(
-            token, settings.SECRET_KEY, algorithms=[settings.ALGORITHM]
-        )
+        payload = jwt.decode(token, settings.SECRET_KEY, algorithms=[settings.ALGORITHM])
         email: Optional[str] = payload.get("sub")
         if email is None:
             raise credentials_exception
@@ -137,9 +131,7 @@ async def get_current_user_ws(
         return await _get_or_create_dev_user(db)
 
     try:
-        payload = jwt.decode(
-            token, settings.SECRET_KEY, algorithms=[settings.ALGORITHM]
-        )
+        payload = jwt.decode(token, settings.SECRET_KEY, algorithms=[settings.ALGORITHM])
         email: Optional[str] = payload.get("sub")
         if email is None:
             raise credentials_exception
@@ -177,10 +169,7 @@ async def get_current_user_for_refresh(
         headers={"WWW-Authenticate": "Bearer"},
     )
 
-    if (
-        token == "dev-token-bypass"
-        and os.getenv("APP_ENV", "development") != "production"
-    ):
+    if token == "dev-token-bypass" and os.getenv("APP_ENV", "development") != "production":
         return await _get_or_create_dev_user(db)
 
     try:

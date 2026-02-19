@@ -10,13 +10,13 @@
 
 Observer provides a RESTful API with WebSocket support for real-time chat. All endpoints return JSON unless otherwise specified.
 
-**Rate Limiting:** 60 requests/minute per user
+**Rate Limiting:** Not currently implemented (planned)
 
 ---
 
-## Atlas Endpoints
+## Emotion Endpoints
 
-### GET /atlas/emotions
+### GET /observer/emotions
 
 Get all emotions from the 87-emotion atlas.
 
@@ -45,15 +45,15 @@ Get all emotions from the 87-emotion atlas.
 **Example:**
 
 ```bash
-curl http://localhost:8000/atlas/emotions
+curl http://localhost:8000/observer/emotions
 
 # Filter by category
-curl "http://localhost:8000/atlas/emotions?category=When%20Life%20Is%20Good"
+curl "http://localhost:8000/observer/emotions?category=When%20Life%20Is%20Good"
 ```
 
 ---
 
-### GET /atlas/categories
+### GET /observer/categories
 
 Get all 13 emotion categories with counts.
 
@@ -73,7 +73,7 @@ Get all 13 emotion categories with counts.
 
 ---
 
-### GET /atlas/emotions/{emotion_id}
+### GET /observer/emotions/{emotion_id}
 
 Get a specific emotion by UUID.
 
@@ -97,7 +97,7 @@ Get a specific emotion by UUID.
 
 ---
 
-### GET /atlas/search
+### GET /observer/search
 
 Search emotions by name or definition.
 
@@ -121,12 +121,12 @@ Search emotions by name or definition.
 **Example:**
 
 ```bash
-curl "http://localhost:8000/atlas/search?query=anger"
+curl "http://localhost:8000/observer/search?query=anger"
 ```
 
 ---
 
-### POST /atlas/compute-all-paths
+### POST /observer/compute-all-paths
 
 Start background job to pre-compute all 7,482 transition paths.
 
@@ -138,13 +138,13 @@ Start background job to pre-compute all 7,482 transition paths.
   "status": "pending",
   "total_paths": 7482,
   "estimated_time": "8-10 minutes",
-  "message": "Poll /atlas/computation-status/{job_id} for progress"
+  "message": "Poll /observer/computation-status/{job_id} for progress"
 }
 ```
 
 ---
 
-### GET /atlas/computation-status/{job_id}
+### GET /observer/computation-status/{job_id}
 
 Get status of path computation job.
 
@@ -163,7 +163,7 @@ Get status of path computation job.
 
 ---
 
-### GET /atlas/recommendations
+### GET /observer/recommendations
 
 Get intelligent emotion recommendations.
 
@@ -672,29 +672,14 @@ Endpoints that return lists support pagination:
 
 ## Rate Limiting
 
-**Limits:**
+**Current Status:** Not implemented.
+
+**Planned (Future):**
 
 - 60 requests/minute per user
 - 10 concurrent WebSocket connections per user
-
-**Headers:**
-
-```text
-X-RateLimit-Limit: 60
-X-RateLimit-Remaining: 45
-X-RateLimit-Reset: 1704234000
-```
-
-**When rate limited:**
-
-```json
-HTTP 429 Too Many Requests
-{
-  "error": "rate_limit_exceeded",
-  "message": "Rate limit of 60 req/min exceeded",
-  "retry_after": 30
-}
-```
+- `X-RateLimit-*` response headers
+- HTTP 429 responses when exceeded
 
 ---
 

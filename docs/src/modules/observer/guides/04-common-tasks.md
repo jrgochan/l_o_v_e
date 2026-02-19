@@ -128,10 +128,10 @@ WHERE name = 'Anticipation';
 
 ```bash
 # Get the new emotion
-curl http://localhost:8000/atlas/emotions/Anticipation | jq
+curl http://localhost:8000/observer/emotions/Anticipation | jq
 
 # Test similarity search
-curl -X POST http://localhost:8000/atlas/similar \
+curl -X POST http://localhost:8000/observer/similar \
   -H "Content-Type: application/json" \
   -d '{"valence": 0.5, "arousal": 0.6, "connection": 0.3}' | jq
 ```
@@ -207,7 +207,7 @@ Expected output:
 
 ```text
 ✅ Updated: Deep Breathing
-✅ Total strategies: 107
+✅ Total strategies: 69
 ```
 
 ### Step 5: Verify
@@ -572,7 +572,7 @@ app.include_router(
 uvicorn app.main:app --reload --port 8000
 
 # Test the new endpoint
-curl http://localhost:8000/atlas/statistics | jq
+curl http://localhost:8000/observer/statistics | jq
 ```
 
 Expected output:
@@ -610,7 +610,7 @@ from app.main import app
 async def test_atlas_statistics():
     """Test the atlas statistics endpoint"""
     async with AsyncClient(app=app, base_url="http://test") as client:
-        response = await client.get("/atlas/statistics")
+        response = await client.get("/observer/statistics")
 
     assert response.status_code == 200
     data = response.json()

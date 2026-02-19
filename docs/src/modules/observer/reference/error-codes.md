@@ -31,7 +31,6 @@ Observer uses structured error responses with consistent error codes for program
 | **201** | Created | Successful POST (resource created) |
 | **400** | Bad Request | Invalid input data |
 | **404** | Not Found | Resource doesn't exist |
-| **429** | Too Many Requests | Rate limit exceeded |
 | **500** | Internal Server Error | Unexpected server error |
 | **503** | Service Unavailable | Observer unhealthy |
 
@@ -133,8 +132,8 @@ Observer uses structured error responses with consistent error codes for program
 **Resolution:**
 
 - Check emotion name spelling
-- Query `/atlas/emotions` for valid names
-- Use `/atlas/search` to find similar emotions
+- Query `/observer/emotions` for valid names
+- Use `/observer/search` to find similar emotions
 
 ---
 
@@ -208,7 +207,7 @@ Observer uses structured error responses with consistent error codes for program
 **Resolution:**
 
 - Try different target emotion
-- Use `/atlas/recommendations` for suggestions
+- Use `/observer/recommendations` for suggestions
 - Check category transition rules
 
 ---
@@ -370,7 +369,9 @@ USING hnsw (embedding vector_cosine_ops);
 
 ---
 
-## Rate Limiting Errors (429)
+## Rate Limiting (Planned)
+
+> **Note:** Rate limiting is **not yet implemented**. The error codes below describe planned behavior for a future release.
 
 ### rate_limit_exceeded
 

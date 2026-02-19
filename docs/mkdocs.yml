@@ -2,8 +2,8 @@ site_name: L.O.V.E. Platform Documentation
 site_description: 'Listener-Observer-Versor-Experience: 3D Emotional Intelligence Platform'
 site_author: 'L.O.V.E. Project Team'
 site_url: https://love.jrgochan.io/docs/
-repo_url: https://gitlab.com/l_o_v_e/platform
-repo_name: 'GitLab'
+repo_url: https://github.com/jrgochan/l_o_v_e
+repo_name: 'GitHub'
 docs_dir: src
 site_dir: ../docs-build
 
@@ -37,7 +37,7 @@ theme:
     - content.code.annotate
     - toc.follow
   icon:
-    repo: fontawesome/brands/gitlab
+    repo: fontawesome/brands/github
 
 plugins:
   - search
@@ -54,7 +54,7 @@ markdown_extensions:
       custom_fences:
         - name: mermaid
           class: mermaid
-          format: !!python/name:mermaid2.fence_mermaid
+          format: !!python/name:mermaid2.fence_mermaid_custom
   - pymdownx.tabbed:
       alternate_style: true
   - pymdownx.tasklist:
@@ -205,6 +205,8 @@ nav:
       - Hooks Reference: modules/experience/02-hooks-reference.md
       - State Management: modules/experience/03-state-management.md
       - Soul Sphere Spec: modules/experience/04-soul-sphere-specification.md
+    - PersonaPlex:
+      - modules/personaplex/index.md
 
   - Features:
     - features/index.md
@@ -286,7 +288,7 @@ nav:
       - Claims: patent/05-CLAIMS.md
 
   - Project Info:
-    - Roadmap (Dec 2025): ROADMAP_DECEMBER_2025.md
+    - Roadmap Archive (Dec 2025): ROADMAP_DECEMBER_2025.md
     - Contributing: contributing.md
     - References: REFERENCES.md
 
@@ -300,8 +302,8 @@ nav:
 
 extra:
   social:
-    - icon: fontawesome/brands/gitlab
-      link: https://gitlab.com/l_o_v_e/platform
+    - icon: fontawesome/brands/github
+      link: https://github.com/jrgochan/l_o_v_e
 
   version:
     provider: mike

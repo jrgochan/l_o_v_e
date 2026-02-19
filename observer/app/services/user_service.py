@@ -9,6 +9,9 @@ import logging
 from datetime import datetime, timezone
 from typing import Any, Dict, List, Optional
 
+from sqlalchemy import select
+from sqlalchemy.ext.asyncio import AsyncSession
+
 from app.core.events import DomainEvent, event_bus
 from app.core.security import get_password_hash, verify_password
 from app.models.chat_message import ChatMessage
@@ -16,8 +19,6 @@ from app.models.chat_session import ChatSession
 from app.models.clinical_alert import ClinicalAlert
 from app.models.user import User
 from app.models.user_trajectory import UserTrajectory
-from sqlalchemy import select
-from sqlalchemy.ext.asyncio import AsyncSession
 
 logger = logging.getLogger(__name__)
 
@@ -160,9 +161,7 @@ class UserService:
                     "session_id": str(msg.session_id),
                     "role": "user" if msg.is_user_message else "assistant",
                     "content": msg.content,
-                    "created_at": (
-                        msg.created_at.isoformat() if msg.created_at else None
-                    ),
+                    "created_at": (msg.created_at.isoformat() if msg.created_at else None),
                 }
                 for msg in messages
             ]

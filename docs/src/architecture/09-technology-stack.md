@@ -32,7 +32,7 @@ The local stack is optimized for "Local First" development with minimal external
 - **Database**: PostgreSQL 18 with pgvector extension
 - **AI Inference**: Ollama (running on host machine)
 - **Orchestration**: `podman-compose` or `docker-compose`
-- **Start Script**: `./infra/run-love-stack.sh`
+- **Start Script**: `./infra/bin/run-love-stack.sh`
 
 ## Infrastructure: Production Deployment (Ansible)
 
@@ -53,7 +53,7 @@ The production stack runs on a single RHEL 9 server managed by Ansible.
 | File | Purpose |
 |------|---------|
 | `infra/deploy/deploy-ansible.sh` | Deployment entry point |
-| `infra/deploy/ansible/group_vars/rhel9.yml` | Server configuration variables |
+| `infra/deploy/ansible/group_vars/production/vars.yml` | Server configuration variables |
 | `infra/deploy/ansible/roles/app/tasks/main.yml` | Main task orchestration |
 | `infra/deploy/ansible/roles/app/templates/nginx.conf.j2` | Nginx configuration |
 

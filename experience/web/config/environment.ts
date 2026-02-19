@@ -29,12 +29,26 @@ const getApiUrl = () => {
     return process.env.NEXT_PUBLIC_API_URL;
   }
 
-  // 3. Fallback to localhost for development
+  // 3. Check for production mode match (default to relative path)
+  if (process.env.NODE_ENV === "production") {
+    return "/api/observer";
+  }
+
+  // 4. Fallback to localhost for development
   return "http://localhost:8000";
 };
 
 // Function to determine the WebSocket URL
 const getWsUrl = (apiUrl: string) => {
+  // Handle relative URLs
+  if (apiUrl.startsWith("/")) {
+    if (typeof window !== "undefined") {
+      const protocol = window.location.protocol === "https:" ? "wss:" : "ws:";
+      return `${protocol}//${window.location.host}${apiUrl}`;
+    }
+    return apiUrl; // Fallback for SSR
+  }
+
   // If API URL is https, use wss. Otherwise ws.
   if (apiUrl.startsWith("https")) {
     return apiUrl.replace("https", "wss");

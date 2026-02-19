@@ -327,7 +327,7 @@ Restarted Ollama with single model loaded.
 ### 3. Follow-up (Within 1 week)
 
 - [ ] RCA shared with team
-- [ ] Action items tracked in GitLab
+- [ ] Action items tracked in GitHub
 - [ ] Preventive measures implemented
 - [ ] Runbook updated
 - [ ] Incident review meeting held

@@ -12,8 +12,9 @@ Complete reference for all configuration options, environment variables, and set
 |----------|------|---------|-------------|
 | `HOST` | string | `"0.0.0.0"` | Server bind address |
 | `PORT` | integer | `8001` | Server port |
-| `API_TITLE` | string | `"Versor API"` | API title in docs |
-| `API_DESCRIPTION` | string | `"Quaternion mathematics..."` | API description |
+| `API_TITLE` | string | `"L.O.V.E. Versor Engine"` | API title in docs |
+| `API_DESCRIPTION` | string | `"Pure mathematical engine..."` | API description |
+| `API_VERSION` | string | `"v1"` | API version string |
 
 **Example (.env):**
 
@@ -28,6 +29,7 @@ PORT=8001
 |----------|------|---------|-------------|
 | `FLOODING_THRESHOLD` | float | `2.0` | Elasticity threshold for flooding (rad/s) |
 | `EPSILON` | float | `1e-6` | Numerical tolerance for zero checks |
+| `SMOOTHING_ALPHA` | float | `0.1` | Exponential smoothing filter alpha (0=heavy, 1=none) |
 
 **Example:**
 
@@ -55,12 +57,27 @@ MAX_SLERP_STEPS=240      # Allow ultra-smooth
 
 | Variable | Type | Default | Description |
 |----------|------|---------|-------------|
-| `CORS_ORIGINS` | list[string] | `["http://localhost:8002"]` | Allowed origins for CORS |
+| `CORS_ORIGINS` | list[string] | `["http://localhost:3000", "http://localhost:19006", "http://localhost:8000"]` | Allowed origins for CORS |
+
+### Security Settings
+
+| Variable | Type | Default | Description |
+|----------|------|---------|-------------|
+| `SECRET_KEY` | string | `"dev-secret-key-change-in-production"` | JWT secret (alias: `JWT_SECRET_KEY`) |
+| `ALGORITHM` | string | `"HS256"` | JWT signing algorithm |
+
+### Operational Settings
+
+| Variable | Type | Default | Description |
+|----------|------|---------|-------------|
+| `MAX_REQUEST_SIZE` | integer | `1048576` | Max request body size in bytes (1MB) |
+| `LOG_LEVEL` | string | `"INFO"` | Logging level |
+| `DEBUG` | boolean | `false` | Debug mode flag |
 
 **Example:**
 
 ```bash
-CORS_ORIGINS='["http://localhost:8002","http://localhost:3000","https://app.love.com"]'
+CORS_ORIGINS='["http://localhost:8000","http://localhost:3000","https://app.love.com"]'
 ```
 
 ---
@@ -86,7 +103,11 @@ MIN_SLERP_STEPS=10
 MAX_SLERP_STEPS=120
 
 # CORS
-CORS_ORIGINS='["http://localhost:8002","http://localhost:3000"]'
+CORS_ORIGINS='["http://localhost:3000","http://localhost:19006","http://localhost:8000"]'
+
+# Security
+SECRET_KEY=dev-secret-key-change-in-production
+ALGORITHM=HS256
 
 # Logging
 LOG_LEVEL=WARNING
@@ -97,33 +118,54 @@ LOG_LEVEL=WARNING
 **File:** `app/config.py`
 
 ```python
-from pydantic_settings import BaseSettings
-from typing import List
+from pydantic import Field
+from pydantic_settings import BaseSettings, SettingsConfigDict
 
-class Settings(BaseSettings):
-    """Application configuration."""
+try:
+    from settings import LoveBaseSettings
+except ImportError:
+    LoveBaseSettings = BaseSettings
 
-    # Server
-    HOST: str = "0.0.0.0"
-    PORT: int = 8001
-    API_TITLE: str = "Versor API"
-    API_DESCRIPTION: str = "Quaternion mathematics for emotional state"
+class Settings(LoveBaseSettings):
+    """Application settings loaded from environment variables."""
 
-    # Thresholds
-    FLOODING_THRESHOLD: float = 2.0
+    # Mathematical constants
     EPSILON: float = 1e-6
-
-    # SLERP
+    FLOODING_THRESHOLD: float = 2.0
+    SMOOTHING_ALPHA: float = 0.1
     DEFAULT_SLERP_STEPS: int = 60
     MIN_SLERP_STEPS: int = 10
     MAX_SLERP_STEPS: int = 120
 
-    # CORS
-    CORS_ORIGINS: List[str] = ["http://localhost:8002"]
+    # API
+    API_VERSION: str = "v1"
+    API_TITLE: str = "L.O.V.E. Versor Engine"
+    API_DESCRIPTION: str = "Pure mathematical engine for quaternion-based emotional state processing"
 
-    class Config:
-        env_file = ".env"
-        env_file_encoding = "utf-8"
+    # CORS
+    CORS_ORIGINS: List[str] = [
+        "http://localhost:3000",
+        "http://localhost:19006",
+        "http://localhost:8000",
+    ]
+
+    # Performance
+    MAX_REQUEST_SIZE: int = 1024 * 1024  # 1MB
+    LOG_LEVEL: str = "INFO"
+    DEBUG: bool = False
+
+    # Security
+    SECRET_KEY: str = Field(
+        validation_alias="JWT_SECRET_KEY",
+        default="dev-secret-key-change-in-production"
+    )
+    ALGORITHM: str = "HS256"
+
+    model_config = SettingsConfigDict(
+        env_file=(".env", "../../infra/config/base.env"),
+        case_sensitive=True,
+        extra="ignore",
+    )
 
 # Singleton
 settings = Settings()
@@ -136,7 +178,7 @@ settings = Settings()
 ### Dockerfile
 
 ```dockerfile
-FROM python:3.11-slim
+FROM python:3.12-slim
 
 WORKDIR /app
 
@@ -178,7 +220,7 @@ services:
       - PORT=8001
       - FLOODING_THRESHOLD=2.0
       - DEFAULT_SLERP_STEPS=60
-      - CORS_ORIGINS=["http://localhost:8002"]
+      - CORS_ORIGINS=["http://localhost:8000"]
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8001/health"]
       interval: 30s
@@ -355,7 +397,7 @@ CORS_ORIGINS='["*"]'  # Allow all (dev only!)
 **Production (restrictive):**
 
 ```bash
-CORS_ORIGINS='["https://api.love.com","https://app.love.com"]'
+CORS_ORIGINS='["https://love.jrgochan.io"]'
 ```
 
 ### HTTPS

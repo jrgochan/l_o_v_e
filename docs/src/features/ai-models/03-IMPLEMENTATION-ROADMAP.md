@@ -313,7 +313,7 @@ curl http://localhost:8000/observer/ai/assignments
 - No console errors
 - Responsive design works
 
-### Milestone 4: Production Ready (After Phase 6)
+### Milestone 4: Alpha (After Phase 6)
 
 **Success Criteria**:
 
@@ -409,7 +409,7 @@ npm run dev  # Test in browser
 ```bash
 # 1. Start full stack
 cd infra
-./run-love-stack.sh
+./bin/run-love-stack.sh
 
 # 2. Test workflows
 open http://localhost:3000/admin/settings

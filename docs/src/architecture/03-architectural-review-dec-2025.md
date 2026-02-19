@@ -1,5 +1,8 @@
 # L.O.V.E. Architectural Review - December 2025
 
+> [!NOTE]
+> **📋 Historical Document** — This review was written in December 2025. Some details (e.g., PostgreSQL 17 → now 18, GitLab CI → now GitHub Actions) may be outdated. It is preserved for architectural reference.
+
 ## Comprehensive System Analysis & Future Planning
 
 **Date**: December 7, 2025
@@ -681,7 +684,7 @@ export const api = new ApiClient();
 
 ### **Current Containerization Status**
 
-| Module | Containerfile | Tested | Production Ready |
+| Module | Containerfile | Tested | Alpha |
 |--------|---------------|--------|------------------|
 | Versor | ✅ Yes | ⏳ Not tested | 🟡 Needs testing |
 | Observer | ✅ Yes | ⏳ Not tested | 🟡 Needs testing |
@@ -748,7 +751,7 @@ curl http://localhost:8001/health # Versor
 
 #### **4. CI/CD Integration** (2-3 hours)
 
-Add `.gitlab-ci.yml` to Experience:
+Add `.github/workflows/ci.yml` to Experience:
 
 ```yaml
 stages:

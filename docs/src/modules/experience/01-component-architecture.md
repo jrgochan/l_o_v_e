@@ -7,7 +7,7 @@
 
 ## Overview
 
-The Experience module contains **35 top-level components** and **18 admin subdirectories** with 120+ admin components. Components are organized by domain: core visualization, navigation, admin dashboard, and clinical tools.
+The Experience module contains **36 top-level components** and **18 admin subdirectories** with 120+ admin components. Components are organized by domain: core visualization, navigation, admin dashboard, and clinical tools.
 
 ---
 
@@ -17,56 +17,71 @@ The Experience module contains **35 top-level components** and **18 admin subdir
 
 | Component | Size | Purpose |
 |-----------|------|---------|
-| `SoulSphere.tsx` | 13KB | Core 3D emotional state visualization with custom GLSL shaders |
-| `Scene.tsx` | 5KB | Three.js scene setup, camera, lighting |
-| `TransitionPathRenderer.tsx` | 9KB | 3D rendering of A* transition paths through VAC space |
-| `VACAnimator.tsx` | 2KB | SLERP-based animation between emotional states |
-| `OrbitControls.tsx` | 2KB | Camera orbit controls for 3D scene |
-| `VACAxisLabels3D.tsx` | 4KB | 3D axis labels in VAC space |
-| `AxisLabels.tsx` | 3KB | 2D axis label overlay |
-| `SimpleAxisLabels.tsx` | 2KB | Simplified axis labels |
-| `VACDisplay.tsx` | 1KB | Current VAC coordinate readout |
-| `CinematicOverlay.tsx` | 6KB | Cinematic camera mode overlay |
-| `DebugBroadcaster.tsx` | 3KB | Debug information broadcaster |
+| `SoulSphere.ts` | 13KB | Core 3D emotional state visualization with custom GLSL shaders |
+| `Scene.ts` | 5KB | Three.js scene setup, camera, lighting |
+| `TransitionPathRenderer.ts` | 9KB | 3D rendering of A* transition paths through VAC space |
+| `VACAnimator.ts` | 2KB | SLERP-based animation between emotional states |
+| `OrbitControls.ts` | 2KB | Camera orbit controls for 3D scene |
+| `VACAxisLabels3D.ts` | 4KB | 3D axis labels in VAC space |
+| `AxisLabels.ts` | 3KB | 2D axis label overlay |
+| `SimpleAxisLabels.ts` | 2KB | Simplified axis labels |
+| `VACDisplay.ts` | 1KB | Current VAC coordinate readout |
+| `CinematicOverlay.ts` | 6KB | Cinematic camera mode overlay |
+| `DebugBroadcaster.ts` | 3KB | Debug information broadcaster |
 
 ### Navigation & Journeys
 
 | Component | Size | Purpose |
 |-----------|------|---------|
-| `GoalSetting.tsx` | 14KB | Emotional goal selection interface |
-| `JourneyProgress.tsx` | 9KB | Active journey progress tracking |
-| `JourneyHistory.tsx` | 8KB | Historical journey timeline |
-| `PathDetailsOverlay.tsx` | 21KB | Detailed path information overlay |
-| `PathExplanationPanel.tsx` | 6KB | AI-generated path explanations |
-| `PathComparisonView.tsx` | 5KB | Side-by-side path comparison |
-| `ViewerPathFlyover.tsx` | 4KB | Animated flyover of transition paths |
-| `WaypointArrivalOverlay.tsx` | 5KB | Overlay shown when reaching a waypoint |
-| `WaypointTooltip.tsx` | 5KB | Hover tooltip for waypoints |
-| `StepAlternativeSelector.tsx` | 4KB | Alternative path step selector |
-| `PathfindingInsights.tsx` | 2KB | Insights from pathfinding results |
+| `GoalSetting.ts` | 14KB | Emotional goal selection interface |
+| `GoalSettingLogic.ts` | 3KB | Goal setting business logic (separated from UI) |
+| `JourneyProgress.ts` | 9KB | Active journey progress tracking |
+| `JourneyHistory.ts` | 8KB | Historical journey timeline |
+| `PathDetailsOverlay.ts` | 21KB | Detailed path information overlay |
+| `PathExplanationPanel.ts` | 6KB | AI-generated path explanations |
+| `PathComparisonView.ts` | 5KB | Side-by-side path comparison |
+| `ViewerPathFlyover.ts` | 4KB | Animated flyover of transition paths |
+| `WaypointArrivalOverlay.ts` | 5KB | Overlay shown when reaching a waypoint |
+| `WaypointTooltip.ts` | 5KB | Hover tooltip for waypoints |
+| `StepAlternativeSelector.ts` | 4KB | Alternative path step selector |
+| `PathfindingInsights.ts` | 2KB | Insights from pathfinding results |
 
 ### Strategies
 
 | Component | Size | Purpose |
 |-----------|------|---------|
-| `StrategyLibraryBrowser.tsx` | 7KB | Browse all regulation strategies |
-| `StrategyDetailsModal.tsx` | 6KB | Strategy detail view |
-| `StrategyFeedbackModal.tsx` | 11KB | Strategy effectiveness feedback |
-| `PersonalStrategies.tsx` | 5KB | User's personal strategy collection |
-| `ContextualRecommendations.tsx` | 11KB | Context-aware strategy recommendations |
+| `StrategyLibraryBrowser.ts` | 7KB | Browse all regulation strategies |
+| `StrategyDetailsModal.ts` | 6KB | Strategy detail view |
+| `StrategyFeedbackModal.ts` | 11KB | Strategy effectiveness feedback |
+| `PersonalStrategies.ts` | 5KB | User's personal strategy collection |
+| `ContextualRecommendations.ts` | 11KB | Context-aware strategy recommendations |
 
 ### Input & Controls
 
 | Component | Size | Purpose |
 |-----------|------|---------|
-| `Settings.tsx` | 26KB | Comprehensive settings panel (largest component) |
-| `CommandPalette.tsx` | 15KB | Cmd+K command palette |
-| `EmotionalInput.tsx` | 3KB | Text-based emotional input |
-| `EmotionalControls.tsx` | 2KB | Emotion selection controls |
-| `ViewerShortcuts.tsx` | 3KB | Keyboard shortcut display |
-| `ConceptTooltip.tsx` | 2KB | Educational concept tooltips |
-| `ZenSessionIndicator.tsx` | 2KB | Zen mode session indicator |
-| `LoggerProvider.tsx` | <1KB | Logging context provider |
+| `Settings.ts` | 26KB | Comprehensive settings panel (largest component) |
+| `CommandPalette.ts` | 15KB | Cmd+K command palette |
+| `EmotionalInput.ts` | 3KB | Text-based emotional input |
+| `EmotionalControls.ts` | 2KB | Emotion selection controls |
+| `ViewerShortcuts.ts` | 3KB | Keyboard shortcut display |
+| `ConceptTooltip.ts` | 2KB | Educational concept tooltips |
+| `ConsentGate.ts` | 2KB | Consent gate for data collection |
+| `ZenSessionIndicator.ts` | 2KB | Zen mode session indicator |
+| `LoggerProvider.ts` | <1KB | Logging context provider |
+
+---
+
+## Component Subdirectories
+
+In addition to top-level components, there are 4 subdirectories:
+
+| Directory | Purpose |
+|-----------|---------|
+| `admin/` | Admin dashboard (18 subdirectories, 120+ components) |
+| `auth/` | Authentication and login components |
+| `command-palette/` | Modular command palette system |
+| `input/` | Specialized input components |
 
 ---
 

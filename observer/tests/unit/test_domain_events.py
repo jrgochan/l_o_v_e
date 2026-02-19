@@ -1,6 +1,7 @@
 from unittest.mock import AsyncMock
 
 import pytest
+
 from app.core.events import DomainEvent, EventBus
 
 

@@ -656,7 +656,7 @@ def test_feature_name():
 
 In production, tests run automatically on every commit.
 
-**CI Configuration:** `.gitlab-ci.yml`
+**CI Configuration:** `.github/workflows/ci.yml`
 
 ```yaml
 test:

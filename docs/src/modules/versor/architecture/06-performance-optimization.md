@@ -808,7 +808,7 @@ def test_slerp_performance():
 **Run in CI:**
 
 ```textyaml
-# .gitlab-ci.yml
+# .github/workflows/ci.yml
 performance_tests:
   script:
     - pytest tests/performance/ -v

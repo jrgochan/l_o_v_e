@@ -51,7 +51,7 @@
       tags: setup
 
     - role: ollama
-      tags: setup
+      tags: [setup, deploy]
       when: enable_ollama | default(false) | bool
 
     - role: nginx

@@ -9,9 +9,7 @@ def test_consent_record_repr():
     user_id = uuid4()
 
     # Active
-    c1 = ConsentRecord(
-        user_id=user_id, consent_type="param1", version="1.0", revoked_at=None
-    )
+    c1 = ConsentRecord(user_id=user_id, consent_type="param1", version="1.0", revoked_at=None)
     assert "active" in repr(c1)
     assert "param1" in repr(c1)
 

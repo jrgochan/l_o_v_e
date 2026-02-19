@@ -51,7 +51,7 @@ The **Transition System** is Observer's crown jewel—a sophisticated A* pathfin
 **3. Evidence Base:**
 
 - Path must make psychological sense
-- Supported by 107 therapeutic strategies
+- Supported by 69 therapeutic strategies
 - Matches established patterns
 
 ---

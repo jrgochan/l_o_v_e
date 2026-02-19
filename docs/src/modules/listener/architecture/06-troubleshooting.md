@@ -472,7 +472,7 @@ WARNING: Failed to record state to Observer: Connection refused
 curl http://localhost:8000/health
 
 # 2. Test Observer manually
-curl http://localhost:8000/observer/atlas/emotions
+curl http://localhost:8000/observer/emotions
 
 # 3. Check Observer logs
 tail -f ../observer/logs/observer.log

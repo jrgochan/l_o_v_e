@@ -45,34 +45,35 @@ PORT=8000
 ### Database Configuration
 
 ```bash
-# Database connection URL
-DATABASE_URL=postgresql+asyncpg://observer_user:observer_pass@localhost:5432/observer_dev
-# Format: postgresql+asyncpg://user:password@host:port/database
-# Required: Yes
+# Database connection components (auto-assembled into DATABASE_URL)
+POSTGRES_USER=love_user
+# Default: love_user
+
+POSTGRES_PASSWORD=love_password
+# Default: love_password
+
+POSTGRES_DB=love_db
+# Default: love_db
+
+POSTGRES_HOST=localhost
+# Default: localhost
+
+POSTGRES_PORT=5432
+# Default: 5432
+
+# OR set DATABASE_URL directly (overrides individual fields)
+DATABASE_URL=postgresql+asyncpg://love_user:love_password@localhost:5432/love_db
+# If not set, auto-assembled from POSTGRES_* fields above
 
 # Connection pool settings
 DB_POOL_SIZE=20
-# Number of persistent connections
 # Default: 20
-# Recommended: 20-30 for production
 
 DB_MAX_OVERFLOW=10
-# Additional connections under load
 # Default: 10
-# Recommended: 10-20
-
-DB_POOL_TIMEOUT=30
-# Seconds to wait for connection
-# Default: 30
 
 DB_POOL_RECYCLE=3600
-# Recycle connections after N seconds
 # Default: 3600 (1 hour)
-
-# Query timeout
-DB_STATEMENT_TIMEOUT=60000
-# Milliseconds
-# Default: 60000 (60 seconds)
 ```
 
 ---
@@ -83,12 +84,47 @@ DB_STATEMENT_TIMEOUT=60000
 # Versor service URL
 VERSOR_URL=http://localhost:8001
 # Default: http://localhost:8001
-# Set to empty to use local quaternion computation
 
-# Use HTTP for Versor calls (vs local computation)
-USE_VERSOR_HTTP=true
+# Listener service URL
+LISTENER_URL=http://localhost:8002
+# Default: http://localhost:8002
+```
+
+---
+
+### Security Settings
+
+```bash
+# JWT secret key (CHANGE IN PRODUCTION)
+SECRET_KEY=dev-secret-key-change-in-production
+# Default: dev-secret-key-change-in-production
+
+# JWT algorithm
+ALGORITHM=HS256
+# Default: HS256
+
+# JWT access token expiration (minutes)
+ACCESS_TOKEN_EXPIRE_MINUTES=30
+# Default: 30
+
+# CORS allowed origins (JSON array string)
+ALLOWED_ORIGINS=["http://localhost:3000", "http://127.0.0.1:3000", "http://localhost:19006"]
+# Default: ["http://localhost:3000", "http://127.0.0.1:3000", "http://localhost:19006"]
+```
+
+---
+
+### Admin Configuration
+
+```bash
+# Default admin account (auto-created on first run)
+ADMIN_EMAIL=admin@admin.com
+ADMIN_PASSWORD=lovelove
+ADMIN_FULL_NAME=System Admin
+
+# Allow new user registration
+REGISTRATION_ENABLED=true
 # Default: true
-# Set to false to always use local computation
 ```
 
 ---
@@ -110,190 +146,74 @@ EMBEDDING_MODEL=all-MiniLM-L6-v2
 OPENAI_API_KEY=sk-...
 # Required if EMBEDDING_PROVIDER=openai
 
-OPENAI_EMBEDDING_MODEL=text-embedding-ada-002
-# Default: text-embedding-ada-002
-# Alternatives: text-embedding-3-small, text-embedding-3-large
-
-# Embedding dimension
-EMBEDDING_DIMENSION=384
-# Default: 384 (matches all-MiniLM-L6-v2)
-# Must match chosen model
+OPENAI_EMBEDDING_MODEL=text-embedding-3-small
+# Default: text-embedding-3-small
+# Alternatives: text-embedding-3-large
 ```
+
+> **Note:** `EMBEDDING_DIMENSION` is automatically computed from the chosen model (384 for `all-MiniLM-L6-v2`, 768 for `all-mpnet-base-v2`, 1536 for `text-embedding-3-small`, 3072 for `text-embedding-3-large`). It is not configurable directly.
 
 ---
 
 ### Vector Search Settings
 
 ```bash
-# HNSW index parameters
-HNSW_M=16
-# Number of connections per node
-# Default: 16
-# Range: 4-64
-# Higher = better recall, more memory
-
-HNSW_EF_CONSTRUCTION=64
-# Exploration factor during index build
-# Default: 64
-# Range: 10-500
-# Higher = better quality, slower build
-
+# HNSW search parameter
 HNSW_EF_SEARCH=40
-# Exploration factor during query
 # Default: 40
-# Range: 10-500
 # Higher = better recall, slower queries
 ```
 
 ---
 
-### Pathfinding Configuration
+### Emotion Matching Configuration
 
 ```bash
-# A* algorithm settings
-ASTAR_MAX_ITERATIONS=1000
-# Prevent infinite loops
-# Default: 1000
+# VAC vs semantic weight for short text (< 10 words)
+EMOTION_MATCHING_VAC_WEIGHT_SHORT=0.8
+EMOTION_MATCHING_SEMANTIC_WEIGHT_SHORT=0.2
 
-ASTAR_MAX_STEP_DISTANCE=1.5
-# Max VAC distance per transition
-# Default: 1.5
-# Range: 0.5-2.0
+# VAC vs semantic weight for long text (>= 10 words)
+EMOTION_MATCHING_VAC_WEIGHT_LONG=0.4
+EMOTION_MATCHING_SEMANTIC_WEIGHT_LONG=0.6
 
-ASTAR_MAX_AROUSAL_CHANGE=0.6
-# Max arousal change per step
-# Default: 0.6
-# Range: 0.3-1.0
+# Word count threshold for short vs long
+EMOTION_MATCHING_SHORT_TEXT_THRESHOLD=10
 
-# Path caching
-ENABLE_PATH_CACHE=true
-# Cache computed paths in database
-# Default: true
-
-PATH_CACHE_TTL=2592000
-# Cache duration in seconds
-# Default: 2592000 (30 days)
+# Normalization constants
+EMOTION_MATCHING_VAC_MAX_DISTANCE=3.46
+EMOTION_MATCHING_SEMANTIC_MAX_DISTANCE=2.0
 ```
 
 ---
 
-### WebSocket Settings
+### Application Settings
 
 ```bash
-# Enable WebSocket endpoints
-ENABLE_WEBSOCKET=true
-# Default: true
+# Application environment
+APP_ENV=development
+# Default: development
 
-# Max connections per session
-MAX_WEBSOCKET_CONNECTIONS_PER_SESSION=5
-# Default: 5
+# API version
+API_VERSION=v1
 
-# Max total connections
-MAX_WEBSOCKET_CONNECTIONS_TOTAL=1000
-# Default: 1000
+# Application name
+APP_NAME=L.O.V.E. Observer API
 
-# Heartbeat interval (seconds)
-WEBSOCKET_HEARTBEAT_INTERVAL=30
-# Default: 30
-
-# Message timeout (seconds)
-WEBSOCKET_MESSAGE_TIMEOUT=300
-# Default: 300 (5 minutes)
+# Default emotion collection
+DEFAULT_EMOTION_COLLECTION=goemotions
 ```
 
 ---
 
-### Chat Configuration
+### Logging
 
 ```bash
-# Enable chat features
-ENABLE_CHAT=true
-# Default: true
-
-# Default tone
-DEFAULT_TONE=warm
-# Options: warm, clinical
-# Default: warm
-
-# Deep Feeling Mode enabled by default
-DEFAULT_DEEP_FEELING=false
+DEBUG=false
 # Default: false
-```
 
----
-
-### Performance Tuning
-
-```bash
-# Atlas cache TTL (seconds)
-ATLAS_CACHE_TTL=3600
-# Default: 3600 (1 hour)
-
-# Embedding cache size
-EMBEDDING_CACHE_SIZE=10000
-# Number of cached embeddings
-# Default: 10000
-
-# Embedding cache TTL (seconds)
-EMBEDDING_CACHE_TTL=3600
-# Default: 3600
-
-# Enable query result caching
-ENABLE_QUERY_CACHE=true
-# Default: true
-
-# Query cache TTL (seconds)
-QUERY_CACHE_TTL=300
-# Default: 300 (5 minutes)
-```
-
----
-
-### Feature Flags
-
-```bash
-# Enable clinical alerts
-ENABLE_CLINICAL_ALERTS=true
-# Default: true
-
-# Enable session analytics
-ENABLE_SESSION_ANALYTICS=true
-# Default: true
-
-# Enable multi-emotion analysis
-ENABLE_MULTI_EMOTION=true
-# Default: true
-
-# Enable path matrix pre-computation
-ENABLE_PATH_MATRIX=true
-# Default: true
-
-# Enable AI model management
-ENABLE_AI_SETTINGS=true
-# Default: true
-```
-
----
-
-### Monitoring & Observability
-
-```bash
-# Enable Prometheus metrics
-ENABLE_METRICS=true
-# Default: true
-
-# Metrics port
-METRICS_PORT=9090
-# Default: 9090
-
-# Enable structured logging
-STRUCTURED_LOGGING=true
-# Default: true
-# Uses structlog for JSON logs
-
-# Sentry DSN (error tracking)
-SENTRY_DSN=https://...
-# Optional: Set to enable Sentry integration
+LOG_LEVEL=INFO
+# Default: INFO
 ```
 
 ---
@@ -305,58 +225,42 @@ SENTRY_DSN=https://...
 Complete example configuration:
 
 ```bash
-# Environment
-ENVIRONMENT=development
-LOG_LEVEL=INFO
-HOST=0.0.0.0
-PORT=8000
-
 # Database
-DATABASE_URL=postgresql+asyncpg://observer_user:observer_pass@localhost:5432/observer_dev
+POSTGRES_USER=love_user
+POSTGRES_PASSWORD=love_password
+POSTGRES_DB=love_db
+POSTGRES_HOST=localhost
+POSTGRES_PORT=5432
 DB_POOL_SIZE=20
 DB_MAX_OVERFLOW=10
-DB_POOL_TIMEOUT=30
 DB_POOL_RECYCLE=3600
 
-# Versor Integration
+# External Services
 VERSOR_URL=http://localhost:8001
-USE_VERSOR_HTTP=true
+LISTENER_URL=http://localhost:8002
 
 # Embeddings
 EMBEDDING_PROVIDER=local
 EMBEDDING_MODEL=all-MiniLM-L6-v2
-EMBEDDING_DIMENSION=384
 
 # Vector Search
-HNSW_M=16
-HNSW_EF_CONSTRUCTION=64
 HNSW_EF_SEARCH=40
 
-# Pathfinding
-ASTAR_MAX_ITERATIONS=1000
-ASTAR_MAX_STEP_DISTANCE=1.5
-ASTAR_MAX_AROUSAL_CHANGE=0.6
-ENABLE_PATH_CACHE=true
+# Security
+SECRET_KEY=dev-secret-key-change-in-production
+ALGORITHM=HS256
+ACCESS_TOKEN_EXPIRE_MINUTES=30
+ALLOWED_ORIGINS=["http://localhost:3000", "http://127.0.0.1:3000"]
 
-# WebSocket
-ENABLE_WEBSOCKET=true
-MAX_WEBSOCKET_CONNECTIONS_PER_SESSION=5
-WEBSOCKET_HEARTBEAT_INTERVAL=30
+# Admin
+ADMIN_EMAIL=admin@admin.com
+ADMIN_PASSWORD=lovelove
+REGISTRATION_ENABLED=true
 
-# Chat
-ENABLE_CHAT=true
-DEFAULT_TONE=warm
-DEFAULT_DEEP_FEELING=false
-
-# Features
-ENABLE_CLINICAL_ALERTS=true
-ENABLE_SESSION_ANALYTICS=true
-ENABLE_MULTI_EMOTION=true
-
-# Monitoring
-ENABLE_METRICS=true
-METRICS_PORT=9090
-STRUCTURED_LOGGING=true
+# Application
+APP_ENV=development
+LOG_LEVEL=INFO
+DEBUG=false
 ```
 
 ---
@@ -367,43 +271,31 @@ STRUCTURED_LOGGING=true
 
 ```bash
 # .env.development
-ENVIRONMENT=development
+APP_ENV=development
 LOG_LEVEL=DEBUG
-DATABASE_URL=postgresql+asyncpg://observer_user:observer_pass@localhost:5432/observer_dev
+DEBUG=true
+POSTGRES_HOST=localhost
+POSTGRES_DB=love_db
 DB_POOL_SIZE=5
-ENABLE_METRICS=false
-```
-
-### Staging
-
-```bash
-# .env.staging
-ENVIRONMENT=staging
-LOG_LEVEL=INFO
-DATABASE_URL=postgresql+asyncpg://observer_user:***@staging-db:5432/observer_staging
-DB_POOL_SIZE=15
-ENABLE_METRICS=true
-SENTRY_DSN=https://***
 ```
 
 ### Production
 
 ```bash
 # .env.production
-ENVIRONMENT=production
+APP_ENV=production
 LOG_LEVEL=WARNING
-DATABASE_URL=postgresql+asyncpg://observer_user:***@prod-db:5432/observer_prod
+DEBUG=false
+POSTGRES_HOST=localhost
+POSTGRES_DB=love_db
+POSTGRES_PASSWORD=<strong-password>
 DB_POOL_SIZE=30
 DB_MAX_OVERFLOW=20
-ENABLE_METRICS=true
-SENTRY_DSN=https://***
-STRUCTURED_LOGGING=true
-
-# OpenAI for better embeddings
+SECRET_KEY=<strong-random-key>
+ALLOWED_ORIGINS=["https://love.jrgochan.io"]
 EMBEDDING_PROVIDER=openai
 OPENAI_API_KEY=sk-***
 OPENAI_EMBEDDING_MODEL=text-embedding-3-large
-EMBEDDING_DIMENSION=3072
 ```
 
 ---
@@ -421,19 +313,18 @@ services:
     ports:
       - "8000:8000"
     environment:
-      - ENVIRONMENT=production
-      - DATABASE_URL=postgresql+asyncpg://observer:${DB_PASSWORD}@postgres:5432/observer
+      - POSTGRES_HOST=postgres
+      - POSTGRES_DB=love_db
       - EMBEDDING_PROVIDER=local
-      - ENABLE_WEBSOCKET=true
     depends_on:
       - postgres
 
   postgres:
-    image: pgvector/pgvector:pg16
+    image: pgvector/pgvector:pg18
     environment:
-      - POSTGRES_USER=observer
+      - POSTGRES_USER=love_user
       - POSTGRES_PASSWORD=${DB_PASSWORD}
-      - POSTGRES_DB=observer
+      - POSTGRES_DB=love_db
     volumes:
       - pgdata:/var/lib/postgresql/data
     ports:
@@ -487,31 +378,40 @@ stringData:
 
 ### Startup Checks
 
-Observer validates configuration on startup:
+Observer validates configuration on startup using Pydantic v2 `@model_validator`:
 
 ```python
-# app/config.py
-class Settings(BaseSettings):
-    # Validate DATABASE_URL format
-    @validator('DATABASE_URL')
-    def validate_database_url(cls, v):
-        if not v.startswith('postgresql'):
-            raise ValueError('DATABASE_URL must start with postgresql://')
-        return v
+# app/core/settings.py
+class Settings(LoveBaseSettings):
+    POSTGRES_USER: str = Field(default="love_user")
+    POSTGRES_PASSWORD: str = Field(default="love_password")
+    POSTGRES_DB: str = Field(default="love_db")
+    POSTGRES_HOST: str = Field(default="localhost")
+    POSTGRES_PORT: int = Field(default=5432)
+    DATABASE_URL: str | None = None
 
-    # Validate pool size
-    @validator('DB_POOL_SIZE')
-    def validate_pool_size(cls, v):
-        if v < 1 or v > 100:
-            raise ValueError('DB_POOL_SIZE must be between 1 and 100')
-        return v
+    @model_validator(mode="after")
+    def assemble_db_connection(self) -> "Settings":
+        """Build DATABASE_URL from components if not explicitly set."""
+        if not self.DATABASE_URL:
+            self.DATABASE_URL = (
+                f"postgresql+asyncpg://{self.POSTGRES_USER}:{self.POSTGRES_PASSWORD}"
+                f"@{self.POSTGRES_HOST}:{self.POSTGRES_PORT}/{self.POSTGRES_DB}"
+            )
+        return self
 
-    # Validate HNSW parameters
-    @validator('HNSW_M')
-    def validate_hnsw_m(cls, v):
-        if v < 4 or v > 64:
-            raise ValueError('HNSW_M must be between 4 and 64')
-        return v
+    @model_validator(mode="after")
+    def validate_embedding_config(self) -> "Settings":
+        """Validate embedding provider configuration."""
+        if self.EMBEDDING_PROVIDER == "openai" and not self.OPENAI_API_KEY:
+            raise ValueError("OPENAI_API_KEY must be set when EMBEDDING_PROVIDER is 'openai'")
+        return self
+
+    model_config = SettingsConfigDict(
+        env_file=(".env", "../../../infra/config/base.env"),
+        case_sensitive=True,
+        extra="ignore",
+    )
 ```
 
 **On invalid config:**
@@ -532,7 +432,7 @@ ERROR: Configuration validation failed
 
 ```bash
 # Print current config
-python -c "from app.config import settings; print(settings.dict())"
+python -c "from app.core.settings import settings; print(settings.model_dump())"
 
 # Validate .env file
 cat .env | grep -v '^#' | grep -v '^$'

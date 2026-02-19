@@ -176,7 +176,7 @@ from app.main import app
 async def test_get_all_emotions():
     """Test getting all emotions from atlas"""
     async with AsyncClient(app=app, base_url="http://test") as client:
-        response = await client.get("/atlas/emotions")
+        response = await client.get("/observer/emotions")
 
     assert response.status_code == 200
     data = response.json()
@@ -190,7 +190,7 @@ async def test_get_all_emotions():
 async def test_get_emotion_by_name():
     """Test getting a specific emotion"""
     async with AsyncClient(app=app, base_url="http://test") as client:
-        response = await client.get("/atlas/emotions/Joy")
+        response = await client.get("/observer/emotions/Joy")
 
     assert response.status_code == 200
     emotion = response.json()
@@ -205,7 +205,7 @@ async def test_find_similar_emotions():
     """Test similarity search"""
     async with AsyncClient(app=app, base_url="http://test") as client:
         response = await client.post(
-            "/atlas/similar",
+            "/observer/similar",
             json={"valence": 0.8, "arousal": 0.6, "connection": 0.7}
         )
 
@@ -251,7 +251,7 @@ async def test_compassion_has_positive_connection():
     This validates our VAC model's key innovation.
     """
     async with AsyncClient(app=app, base_url="http://test") as client:
-        response = await client.get("/atlas/emotions/Compassion")
+        response = await client.get("/observer/emotions/Compassion")
 
     assert response.status_code == 200
     emotion = response.json()
@@ -269,7 +269,7 @@ async def test_pity_has_negative_connection():
     This distinguishes it from Compassion.
     """
     async with AsyncClient(app=app, base_url="http://test") as client:
-        response = await client.get("/atlas/emotions/Pity")
+        response = await client.get("/observer/emotions/Pity")
 
     assert response.status_code == 200
     emotion = response.json()
@@ -288,8 +288,8 @@ async def test_compassion_pity_distinction():
     """
     async with AsyncClient(app=app, base_url="http://test") as client:
         # Get both emotions
-        compassion_resp = await client.get("/atlas/emotions/Compassion")
-        pity_resp = await client.get("/atlas/emotions/Pity")
+        compassion_resp = await client.get("/observer/emotions/Compassion")
+        pity_resp = await client.get("/observer/emotions/Pity")
 
     compassion = compassion_resp.json()
     pity = pity_resp.json()
@@ -317,13 +317,13 @@ async def test_similar_compassion_returns_compassion():
     """Test that compassion-like VAC coordinates return Compassion"""
     async with AsyncClient(app=app, base_url="http://test") as client:
         # Get Compassion's actual VAC
-        compassion_resp = await client.get("/atlas/emotions/Compassion")
+        compassion_resp = await client.get("/observer/emotions/Compassion")
         compassion = compassion_resp.json()
         compassion_vac = compassion["vac"]
 
         # Search for similar emotions
         response = await client.post(
-            "/atlas/similar",
+            "/observer/similar",
             json={
                 "valence": compassion_vac[0],
                 "arousal": compassion_vac[1],

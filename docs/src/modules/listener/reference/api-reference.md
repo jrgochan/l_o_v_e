@@ -17,8 +17,13 @@ Production: https://love.jrgochan.io/listener
 
 ## Authentication
 
-**Current:** No authentication (development)
-**Future:** JWT tokens for production
+**Required:** JWT Bearer token on all endpoints.
+
+```text
+Authorization: Bearer <jwt-token>
+```
+
+Tokens are issued by the Observer auth endpoints and validated on every request.
 
 ---
 
@@ -35,11 +40,11 @@ Production: https://love.jrgochan.io/listener
 | `/listener/extract-audio-features` | POST | Audio feature extraction | ~1s |
 | `/listener/ingest` | POST | Queue audio (async) | < 100ms |
 | `/listener/status/{job_id}` | GET | Check job status | < 50ms |
-| `/listener/ai-models/local` | GET | List local models | < 100ms |
-| `/listener/ai-models/pull` | POST | Pull a new model | varies |
-| `/listener/ai-models/{name}` | DELETE | Delete a model | < 1s |
-| `/listener/ai-models/{name}/details` | GET | Model details | < 100ms |
-| `/listener/ai-models/health` | GET | AI model health | < 100ms |
+| `/listener/ai/models/local` | GET | List local models | < 100ms |
+| `/listener/ai/models/pull` | POST | Pull a new model | varies |
+| `/listener/ai/models/{name}` | DELETE | Delete a model | < 1s |
+| `/listener/ai/models/{name}/details` | GET | Model details | < 100ms |
+| `/listener/ai/models/health` | GET | AI model health | < 100ms |
 
 ---
 
@@ -192,7 +197,7 @@ curl -X POST http://localhost:8002/listener/analyze-audio \
 - MP3
 - AAC
 
-**Max Size:** 25MB
+**Max Size:** 50MB
 **Max Duration:** 5 minutes
 
 **Response:**
@@ -352,7 +357,8 @@ curl http://localhost:8002/listener/status/7f3a8c9d-1234-5678-9abc-def012345678
 **Request:**
 
 ```bash
-curl http://localhost:8002/listener/ai/models/local
+curl -H "Authorization: Bearer <token>" \
+  http://localhost:8002/listener/ai/models/local
 ```
 
 **Response:**
@@ -374,7 +380,7 @@ curl http://localhost:8002/listener/ai/models/local
 }
 ```
 
-### POST /listener/ai-models/pull
+### POST /listener/ai/models/pull
 
 **Purpose:** Pull (download) a new Ollama model.
 
@@ -382,7 +388,7 @@ curl http://localhost:8002/listener/ai/models/local
 
 ```json
 {
-  "model_name": "llama3.1:8b-instruct-q4_0"
+  "name": "llama3.1:8b"
 }
 ```
 
@@ -390,21 +396,21 @@ curl http://localhost:8002/listener/ai/models/local
 
 ```json
 {
-  "status": "pulling",
-  "model_name": "llama3.1:8b-instruct-q4_0",
-  "message": "Model download initiated"
+  "task_id": "uuid",
+  "ai_model_name": "llama3.1:8b",
+  "status": "pulling"
 }
 ```
 
-### DELETE /listener/ai-models/{model_name}
+### DELETE /listener/ai/models/{model_name}
 
 **Purpose:** Delete a locally cached model.
 
-### GET /listener/ai-models/{model_name}/details
+### GET /listener/ai/models/{model_name}/details
 
 **Purpose:** Get detailed info about a specific model.
 
-### GET /listener/ai-models/health
+### GET /listener/ai/models/health
 
 **Purpose:** Check if Ollama and configured models are accessible.
 
@@ -460,7 +466,7 @@ curl -X POST http://localhost:8002/listener/analyze-audio-multi-emotion \
 | Code | Error | Meaning |
 |------|-------|---------|
 | `400` | Bad Request | Missing or invalid parameters |
-| `413` | Payload Too Large | Audio file > 25MB |
+| `413` | Payload Too Large | Audio file > 50MB |
 | `415` | Unsupported Media Type | Invalid audio format |
 | `422` | Unprocessable Entity | Pydantic validation failed |
 
@@ -564,7 +570,7 @@ http://localhost:8002/openapi.json
 
 ## Key Takeaways
 
-✅ **13 endpoints** covering text, audio, multi-emotion, and AI model management
+✅ **14 endpoints** covering text, audio, multi-emotion, and AI model management
 ✅ **Sync and async** options available
 ✅ **Well-documented** with examples
 ✅ **Error handling** with clear codes

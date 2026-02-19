@@ -15,14 +15,14 @@ The Observer follows a clean architecture pattern with clear separation of conce
 observer/
 ├── app/                    # Application code
 │   ├── api/               # API routes and schemas
+│   ├── core/              # Factory, settings, security
 │   ├── models/            # Database models
 │   ├── services/          # Business logic
 │   ├── repositories/      # Data access (currently minimal)
 │   ├── utils/             # Helper functions
 │   ├── websocket/         # WebSocket handling
-│   ├── config.py          # Configuration
 │   ├── database.py        # Database connection
-│   └── main.py            # FastAPI application
+│   └── main.py            # Thin wrapper around factory
 ├── migrations/            # Alembic database migrations
 ├── scripts/               # Seed and utility scripts
 ├── tests/                 # Test suite
@@ -45,21 +45,18 @@ This is where all the application code lives.
 **What it does:** Bootstraps the FastAPI application, registers routes, sets up middleware.
 
 ```python
-from fastapi import FastAPI
-from app.api.routes import atlas, state, transitions, health
-from app.database import engine
+from app.core.factory import create_app
 
-app = FastAPI(title="Observer API")
+app = create_app()
 
-# Register routes
-app.include_router(atlas.router, prefix="/atlas", tags=["Atlas"])
-app.include_router(state.router, prefix="/state", tags=["State"])
-# ... more routes
-
-@app.on_event("startup")
-async def startup():
-    # Initialize database, load atlas, etc.
-    pass
+# create_app() configures:
+# - CORS middleware
+# - Router registration (19 routers including):
+app.include_router(emotions.router, prefix="/observer", tags=["Emotions"])
+app.include_router(state.router, tags=["State"])
+app.include_router(collections.router, prefix="/observer", tags=["Collections"])
+app.include_router(auth.router, prefix="/auth", tags=["Authentication"])
+# ... and more
 ```
 
 **When to edit:**
@@ -70,21 +67,21 @@ async def startup():
 
 ---
 
-#### `app/config.py` - Configuration Management
+#### `app/core/settings.py` - Configuration Management
 
 **What it does:** Loads environment variables and provides configuration to the app.
 
 ```python
 from pydantic_settings import BaseSettings
 
-class Settings(BaseSettings):
-    DATABASE_URL: str
+class Settings(LoveBaseSettings):
+    POSTGRES_HOST: str = Field(default="localhost")
+    POSTGRES_PORT: int = Field(default=5432)
+    DATABASE_URL: str | None = None
     ENVIRONMENT: str = "development"
     VERSOR_URL: str = "http://localhost:8001"
-    EMBEDDING_PROVIDER: str = "local"
-
-    class Config:
-        env_file = ".env"
+    HOST: str = "0.0.0.0"
+    PORT: int = 8000
 
 settings = Settings()
 ```
@@ -291,7 +288,7 @@ Organizes routes and request/response schemas.
 
 #### `app/api/routes/` - Endpoint Definitions
 
-**`atlas.py`** - Atlas Queries
+**`emotions.py`** - Emotion Queries
 
 ```python
 @router.get("/emotions")
@@ -349,8 +346,18 @@ async def health_check():
 - `bootstrap.py` - Bootstrap patterns
 - `current.py` - Current state queries
 - `history.py` - Historical trajectory
-- `chat_websocket.py` - WebSocket chat
+- `collections.py` - Emotion collections
+- `matrix.py` - Path matrix
+- `recommendations.py` - Smart recommendations
+- `transitions.py` - Transition pathfinding
+- `auth.py` - Authentication
+- `users.py` - User management
+- `admin.py` - Admin endpoints
+- `clinician.py` - Clinician endpoints
+- `consent.py` - Consent management
+- `prompts.py` - AI prompt management
 - `ai_settings.py` - AI model configuration
+- `chat_websocket.py` - WebSocket chat
 
 #### `app/api/schemas/` - Request/Response Models
 
@@ -426,7 +433,7 @@ alembic downgrade -1
 python scripts/seed_atlas.py
 ```
 
-**`seed_enhanced_strategies.py`** - Seed 50+ strategies
+**`seed_enhanced_strategies.py`** - Seed 69 therapeutic strategies
 
 ```bash
 python scripts/seed_enhanced_strategies.py

@@ -25,10 +25,10 @@ Now it's time to contribute! 🚀
 
 ### Look for "good first issue" Label
 
-On GitLab, issues tagged with `good first issue` are specifically chosen for new contributors:
+On GitHub, issues tagged with `good first issue` are specifically chosen for new contributors:
 
 ```text
-https://gitlab.com/l_o_v_e/platform/-/issues?label_name[]=good%20first%20issue
+https://github.com/jrgochan/l_o_v_e/issues?label_name[]=good%20first%20issue
 ```
 
 ### Types of Good First Issues
@@ -60,8 +60,8 @@ https://gitlab.com/l_o_v_e/platform/-/issues?label_name[]=good%20first%20issue
 **If you're an external contributor:**
 
 ```bash
-# Fork on GitLab first, then:
-git clone https://gitlab.com/YOUR_USERNAME/l_o_v_e.git
+# Fork on GitHub first, then:
+git clone https://github.com/YOUR_USERNAME/l_o_v_e.git
 cd l_o_v_e
 ```
 
@@ -241,9 +241,9 @@ Closes #45"
 git push origin feat/add-awe-emotion
 ```
 
-### Step 2: Create MR on GitLab
+### Step 2: Create PR on GitHub
 
-1. Go to <https://gitlab.com/l_o_v_e/platform>
+1. Go to <https://github.com/jrgochan/l_o_v_e>
 2. Click "Create merge request"
 3. Fill in the template:
 
@@ -463,13 +463,13 @@ Added comprehensive tests for Hope emotion detection:
 Closes #156"
 ```
 
-### Step 5: Push and Create MR
+### Step 5: Push and Create PR
 
 ```bash
 git push origin test/add-hope-emotion-test
 ```
 
-Then create MR on GitLab with description.
+Then create MR on GitHub with description.
 
 ### Step 6: Respond to Review
 
@@ -695,7 +695,7 @@ Now that you're ready to contribute:
 2. **Ask to be assigned** - Comment: "I'd like to work on this!"
 3. **Create a branch** - Follow naming convention
 4. **Make changes + tests** - Follow this guide
-5. **Create MR** - Get feedback, iterate
+5. **Create PR** - Get feedback, iterate
 6. **Celebrate!** - You're a contributor! 🎊
 
 ---
@@ -712,4 +712,4 @@ Ready for more?
 
 **Questions?** Ask in Slack or comment on the issue!
 
-**Ready to start?** [Browse good first issues →](https://gitlab.com/l_o_v_e/platform/-/issues?label_name[]=good%20first%20issue)
+**Ready to start?** [Browse good first issues →](https://github.com/jrgochan/l_o_v_e/issues?label_name[]=good%20first%20issue)

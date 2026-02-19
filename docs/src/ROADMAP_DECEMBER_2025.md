@@ -1,9 +1,12 @@
 # L.O.V.E. Platform Roadmap - December 2025
 
+> [!NOTE]
+> **📋 Historical Snapshot** — This roadmap was created in December 2025 and is preserved as an archive. For current project status, see [Project Status](project-status.md).
+
 ## Comprehensive Next Steps & Strategic Planning
 
 **Date**: December 7, 2025
-**Status**: Post-Wibbly-Paths Implementation
+**Status**: Post-Wibbly-Paths Implementation (Archived)
 **Purpose**: Guide next development phases
 
 ---
@@ -15,7 +18,7 @@
 **Backend (L+O+V)**: Production-ready
 
 - ✅ All APIs functional and tested
-- ✅ Database seeded (87 emotions, 107 strategies)
+- ✅ Database seeded (87 emotions, 69 strategies)
 - ✅ WebSocket chat working
 - ✅ Multi-emotion analysis
 - ✅ Insight generation (warm mode complete)
@@ -196,7 +199,7 @@
 
 #### **4.1 CI/CD Pipeline** (6-8 hours)
 
-- [ ] GitLab CI for all modules
+- [ ] GitHub Actions for all modules
 - [ ] Automated testing on PR
 - [ ] Container image building
 - [ ] Automated deployment to staging

@@ -97,7 +97,7 @@ class SemanticAnalyzer:
     """Extract VAC from text using LLM"""
 
     def __init__(self):
-        self.llm = Ollama(model="llama3.1:8b-instruct-q4_0")
+        self.llm = Ollama(model="llama3.1:8b")
         self.prompt = self._create_prompt()  # The critical prompt!
 
     async def analyze(self, text: str) -> EmotionalClassification:
@@ -184,23 +184,16 @@ When you use `POST /listener/ingest`, the audio is queued in Redis and processed
 
 ```python
 # app/main.py
-from fastapi import FastAPI
-from app.api.routes import health, ingest, ai_models
+from app.core.factory import create_app
 
-app = FastAPI(title="Listener API")
+app = create_app()
 
-# Register routes
+# create_app() configures:
+# - CORS middleware
+# - Router registration:
 app.include_router(health.router, tags=["Health"])
 app.include_router(ingest.router, prefix="/listener", tags=["Ingestion"])
 app.include_router(ai_models.router, prefix="/listener", tags=["AI Models"])
-
-@app.on_event("startup")
-async def startup_event():
-    logger.info("🎧 Listener API starting up...")
-
-@app.on_event("shutdown")
-async def shutdown_event():
-    logger.info("Listener API shutting down...")
 ```
 
 !!! tip "Starting point for debugging"
@@ -221,7 +214,7 @@ class Settings(BaseSettings):
 
     # Ollama
     OLLAMA_BASE_URL: str = "http://localhost:11434"
-    OLLAMA_MODEL: str = "llama3.1:8b-instruct-q4_0"
+    OLLAMA_MODEL: str = "llama3.1:8b"
 
     # Redis
     REDIS_HOST: str = "localhost"

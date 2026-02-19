@@ -13,7 +13,7 @@ User Input
     ↓
 LISTENER (port 8000)
     ↓ VAC vectors
-OBSERVER (port 8002)
+OBSERVER (port 8000)
     ↓ VAC + previous quaternion
 VERSOR (port 8001) ← YOU ARE HERE
     ↓ Quaternion + metrics + SLERP path
@@ -204,7 +204,7 @@ spec:
 ```python
 # app/config.py
 CORS_ORIGINS = [
-    "http://localhost:8002",     # Observer (dev)
+    "http://localhost:8000",     # Observer (dev)
     "http://localhost:3000",     # Experience (dev)
     "https://api.love.com",      # Observer (prod)
     "https://app.love.com"       # Experience (prod)
@@ -338,8 +338,8 @@ livenessProbe:
   "status": "healthy",
   "version": "1.0.0",
   "dependencies": {
-    "numpy": "1.26.3",
-    "scipy": "1.12.0"
+    "numpy": "2.3.1",
+    "scipy": "1.17.0"
   }
 }
 ```
@@ -371,9 +371,9 @@ versor_request_duration_seconds_bucket{le="0.1"} 15230
 **Required:**
 
 - Python 3.12+
-- NumPy 1.26.3+
-- SciPy 1.12.0+
-- FastAPI 0.109.0+
+- NumPy 2.3.1+
+- SciPy 1.17.0+
+- FastAPI 0.115.0+
 
 **Optional:**
 

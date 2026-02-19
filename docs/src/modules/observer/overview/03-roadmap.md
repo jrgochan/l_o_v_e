@@ -26,7 +26,7 @@
 - **VAC Model** - 3D emotional space (Valence, Arousal, Connection)
 - **Vector Search** - Find similar past moments
 - **A* Pathfinding** - Therapeutic transition paths
-- **107 Strategies** - Evidence-based interventions (ACT, DBT, CBT)
+- **69 Strategies** - Evidence-based interventions (ACT, DBT, CBT)
 - **Real-time Chat** - WebSocket-based guidance
 - **Temporal Metrics** - Elasticity and rigidity
 - **Clinical Alerts** - Risk detection

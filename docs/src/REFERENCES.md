@@ -101,7 +101,7 @@ This relational quality became the **Connection axis**, the core innovation of t
 
 ## 3. Therapeutic Frameworks
 
-The L.O.V.E. platform implements **107 evidence-based strategies** from multiple therapeutic modalities.
+The L.O.V.E. platform implements **69 evidence-based strategies** from multiple therapeutic modalities.
 
 ### Dialectical Behavior Therapy (DBT)
 
@@ -506,7 +506,7 @@ The Versor module transforms emotional vectors into smooth 3D rotations using qu
 
 - Hart, Nilsson, & Raphael (1968) - A* pathfinding
 - Brené Brown (2021) - Emotion categories and constraints
-- Linehan (2015), Hayes (1999), Neff (2013) - 107 therapeutic strategies
+- Linehan (2015), Hayes (1999), Neff (2013) - 69 therapeutic strategies
 - Johnson (2023) - pgvector for similarity search
 
 ### Versor Module

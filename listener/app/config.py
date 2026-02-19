@@ -116,7 +116,7 @@ class Settings(LoveBaseSettings):  # type: ignore[misc]
 
     # LLM Configuration (Ollama)
     OLLAMA_BASE_URL: str = "http://localhost:11434"
-    OLLAMA_MODEL: str = "llama3.1:8b-instruct-q4_0"
+    OLLAMA_MODEL: str = "llama3.1:8b"
     LLM_TEMPERATURE: float = 0.0
 
     # Cloud AI Configuration

@@ -45,23 +45,24 @@ Developer Machine                    Production Server (RHEL 9)
 infra/deploy/
 ├── deploy-ansible.sh              # Entry point script
 └── ansible/
-    ├── playbook.yml               # Main playbook
+    ├── deploy.yml                 # Main playbook
+    ├── ansible.cfg                # Ansible configuration
     ├── inventory/
     │   └── hosts.yml              # Server inventory
     ├── group_vars/
-    │   └── rhel9.yml              # Configuration variables
+    │   ├── all.yml                # Default variables
+    │   └── production/
+    │       └── vars.yml           # Production overrides
     └── roles/
-        ├── common/
-        │   └── tasks/main.yml     # System dependencies
-        └── app/
-            ├── tasks/
-            │   ├── main.yml       # Task orchestration
-            │   ├── backend.yml    # Backend deployment
-            │   ├── frontend.yml   # Frontend build
-            │   ├── docs.yml       # Documentation build
-            │   └── nginx.yml      # Nginx configuration
-            └── templates/
-                └── nginx.conf.j2  # Nginx config template
+        ├── common/                # System dependencies
+        ├── python/                # Python installation
+        ├── postgres/              # PostgreSQL + pgvector
+        ├── redis/                 # Redis server
+        ├── ollama/                # Ollama LLM inference
+        ├── app/                   # Application deployment
+        ├── nginx/                 # Reverse proxy + SSL
+        ├── fail2ban/              # Security (brute-force protection)
+        └── cloudflared/           # Cloudflare tunnel
 ```
 
 ---
@@ -112,7 +113,7 @@ For each backend module (Observer, Versor, Listener):
 
 ---
 
-## Key Variables (`group_vars/rhel9.yml`)
+## Key Variables (`group_vars/production/vars.yml`)
 
 | Variable | Default | Purpose |
 |----------|---------|---------|
@@ -173,8 +174,8 @@ for svc in observer versor listener experience; do
 done
 
 # API health endpoints
-curl -s http://localhost:8000/observer/health | jq .
-curl -s http://localhost:8001/versor/health | jq .
+curl -s http://localhost:8000/health | jq .
+curl -s http://localhost:8001/health | jq .
 curl -s http://localhost:8002/health | jq .
 ```
 

@@ -21,7 +21,7 @@ Built with Next.js and React Three Fiber, it provides:
 
 ## Quick Facts
 
-- **Status:** ✅ Production Ready (deployed at love.jrgochan.io)
+- **Status:** 🧪 Alpha (deployed at love.jrgochan.io)
 - **Framework:** Next.js 16.1.1 (App Router)
 - **UI Library:** React 19.2.1
 - **3D Engine:** React Three Fiber v9 + Three.js 0.170
@@ -52,7 +52,7 @@ Built with Next.js and React Three Fiber, it provides:
 ```text
 experience/web/
 ├── app/                    # Next.js App Router pages
-├── components/             # 35 top-level components
+├── components/             # 36 top-level components
 │   ├── SoulSphere.tsx      # Core 3D visualization
 │   ├── Settings.tsx        # Settings panel (26KB)
 │   ├── CommandPalette.tsx  # Cmd+K command palette
@@ -68,7 +68,7 @@ experience/web/
 │       ├── chat/           # Chat components (12 components)
 │       ├── clinical/       # Clinical tools (11 components)
 │       └── ...             # 13 more subdirectories
-├── hooks/                  # 20 root hooks + 15 subdirectories
+├── hooks/                  # 21 root hooks + 16 subdirectories
 │   ├── useEmotionData.ts   # Emotion data fetching
 │   ├── useWebSocketChat.ts # WebSocket chat connection
 │   ├── useObserverPolling.ts # Observer API polling

@@ -7,7 +7,7 @@ Complete API documentation for all Versor endpoints with request/response schema
 ## Base URL
 
 **Development:** `http://localhost:8001`
-**Production:** `http://versor.love-platform.com`
+**Production:** `https://love.jrgochan.io/versor`
 
 **All endpoints prefixed with:** `/versor/`
 
@@ -15,9 +15,13 @@ Complete API documentation for all Versor endpoints with request/response schema
 
 ## Authentication
 
-**None required** - Versor is an internal service.
+**Required:** JWT Bearer token on all endpoints.
 
-Accessed only by Observer module within private network.
+```text
+Authorization: Bearer <jwt-token>
+```
+
+Tokens are issued by the Observer auth endpoints. Versor validates tokens using the shared `SECRET_KEY`.
 
 ---
 
@@ -70,8 +74,8 @@ Host: localhost:8001
   "status": "healthy",
   "version": "1.0.0",
   "dependencies": {
-    "numpy": "1.26.3",
-    "scipy": "1.12.0"
+    "numpy": "2.3.1",
+    "scipy": "1.17.0"
   }
 }
 ```

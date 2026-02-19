@@ -233,7 +233,7 @@ Extended emotional exploration mode with layered questioning and deeper therapeu
 
 ### Evidence-Based Strategy
 
-Therapeutic intervention supported by research (randomized controlled trials, meta-analyses). All 107 Observer strategies have research backing.
+Therapeutic intervention supported by research (randomized controlled trials, meta-analyses). All 69 Observer strategies have research backing.
 
 ### Therapeutic Validity
 

@@ -11,7 +11,7 @@ The **Listener Module** is the first point of contact between human emotional ex
 ```mermaid
 graph TD
     A[User Input<br/>Voice or Text] --> B{Input Type?}
-    B -->|Audio| C[faster-whisper<br/>Transcription]
+    B -->|Audio| C[OpenAI Whisper<br/>Transcription]
     B -->|Text| D[Direct Processing]
     C --> E[Semantic Analyzer<br/>Ollama + Llama 3.1]
     D --> E
@@ -38,7 +38,7 @@ listener/
 
 ### 🎤 **Multi-Modal Input**
 
-- Audio transcription (faster-whisper)
+- Audio transcription (OpenAI Whisper)
 - Direct text analysis
 - Multi-emotion analysis pipeline
 
@@ -50,8 +50,8 @@ listener/
 
 ### 🔐 **Privacy-First Architecture**
 
-- All processing happens locally
-- No external API calls
+- All processing happens locally by default
+- Optional cloud AI via Google Vertex (`AI_PROVIDER=google_vertex`)
 - PII automatically scrubbed before storage
 
 ### ⚡ **Performance**
@@ -185,14 +185,14 @@ Complete technical reference material:
 
 | Component | Status | Tests | Coverage |
 |-----------|--------|-------|----------|
-| Transcription | ✅ Production | Passing | 95% |
-| Semantic Analyzer | ✅ Production | Passing | 92% |
-| PII Scrubber | ✅ Production | Passing | 98% |
-| Multi-Emotion | ✅ Production | Passing | 90% |
-| Prosody Analyzer | ✅ Production | Passing | 88% |
-| API Endpoints | ✅ Production | Passing | 94% |
+| Transcription | 🧪 Alpha | Passing | 95% |
+| Semantic Analyzer | 🧪 Alpha | Passing | 92% |
+| PII Scrubber | 🧪 Alpha | Passing | 98% |
+| Multi-Emotion | 🧪 Alpha | Passing | 90% |
+| Prosody Analyzer | 🧪 Alpha | Passing | 88% |
+| API Endpoints | 🧪 Alpha | Passing | 94% |
 
-**Overall Status:** Production Ready ✅
+**Overall Status:** Alpha 🧪
 
 ---
 
@@ -200,9 +200,9 @@ Complete technical reference material:
 
 | Component | Technology | Version | Purpose |
 |-----------|------------|---------|---------|
-| **Framework** | FastAPI | 0.104+ | REST API server |
-| **Transcription** | faster-whisper | base.en | Local speech-to-text |
-| **LLM** | Ollama + Llama 3.1 | 8b-instruct-q4_0 | Semantic analysis |
+| **Framework** | FastAPI | 0.115+ | REST API server |
+| **Transcription** | OpenAI Whisper | base.en | Local speech-to-text |
+| **LLM** | Ollama + Llama 3.1 | 8b | Semantic analysis |
 | **Task Queue** | Arq + Redis | 0.26+ / 7+ | Async job processing |
 | **NER** | Spacy | 3.7+ | PII detection |
 | **Validation** | Pydantic | 2.0+ | Type-safe schemas |
@@ -232,4 +232,4 @@ Measured on M1 MacBook Pro (2021):
 
 ---
 
-**Questions?** Check the [Troubleshooting Guide](architecture/06-troubleshooting.md) or [open an issue](https://gitlab.com/l_o_v_e/platform/-/issues).
+**Questions?** Check the [Troubleshooting Guide](architecture/06-troubleshooting.md) or [open an issue](https://github.com/jrgochan/l_o_v_e/issues).

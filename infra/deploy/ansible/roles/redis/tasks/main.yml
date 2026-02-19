@@ -10,16 +10,10 @@
     regexp: '^bind '
     line: 'bind 127.0.0.1'
     state: present
-    notify: Restart Redis
+  notify: Restart Redis
 
 - name: Enable and Start Redis
   service:
     name: redis
     state: started
     enabled: yes
-
-- name: Restart Redis
-  service:
-    name: redis
-    state: restarted
-  listen: "Restart Redis"

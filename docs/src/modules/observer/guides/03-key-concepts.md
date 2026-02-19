@@ -538,7 +538,7 @@ R = 1 / 0.02 = 50 → Very high rigidity! ⚠️
 
 ### What Are Strategies?
 
-**107 evidence-based interventions** from:
+**69 evidence-based interventions** from:
 
 - **ACT** (Acceptance and Commitment Therapy)
 - **DBT** (Dialectical Behavior Therapy)
@@ -728,7 +728,7 @@ graph TB
 3. **Weighted Fusion**: Combines geometric + semantic distance
 4. **A* Pathfinding**: Respects category boundaries, uses bridges
 5. **Temporal Metrics**: Elasticity (speed) and Rigidity (resistance)
-6. **Therapeutic Strategies**: 107 evidence-based interventions
+6. **Therapeutic Strategies**: 69 evidence-based interventions
 
 ---
 

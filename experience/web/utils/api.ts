@@ -23,11 +23,10 @@ import {
   PromptTestResponse,
 } from "../types/admin";
 
-export const API_BASE_URL =
-  process.env.NEXT_PUBLIC_OBSERVER_API_URL ||
-  process.env.NEXT_PUBLIC_API_URL ||
-  "http://localhost:8000";
-const API_URL = API_BASE_URL;
+import { API_URL as ENV_API_URL } from "@/config/environment";
+// Use the centralized configuration
+const API_URL = ENV_API_URL;
+export const API_BASE_URL = API_URL;
 
 interface RequestOptions extends RequestInit {
   authenticated?: boolean;

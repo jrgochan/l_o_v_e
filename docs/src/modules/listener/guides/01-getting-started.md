@@ -107,8 +107,8 @@ If you haven't already:
 ```bash
 # Clone the repo
 cd ~/code  # Or wherever you keep your projects
-git clone https://gitlab.com/l_o_v_e/platform.git
-cd platform
+git clone https://github.com/jrgochan/l_o_v_e.git
+cd l_o_v_e
 
 # Navigate to Listener
 cd listener
@@ -122,7 +122,7 @@ Virtual environments keep your dependencies separate from other projects. This i
 
 ```bash
 # Create a virtual environment
-python3 -m .venv .venv
+python3 -m venv .venv
 
 # Activate it
 source .venv/bin/activate  # On macOS/Linux
@@ -194,7 +194,7 @@ Ollama server listening on http://127.0.0.1:11434
 In your original terminal (with .venv activated):
 
 ```bash
-ollama pull llama3.1:8b-instruct-q4_0
+ollama pull llama3.1:8b
 ```
 
 <!-- markdownlint-disable MD046 -->
@@ -227,7 +227,7 @@ LOG_LEVEL=INFO
 
 # Ollama Configuration
 OLLAMA_BASE_URL=http://localhost:11434
-OLLAMA_MODEL=llama3.1:8b-instruct-q4_0
+OLLAMA_MODEL=llama3.1:8b
 LLM_TEMPERATURE=0.0
 
 # Whisper Configuration
@@ -419,12 +419,12 @@ uvicorn app.main:app --reload --port 8002
 ollama serve
 ```
 
-### Issue: "Model not found: llama3.1:8b-instruct-q4_0"
+### Issue: "Model not found: llama3.1:8b"
 
 **Solution:** Download the model:
 
 ```bash
-ollama pull llama3.1:8b-instruct-q4_0
+ollama pull llama3.1:8b
 ```
 
 ### Issue: Analysis is slow (> 5 seconds)
@@ -459,7 +459,7 @@ pip install -r requirements.txt
 
 ### Join the Community
 
-- **GitLab Issues:** [Report bugs or ask questions](https://gitlab.com/l_o_v_e/platform/-/issues)
+- **GitHub Issues:** [Report bugs or ask questions](https://github.com/jrgochan/l_o_v_e/issues)
 - **Slack:** #listener-module (ask for invite)
 
 ---

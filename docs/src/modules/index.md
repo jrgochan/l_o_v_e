@@ -1,6 +1,6 @@
 # Modules Overview
 
-The L.O.V.E. platform is composed of four core modules, each handling a distinct layer of the emotional intelligence pipeline.
+The L.O.V.E. platform is composed of five modules, each handling a distinct layer of the emotional intelligence pipeline.
 
 ---
 
@@ -12,10 +12,12 @@ graph LR
     B --> C[Observer]
     C --> D[Versor]
     D --> E[Experience]
+    A -->|Voice| F[PersonaPlex]
     style B fill:#4f46e5,color:#fff
     style C fill:#6366f1,color:#fff
     style D fill:#818cf8,color:#fff
     style E fill:#a5b4fc,color:#000
+    style F fill:#f59e0b,color:#000
 ```
 
 ## Core Modules
@@ -26,6 +28,7 @@ graph LR
 | **[Observer](observer/index.md)** | Data persistence & vector search | Python 3.12 / FastAPI + PostgreSQL 18 | 8000 |
 | **[Versor](versor/index.md)** | Quaternion math engine | Python 3.12 / FastAPI | 8001 |
 | **[Experience](experience/index.md)** | 3D visualization & UI | Next.js / React 19 / Three.js | 3000 |
+| **[PersonaPlex](personaplex/index.md)** | Voice mode & persona AI | Python 3.10+ / FastAPI + NVIDIA Moshi | 8003 |
 
 ## Data Flow
 

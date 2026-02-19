@@ -7,7 +7,7 @@
 
 ## Overview
 
-The Experience module uses **20 root-level hooks** and **15 hook subdirectories** (80+ hook files) to encapsulate data fetching, state synchronization, and user interaction logic.
+The Experience module uses **21 root-level hooks** and **16 hook subdirectories** (80+ hook files) to encapsulate data fetching, state synchronization, and user interaction logic.
 
 ---
 
@@ -32,6 +32,7 @@ The Experience module uses **20 root-level hooks** and **15 hook subdirectories*
 | `useWebSocketChat.ts` | 4KB | WebSocket connection for chat sessions |
 | `usePersonaPlexVoice.ts` | 10KB | Voice interaction with PersonaPlex AI (largest hook) |
 | `useVoiceRecording.ts` | 2KB | Browser audio recording via MediaRecorder API |
+| `useTokenRefresh.ts` | 2KB | JWT token refresh and auth state management |
 
 ### Visualization & Animation
 
@@ -124,6 +125,9 @@ Performance monitoring and metrics hooks.
 ### `interaction/` (1 file)
 User interaction tracking hooks.
 
+### `utils/` (utility files)
+Shared hook utility functions and helpers.
+
 ---
 
 ## Patterns
@@ -135,7 +139,7 @@ function useEmotionData(emotionId: string) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch(`/observer/atlas/emotions/${emotionId}`)
+    fetch(`/observer/emotions/${emotionId}`)
       .then(res => res.json())
       .then(setData)
       .finally(() => setLoading(false));

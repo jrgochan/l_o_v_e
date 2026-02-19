@@ -53,10 +53,11 @@ OLLAMA_BASE_URL=http://localhost:11434
 # Example: http://ollama-service:11434 (K8s)
 
 # Default model for semantic analysis
-OLLAMA_MODEL=llama3.1:8b-instruct-q4_0
+OLLAMA_MODEL=llama3.1:8b
 # Options:
 #   - phi-3:mini (fastest, less accurate)
-#   - llama3.1:8b-instruct-q4_0 (balanced - recommended)
+#   - llama3.1:8b (balanced - default)
+#   - llama3.1:8b-instruct-q4_0 (quantized, good balance)
 #   - llama3.1:8b-instruct-q8_0 (slower, more accurate)
 #   - llama3.1:70b (slowest, best accuracy - GPU required)
 
@@ -131,11 +132,6 @@ REDIS_PORT=6379
 REDIS_DB=0
 # Use different DB for different environments
 # Example: DB 0 (prod), DB 1 (staging), DB 2 (dev)
-
-# Redis password (optional)
-REDIS_PASSWORD=
-# Leave empty for local development
-# Set in production for security
 ```
 
 ---
@@ -149,84 +145,68 @@ REDIS_PASSWORD=
 OBSERVER_URL=http://localhost:8000
 # Production: http://observer-service:8000
 
-# Observer timeout (seconds)
-OBSERVER_TIMEOUT=30.0
-# How long to wait for Observer responses
-# Recommendation: 30s (Observer calls can be slow)
-
-# Fail gracefully if Observer is down
-OBSERVER_REQUIRED=false
-# true = Fail if Observer unavailable
-# false = Continue without Observer (recommended)
+# Versor API URL
+VERSOR_URL=http://localhost:8001
+# Production: http://versor-service:8001
 ```
 
 ---
 
-## Performance Tuning
+## Cloud AI Configuration
 
-### Resource Limits
+### Google Vertex AI (Optional)
 
 ```bash
-# Max concurrent LLM requests
-MAX_CONCURRENT_LLM=5
-# Prevent Ollama overload
-# Recommendation: 5-10 depending on hardware
+# AI provider selection
+AI_PROVIDER=ollama
+# Options: ollama (local, default), google_vertex (cloud)
+# When set to google_vertex, Listener uses Google Cloud for analysis
 
-# Request timeout (seconds)
-REQUEST_TIMEOUT=30
-# How long before request times out
-# Recommendation: 30s (allow for slow LLM inference)
+# Google Cloud settings (required when AI_PROVIDER=google_vertex)
+GOOGLE_CLOUD_PROJECT=your-project-id
+GOOGLE_CLOUD_LOCATION=us-central1
+VERTEX_MODEL_NAME=gemini-1.5-flash-001
+```
 
-# Worker concurrency
-ARQ_MAX_JOBS=10
+---
+
+## Worker Configuration
+
+### Background Job Settings
+
+```bash
 # Max concurrent background jobs
-# Recommendation: 10-20 depending on resources
-```
+ARQ_MAX_JOBS=5
+# Recommendation: 5-10 depending on resources
 
----
-
-## Feature Flags
-
-### Experimental Features
-
-```bash
-# Enable batch processing endpoint
-ENABLE_BATCH_PROCESSING=true
-
-# Enable multi-emotion analysis
-ENABLE_MULTI_EMOTION=true
-
-# Enable clinical mode
-ENABLE_CLINICAL_MODE=false
-# Set to true only for clinical deployments
-
-# Enable prosody analysis
-ENABLE_PROSODY=true
-
-# Enable PII scrubbing
-ENABLE_PII_SCRUBBING=true
-# Recommendation: Always true in production
+# Job timeout (seconds)
+ARQ_JOB_TIMEOUT=300
+# How long before a background job times out
 ```
 
 ---
 
 ## Security Settings
 
-### Privacy & Security
+### Authentication & CORS
 
 ```bash
-# PII scrubbing entities to remove
-PII_ENTITIES=PERSON,ORG,GPE,DATE,PHONE,EMAIL,SSN
-# Comma-separated list of entity types
+# JWT secret key (CHANGE IN PRODUCTION)
+SECRET_KEY=dev-secret-key-change-in-production
+# Used for JWT token validation
+# Can also be set via JWT_SECRET_KEY env var
 
-# CORS allowed origins (comma-separated)
-CORS_ORIGINS=http://localhost:3000,http://localhost:3001
-# Production: Specific domains only
-# Development: Can use * (wildcard)
+# JWT algorithm
+ALGORITHM=HS256
 
-# Enable HTTPS only
-REQUIRE_HTTPS=false
-# Set to true in production
+# CORS allowed origins (JSON array string)
+ALLOWED_ORIGINS=["http://localhost:3000", "http://127.0.0.1:3000"]
+# Production: Restrict to your actual domains
+
+# PII model path (optional)
+PII_MODEL_PATH=
+# Path to custom PII scrubbing model
+# Leave empty to use default
 ```
 
 ---
@@ -242,21 +222,7 @@ LOG_LEVEL=DEBUG
 OLLAMA_BASE_URL=http://localhost:11434
 REDIS_HOST=localhost
 OBSERVER_URL=http://localhost:8000
-CORS_ORIGINS=*
-REQUIRE_HTTPS=false
-```
-
-### Staging
-
-```bash
-# listener/.env.staging
-ENVIRONMENT=staging
-LOG_LEVEL=INFO
-OLLAMA_BASE_URL=http://ollama:11434
-REDIS_HOST=redis
-OBSERVER_URL=http://observer:8000
-CORS_ORIGINS=https://staging.love-platform.dev
-REQUIRE_HTTPS=true
+ALLOWED_ORIGINS=["http://localhost:3000", "http://127.0.0.1:3000"]
 ```
 
 ### Production
@@ -265,46 +231,46 @@ REQUIRE_HTTPS=true
 # listener/.env.production
 ENVIRONMENT=production
 LOG_LEVEL=WARNING
-OLLAMA_BASE_URL=http://ollama-service.production.svc.cluster.local:11434
-REDIS_HOST=redis-service.production.svc.cluster.local
-OBSERVER_URL=http://observer-service.production.svc.cluster.local:8000
-CORS_ORIGINS=https://love-platform.dev,https://app.love-platform.dev
-REQUIRE_HTTPS=true
-ENABLE_CLINICAL_MODE=true
+OLLAMA_BASE_URL=http://ollama:11434
+REDIS_HOST=redis
+OBSERVER_URL=http://observer:8000
+ALLOWED_ORIGINS=["https://love.jrgochan.io"]
+SECRET_KEY=<strong-random-key>
 ```
 
 ---
 
 ## Configuration Validation
 
-### Startup Checks
+### Startup Validation
+
+Listener uses Pydantic Settings v2 for configuration validation. All settings are validated on import:
 
 ```python
 # app/config.py
-class Settings(BaseSettings):
-    """Validates configuration on startup"""
+class Settings(LoveBaseSettings):
+    """Validated on import — startup fails fast if config is invalid."""
 
-    @validator('OLLAMA_MODEL')
-    def validate_model(cls, v):
-        """Ensure model name is valid"""
-        valid_models = [
-            "phi-3:mini",
-            "llama3.1:8b-instruct-q4_0",
-            "llama3.1:70b"
-        ]
-        if v not in valid_models:
-            logger.warning(f"Unusual model: {v}")
-        return v
+    ENVIRONMENT: Literal["development", "staging", "production"] = "development"
+    PORT: int = 8002
+    OLLAMA_MODEL: str = "llama3.1:8b"
+    AI_PROVIDER: Literal["ollama", "google_vertex"] = "ollama"
+    # ... all fields with type checking and defaults
 
-    @validator('LLM_TEMPERATURE')
-    def validate_temperature(cls, v):
-        """Ensure temperature is in valid range"""
-        if not 0.0 <= v <= 1.0:
-            raise ValueError("Temperature must be 0.0-1.0")
-        if v != 0.0:
-            logger.warning("Non-zero temperature may cause inconsistent results")
-        return v
+    model_config = SettingsConfigDict(
+        env_file=(".env", "../../infra/config/base.env"),
+        case_sensitive=True,
+        extra="ignore",
+    )
 ```
+
+**Validation features:**
+
+- Type checking via Pydantic (strings to ints, etc.)
+- `Literal` types for constrained values (e.g., `ENVIRONMENT`)
+- Case-sensitive variable names
+- Reads from `.env` file automatically
+- Falls back to `infra/config/base.env` for shared config
 
 ---
 

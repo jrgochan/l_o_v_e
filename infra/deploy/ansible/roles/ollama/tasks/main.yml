@@ -38,3 +38,12 @@
     enabled: yes
     state: started
   when: not ansible_check_mode
+
+- name: Pull Ollama Models
+  command: "ollama pull {{ item }}"
+  loop: "{{ ollama_models | default([]) }}"
+  register: pull_result
+  changed_when: "'downloading' in pull_result.stdout or 'success' in pull_result.stdout"
+  failed_when: pull_result.rc != 0
+  # Ensure the service is up first (handled by previous task, but let's be safe)
+  when: not ansible_check_mode

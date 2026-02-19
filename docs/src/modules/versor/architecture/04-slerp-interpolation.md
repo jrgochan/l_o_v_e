@@ -817,7 +817,7 @@ ModuleNotFoundError: No module named 'scipy'
 **Fix:**
 
 ```bash
-pip install scipy==1.12.0
+pip install scipy>=1.17.0
 ```
 
 ---

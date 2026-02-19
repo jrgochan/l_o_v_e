@@ -11,7 +11,7 @@ The Listener module's service layer handles the complete pipeline from raw audio
 
 ```text
 listener/app/services/
-├── transcription.py          # Audio → text (faster-whisper)
+├── transcription.py          # Audio → text (OpenAI Whisper)
 ├── semantic_analyzer.py      # Text → VAC extraction (Ollama)
 ├── multi_emotion_analyzer.py # Multi-emotion analysis pipeline
 ├── prosody_analyzer.py       # Voice feature extraction
@@ -72,10 +72,10 @@ Text → Few-shot Prompt Construction → Ollama LLM → Parse VAC Output
 
 ### Transcription (`transcription.py`)
 
-Audio transcription service (22KB). Uses faster-whisper for local speech-to-text.
+Audio transcription service (22KB). Uses OpenAI Whisper for local speech-to-text.
 
 **Supported formats:** WAV, M4A, WebM, MP3, AAC
-**Max file size:** 25MB
+**Max file size:** 50MB
 **Model:** base.en (optimized for English)
 
 ### Observer Client (`observer_client.py`)
@@ -128,7 +128,7 @@ LLM client factory (4KB).
 ```mermaid
 graph TD
     subgraph Input
-        A[Audio File] -->|faster-whisper| B[Transcription]
+        A[Audio File] -->|OpenAI Whisper| B[Transcription]
         C[Text Input] --> D{Analysis Mode}
     end
 

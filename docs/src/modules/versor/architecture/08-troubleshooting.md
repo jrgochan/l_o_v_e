@@ -796,7 +796,7 @@ python -c "import pstats; p=pstats.Stats('profile.stats'); p.sort_stats('cumulat
 #### Solution
 
 ```bash
-pip install scipy==1.12.0
+pip install scipy==1.17.0
 ```
 
 ### "Import error: cannot import name 'Quaternion'"
@@ -885,8 +885,8 @@ curl http://localhost:8001/health
   "status": "healthy",
   "version": "1.0.0",
   "dependencies": {
-    "numpy": "1.26.3",
-    "scipy": "1.12.0"
+    "numpy 2.3.1",
+    "scipy>=1.17.0"
   }
 }
 ```

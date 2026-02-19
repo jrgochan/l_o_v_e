@@ -8,10 +8,10 @@ This page provides a centralized view of the maturity and development status of 
 
 | Module | Status | Version | Key Blockers |
 |--------|--------|---------|--------------|
-| **Listener** | ✅ Production Ready | 0.1.0 | None |
-| **Observer** | ✅ Production Ready | 0.1.0 | None |
-| **Versor** | ✅ Production Ready | 0.1.0 | None (68/68 tests passing) |
-| **Experience** | ✅ Production Ready | 1.0.0 | None (React 19 / R3F conflict resolved) |
+| **Listener** | 🧪 Alpha | 0.1.0 | None |
+| **Observer** | 🧪 Alpha | 0.1.0 | None |
+| **Versor** | 🧪 Alpha | 0.1.0 | None (68/68 tests passing) |
+| **Experience** | 🧪 Alpha | 1.0.0 | None (React 19 / R3F conflict resolved) |
 
 ## Feature Status
 

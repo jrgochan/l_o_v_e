@@ -312,7 +312,7 @@ pytest tests/ -v
 # tests/unit/test_quaternion.py::test_identity ... PASSED
 # tests/unit/test_quaternion.py::test_normalize ... PASSED
 # ...
-# ============ 56 passed in 0.55s ==============
+# ============ 82 passed in 0.55s ==============
 ```
 
 ### Run Specific Test File

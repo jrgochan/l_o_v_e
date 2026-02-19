@@ -787,7 +787,7 @@ location /ws/ {
 ### 1. Enable Verbose Logging
 
 ```python
-# app/config.py
+# app/core/settings.py
 import logging
 
 # Development

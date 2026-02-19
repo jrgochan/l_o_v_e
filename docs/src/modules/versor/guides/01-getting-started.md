@@ -26,8 +26,8 @@ python3 --version
 
 If you need to install Python 3.12+:
 
-- **macOS:** `brew install python@3.11`
-- **Ubuntu:** `sudo apt install python3.11`
+- **macOS:** `brew install python@3.12`
+- **Ubuntu:** `sudo apt install python3.12`
 - **Windows:** Download from [python.org](https://www.python.org/downloads/)
 
 ---
@@ -39,10 +39,10 @@ If you need to install Python 3.12+:
 cd ~/projects
 
 # Clone the L.O.V.E. platform
-git clone https://gitlab.com/l_o_v_e/platform.git
+git clone https://github.com/jrgochan/l_o_v_e.git
 
 # Navigate to the Versor module
-cd platform/versor
+cd l_o_v_e/versor
 ```
 
 ---
@@ -53,7 +53,7 @@ Always use a virtual environment to isolate dependencies:
 
 ```bash
 # Create virtual environment
-python3 -m .venv .venv
+python3 -m venv .venv
 
 # Activate it
 source .venv/bin/activate  # macOS/Linux
@@ -98,7 +98,7 @@ uvicorn app.main:app --reload --port 8001
 # INFO:     Application startup complete.
 ```
 
-**Note:** Port 8001 is the standard Versor port (Listener uses 8000, Observer uses 8002).
+**Note:** Port 8001 is the standard Versor port (Observer uses 8000, Listener uses 8002).
 
 ---
 
@@ -229,7 +229,7 @@ tests/unit/test_transitions.py .................. PASSED
 tests/unit/test_interpolation.py ................ PASSED
 tests/integration/test_api.py ................... PASSED
 
-============ 56 passed in 0.55s ==============
+============ 82 passed in 0.55s ==============
 Coverage: 100%
 ```
 
@@ -293,10 +293,10 @@ SyntaxError: match statement requires Python 3.10+
 python3 --version
 
 # Install Python 3.12+
-brew install python@3.11  # macOS
+brew install python@3.12  # macOS
 
 # Recreate virtual environment with correct version
-python3.11 -m .venv .venv
+python3.12 -m .venv .venv
 source .venv/bin/activate
 pip install -r requirements.txt
 ```
@@ -421,7 +421,7 @@ Now that you're set up, continue learning:
 If you encounter issues:
 
 1. Check [Troubleshooting Guide](../architecture/08-troubleshooting.md)
-2. Search existing issues on GitLab
+2. Search existing issues on GitHub
 3. Ask in team Slack channel
 4. Consult senior developers
 

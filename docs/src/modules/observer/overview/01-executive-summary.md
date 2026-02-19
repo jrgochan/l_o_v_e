@@ -44,7 +44,7 @@ Observer provides:
 - **3D emotional space** (Valence, Arousal, Connection)
 - **AI-powered pathfinding** (therapeutic transitions)
 - **Pattern recognition** ("similar moments" from your history)
-- **Evidence-based strategies** (107 techniques from ACT, DBT, CBT)
+- **Evidence-based strategies** (69 techniques from ACT, DBT, CBT)
 
 ---
 
@@ -134,7 +134,7 @@ L.O.V.E. model:
 | **Tracking** | 1-10 scale | 3D VAC coordinates ✅ |
 | **Memory** | Recent only | Full history with patterns ✅ |
 | **Guidance** | Generic tips | Personalized paths ✅ |
-| **Evidence Base** | Varies | 107 research-backed strategies ✅ |
+| **Evidence Base** | Varies | 69 research-backed strategies ✅ |
 | **Visualization** | Charts | 3D Soul Sphere ✅ |
 
 ---

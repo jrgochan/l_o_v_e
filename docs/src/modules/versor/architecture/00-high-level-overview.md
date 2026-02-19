@@ -80,9 +80,9 @@ The Versor is the **mathematical engine** that converts emotional states into ge
 |-----------|------------|---------|
 | **Language** | Python 3.12+ | Scientific computing |
 | **Framework** | FastAPI | REST API |
-| **Math Library** | NumPy 1.26.3 | Vector operations |
-| **Rotation Library** | SciPy 1.12.0 | SLERP interpolation |
-| **Validation** | Pydantic 2.5.3 | Type safety |
+| **Math Library** | NumPy 2.3.1 | Vector operations |
+| **Rotation Library** | SciPy 1.17.0 | SLERP interpolation |
+| **Validation** | Pydantic 2.12.5 | Type safety |
 | **Server** | Uvicorn | ASGI server |
 | **Testing** | Pytest | 100% coverage |
 
@@ -258,8 +258,8 @@ Experience displays the 60-frame SLERP path as smooth 1-second animation.
   "status": "healthy",
   "version": "1.0.0",
   "dependencies": {
-    "numpy": "1.26.3",
-    "scipy": "1.12.0"
+    "numpy 2.3.1",
+    "scipy>=1.17.0"
   }
 }
 ```

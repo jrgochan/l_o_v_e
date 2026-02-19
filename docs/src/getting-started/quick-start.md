@@ -6,7 +6,7 @@ Get up and running with the L.O.V.E. Stack in 5 minutes!
 
 ```bash
 cd infra
-./run-love-stack.sh
+./bin/run-love-stack.sh
 ```
 
 This starts:
@@ -33,7 +33,7 @@ open http://localhost:8001/docs
 ### Get All Emotions
 
 ```bash
-curl http://localhost:8000/api/atlas/emotions | jq
+curl http://localhost:8000/observer/emotions | jq
 ```
 
 Returns all 87 emotions from Atlas of the Heart with VAC vectors.
@@ -41,44 +41,47 @@ Returns all 87 emotions from Atlas of the Heart with VAC vectors.
 ### Find Similar Emotions
 
 ```bash
-curl -X POST http://localhost:8000/api/atlas/search \
-  -H "Content-Type: application/json" \
-  -d '{"text": "feeling anxious about the future"}' | jq
+curl "http://localhost:8000/observer/search?query=feeling+anxious+about+the+future" | jq
 ```
 
 ### Convert VAC to Quaternion
 
 ```bash
-curl -X POST http://localhost:8001/api/quaternion/from-vac \
+curl -X POST http://localhost:8001/versor/calculate \
   -H "Content-Type: application/json" \
-  -d '{"vac": [-0.5, 0.7, -0.4]}' | jq
+  -d '{"current_vac": {"valence": -0.5, "arousal": 0.7, "connection": -0.4}}' | jq
 ```
 
 ### Analyze Voice Input
 
 ```bash
-curl -X POST http://localhost:8002/api/ingest/audio \
-  -F "audio=@recording.wav" | jq
+curl -X POST http://localhost:8002/listener/ingest \
+  -F "audio=@recording.wav" \
+  -F "user_id=user123" \
+  -F "session_id=session456" | jq
 ```
 
 ## 4. Common Tasks
 
-### Check Emotion by Name
+### Get Emotion by ID
 
 ```bash
-curl http://localhost:8000/api/atlas/emotions/Joy | jq
+# First get the emotion UUID from /observer/emotions, then:
+curl http://localhost:8000/observer/emotions/{emotion_uuid} | jq
 ```
 
 ### Get Transition Strategies
 
 ```bash
-curl http://localhost:8000/api/transitions/strategies | jq
+curl http://localhost:8000/observer/strategies | jq
 ```
 
-### Search Transition Patterns
+### Find a Transition Path
 
 ```bash
-curl http://localhost:8000/api/transitions/patterns | jq
+curl -X POST http://localhost:8000/observer/transition-path \
+  -H "Content-Type: application/json" \
+  -d '{"from_emotion_id": "uuid-anger", "to_emotion_id": "uuid-calm", "user_id": "user123"}' | jq
 ```
 
 ## 5. Database Access
@@ -103,7 +106,7 @@ ORDER BY difficulty_level;
 
 ```bash
 cd infra
-./stop-love-stack.sh
+./bin/stop-love-stack.sh
 ```
 
 ## Next Steps
@@ -120,8 +123,8 @@ cd infra
 ```bash
 # Find and kill process
 lsof -ti:8000 | xargs kill -9  # Observer
-lsof -ti:8080 | xargs kill -9  # Versor
-lsof -ti:8001 | xargs kill -9  # Listener
+lsof -ti:8001 | xargs kill -9  # Versor
+lsof -ti:8002 | xargs kill -9  # Listener
 ```
 
 ### Database Connection Error
@@ -145,7 +148,7 @@ tail -f /tmp/versor.log
 # Manual start
 cd versor
 source .venv/bin/activate
-uvicorn app.main:app --host 0.0.0.0 --port 8080
+uvicorn app.main:app --host 0.0.0.0 --port 8001
 ```
 
 ## Development Workflow

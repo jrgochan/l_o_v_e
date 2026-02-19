@@ -43,23 +43,13 @@ graph TB
 **File:** `app/main.py`
 
 ```python
-app = FastAPI(
-    title="Listener API",
-    version="0.1.0",
-    docs_url="/docs",
-    redoc_url="/redoc"
-)
+from app.core.factory import create_app
 
-# CORS for cross-origin requests
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],  # Configure for production
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
+app = create_app()
 
-# Router registration
+# create_app() configures:
+# - CORS for cross-origin requests
+# - Router registration:
 app.include_router(health.router, tags=["Health"])
 app.include_router(ingest.router, prefix="/listener", tags=["Ingestion"])
 app.include_router(ai_models.router, prefix="/listener", tags=["AI Models"])
@@ -552,7 +542,7 @@ spec:
     spec:
       containers:
       - name: listener
-        image: registry.gitlab.com/l_o_v_e/listener:latest
+        image: ghcr.io/jrgochan/l_o_v_e/listener:latest
         resources:
           requests:
             memory: "2Gi"

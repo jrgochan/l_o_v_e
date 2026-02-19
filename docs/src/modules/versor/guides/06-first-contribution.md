@@ -362,7 +362,7 @@ git push -u origin feature/improve-flooding-detection
 
 ## Step 8: Create a Pull Request
 
-### On GitLab/GitHub
+### On GitHub/GitHub
 
 1. Navigate to the repository
 2. Click "New Pull Request" or "New Merge Request"
@@ -565,7 +565,7 @@ git push origin feature/your-feature --force
 # Run tests in clean environment
 deactivate  # Exit .venv if active
 rm -rf .venv
-python3 -m .venv .venv
+python3 -m venv .venv
 source .venv/bin/activate
 pip install -r requirements.txt
 pytest tests/ -v
@@ -691,11 +691,11 @@ Don't hesitate to ask for help:
 
 ## Resources
 
-### Git & GitHub/GitLab
+### Git & GitHub
 
 - [Git Book](https://git-scm.com/book/en/v2)
 - [GitHub Flow](https://guides.github.com/introduction/flow/)
-- [GitLab Flow](https://docs.gitlab.com/ee/topics/gitlab_flow.html)
+- [GitHub Flow](https://docs.github.com/en/get-started/using-github/github-flow)
 
 ### Code Review
 

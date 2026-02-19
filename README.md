@@ -22,7 +22,7 @@ l_o_v_e/
 
 - **Python 3.12+** (Required for all backend services)
 - **Node.js 18+** (for Experience module)
-- **PostgreSQL 14+** (PostgreSQL 18 recommended) with `pgvector` extension
+- **PostgreSQL 18+** with `pgvector` extension
 - **Redis** (for task queuing)
 - **Ollama** (for local LLM inference)
 
@@ -76,27 +76,17 @@ Once running, access the interactive API documentation:
 
 ## 📊 Project Status
 
-**Release Readiness: stable-rc1**
+**Status: Alpha**
 
 | Module | Stack | Status | Test Coverage |
 |--------|-------|--------|---------------|
-| **Native App** | Swift 5.9 / SwiftUI / Metal | ✅ **Production Ready** | 100% Logic Coverage |
-| **Listener** | Python 3.12 / FastAPI | ✅ Stable | High |
-| **Observer** | Python 3.12 / Postgres | ✅ Stable | High |
-| **Versor** | Python 3.12 / NumPy | ✅ Stable | High |
-| **Experience** | React 19 / Three.js | ✅ Stable | High |
-
-The Native Swift implementation ("Soul Stack") has achieved **100% Logic Coverage** and is the recommended client for macOS users.
+| **Listener** | Python 3.12 / FastAPI | 🧪 Alpha | High |
+| **Observer** | Python 3.12 / Postgres | 🧪 Alpha | High |
+| **Versor** | Python 3.12 / NumPy | 🧪 Alpha | High |
+| **Experience** | React 19 / Three.js | 🧪 Alpha | High |
+| **PersonaPlex** | Python 3.10+ / NVIDIA Moshi | 🧪 Experimental | Early |
 
 ## 📦 Modules
-
-### Native macOS App ("Liquid Metal")
-A fully native, privacy-first implementation of the L.O.V.E. protocol.
-- **Architecture**: Modular "Soul Stack" (`SoulCore`, `SoulBrain`, `SoulBio`, `SoulVoice`, `SoulUI`, `SoulChat`).
-- **Performance**: 120Hz ProMotion via logic-less Metal shaders.
-- **Privacy**: Fully offline, on-device Speech Recognition and ML.
-- **Integration**: Deep system integration (Haptics, Microphone).
-- [→ Full Native Documentation](experience/desktop/native-swift/docs/README.md)
 
 ### Listener
 Audio transcription and semantic analysis using local LLM (Ollama) to extract VAC coordinates.
@@ -113,6 +103,10 @@ Quaternion mathematics engine providing the geometric foundation.
 ### Experience (Web)
 Next.js web application with 3D visualization.
 - [→ Full Documentation](experience/README.md)
+
+### PersonaPlex (Voice Mode)
+Full-duplex speech-to-speech voice conversations with persona-conditioned AI.
+- [→ Full Documentation](personaplex/README.md)
 
 ## 🔧 Infrastructure & Tooling
 

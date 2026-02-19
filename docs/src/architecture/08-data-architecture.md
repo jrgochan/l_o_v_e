@@ -23,7 +23,7 @@ We use HNSW (Hierarchical Navigable Small World) indexing for millisecond-latenc
 The database is seeded with initial data for:
 
 - 87 Emotions (Brené Brown's taxonomy)
-- 107 Regulation Strategies
+- 69 Regulation Strategies (across 7 categories + core set)
 - Valid Transition Paths
 
 *(This document is a stub. Full schema details to be extracted from `observer/app/models`.)*

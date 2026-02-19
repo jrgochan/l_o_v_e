@@ -11,10 +11,10 @@ The stack operates on a "Local First" philosophy. All dependencies run locally.
 
 ```bash
 # Start all services (Observer, Versor, Listener, Experience)
-./infra/run-love-stack.sh
+./infra/bin/run-love-stack.sh
 
 # Stop all services
-./infra/stop-love-stack.sh
+./infra/bin/stop-love-stack.sh
 ```
 
 ### Service Ports
@@ -87,14 +87,14 @@ The Ansible playbook executes these steps in order:
 |------|---------|
 | `infra/deploy/deploy-ansible.sh` | Entry point script |
 | `infra/deploy/ansible/inventory/hosts.yml` | Server inventory |
-| `infra/deploy/ansible/group_vars/rhel9.yml` | Server variables |
+| `infra/deploy/ansible/group_vars/production/vars.yml` | Server variables |
 | `infra/deploy/ansible/roles/app/tasks/main.yml` | Task orchestration |
 | `infra/deploy/ansible/roles/app/tasks/backend.yml` | Backend deployment |
 | `infra/deploy/ansible/roles/app/tasks/frontend.yml` | Frontend build |
 | `infra/deploy/ansible/roles/app/tasks/docs.yml` | Documentation build |
 | `infra/deploy/ansible/roles/app/templates/nginx.conf.j2` | Nginx config template |
 
-### Server Variables (`group_vars/rhel9.yml`)
+### Server Variables (`group_vars/production/vars.yml`)
 
 ```yaml
 domain_name: love.jrgochan.io
@@ -114,9 +114,9 @@ frontend_port: 3000
 
 Each service exposes a health endpoint:
 
-- Observer: `GET /observer/health`
-- Versor: `GET /versor/health`
-- Listener: `GET /listener/health`
+- Observer: `GET /health`
+- Versor: `GET /health`
+- Listener: `GET /health`
 
 ### systemd Service Management
 

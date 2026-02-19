@@ -433,27 +433,31 @@ class EmotionMapper:
         self,
         vac_distance: float,
         semantic_distance: float,
-        text: str
+        word_count: int
     ) -> float:
         """
         Adaptive weighting based on text length.
 
-        Short text: Trust VAC more (LLM gave clear signal)
-        Long text: Trust semantics more (rich context)
+        Short text (< 10 words): Trust VAC more (LLM gave clear signal)
+        Long text (>= 10 words): Trust semantics more (rich context)
+
+        Weights are configurable via settings:
+          EMOTION_MATCHING_VAC_WEIGHT_SHORT (default: 0.8)
+          EMOTION_MATCHING_SEMANTIC_WEIGHT_SHORT (default: 0.2)
+          EMOTION_MATCHING_VAC_WEIGHT_LONG (default: 0.4)
+          EMOTION_MATCHING_SEMANTIC_WEIGHT_LONG (default: 0.6)
         """
-        word_count = len(text.split())
-
-        if word_count < 10:
-            vac_weight = 0.8
-            semantic_weight = 0.2
-        elif word_count < 50:
-            vac_weight = 0.6
-            semantic_weight = 0.4
+        if word_count < settings.EMOTION_MATCHING_SHORT_TEXT_THRESHOLD:  # default: 10
+            vac_weight = settings.EMOTION_MATCHING_VAC_WEIGHT_SHORT      # default: 0.8
+            semantic_weight = settings.EMOTION_MATCHING_SEMANTIC_WEIGHT_SHORT  # default: 0.2
         else:
-            vac_weight = 0.4
-            semantic_weight = 0.6
+            vac_weight = settings.EMOTION_MATCHING_VAC_WEIGHT_LONG       # default: 0.4
+            semantic_weight = settings.EMOTION_MATCHING_SEMANTIC_WEIGHT_LONG   # default: 0.6
 
-        return (vac_weight * vac_distance) + (semantic_weight * semantic_distance)
+        vac_normalized = vac_distance / settings.EMOTION_MATCHING_VAC_MAX_DISTANCE
+        semantic_normalized = semantic_distance / settings.EMOTION_MATCHING_SEMANTIC_MAX_DISTANCE
+
+        return (vac_weight * vac_normalized) + (semantic_weight * semantic_normalized)
 ```
 
 ### PathPlanner: A* Implementation

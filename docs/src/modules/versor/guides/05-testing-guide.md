@@ -10,15 +10,19 @@ The Versor module maintains 100% test coverage. This guide shows you how to run 
 
 ```text
 tests/
+├── conftest.py        # Shared test fixtures
 ├── unit/              # Pure function tests (no dependencies)
 │   ├── test_quaternion.py
 │   ├── test_vac_model.py
 │   ├── test_transitions.py
-│   └── test_interpolation.py
+│   ├── test_interpolation.py
+│   ├── test_factory.py
+│   ├── test_config.py
+│   ├── test_auth.py
+│   └── test_main.py
 ├── integration/       # API endpoint tests
 │   └── test_api.py
-└── semantic/          # Semantic validation
-    └── test_connection_axis.py
+└── semantic/          # Semantic validation (placeholder)
 ```
 
 ### Test Philosophy
@@ -44,7 +48,7 @@ pytest tests/ -v
 tests/unit/test_quaternion.py::test_identity PASSED
 tests/unit/test_quaternion.py::test_normalize PASSED
 ...
-============ 56 passed in 0.55s ==============
+============ 82 passed in 0.55s ==============
 ```
 
 ### Run Specific Test File
@@ -96,12 +100,13 @@ pytest tests/ --cov=app --cov-report=html --cov-report=term-missing
 Name                              Stmts   Miss  Cover   Missing
 ---------------------------------------------------------------
 app/__init__.py                       0      0   100%
+app/core/factory.py                  38      0   100%
 app/core/quaternion.py               45      0   100%
 app/core/vac_model.py                32      0   100%
 app/core/transitions.py              28      0   100%
 app/core/interpolation.py            24      0   100%
 ---------------------------------------------------------------
-TOTAL                               129      0   100%
+TOTAL                               167      0   100%
 ```
 
 ### View HTML Report
@@ -518,12 +523,12 @@ pytest tests/unit/test_quaternion.py::test_with_debugger -s
 
 ## Continuous Integration
 
-### GitHub Actions / GitLab CI
+### GitHub Actions / GitHub Actions
 
 Tests run automatically on every commit:
 
 ```yaml
-# .gitlab-ci.yml
+# .github/workflows/ci.yml
 test:
   script:
     - cd versor/

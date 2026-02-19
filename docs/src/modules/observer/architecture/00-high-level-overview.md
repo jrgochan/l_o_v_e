@@ -62,7 +62,7 @@ graph TB
 
 | Layer | Technology | Purpose | Version |
 |-------|------------|---------|---------|
-| **API Framework** | FastAPI | REST + WebSocket endpoints | 0.104+ |
+| **API Framework** | FastAPI | REST + WebSocket endpoints | 0.115+ |
 | **Language** | Python | Application code | 3.11+ |
 | **Database** | PostgreSQL | Relational + vector storage | 16+ |
 | **Vector Search** | pgvector | Semantic similarity | 0.6.0+ |
@@ -88,7 +88,7 @@ graph TB
 
 **Key endpoints:**
 
-- `/atlas/*` - Emotion atlas queries
+- `/observer/*` - Emotion atlas queries
 - `/state` - Store/retrieve emotional states
 - `/transitions/*` - Pathfinding
 - `/history/*` - User trajectory
@@ -111,7 +111,7 @@ graph TB
 
 - `AtlasDefinition` - 87 emotions
 - `UserTrajectory` - Emotional journey over time
-- `TransitionStrategy` - 107 therapeutic strategies
+- `TransitionStrategy` - 69 therapeutic strategies
 - `ChatSession` / `ChatMessage` - Chat functionality
 - `ClinicalAlert` - Risk detection
 - `SessionAnalytics` - Metrics aggregation

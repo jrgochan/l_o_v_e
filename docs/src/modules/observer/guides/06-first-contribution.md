@@ -20,7 +20,7 @@ You've learned the concepts, explored the code, and written tests. Now it's time
 - [ ] Observer runs locally without errors
 - [ ] All tests pass (`pytest`)
 - [ ] You understand the codebase structure
-- [ ] You have a GitLab account
+- [ ] You have a GitHub account
 - [ ] You have write access to the repo (or can fork)
 
 ### 🎯 Good First Issues
@@ -134,7 +134,7 @@ Following the [Common Tasks guide](04-common-tasks.md), add the emotion:
 python scripts/seed_atlas.py
 
 # Verify it works
-curl http://localhost:8000/atlas/emotions/Anticipation | jq
+curl http://localhost:8000/observer/emotions/Anticipation | jq
 
 # Run tests
 pytest -v
@@ -179,12 +179,12 @@ git push origin feature/add-anticipation-emotion
 
 ## Creating a Pull Request
 
-### Step 1: Go to GitLab
+### Step 1: Go to GitHub
 
 Navigate to:
 
 ```text
-https://gitlab.com/l_o_v_e/platform/-/merge_requests/new
+https://github.com/jrgochan/l_o_v_e/compare
 ```
 
 ### Step 2: Fill Out the PR Template
@@ -211,7 +211,7 @@ This PR adds the "Anticipation" emotion to the Observer atlas.
 ## Testing
 
 - [x] All existing tests pass
-- [x] Verified emotion appears in API: `/atlas/emotions/Anticipation`
+- [x] Verified emotion appears in API: `/observer/emotions/Anticipation`
 - [x] Tested similarity search with anticipation-like coordinates
 - [ ] Added new tests (not required for data-only change)
 
@@ -522,7 +522,7 @@ def downgrade():
 1. **Check existing docs** (you're reading them!)
 2. **Search closed issues** - someone may have solved it
 3. **Ask in Slack** #observer-module
-4. **Create a discussion** on GitLab
+4. **Create a discussion** on GitHub
 5. **Ask in your PR** - reviewers are happy to help!
 
 ### Good Questions

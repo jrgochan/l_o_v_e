@@ -74,27 +74,13 @@ The Versor is built on three core principles:
 **File:** `app/main.py`
 
 ```python
-from fastapi import FastAPI
-from fastapi.middleware.cors import CORSMiddleware
-from app.config import settings
+from app.core.factory import create_app
 
-# Create FastAPI instance
-app = FastAPI(
-    title=settings.API_TITLE,
-    description=settings.API_DESCRIPTION,
-    version="1.0.0"
-)
+app = create_app()
 
-# Configure CORS for cross-origin requests
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=settings.CORS_ORIGINS,  # Observer, Experience
-    allow_credentials=True,
-    allow_methods=["GET", "POST"],
-    allow_headers=["Content-Type"],
-)
-
-# Mount routers
+# create_app() configures:
+# - CORS for cross-origin requests (Observer, Experience)
+# - Router mounting:
 app.include_router(calculate.router, prefix="/versor", tags=["Calculation"])
 app.include_router(slerp.router, prefix="/versor", tags=["Interpolation"])
 ```
@@ -134,7 +120,7 @@ app.include_router(slerp.router, prefix="/versor", tags=["Interpolation"])
 6. Get previous quaternion (or identity)
    ↓
 7. calculate_transition(q_prev, q_current)
-   └─ q_trans = q_prev^(-1) * q_current
+   └─ q_trans = q_current * q_prev^(-1)
    ↓
 8. angular_distance(q_trans)
    └─ φ = 2 * arccos(|w_trans|)
@@ -200,7 +186,7 @@ def calculate_transition(q1: Quaternion, q2: Quaternion) -> Quaternion:
     # Same inputs → same outputs (deterministic)
     # No state modification
     # No side effects
-    return q1.conjugate().multiply(q2)
+    return q2.multiply(q1.conjugate())
 ```
 
 **Benefits:**
@@ -392,25 +378,20 @@ HTTP Status Codes:
 
 ```python
 # Core scientific computing
-numpy==1.26.3      # Vector operations, trigonometry
-scipy==1.12.0      # SLERP implementation
+numpy==2.3.1      # Vector operations, trigonometry
+scipy==1.17.0      # SLERP implementation
 
 # Web framework
-fastapi==0.109.0   # REST API
-uvicorn==0.27.0    # ASGI server
-pydantic==2.5.3    # Validation
-
-# Development
-pytest==7.4.4      # Testing
-mypy==1.8.0        # Type checking
-black==24.1.1      # Formatting
+fastapi==0.115.6   # REST API
+uvicorn==0.34.0    # ASGI server
+pydantic==2.12.5   # Validation
 ```
 
 ### Why These Versions?
 
-- **NumPy 1.26.3:** Stable, well-tested array operations
-- **SciPy 1.12.0:** Latest SLERP implementation
-- **FastAPI 0.109:** Pydantic v2 support
+- **NumPy 2.3.1:** Stable, well-tested array operations
+- **SciPy 1.17.0:** Latest SLERP implementation
+- **FastAPI 0.115:** Pydantic v2 support, latest stability improvements
 - **Python 3.12+:** Match keyword, performance improvements
 
 ---
@@ -421,7 +402,7 @@ black==24.1.1      # Formatting
 
 Allow cross-origin requests from:
 
-- Observer API (port 8002)
+- Observer API (port 8000)
 - Experience web app (port 3000)
 
 ### Configuration
@@ -430,8 +411,8 @@ Allow cross-origin requests from:
 # app/config.py
 class Settings(BaseSettings):
     CORS_ORIGINS: List[str] = [
-        "http://localhost:8000",  # Listener
-        "http://localhost:8002",  # Observer
+        "http://localhost:8002",  # Listener
+        "http://localhost:8000",  # Observer
         "http://localhost:3000",  # Experience
         "http://localhost:3001",  # Experience dev
     ]
@@ -571,7 +552,7 @@ class Settings(BaseSettings):
     MAX_SLERP_STEPS: int = 120
 
     # CORS
-    CORS_ORIGINS: List[str] = ["http://localhost:8002"]
+    CORS_ORIGINS: List[str] = ["http://localhost:8000"]
 
     class Config:
         env_file = ".env"
@@ -589,7 +570,7 @@ Create `.env` file:
 # Override defaults
 FLOODING_THRESHOLD=2.5
 DEFAULT_SLERP_STEPS=120
-CORS_ORIGINS=["http://localhost:3000","http://localhost:8002"]
+CORS_ORIGINS=["http://localhost:3000","http://localhost:8000"]
 ```
 
 ### Accessing Settings

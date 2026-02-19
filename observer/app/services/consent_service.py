@@ -11,6 +11,9 @@ from datetime import datetime, timezone
 from typing import Any
 from uuid import UUID
 
+from sqlalchemy import and_, select
+from sqlalchemy.ext.asyncio import AsyncSession
+
 from app.core.consent_policies import (
     CONSENT_POLICIES,
     ConsentPolicy,
@@ -20,8 +23,6 @@ from app.core.consent_policies import (
 from app.core.events import DomainEvent, event_bus
 from app.models.consent_record import ConsentRecord
 from app.models.user import User
-from sqlalchemy import and_, select
-from sqlalchemy.ext.asyncio import AsyncSession
 
 logger = logging.getLogger(__name__)
 
@@ -182,9 +183,7 @@ class ConsentService:
         }
         """
         active_records = await self.get_user_consents(user_id)
-        consented: dict[str, ConsentRecord] = {
-            r.consent_type: r for r in active_records
-        }
+        consented: dict[str, ConsentRecord] = {r.consent_type: r for r in active_records}
 
         granted = []
         missing = []
@@ -244,9 +243,7 @@ class ConsentService:
     # Private helpers
     # ------------------------------------------------------------------
 
-    async def _get_active_consent(
-        self, user_id: UUID, policy_key: str
-    ) -> ConsentRecord | None:
+    async def _get_active_consent(self, user_id: UUID, policy_key: str) -> ConsentRecord | None:
         """Get the active (non-revoked) consent for a specific policy."""
         stmt = select(ConsentRecord).where(
             and_(

@@ -420,8 +420,8 @@ fi
 
 | Endpoint | P50 | P95 | P99 |
 |----------|-----|-----|-----|
-| `GET /atlas/emotions` | 10ms | 20ms | 30ms |
-| `POST /atlas/similar` | 30ms | 60ms | 100ms |
+| `GET /observer/emotions` | 10ms | 20ms | 30ms |
+| `POST /observer/similar` | 30ms | 60ms | 100ms |
 | `POST /state` | 50ms | 100ms | 150ms |
 | `POST /transitions/path` | 100ms | 200ms | 400ms |
 | `GET /history/{user}` | 40ms | 80ms | 120ms |

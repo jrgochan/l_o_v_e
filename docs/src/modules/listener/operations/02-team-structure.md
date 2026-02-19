@@ -182,7 +182,7 @@ For active development:
 
 - Docker/K8s
 - Prometheus/Grafana
-- CI/CD (GitLab CI)
+- CI/CD (GitHub Actions)
 - Python (basic)
 
 **Time Allocation:**

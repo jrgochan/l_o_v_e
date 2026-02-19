@@ -14,6 +14,7 @@ versor/
 │   ├── config.py          # Settings and configuration
 │   ├── core/              # Pure mathematical functions
 │   │   ├── __init__.py
+│   │   ├── factory.py         # Application factory (create_app)
 │   │   ├── quaternion.py      # Quaternion class & algebra
 │   │   ├── vac_model.py       # VAC vector & conversion
 │   │   ├── transitions.py     # Angular distance, elasticity
@@ -33,16 +34,20 @@ versor/
 │       └── scipy_adapter.py   # Scalar convention adapter
 ├── tests/                 # Test suite (100% coverage)
 │   ├── __init__.py
+│   ├── conftest.py        # Shared test fixtures
 │   ├── unit/              # Unit tests (pure functions)
 │   │   ├── __init__.py
 │   │   ├── test_quaternion.py
 │   │   ├── test_vac_model.py
 │   │   ├── test_transitions.py
-│   │   └── test_interpolation.py
+│   │   ├── test_interpolation.py
+│   │   ├── test_factory.py
+│   │   ├── test_config.py
+│   │   ├── test_auth.py
+│   │   └── test_main.py
 │   ├── integration/       # API integration tests
 │   │   └── test_api.py
-│   └── semantic/          # Semantic validation tests
-│       └── test_connection_axis.py  # Pity→Compassion
+│   └── semantic/          # Semantic validation tests (placeholder)
 ├── docs/                  # Technical documentation
 │   ├── 00-overview.md
 │   ├── 01-architecture.md
@@ -427,24 +432,15 @@ class Settings(BaseSettings):
 **Key components:**
 
 ```python
-app = FastAPI(
-    title="Versor API",
-    description="Quaternion mathematics for emotional state processing",
-    version="1.0.0"
-)
+from app.core.factory import create_app
 
-# Include routers
-app.include_router(calculate_router, prefix="/versor", tags=["versor"])
+app = create_app()
 
-# Health check
-@app.get("/health")
-async def health_check():
-    return {"status": "healthy", "service": "versor"}
-
-# Root endpoint
-@app.get("/")
-async def root():
-    return {"message": "Versor API - Quaternion Mathematics"}
+# create_app() configures:
+# - CORS middleware (settings.CORS_ORIGINS)
+# - Routers: /versor/calculate, /versor/slerp
+# - Health check at /health
+# - Root endpoint at /
 ```
 
 **When you'll use it:**
@@ -452,7 +448,7 @@ async def root():
 - Adding new routers
 - Configuring middleware
 - Setting up CORS
-- Adding startup/shutdown events
+- Understanding the application factory pattern (see `core/factory.py`)
 
 ---
 

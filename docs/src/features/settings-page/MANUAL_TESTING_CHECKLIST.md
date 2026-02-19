@@ -12,7 +12,7 @@
 
 ```bash
 # Terminal 1 - Backend services
-cd infra && ./run-love-stack.sh
+cd infra && ./bin/run-love-stack.sh
 
 # Terminal 2 - Frontend
 cd experience/web && npm run dev

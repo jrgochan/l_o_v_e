@@ -660,12 +660,12 @@ class ObserverUser(HttpUser):
     @task(3)  # Weight: 3x more common
     def get_emotions(self):
         """Load test: Get emotions"""
-        self.client.get("/atlas/emotions")
+        self.client.get("/observer/emotions")
 
     @task(2)
     def find_similar(self):
         """Load test: Similarity search"""
-        self.client.post("/atlas/similar", json={
+        self.client.post("/observer/similar", json={
             "valence": 0.5,
             "arousal": 0.6,
             "connection": 0.7

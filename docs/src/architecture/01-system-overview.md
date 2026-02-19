@@ -45,7 +45,7 @@ The L.O.V.E. Stack is a **microservices-based emotional intelligence platform** 
 │                                                                   │
 │  - Stores emotional states over time                            │
 │  - Vector similarity search (HNSW indexing)                     │
-│  - A* pathfinding with 50+ strategies                           │
+│  - A* pathfinding with 69 strategies                           │
 └────────────────────────────┬────────────────────────────────────┘
                              ↓
 ┌─────────────────────────────────────────────────────────────────┐
@@ -86,7 +86,7 @@ The L.O.V.E. Stack is a **microservices-based emotional intelligence platform** 
 **Purpose:** Transform human expression into VAC coordinates
 **Port:** 8002
 **Language:** Python 3.12 + FastAPI
-**Status:** ✅ Production Ready
+**Status:** 🧪 Alpha
 
 **Key Features:**
 
@@ -107,14 +107,14 @@ The L.O.V.E. Stack is a **microservices-based emotional intelligence platform** 
 **Purpose:** Memory and context—stores emotional states, finds patterns
 **Port:** 8000
 **Language:** Python 3.12 + FastAPI
-**Status:** ✅ Production Ready
+**Status:** 🧪 Alpha
 
 **Key Features:**
 
 - PostgreSQL 18 + pgvector for vector similarity search
 - 87-emotion atlas based on Brené Brown's research
 - A* pathfinding for emotional transitions
-- 50 evidence-based regulation strategies across 7 categories
+- 69 evidence-based regulation strategies across 7 categories
 - Bootstrap patterns for new users
 - HNSW indexing for fast nearest-neighbor queries
 - Admin dashboard, clinical alerts, analytics
@@ -128,7 +128,7 @@ The L.O.V.E. Stack is a **microservices-based emotional intelligence platform** 
 **Purpose:** Pure quaternion mathematics for smooth 3D rotations
 **Port:** 8001
 **Language:** Python 3.12 + FastAPI
-**Status:** ✅ Production Ready (68 tests passing)
+**Status:** 🧪 Alpha (82 tests passing)
 
 **Key Features:**
 
@@ -147,7 +147,7 @@ The L.O.V.E. Stack is a **microservices-based emotional intelligence platform** 
 **Purpose:** 3D visualization of emotional states as "Soul Spheres"
 **Port:** 3000
 **Language:** TypeScript + Next.js 16.1.1
-**Status:** ✅ Production Ready (deployed at love.jrgochan.io)
+**Status:** 🧪 Alpha (deployed at love.jrgochan.io)
 
 **Key Features:**
 
@@ -221,7 +221,7 @@ All modules expose FastAPI REST endpoints:
 | Module | Base URL | Key Endpoints |
 |--------|----------|---------------|
 | Listener | <http://localhost:8002> | `/listener/analyze`, `/listener/ingest`, `/listener/analyze-multi-emotion`, `/listener/analyze-audio`, `/listener/ai-models/*` |
-| Observer | <http://localhost:8000> | `/observer/state`, `/observer/transition-path`, `/observer/journey/*`, `/observer/strategies/*`, `/atlas/emotions`, `/admin/*`, `/auth/*`, `/observer/paths/*` |
+| Observer | <http://localhost:8000> | `/observer/state`, `/observer/transition-path`, `/observer/journey/*`, `/observer/strategies`, `/observer/emotions`, `/admin/*`, `/auth/*` |
 | Versor | <http://localhost:8001> | `/versor/calculate`, `/versor/slerp` |
 | Experience | <http://localhost:3000> | Web UI + Next.js API proxy |
 
@@ -246,7 +246,7 @@ All modules expose FastAPI REST endpoints:
 │  Terminal 3: cd listener && uvicorn app.main:app --port 8002│
 │  Terminal 4: cd experience/web && npm run dev (port 3000) │
 │                                                             │
-│  OR: cd infra && ./run-love-stack.sh  (starts all)        │
+│  OR: cd infra && ./bin/run-love-stack.sh  (starts all)      │
 └─────────────────────────────────────────────────────────────┘
 ```
 
@@ -304,7 +304,7 @@ See `infra/deploy/ansible/` for roles and configuration.
 
 **Why:** Clinical validity and therapeutic effectiveness.
 
-- All 50+ strategies cite peer-reviewed research
+- All 69 strategies cite peer-reviewed research
 - Evidence hierarchy: meta-analysis > RCT > clinical observation > theory
 - Ready for clinical trials and publication
 
@@ -388,11 +388,11 @@ See `infra/deploy/ansible/` for roles and configuration.
 3. **Sanitized Storage:** Only anonymized emotional data persists
 4. **User Control:** Users can delete all their data at any time
 
-### Authentication (Future)
+### Authentication
 
-- JWT tokens for API authentication
+- JWT Bearer tokens for API authentication (`/auth/login`, `/auth/register`)
 - User-specific data isolation
-- Role-based access control (RBAC) for therapists
+- Role-based access control for admin features
 
 ---
 
@@ -450,7 +450,7 @@ curl http://localhost:8002/health  # Listener
 
 ### Unit Tests
 
-- **Versor:** 68 tests (quaternion operations, SLERP, conversions, transitions)
+- **Versor:** 82 tests (quaternion operations, SLERP, conversions, transitions)
 - **Listener:** Transcription, PII scrubbing, semantic extraction, multi-emotion analysis
 - **Observer:** Repository methods, service logic
 - **Experience:** Component tests, store logic
@@ -481,7 +481,7 @@ This test validates the entire VAC model innovation.
 
 ```bash
 cd infra
-./run-love-stack.sh
+./bin/run-love-stack.sh
 ```
 
 This script:
@@ -496,7 +496,7 @@ This script:
 
 ```bash
 cd infra
-./stop-love-stack.sh
+./bin/stop-love-stack.sh
 ```
 
 ### Running Tests
@@ -504,7 +504,7 @@ cd infra
 ```bash
 # All modules
 cd infra
-./test-love-stack.sh
+./bin/test-love-stack.sh
 
 # Individual modules
 cd versor && pytest tests/unit/ -v

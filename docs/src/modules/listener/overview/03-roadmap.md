@@ -15,7 +15,7 @@
 
 ## Current State (Q1 2026)
 
-✅ **Production Ready**
+✅ **Alpha**
 
 - Core VAC extraction working
 - Privacy-first architecture validated

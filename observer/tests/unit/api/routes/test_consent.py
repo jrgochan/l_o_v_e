@@ -1,9 +1,10 @@
 from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
+from fastapi import HTTPException
+
 from app.api.routes import consent
 from app.models.user import User
-from fastapi import HTTPException
 
 
 @pytest.fixture
@@ -64,9 +65,7 @@ async def test_grant_consents_unknown_policy(mock_db, mock_user, mock_request):
 @pytest.mark.asyncio
 async def test_revoke_consent_unknown_policy(mock_db, mock_user, mock_request):
     with pytest.raises(HTTPException) as exc:
-        await consent.revoke_consent(
-            "non_existent_policy", mock_user, mock_db, mock_request
-        )
+        await consent.revoke_consent("non_existent_policy", mock_user, mock_db, mock_request)
     assert exc.value.status_code == 404
     assert "Unknown consent policy" in exc.value.detail
 
@@ -78,9 +77,7 @@ async def test_revoke_consent_not_granted(mock_db, mock_user, mock_request):
         mock_service.revoke_consent = AsyncMock(return_value=None)
 
         with pytest.raises(HTTPException) as exc:
-            await consent.revoke_consent(
-                "terms_of_service", mock_user, mock_db, mock_request
-            )
+            await consent.revoke_consent("terms_of_service", mock_user, mock_db, mock_request)
         assert exc.value.status_code == 404
         assert "No active consent found" in exc.value.detail
 
@@ -96,9 +93,7 @@ async def test_revoke_consent_success(mock_db, mock_user, mock_request):
         }
         mock_service.revoke_consent = AsyncMock(return_value=mock_record)
 
-        res = await consent.revoke_consent(
-            "terms_of_service", mock_user, mock_db, mock_request
-        )
+        res = await consent.revoke_consent("terms_of_service", mock_user, mock_db, mock_request)
 
         assert mock_db.commit.called
         assert res["revoked"]["status"] == "revoked"
@@ -108,9 +103,7 @@ async def test_revoke_consent_success(mock_db, mock_user, mock_request):
 async def test_get_my_consent_status(mock_db, mock_user):
     with patch("app.api.routes.consent.ConsentService") as MockService:
         mock_service = MockService.return_value
-        mock_service.get_consent_status = AsyncMock(
-            return_value={"granted": [], "missing": []}
-        )
+        mock_service.get_consent_status = AsyncMock(return_value={"granted": [], "missing": []})
 
         res = await consent.get_my_consent_status(mock_user, mock_db)
 

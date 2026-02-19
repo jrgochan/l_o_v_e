@@ -159,7 +159,7 @@ At 10,000 users × 5 analyses/day:
 
 ### Q1 2026
 
-- ✅ Production deployment
+- 🧪 Alpha deployment
 - ✅ GPU acceleration (5-10x speedup)
 - ✅ Multi-language support (Spanish, French)
 

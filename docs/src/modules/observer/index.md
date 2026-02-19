@@ -11,7 +11,7 @@ The **Observer** is the mnemonic core of the L.O.V.E. platform—the system's me
 - 🧠 **State Persistence** - Your emotional trajectory over time
 - 🗺️ **Digital Atlas** - 87 emotions from Brené Brown's *Atlas of the Heart*
 - 🔍 **Semantic Search** - Finding patterns and similar past moments
-- 🎯 **Therapeutic Pathfinding** - A* navigation through emotional space with 50 evidence-based strategies across 7 categories
+- 🎯 **Therapeutic Pathfinding** - A* navigation through emotional space with 69 evidence-based strategies across 7 categories
 
 ---
 
@@ -43,7 +43,7 @@ Observer's **A* pathfinding** algorithm plans evidence-based emotional transitio
 
 - Category boundaries (13 semantic groupings)
 - Bridge emotions for difficult transitions
-- 50 therapeutic strategies from ACT, DBT, CBT, and more
+- 69 therapeutic strategies from ACT, DBT, CBT, and more
 
 ---
 
@@ -151,7 +151,7 @@ graph TB
         Observer --> Atlas[87 Emotions Atlas]
         Observer --> Vector[Vector Search]
         Observer --> Path[A* Pathfinding]
-        Observer --> Strat[50 Strategies]
+        Observer --> Strat[69 Strategies]
     end
 
     DB --> Vector
@@ -214,7 +214,7 @@ Ready to contribute? Start with:
 
 ## Support
 
-- **Issues:** [GitLab Issues](https://gitlab.com/l_o_v_e/platform/-/issues)
+- **Issues:** [GitHub Issues](https://github.com/jrgochan/l_o_v_e/issues)
 - **Discussions:** Project Slack #observer-module
 - **Docs:** You're reading them! 📖
 

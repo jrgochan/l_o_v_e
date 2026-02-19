@@ -356,10 +356,10 @@ def test_round_trip_conversion():
 
 ```python
 # requirements.txt
-scipy>=1.12.0
+scipy>=1.17.0
 ```
 
-**Why 1.12.0?**
+**Why 1.17.0?**
 
 - Latest stable release
 - Improved Slerp performance
@@ -368,7 +368,7 @@ scipy>=1.12.0
 
 ### Breaking Changes to Watch
 
-**1.11.0 → 1.12.0:**
+**1.11.0 → 1.17.0:**
 
 - `Slerp` interface changed slightly
 - Quaternion normalization more strict
@@ -380,7 +380,7 @@ scipy>=1.12.0
 # Old (1.11.0)
 slerp = Slerp([0, 1], rotations)
 
-# New (1.12.0) - Same interface! ✓
+# New (1.17.0) - Same interface! ✓
 slerp = Slerp(times, rotations)
 ```
 
@@ -678,7 +678,7 @@ When quaternions seem wrong:
 1. ✅ Check you're using the adapter functions
 2. ✅ Verify quaternion is normalized before conversion
 3. ✅ Print both formats to compare
-4. ✅ Check SciPy version is >= 1.12.0
+4. ✅ Check SciPy version is >= 1.17.0
 5. ✅ Verify NaN isn't present in values
 
 ---

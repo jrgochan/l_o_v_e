@@ -53,10 +53,30 @@
       - libffi-devel
       - zlib-devel
       - policycoreutils-python-utils
+      - python3-libselinux
       - nodejs
     state: present
     nobest: true
     skip_broken: true
+
+- name: Install RPM Fusion (Free)
+  dnf:
+    name: https://mirrors.rpmfusion.org/free/el/rpmfusion-free-release-{{ ansible_distribution_major_version }}.noarch.rpm
+    state: present
+    disable_gpg_check: yes
+
+- name: Install RPM Fusion (Nonfree)
+  dnf:
+    name: https://mirrors.rpmfusion.org/nonfree/el/rpmfusion-nonfree-release-{{ ansible_distribution_major_version }}.noarch.rpm
+    state: present
+    disable_gpg_check: yes
+
+- name: Install multimedia dependencies (ffmpeg)
+  dnf:
+    name:
+      - ffmpeg
+      - ffmpeg-devel
+    state: present
 
 - name: Allow Nginx/HTTPD to connect to network (SELinux)
   seboolean:

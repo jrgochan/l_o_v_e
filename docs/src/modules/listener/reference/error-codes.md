@@ -51,7 +51,7 @@ All errors follow this structure:
 
 | Code | Message | Limit | Solution |
 |------|---------|-------|----------|
-| `AUDIO_TOO_LARGE` | "Audio file exceeds 25MB limit" | 25MB | Compress or split audio |
+| `AUDIO_TOO_LARGE` | "Audio file exceeds 50MB limit" | 50MB | Compress or split audio |
 | `AUDIO_TOO_LONG` | "Audio duration exceeds 5 minute limit" | 5 min | Split into shorter segments |
 
 ---

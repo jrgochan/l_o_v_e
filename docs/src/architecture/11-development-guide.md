@@ -15,9 +15,9 @@
 
    ```bash
    cd infra
-   ./setup-love-stack.sh
+   ./bin/setup-love-stack.sh
    # To update existing envs:
-   ./setup-love-stack.sh --update
+   ./bin/setup-love-stack.sh --update
    ```
 
 ## Dependency Management
@@ -34,12 +34,12 @@ We use a split dependency model to optimize production images:
 
 ## Workflow
 
-- We use **GitLab Flow** (feature branches off `main`).
+- We use **GitHub Flow** (feature branches off `main`).
 - **Commits**: Use conventional commits (e.g., `feat:`, `fix:`, `docs:`).
 
 ## Testing
 
-- Run full suite: `./infra/test-love-stack.sh`
+- Run full suite: `./infra/bin/test-love-stack.sh`
 - Backend: `pytest`
 - Frontend: `npm run test`
 

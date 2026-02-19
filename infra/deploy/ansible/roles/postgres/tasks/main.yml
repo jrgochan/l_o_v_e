@@ -18,42 +18,42 @@
   changed_when: false
   ignore_errors: yes
 
-- name: Install PostgreSQL 18
+- name: Install PostgreSQL {{ postgresql_version }}
   dnf:
     name:
-      - postgresql18-server
-      - postgresql18-contrib
+      - postgresql{{ postgresql_version }}-server
+      - postgresql{{ postgresql_version }}-contrib
     state: present
     nobest: true
     skip_broken: true
 
 - name: Check if PG_VERSION exists
   stat:
-    path: /var/lib/pgsql/18/data/PG_VERSION
+    path: /var/lib/pgsql/{{ postgresql_version }}/data/PG_VERSION
   register: pg_version
 
 - name: Check if data directory is empty
   find:
-    paths: /var/lib/pgsql/18/data
+    paths: /var/lib/pgsql/{{ postgresql_version }}/data
     file_type: any
   register: pg_data_files
   when: not pg_version.stat.exists
 
 - name: Backup and clear corrupted data directory
   shell: |
-    mv /var/lib/pgsql/18/data /var/lib/pgsql/18/data.bak.$(date +%s)
-    mkdir -p /var/lib/pgsql/18/data
-    chown postgres:postgres /var/lib/pgsql/18/data
-    chmod 700 /var/lib/pgsql/18/data
+    mv /var/lib/pgsql/{{ postgresql_version }}/data /var/lib/pgsql/{{ postgresql_version }}/data.bak.$(date +%s)
+    mkdir -p /var/lib/pgsql/{{ postgresql_version }}/data
+    chown postgres:postgres /var/lib/pgsql/{{ postgresql_version }}/data
+    chmod 700 /var/lib/pgsql/{{ postgresql_version }}/data
   when: not pg_version.stat.exists and pg_data_files.matched > 0
 
 - name: Initialize PostgreSQL
-  command: /usr/pgsql-18/bin/postgresql-18-setup initdb
+  command: /usr/pgsql-{{ postgresql_version }}/bin/postgresql-{{ postgresql_version }}-setup initdb
   when: not pg_version.stat.exists
 
 - name: Enable and Start PostgreSQL
   service:
-    name: postgresql-18
+    name: postgresql-{{ postgresql_version }}
     state: started
     enabled: yes
 
@@ -148,7 +148,7 @@
 
 - name: Install PostgreSQL Development Headers
   dnf:
-    name: postgresql18-devel
+    name: postgresql{{ postgresql_version }}-devel
     state: present
     nobest: true
 
@@ -161,7 +161,8 @@
 
 - name: Build and Install pgvector
   shell: |
-    export PATH=/usr/pgsql-18/bin:$PATH
+    export PATH=/usr/pgsql-{{ postgresql_version }}/bin:$PATH
+    make clean
     make
     make install
   args:

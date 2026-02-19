@@ -99,8 +99,8 @@ If you haven't already:
 ```bash
 # Clone the repo
 cd ~/code  # Or wherever you keep your projects
-git clone https://gitlab.com/l_o_v_e/platform.git
-cd platform
+git clone https://github.com/jrgochan/l_o_v_e.git
+cd l_o_v_e
 
 # Navigate to Observer
 cd observer
@@ -149,7 +149,7 @@ Virtual environments keep dependencies isolated:
 cd observer  # if not already there
 
 # Create virtual environment
-python3 -m .venv .venv
+python3 -m venv .venv
 
 # Activate it
 source .venv/bin/activate  # On macOS/Linux
@@ -278,7 +278,7 @@ Expected output:
 
 ```text
 ✅ Seeded 87 emotions to atlas_definitions
-✅ Seeded 107 therapeutic strategies
+✅ Seeded 69 therapeutic strategies
 ✅ Created 5 demo users with trajectory data
 ```
 
@@ -325,7 +325,7 @@ You'll see FastAPI's interactive Swagger UI.
 
 #### Try: Get All Emotions
 
-1. Find `GET /atlas/emotions`
+1. Find `GET /observer/emotions`
 2. Click **"Try it out"**
 3. Click **"Execute"**
 
@@ -349,7 +349,7 @@ You should see all 87 emotions:
 
 #### Try: Find Similar Emotions
 
-1. Find `POST /atlas/similar`
+1. Find `POST /observer/similar`
 2. Click **"Try it out"**
 3. Enter VAC coordinates:
 
@@ -385,13 +385,13 @@ Open a new terminal:
 
 ```bash
 # Get all emotions
-curl http://localhost:8000/atlas/emotions | jq
+curl http://localhost:8000/observer/emotions | jq
 
 # Get a specific emotion by name
-curl http://localhost:8000/atlas/emotions/Joy | jq
+curl http://localhost:8000/observer/emotions/Joy | jq
 
 # Find similar emotions
-curl -X POST http://localhost:8000/atlas/similar \
+curl -X POST http://localhost:8000/observer/similar \
   -H "Content-Type: application/json" \
   -d '{"valence": 0.8, "arousal": 0.6, "connection": 0.7}' | jq
 ```
@@ -542,10 +542,10 @@ Try querying different emotions:
 
 ```bash
 # Get emotions by category
-curl "http://localhost:8000/atlas/emotions?category=When%20Life%20Is%20Good" | jq
+curl "http://localhost:8000/observer/emotions?category=When%20Life%20Is%20Good" | jq
 
 # Search for emotions by name
-curl "http://localhost:8000/atlas/emotions?search=anger" | jq
+curl "http://localhost:8000/observer/emotions?search=anger" | jq
 ```
 
 ---

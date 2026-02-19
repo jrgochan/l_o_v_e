@@ -11,11 +11,12 @@ repo_branch: main
 app_user: love
 app_group: love
 app_dir: /home/love/love-stack
+ansible_python_interpreter: /usr/bin/python3
 
 # --- Versions ---
 python_version: "3.12"
 nodejs_version: "20"
-postgresql_version: "18"
+postgresql_version: "16"
 
 # --- Ports ---
 port_frontend: 3001
@@ -73,7 +74,10 @@ fail2ban_bantime: 600
 # --- AI / Embeddings ---
 ai_provider: "ollama"
 ollama_base_url: "http://localhost:11434"
-embedding_model: "all-MiniLM-L6-v2"
+embedding_model: "all-minilm"
+ollama_models:
+  - "llama3.1:8b"
+  - "{{ embedding_model }}"
 
 # --- Logging ---
 log_level: "INFO"

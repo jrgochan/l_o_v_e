@@ -4,7 +4,7 @@
 ## Welcome to the L.O.V.E. (Listener-Observer-Versor-Experience) Platform Documentation
 
 ![L.O.V.E. Platform](https://img.shields.io/badge/L.O.V.E.-Platform-indigo?style=for-the-badge)
-![Status](https://img.shields.io/badge/status-beta-orange?style=for-the-badge)
+![Status](https://img.shields.io/badge/status-alpha-yellow?style=for-the-badge)
 ![License](https://img.shields.io/badge/license-MIT-green?style=for-the-badge)
 
 ---
@@ -66,7 +66,7 @@ Stores emotional states, finds patterns, and provides therapeutic guidance.
 
 - PostgreSQL + pgvector for similarity search
 - 87-emotion atlas (Brené Brown's taxonomy)
-- A* pathfinding with 50+ evidence-based strategies
+- A* pathfinding with 69 evidence-based strategies
 - Transition system for emotional journeys
 
 [:octicons-arrow-right-24: Observer Documentation](modules/observer/index.md)
@@ -162,8 +162,8 @@ Podman or Docker
 
     ```bash
     cd infra
-    ./setup-love-stack.sh
-    ./run-love-stack.sh
+    ./bin/setup-love-stack.sh
+    ./bin/run-love-stack.sh
     ```
 
 === "Individual Modules"
@@ -171,24 +171,24 @@ Podman or Docker
     ```bash
     # Versor (Port 8001)
     cd versor
-    python3 -m .venv .venv
+    python3 -m venv .venv
     source .venv/bin/activate
     pip install -r requirements.txt
     uvicorn app.main:app --port 8001
 
     # Observer (Port 8000)
     cd observer
-    python3 -m .venv .venv
+    python3 -m venv .venv
     source .venv/bin/activate
     pip install -r requirements.txt
     uvicorn app.main:app --port 8000
 
     # Listener (Port 8002)
     cd listener
-    python3 -m .venv .venv
+    python3 -m venv .venv
     source .venv/bin/activate
     pip install -r requirements.txt
-    ollama pull llama3.1:8b-instruct-q4_0
+    ollama pull llama3.1:8b
     uvicorn app.main:app --port 8002
 
     # Experience (Port 3000)
@@ -205,12 +205,12 @@ curl -X POST http://localhost:8002/listener/analyze \
   -F "text=I'm feeling overwhelmed but hopeful"
 
 # Test Observer
-curl http://localhost:8000/observer/atlas/emotions
+curl http://localhost:8000/observer/emotions
 
 # Test Versor
 curl -X POST http://localhost:8001/versor/calculate \
   -H "Content-Type: application/json" \
-  -d '{"valence": 0.5, "arousal": 0.7, "connection": 0.8}'
+  -d '{"current_vac": {"valence": 0.5, "arousal": 0.7, "connection": 0.8}}'
 ```
 
 ---
@@ -248,7 +248,7 @@ curl -X POST http://localhost:8001/versor/calculate \
 | **Versor** | :white_check_mark: Complete | 68/68 passing | :white_check_mark: Complete | :white_check_mark: Ready |
 | **Observer** | :white_check_mark: Complete | Passing | :white_check_mark: Complete | :white_check_mark: Ready |
 | **Listener** | :white_check_mark: Complete | Passing | :white_check_mark: Complete | :white_check_mark: Ready |
-| **Experience** | :white_check_mark: Production Ready | Passing | :white_check_mark: Complete | :white_check_mark: Ready |
+| **Experience** | :white_check_mark: Alpha | Passing | :white_check_mark: Complete | :white_check_mark: Ready |
 
 ---
 
@@ -269,14 +269,14 @@ We welcome contributions! See our [Contributing Guide](contributing.md) for deta
 
 ## :page_facing_up: License
 
-The L.O.V.E. Platform is released under the MIT License. See [LICENSE](https://gitlab.com/l_o_v_e/platform/-/blob/main/LICENSE) for details.
+The L.O.V.E. Platform is released under the MIT License. See [LICENSE](https://github.com/jrgochan/l_o_v_e/blob/main/LICENSE) for details.
 
 ---
 
 ## :email: Contact
 
-- **GitLab:** [gitlab.com/l_o_v_e/platform](https://gitlab.com/l_o_v_e/platform)
-- **Issues:** [GitLab Issues](https://gitlab.com/l_o_v_e/platform/-/issues)
+- **GitHub:** [github.com/jrgochan/l_o_v_e](https://github.com/jrgochan/l_o_v_e)
+- **Issues:** [GitHub Issues](https://github.com/jrgochan/l_o_v_e/issues)
 
 ---
 

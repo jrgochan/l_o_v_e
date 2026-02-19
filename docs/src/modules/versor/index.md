@@ -14,10 +14,10 @@ The **Versor** module is the pure mathematical engine that transforms 3D emotion
 
 ## Quick Facts
 
-- **Status:** ✅ Production Ready
+- **Status:** 🧪 Alpha
 - **Language:** Python 3.12
 - **Architecture:** Stateless microservice
-- **Test Coverage:** 100% (68 tests passing)
+- **Test Coverage:** 100% (82 tests passing)
 - **P99 Latency:** < 50ms
 - **Port:** 8001
 
@@ -248,7 +248,7 @@ This test proves that the Connection axis successfully differentiates states tha
 ## Performance
 
 - **P99 Latency:** < 50ms (typically 10-20ms)
-- **Test Suite:** 0.55 seconds for 56 tests
+- **Test Suite:** 0.55 seconds for 82 tests
 - **Memory:** Minimal (stateless, no caching)
 - **Scalability:** Horizontal scaling ready (no shared state)
 
@@ -260,9 +260,9 @@ This test proves that the Connection axis successfully differentiates states tha
 |-----------|------------|---------|
 | Language | Python 3.12 | Scientific computing |
 | Framework | FastAPI | Async REST API |
-| Math Library | NumPy 1.26.3 | Vector operations |
-| Rotation Library | SciPy 1.12.0 | SLERP implementation |
-| Validation | Pydantic 2.5.3 | Type safety |
+| Math Library | NumPy 2.3.1 | Vector operations |
+| Rotation Library | SciPy 1.17.0 | SLERP implementation |
+| Validation | Pydantic 2.12.5 | Type safety |
 | Server | Uvicorn | ASGI server |
 
 ---

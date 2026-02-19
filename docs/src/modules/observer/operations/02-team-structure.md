@@ -116,7 +116,7 @@ Engineering Manager
 **Core skills:**
 
 - Docker / Docker Compose
-- CI/CD (GitLab CI, GitHub Actions)
+- CI/CD (GitHub Actions, GitHub Actions)
 - Monitoring (Prometheus, Grafana)
 - PostgreSQL operations
 - AWS / GCP / Azure
@@ -303,8 +303,8 @@ Engineering Manager
 
 - **Slack #observer-dev:** Day-to-day discussion
 - **Slack #observer-alerts:** Production alerts
-- **GitLab issues:** Feature requests, bugs
-- **GitLab MRs:** Code review
+- **GitHub issues:** Feature requests, bugs
+- **GitHub PRs:** Code review
 - **Weekly sync:** Team alignment
 
 ### Cross-Team
