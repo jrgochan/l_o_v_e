@@ -615,7 +615,7 @@ The L.O.V.E. Platform itself integrates these works in novel ways to create a un
 
 ## 15. Note on AI-Assisted Development Methodology
 
-> **AI Co-Creation Acknowledgment:** This project represents a novel paradigm in software creation. The foundational concepts and intent were provided by the human inventor, while the system architecture, mathematical models, and the entirety of the application codebase were collaboratively generated and iterated upon through conversations with Anthropic's Claude and Google's Gemini over a period of 2.5 months. The human author served as the visionary director, with the AI models acting as active co-architects and implementers.
+> **AI Co-Creation Acknowledgment:** This project represents a novel paradigm in software creation. The foundational concepts and intent were provided by the human inventor, while the system architecture, mathematical models, and the entirety of the application codebase were collaboratively generated and iterated upon through conversations with Anthropic's Claude and Google's Gemini over a period of 3.5 months. The human author served as the visionary director, with the AI models acting as active co-architects and implementers.
 
 ---
 
