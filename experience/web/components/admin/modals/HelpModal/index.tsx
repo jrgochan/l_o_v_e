@@ -2,7 +2,7 @@
  * Help Modal Component
  *
  * Comprehensive guide explaining the VAC model, Soul Sphere,
- * and how to use the Atlas Admin Interface.
+ * and how to use the Admin Interface.
  */
 
 "use client";
@@ -34,7 +34,7 @@ export function HelpModal({ onClose }: HelpModalProps) {
         >
           <div>
             <h2 className={`text-2xl font-bold ${theme.colors.text.primary}`}>
-              Soul Sphere Atlas - Help & Guide
+              Soul Sphere - Help & Guide
             </h2>
             <p className={`text-sm ${theme.colors.text.secondary} mt-1`}>
               Understanding the VAC Model and Interface
@@ -208,23 +208,19 @@ function ModelTab() {
 
       <section>
         <h3 className={`text-xl font-bold ${theme.colors.text.primary} mb-3`}>
-          Research Foundation
+          Ethical & Research Foundation
         </h3>
         <div
-          className={`bg-black/20 border ${theme.colors.border} rounded-lg p-4 ${theme.colors.text.secondary} space-y-2 text-sm`}
+          className={`bg-black/20 border ${theme.colors.border} rounded-lg p-4 ${theme.colors.text.secondary} space-y-3 text-sm`}
         >
           <p>
-            <strong className={theme.colors.text.primary}>Brené Brown&apos;s</strong> - Atlas of the
-            Heart ( relational dynamics)
+            L.O.V.E. is a <strong className={theme.colors.text.primary}>private research initiative</strong> heavily indebted to the fundamental emotional theories of researchers such as <strong className={theme.colors.text.primary}>Dr. Brené Brown</strong> (relational dynamics), <strong className={theme.colors.text.primary}>Dr. James Russell</strong> (Circumplex Model), and <strong className={theme.colors.text.primary}>Dr. Paul Ekman</strong>.
           </p>
-          <p>
-            <strong className={theme.colors.text.primary}>James Russell</strong> - Circumplex Model
-            (VA foundation, extended to VAC)
-          </p>
-          <p>
-            <strong className={theme.colors.text.primary}>Paul Ekman</strong> - Basic Emotions
-            (universal patterns)
-          </p>
+          <div className="bg-blue-900/20 border border-blue-500/30 rounded p-3">
+            <p className="italic text-blue-300">
+              No endorsement by these researchers is implied. This system represents an experimental attempt to operationalize their insights and was co-created through collaborative human-AI generation over 3.5 months.
+            </p>
+          </div>
         </div>
       </section>
     </div>
