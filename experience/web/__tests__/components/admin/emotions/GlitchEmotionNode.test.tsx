@@ -64,7 +64,7 @@ describe("GlitchEmotionNode", () => {
     definition: "Scary",
     quaternion: { _x: 0, _y: 0, _z: 0, _w: 1 },
   } as any;
-  const mockColor = new THREE.Color("#FF0000");
+  const mockColor = new THREE.Color("#E11D48");
 
   const runFrameLoopTest = (props: any, sinValue = 1) => {
     let frameCallback: any;

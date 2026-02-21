@@ -28,9 +28,7 @@ seed_with_bootstrap: true
 # --- Security ---
 jwt_secret_key: "{{ vault_jwt_secret }}"
 
-# --- Resource Scaling ---
-uvicorn_workers_observer: 4
-uvicorn_workers_default: 2
+# --- Resource Scaling (Managed by setup_profile) ---
 
 # --- PostgreSQL Tuning ---
 postgres_shared_buffers: "4GB"

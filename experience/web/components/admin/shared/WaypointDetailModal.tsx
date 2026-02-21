@@ -324,7 +324,7 @@ export function WaypointDetailModal({
       aria-modal="true"
     >
       <div
-        className={`bg-gray-900 ${theme.layout.borderRadius} shadow-2xl w-full max-w-4xl max-h-[90vh] flex flex-col border-2 ${theme.colors.border} transition-colors duration-500`}
+        className={`${theme.colors.background} ${theme.layout.borderRadius} shadow-2xl w-full max-w-4xl max-h-[90vh] flex flex-col border-2 ${theme.colors.border} transition-colors duration-500`}
       >
         {/* Header - Matches HelpModal Style */}
         <div
@@ -557,7 +557,9 @@ export function WaypointDetailModal({
                             {citation.key_finding}
                           </p>
                           {citation.quote && (
-                            <p className="text-xs text-gray-400 mt-3 pl-3 border-l-2 border-blue-500/50 italic">
+                            <p
+                              className={`text-xs mt-3 pl-3 border-l-2 border-blue-500/50 italic ${theme.colors.text.muted}`}
+                            >
                               &quot;{citation.quote}&quot;
                             </p>
                           )}

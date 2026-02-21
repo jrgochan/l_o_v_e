@@ -1,0 +1,36 @@
+---
+# Default model mappings for different hardware profiles.
+# These dictate what ollama pulls and deploys based on RAM/compute.
+
+profile_model_map:
+  # Micro: < 8GB RAM (Optimized for strict memory boundaries)
+  micro:
+    models:
+      - "llama3.2:3b"
+      - "{{ embedding_model }}"
+    workers_observer: 1
+    workers_default: 1
+
+  # Standard: 8GB - 16GB RAM + CPU (e.g. general Intel NUC)
+  standard:
+    models:
+      - "llama3.1:8b"
+      - "{{ embedding_model }}"
+    workers_observer: 2
+    workers_default: 1
+
+  # GPU-Accelerated: Dedicated Nvidia GPU (Fast inference, high capacity)
+  gpu-accelerated:
+    models:
+      - "llama3.1:8b"
+      - "{{ embedding_model }}"
+    workers_observer: 4
+    workers_default: 2
+
+  # Compute-Heavy: > 32GB RAM + CPU (Beefy CPU server)
+  compute-heavy:
+    models:
+      - "llama3.1:8b"
+      - "{{ embedding_model }}"
+    workers_observer: 4
+    workers_default: 2

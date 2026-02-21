@@ -271,11 +271,11 @@ export function SoulSphere() {
 
   // Compute aggregate VAC and Color
   const aggregateColor = useMemo(() => {
-    // Default Cyan if no selection
-    if (selectedEmotionIds.size === 0) return new THREE.Color("#00FFFF"); // Cyan
+    // Default Teal if no selection
+    if (selectedEmotionIds.size === 0) return new THREE.Color("#2DD4BF"); // Teal
 
     const selected = allEmotions.filter((e) => selectedEmotionIds.has(e.id));
-    if (selected.length === 0) return new THREE.Color("#00FFFF");
+    if (selected.length === 0) return new THREE.Color("#2DD4BF");
 
     // Calculate average VAC
     const agg = selected.reduce(
@@ -294,12 +294,12 @@ export function SoulSphere() {
     const c = agg[2] / count;
 
     // Axis colors (matching VACAxisLabels3D)
-    // Valence: Cyan (+) / Red (-)
-    const cV = v >= 0 ? new THREE.Color("#00FFFF") : new THREE.Color("#FF0000");
-    // Arousal: Yellow (+) / Blue (-)
-    const cA = a >= 0 ? new THREE.Color("#FFFF00") : new THREE.Color("#0000FF");
-    // Connection: Purple (+) / Gray (-)
-    const cC = c >= 0 ? new THREE.Color("#800080") : new THREE.Color("#808080");
+    // Valence: Teal/Cyan (+) / Crimson (-)
+    const cV = v >= 0 ? new THREE.Color("#2DD4BF") : new THREE.Color("#E11D48");
+    // Arousal: Amber (+) / Indigo/Blue (-)
+    const cA = a >= 0 ? new THREE.Color("#F59E0B") : new THREE.Color("#4338CA");
+    // Connection: Vibrant Purple (+) / Slate Gray (-)
+    const cC = c >= 0 ? new THREE.Color("#A855F7") : new THREE.Color("#64748B");
 
     // Weight by magnitude of deviation from center
     const wV = Math.abs(v);
@@ -307,8 +307,8 @@ export function SoulSphere() {
     const wC = Math.abs(c);
     const totalW = wV + wA + wC;
 
-    // If perfectly neutral, default to Cyan or White? Defaulting to Cyan as per "default" request
-    if (totalW < 0.01) return new THREE.Color("#00FFFF");
+    // If perfectly neutral, default to Teal
+    if (totalW < 0.01) return new THREE.Color("#2DD4BF");
 
     // Weighted blend
     const mixed = new THREE.Color(0, 0, 0);

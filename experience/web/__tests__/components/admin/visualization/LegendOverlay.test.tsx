@@ -12,8 +12,8 @@ describe("LegendOverlay", () => {
     jest.clearAllMocks();
     mockUseAtlasAdminStore.mockReturnValue({
       categoryFilters: new Map([
-        ["Joy", { enabled: true, color: "#FF0000", name: "Joy" }],
-        ["Sadness", { enabled: false, color: "#0000FF", name: "Sadness" }],
+        ["Joy", { enabled: true, color: "#E11D48", name: "Joy" }],
+        ["Sadness", { enabled: false, color: "#4338CA", name: "Sadness" }],
       ]),
     });
   });

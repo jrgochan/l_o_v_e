@@ -57,11 +57,11 @@ export function GlitchEmotionNode({
     [color, modeConfig.colors, emotion.vac]
   );
 
-  // Matrix-green tinted version
+  // Matrix-teal tinted version
   const glitchColor = useMemo(() => {
     const c = enhancedColor.clone();
-    // Add matrix green tint
-    c.lerp(new THREE.Color("#00FF41"), 0.25);
+    // Add matrix teal tint
+    c.lerp(new THREE.Color("#2DD4BF"), 0.25);
     return c;
   }, [enhancedColor]);
 
@@ -142,7 +142,7 @@ export function GlitchEmotionNode({
       <mesh ref={redRef} data-testid="glitch-red">
         <boxGeometry args={[1, 1, 1]} />
         <meshBasicMaterial
-          color="#FF0000"
+          color="#E11D48" // Rose
           transparent
           opacity={channelOpacity}
           blending={THREE.AdditiveBlending}
@@ -172,7 +172,7 @@ export function GlitchEmotionNode({
       <mesh ref={blueRef} data-testid="glitch-blue">
         <boxGeometry args={[1, 1, 1]} />
         <meshBasicMaterial
-          color="#0066FF"
+          color="#4338CA" // Indigo
           transparent
           opacity={channelOpacity}
           blending={THREE.AdditiveBlending}
@@ -185,7 +185,7 @@ export function GlitchEmotionNode({
         <mesh data-testid="glitch-aura">
           <boxGeometry args={[size * 2.5, size * 2.5, size * 2.5]} />
           <meshBasicMaterial
-            color="#00FF41"
+            color="#2DD4BF" // Teal
             transparent
             opacity={0.08}
             wireframe

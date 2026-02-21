@@ -31,9 +31,7 @@ enable_personaplex: false
 enable_docs: true
 enable_fail2ban: false
 
-# --- Resource Scaling (Defaults = Minimal) ---
-uvicorn_workers_observer: 1
-uvicorn_workers_default: 1
+# --- Resource Scaling (Defaults managed by setup_profile) ---
 
 # --- PostgreSQL Tuning ---
 postgres_shared_buffers: "512MB"
@@ -75,9 +73,6 @@ fail2ban_bantime: 600
 ai_provider: "ollama"
 ollama_base_url: "http://localhost:11434"
 embedding_model: "all-minilm"
-ollama_models:
-  - "llama3.1:8b"
-  - "{{ embedding_model }}"
 
 # --- Logging ---
 log_level: "INFO"

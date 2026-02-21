@@ -388,11 +388,11 @@ function EmotionSphere({
         </>
       )}
 
-      {/* Focused indicator (bright cyan ring for waypoint navigation) */}
+      {/* Focused indicator (bright teal ring for waypoint navigation) */}
       {isFocused && (
         <mesh>
           <torusGeometry args={[size * 2.0, size * 0.2, 8, 24]} />
-          <meshBasicMaterial color="#00FFFF" transparent opacity={0.8} />
+          <meshBasicMaterial color="#2DD4BF" transparent opacity={0.8} />
         </mesh>
       )}
 
@@ -401,7 +401,7 @@ function EmotionSphere({
         <mesh>
           <sphereGeometry args={[size * 1.8, 16, 16]} />
           <meshBasicMaterial
-            color={isFocused ? new THREE.Color("#00FFFF") : color}
+            color={isFocused ? new THREE.Color("#2DD4BF") : color}
             transparent
             opacity={isFocused ? 0.3 : 0.15}
             side={THREE.BackSide}

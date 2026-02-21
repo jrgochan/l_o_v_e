@@ -74,7 +74,7 @@ describe("LiquidEmotionNode", () => {
     definition: "Sad",
     quaternion: { _x: 0, _y: 0, _z: 0, _w: 1 },
   } as any;
-  const mockColor = new THREE.Color("#0000FF");
+  const mockColor = new THREE.Color("#4338CA");
 
   const runFrameLoopTest = (props: any) => {
     // Capture frame callback

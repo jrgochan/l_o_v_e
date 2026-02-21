@@ -13,6 +13,7 @@
 
 import type { Emotion, EmotionPath } from "@/types/visualization";
 import { DIFFICULTY_COLORS } from "@/types/visualization";
+import { useAdminTheme } from "@/hooks/admin/useAdminTheme";
 
 interface MatrixTooltipProps {
   fromEmotion: Emotion;
@@ -24,8 +25,11 @@ interface MatrixTooltipProps {
  * Renders enhanced hover tooltip with path details
  */
 export function MatrixTooltip({ fromEmotion, toEmotion, path }: MatrixTooltipProps) {
+  const theme = useAdminTheme();
   return (
-    <div className="absolute bottom-4 right-4 bg-gray-800 border-2 border-gray-600 rounded-lg p-4 shadow-2xl max-w-md z-50 animate-in fade-in duration-200">
+    <div
+      className={`absolute bottom-4 right-4 ${theme.colors.background} border-2 ${theme.colors.border} ${theme.layout.borderRadius} p-4 shadow-2xl max-w-md z-50 animate-in fade-in duration-200`}
+    >
       {/* Header with Difficulty Color Bar */}
       <div className="flex items-center gap-3 mb-3">
         {path && (
@@ -35,10 +39,10 @@ export function MatrixTooltip({ fromEmotion, toEmotion, path }: MatrixTooltipPro
           />
         )}
         <div className="flex-1">
-          <h3 className="text-sm font-bold text-white mb-1">
+          <h3 className={`text-sm font-bold ${theme.colors.text.primary} mb-1`}>
             {fromEmotion.name} → {toEmotion.name}
           </h3>
-          <div className="text-xs text-gray-400">
+          <div className={`text-xs ${theme.colors.text.secondary}`}>
             {fromEmotion.category} → {toEmotion.category}
           </div>
         </div>
@@ -58,26 +62,30 @@ export function MatrixTooltip({ fromEmotion, toEmotion, path }: MatrixTooltipPro
           </div>
 
           {/* Metrics Grid */}
-          <div className="grid grid-cols-2 gap-3 bg-gray-900/50 rounded p-3">
+          <div className={`grid grid-cols-2 gap-3 bg-black/20 rounded p-3`}>
             <div>
-              <div className="text-xs text-gray-400">Distance</div>
-              <div className="text-sm text-white font-mono font-semibold">
+              <div className={`text-xs ${theme.colors.text.secondary}`}>Distance</div>
+              <div className={`text-sm ${theme.colors.text.primary} font-mono font-semibold`}>
                 {path.total_distance.toFixed(3)}
               </div>
             </div>
             <div>
-              <div className="text-xs text-gray-400">Waypoints</div>
-              <div className="text-sm text-cyan-400 font-semibold">{path.waypoints.length}</div>
+              <div className={`text-xs ${theme.colors.text.secondary}`}>Waypoints</div>
+              <div className={`text-sm ${theme.colors.primary} font-semibold`}>
+                {path.waypoints.length}
+              </div>
             </div>
             <div className="col-span-2">
-              <div className="text-xs text-gray-400">Estimated Time</div>
-              <div className="text-sm text-white font-medium">{path.estimated_time}</div>
+              <div className={`text-xs ${theme.colors.text.secondary}`}>Estimated Time</div>
+              <div className={`text-sm ${theme.colors.text.primary} font-medium`}>
+                {path.estimated_time}
+              </div>
             </div>
           </div>
 
           {/* Bridge Requirements */}
           {path.requires_bridge && path.bridge_emotions && path.bridge_emotions.length > 0 && (
-            <div className="mt-3 pt-3 border-t border-gray-700">
+            <div className={`mt-3 pt-3 border-t ${theme.colors.border}`}>
               <div className="flex items-center gap-2 text-yellow-400">
                 <span className="text-lg">★</span>
                 <span className="text-xs font-semibold">Requires Bridge Emotions:</span>
@@ -87,14 +95,16 @@ export function MatrixTooltip({ fromEmotion, toEmotion, path }: MatrixTooltipPro
           )}
 
           {/* Click Hint */}
-          <div className="mt-2 pt-2 border-t border-gray-700/50 text-xs text-gray-500 italic">
+          <div
+            className={`mt-2 pt-2 border-t ${theme.colors.border} text-xs ${theme.colors.text.muted} italic`}
+          >
             💡 Click to select and view in 3D
           </div>
         </div>
       ) : (
-        <div className="bg-gray-900/50 rounded p-3">
-          <p className="text-xs text-gray-500 italic">Path not computed yet</p>
-          <p className="text-xs text-gray-600 mt-1">
+        <div className="bg-black/20 rounded p-3">
+          <p className={`text-xs ${theme.colors.text.muted} italic`}>Path not computed yet</p>
+          <p className={`text-xs ${theme.colors.text.muted} mt-1`}>
             Click &quot;Load Cached&quot; or &quot;Compute All&quot; to calculate
           </p>
         </div>

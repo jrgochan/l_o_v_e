@@ -19,17 +19,20 @@ interface RecommendationsPanelProps {
   onApplyRecommendation: (functionName: string, modelName: string) => void;
 }
 
+import { useAdminTheme } from "@/hooks/admin/useAdminTheme";
+
 export function RecommendationsPanel({
   recommendations,
   currentAssignments,
   onApplyRecommendation,
 }: RecommendationsPanelProps) {
+  const theme = useAdminTheme();
   const functionNames = Object.keys(recommendations);
 
   if (functionNames.length === 0) {
     return (
-      <div className="bg-gray-800/50 rounded-lg p-6 border border-gray-700 text-center">
-        <p className="text-gray-400 text-sm">
+      <div className={`bg-black/20 rounded-lg p-6 border ${theme.colors.border} text-center`}>
+        <p className={`${theme.colors.text.secondary} text-sm`}>
           No recommendations available. Add more models to see suggestions.
         </p>
       </div>
@@ -65,13 +68,15 @@ export function RecommendationsPanel({
           <div
             key={funcName}
             className={`rounded-lg p-4 border ${
-              isActionable ? "bg-blue-900/20 border-blue-500/30" : "bg-gray-800/50 border-gray-700"
+              isActionable
+                ? `bg-blue-900/20 border-blue-500/30`
+                : `bg-black/20 ${theme.colors.border}`
             }`}
           >
             <div className="flex items-start justify-between mb-3">
               <div className="flex-1">
                 <div className="flex items-center gap-2 mb-1">
-                  <h4 className="text-white font-semibold text-sm">
+                  <h4 className={`${theme.colors.text.primary} font-semibold text-sm`}>
                     {formatFunctionName(funcName)}
                   </h4>
                   {isActionable && (
@@ -80,8 +85,9 @@ export function RecommendationsPanel({
                     </span>
                   )}
                 </div>
-                <p className="text-xs text-gray-400">
-                  Currently: <span className="font-mono text-gray-300">{current}</span>
+                <p className={`text-xs ${theme.colors.text.secondary}`}>
+                  Currently:{" "}
+                  <span className={`font-mono ${theme.colors.text.primary}`}>{current}</span>
                 </p>
               </div>
             </div>
@@ -99,7 +105,7 @@ export function RecommendationsPanel({
                         className={`px-3 py-1.5 rounded text-xs border ${
                           isCurrent
                             ? "bg-green-600/20 border-green-500/50 text-green-400"
-                            : "bg-gray-800 border-gray-600 text-gray-300"
+                            : `bg-black/20 ${theme.colors.border} ${theme.colors.text.secondary}`
                         }`}
                       >
                         <span className="font-mono">{modelName}</span>
@@ -124,7 +130,7 @@ export function RecommendationsPanel({
                         className={`px-3 py-1.5 rounded text-xs border ${
                           isCurrent
                             ? "bg-orange-600/20 border-orange-500/50 text-orange-400 font-medium"
-                            : "bg-gray-800 border-gray-600 text-gray-500"
+                            : `bg-black/20 ${theme.colors.border} ${theme.colors.text.muted}`
                         }`}
                       >
                         <span className="font-mono">{modelName}</span>
@@ -137,9 +143,11 @@ export function RecommendationsPanel({
             )}
 
             {/* Reasoning */}
-            <div className="p-3 bg-gray-900/50 rounded border border-gray-700 mb-3">
-              <div className="text-xs font-medium text-gray-400 mb-1">Why:</div>
-              <p className="text-xs text-gray-300 leading-relaxed">{rec.reasoning}</p>
+            <div className={`p-3 bg-black/40 rounded border ${theme.colors.border} mb-3`}>
+              <div className={`text-xs font-medium ${theme.colors.text.secondary} mb-1`}>Why:</div>
+              <p className={`text-xs ${theme.colors.text.primary} leading-relaxed`}>
+                {rec.reasoning}
+              </p>
             </div>
 
             {/* Action Button */}

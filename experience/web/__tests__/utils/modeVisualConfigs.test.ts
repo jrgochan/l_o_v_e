@@ -19,7 +19,7 @@ describe("modeVisualConfigs", () => {
   });
 
   describe("applyColorConfig", () => {
-    const baseColor = new THREE.Color("#ff0000"); // Red
+    const baseColor = new THREE.Color("#E11D48"); // Rose
     const config: ColorConfig = {
       saturationMultiplier: 1.0,
       luminosityMultiplier: 1.0,
@@ -31,27 +31,32 @@ describe("modeVisualConfigs", () => {
     it("should return a new color instance", () => {
       const result = applyColorConfig(baseColor, config, 0, 0);
       expect(result).not.toBe(baseColor);
-      expect(result.equals(baseColor)).toBe(true);
+      // Floating point HSL conversions might make it not perfectly equal
+      expect(result.r).toBeCloseTo(baseColor.r);
+      expect(result.g).toBeCloseTo(baseColor.g);
+      expect(result.b).toBeCloseTo(baseColor.b);
     });
 
     it("should apply saturation multiplier", () => {
       const lowSatConfig = { ...config, saturationMultiplier: 0.5 };
       const result = applyColorConfig(baseColor, lowSatConfig, 0, 0);
 
-      const hsl = { h: 0, s: 0, l: 0 };
-      result.getHSL(hsl);
-      expect(hsl.s).toBeCloseTo(0.5); // Original S=1 * 0.5
+      const baseHsl = { h: 0, s: 0, l: 0 };
+      baseColor.getHSL(baseHsl);
+      const resultHsl = { h: 0, s: 0, l: 0 };
+      result.getHSL(resultHsl);
+      expect(resultHsl.s).toBeCloseTo(baseHsl.s * 0.5);
     });
 
     it("should apply valence shift", () => {
       const shiftConfig = { ...config, valenceTempShift: 1.0 };
       const result = applyColorConfig(baseColor, shiftConfig, 1.0, 0); // High positive valence
 
-      // Should shift towards Orange (#FFA500)
-      const orange = new THREE.Color("#FFA500");
-      // Since shift is 1.0, it should be equal to orange?
-      // lerp(target, valence * shift) -> lerp(orange, 1 * 1) -> orange
-      expect(result.getHex()).toBe(16711680);
+      // Valence temperature shift was removed to preserve dataset color identity
+      // So the color should remain close to the base color
+      expect(result.r).toBeCloseTo(baseColor.r);
+      expect(result.g).toBeCloseTo(baseColor.g);
+      expect(result.b).toBeCloseTo(baseColor.b);
     });
   });
 

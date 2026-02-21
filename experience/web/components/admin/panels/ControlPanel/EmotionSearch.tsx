@@ -64,7 +64,7 @@ export function EmotionSearch({
             value={searchQuery}
             onChange={(e) => onSearchChange(e.target.value)}
             placeholder="Search emotions..."
-            className={`w-full pl-10 pr-4 py-2 bg-black/20 border ${theme.colors.border} ${theme.layout.borderRadius} ${theme.colors.text.primary} text-sm focus:outline-none focus:ring-1 focus:ring-current caret-current transition shadow-sm placeholder-gray-500/50`}
+            className={`w-full pl-10 pr-4 py-2 bg-black/20 border ${theme.colors.border} ${theme.layout.borderRadius} ${theme.colors.text.primary} text-sm focus:outline-none focus:ring-1 focus:ring-current caret-current transition shadow-sm placeholder-white/20`}
             style={{
               fontFamily: theme.typography.fontFamily === "font-mono" ? "monospace" : undefined,
             }}
@@ -126,7 +126,7 @@ export function EmotionSearch({
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-2">
                         <span
-                          className={`w-2 h-2 rounded-full ${isSelected ? theme.colors.primary.replace("text-", "bg-") : "bg-gray-600"}`}
+                          className={`w-2 h-2 rounded-full ${isSelected ? theme.colors.primary.replace("text-", "bg-") : "bg-black/40"}`}
                         />
                         <span className="font-medium">{emotion.name}</span>
                         {isBridge && (

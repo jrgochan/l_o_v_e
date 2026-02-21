@@ -24,7 +24,8 @@ export function PathAnimator({ path, isPlaying, speed, onProgress }: PathAnimato
   const progressRef = useRef(0);
 
   // Build path curve
-  const curve = useRef<THREE.CatmullRomCurve3 | undefined>(undefined);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const curve = useRef<any>(undefined);
   const emotions = useRef<string[]>([]);
 
   useEffect(() => {
@@ -45,8 +46,8 @@ export function PathAnimator({ path, isPlaying, speed, onProgress }: PathAnimato
     // End
     points.push(new THREE.Vector3(...path.to.vac));
     emotionNames.push(path.to.name);
-
-    curve.current = new THREE.CatmullRomCurve3(points, false, "catmullrom", 0.5);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    curve.current = new (THREE as any).CatmullRomCurve3(points, false, "catmullrom", 0.5);
     emotions.current = emotionNames;
 
     // Reset progress when path changes
@@ -89,7 +90,7 @@ export function PathAnimator({ path, isPlaying, speed, onProgress }: PathAnimato
       {/* Outer glow */}
       <mesh>
         <sphereGeometry args={[0.15, 16, 16]} />
-        <meshBasicMaterial color="#00FFFF" transparent opacity={0.3} side={THREE.BackSide} />
+        <meshBasicMaterial color="#2DD4BF" transparent opacity={0.3} side={THREE.BackSide} />
       </mesh>
     </mesh>
   );

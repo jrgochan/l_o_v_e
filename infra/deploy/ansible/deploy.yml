@@ -19,21 +19,10 @@
       debug:
         msg: "Deploying tier: {{ deployment_tier | default('unknown') }} to {{ inventory_hostname }}"
 
-    - name: Detect GPU availability
-      shell: lspci 2>/dev/null | grep -i nvidia || echo "none"
-      register: gpu_check
-      changed_when: false
-      failed_when: false
-
-    - name: Set GPU fact
-      set_fact:
-        gpu_available: "{{ 'nvidia' in (gpu_check.stdout | default('none') | lower) }}"
-
-    - name: Display GPU status
-      debug:
-        msg: "GPU detected: {{ gpu_available }}"
-
   roles:
+    - role: setup_profile
+      tags: always
+
     - role: common
       tags: setup
 

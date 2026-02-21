@@ -1,0 +1,37 @@
+---
+- name: Gather facts if not already gathered
+  setup:
+  when: ansible_memtotal_mb is not defined
+
+- name: Determine if GPU is available
+  shell: lspci 2>/dev/null | grep -i nvidia || echo "none"
+  register: gpu_check
+  changed_when: false
+  failed_when: false
+
+- name: Set GPU fact
+  set_fact:
+    gpu_available: "{{ 'nvidia' in (gpu_check.stdout | default('none') | lower) }}"
+
+- name: Determine Hardware Profile
+  set_fact:
+    hardware_profile: >-
+      {% if gpu_available %}
+      gpu-accelerated
+      {% elif ansible_memtotal_mb < 7000 %}
+      micro
+      {% elif ansible_memtotal_mb > 30000 %}
+      compute-heavy
+      {% else %}
+      standard
+      {% endif %}
+
+- name: Display Hardware Profile
+  debug:
+    msg: "Hardware profile detected as '{{ hardware_profile | trim }}' (RAM: {{ ansible_memtotal_mb }} MB, GPU: {{ gpu_available }})"
+
+- name: Set dynamic deployment variables based on profile
+  set_fact:
+    ollama_models: "{{ ollama_models | default(profile_model_map[hardware_profile | trim]['models']) }}"
+    uvicorn_workers_observer: "{{ uvicorn_workers_observer | default(profile_model_map[hardware_profile | trim]['workers_observer']) }}"
+    uvicorn_workers_default: "{{ uvicorn_workers_default | default(profile_model_map[hardware_profile | trim]['workers_default']) }}"

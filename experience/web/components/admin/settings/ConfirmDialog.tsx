@@ -17,6 +17,8 @@ interface ConfirmDialogProps {
   onCancel: () => void;
 }
 
+import { useAdminTheme } from "@/hooks/admin/useAdminTheme";
+
 export function ConfirmDialog({
   isOpen,
   title,
@@ -27,6 +29,8 @@ export function ConfirmDialog({
   onConfirm,
   onCancel,
 }: ConfirmDialogProps) {
+  const theme = useAdminTheme();
+
   if (!isOpen) return null;
 
   const variantStyles = {
@@ -36,15 +40,19 @@ export function ConfirmDialog({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm">
-      <div className="bg-gray-900 rounded-lg p-6 max-w-md w-full mx-4 border border-gray-700">
-        <h3 className="text-lg font-bold text-white mb-3">{title}</h3>
-        <p className="text-gray-300 text-sm mb-6 leading-relaxed">{message}</p>
+    <div
+      className={`fixed inset-0 z-50 flex items-center justify-center ${theme.effects.backdropBlur} ${theme.effects.glass}`}
+    >
+      <div
+        className={`${theme.colors.background} ${theme.layout.borderRadius} p-6 max-w-md w-full mx-4 border ${theme.colors.border}`}
+      >
+        <h3 className={`text-lg font-bold ${theme.colors.text.primary} mb-3`}>{title}</h3>
+        <p className={`${theme.colors.text.secondary} text-sm mb-6 leading-relaxed`}>{message}</p>
 
         <div className="flex gap-3">
           <button
             onClick={onCancel}
-            className="flex-1 px-4 py-2 bg-gray-700 hover:bg-gray-600 text-white rounded transition"
+            className={`flex-1 px-4 py-2 bg-black/40 hover:bg-black/60 ${theme.colors.text.primary} border ${theme.colors.border} rounded transition`}
           >
             {cancelLabel}
           </button>

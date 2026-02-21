@@ -16,6 +16,7 @@ import { useState } from "react";
 import { useVisualizationStore } from "@/stores/useVisualizationStore";
 import { useComputeAllPaths } from "@/hooks/useComputeAllPaths";
 import { useMatrixData } from "@/hooks/visualization/useMatrixData";
+import { useAdminTheme } from "@/hooks/admin/useAdminTheme";
 import { logger } from "@/utils/logger";
 import { MatrixHeader } from "./MatrixHeader";
 import { MatrixLegend } from "./MatrixLegend";
@@ -42,6 +43,7 @@ export function PathMatrixGrid({ onClose }: PathMatrixGridProps) {
   const selectMultiple = useVisualizationStore((state) => state.selectMultiple);
 
   // Hooks
+  const theme = useAdminTheme();
   const { computeAllPaths, isComputing, progress, estimatedTimeRemaining } = useComputeAllPaths();
   const {
     sortedEmotions,
@@ -196,7 +198,9 @@ export function PathMatrixGrid({ onClose }: PathMatrixGridProps) {
 
   return (
     <div className="fixed inset-0 z-50 bg-black/80 flex items-center justify-center p-8 backdrop-blur-sm">
-      <div className="bg-gray-900 rounded-lg shadow-2xl w-full h-full flex flex-col border-2 border-gray-700">
+      <div
+        className={`${theme.effects.glass} ${theme.layout.borderRadius} shadow-2xl w-full h-full flex flex-col border ${theme.colors.border}`}
+      >
         {/* Header */}
         <MatrixHeader
           viewMode={viewMode}
@@ -216,7 +220,7 @@ export function PathMatrixGrid({ onClose }: PathMatrixGridProps) {
         <MatrixLegend stats={stats} />
 
         {/* Matrix Grid */}
-        <div className="flex-1 overflow-auto p-4 bg-gray-950">
+        <div className={`flex-1 overflow-auto p-4 ${theme.colors.background}`}>
           <MatrixGrid
             viewMode={viewMode}
             sortedEmotions={sortedEmotions}

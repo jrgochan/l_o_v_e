@@ -269,6 +269,7 @@ nav:
     - Path Helpers: guides/PATH_HELPERS_IMPLEMENTATION.md
 
   - Research:
+    - Academic References: REFERENCES.md
     - Research Paper:
       - Abstract: paper/01-abstract.md
       - Introduction: paper/02-introduction.md
@@ -290,7 +291,6 @@ nav:
   - Project Info:
     - Roadmap Archive (Dec 2025): ROADMAP_DECEMBER_2025.md
     - Contributing: contributing.md
-    - References: REFERENCES.md
 
   - Reference:
     - reference/index.md

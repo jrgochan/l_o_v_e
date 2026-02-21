@@ -20,9 +20,7 @@ seed_level: "enhanced"
 seed_dataset: "goemotions"
 seed_with_bootstrap: true
 
-# --- Resource Scaling ---
-uvicorn_workers_observer: 2
-uvicorn_workers_default: 2
+# --- Resource Scaling (Managed by setup_profile) ---
 
 # --- PostgreSQL Tuning ---
 postgres_shared_buffers: "1GB"

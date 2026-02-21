@@ -100,7 +100,7 @@ export function BaseModal({
       {/* Modal Content */}
       <div
         className={`
-          relative bg-gray-900 border-2 ${theme.colors.border} ${theme.layout.borderRadius} shadow-2xl
+          relative ${theme.colors.background} border-2 ${theme.colors.border} ${theme.layout.borderRadius} ${theme.effects.glow}
           ${sizeClasses[size]} w-full
           max-h-[90vh] overflow-y-auto
           animate-scale-in transition-colors duration-500
@@ -111,7 +111,7 @@ export function BaseModal({
         {/* Header */}
         {(title || showCloseButton) && (
           <div
-            className={`sticky top-0 z-10 bg-gray-900 border-b ${theme.colors.border} px-6 py-4 flex items-center justify-between`}
+            className={`sticky top-0 z-10 ${theme.colors.background} border-b ${theme.colors.border} px-6 py-4 flex items-center justify-between`}
           >
             {title && <h2 className={`text-xl font-bold ${theme.colors.text.primary}`}>{title}</h2>}
             {showCloseButton && (

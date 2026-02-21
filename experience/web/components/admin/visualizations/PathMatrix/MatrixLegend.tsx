@@ -10,6 +10,7 @@
 "use client";
 
 import { DIFFICULTY_COLORS } from "@/types/visualization";
+import { useAdminTheme } from "@/hooks/admin/useAdminTheme";
 
 interface MatrixLegendProps {
   stats: {
@@ -25,15 +26,16 @@ interface MatrixLegendProps {
  * Renders enhanced legend with statistics
  */
 export function MatrixLegend({ stats }: MatrixLegendProps) {
+  const theme = useAdminTheme();
   const total =
     stats.byDifficulty.easy + stats.byDifficulty.moderate + stats.byDifficulty.difficult;
 
   return (
-    <div className="p-4 border-b border-gray-700 bg-gray-900/30">
+    <div className={`p-4 border-b ${theme.colors.border} bg-black/20`}>
       <div className="flex items-center gap-8">
         {/* Legend Label */}
-        <div className="text-sm font-semibold text-gray-300">
-          <span className="text-cyan-400">Legend:</span>
+        <div className={`text-sm font-semibold ${theme.colors.text.secondary}`}>
+          <span className={theme.colors.primary}>Legend:</span>
         </div>
 
         {/* Easy Paths */}
@@ -43,8 +45,8 @@ export function MatrixLegend({ stats }: MatrixLegendProps) {
             style={{ backgroundColor: DIFFICULTY_COLORS.easy }}
           />
           <div>
-            <div className="text-sm text-gray-300 font-medium">Easy</div>
-            <div className="text-xs text-gray-500">
+            <div className={`text-sm ${theme.colors.text.primary} font-medium`}>Easy</div>
+            <div className={`text-xs ${theme.colors.text.muted}`}>
               {stats.byDifficulty.easy} paths
               {total > 0 && ` (${((stats.byDifficulty.easy / total) * 100).toFixed(1)}%)`}
             </div>
@@ -58,8 +60,8 @@ export function MatrixLegend({ stats }: MatrixLegendProps) {
             style={{ backgroundColor: DIFFICULTY_COLORS.moderate }}
           />
           <div>
-            <div className="text-sm text-gray-300 font-medium">Moderate</div>
-            <div className="text-xs text-gray-500">
+            <div className={`text-sm ${theme.colors.text.primary} font-medium`}>Moderate</div>
+            <div className={`text-xs ${theme.colors.text.muted}`}>
               {stats.byDifficulty.moderate} paths
               {total > 0 && ` (${((stats.byDifficulty.moderate / total) * 100).toFixed(1)}%)`}
             </div>
@@ -73,8 +75,8 @@ export function MatrixLegend({ stats }: MatrixLegendProps) {
             style={{ backgroundColor: DIFFICULTY_COLORS.difficult }}
           />
           <div>
-            <div className="text-sm text-gray-300 font-medium">Difficult</div>
-            <div className="text-xs text-gray-500">
+            <div className={`text-sm ${theme.colors.text.primary} font-medium`}>Difficult</div>
+            <div className={`text-xs ${theme.colors.text.muted}`}>
               {stats.byDifficulty.difficult} paths
               {total > 0 && ` (${((stats.byDifficulty.difficult / total) * 100).toFixed(1)}%)`}
             </div>
@@ -83,10 +85,10 @@ export function MatrixLegend({ stats }: MatrixLegendProps) {
 
         {/* Not Computed */}
         <div className="flex items-center gap-3">
-          <div className="w-5 h-5 rounded bg-gray-700 border border-gray-600 shadow-md" />
+          <div className="w-5 h-5 rounded bg-black/40 border border-black/50 shadow-md" />
           <div>
-            <div className="text-sm text-gray-300 font-medium">Not Computed</div>
-            <div className="text-xs text-gray-500">
+            <div className={`text-sm ${theme.colors.text.primary} font-medium`}>Not Computed</div>
+            <div className={`text-xs ${theme.colors.text.muted}`}>
               Click &quot;Load Cached&quot; or &quot;Compute All&quot;
             </div>
           </div>
@@ -94,7 +96,9 @@ export function MatrixLegend({ stats }: MatrixLegendProps) {
       </div>
 
       {/* Help Text */}
-      <div className="mt-3 text-xs text-gray-500 bg-gray-800/50 px-3 py-2 rounded border border-gray-700/50">
+      <div
+        className={`mt-3 text-xs ${theme.colors.text.muted} bg-black/20 px-3 py-2 rounded border ${theme.colors.border}`}
+      >
         💡 <span className="font-medium">Tip:</span> Click any cell to select those two emotions and
         view the path in 3D. Hover for details.
       </div>

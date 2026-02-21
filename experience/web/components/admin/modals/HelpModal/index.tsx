@@ -9,6 +9,7 @@
 
 import { useState } from "react";
 import { useVisualizationStore } from "@/stores/useVisualizationStore";
+import { useAdminTheme } from "@/hooks/admin/useAdminTheme";
 
 type TabType = "model" | "usage" | "shortcuts" | "concepts";
 
@@ -18,70 +19,57 @@ interface HelpModalProps {
 
 export function HelpModal({ onClose }: HelpModalProps) {
   const [activeTab, setActiveTab] = useState<TabType>("model");
+  const theme = useAdminTheme();
 
   return (
-    <div className="fixed inset-0 z-50 bg-black/80 flex items-center justify-center p-8 backdrop-blur-sm">
-      <div className="bg-gray-900 rounded-lg shadow-2xl w-full max-w-4xl max-h-[90vh] flex flex-col border-2 border-cyan-500/50">
+    <div
+      className={`fixed inset-0 z-50 bg-black/80 flex items-center justify-center p-8 backdrop-blur-sm`}
+    >
+      <div
+        className={`${theme.effects.glass} border ${theme.colors.border} ${theme.layout.borderRadius} ${theme.effects.glow} w-full max-w-4xl max-h-[90vh] flex flex-col overflow-hidden`}
+      >
         {/* Header */}
-        <div className="flex items-center justify-between p-6 border-b border-gray-700 bg-gray-900/50">
+        <div
+          className={`flex items-center justify-between p-6 border-b ${theme.colors.border} ${theme.colors.background}`}
+        >
           <div>
-            <h2 className="text-2xl font-bold text-white">Soul Sphere Atlas - Help & Guide</h2>
-            <p className="text-sm text-gray-400 mt-1">Understanding the VAC Model and Interface</p>
+            <h2 className={`text-2xl font-bold ${theme.colors.text.primary}`}>
+              Soul Sphere Atlas - Help & Guide
+            </h2>
+            <p className={`text-sm ${theme.colors.text.secondary} mt-1`}>
+              Understanding the VAC Model and Interface
+            </p>
           </div>
           <button
             onClick={onClose}
-            className="px-4 py-2 bg-gray-700 hover:bg-gray-600 text-white rounded transition"
+            className={`px-4 py-2 border ${theme.colors.border} ${theme.colors.text.primary} ${theme.colors.hover} rounded transition`}
           >
             Close
           </button>
         </div>
 
         {/* Tab Navigation */}
-        <div className="flex border-b border-gray-700">
-          <button
-            onClick={() => setActiveTab("model")}
-            className={`flex-1 px-6 py-3 text-sm font-medium transition ${
-              activeTab === "model"
-                ? "text-white bg-gray-800 border-b-2 border-cyan-500"
-                : "text-gray-400 hover:text-gray-300 hover:bg-gray-800/50"
-            }`}
-          >
-            🧠 VAC Model & Soul Sphere
-          </button>
-          <button
-            onClick={() => setActiveTab("usage")}
-            className={`flex-1 px-6 py-3 text-sm font-medium transition ${
-              activeTab === "usage"
-                ? "text-white bg-gray-800 border-b-2 border-cyan-500"
-                : "text-gray-400 hover:text-gray-300 hover:bg-gray-800/50"
-            }`}
-          >
-            🎯 How to Use
-          </button>
-          <button
-            onClick={() => setActiveTab("shortcuts")}
-            className={`flex-1 px-6 py-3 text-sm font-medium transition ${
-              activeTab === "shortcuts"
-                ? "text-white bg-gray-800 border-b-2 border-cyan-500"
-                : "text-gray-400 hover:text-gray-300 hover:bg-gray-800/50"
-            }`}
-          >
-            ⌨️ Shortcuts
-          </button>
-          <button
-            onClick={() => setActiveTab("concepts")}
-            className={`flex-1 px-6 py-3 text-sm font-medium transition ${
-              activeTab === "concepts"
-                ? "text-white bg-gray-800 border-b-2 border-cyan-500"
-                : "text-gray-400 hover:text-gray-300 hover:bg-gray-800/50"
-            }`}
-          >
-            🌟 Key Concepts
-          </button>
+        <div className={`flex border-b ${theme.colors.border} ${theme.colors.background}`}>
+          {(["model", "usage", "shortcuts", "concepts"] as const).map((tab) => (
+            <button
+              key={tab}
+              onClick={() => setActiveTab(tab)}
+              className={`flex-1 px-6 py-3 text-sm font-medium transition flex items-center justify-center gap-2 ${
+                activeTab === tab
+                  ? `${theme.colors.text.primary} bg-black/20 border-b-2 border-current`
+                  : `${theme.colors.text.secondary} ${theme.colors.hover}`
+              }`}
+            >
+              {tab === "model" && "🧠 VAC Model & Soul Sphere"}
+              {tab === "usage" && "🎯 How to Use"}
+              {tab === "shortcuts" && "⌨️ Shortcuts"}
+              {tab === "concepts" && "🌟 Key Concepts"}
+            </button>
+          ))}
         </div>
 
         {/* Content */}
-        <div className="flex-1 overflow-y-auto p-6">
+        <div className={`flex-1 overflow-y-auto p-6 ${theme.colors.background}`}>
           {activeTab === "model" && <ModelTab />}
           {activeTab === "usage" && <UsageTab />}
           {activeTab === "shortcuts" && <ShortcutsTab />}
@@ -93,64 +81,71 @@ export function HelpModal({ onClose }: HelpModalProps) {
 }
 
 function ModelTab() {
+  const theme = useAdminTheme();
   return (
-    <div className="prose prose-invert max-w-none space-y-6">
+    <div className={`prose prose-invert max-w-none space-y-6 ${theme.colors.text.secondary}`}>
       <section>
-        <h3 className="text-xl font-bold text-white mb-3">What is the Soul Sphere?</h3>
-        <div className="bg-gray-800 rounded-lg p-4 space-y-2 text-gray-300">
+        <h3 className={`text-xl font-bold ${theme.colors.text.primary} mb-3`}>
+          What is the Soul Sphere?
+        </h3>
+        <div
+          className={`bg-black/20 border ${theme.colors.border} rounded-lg p-4 space-y-2 ${theme.colors.text.secondary}`}
+        >
           <p>
-            The Soul Sphere is a <strong className="text-white">living visualization</strong> of
-            emotional states in 3D space. Unlike static charts or graphs, it morphs and transforms
-            based on your position in the emotional landscape.
+            The Soul Sphere is a{" "}
+            <strong className={theme.colors.text.primary}>living visualization</strong> of emotional
+            states in 3D space. Unlike static charts or graphs, it morphs and transforms based on
+            your position in the emotional landscape.
           </p>
           <p>
             The sphere is procedurally generated using custom shaders, with three visual dimensions:
           </p>
           <ul className="list-disc list-inside space-y-1 ml-4">
             <li>
-              <strong className="text-cyan-400">Color</strong> - Emotional tone (positive ↔
+              <strong className={theme.colors.primary}>Color</strong> - Emotional tone (positive ↔
               negative)
             </li>
             <li>
-              <strong className="text-cyan-400">Shape</strong> - Energy level (calm ↔ chaotic)
+              <strong className={theme.colors.primary}>Shape</strong> - Energy level (calm ↔
+              chaotic)
             </li>
             <li>
-              <strong className="text-cyan-400">Glow</strong> - Connection quality (isolated ↔
-              connected)
+              <strong className={theme.colors.primary}>Glow</strong> - Connection quality (isolated
+              ↔ connected)
             </li>
           </ul>
         </div>
       </section>
 
       <section>
-        <h3 className="text-xl font-bold text-white mb-3">The VAC Model</h3>
-        <div className="bg-gray-800 rounded-lg p-4 space-y-3">
-          <p className="text-gray-300">
-            <strong className="text-white">VAC</strong> stands for{" "}
-            <strong>Valence-Arousal-Connection</strong>, a three-dimensional model for representing
-            emotions in computational space.
+        <h3 className={`text-xl font-bold ${theme.colors.text.primary} mb-3`}>The VAC Model</h3>
+        <div className={`bg-black/20 border ${theme.colors.border} rounded-lg p-4 space-y-3`}>
+          <p className={theme.colors.text.secondary}>
+            <strong className={theme.colors.text.primary}>VAC</strong> stands for{" "}
+            <strong className={theme.colors.text.primary}>Valence-Arousal-Connection</strong>, a
+            three-dimensional model for representing emotions in computational space.
           </p>
 
           <div className="grid grid-cols-3 gap-4 mt-4">
-            <div className="bg-gray-700 rounded p-3">
-              <h4 className="font-semibold text-red-400 mb-2">V - Valence</h4>
-              <p className="text-sm text-gray-300">
+            <div className="bg-black/40 border border-white/10 rounded p-3">
+              <h4 className="font-semibold text-teal-400 mb-2">V - Valence</h4>
+              <p className={`text-sm ${theme.colors.text.secondary}`}>
                 Positive ↔ Negative
                 <br />
                 Joy (+0.9) to Shame (-0.9)
               </p>
             </div>
-            <div className="bg-gray-700 rounded p-3">
-              <h4 className="font-semibold text-green-400 mb-2">A - Arousal</h4>
-              <p className="text-sm text-gray-300">
+            <div className="bg-black/40 border border-white/10 rounded p-3">
+              <h4 className="font-semibold text-amber-500 mb-2">A - Arousal</h4>
+              <p className={`text-sm ${theme.colors.text.secondary}`}>
                 High Energy ↔ Low Energy
                 <br />
                 Overwhelm (+0.9) to Tranquility (-0.8)
               </p>
             </div>
-            <div className="bg-gray-700 rounded p-3">
-              <h4 className="font-semibold text-blue-400 mb-2">C - Connection</h4>
-              <p className="text-sm text-gray-300">
+            <div className="bg-black/40 border border-white/10 rounded p-3">
+              <h4 className="font-semibold text-purple-400 mb-2">C - Connection</h4>
+              <p className={`text-sm ${theme.colors.text.secondary}`}>
                 With Others ↔ Isolated
                 <br />
                 Love (+1.0) to Shame (-1.0)
@@ -161,40 +156,48 @@ function ModelTab() {
       </section>
 
       <section>
-        <h3 className="text-xl font-bold text-white mb-3">Why Connection Matters</h3>
-        <div className="bg-gray-800 rounded-lg p-4">
-          <p className="text-gray-300 mb-3">
-            The Connection axis is our <strong className="text-cyan-400">innovation</strong>.
+        <h3 className={`text-xl font-bold ${theme.colors.text.primary} mb-3`}>
+          Why Connection Matters
+        </h3>
+        <div className={`bg-black/20 border ${theme.colors.border} rounded-lg p-4`}>
+          <p className={`${theme.colors.text.secondary} mb-3`}>
+            The Connection axis is our <strong className={theme.colors.primary}>innovation</strong>.
             Traditional models use Dominance, which can&apos;t distinguish emotions that differ in
             relational quality.
           </p>
 
           <div className="space-y-3">
-            <div className="bg-gray-700/50 rounded p-3">
-              <h4 className="font-semibold text-yellow-400 mb-1">Pity vs. Compassion</h4>
-              <div className="text-sm text-gray-300 space-y-1">
+            <div className="bg-black/40 border border-white/10 rounded p-3">
+              <h4 className={`font-semibold ${theme.colors.secondary} mb-1`}>
+                Pity vs. Compassion
+              </h4>
+              <div className={`text-sm ${theme.colors.text.secondary} space-y-1`}>
                 <p>
-                  <strong>Pity:</strong> &quot;I feel sorry FOR them&quot; (Connection: -0.7)
+                  <strong className={theme.colors.text.primary}>Pity:</strong> &quot;I feel sorry
+                  FOR them&quot; (Connection: -0.7)
                 </p>
                 <p>
-                  <strong>Compassion:</strong> &quot;I feel WITH them&quot; (Connection: +0.9)
+                  <strong className={theme.colors.text.primary}>Compassion:</strong> &quot;I feel
+                  WITH them&quot; (Connection: +0.9)
                 </p>
-                <p className="text-gray-400 italic">
+                <p className={`${theme.colors.text.muted} italic`}>
                   Both feel &quot;caring&quot; but have different therapeutic value
                 </p>
               </div>
             </div>
 
-            <div className="bg-gray-700/50 rounded p-3">
-              <h4 className="font-semibold text-yellow-400 mb-1">Grief vs. Despair</h4>
-              <div className="text-sm text-gray-300 space-y-1">
+            <div className="bg-black/40 border border-white/10 rounded p-3">
+              <h4 className={`font-semibold ${theme.colors.secondary} mb-1`}>Grief vs. Despair</h4>
+              <div className={`text-sm ${theme.colors.text.secondary} space-y-1`}>
                 <p>
-                  <strong>Grief:</strong> Love persists despite pain (Connection: +0.7)
+                  <strong className={theme.colors.text.primary}>Grief:</strong> Love persists
+                  despite pain (Connection: +0.7)
                 </p>
                 <p>
-                  <strong>Despair:</strong> Isolated suffering (Connection: -0.6)
+                  <strong className={theme.colors.text.primary}>Despair:</strong> Isolated suffering
+                  (Connection: -0.6)
                 </p>
-                <p className="text-gray-400 italic">
+                <p className={`${theme.colors.text.muted} italic`}>
                   Connection distinguishes healing from hopelessness
                 </p>
               </div>
@@ -204,18 +207,23 @@ function ModelTab() {
       </section>
 
       <section>
-        <h3 className="text-xl font-bold text-white mb-3">Research Foundation</h3>
-        <div className="bg-gray-800 rounded-lg p-4 text-gray-300 space-y-2 text-sm">
+        <h3 className={`text-xl font-bold ${theme.colors.text.primary} mb-3`}>
+          Research Foundation
+        </h3>
+        <div
+          className={`bg-black/20 border ${theme.colors.border} rounded-lg p-4 ${theme.colors.text.secondary} space-y-2 text-sm`}
+        >
           <p>
-            <strong className="text-white">Brené Brown&apos;s</strong> - Atlas of the Heart (
-            relational dynamics)
+            <strong className={theme.colors.text.primary}>Brené Brown&apos;s</strong> - Atlas of the
+            Heart ( relational dynamics)
           </p>
           <p>
-            <strong className="text-white">James Russell</strong> - Circumplex Model (VA foundation,
-            extended to VAC)
+            <strong className={theme.colors.text.primary}>James Russell</strong> - Circumplex Model
+            (VA foundation, extended to VAC)
           </p>
           <p>
-            <strong className="text-white">Paul Ekman</strong> - Basic Emotions (universal patterns)
+            <strong className={theme.colors.text.primary}>Paul Ekman</strong> - Basic Emotions
+            (universal patterns)
           </p>
         </div>
       </section>
@@ -224,63 +232,71 @@ function ModelTab() {
 }
 
 function UsageTab() {
+  const theme = useAdminTheme();
   return (
-    <div className="prose prose-invert max-w-none space-y-6">
+    <div className={`prose prose-invert max-w-none space-y-6 ${theme.colors.text.secondary}`}>
       <section>
-        <h3 className="text-xl font-bold text-white mb-3">Getting Started</h3>
-        <div className="bg-gray-800 rounded-lg p-4">
-          <ol className="list-decimal list-inside space-y-2 text-gray-300">
+        <h3 className={`text-xl font-bold ${theme.colors.text.primary} mb-3`}>Getting Started</h3>
+        <div className={`bg-black/20 border ${theme.colors.border} rounded-lg p-4`}>
+          <ol className="list-decimal list-inside space-y-2">
             <li>
-              <strong className="text-white">Select emotions</strong> from the left panel or click
-              them in the 3D view
+              <strong className={theme.colors.text.primary}>Select emotions</strong> from the left
+              panel or click them in the 3D view
             </li>
             <li>
-              <strong className="text-white">Paths auto-compute</strong> showing optimal transitions
+              <strong className={theme.colors.text.primary}>Paths auto-compute</strong> showing
+              optimal transitions
             </li>
             <li>
-              <strong className="text-white">Explore in InfoPanel</strong> on the right (sorted by
-              distance)
+              <strong className={theme.colors.text.primary}>Explore in InfoPanel</strong> on the
+              right (sorted by distance)
             </li>
             <li>
-              <strong className="text-white">Click waypoints</strong> for comprehensive transition
-              guidance
+              <strong className={theme.colors.text.primary}>Click waypoints</strong> for
+              comprehensive transition guidance
             </li>
           </ol>
         </div>
       </section>
 
       <section>
-        <h3 className="text-xl font-bold text-white mb-3">3D Visualization</h3>
-        <div className="bg-gray-800 rounded-lg p-4 space-y-3">
+        <h3 className={`text-xl font-bold ${theme.colors.text.primary} mb-3`}>3D Visualization</h3>
+        <div className={`bg-black/20 border ${theme.colors.border} rounded-lg p-4 space-y-3`}>
           <div>
-            <h4 className="font-semibold text-cyan-400 mb-2">Navigation</h4>
-            <ul className="list-disc list-inside space-y-1 text-gray-300 text-sm">
+            <h4 className={`font-semibold ${theme.colors.primary} mb-2`}>Navigation</h4>
+            <ul className="list-disc list-inside space-y-1 text-sm">
               <li>
-                <strong>Orbit:</strong> Left-click and drag to rotate view
+                <strong className={theme.colors.text.primary}>Orbit:</strong> Left-click and drag to
+                rotate view
               </li>
               <li>
-                <strong>Zoom:</strong> Scroll wheel to zoom in/out
+                <strong className={theme.colors.text.primary}>Zoom:</strong> Scroll wheel to zoom
+                in/out
               </li>
               <li>
-                <strong>Pan:</strong> Right-click and drag (or Ctrl+drag)
+                <strong className={theme.colors.text.primary}>Pan:</strong> Right-click and drag (or
+                Ctrl+drag)
               </li>
             </ul>
           </div>
 
           <div>
-            <h4 className="font-semibold text-cyan-400 mb-2">Interaction</h4>
-            <ul className="list-disc list-inside space-y-1 text-gray-300 text-sm">
+            <h4 className={`font-semibold ${theme.colors.primary} mb-2`}>Interaction</h4>
+            <ul className="list-disc list-inside space-y-1 text-sm">
               <li>
-                <strong>Click emotion</strong> to select/deselect
+                <strong className={theme.colors.text.primary}>Click emotion</strong> to
+                select/deselect
               </li>
               <li>
-                <strong>Hover emotion</strong> for instant info in InfoPanel
+                <strong className={theme.colors.text.primary}>Hover emotion</strong> for instant
+                info in InfoPanel
               </li>
               <li>
-                <strong>Click path</strong> in 3D to persist details
+                <strong className={theme.colors.text.primary}>Click path</strong> in 3D to persist
+                details
               </li>
               <li>
-                <strong>Hover path</strong> for quick preview
+                <strong className={theme.colors.text.primary}>Hover path</strong> for quick preview
               </li>
             </ul>
           </div>
@@ -288,11 +304,12 @@ function UsageTab() {
       </section>
 
       <section>
-        <h3 className="text-xl font-bold text-white mb-3">Path Exploration</h3>
-        <div className="bg-gray-800 rounded-lg p-4 space-y-3 text-gray-300">
+        <h3 className={`text-xl font-bold ${theme.colors.text.primary} mb-3`}>Path Exploration</h3>
+        <div className={`bg-black/20 border ${theme.colors.border} rounded-lg p-4 space-y-3`}>
           <p>
-            All computed paths appear in the <strong className="text-white">InfoPanel</strong>{" "}
-            (right sidebar), sorted with the shortest/optimal path first (⭐).
+            All computed paths appear in the{" "}
+            <strong className={theme.colors.text.primary}>InfoPanel</strong> (right sidebar), sorted
+            with the shortest/optimal path first (⭐).
           </p>
           <p>Each path card shows:</p>
           <ul className="list-disc list-inside space-y-1 text-sm ml-4">
@@ -300,16 +317,20 @@ function UsageTab() {
             <li>Distance, difficulty, and time estimates</li>
             <li>Bridge emotion requirements</li>
             <li>
-              <strong className="text-cyan-400">Clickable waypoints</strong> - Click any for deep
-              dive modal
+              <strong className={theme.colors.primary}>Clickable waypoints</strong> - Click any for
+              deep dive modal
             </li>
           </ul>
         </div>
       </section>
 
       <section>
-        <h3 className="text-xl font-bold text-white mb-3">Waypoint Deep Dive</h3>
-        <div className="bg-gray-800 rounded-lg p-4 space-y-2 text-gray-300 text-sm">
+        <h3 className={`text-xl font-bold ${theme.colors.text.primary} mb-3`}>
+          Waypoint Deep Dive
+        </h3>
+        <div
+          className={`bg-black/20 border ${theme.colors.border} rounded-lg p-4 space-y-2 text-sm`}
+        >
           <p>Click any waypoint to open a comprehensive modal with 3 tabs:</p>
           <div className="space-y-2 ml-4">
             <div>
@@ -326,15 +347,16 @@ function UsageTab() {
             </div>
           </div>
           <p className="mt-3">
-            <strong>3D Highlighting:</strong> When viewing waypoint details, the corresponding
-            emotion pulses with a bright cyan ring in the 3D sphere!
+            <strong className={theme.colors.text.primary}>3D Highlighting:</strong> When viewing
+            waypoint details, the corresponding emotion pulses with a bright cyan ring in the 3D
+            sphere!
           </p>
         </div>
       </section>
 
       <section>
-        <h3 className="text-xl font-bold text-white mb-3">Path Matrix</h3>
-        <div className="bg-gray-800 rounded-lg p-4 space-y-2 text-gray-300">
+        <h3 className={`text-xl font-bold ${theme.colors.text.primary} mb-3`}>Path Matrix</h3>
+        <div className={`bg-black/20 border ${theme.colors.border} rounded-lg p-4 space-y-2`}>
           <p>
             Click <strong className="text-purple-400">&quot;📊 Show Path Matrix&quot;</strong> to
             view all possible emotion transitions at once.
@@ -352,36 +374,42 @@ function UsageTab() {
       </section>
 
       <section>
-        <h3 className="text-xl font-bold text-white mb-3">Backend Cache & Performance</h3>
-        <div className="bg-gray-800 rounded-lg p-4 space-y-3">
-          <p className="text-gray-300">
-            All paths are <strong className="text-white">automatically cached</strong> in the
+        <h3 className={`text-xl font-bold ${theme.colors.text.primary} mb-3`}>
+          Backend Cache & Performance
+        </h3>
+        <div className={`bg-black/20 border ${theme.colors.border} rounded-lg p-4 space-y-3`}>
+          <p>
+            All paths are{" "}
+            <strong className={theme.colors.text.primary}>automatically cached</strong> in the
             Observer backend database for instant loading on future visits.
           </p>
           <div className="bg-green-900/20 border border-green-500/30 rounded p-3">
             <p className="text-green-400 font-semibold mb-2">⚡ Performance Benefits:</p>
             <ul className="list-disc list-inside space-y-1 text-sm text-green-300">
               <li>
-                <strong>240x faster</strong> than client-side computation
+                <strong className="text-green-200">240x faster</strong> than client-side computation
               </li>
               <li>Load 7,482 paths in under 1 second</li>
               <li>Path Matrix ready instantly</li>
               <li>Statistics computed in real-time from database</li>
             </ul>
           </div>
-          <p className="text-gray-300 text-sm">
-            Watch the <strong className="text-cyan-400">Cache Performance</strong> section in the
-            Statistics tab to see load times and cache status.
+          <p className="text-sm">
+            Watch the <strong className={theme.colors.primary}>Cache Performance</strong> section in
+            the Statistics tab to see load times and cache status.
           </p>
         </div>
       </section>
 
       <section>
-        <h3 className="text-xl font-bold text-white mb-3">Statistics Dashboard</h3>
-        <div className="bg-gray-800 rounded-lg p-4 text-gray-300">
+        <h3 className={`text-xl font-bold ${theme.colors.text.primary} mb-3`}>
+          Statistics Dashboard
+        </h3>
+        <div className={`bg-black/20 border ${theme.colors.border} rounded-lg p-4`}>
           <p>
-            Switch to the <strong className="text-cyan-400">&quot;📊 Statistics&quot;</strong> tab
-            in the InfoPanel to view aggregate analytics:
+            Switch to the{" "}
+            <strong className={theme.colors.primary}>&quot;📊 Statistics&quot;</strong> tab in the
+            InfoPanel to view aggregate analytics:
           </p>
           <ul className="list-disc list-inside space-y-1 text-sm ml-4 mt-2">
             <li>Computation progress and completion percentage</li>
@@ -396,28 +424,33 @@ function UsageTab() {
       </section>
 
       <section>
-        <h3 className="text-xl font-bold text-white mb-3">Tips & Tricks</h3>
-        <div className="bg-gray-800 rounded-lg p-4 space-y-2 text-gray-300 text-sm">
+        <h3 className={`text-xl font-bold ${theme.colors.text.primary} mb-3`}>Tips & Tricks</h3>
+        <div
+          className={`bg-black/20 border ${theme.colors.border} rounded-lg p-4 space-y-2 text-sm`}
+        >
           <p>
-            • <strong>Resize InfoPanel:</strong> Drag the thin vertical bar between 3D view and
-            InfoPanel
+            <strong className={theme.colors.text.primary}>• Resize InfoPanel:</strong> Drag the thin
+            vertical bar between 3D view and InfoPanel
           </p>
           <p>
-            • <strong>Search:</strong> Use search box in left panel to filter emotions quickly
+            <strong className={theme.colors.text.primary}>• Search:</strong> Use search box in left
+            panel to filter emotions quickly
           </p>
           <p>
-            • <strong>Category filters:</strong> Toggle categories to reduce visual clutter
+            <strong className={theme.colors.text.primary}>• Category filters:</strong> Toggle
+            categories to reduce visual clutter
           </p>
           <p>
-            • <strong>Layer controls:</strong> Show/hide soul sphere, paths, waypoints, etc.
+            <strong className={theme.colors.text.primary}>• Layer controls:</strong> Show/hide soul
+            sphere, paths, waypoints, etc.
           </p>
           <p>
-            • <strong>Export:</strong> Use buttons at bottom of left panel (JSON, CSV, clipboard,
-            share link)
+            <strong className={theme.colors.text.primary}>• Export:</strong> Use buttons at bottom
+            of left panel (JSON, CSV, clipboard, share link)
           </p>
           <p>
-            • <strong>Bridge emotions:</strong> Click yellow button to instantly select all 6
-            gateway emotions
+            <strong className={theme.colors.text.primary}>• Bridge emotions:</strong> Click yellow
+            button to instantly select all 6 gateway emotions
           </p>
         </div>
       </section>
@@ -426,104 +459,185 @@ function UsageTab() {
 }
 
 function ShortcutsTab() {
+  const theme = useAdminTheme();
   return (
     <div className="space-y-4">
-      <h3 className="text-xl font-bold text-white mb-3">Keyboard Shortcuts</h3>
+      <h3 className={`text-xl font-bold ${theme.colors.text.primary} mb-3`}>Keyboard Shortcuts</h3>
 
-      <div className="bg-gray-800 rounded-lg p-4">
-        <h4 className="font-semibold text-gray-400 mb-3">Navigation & Selection</h4>
+      <div className={`bg-black/20 border ${theme.colors.border} rounded-lg p-4`}>
+        <h4 className={`font-semibold ${theme.colors.secondary} mb-3`}>Navigation & Selection</h4>
         <div className="space-y-2 text-sm">
           <div className="flex items-center justify-between">
-            <span className="text-gray-300">Clear selection</span>
-            <kbd className="px-3 py-1 bg-gray-700 rounded font-mono text-white">Esc</kbd>
+            <span className={theme.colors.text.primary}>Clear selection</span>
+            <kbd
+              className={`px-3 py-1 bg-black/40 border ${theme.colors.border} rounded font-mono ${theme.colors.text.primary}`}
+            >
+              Esc
+            </kbd>
           </div>
           <div className="flex items-center justify-between">
-            <span className="text-gray-300">Select all bridge emotions</span>
-            <kbd className="px-3 py-1 bg-gray-700 rounded font-mono text-white">B</kbd>
+            <span className={theme.colors.text.primary}>Select all bridge emotions</span>
+            <kbd
+              className={`px-3 py-1 bg-black/40 border ${theme.colors.border} rounded font-mono ${theme.colors.text.primary}`}
+            >
+              B
+            </kbd>
           </div>
         </div>
       </div>
 
-      <div className="bg-gray-800 rounded-lg p-4">
-        <h4 className="font-semibold text-gray-400 mb-3">View Controls</h4>
+      <div className={`bg-black/20 border ${theme.colors.border} rounded-lg p-4`}>
+        <h4 className={`font-semibold ${theme.colors.secondary} mb-3`}>View Controls</h4>
         <div className="space-y-2 text-sm">
           <div className="flex items-center justify-between">
-            <span className="text-gray-300">Toggle focus mode (hide unselected)</span>
-            <kbd className="px-3 py-1 bg-gray-700 rounded font-mono text-white">F</kbd>
+            <span className={theme.colors.text.primary}>Toggle focus mode (hide unselected)</span>
+            <kbd
+              className={`px-3 py-1 bg-black/40 border ${theme.colors.border} rounded font-mono ${theme.colors.text.primary}`}
+            >
+              F
+            </kbd>
           </div>
           <div className="flex items-center justify-between">
-            <span className="text-gray-300">Cycle animation modes</span>
-            <kbd className="px-3 py-1 bg-purple-700 rounded font-mono text-white">M</kbd>
+            <span className={theme.colors.text.primary}>Cycle animation modes</span>
+            <kbd
+              className={`px-3 py-1 bg-purple-900/40 border border-purple-500/50 rounded font-mono ${theme.colors.primary}`}
+            >
+              M
+            </kbd>
           </div>
           <div className="flex items-center justify-between">
-            <span className="text-gray-300">Toggle path visibility</span>
-            <kbd className="px-3 py-1 bg-gray-700 rounded font-mono text-white">Space</kbd>
+            <span className={theme.colors.text.primary}>Toggle path visibility</span>
+            <kbd
+              className={`px-3 py-1 bg-black/40 border ${theme.colors.border} rounded font-mono ${theme.colors.text.primary}`}
+            >
+              Space
+            </kbd>
           </div>
           <div className="flex items-center justify-between">
-            <span className="text-gray-300">Toggle all paths</span>
-            <kbd className="px-3 py-1 bg-gray-700 rounded font-mono text-white">P</kbd>
+            <span className={theme.colors.text.primary}>Toggle all paths</span>
+            <kbd
+              className={`px-3 py-1 bg-black/40 border ${theme.colors.border} rounded font-mono ${theme.colors.text.primary}`}
+            >
+              P
+            </kbd>
           </div>
           <div className="flex items-center justify-between">
-            <span className="text-gray-300">Toggle emotion labels</span>
-            <kbd className="px-3 py-1 bg-gray-700 rounded font-mono text-white">L</kbd>
+            <span className={theme.colors.text.primary}>Toggle emotion labels</span>
+            <kbd
+              className={`px-3 py-1 bg-black/40 border ${theme.colors.border} rounded font-mono ${theme.colors.text.primary}`}
+            >
+              L
+            </kbd>
           </div>
           <div className="flex items-center justify-between">
-            <span className="text-gray-300">Toggle soul sphere background</span>
-            <kbd className="px-3 py-1 bg-gray-700 rounded font-mono text-white">S</kbd>
+            <span className={theme.colors.text.primary}>Toggle soul sphere background</span>
+            <kbd
+              className={`px-3 py-1 bg-black/40 border ${theme.colors.border} rounded font-mono ${theme.colors.text.primary}`}
+            >
+              S
+            </kbd>
           </div>
           <div className="flex items-center justify-between">
-            <span className="text-gray-300">Toggle legend</span>
-            <kbd className="px-3 py-1 bg-gray-700 rounded font-mono text-white">G</kbd>
+            <span className={theme.colors.text.primary}>Toggle legend</span>
+            <kbd
+              className={`px-3 py-1 bg-black/40 border ${theme.colors.border} rounded font-mono ${theme.colors.text.primary}`}
+            >
+              G
+            </kbd>
           </div>
           <div className="flex items-center justify-between">
-            <span className="text-gray-300">Toggle axis labels & grids</span>
-            <kbd className="px-3 py-1 bg-gray-700 rounded font-mono text-white">A</kbd>
+            <span className={theme.colors.text.primary}>Toggle axis labels & grids</span>
+            <kbd
+              className={`px-3 py-1 bg-black/40 border ${theme.colors.border} rounded font-mono ${theme.colors.text.primary}`}
+            >
+              A
+            </kbd>
           </div>
           <div className="flex items-center justify-between">
-            <span className="text-gray-300">Toggle motion indicators</span>
-            <kbd className="px-3 py-1 bg-gray-700 rounded font-mono text-white">O</kbd>
+            <span className={theme.colors.text.primary}>Toggle motion indicators</span>
+            <kbd
+              className={`px-3 py-1 bg-black/40 border ${theme.colors.border} rounded font-mono ${theme.colors.text.primary}`}
+            >
+              O
+            </kbd>
           </div>
           <div className="flex items-center justify-between">
-            <span className="text-gray-300">Toggle data visualization mode</span>
-            <kbd className="px-3 py-1 bg-gray-700 rounded font-mono text-white">X</kbd>
+            <span className={theme.colors.text.primary}>Toggle data visualization mode</span>
+            <kbd
+              className={`px-3 py-1 bg-black/40 border ${theme.colors.border} rounded font-mono ${theme.colors.text.primary}`}
+            >
+              X
+            </kbd>
           </div>
           <div className="flex items-center justify-between">
-            <span className="text-gray-300">Toggle Debug Panels</span>
-            <kbd className="px-3 py-1 bg-gray-700 rounded font-mono text-white">D</kbd>
+            <span className={theme.colors.text.primary}>Toggle Debug Panels</span>
+            <kbd
+              className={`px-3 py-1 bg-black/40 border ${theme.colors.border} rounded font-mono ${theme.colors.text.primary}`}
+            >
+              D
+            </kbd>
           </div>
           <div className="flex items-center justify-between">
-            <span className="text-gray-300">Toggle Zen session indicator</span>
-            <kbd className="px-3 py-1 bg-gray-700 rounded font-mono text-white">I</kbd>
+            <span className={theme.colors.text.primary}>Toggle Zen session indicator</span>
+            <kbd
+              className={`px-3 py-1 bg-black/40 border ${theme.colors.border} rounded font-mono ${theme.colors.text.primary}`}
+            >
+              I
+            </kbd>
           </div>
         </div>
       </div>
 
-      <div className="bg-gray-800 rounded-lg p-4">
-        <h4 className="font-semibold text-gray-400 mb-3">Navigation & System</h4>
+      <div className={`bg-black/20 border ${theme.colors.border} rounded-lg p-4`}>
+        <h4 className={`font-semibold ${theme.colors.secondary} mb-3`}>Navigation & System</h4>
         <div className="space-y-2 text-sm">
           <div className="flex items-center justify-between">
-            <span className="text-gray-300">Previous/Next path</span>
-            <kbd className="px-3 py-1 bg-gray-700 rounded font-mono text-white">↑ / ↓</kbd>
+            <span className={theme.colors.text.primary}>Previous/Next path</span>
+            <kbd
+              className={`px-3 py-1 bg-black/40 border ${theme.colors.border} rounded font-mono ${theme.colors.text.primary}`}
+            >
+              ↑ / ↓
+            </kbd>
           </div>
           <div className="flex items-center justify-between">
-            <span className="text-gray-300">Jump to specific path</span>
-            <kbd className="px-3 py-1 bg-gray-700 rounded font-mono text-white">1 - 5</kbd>
+            <span className={theme.colors.text.primary}>Jump to specific path</span>
+            <kbd
+              className={`px-3 py-1 bg-black/40 border ${theme.colors.border} rounded font-mono ${theme.colors.text.primary}`}
+            >
+              1 - 5
+            </kbd>
           </div>
           <div className="flex items-center justify-between">
-            <span className="text-gray-300">Open Command Palette</span>
-            <kbd className="px-3 py-1 bg-gray-700 rounded font-mono text-white">Cmd+K</kbd>
+            <span className={theme.colors.text.primary}>Open Command Palette</span>
+            <kbd
+              className={`px-3 py-1 bg-black/40 border ${theme.colors.border} rounded font-mono ${theme.colors.text.primary}`}
+            >
+              Cmd+K
+            </kbd>
           </div>
           <div className="flex items-center justify-between">
-            <span className="text-gray-300">Open Settings</span>
-            <kbd className="px-3 py-1 bg-gray-700 rounded font-mono text-white">Cmd+,</kbd>
+            <span className={theme.colors.text.primary}>Open Settings</span>
+            <kbd
+              className={`px-3 py-1 bg-black/40 border ${theme.colors.border} rounded font-mono ${theme.colors.text.primary}`}
+            >
+              Cmd+,
+            </kbd>
           </div>
           <div className="flex items-center justify-between">
-            <span className="text-gray-300">Cycle View (Full / Zen / Cinema)</span>
-            <kbd className="px-3 py-1 bg-gray-700 rounded font-mono text-white">Z</kbd>
+            <span className={theme.colors.text.primary}>Cycle View (Full / Zen / Cinema)</span>
+            <kbd
+              className={`px-3 py-1 bg-black/40 border ${theme.colors.border} rounded font-mono ${theme.colors.text.primary}`}
+            >
+              Z
+            </kbd>
           </div>
           <div className="flex items-center justify-between">
-            <span className="text-gray-300">Open this Help</span>
-            <kbd className="px-3 py-1 bg-gray-700 rounded font-mono text-white">H / ?</kbd>
+            <span className={theme.colors.text.primary}>Open this Help</span>
+            <kbd
+              className={`px-3 py-1 bg-black/40 border ${theme.colors.border} rounded font-mono ${theme.colors.text.primary}`}
+            >
+              H / ?
+            </kbd>
           </div>
         </div>
       </div>
@@ -541,16 +655,21 @@ function ShortcutsTab() {
 function ConceptsTab() {
   const { allEmotions, getBridgeEmotions } = useVisualizationStore();
   const bridgeEmotions = getBridgeEmotions();
+  const theme = useAdminTheme();
 
   return (
-    <div className="prose prose-invert max-w-none space-y-6">
+    <div className={`prose prose-invert max-w-none space-y-6 ${theme.colors.text.secondary}`}>
       <section>
-        <h3 className="text-xl font-bold text-white mb-3">The {allEmotions.length} Emotions</h3>
-        <div className="bg-gray-800 rounded-lg p-4 text-gray-300">
+        <h3 className={`text-xl font-bold ${theme.colors.text.primary} mb-3`}>
+          The {allEmotions.length} Emotions
+        </h3>
+        <div className={`bg-black/20 border ${theme.colors.border} rounded-lg p-4`}>
           <p className="mb-2">
             The system maps{" "}
-            <strong className="text-white">{allEmotions.length} distinct emotions</strong> to VAC
-            space.
+            <strong className={theme.colors.text.primary}>
+              {allEmotions.length} distinct emotions
+            </strong>{" "}
+            to VAC space.
           </p>
           <p>
             These emotions are organized into categories representing different &quot;places we
@@ -560,92 +679,111 @@ function ConceptsTab() {
       </section>
 
       <section>
-        <h3 className="text-xl font-bold text-white mb-3">
+        <h3 className={`text-xl font-bold ${theme.colors.text.primary} mb-3`}>
           Bridge Emotions ({bridgeEmotions.length} Gateway States)
         </h3>
         <div className="space-y-2">
           {bridgeEmotions.length > 0 ? (
             bridgeEmotions.map((bridge) => (
-              <div key={bridge.id} className="bg-gray-800 rounded-lg p-3">
+              <div
+                key={bridge.id}
+                className={`bg-black/20 border ${theme.colors.border} rounded-lg p-3`}
+              >
                 <div className="flex items-start gap-2">
                   <span className="text-yellow-400 text-lg">★</span>
                   <div className="flex-1">
-                    <h4 className="font-semibold text-white">
+                    <h4 className={`font-semibold ${theme.colors.text.primary}`}>
                       {bridge.name}{" "}
-                      <span className="text-xs text-gray-400 font-mono">
+                      <span className={`text-xs ${theme.colors.text.muted} font-mono`}>
                         [{bridge.vac[0].toFixed(1)}, {bridge.vac[1].toFixed(1)},{" "}
                         {bridge.vac[2].toFixed(1)}]
                       </span>
                     </h4>
-                    <p className="text-sm text-gray-300 mt-1">{bridge.definition}</p>
+                    <p className={`text-sm ${theme.colors.text.secondary} mt-1`}>
+                      {bridge.definition}
+                    </p>
                   </div>
                 </div>
               </div>
             ))
           ) : (
-            <p className="text-gray-400 italic">No bridge emotions defined for this collection.</p>
+            <p className={`${theme.colors.text.muted} italic`}>
+              No bridge emotions defined for this collection.
+            </p>
           )}
         </div>
       </section>
 
       <section>
-        <h3 className="text-xl font-bold text-white mb-3">Path Intelligence</h3>
-        <div className="bg-gray-800 rounded-lg p-4 space-y-3 text-gray-300">
+        <h3 className={`text-xl font-bold ${theme.colors.text.primary} mb-3`}>Path Intelligence</h3>
+        <div className={`bg-black/20 border ${theme.colors.border} rounded-lg p-4 space-y-3`}>
           <p>
-            The system uses <strong className="text-white">A* pathfinding</strong> with
-            psychological constraints to find optimal emotional transitions.
+            The system uses <strong className={theme.colors.text.primary}>A* pathfinding</strong>{" "}
+            with psychological constraints to find optimal emotional transitions.
           </p>
           <div className="text-sm space-y-2">
             <p>
-              <strong className="text-cyan-400">Category-aware:</strong> Some category transitions
-              are easier than others
+              <strong className={theme.colors.primary}>Category-aware:</strong> Some category
+              transitions are easier than others
             </p>
             <p>
-              <strong className="text-cyan-400">Bridge detection:</strong> Automatically inserts
-              bridge emotions when needed
+              <strong className={theme.colors.primary}>Bridge detection:</strong> Automatically
+              inserts bridge emotions when needed
             </p>
             <p>
-              <strong className="text-cyan-400">Arousal regulation:</strong> High arousal must
-              decrease before complex processing
+              <strong className={theme.colors.primary}>Arousal regulation:</strong> High arousal
+              must decrease before complex processing
             </p>
             <p>
-              <strong className="text-cyan-400">Weighted distance:</strong> Connection axis is 1.5x
-              more significant than Valence
+              <strong className={theme.colors.primary}>Weighted distance:</strong> Connection axis
+              is 1.5x more significant than Valence
             </p>
           </div>
         </div>
       </section>
 
       <section>
-        <h3 className="text-xl font-bold text-white mb-3">Color Coding</h3>
-        <div className="bg-gray-800 rounded-lg p-4">
+        <h3 className={`text-xl font-bold ${theme.colors.text.primary} mb-3`}>Color Coding</h3>
+        <div className={`bg-black/20 border ${theme.colors.border} rounded-lg p-4`}>
           <div className="space-y-3">
             <div className="flex items-center gap-3">
-              <div className="w-8 h-8 rounded" style={{ backgroundColor: "#00FFC8" }} />
+              <div className="w-8 h-8 rounded" style={{ backgroundColor: "#2DD4BF" }} />
               <div className="flex-1">
-                <p className="font-semibold text-white">Green - Easy Transitions</p>
-                <p className="text-sm text-gray-400">Distance &lt; 1.0 in VAC space</p>
+                <p className={`font-semibold ${theme.colors.text.primary}`}>
+                  Teal - Easy Transitions
+                </p>
+                <p className={`text-sm ${theme.colors.text.muted}`}>
+                  Distance &lt; 1.0 in VAC space
+                </p>
               </div>
             </div>
             <div className="flex items-center gap-3">
-              <div className="w-8 h-8 rounded" style={{ backgroundColor: "#FFC800" }} />
+              <div className="w-8 h-8 rounded" style={{ backgroundColor: "#F59E0B" }} />
               <div className="flex-1">
-                <p className="font-semibold text-white">Yellow - Moderate Difficulty</p>
-                <p className="text-sm text-gray-400">Distance 1.0 - 2.0</p>
+                <p className={`font-semibold ${theme.colors.text.primary}`}>
+                  Amber - Moderate Difficulty
+                </p>
+                <p className={`text-sm ${theme.colors.text.muted}`}>Distance 1.0 - 2.0</p>
               </div>
             </div>
             <div className="flex items-center gap-3">
-              <div className="w-8 h-8 rounded" style={{ backgroundColor: "#FF0096" }} />
+              <div className="w-8 h-8 rounded" style={{ backgroundColor: "#E11D48" }} />
               <div className="flex-1">
-                <p className="font-semibold text-white">Red - Difficult Transitions</p>
-                <p className="text-sm text-gray-400">Distance &gt; 2.0, may require bridges</p>
+                <p className={`font-semibold ${theme.colors.text.primary}`}>
+                  Rose - Difficult Transitions
+                </p>
+                <p className={`text-sm ${theme.colors.text.muted}`}>
+                  Distance &gt; 2.0, may require bridges
+                </p>
               </div>
             </div>
             <div className="flex items-center gap-3">
               <div className="w-8 h-8 rounded bg-yellow-500" />
               <div className="flex-1">
-                <p className="font-semibold text-white">Gold Ring - Bridge Emotion</p>
-                <p className="text-sm text-gray-400">
+                <p className={`font-semibold ${theme.colors.text.primary}`}>
+                  Gold Ring - Bridge Emotion
+                </p>
+                <p className={`text-sm ${theme.colors.text.muted}`}>
                   Gateway state enabling difficult transitions
                 </p>
               </div>

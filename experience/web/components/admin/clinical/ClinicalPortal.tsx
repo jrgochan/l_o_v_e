@@ -66,7 +66,7 @@ const TABS: Tab[] = [
 // ---------------------------------------------------------------------------
 
 export function ClinicalPortal() {
-  const [theme] = useState(useAdminTheme()); // eslint-disable-line @typescript-eslint/no-unused-vars
+  const [theme] = useState(useAdminTheme());
   const user = useAuthStore((state) => state.user);
   const [activeTab, setActiveTab] = useState<TabId>("overview");
 
@@ -152,17 +152,19 @@ export function ClinicalPortal() {
 
   // --- Render ---
   return (
-    <div className="min-h-screen bg-gray-950 text-white">
+    <div className={`min-h-screen ${theme.colors.background} ${theme.colors.text.primary}`}>
       {/* Header */}
-      <header className="sticky top-0 z-50 border-b border-gray-800 bg-gray-950/90 backdrop-blur-xl">
+      <header
+        className={`sticky top-0 z-50 border-b ${theme.colors.border} bg-black/50 ${theme.effects.backdropBlur}`}
+      >
         <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-teal-500 to-cyan-600 flex items-center justify-center">
               <Shield className="w-5 h-5 text-white" />
             </div>
             <div>
-              <h1 className="text-lg font-bold text-white">Clinical Portal</h1>
-              <p className="text-xs text-gray-400">
+              <h1 className={`text-lg font-bold ${theme.colors.text.primary}`}>Clinical Portal</h1>
+              <p className={`text-xs ${theme.colors.text.secondary}`}>
                 {user?.full_name || "Clinician"} · {clients.length} client
                 {clients.length !== 1 ? "s" : ""}
               </p>
@@ -171,10 +173,12 @@ export function ClinicalPortal() {
           <button
             onClick={loadData}
             disabled={loading}
-            className="p-2 rounded-lg border border-gray-700 hover:border-gray-600 hover:bg-gray-800 transition-colors disabled:opacity-50"
+            className={`p-2 rounded-lg border ${theme.colors.border} ${theme.colors.hover} bg-black/10 transition-colors disabled:opacity-50`}
             title="Refresh data"
           >
-            <RefreshCw className={`w-4 h-4 text-gray-400 ${loading ? "animate-spin" : ""}`} />
+            <RefreshCw
+              className={`w-4 h-4 ${theme.colors.text.secondary} ${loading ? "animate-spin" : ""}`}
+            />
           </button>
         </div>
 
@@ -187,8 +191,8 @@ export function ClinicalPortal() {
                 onClick={() => setActiveTab(tab.id)}
                 className={`flex items-center gap-2 px-4 py-2.5 text-sm font-medium border-b-2 transition-all ${
                   activeTab === tab.id
-                    ? "border-teal-500 text-teal-400"
-                    : "border-transparent text-gray-500 hover:text-gray-300 hover:border-gray-700"
+                    ? `${theme.colors.primary.replace("text-", "border-")} ${theme.colors.primary}`
+                    : `border-transparent ${theme.colors.text.muted} ${theme.colors.hover}`
                 }`}
               >
                 {tab.icon}
@@ -274,12 +278,13 @@ export function ClinicalPortal() {
 // ---------------------------------------------------------------------------
 
 function LoadingSkeleton() {
+  const theme = useAdminTheme();
   return (
     <div className="grid grid-cols-4 gap-4 animate-pulse">
       {[...Array(4)].map((_, i) => (
-        <div key={i} className="h-28 rounded-xl bg-gray-800/50 border border-gray-800" />
+        <div key={i} className={`h-28 rounded-xl bg-black/20 border ${theme.colors.border}`} />
       ))}
-      <div className="col-span-4 h-64 rounded-xl bg-gray-800/50 border border-gray-800" />
+      <div className={`col-span-4 h-64 rounded-xl bg-black/20 border ${theme.colors.border}`} />
     </div>
   );
 }
@@ -301,6 +306,7 @@ function OverviewTab({
   criticalAlerts: ClinicalAlertItem[];
   onSwitchTab: (tab: TabId) => void;
 }) {
+  const theme = useAdminTheme();
   return (
     <div className="space-y-6">
       {/* Stat Cards */}
@@ -345,10 +351,14 @@ function OverviewTab({
                 className="flex items-center justify-between p-3 rounded-lg bg-red-950/30 border border-red-900/30"
               >
                 <div>
-                  <p className="text-sm text-white font-medium">{alert.message}</p>
+                  <p className={`text-sm ${theme.colors.text.primary} font-medium`}>
+                    {alert.message}
+                  </p>
                   <p className="text-xs text-red-400 mt-0.5">{alert.suggestion}</p>
                 </div>
-                <span className="text-xs text-gray-500 font-mono whitespace-nowrap ml-4">
+                <span
+                  className={`text-xs ${theme.colors.text.muted} font-mono whitespace-nowrap ml-4`}
+                >
                   {new Date(alert.timestamp).toLocaleString()}
                 </span>
               </div>
@@ -361,28 +371,28 @@ function OverviewTab({
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <button
           onClick={() => onSwitchTab("alerts")}
-          className="flex items-center gap-3 p-4 rounded-xl border border-gray-800 hover:border-teal-700 hover:bg-teal-950/20 transition-all group text-left"
+          className={`flex items-center gap-3 p-4 rounded-xl border ${theme.colors.border} hover:border-teal-700 hover:bg-teal-950/20 transition-all group text-left`}
         >
           <div className="w-10 h-10 rounded-lg bg-teal-900/30 flex items-center justify-center group-hover:bg-teal-900/50 transition">
             <AlertTriangle className="w-5 h-5 text-teal-400" />
           </div>
           <div>
-            <p className="font-medium text-white text-sm">Review Alerts</p>
-            <p className="text-xs text-gray-500">
+            <p className={`font-medium ${theme.colors.text.primary} text-sm`}>Review Alerts</p>
+            <p className={`text-xs ${theme.colors.text.secondary}`}>
               {alerts.length} alert{alerts.length !== 1 ? "s" : ""} need your attention
             </p>
           </div>
         </button>
         <button
           onClick={() => onSwitchTab("clients")}
-          className="flex items-center gap-3 p-4 rounded-xl border border-gray-800 hover:border-purple-700 hover:bg-purple-950/20 transition-all group text-left"
+          className={`flex items-center gap-3 p-4 rounded-xl border ${theme.colors.border} hover:border-purple-700 hover:bg-purple-950/20 transition-all group text-left`}
         >
           <div className="w-10 h-10 rounded-lg bg-purple-900/30 flex items-center justify-center group-hover:bg-purple-900/50 transition">
             <Users className="w-5 h-5 text-purple-400" />
           </div>
           <div>
-            <p className="font-medium text-white text-sm">View Caseload</p>
-            <p className="text-xs text-gray-500">
+            <p className={`font-medium ${theme.colors.text.primary} text-sm`}>View Caseload</p>
+            <p className={`text-xs ${theme.colors.text.secondary}`}>
               {clients.length} client{clients.length !== 1 ? "s" : ""} in your caseload
             </p>
           </div>
@@ -390,14 +400,16 @@ function OverviewTab({
       </div>
 
       {/* Recent Activity Feed */}
-      <div className="rounded-xl border border-gray-800 bg-gray-900/50">
-        <div className="px-5 py-4 border-b border-gray-800">
-          <h3 className="text-sm font-bold text-gray-300 uppercase tracking-wider flex items-center gap-2">
+      <div className={`rounded-xl border ${theme.colors.border} bg-black/20`}>
+        <div className={`px-5 py-4 border-b ${theme.colors.border}`}>
+          <h3
+            className={`text-sm font-bold ${theme.colors.text.secondary} uppercase tracking-wider flex items-center gap-2`}
+          >
             <Clock className="w-4 h-4" />
             Recent Activity
           </h3>
         </div>
-        <div className="divide-y divide-gray-800">
+        <div className={`divide-y divide-black/20`}>
           {alerts.slice(0, 8).map((alert) => (
             <div key={alert.id} className="px-5 py-3 flex items-center gap-3">
               <div
@@ -409,14 +421,18 @@ function OverviewTab({
                       : "bg-yellow-500"
                 }`}
               />
-              <p className="text-sm text-gray-300 flex-1 truncate">{alert.message}</p>
-              <span className="text-xs text-gray-600 font-mono whitespace-nowrap">
+              <p className={`text-sm ${theme.colors.text.secondary} flex-1 truncate`}>
+                {alert.message}
+              </p>
+              <span className={`text-xs ${theme.colors.text.muted} font-mono whitespace-nowrap`}>
                 {new Date(alert.timestamp).toLocaleTimeString()}
               </span>
             </div>
           ))}
           {alerts.length === 0 && (
-            <div className="px-5 py-8 text-center text-gray-600 text-sm">No recent activity</div>
+            <div className={`px-5 py-8 text-center ${theme.colors.text.muted} text-sm`}>
+              No recent activity
+            </div>
           )}
         </div>
       </div>
@@ -438,13 +454,16 @@ function StatCard({
   value: number;
   accent: string;
 }) {
+  const theme = useAdminTheme();
   return (
-    <div className="rounded-xl border border-gray-800 bg-gray-900/50 p-5">
+    <div className={`rounded-xl border ${theme.colors.border} bg-black/20 p-5`}>
       <div className="flex items-center gap-3 mb-3">
         {icon}
-        <span className="text-xs font-medium text-gray-500 uppercase tracking-wider">{label}</span>
+        <span className={`text-xs font-medium ${theme.colors.text.muted} uppercase tracking-wider`}>
+          {label}
+        </span>
       </div>
-      <p className="text-3xl font-bold text-white">{value}</p>
+      <p className={`text-3xl font-bold ${theme.colors.text.primary}`}>{value}</p>
     </div>
   );
 }
@@ -465,24 +484,27 @@ function ClientsTab({
   onSelectClient: (client: ClientSummary) => void;
   alerts: ClinicalAlertItem[];
 }) {
+  const theme = useAdminTheme();
   return (
     <div className="space-y-4">
       {/* Search */}
       <div className="relative">
-        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500" />
+        <Search
+          className={`absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 ${theme.colors.text.muted}`}
+        />
         <input
           type="text"
           placeholder="Search clients by name or email..."
           value={searchQuery}
           onChange={(e) => onSearchChange(e.target.value)}
-          className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-gray-900 border border-gray-800 text-white text-sm placeholder-gray-600 focus:outline-none focus:border-teal-600 transition"
+          className={`w-full pl-10 pr-4 py-2.5 rounded-xl bg-black/20 border ${theme.colors.border} ${theme.colors.text.primary} text-sm placeholder-gray-600 focus:outline-none focus:border-teal-600 transition`}
         />
         {searchQuery && (
           <button
             onClick={() => onSearchChange("")}
             className="absolute right-3 top-1/2 -translate-y-1/2"
           >
-            <X className="w-4 h-4 text-gray-500 hover:text-gray-300" />
+            <X className={`w-4 h-4 ${theme.colors.text.muted} ${theme.colors.hover}`} />
           </button>
         )}
       </div>
@@ -501,20 +523,22 @@ function ClientsTab({
                 <User className="w-5 h-5 text-white" />
               </div>
               <div className="flex-1 min-w-0">
-                <p className="font-medium text-white text-sm truncate">
+                <p className={`font-medium ${theme.colors.text.primary} text-sm truncate`}>
                   {client.full_name || "Unknown"}
                 </p>
-                <p className="text-xs text-gray-500 truncate">{client.email}</p>
+                <p className={`text-xs ${theme.colors.text.secondary} truncate`}>{client.email}</p>
               </div>
               <span
                 className={`px-2 py-0.5 rounded-full text-xs font-medium ${
-                  client.is_active ? "bg-green-900/30 text-green-400" : "bg-gray-800 text-gray-500"
+                  client.is_active
+                    ? "bg-green-900/30 text-green-400"
+                    : `bg-black/40 ${theme.colors.text.muted}`
                 }`}
               >
                 {client.is_active ? "Active" : "Inactive"}
               </span>
             </div>
-            <div className="mt-3 flex items-center gap-4 text-xs text-gray-500">
+            <div className={`mt-3 flex items-center gap-4 text-xs ${theme.colors.text.muted}`}>
               <span className="flex items-center gap-1">
                 <Clock className="w-3 h-3" />
                 Joined {new Date(client.created_at).toLocaleDateString()}
@@ -525,7 +549,7 @@ function ClientsTab({
       </div>
 
       {clients.length === 0 && (
-        <div className="text-center py-16 text-gray-600">
+        <div className={`text-center py-16 ${theme.colors.text.muted}`}>
           <Users className="w-12 h-12 mx-auto mb-3 opacity-30" />
           <p className="text-sm">
             {searchQuery ? "No clients match your search" : "No clients assigned"}
@@ -555,6 +579,7 @@ function ClientDetailView({
   onClose: () => void;
   alerts: ClinicalAlertItem[];
 }) {
+  const theme = useAdminTheme();
   const [detailTab, setDetailTab] = useState<"sessions" | "trajectory" | "alerts" | "notes">(
     "sessions"
   );
@@ -585,49 +610,53 @@ function ClientDetailView({
       <div className="flex items-center gap-3">
         <button
           onClick={onClose}
-          className="p-2 rounded-lg border border-gray-700 hover:bg-gray-800 transition"
+          className={`p-2 rounded-lg border ${theme.colors.border} ${theme.colors.hover} bg-black/10 transition`}
           aria-label="Back to client list"
         >
-          <ChevronLeft className="w-4 h-4 text-gray-400" />
+          <ChevronLeft className={`w-4 h-4 ${theme.colors.text.secondary}`} />
         </button>
         <div className="flex items-center gap-3 flex-1">
           <div className="w-12 h-12 rounded-full bg-gradient-to-br from-purple-600 to-pink-600 flex items-center justify-center">
             <User className="w-6 h-6 text-white" />
           </div>
           <div>
-            <h2 className="text-lg font-bold text-white">{client.full_name || "Unknown Client"}</h2>
-            <p className="text-sm text-gray-500">{client.email}</p>
+            <h2 className={`text-lg font-bold ${theme.colors.text.primary}`}>
+              {client.full_name || "Unknown Client"}
+            </h2>
+            <p className={`text-sm ${theme.colors.text.secondary}`}>{client.email}</p>
           </div>
         </div>
       </div>
 
       {/* Stats row */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-        <div className="rounded-lg border border-gray-800 bg-gray-900/50 p-3 text-center">
-          <p className="text-2xl font-bold text-white">{sessions.length}</p>
-          <p className="text-xs text-gray-500">Sessions</p>
+        <div className={`rounded-lg border ${theme.colors.border} bg-black/20 p-3 text-center`}>
+          <p className={`text-2xl font-bold ${theme.colors.text.primary}`}>{sessions.length}</p>
+          <p className={`text-xs ${theme.colors.text.muted}`}>Sessions</p>
         </div>
-        <div className="rounded-lg border border-gray-800 bg-gray-900/50 p-3 text-center">
-          <p className="text-2xl font-bold text-white">{trajectory.length}</p>
-          <p className="text-xs text-gray-500">Data Points</p>
+        <div className={`rounded-lg border ${theme.colors.border} bg-black/20 p-3 text-center`}>
+          <p className={`text-2xl font-bold ${theme.colors.text.primary}`}>{trajectory.length}</p>
+          <p className={`text-xs ${theme.colors.text.muted}`}>Data Points</p>
         </div>
-        <div className="rounded-lg border border-gray-800 bg-gray-900/50 p-3 text-center">
-          <p className="text-2xl font-bold text-white">{latestEmotion?.emotion_name || "—"}</p>
-          <p className="text-xs text-gray-500">Latest Emotion</p>
+        <div className={`rounded-lg border ${theme.colors.border} bg-black/20 p-3 text-center`}>
+          <p className={`text-2xl font-bold ${theme.colors.text.primary}`}>
+            {latestEmotion?.emotion_name || "—"}
+          </p>
+          <p className={`text-xs ${theme.colors.text.muted}`}>Latest Emotion</p>
         </div>
-        <div className="rounded-lg border border-gray-800 bg-gray-900/50 p-3 text-center">
+        <div className={`rounded-lg border ${theme.colors.border} bg-black/20 p-3 text-center`}>
           <p
             className={`text-2xl font-bold ${avgValence >= 0 ? "text-green-400" : "text-red-400"}`}
           >
             {avgValence.toFixed(2)}
           </p>
-          <p className="text-xs text-gray-500">Avg. Valence</p>
+          <p className={`text-xs ${theme.colors.text.muted}`}>Avg. Valence</p>
         </div>
       </div>
 
       {/* Detail tabs */}
       <div
-        className="flex gap-1 border-b border-gray-800"
+        className={`flex gap-1 border-b ${theme.colors.border}`}
         role="tablist"
         aria-label="Client detail tabs"
       >
@@ -645,20 +674,22 @@ function ClientDetailView({
             data-testid={`client-detail-tab-${tab.id}`}
             className={`px-4 py-2 text-sm font-medium border-b-2 transition flex items-center gap-1.5 ${
               detailTab === tab.id
-                ? "border-teal-500 text-teal-400"
-                : "border-transparent text-gray-500 hover:text-gray-300"
+                ? `${theme.colors.primary.replace("text-", "border-")} ${theme.colors.primary}`
+                : `border-transparent ${theme.colors.text.muted} ${theme.colors.hover}`
             }`}
           >
             {tab.id === "notes" && <StickyNote className="w-3.5 h-3.5" />}
             {tab.label}
-            {tab.count !== null && <span className="text-xs text-gray-600">({tab.count})</span>}
+            {tab.count !== null && (
+              <span className={`text-xs ${theme.colors.text.muted}`}>({tab.count})</span>
+            )}
           </button>
         ))}
       </div>
 
       {loading ? (
         <div className="flex items-center justify-center py-16">
-          <RefreshCw className="w-6 h-6 text-gray-600 animate-spin" />
+          <RefreshCw className={`w-6 h-6 ${theme.colors.text.secondary} animate-spin`} />
         </div>
       ) : (
         <>
@@ -667,7 +698,7 @@ function ClientDetailView({
           {detailTab === "alerts" && (
             <div className="space-y-3">
               {alerts.length === 0 ? (
-                <div className="text-center py-12 text-gray-600">
+                <div className={`text-center py-12 ${theme.colors.text.muted}`}>
                   <Shield className="w-10 h-10 mx-auto mb-3 opacity-30" />
                   <p className="text-sm">No alerts for this client</p>
                 </div>
@@ -707,9 +738,10 @@ function ClientDetailView({
 // ---------------------------------------------------------------------------
 
 function SessionsList({ sessions }: { sessions: ClientSession[] }) {
+  const theme = useAdminTheme();
   if (sessions.length === 0) {
     return (
-      <div className="text-center py-12 text-gray-600">
+      <div className={`text-center py-12 ${theme.colors.text.muted}`}>
         <Clock className="w-10 h-10 mx-auto mb-3 opacity-30" />
         <p className="text-sm">No sessions found</p>
       </div>
@@ -721,13 +753,13 @@ function SessionsList({ sessions }: { sessions: ClientSession[] }) {
       {sessions.map((session) => (
         <div
           key={session.id}
-          className="p-4 rounded-lg border border-gray-800 bg-gray-900/50 flex items-center justify-between"
+          className={`p-4 rounded-lg border ${theme.colors.border} bg-black/20 flex items-center justify-between`}
         >
           <div>
-            <p className="text-sm text-white font-medium">
+            <p className={`text-sm ${theme.colors.text.primary} font-medium`}>
               Session on {new Date(session.started_at).toLocaleDateString()}
             </p>
-            <div className="flex items-center gap-4 mt-1 text-xs text-gray-500">
+            <div className={`flex items-center gap-4 mt-1 text-xs ${theme.colors.text.muted}`}>
               <span>{session.message_count} messages</span>
               <span>
                 {session.ended_at
@@ -737,7 +769,9 @@ function SessionsList({ sessions }: { sessions: ClientSession[] }) {
               <span className="capitalize">Tone: {session.tone_preference}</span>
             </div>
           </div>
-          <div className="text-xs text-gray-600 font-mono">{session.id.slice(0, 8)}...</div>
+          <div className={`text-xs ${theme.colors.text.muted} font-mono`}>
+            {session.id.slice(0, 8)}...
+          </div>
         </div>
       ))}
     </div>
@@ -749,9 +783,10 @@ function SessionsList({ sessions }: { sessions: ClientSession[] }) {
 // ---------------------------------------------------------------------------
 
 function TrajectoryView({ trajectory }: { trajectory: TrajectoryPoint[] }) {
+  const theme = useAdminTheme();
   if (trajectory.length === 0) {
     return (
-      <div className="text-center py-12 text-gray-600">
+      <div className={`text-center py-12 ${theme.colors.text.muted}`}>
         <TrendingUp className="w-10 h-10 mx-auto mb-3 opacity-30" />
         <p className="text-sm">No trajectory data yet</p>
       </div>
@@ -769,8 +804,10 @@ function TrajectoryView({ trajectory }: { trajectory: TrajectoryPoint[] }) {
   return (
     <div className="space-y-6">
       {/* Category distribution */}
-      <div className="rounded-xl border border-gray-800 bg-gray-900/50 p-5">
-        <h4 className="text-sm font-bold text-gray-400 uppercase tracking-wider mb-4">
+      <div className={`rounded-xl border ${theme.colors.border} bg-black/20 p-5`}>
+        <h4
+          className={`text-sm font-bold ${theme.colors.text.muted} uppercase tracking-wider mb-4`}
+        >
           Emotion Category Distribution
         </h4>
         <div className="space-y-2">
@@ -778,14 +815,20 @@ function TrajectoryView({ trajectory }: { trajectory: TrajectoryPoint[] }) {
             const pct = (count / trajectory.length) * 100;
             return (
               <div key={category} className="flex items-center gap-3">
-                <span className="text-xs text-gray-400 w-40 truncate">{category}</span>
-                <div className="flex-1 h-2 rounded-full bg-gray-800 overflow-hidden">
+                <span className={`text-xs ${theme.colors.text.secondary} w-40 truncate`}>
+                  {category}
+                </span>
+                <div
+                  className={`flex-1 h-2 rounded-full ${theme.colors.border.replace("border", "bg")} overflow-hidden`}
+                >
                   <div
                     className="h-full rounded-full bg-gradient-to-r from-teal-600 to-cyan-500 transition-all"
                     style={{ width: `${pct}%` }}
                   />
                 </div>
-                <span className="text-xs text-gray-500 w-12 text-right">{pct.toFixed(0)}%</span>
+                <span className={`text-xs ${theme.colors.text.muted} w-12 text-right`}>
+                  {pct.toFixed(0)}%
+                </span>
               </div>
             );
           })}
@@ -793,15 +836,17 @@ function TrajectoryView({ trajectory }: { trajectory: TrajectoryPoint[] }) {
       </div>
 
       {/* VAC timeline mini-chart */}
-      <div className="rounded-xl border border-gray-800 bg-gray-900/50 p-5">
-        <h4 className="text-sm font-bold text-gray-400 uppercase tracking-wider mb-4">
+      <div className={`rounded-xl border ${theme.colors.border} bg-black/20 p-5`}>
+        <h4
+          className={`text-sm font-bold ${theme.colors.text.muted} uppercase tracking-wider mb-4`}
+        >
           Recent Emotional States
         </h4>
         <div className="space-y-1 max-h-80 overflow-y-auto">
           {trajectory.slice(0, 20).map((point) => (
             <div
               key={point.id}
-              className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-800/50 transition"
+              className={`flex items-center gap-3 px-3 py-2 rounded-lg ${theme.colors.hover} transition`}
             >
               <Heart
                 className="w-3 h-3 flex-shrink-0"
@@ -809,14 +854,14 @@ function TrajectoryView({ trajectory }: { trajectory: TrajectoryPoint[] }) {
                   color: (point.valence ?? 0) >= 0 ? "#4ade80" : "#f87171",
                 }}
               />
-              <span className="text-sm text-white flex-1 truncate">
+              <span className={`text-sm ${theme.colors.text.primary} flex-1 truncate`}>
                 {point.emotion_name || "Unknown"}
               </span>
-              <span className="text-xs text-gray-600 font-mono">
+              <span className={`text-xs ${theme.colors.text.muted} font-mono`}>
                 V:{(point.valence ?? 0).toFixed(1)} A:{(point.arousal ?? 0).toFixed(1)} C:
                 {(point.connection ?? 0).toFixed(1)}
               </span>
-              <span className="text-xs text-gray-600 whitespace-nowrap">
+              <span className={`text-xs ${theme.colors.text.muted} whitespace-nowrap`}>
                 {new Date(point.timestamp).toLocaleDateString()}
               </span>
             </div>
@@ -844,12 +889,15 @@ function ClinicalNotesTab({
   saved: boolean;
   clientName: string;
 }) {
+  const theme = useAdminTheme();
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
           <FileText className="w-4 h-4 text-teal-400" />
-          <h3 className="text-sm font-bold text-gray-300 uppercase tracking-wider">
+          <h3
+            className={`text-sm font-bold ${theme.colors.text.secondary} uppercase tracking-wider`}
+          >
             Clinical Notes — {clientName}
           </h3>
         </div>
@@ -872,11 +920,11 @@ function ClinicalNotesTab({
         value={notes}
         onChange={(e) => onNotesChange(e.target.value)}
         placeholder="Add clinical observations, treatment notes, or follow-up actions for this client..."
-        className="w-full h-64 p-4 rounded-xl bg-gray-900 border border-gray-800 text-white text-sm placeholder-gray-600 focus:outline-none focus:border-teal-600 transition resize-y font-mono leading-relaxed"
+        className={`w-full h-64 p-4 rounded-xl bg-black/20 border ${theme.colors.border} ${theme.colors.text.primary} text-sm placeholder-gray-600 focus:outline-none focus:border-teal-600 transition resize-y font-mono leading-relaxed`}
         aria-label={`Clinical notes for ${clientName}`}
       />
 
-      <p className="text-xs text-gray-600 flex items-center gap-1.5">
+      <p className={`text-xs ${theme.colors.text.muted} flex items-center gap-1.5`}>
         <StickyNote className="w-3 h-3" />
         Notes are saved locally. They will sync to the server once the clinical notes backend is
         connected.
@@ -890,19 +938,20 @@ function ClinicalNotesTab({
 // ---------------------------------------------------------------------------
 
 function AlertCard({ alert }: { alert: ClinicalAlertItem }) {
+  const theme = useAdminTheme();
   const [acknowledged, setAcknowledged] = useState(false);
 
   const severityStyles = {
     critical: "border-red-800 bg-red-950/20",
     warning: "border-orange-800 bg-orange-950/20",
     attention: "border-yellow-800 bg-yellow-950/20",
-    stable: "border-gray-800 bg-gray-900/50",
+    stable: `${theme.colors.border.replace("border-", "")} bg-black/20`,
   };
   const levelColors = {
     critical: "text-red-400 bg-red-900/30",
     warning: "text-orange-400 bg-orange-900/30",
     attention: "text-yellow-400 bg-yellow-900/30",
-    stable: "text-gray-400 bg-gray-800",
+    stable: `${theme.colors.text.secondary.replace("text-", "")} bg-black/40`,
   };
 
   const handleAcknowledge = () => {
@@ -929,13 +978,13 @@ function AlertCard({ alert }: { alert: ClinicalAlertItem }) {
           )}
         </div>
         <div className="flex items-center gap-2">
-          <span className="text-xs text-gray-600 font-mono">
+          <span className={`text-xs ${theme.colors.text.muted} font-mono`}>
             {new Date(alert.timestamp).toLocaleString()}
           </span>
           {!acknowledged && (
             <button
               onClick={handleAcknowledge}
-              className="text-xs px-2 py-1 rounded border border-gray-700 text-gray-400 hover:bg-gray-800 hover:text-white transition-colors"
+              className={`text-xs px-2 py-1 rounded border ${theme.colors.border} ${theme.colors.text.secondary} ${theme.colors.hover} transition-colors`}
               title="Mark as reviewed"
             >
               Acknowledge
@@ -943,8 +992,10 @@ function AlertCard({ alert }: { alert: ClinicalAlertItem }) {
           )}
         </div>
       </div>
-      <p className="text-sm text-white font-medium">{alert.message}</p>
-      {alert.suggestion && <p className="text-xs text-gray-400 mt-1">{alert.suggestion}</p>}
+      <p className={`text-sm ${theme.colors.text.primary} font-medium`}>{alert.message}</p>
+      {alert.suggestion && (
+        <p className={`text-xs ${theme.colors.text.secondary} mt-1`}>{alert.suggestion}</p>
+      )}
     </div>
   );
 }
@@ -964,20 +1015,23 @@ function AlertsTab({
   onFilterChange: (level: string) => void;
   allAlerts: ClinicalAlertItem[];
 }) {
+  const theme = useAdminTheme();
   return (
     <div className="space-y-4">
       {/* Header */}
       <div className="flex items-center justify-between">
-        <h2 className="text-lg font-bold text-white flex items-center gap-2">
+        <h2 className={`text-lg font-bold ${theme.colors.text.primary} flex items-center gap-2`}>
           <AlertTriangle className="w-5 h-5 text-red-400" />
           Clinical Risk Alerts
         </h2>
-        <div className="flex items-center gap-2 rounded-lg px-3 py-1.5 bg-gray-900 border border-gray-800">
-          <Filter className="w-4 h-4 text-gray-500" />
+        <div
+          className={`flex items-center gap-2 rounded-lg px-3 py-1.5 bg-black/20 border ${theme.colors.border}`}
+        >
+          <Filter className={`w-4 h-4 ${theme.colors.text.muted}`} />
           <select
             value={filterLevel}
             onChange={(e) => onFilterChange(e.target.value)}
-            className="bg-transparent text-sm text-white outline-none border-none"
+            className={`bg-transparent text-sm ${theme.colors.text.primary} outline-none border-none`}
           >
             <option value="all">All Severities</option>
             <option value="critical">Critical</option>
@@ -1019,7 +1073,7 @@ function AlertsTab({
           <AlertCard key={alert.id} alert={alert} />
         ))}
         {alerts.length === 0 && (
-          <div className="text-center py-12 text-gray-600">
+          <div className={`text-center py-12 ${theme.colors.text.muted}`}>
             <Shield className="w-10 h-10 mx-auto mb-3 opacity-30" />
             <p className="text-sm">No alerts matching your filter</p>
           </div>
@@ -1042,6 +1096,7 @@ function AnalyticsTab({
   alerts: ClinicalAlertItem[];
   alertSummary: AlertSummary | null;
 }) {
+  const theme = useAdminTheme();
   // Compute analytics from available data
   const activeClients = clients.filter((c) => c.is_active).length;
   const inactiveClients = clients.length - activeClients;
@@ -1082,28 +1137,38 @@ function AnalyticsTab({
     <div className="space-y-6">
       {/* Caseload Health */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <div className="rounded-xl border border-gray-800 bg-gray-900/50 p-5">
-          <h4 className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-3">
+        <div className={`rounded-xl border ${theme.colors.border} bg-black/20 p-5`}>
+          <h4
+            className={`text-xs font-bold ${theme.colors.text.muted} uppercase tracking-wider mb-3`}
+          >
             Caseload Status
           </h4>
           <div className="flex items-center gap-4">
             <div className="flex-1">
               <div className="flex items-center gap-2 mb-2">
                 <div className="w-3 h-3 rounded-full bg-green-500" />
-                <span className="text-sm text-gray-300">Active</span>
-                <span className="ml-auto font-bold text-white">{activeClients}</span>
+                <span className={`text-sm ${theme.colors.text.secondary}`}>Active</span>
+                <span className={`ml-auto font-bold ${theme.colors.text.primary}`}>
+                  {activeClients}
+                </span>
               </div>
               <div className="flex items-center gap-2">
-                <div className="w-3 h-3 rounded-full bg-gray-600" />
-                <span className="text-sm text-gray-300">Inactive</span>
-                <span className="ml-auto font-bold text-white">{inactiveClients}</span>
+                <div
+                  className={`w-3 h-3 rounded-full ${theme.colors.text.muted.replace("text-", "bg-")}`}
+                />
+                <span className={`text-sm ${theme.colors.text.secondary}`}>Inactive</span>
+                <span className={`ml-auto font-bold ${theme.colors.text.primary}`}>
+                  {inactiveClients}
+                </span>
               </div>
             </div>
           </div>
         </div>
 
-        <div className="rounded-xl border border-gray-800 bg-gray-900/50 p-5">
-          <h4 className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-3">
+        <div className={`rounded-xl border ${theme.colors.border} bg-black/20 p-5`}>
+          <h4
+            className={`text-xs font-bold ${theme.colors.text.muted} uppercase tracking-wider mb-3`}
+          >
             Alert Severity Breakdown
           </h4>
           <div className="space-y-2">
@@ -1118,9 +1183,11 @@ function AnalyticsTab({
               return (
                 <div key={level} className="flex items-center gap-2">
                   <div className={`w-3 h-3 rounded-full ${colors[level] || "bg-gray-600"}`} />
-                  <span className="text-sm text-gray-300 capitalize flex-1">{level}</span>
-                  <span className="text-xs font-mono text-gray-500">{count}</span>
-                  <div className="w-16 h-1.5 rounded-full bg-gray-800 overflow-hidden">
+                  <span className={`text-sm ${theme.colors.text.secondary} capitalize flex-1`}>
+                    {level}
+                  </span>
+                  <span className={`text-xs font-mono ${theme.colors.text.muted}`}>{count}</span>
+                  <div className="w-16 h-1.5 rounded-full bg-black/40 overflow-hidden">
                     <div
                       className={`h-full rounded-full ${colors[level] || "bg-gray-600"}`}
                       style={{ width: `${(count / totalAlerts) * 100}%` }}
@@ -1132,36 +1199,42 @@ function AnalyticsTab({
           </div>
         </div>
 
-        <div className="rounded-xl border border-gray-800 bg-gray-900/50 p-5">
-          <h4 className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-3">
+        <div className={`rounded-xl border ${theme.colors.border} bg-black/20 p-5`}>
+          <h4
+            className={`text-xs font-bold ${theme.colors.text.muted} uppercase tracking-wider mb-3`}
+          >
             Alert Types
           </h4>
           <div className="space-y-2">
             {sortedAlertTypes.slice(0, 5).map(([type, count]) => (
               <div key={type} className="flex items-center gap-2">
-                <span className="text-sm text-gray-300 flex-1 truncate capitalize">
+                <span
+                  className={`text-sm ${theme.colors.text.secondary} flex-1 truncate capitalize`}
+                >
                   {type.replace(/_/g, " ")}
                 </span>
-                <span className="text-xs font-mono text-gray-500">{count}</span>
+                <span className={`text-xs font-mono ${theme.colors.text.muted}`}>{count}</span>
               </div>
             ))}
             {sortedAlertTypes.length === 0 && (
-              <p className="text-xs text-gray-600">No alert data</p>
+              <p className={`text-xs ${theme.colors.text.muted}`}>No alert data</p>
             )}
           </div>
         </div>
       </div>
 
       {/* Weekly Activity Chart */}
-      <div className="rounded-xl border border-gray-800 bg-gray-900/50 p-5">
-        <h4 className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-4">
+      <div className={`rounded-xl border ${theme.colors.border} bg-black/20 p-5`}>
+        <h4
+          className={`text-xs font-bold ${theme.colors.text.muted} uppercase tracking-wider mb-4`}
+        >
           Alerts — Last 7 Days
         </h4>
         <div className="flex items-end gap-2 h-32">
           {weeklyAlerts.map((day) => (
             <div key={day.day} className="flex-1 flex flex-col items-center gap-1">
-              <span className="text-xs text-gray-500 font-mono">{day.count}</span>
-              <div className="w-full rounded-t-md bg-gray-800 relative" style={{ height: "100%" }}>
+              <span className={`text-xs ${theme.colors.text.muted} font-mono`}>{day.count}</span>
+              <div className="w-full rounded-t-md bg-black/20 relative" style={{ height: "100%" }}>
                 <div
                   className="absolute bottom-0 left-0 right-0 rounded-t-md bg-gradient-to-t from-teal-600 to-cyan-500 transition-all"
                   style={{
@@ -1170,7 +1243,7 @@ function AnalyticsTab({
                   }}
                 />
               </div>
-              <span className="text-xs text-gray-600">{day.day}</span>
+              <span className={`text-xs ${theme.colors.text.muted}`}>{day.day}</span>
             </div>
           ))}
         </div>

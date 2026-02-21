@@ -25,7 +25,7 @@ describe("EmotionsTab", () => {
       definition: "A feeling of great pleasure.",
       vac_vector: [0.8, 0.5, 0.2],
       haptic_pattern_id: "h1",
-      color_hint: "#FF0000",
+      color_hint: "#E11D48",
     },
     {
       id: "e2",

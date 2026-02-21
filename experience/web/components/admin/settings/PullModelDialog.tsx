@@ -14,6 +14,7 @@ import { useState, useEffect, useMemo, useCallback } from "react";
 import type { PullProgress } from "@/hooks/useOllamaModels";
 import type { ModelInfo } from "@/hooks/useOllamaModels";
 import { searchOllamaModels } from "@/utils/ollamaModels";
+import { useAdminTheme } from "@/hooks/admin/useAdminTheme";
 
 interface PullModelDialogProps {
   isOpen: boolean;
@@ -30,6 +31,7 @@ export function PullModelDialog({
   pullProgress,
   localModels,
 }: PullModelDialogProps) {
+  const theme = useAdminTheme();
   const [modelName, setModelName] = useState("");
   const [isPulling, setIsPulling] = useState(false);
   const [pullStartTime, setPullStartTime] = useState<number | null>(null);
@@ -173,18 +175,27 @@ export function PullModelDialog({
   const statusDisplay = currentPull ? getStatusDisplayInfo(displayStatus) : null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm">
-      <div className="bg-gray-900 rounded-lg p-6 max-w-lg w-full mx-4 border border-cyan-500/50">
+    <div
+      className={`fixed inset-0 z-50 flex items-center justify-center ${theme.effects.backdropBlur} ${theme.effects.glass}`}
+    >
+      <div
+        className={`${theme.colors.background} ${theme.layout.borderRadius} p-6 max-w-lg w-full mx-4 border ${theme.colors.border}`}
+      >
         <div className="flex items-center justify-between mb-4">
-          <h2 className="text-xl font-bold text-white">Pull New Model</h2>
-          <button onClick={handleClose} className="text-gray-400 hover:text-white transition">
+          <h2 className={`text-xl font-bold ${theme.colors.text.primary}`}>Pull New Model</h2>
+          <button
+            onClick={handleClose}
+            className={`${theme.colors.text.muted} hover:${theme.colors.text.primary} transition`}
+          >
             ✕
           </button>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="relative">
-            <label className="block text-sm font-medium text-gray-300 mb-2">Model Name</label>
+            <label className={`block text-sm font-medium ${theme.colors.text.secondary} mb-2`}>
+              Model Name
+            </label>
             <input
               type="text"
               value={modelName}
@@ -198,13 +209,15 @@ export function PullModelDialog({
                 setTimeout(() => setShowSuggestions(false), 200);
               }}
               placeholder="Type to search models (e.g., mix, phi, llama)..."
-              className="w-full bg-gray-800 border border-gray-600 rounded px-3 py-2 text-white text-sm"
+              className={`w-full bg-black/20 border ${theme.colors.border} focus:border-cyan-500 rounded px-3 py-2 ${theme.colors.text.primary} text-sm`}
               disabled={isDownloading}
             />
 
             {/* Autocomplete Dropdown */}
             {showSuggestions && suggestions.length > 0 && !isDownloading && (
-              <div className="absolute z-10 w-full mt-1 bg-gray-800 border border-cyan-500/50 rounded-lg shadow-lg max-h-64 overflow-y-auto">
+              <div
+                className={`absolute z-10 w-full mt-1 ${theme.colors.background} border ${theme.colors.border} rounded-lg shadow-lg max-h-64 overflow-y-auto`}
+              >
                 {suggestions.map((suggestion) => (
                   <button
                     key={suggestion.name}
@@ -213,14 +226,14 @@ export function PullModelDialog({
                       e.preventDefault(); // Prevent onBlur from hiding dropdown
                       handleSelectSuggestion(suggestion.name);
                     }}
-                    className="w-full text-left px-4 py-3 hover:bg-cyan-900/30 transition border-b border-gray-700 last:border-b-0"
+                    className={`w-full text-left px-4 py-3 hover:bg-black/20 transition border-b ${theme.colors.border} last:border-b-0`}
                   >
                     <div className="flex items-start justify-between gap-2">
                       <div className="flex-1 min-w-0">
-                        <div className="font-mono text-cyan-400 text-sm mb-0.5">
+                        <div className={`font-mono ${theme.colors.primary} text-sm mb-0.5`}>
                           {suggestion.name}
                         </div>
-                        <div className="text-xs text-gray-400 line-clamp-1">
+                        <div className={`text-xs ${theme.colors.text.secondary} line-clamp-1`}>
                           {suggestion.description}
                         </div>
                         {suggestion.recommended_for && suggestion.recommended_for.length > 0 && (
@@ -236,7 +249,9 @@ export function PullModelDialog({
                           </div>
                         )}
                       </div>
-                      <div className="text-xs text-gray-500 whitespace-nowrap flex-shrink-0">
+                      <div
+                        className={`text-xs ${theme.colors.text.muted} whitespace-nowrap flex-shrink-0`}
+                      >
                         {suggestion.size}
                       </div>
                     </div>
@@ -245,7 +260,7 @@ export function PullModelDialog({
               </div>
             )}
 
-            <p className="text-xs text-gray-500 mt-1">
+            <p className={`text-xs ${theme.colors.text.muted} mt-1`}>
               💡 Start typing to see suggestions, or enter any Ollama model name
             </p>
           </div>
@@ -262,14 +277,16 @@ export function PullModelDialog({
 
           {/* Progress Display */}
           {(currentPull || (isPulling && modelExists)) && (
-            <div className="bg-gray-800 rounded-lg p-4 border border-gray-700">
+            <div className={`bg-black/20 rounded-lg p-4 border ${theme.colors.border}`}>
               {/* Model already installed path */}
               {isPulling && modelExists && !currentPull && (
                 <div>
                   <div className="text-center py-3">
                     <div className="text-3xl mb-2">✅</div>
                     <div className="text-green-400 font-medium mb-1">Already Installed!</div>
-                    <div className="text-sm text-gray-400">{modelName} is ready to use</div>
+                    <div className={`text-sm ${theme.colors.text.secondary}`}>
+                      {modelName} is ready to use
+                    </div>
                   </div>
                 </div>
               )}
@@ -309,9 +326,9 @@ export function PullModelDialog({
                       currentPull.completed !== undefined &&
                       currentPull.percent &&
                       currentPull.percent > 0 && (
-                        <div className="w-full bg-gray-700 rounded-full h-2.5 overflow-hidden">
+                        <div className={`w-full bg-black/40 rounded-full h-2.5 overflow-hidden`}>
                           <div
-                            className="bg-gradient-to-r from-cyan-500 to-blue-500 h-full transition-all duration-500 ease-out"
+                            className={`h-full transition-all duration-500 ease-out bg-cyan-500`}
                             style={{ width: `${currentPull.percent}%` }}
                           />
                         </div>
@@ -322,7 +339,7 @@ export function PullModelDialog({
                   {currentPull.total &&
                     currentPull.completed !== undefined &&
                     currentPull.completed > 0 && (
-                      <div className="text-xs text-gray-400 space-y-1 mb-3">
+                      <div className={`text-xs ${theme.colors.text.secondary} space-y-1 mb-3`}>
                         <div className="flex justify-between">
                           <span>Downloaded:</span>
                           <span className="font-mono">
@@ -346,7 +363,9 @@ export function PullModelDialog({
                       <div className="text-center">
                         <div className="text-2xl mb-1">✅</div>
                         <div className="text-green-400 font-medium text-sm">Model ready!</div>
-                        <div className="text-xs text-gray-400 mt-1">Closing automatically...</div>
+                        <div className={`text-xs ${theme.colors.text.secondary} mt-1`}>
+                          Closing automatically...
+                        </div>
                       </div>
                     </div>
                   )}
@@ -359,8 +378,10 @@ export function PullModelDialog({
                         <div className="text-green-400 font-medium text-sm mb-1">
                           Already Installed!
                         </div>
-                        <div className="text-xs text-gray-400">ready to use</div>
-                        <div className="text-xs text-gray-500 mt-2">Closing automatically...</div>
+                        <div className={`text-xs ${theme.colors.text.secondary}`}>ready to use</div>
+                        <div className={`text-xs ${theme.colors.text.muted} mt-2`}>
+                          Closing automatically...
+                        </div>
                       </div>
                     </div>
                   )}
@@ -380,7 +401,7 @@ export function PullModelDialog({
                     <div className="mt-3 p-3 bg-yellow-900/20 border border-yellow-500/30 rounded">
                       <div className="text-yellow-300 text-xs">
                         <div className="font-medium mb-1">⚠️ Taking longer than expected</div>
-                        <div className="text-gray-400">
+                        <div className={theme.colors.text.secondary}>
                           The connection might be slow. You can close this dialog and check back
                           later.
                         </div>
@@ -409,7 +430,7 @@ export function PullModelDialog({
                 <button
                   type="button"
                   onClick={handleClose}
-                  className="flex-1 px-4 py-2 bg-gray-700 hover:bg-gray-600 text-white rounded transition"
+                  className={`flex-1 px-4 py-2 bg-black/40 hover:bg-black/60 ${theme.colors.text.primary} rounded transition border ${theme.colors.border}`}
                 >
                   Cancel
                 </button>
@@ -426,7 +447,7 @@ export function PullModelDialog({
               <button
                 type="button"
                 onClick={handleClose}
-                className="flex-1 px-4 py-2 bg-gray-700 hover:bg-gray-600 text-white rounded transition"
+                className={`flex-1 px-4 py-2 bg-black/40 hover:bg-black/60 ${theme.colors.text.primary} rounded transition border ${theme.colors.border}`}
               >
                 Close
               </button>

@@ -8,6 +8,7 @@
 "use client";
 
 import type { ModelInfo } from "@/hooks/useOllamaModels";
+import { useAdminTheme } from "@/hooks/admin/useAdminTheme";
 
 interface ModelCardProps {
   model: ModelInfo;
@@ -17,6 +18,7 @@ interface ModelCardProps {
 }
 
 export function ModelCard({ model, usedByFunctions, onDelete, onAssign }: ModelCardProps) {
+  const theme = useAdminTheme();
   const formatBytes = (bytes: number) => {
     const gb = bytes / 1024 ** 3;
     return `${gb.toFixed(1)} GB`;
@@ -79,12 +81,16 @@ export function ModelCard({ model, usedByFunctions, onDelete, onAssign }: ModelC
   };
 
   return (
-    <div className="bg-gray-800 rounded-lg p-5 border border-gray-700 hover:border-cyan-500/50 transition-all">
+    <div
+      className={`bg-black/40 rounded-lg p-5 border ${theme.colors.border} hover:border-cyan-500/50 transition-all`}
+    >
       {/* Header */}
       <div className="flex items-start justify-between mb-4">
         <div className="flex-1">
           <div className="flex items-center gap-3 mb-2">
-            <h4 className="font-mono text-white text-base font-semibold">{model.name}</h4>
+            <h4 className={`font-mono ${theme.colors.text.primary} text-base font-semibold`}>
+              {model.name}
+            </h4>
             {isActive && (
               <span className="px-2 py-0.5 bg-green-600/20 border border-green-500/50 text-green-400 text-xs rounded-full">
                 Active
@@ -106,7 +112,7 @@ export function ModelCard({ model, usedByFunctions, onDelete, onAssign }: ModelC
           </div>
 
           {/* Basic Info */}
-          <div className="flex flex-wrap gap-3 text-xs text-gray-400">
+          <div className={`flex flex-wrap gap-3 text-xs ${theme.colors.text.secondary}`}>
             <span className="flex items-center gap-1">
               <span className="text-cyan-400">📦</span>
               {formatBytes(model.size)}
@@ -128,27 +134,29 @@ export function ModelCard({ model, usedByFunctions, onDelete, onAssign }: ModelC
       </div>
 
       {/* Ratings Grid */}
-      <div className="grid grid-cols-3 gap-4 mb-4 p-3 bg-gray-900/50 rounded-lg">
+      <div className="grid grid-cols-3 gap-4 mb-4 p-3 bg-black/20 rounded-lg">
         <div>
-          <div className="text-xs text-gray-400 mb-1">Speed</div>
+          <div className={`text-xs ${theme.colors.text.secondary} mb-1`}>Speed</div>
           <div className="flex gap-0.5 text-sm">{renderStars(speedRating, "⚡")}</div>
-          <div className="text-xs text-gray-500 mt-1">
+          <div className={`text-xs ${theme.colors.text.muted} mt-1`}>
             {speedRating >= 4 ? "Very Fast" : speedRating >= 3 ? "Fast" : "Moderate"}
           </div>
         </div>
 
         <div>
-          <div className="text-xs text-gray-400 mb-1">Quality</div>
+          <div className={`text-xs ${theme.colors.text.secondary} mb-1`}>Quality</div>
           <div className="flex gap-0.5 text-sm">{renderStars(qualityRating)}</div>
-          <div className="text-xs text-gray-500 mt-1">
+          <div className={`text-xs ${theme.colors.text.muted} mt-1`}>
             {qualityRating >= 5 ? "Excellent" : qualityRating >= 4 ? "Very Good" : "Good"}
           </div>
         </div>
 
         <div>
-          <div className="text-xs text-gray-400 mb-1">RAM Required</div>
-          <div className="text-sm text-white font-semibold mt-1">{ramEstimate}</div>
-          <div className="text-xs text-gray-500 mt-1">minimum</div>
+          <div className={`text-xs ${theme.colors.text.secondary} mb-1`}>RAM Required</div>
+          <div className={`text-sm ${theme.colors.text.primary} font-semibold mt-1`}>
+            {ramEstimate}
+          </div>
+          <div className={`text-xs ${theme.colors.text.muted} mt-1`}>minimum</div>
         </div>
       </div>
 
@@ -162,7 +170,7 @@ export function ModelCard({ model, usedByFunctions, onDelete, onAssign }: ModelC
             {usedByFunctions.map((func) => (
               <span
                 key={func}
-                className="px-2 py-0.5 bg-gray-800 border border-gray-600 text-gray-300 text-xs rounded"
+                className={`px-2 py-0.5 bg-black/40 border border-white/20 ${theme.colors.text.secondary} text-xs rounded`}
               >
                 {func.replace("_", " ")}
               </span>

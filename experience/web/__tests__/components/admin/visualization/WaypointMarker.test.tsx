@@ -37,7 +37,7 @@ describe("WaypointMarker", () => {
       <WaypointMarker
         position={[0, 0, 0]}
         emotionName="Joy"
-        categoryColor="#ff0000"
+        categoryColor="#E11D48"
         isHighlighted={false}
         mode="subtle"
         opacity={1}
@@ -66,7 +66,7 @@ describe("WaypointMarker", () => {
       <WaypointMarker
         position={[0, 0, 0]}
         emotionName="Unknown"
-        categoryColor="#ff0000"
+        categoryColor="#E11D48"
         isHighlighted={false}
         mode="subtle"
         opacity={1}
@@ -91,7 +91,7 @@ describe("WaypointMarker", () => {
       <WaypointMarker
         position={[0, 0, 0]}
         emotionName="Joy"
-        categoryColor="#ff0000"
+        categoryColor="#E11D48"
         isHighlighted={true}
         mode="dynamic"
         opacity={0.5}
@@ -109,7 +109,7 @@ describe("WaypointMarker", () => {
       <WaypointMarker
         position={[0, 0, 0]}
         emotionName="Joy"
-        categoryColor="#ff0000"
+        categoryColor="#E11D48"
         isHighlighted={false}
         mode="subtle"
         opacity={1}

@@ -33,6 +33,7 @@ describe("ConsentGate", () => {
     (useAuthStore as unknown as jest.Mock).mockReturnValue({
       consentRequired: true,
       outstandingPolicies: mockOutstandingPolicies,
+      token: "mock-token",
     });
 
     // Mock setState on the store itself since the component calls useAuthStore.setState
@@ -43,6 +44,7 @@ describe("ConsentGate", () => {
     (useAuthStore as unknown as jest.Mock).mockReturnValue({
       consentRequired: false,
       outstandingPolicies: [],
+      token: "mock-token",
     });
 
     render(

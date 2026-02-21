@@ -41,7 +41,7 @@ export function VisualSettingsPanel() {
           step="0.05"
           value={1 - settings.sphereOpacity}
           onChange={(e) => settings.setSphereOpacity(1 - parseFloat(e.target.value))}
-          className="w-full h-1.5 bg-gray-700 rounded-lg appearance-none cursor-pointer accent-purple-500"
+          className="w-full h-1.5 bg-black/30 rounded-lg appearance-none cursor-pointer accent-purple-500"
         />
       </div>
 
@@ -60,7 +60,7 @@ export function VisualSettingsPanel() {
           step="0.1"
           value={settings.animationSpeed}
           onChange={(e) => settings.setAnimationSpeed(parseFloat(e.target.value))}
-          className="w-full h-1.5 bg-gray-700 rounded-lg appearance-none cursor-pointer accent-cyan-500"
+          className="w-full h-1.5 bg-black/30 rounded-lg appearance-none cursor-pointer accent-cyan-500"
         />
       </div>
 
@@ -72,10 +72,10 @@ export function VisualSettingsPanel() {
             <button
               key={q}
               onClick={() => settings.setRenderQuality(q)}
-              className={`px-2 py-1 rounded text-xs font-medium transition capitalize ${
+              className={`px-2 py-1 rounded text-xs font-medium transition capitalize border ${
                 settings.renderQuality === q
-                  ? "bg-cyan-900/50 text-cyan-300 border border-cyan-600"
-                  : `${theme.colors.background} ${theme.colors.text.muted} border ${theme.colors.border} hover:border-gray-600`
+                  ? `${theme.colors.primary.replace("text-", "bg-")}/20 ${theme.colors.primary} ${theme.colors.border}`
+                  : `bg-transparent ${theme.colors.text.muted} border-transparent hover:${theme.colors.text.primary}`
               }`}
             >
               {q}
@@ -96,7 +96,7 @@ export function VisualSettingsPanel() {
         <span>Auto-Rotate</span>
         <span
           className={`w-2 h-2 rounded-full ${
-            settings.autoRotate ? "bg-purple-400" : "bg-gray-600"
+            settings.autoRotate ? theme.colors.primary.replace("text-", "bg-") : "bg-black/40"
           }`}
         />
       </button>

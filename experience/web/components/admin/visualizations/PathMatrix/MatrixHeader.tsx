@@ -11,6 +11,8 @@
 
 "use client";
 
+import { useAdminTheme } from "@/hooks/admin/useAdminTheme";
+
 interface MatrixHeaderProps {
   viewMode: "emotions" | "categories";
   onViewModeChange: (mode: "emotions" | "categories") => void;
@@ -45,12 +47,18 @@ export function MatrixHeader({
   onExport,
   onClose,
 }: MatrixHeaderProps) {
+  const theme = useAdminTheme();
+
   return (
-    <div className="flex items-center justify-between p-4 border-b border-gray-700 bg-gray-900/50">
+    <div
+      className={`flex items-center justify-between p-4 border-b ${theme.colors.border} ${theme.colors.background}`}
+    >
       <div className="flex items-center gap-4">
         <div>
-          <h2 className="text-xl font-bold text-white">Emotion Transition Matrix</h2>
-          <p className="text-sm text-gray-400">
+          <h2 className={`text-xl font-bold ${theme.colors.text.primary}`}>
+            Emotion Transition Matrix
+          </h2>
+          <p className={`text-sm ${theme.colors.text.secondary}`}>
             {viewMode === "emotions"
               ? "Grid showing all possible emotional transitions"
               : "Grid showing category-level transitions"}
@@ -58,13 +66,13 @@ export function MatrixHeader({
         </div>
 
         {/* View Mode Toggle - Enhanced UX */}
-        <div className="flex bg-gray-800 rounded-lg p-1 border border-gray-700">
+        <div className={`flex bg-black/20 rounded-lg p-1 border ${theme.colors.border}`}>
           <button
             onClick={() => onViewModeChange("emotions")}
             className={`px-4 py-2 text-sm rounded transition-all ${
               viewMode === "emotions"
-                ? "bg-cyan-600 text-white shadow-lg"
-                : "text-gray-400 hover:text-gray-200 hover:bg-gray-700"
+                ? `bg-black/40 ${theme.colors.text.primary} shadow-lg border ${theme.colors.border}`
+                : `${theme.colors.text.secondary} hover:${theme.colors.text.primary} ${theme.colors.hover}`
             }`}
           >
             <span className="flex items-center gap-2">
@@ -76,8 +84,8 @@ export function MatrixHeader({
             onClick={() => onViewModeChange("categories")}
             className={`px-4 py-2 text-sm rounded transition-all ${
               viewMode === "categories"
-                ? "bg-cyan-600 text-white shadow-lg"
-                : "text-gray-400 hover:text-gray-200 hover:bg-gray-700"
+                ? `bg-black/40 ${theme.colors.text.primary} shadow-lg border ${theme.colors.border}`
+                : `${theme.colors.text.secondary} hover:${theme.colors.text.primary} ${theme.colors.hover}`
             }`}
           >
             <span className="flex items-center gap-2">
@@ -103,10 +111,15 @@ export function MatrixHeader({
         ) : (
           <>
             {/* Stats Display */}
-            <div className="text-sm text-gray-400 bg-gray-800/50 px-3 py-2 rounded border border-gray-700">
-              Computed: <span className="text-white font-mono font-semibold">{stats.computed}</span>{" "}
+            <div
+              className={`text-sm ${theme.colors.text.secondary} bg-black/20 px-3 py-2 rounded border ${theme.colors.border}`}
+            >
+              Computed:{" "}
+              <span className={`${theme.colors.text.primary} font-mono font-semibold`}>
+                {stats.computed}
+              </span>{" "}
               / {stats.totalPossible}
-              <span className="ml-2 text-cyan-400">({stats.percentage}%)</span>
+              <span className={`ml-2 ${theme.colors.primary}`}>({stats.percentage}%)</span>
             </div>
 
             {/* Loading Cache Indicator */}
@@ -159,7 +172,7 @@ export function MatrixHeader({
         <button
           onClick={onClose}
           disabled={isComputing}
-          className="px-4 py-2 bg-gray-700 hover:bg-gray-600 disabled:bg-gray-800 disabled:text-gray-500 text-white rounded transition-all hover:shadow-lg"
+          className={`px-4 py-2 bg-black/40 border ${theme.colors.border} ${theme.colors.hover} disabled:opacity-50 ${theme.colors.text.primary} rounded transition-all hover:shadow-lg`}
           title={isComputing ? "Cannot close while computing" : "Close matrix view"}
         >
           Close

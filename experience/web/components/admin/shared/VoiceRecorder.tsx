@@ -88,9 +88,11 @@ export function VoiceRecorder({ isOpen, onClose, onSend }: VoiceRecorderProps) {
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm">
+    <div
+      className={`fixed inset-0 z-50 flex items-center justify-center bg-black/70 ${theme.effects.backdropBlur}`}
+    >
       <div
-        className={`bg-gray-900 ${theme.layout.borderRadius} border-2 ${theme.colors.border} ${theme.effects.glow} p-6 max-w-2xl w-full mx-4 transition-colors duration-500`}
+        className={`${theme.colors.background} ${theme.layout.borderRadius} border-2 ${theme.colors.border} ${theme.effects.glow} p-6 max-w-2xl w-full mx-4 transition-colors duration-500`}
       >
         {/* Header */}
         <div className="flex items-center justify-between mb-6">

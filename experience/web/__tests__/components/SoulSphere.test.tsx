@@ -57,30 +57,30 @@ jest.mock("three", () => {
 
       if (args.length === 1 && typeof args[0] === "string") {
         const hex = args[0];
-        if (hex === "#00FFFF") {
-          colorInstance.r = 0;
-          colorInstance.g = 1;
-          colorInstance.b = 1;
-        } else if (hex === "#FF0000" || hex === "#FF4444") {
-          colorInstance.r = 1;
-          colorInstance.g = 0;
-          colorInstance.b = 0;
-        } else if (hex === "#FFFF00") {
-          colorInstance.r = 1;
-          colorInstance.g = 1;
-          colorInstance.b = 0;
-        } else if (hex === "#0000FF") {
-          colorInstance.r = 0;
-          colorInstance.g = 0;
-          colorInstance.b = 1;
-        } else if (hex === "#800080") {
-          colorInstance.r = 0.5;
-          colorInstance.g = 0;
-          colorInstance.b = 0.5;
-        } else if (hex === "#808080") {
-          colorInstance.r = 0.5;
-          colorInstance.g = 0.5;
-          colorInstance.b = 0.5;
+        if (hex === "#2DD4BF") {
+          colorInstance.r = 0.176;
+          colorInstance.g = 0.831;
+          colorInstance.b = 0.749;
+        } else if (hex === "#E11D48" || hex === "#FF4444") {
+          colorInstance.r = 0.882;
+          colorInstance.g = 0.114;
+          colorInstance.b = 0.282;
+        } else if (hex === "#F59E0B") {
+          colorInstance.r = 0.961;
+          colorInstance.g = 0.62;
+          colorInstance.b = 0.043;
+        } else if (hex === "#4338CA") {
+          colorInstance.r = 0.263;
+          colorInstance.g = 0.22;
+          colorInstance.b = 0.792;
+        } else if (hex === "#A855F7") {
+          colorInstance.r = 0.659;
+          colorInstance.g = 0.333;
+          colorInstance.b = 0.969;
+        } else if (hex === "#64748B") {
+          colorInstance.r = 0.392;
+          colorInstance.g = 0.455;
+          colorInstance.b = 0.545;
         } else if (hex === "#44FF44") {
           colorInstance.r = 0.26;
           colorInstance.g = 1;
@@ -161,7 +161,7 @@ describe("SoulSphere", () => {
       { id: "e5", name: "Neutral", vac: [0.001, -0.001, 0] }, // Near Zero
     ];
 
-    it("should default to Cyan when no emotions selected", () => {
+    it("should default to Teal when no emotions selected", () => {
       mockUseAtlasAdminStore.mockImplementation((selector: any) =>
         selector({ allEmotions: mockEmotions, selectedEmotionIds: new Set() })
       );
@@ -180,9 +180,9 @@ describe("SoulSphere", () => {
 
       updateModeCallback();
 
-      expect(capturedColor.r).toBe(0);
-      expect(capturedColor.g).toBe(1);
-      expect(capturedColor.b).toBe(1);
+      expect(capturedColor.r).toBeCloseTo(0.176, 2);
+      expect(capturedColor.g).toBeCloseTo(0.831, 2);
+      expect(capturedColor.b).toBeCloseTo(0.749, 2);
     });
 
     it("should calculate reddish color for Negative Valence (Sadness)", () => {
@@ -256,7 +256,7 @@ describe("SoulSphere", () => {
       expect(capturedColor.b).toBeGreaterThan(0.4);
     });
 
-    it("should default to Cyan if total weight is negligible (Neutral)", () => {
+    it("should default to Teal if total weight is negligible (Neutral)", () => {
       mockUseAtlasAdminStore.mockImplementation((selector: any) =>
         selector({
           allEmotions: mockEmotions,
@@ -276,9 +276,9 @@ describe("SoulSphere", () => {
       };
       updateModeCallback();
 
-      expect(capturedColor.r).toBe(0);
-      expect(capturedColor.g).toBe(1);
-      expect(capturedColor.b).toBe(1);
+      expect(capturedColor.r).toBeCloseTo(0.176, 2);
+      expect(capturedColor.g).toBeCloseTo(0.831, 2);
+      expect(capturedColor.b).toBeCloseTo(0.749, 2);
     });
   });
 
@@ -372,7 +372,7 @@ describe("SoulSphere", () => {
     expect(() => modeCallback()).not.toThrow();
   });
 
-  it("should default to Cyan when selected IDs do not match any known emotions", () => {
+  it("should default to Teal when selected IDs do not match any known emotions", () => {
     // This covers the case where selectedEmotionIds is not empty, but filtered result IS empty
     const mockEmotions = [
       { id: "joy", valence: 0.8, arousal: 0.7, color: "#FFFF00" },
@@ -397,10 +397,10 @@ describe("SoulSphere", () => {
     };
     updateModeCallback();
 
-    // Should hit line 263 and return Cyan
-    expect(capturedColor.r).toBe(0);
-    expect(capturedColor.g).toBe(1);
-    expect(capturedColor.b).toBe(1);
+    // Should hit line 263 and return Teal
+    expect(capturedColor.r).toBeCloseTo(0.176, 2);
+    expect(capturedColor.g).toBeCloseTo(0.831, 2);
+    expect(capturedColor.b).toBeCloseTo(0.749, 2);
   });
 
   it("should create geometry and material", () => {

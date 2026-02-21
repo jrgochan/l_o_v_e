@@ -10,7 +10,7 @@ jest.mock("@/hooks/admin/useAdminTheme", () => ({
 
 describe("CategoryBrowser", () => {
   const mockFilters = new Map<string, CategoryFilter>([
-    ["Cat1", { name: "Cat1", enabled: true, color: "#FF0000", emotionCount: 2 }],
+    ["Cat1", { name: "Cat1", enabled: true, color: "#E11D48", emotionCount: 2 }],
   ]);
 
   const mockEmotions = new Map<string, Emotion[]>([

@@ -31,7 +31,7 @@ export function VACAxisLabels3D() {
         <AxisLabel3D
           axis="V+"
           description="Positive"
-          color="cyan"
+          color="teal"
           tooltip="Valence: Pleasant, positive emotions"
         />
       </Html>
@@ -46,7 +46,7 @@ export function VACAxisLabels3D() {
         <AxisLabel3D
           axis="V−"
           description="Negative"
-          color="red"
+          color="rose"
           tooltip="Valence: Unpleasant, negative emotions"
         />
       </Html>
@@ -62,7 +62,7 @@ export function VACAxisLabels3D() {
         <AxisLabel3D
           axis="A+"
           description="Activated"
-          color="yellow"
+          color="amber"
           tooltip="Arousal: High energy, stimulated"
         />
       </Html>
@@ -77,7 +77,7 @@ export function VACAxisLabels3D() {
         <AxisLabel3D
           axis="A−"
           description="Calm"
-          color="blue"
+          color="indigo"
           tooltip="Arousal: Low energy, relaxed"
         />
       </Html>
@@ -108,7 +108,7 @@ export function VACAxisLabels3D() {
         <AxisLabel3D
           axis="C−"
           description="Separated"
-          color="gray"
+          color="slate"
           tooltip="Connection: Feeling FOR/AT, disconnected"
         />
       </Html>
@@ -119,18 +119,18 @@ export function VACAxisLabels3D() {
 interface AxisLabel3DProps {
   axis: string;
   description: string;
-  color: "cyan" | "red" | "yellow" | "blue" | "purple" | "gray";
+  color: "teal" | "rose" | "amber" | "indigo" | "purple" | "slate";
   tooltip: string;
 }
 
 function AxisLabel3D({ axis, description, color, tooltip }: AxisLabel3DProps) {
   const colorStyles = {
-    cyan: "bg-cyan-500/30 border-cyan-400 text-cyan-200",
-    red: "bg-red-500/30 border-red-400 text-red-200",
-    yellow: "bg-yellow-500/30 border-yellow-400 text-yellow-200",
-    blue: "bg-blue-500/30 border-blue-400 text-blue-200",
+    teal: "bg-teal-500/30 border-teal-400 text-teal-200",
+    rose: "bg-rose-500/30 border-rose-400 text-rose-200",
+    amber: "bg-amber-500/30 border-amber-400 text-amber-200",
+    indigo: "bg-indigo-500/30 border-indigo-400 text-indigo-200",
     purple: "bg-purple-500/30 border-purple-400 text-purple-200",
-    gray: "bg-gray-500/30 border-gray-400 text-gray-200",
+    slate: "bg-slate-500/30 border-slate-400 text-slate-200",
   };
 
   return (

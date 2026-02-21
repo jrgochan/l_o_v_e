@@ -9,8 +9,8 @@ jest.mock("@/components/admin/shared/ExportControls", () => ({
 
 describe("LayerControls", () => {
   const mockCategoryFilters = new Map([
-    ["joy", { name: "Joy", enabled: true, color: "#FFFF00", emotionCount: 10 }],
-    ["sadness", { name: "Sadness", enabled: false, color: "#0000FF", emotionCount: 5 }],
+    ["joy", { name: "Joy", enabled: true, color: "#F59E0B", emotionCount: 10 }],
+    ["sadness", { name: "Sadness", enabled: false, color: "#4338CA", emotionCount: 5 }],
   ]);
 
   const mockLayers = {

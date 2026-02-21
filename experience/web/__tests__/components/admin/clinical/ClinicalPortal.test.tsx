@@ -9,9 +9,50 @@ jest.mock("@/hooks/admin/useAdminTheme", () => ({
   useAdminTheme: jest.fn(() => ({
     colors: {
       primary: "#00ff00",
-      secondary: "#0000ff",
-      background: "#000000",
-      text: "#ffffff",
+      secondary: "#4338ca",
+      background: "bg-black",
+      surface: "bg-gray-900",
+      border: "border-gray-800",
+      hover: "hover:bg-gray-800",
+      text: {
+        primary: "text-white",
+        secondary: "text-gray-300",
+        muted: "text-gray-500",
+        inverted: "text-black",
+      },
+      status: {
+        success: "text-green-400 bg-green-900/30",
+        warning: "text-yellow-400 bg-yellow-900/30",
+        error: "text-red-400 bg-red-900/30",
+        info: "text-blue-400 bg-blue-900/30",
+      },
+      buttonPrimary: "bg-teal-600 hover:bg-teal-500 text-white",
+      buttonSecondary: "bg-gray-800 hover:bg-gray-700 text-white",
+      buttonAction: "bg-cyan-600 hover:bg-cyan-500 text-white",
+      buttonDanger: "bg-red-600 hover:bg-red-500 text-white",
+      chart: {
+        linePrimary: "stroke-teal-400",
+        lineSecondary: "stroke-cyan-500",
+        grid: "stroke-gray-800",
+        tooltipBackground: "bg-gray-900",
+      },
+    },
+    effects: {
+      glowPrimary: "shadow-[0_0_15px_rgba(20,184,166,0.5)]",
+      glowSecondary: "shadow-[0_0_15px_rgba(6,182,212,0.5)]",
+      glass: "bg-gray-900/80 backdrop-blur-md",
+      backdropBlur: "backdrop-blur-md",
+    },
+    layout: {
+      containerPadding: "p-6",
+      panelGap: "gap-6",
+      borderRadius: "rounded-xl",
+      cardBorderRadius: "rounded-lg",
+    },
+    typography: {
+      fontFamily: "font-sans",
+      headingScale: "text-xl md:text-2xl lg:text-3xl font-bold",
+      bodyScale: "text-sm md:text-base",
     },
   })),
 }));

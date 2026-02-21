@@ -8,6 +8,13 @@
 
 ## Overview
 
+> [!NOTE]
+> **Ethical Context & Private Research Exploration**
+>
+> The L.O.V.E. platform is currently a **private, non-commercial research initiative**. The algorithms and architectures described herein are deeply indebted to the foundational work of the researchers, clinicians, and theorists cited below (including Dr. Brené Brown, Dr. James Russell, Marsha Linehan, and others).
+>
+> This experimental digital architecture represents an attempt to honor and operationalize their insights into human emotion. No endorsement by these researchers is implied. The underlying source code is strictly private, and this system will not be commercialized or publicly deployed without appropriate ethical review, consent, and partnership with the clinical research community.
+
 The L.O.V.E. Platform (Listener-Observer-Versor-Experience) synthesizes research from psychology, neuroscience, computer science, and mathematics to create a novel emotional intelligence system. This document acknowledges all the researchers, theorists, clinicians, and technologists whose work makes this platform possible.
 
 ---
@@ -311,14 +318,20 @@ The Versor module transforms emotional vectors into smooth 3D rotations using qu
 
 **Emily Mower Provost** - Multimodal Emotion Recognition
 
-- **Note:** Specific papers to be added - Provost's work on:
-  - Speech-based emotion recognition from prosodic features
-  - Multimodal approaches combining acoustic and linguistic channels
-  - Mental health applications of speech analysis
-  - Real-world, naturalistic speech emotion detection
-- **Relevance:** Foundation for future prosody analysis of Connection dimension
+- *Citation:* Mower Provost, E., et al. (2025). Emotion Recognition in the Real World: Passively Collecting and Estimating Emotions from Natural Speech Data of Individuals with Bipolar Disorder. *IEEE Transactions on Affective Computing*, 16(1), 28-40.
+- *Citation:* Gideon, J., ..., & Mower Provost, E. (2016). Wild Wild Emotion: A Multimodal Ensemble Approach. *Proceedings of the 18th ACM International Conference on Multimodal Interaction*.
+- **Relevance:** Foundation for future prosody analysis of Connection dimension and real-world clinical application of speech emotion analysis.
 
 ### Natural Language Processing
+
+### Core AI Foundation Models
+
+- **Moshi (Kyutai)**: Used in the PersonaPlex module for real-time, full-duplex spoken dialogue.
+  - *Citation:* Défossez, A., et al. (2024). Moshi: a speech-text foundation model for real-time dialogue. *arXiv preprint arXiv:2410.00037*.
+- **Whisper (OpenAI)**: Used in the Listener module via `faster-whisper` for robust local transcription.
+  - *Citation:* Radford, A., et al. (2023). Robust speech recognition via large-scale weak supervision. *International Conference on Machine Learning*. PMLR.
+- **Sentence-Transformers**: Used heavily in the Observer and Listener for semantic VAC embeddings.
+  - *Citation:* Reimers, N., & Gurevych, I. (2019). Sentence-BERT: Sentence Embeddings using Siamese BERT-Networks. *Proceedings of the 2019 Conference on Empirical Methods in Natural Language Processing*.
 
 ### Local LLM Processing
 
@@ -479,6 +492,14 @@ The Versor module transforms emotional vectors into smooth 3D rotations using qu
 
 4. Shoemake, K. (1985). Animating Rotation with Quaternion Curves. *ACM SIGGRAPH Computer Graphics*, 19(3), 245-254.
 
+### Artificial Intelligence Foundation Models
+
+1. Défossez, A., Mazaré, L., Orsini, M., Royer, A., Pérez, P., Jégou, H., Grave, E., & Zeghidour, N. (2024). Moshi: a speech-text foundation model for real-time dialogue. *arXiv preprint arXiv:2410.00037*.
+
+2. Radford, A., Kim, J. W., Xu, T., Brockman, G., McLeavey, C., & Sutskever, I. (2023). Robust speech recognition via large-scale weak supervision. *International Conference on Machine Learning*. PMLR.
+
+3. Reimers, N., & Gurevych, I. (2019). Sentence-BERT: Sentence Embeddings using Siamese BERT-Networks. *Proceedings of the 2019 Conference on Empirical Methods in Natural Language Processing*, 3982–3992.
+
 ### Validation & Methodology
 
 1. Fitzpatrick, K. K., Darcy, A., & Vierhile, M. (2017). Delivering Cognitive Behavior Therapy to Young Adults With Symptoms of Depression and Anxiety Using a Fully Automated Conversational Agent (Woebot): A Randomized Controlled Trial. *JMIR Mental Health*, 4(2), e19.
@@ -592,11 +613,17 @@ The L.O.V.E. Platform itself integrates these works in novel ways to create a un
 
 ---
 
-## 15. Contact & Contributions
+## 15. Note on AI-Assisted Development Methodology
+
+> **AI Co-Creation Acknowledgment:** This project represents a novel paradigm in software creation. The foundational concepts and intent were provided by the human inventor, while the system architecture, mathematical models, and the entirety of the application codebase were collaboratively generated and iterated upon through conversations with Anthropic's Claude and Google's Gemini over a period of 2.5 months. The human author served as the visionary director, with the AI models acting as active co-architects and implementers.
+
+---
+
+## 16. Contact & Contributions
 
 If you are a researcher whose work should be cited here, or if you find any attribution errors, please contact the L.O.V.E. project team or open an issue in the project repository.
 
-**Last Updated:** January 4, 2026
+**Last Updated:** February 20, 2026
 **Maintainer:** L.O.V.E. Project Team
 **Review Cycle:** Quarterly
 

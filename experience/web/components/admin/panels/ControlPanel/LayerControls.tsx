@@ -69,7 +69,7 @@ export function LayerControls({
                 type="checkbox"
                 checked={filter.enabled}
                 onChange={() => onToggleCategoryFilter(filter.name)}
-                className={`rounded border-gray-600 bg-transparent focus:ring-1 focus:ring-offset-0 ${theme.colors.primary}`}
+                className={`rounded border-white/20 bg-transparent focus:ring-1 focus:ring-offset-0 ${theme.colors.primary}`}
               />
               <div className="w-3 h-3 rounded-full" style={{ backgroundColor: filter.color }} />
               <span
@@ -96,7 +96,7 @@ export function LayerControls({
               onChange={(e) =>
                 onUpdateSetting("computeMode", e.target.checked ? "cache-first" : "manual")
               }
-              className="rounded border-gray-600 bg-transparent"
+              className="rounded border-white/20 bg-transparent"
             />
             <span className="text-sm">Auto-compute paths</span>
           </label>
@@ -108,7 +108,7 @@ export function LayerControls({
               type="checkbox"
               checked={settings.enableAnimations}
               onChange={(e) => onUpdateSetting("enableAnimations", e.target.checked)}
-              className="rounded border-gray-600 bg-transparent"
+              className="rounded border-white/20 bg-transparent"
             />
             <span className="text-sm">Enable animations</span>
           </label>
@@ -130,7 +130,7 @@ export function LayerControls({
                   type="checkbox"
                   checked={value}
                   onChange={() => onToggleLayer(key as keyof LayerVisibility)}
-                  className="rounded border-gray-600 bg-transparent"
+                  className="rounded border-white/20 bg-transparent"
                 />
                 <span className="text-sm capitalize">
                   {key.replace(/([A-Z])/g, " $1").trim()} {/* Proper Case */}
@@ -151,19 +151,19 @@ export function LayerControls({
         <h2 className={`text-sm font-semibold mb-2 ${theme.colors.text.secondary}`}>Shortcuts</h2>
         <div className={`text-xs space-y-1 ${theme.colors.text.muted}`}>
           <div className="flex items-center gap-2">
-            <kbd className={`px-1.5 py-0.5 rounded bg-gray-800 border ${theme.colors.border}`}>
+            <kbd className={`px-1.5 py-0.5 rounded bg-black/40 border ${theme.colors.border}`}>
               Esc
             </kbd>
             <span>Clear selection</span>
           </div>
           <div className="flex items-center gap-2">
-            <kbd className={`px-1.5 py-0.5 rounded bg-gray-800 border ${theme.colors.border}`}>
+            <kbd className={`px-1.5 py-0.5 rounded bg-black/40 border ${theme.colors.border}`}>
               M
             </kbd>
             <span>Cycle animation modes</span>
           </div>
           <div className="flex items-center gap-2">
-            <kbd className={`px-1.5 py-0.5 rounded bg-gray-800 border ${theme.colors.border}`}>
+            <kbd className={`px-1.5 py-0.5 rounded bg-black/40 border ${theme.colors.border}`}>
               Space
             </kbd>
             <span>Toggle paths</span>
