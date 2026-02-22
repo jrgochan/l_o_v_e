@@ -28,7 +28,7 @@ export function MatrixTooltip({ fromEmotion, toEmotion, path }: MatrixTooltipPro
   const theme = useAdminTheme();
   return (
     <div
-      className={`absolute bottom-4 right-4 ${theme.colors.background} border-2 ${theme.colors.border} ${theme.layout.borderRadius} p-4 shadow-2xl max-w-md z-50 animate-in fade-in duration-200`}
+      className={`absolute bottom-4 right-4 ${theme.colors.background} ${theme.effects.glass} border-2 ${theme.colors.border} ${theme.layout.borderRadius} p-4 shadow-2xl ${theme.effects.glow} max-w-md z-50 animate-in fade-in duration-200`}
     >
       {/* Header with Difficulty Color Bar */}
       <div className="flex items-center gap-3 mb-3">

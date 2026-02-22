@@ -257,10 +257,10 @@ export function DataVisualizationOverlay({ onClose }: DataVisualizationOverlayPr
             {/* 'All' Toggle */}
             <button
               onClick={() => setSelectedCategory(null)}
-              className={`nav-item w-full flex items-center justify-between p-2 rounded transition-all mb-4 ${
+              className={`nav-item w-full flex items-center justify-between p-3 rounded transition-all duration-300 mb-4 ${
                 !selectedCategory
-                  ? "bg-cyan-500/20 border border-cyan-500/50 text-cyan-300 shadow-[0_0_15px_rgba(6,182,212,0.15)]"
-                  : "hover:bg-white/5 text-white/50 hover:text-white"
+                  ? `bg-cyan-500/20 border border-cyan-500/50 text-cyan-300 ${theme.effects.glow} translate-x-1`
+                  : `hover:${theme.colors.hover} text-white/50 hover:text-white border border-transparent hover:border-white/10 hover:shadow-lg`
               }`}
             >
               <span className="text-sm font-medium">Whole Atlas</span>
@@ -276,11 +276,16 @@ export function DataVisualizationOverlay({ onClose }: DataVisualizationOverlayPr
                 <button
                   key={cat}
                   onClick={() => setSelectedCategory(isSelected ? null : cat)}
-                  className="group w-full relative h-9 flex items-center px-2 rounded overflow-hidden transition-all text-left"
+                  className={`group w-full relative h-10 flex items-center px-3 mb-1.5 rounded-lg border transition-all duration-300 text-left overflow-hidden
+                    ${
+                      isSelected
+                        ? `border-cyan-500/50 bg-cyan-900/20 ${theme.effects.glow} translate-x-1`
+                        : "border-transparent hover:border-white/10 hover:bg-white/[0.03] hover:shadow-md"
+                    }`}
                 >
                   {/* Bar Background */}
                   <div
-                    className={`absolute top-0 bottom-0 left-0 transition-all duration-500 opacity-20 group-hover:opacity-30 ${isSelected ? "bg-cyan-500 !opacity-40" : "bg-white"}`}
+                    className={`absolute top-0 bottom-0 left-0 transition-all duration-500 opacity-20 group-hover:opacity-40 ${isSelected ? "bg-cyan-500 !opacity-30" : "bg-white"}`}
                     style={{ width: `${percent}%` }}
                   />
 
@@ -363,13 +368,17 @@ export function DataVisualizationOverlay({ onClose }: DataVisualizationOverlayPr
             </h3>
 
             {hoveredEmotion ? (
-              <div className="animate-in fade-in slide-in-from-right-4 duration-300">
+              <div
+                className={`animate-in fade-in slide-in-from-right-4 duration-300 ${theme.effects.glass} rounded-xl p-5 border border-white/10 shadow-2xl`}
+              >
                 {/* Title & Radar */}
-                <div className="flex items-start justify-between mb-2">
+                <div className="flex items-start justify-between mb-4">
                   <div>
-                    <h2 className="text-2xl font-bold text-white mb-1">{hoveredEmotion.name}</h2>
-                    <p className="text-xs text-cyan-400 font-medium bg-cyan-900/30 px-2 py-0.5 rounded w-fit border border-cyan-800">
-                      {hoveredEmotion.category.toUpperCase()}
+                    <h2 className="text-2xl font-bold text-white mb-2 tracking-tight">
+                      {hoveredEmotion.name}
+                    </h2>
+                    <p className="text-[10px] text-cyan-400 font-bold tracking-widest uppercase bg-cyan-900/30 px-2 py-1 rounded w-fit border border-cyan-800">
+                      {hoveredEmotion.category}
                     </p>
                   </div>
                   <div className="opacity-80">

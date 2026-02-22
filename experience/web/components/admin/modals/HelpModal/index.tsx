@@ -214,11 +214,19 @@ function ModelTab() {
           className={`bg-black/20 border ${theme.colors.border} rounded-lg p-4 ${theme.colors.text.secondary} space-y-3 text-sm`}
         >
           <p>
-            L.O.V.E. is a <strong className={theme.colors.text.primary}>private research initiative</strong> heavily indebted to the fundamental emotional theories of researchers such as <strong className={theme.colors.text.primary}>Dr. Brené Brown</strong> (relational dynamics), <strong className={theme.colors.text.primary}>Dr. James Russell</strong> (Circumplex Model), and <strong className={theme.colors.text.primary}>Dr. Paul Ekman</strong>.
+            L.O.V.E. is a{" "}
+            <strong className={theme.colors.text.primary}>private research initiative</strong>{" "}
+            heavily indebted to the fundamental emotional theories of researchers such as{" "}
+            <strong className={theme.colors.text.primary}>Dr. Brené Brown</strong> (relational
+            dynamics), <strong className={theme.colors.text.primary}>Dr. James Russell</strong>{" "}
+            (Circumplex Model), and{" "}
+            <strong className={theme.colors.text.primary}>Dr. Paul Ekman</strong>.
           </p>
           <div className="bg-blue-900/20 border border-blue-500/30 rounded p-3">
             <p className="italic text-blue-300">
-              No endorsement by these researchers is implied. This system represents an experimental attempt to operationalize their insights and was co-created through collaborative human-AI generation over 3.5 months.
+              No endorsement by these researchers is implied. This system represents an experimental
+              attempt to operationalize their insights and was co-created through collaborative
+              human-AI generation over 3.5 months.
             </p>
           </div>
         </div>

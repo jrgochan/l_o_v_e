@@ -66,32 +66,30 @@ export function MatrixHeader({
         </div>
 
         {/* View Mode Toggle - Enhanced UX */}
-        <div className={`flex bg-black/20 rounded-lg p-1 border ${theme.colors.border}`}>
+        <div
+          className={`flex bg-black/50 rounded-lg p-1 border ${theme.colors.border} ${theme.effects.glass}`}
+        >
           <button
             onClick={() => onViewModeChange("emotions")}
-            className={`px-4 py-2 text-sm rounded transition-all ${
+            className={`px-4 py-2 text-sm rounded transition-all flex items-center gap-2 ${
               viewMode === "emotions"
-                ? `bg-black/40 ${theme.colors.text.primary} shadow-lg border ${theme.colors.border}`
-                : `${theme.colors.text.secondary} hover:${theme.colors.text.primary} ${theme.colors.hover}`
+                ? `bg-black/60 ${theme.colors.text.primary} shadow-lg border ${theme.colors.border} ${theme.effects.glow}`
+                : `${theme.colors.text.secondary} hover:${theme.colors.text.primary} hover:bg-white/5`
             }`}
           >
-            <span className="flex items-center gap-2">
-              <span>🎭</span>
-              <span>Emotions</span>
-            </span>
+            <span>🎭</span>
+            <span>Emotions</span>
           </button>
           <button
             onClick={() => onViewModeChange("categories")}
-            className={`px-4 py-2 text-sm rounded transition-all ${
+            className={`px-4 py-2 text-sm rounded transition-all flex items-center gap-2 ${
               viewMode === "categories"
-                ? `bg-black/40 ${theme.colors.text.primary} shadow-lg border ${theme.colors.border}`
-                : `${theme.colors.text.secondary} hover:${theme.colors.text.primary} ${theme.colors.hover}`
+                ? `bg-black/60 ${theme.colors.text.primary} shadow-lg border ${theme.colors.border} ${theme.effects.glow}`
+                : `${theme.colors.text.secondary} hover:${theme.colors.text.primary} hover:bg-white/5`
             }`}
           >
-            <span className="flex items-center gap-2">
-              <span>📂</span>
-              <span>Categories (13×13)</span>
-            </span>
+            <span>📂</span>
+            <span>Categories (13×13)</span>
           </button>
         </div>
       </div>

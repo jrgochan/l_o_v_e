@@ -8,7 +8,6 @@
 "use client";
 
 import { Suspense, useState, useEffect } from "react";
-import Link from "next/link";
 import { Canvas } from "@react-three/fiber";
 import { OrbitControls as DreiOrbitControls, Stars } from "@react-three/drei";
 
@@ -37,7 +36,6 @@ import {
 import { PathMatrixGrid } from "@/components/admin/visualizations/PathMatrix";
 import { HelpModal } from "@/components/admin/modals/HelpModal";
 import { ChatPanel } from "@/components/admin/ChatPanel";
-import { AggregateVACHeaderDisplay } from "@/components/admin/state-display/AggregateVACHeaderDisplay";
 import { DataVisualizationOverlay } from "@/components/admin/visualizations/DataVisualizationOverlay";
 import { CommandPalette } from "@/components/CommandPalette";
 import { useCommandPalette } from "@/hooks/useCommandPalette";
@@ -52,6 +50,7 @@ import { PathDetailsOverlay } from "@/components/PathDetailsOverlay";
 import { useAdminTheme } from "@/hooks/admin/useAdminTheme";
 import { WaypointArrivalOverlay } from "@/components/WaypointArrivalOverlay";
 import { StrategyLibraryBrowser } from "@/components/strategy/StrategyLibraryBrowser";
+import { VisualizationHeader } from "@/components/admin/visualization/VisualizationHeader";
 
 const VisualizationAdminContent = () => {
   // Load emotions and set up path calculator
@@ -299,82 +298,22 @@ const VisualizationAdminContent = () => {
   return (
     <div className="relative w-screen h-screen bg-gray-950 overflow-hidden">
       {/* Header - Hidden in Zen Mode or Intro */}
-      <header
-        className={`absolute top-0 left-0 right-0 z-30 transition-all duration-500 border-b ${theme.colors.background} ${theme.effects.backdropBlur} ${theme.colors.border} ${!isHeaderVisible ? "-translate-y-full" : "translate-y-0"}`}
-        style={{
-          fontFamily: theme.typography.fontFamily === "font-mono" ? "monospace" : undefined,
-        }}
-      >
-        <div className="flex items-center justify-between px-6 py-4">
-          <div>
-            <h1 className={`text-2xl font-bold ${theme.colors.text.primary}`}>Soul Sphere</h1>
-            <p className={`text-sm ${theme.colors.text.secondary}`}>
-              Admin Interface - Emotion Visualization
-            </p>
-            {/* DEBUG: Remove after fixing */}
-          </div>
-
-          {/* Center: Aggregate VAC Display */}
-          <div className="flex-1 flex justify-center">
-            <AggregateVACHeaderDisplay />
-          </div>
-
-          <div className="flex items-center gap-3">
-            <button
-              onClick={() => {
-                toggleMute();
-                playClickSound();
-              }}
-              className={`px-3 py-2 ${theme.layout.borderRadius} transition-all duration-300 flex items-center gap-2 text-sm border ${
-                isMuted
-                  ? `bg-red-900/50 border-red-800 text-red-200 hover:bg-red-800/50`
-                  : `${theme.colors.background} ${theme.colors.border} ${theme.colors.text.secondary} hover:${theme.colors.text.primary}`
-              }`}
-              title={isMuted ? "Unmute Audio" : "Mute Audio"}
-            >
-              {isMuted ? "🔇" : "🔊"}
-            </button>
-            <Link
-              href="/admin/users"
-              className={`px-4 py-2 text-sm transition-all duration-300 inline-flex items-center gap-2 ${theme.layout.borderRadius} ${theme.colors.primary} ${theme.effects.glass} hover:brightness-110 shadow-lg`}
-              title="Return to Admin Dashboard"
-            >
-              ⚡ Dashboard
-            </Link>
-            <Link
-              href="/admin/settings"
-              className={`px-4 py-2 text-sm transition-all duration-300 inline-flex items-center gap-2 ${theme.layout.borderRadius} hover:bg-white/10 ${theme.colors.text.secondary} hover:${theme.colors.text.primary}`}
-              title="Settings (Ctrl/Cmd+,)"
-            >
-              ⚙️ Settings
-            </Link>
-            <button
-              onClick={() => setShowHelp(true)}
-              className={`px-4 py-2 text-sm transition-all duration-300 ${theme.layout.borderRadius} hover:bg-white/10 ${theme.colors.text.secondary} hover:${theme.colors.text.primary}`}
-            >
-              📖 Help
-            </button>
-            <button
-              onClick={() => setShowMatrix(true)}
-              className={`px-4 py-2 text-sm transition-all duration-300 ${theme.layout.borderRadius} hover:bg-white/10 ${theme.colors.text.secondary} hover:${theme.colors.text.primary}`}
-            >
-              📊 Path Matrix
-            </button>
-            <button
-              onClick={() => setShowStrategyLibrary(true)}
-              className={`px-4 py-2 text-sm transition-all duration-300 ${theme.layout.borderRadius} hover:bg-white/10 ${theme.colors.text.secondary} hover:${theme.colors.text.primary}`}
-            >
-              📚 Library
-            </button>
-            {isLoading && (
-              <div className="flex items-center gap-2 text-cyan-400">
-                <div className="animate-spin h-5 w-5 border-2 border-cyan-400 border-t-transparent rounded-full" />
-                <span>Loading emotions...</span>
-              </div>
-            )}
-          </div>
-        </div>
-      </header>
+      <VisualizationHeader
+        isHeaderVisible={isHeaderVisible}
+        isLoading={isLoading}
+        isMuted={isMuted}
+        toggleMute={toggleMute}
+        playClickSound={playClickSound}
+        setShowHelp={setShowHelp}
+        showMatrix={showMatrix}
+        setShowMatrix={setShowMatrix}
+        showStrategyLibrary={showStrategyLibrary}
+        setShowStrategyLibrary={setShowStrategyLibrary}
+        dataVisualizationMode={dataVisualizationMode}
+        toggleDataVisualizationMode={() =>
+          updateSetting("dataVisualizationMode", !dataVisualizationMode)
+        }
+      />
 
       {/* Main Layout: Control Panel | 3D Scene | Info Panel */}
       <div

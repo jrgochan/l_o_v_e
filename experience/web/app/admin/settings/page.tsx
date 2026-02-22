@@ -145,7 +145,7 @@ export default function SettingsPage() {
                 href="/admin/visualization"
                 className="text-gray-400 hover:text-white transition"
               >
-                ← Back to Atlas
+                ← Back to Admin
               </Link>
               <div className="h-6 w-px bg-gray-700" />
               <div>

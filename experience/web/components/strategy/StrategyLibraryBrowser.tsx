@@ -3,6 +3,7 @@
 import React, { useEffect } from "react";
 import { useStrategyBrowserStore } from "../../stores/useStrategyBrowserStore";
 import { StrategyDetailsModal } from "./StrategyDetailsModal";
+import { useAdminTheme } from "@/hooks/admin/useAdminTheme";
 
 // Assuming shared components or icons are available, using simple HTML for now to minimize deps.
 // Filter icons could be Lucide React if available.
@@ -28,8 +29,10 @@ export const StrategyLibraryBrowser = () => {
     return () => clearTimeout(timer);
   }, [filters, fetchStrategies]);
 
+  const theme = useAdminTheme();
+
   return (
-    <div className="w-full h-full bg-slate-950 text-white p-8 overflow-y-auto">
+    <div className={`w-full h-full ${theme.colors.background} text-white p-8 overflow-y-auto`}>
       <div className="max-w-7xl mx-auto">
         <header className="mb-12">
           <h1 className="text-4xl font-thin tracking-tight mb-4 text-white">Strategy Library</h1>
@@ -39,7 +42,9 @@ export const StrategyLibraryBrowser = () => {
         </header>
 
         {/* Filters */}
-        <div className="flex flex-col md:flex-row gap-4 mb-10 sticky top-0 bg-slate-950/80 backdrop-blur-md py-4 z-10 border-b border-white/5">
+        <div
+          className={`flex flex-col md:flex-row gap-4 mb-10 sticky top-0 ${theme.colors.background} backdrop-blur-md py-4 z-10 border-b ${theme.colors.border}`}
+        >
           <div className="relative flex-grow max-w-md">
             <input
               type="text"
@@ -93,10 +98,12 @@ export const StrategyLibraryBrowser = () => {
               <div
                 key={strategy.strategy_id}
                 onClick={() => selectStrategy(strategy)}
-                className="group bg-white/[0.03] rounded-2xl p-6 hover:bg-white/[0.07] transition-all duration-300 border border-white/5 hover:border-white/10 cursor-pointer flex flex-col h-full hover:shadow-2xl hover:shadow-black/50 hover:-translate-y-1"
+                className={`group ${theme.effects.glass} ${theme.layout.borderRadius} p-6 transition-all duration-300 border ${theme.colors.border} cursor-pointer flex flex-col h-full hover:shadow-2xl hover:shadow-cyan-900/40 hover:-translate-y-1 hover:${theme.effects.glow} bg-white/[0.02] hover:bg-white/[0.05]`}
               >
                 <div className="flex justify-between items-start mb-4">
-                  <div className="text-xs font-mono text-white/30 uppercase tracking-wider">
+                  <div
+                    className={`text-xs font-mono uppercase tracking-wider ${theme.colors.text.secondary}`}
+                  >
                     {strategy.type?.replace(/_/g, " ")}
                   </div>
                   <span
@@ -108,15 +115,21 @@ export const StrategyLibraryBrowser = () => {
                   </span>
                 </div>
 
-                <h3 className="text-xl font-light text-white mb-2 group-hover:text-cyan-300 transition-colors">
+                <h3
+                  className={`text-xl font-light ${theme.colors.text.primary} mb-2 group-hover:${theme.colors.primary} transition-colors`}
+                >
                   {strategy.name}
                 </h3>
 
-                <p className="text-white/60 text-sm mb-6 line-clamp-3 font-light leading-relaxed flex-grow">
+                <p
+                  className={`text-sm mb-6 line-clamp-3 font-light leading-relaxed flex-grow ${theme.colors.text.secondary}`}
+                >
                   {strategy.description}
                 </p>
 
-                <div className="border-t border-white/5 pt-4 flex justify-between items-center text-xs text-white/40">
+                <div
+                  className={`border-t ${theme.colors.border} pt-4 flex justify-between items-center text-xs ${theme.colors.text.muted}`}
+                >
                   <div className="flex items-center gap-1">
                     <span>Diff:</span>
                     <div className="flex">

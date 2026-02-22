@@ -3,6 +3,8 @@ import type { NextConfig } from "next";
 const isDesktop = process.env.APP_MODE === "desktop";
 
 const nextConfig: NextConfig = {
+  // Disable x-powered-by header for security
+  poweredByHeader: false,
   // Enable standalone output for Docker/Podman containers, or export for Desktop
   output: isDesktop ? "export" : "standalone",
   // Disable server-side image optimization for static export
