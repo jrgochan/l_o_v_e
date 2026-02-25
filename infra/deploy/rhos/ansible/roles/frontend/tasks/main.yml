@@ -1,0 +1,29 @@
+---
+# Frontend deployment
+
+- name: Get Observer Route Host
+  kubernetes.core.k8s_info:
+    api_version: route.openshift.io/v1
+    kind: Route
+    name: love-observer
+    namespace: "{{ project_name }}"
+  register: observer_route
+
+- name: Set Observer URL fact
+  set_fact:
+    observer_url: "http://{{ observer_route.resources[0].spec.host }}"
+  when: observer_route.resources | length > 0
+
+- name: Build frontend service
+  command: "{{ playbook_dir }}/../02-build.sh experience"
+  register: build_frontend_result
+  changed_when: "'Successfully pushed' in build_frontend_result.stdout or 'Push successful' in build_frontend_result.stdout"
+  when: observer_url is defined
+
+- name: Deploy Experience Frontend
+  kubernetes.core.k8s:
+    state: present
+    namespace: "{{ project_name }}"
+    definition: "{{ item }}"
+  loop: "{{ lookup('file', playbook_dir + '/../manifests/experience.yaml') | from_yaml_all | list }}"
+  when: item is not none

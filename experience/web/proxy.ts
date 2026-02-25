@@ -21,8 +21,6 @@ export function proxy(request: NextRequest) {
     base-uri 'self';
     form-action 'self';
     frame-ancestors 'none';
-    block-all-mixed-content;
-    ${process.env.NODE_ENV === "development" ? "" : "upgrade-insecure-requests;"}
   `;
 
   // Replace newlines with spaces
@@ -55,15 +53,6 @@ export function proxy(request: NextRequest) {
     "Permissions-Policy",
     "camera=(), microphone=(self), geolocation=(), browsing-topics=()"
   );
-
-  // HSTS (Strict-Transport-Security)
-  // Only effective on HTTPS, but good practice to set.
-  if (process.env.NODE_ENV !== "development") {
-    response.headers.set(
-      "Strict-Transport-Security",
-      "max-age=31536000; includeSubDomains; preload"
-    );
-  }
 
   return response;
 }

@@ -39,5 +39,21 @@ spec:
           ports:
             - containerPort: 8002
           env:
-            - name: OLLAMA_BASE_URL
-              value: "http://love-ollama:11434"
+             - name: OLLAMA_BASE_URL
+               value: "http://love-ollama:11434"
+             - name: ALLOWED_ORIGINS
+               value: '["http://localhost:3000", "http://127.0.0.1:3000", "http://localhost:19006", "http://love-experience-love-stack.apps-crc.testing"]'
+---
+apiVersion: route.openshift.io/v1
+kind: Route
+metadata:
+  name: love-listener
+  labels:
+    app: love-stack
+    component: listener
+spec:
+  to:
+    kind: Service
+    name: love-listener
+  port:
+    targetPort: 8002

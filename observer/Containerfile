@@ -26,7 +26,7 @@ RUN uv sync --frozen --no-install-project --no-dev --group observer
 COPY observer/app/ app/
 COPY infra/lib/python/ common/
 COPY observer/alembic.ini .
-COPY observer/migrations/ migrations/
+COPY observer/alembic/ alembic/
 COPY observer/scripts/ scripts/
 COPY observer/data/ data/
 COPY observer/start.sh .

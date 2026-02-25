@@ -1,0 +1,89 @@
+---
+# RBAC configuration for least-privilege operations
+
+- name: Create App Team Role
+  kubernetes.core.k8s:
+    state: present
+    namespace: "{{ project_name }}"
+    definition:
+      apiVersion: rbac.authorization.k8s.io/v1
+      kind: Role
+      metadata:
+        name: love-app-developer
+      rules:
+      - apiGroups: ["", "apps", "batch", "route.openshift.io"]
+        resources: ["pods", "services", "deployments", "jobs", "routes", "configmaps"]
+        verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
+      - apiGroups: [""]
+        resources: ["secrets"]
+        verbs: ["get", "list", "watch"] # Developers can read but not change secrets directly
+
+- name: Create SRE Role (Read-Only Observer)
+  kubernetes.core.k8s:
+    state: present
+    namespace: "{{ project_name }}"
+    definition:
+      apiVersion: rbac.authorization.k8s.io/v1
+      kind: Role
+      metadata:
+        name: love-sre-observer
+      rules:
+      - apiGroups: ["", "apps", "batch", "route.openshift.io"]
+        resources: ["pods", "services", "deployments", "jobs", "routes", "pods/log", "events"]
+        verbs: ["get", "list", "watch"]
+
+- name: Bind App Team Role to a ServiceAccount
+  kubernetes.core.k8s:
+    state: present
+    namespace: "{{ project_name }}"
+    definition:
+      apiVersion: rbac.authorization.k8s.io/v1
+      kind: RoleBinding
+      metadata:
+        name: love-app-developer-binding
+      subjects:
+      - kind: ServiceAccount
+        name: love-developer-sa
+        namespace: "{{ project_name }}"
+      roleRef:
+        kind: Role
+        name: love-app-developer
+        apiGroup: rbac.authorization.k8s.io
+
+- name: Ensure Developer ServiceAccount exists
+  kubernetes.core.k8s:
+    state: present
+    namespace: "{{ project_name }}"
+    definition:
+      apiVersion: v1
+      kind: ServiceAccount
+      metadata:
+        name: love-developer-sa
+
+- name: Ensure love-db ServiceAccount exists for PostgreSQL pgvector
+  kubernetes.core.k8s:
+    state: present
+    namespace: "{{ project_name }}"
+    definition:
+      apiVersion: v1
+      kind: ServiceAccount
+      metadata:
+        name: love-db
+
+- name: Bind anyuid SCC to love-db ServiceAccount
+  kubernetes.core.k8s:
+    state: present
+    namespace: "{{ project_name }}"
+    definition:
+      apiVersion: rbac.authorization.k8s.io/v1
+      kind: RoleBinding
+      metadata:
+        name: system:openshift:scc:anyuid
+      roleRef:
+        apiGroup: rbac.authorization.k8s.io
+        kind: ClusterRole
+        name: system:openshift:scc:anyuid
+      subjects:
+      - kind: ServiceAccount
+        name: love-db
+        namespace: "{{ project_name }}"

@@ -1,0 +1,46 @@
+---
+# =============================================================================
+# L.O.V.E. Stack — OpenShift Deployment Playbook
+# =============================================================================
+# Deploys the L.O.V.E. stack to a local CRC / OpenShift environment using the
+# kubernetes.core.k8s collection for Infrastructure as Code.
+#
+# Usage:
+#   ansible-playbook deploy-openshift.yml
+#
+
+- name: Deploy L.O.V.E. to OpenShift
+  hosts: localhost
+  connection: local
+  gather_facts: false
+
+  vars:
+    project_name: love-stack
+    db_name: love_db
+    db_user: love_user
+    # db_password will be generated in the secrets role if it doesn't exist
+
+  roles:
+    - role: namespace
+      tags: always
+
+    - role: rbac
+      tags: [setup, security]
+
+    - role: network-policies
+      tags: [deploy, security]
+
+    - role: secrets
+      tags: [setup, deploy]
+
+    - role: database
+      tags: setup
+
+    - role: redis
+      tags: setup
+
+    - role: backend
+      tags: deploy
+
+    - role: frontend
+      tags: deploy

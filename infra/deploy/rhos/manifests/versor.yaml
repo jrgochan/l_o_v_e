@@ -42,3 +42,19 @@ spec:
              # Add any specific env vars here
              - name: PYTHONUNBUFFERED
                value: "1"
+             - name: ALLOWED_ORIGINS
+               value: '["http://localhost:3000", "http://127.0.0.1:3000", "http://localhost:19006", "http://love-experience-love-stack.apps-crc.testing"]'
+---
+apiVersion: route.openshift.io/v1
+kind: Route
+metadata:
+  name: love-versor
+  labels:
+    app: love-stack
+    component: versor
+spec:
+  to:
+    kind: Service
+    name: love-versor
+  port:
+    targetPort: 8001

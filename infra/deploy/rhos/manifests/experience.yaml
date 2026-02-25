@@ -26,8 +26,6 @@ spec:
     name: love-experience
   port:
     targetPort: 3000
-  tls:
-    termination: edge
 ---
 apiVersion: apps/v1
 kind: Deployment

@@ -1,0 +1,76 @@
+---
+# Network Policies for internal security segmentation
+
+- name: Allow internal traffic within namespace
+  kubernetes.core.k8s:
+    state: present
+    namespace: "{{ project_name }}"
+    definition:
+      apiVersion: networking.k8s.io/v1
+      kind: NetworkPolicy
+      metadata:
+        name: allow-same-namespace
+      spec:
+        podSelector: {} # Selects all pods in the namespace
+        ingress:
+        - from:
+          - podSelector: {} # Allow from all pods in the same namespace
+
+- name: Expose Experience and Observer to OpenShift Router (Ingress)
+  kubernetes.core.k8s:
+    state: present
+    namespace: "{{ project_name }}"
+    definition:
+      apiVersion: networking.k8s.io/v1
+      kind: NetworkPolicy
+      metadata:
+        name: allow-ingress-router
+      spec:
+        podSelector:
+          matchExpressions:
+            - key: component
+              operator: In
+              values: ["experience", "observer"]
+        ingress:
+        - from:
+          - namespaceSelector:
+              matchLabels:
+                network.openshift.io/policy-group: ingress # Default OCP router namespace label
+
+- name: Restrict Database Access (Only Observer can access DB)
+  kubernetes.core.k8s:
+    state: present
+    namespace: "{{ project_name }}"
+    definition:
+      apiVersion: networking.k8s.io/v1
+      kind: NetworkPolicy
+      metadata:
+        name: restrict-db-access
+      spec:
+        podSelector:
+          matchLabels:
+            component: database
+        ingress:
+        - from:
+          - podSelector:
+              matchLabels:
+                component: observer
+
+- name: Restrict Redis Access (Only Observer can access Redis)
+  kubernetes.core.k8s:
+    state: present
+    namespace: "{{ project_name }}"
+    definition:
+      apiVersion: networking.k8s.io/v1
+      kind: NetworkPolicy
+      metadata:
+        name: restrict-redis-access
+      spec:
+        podSelector:
+          matchLabels:
+            component: cache
+        ingress:
+        - from:
+          - podSelector:
+              matchLabels:
+                component: observer

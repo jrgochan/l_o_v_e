@@ -28,9 +28,10 @@ dependencies = [
     "opentelemetry-sdk>=1.25.0",
     "opentelemetry-instrumentation-fastapi>=0.46b0",
     "opentelemetry-exporter-otlp-proto-grpc>=1.25.0",
+    "prometheus-fastapi-instrumentator>=7.0.0",
 ]
 
-[project.optional-dependencies]
+[dependency-groups]
 
 # --- Module: Listener ---
 listener = [
@@ -116,10 +117,7 @@ dev = [
 [tool.setuptools]
 packages = ["listener", "observer", "versor", "experience", "personaplex", "infra"]
 
-[tool.uv]
-dev-dependencies = [
-    "love-stack[dev]",
-]
+
 
 # --- Tool Config (Migrated from pyproject.toml) ---
 

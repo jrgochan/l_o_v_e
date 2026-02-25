@@ -26,8 +26,6 @@ spec:
     name: love-observer
   port:
     targetPort: 8000
-  tls:
-    termination: edge
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -55,25 +53,29 @@ spec:
           ports:
             - containerPort: 8000
           env:
-            - name: DB_HOST
+            - name: POSTGRES_HOST
               value: "love-db"
-            - name: DB_PORT
+            - name: POSTGRES_PORT
               value: "5432"
-            - name: DB_NAME
+            - name: POSTGRES_DB
               valueFrom:
                 configMapKeyRef:
                   name: love-config
                   key: DB_NAME
-            - name: DB_USER
+            - name: POSTGRES_USER
               valueFrom:
                 configMapKeyRef:
                   name: love-config
                   key: DB_USER
-            - name: DB_PASSWORD
+            - name: POSTGRES_PASSWORD
               valueFrom:
                 secretKeyRef:
                   name: love-secrets
                   key: DB_PASSWORD
+            - name: DATABASE_URL
+              value: "postgresql+asyncpg://$(POSTGRES_USER):$(POSTGRES_PASSWORD)@$(POSTGRES_HOST):$(POSTGRES_PORT)/$(POSTGRES_DB)"
+            - name: ALLOWED_ORIGINS
+              value: '["http://localhost:3000", "http://127.0.0.1:3000", "http://localhost:19006", "http://love-experience-love-stack.apps-crc.testing"]'
             - name: REDIS_HOST
               value: "love-redis"
             - name: REDIS_PORT

@@ -1,0 +1,12 @@
+---
+- name: Read database manifest
+  set_fact:
+    db_manifest: "{{ lookup('file', playbook_dir + '/../manifests/postgres.yaml') | from_yaml_all | list }}"
+
+- name: Deploy Postgres Database components
+  kubernetes.core.k8s:
+    state: present
+    namespace: "{{ project_name }}"
+    definition: "{{ item }}"
+  loop: "{{ db_manifest }}"
+  when: item is not none

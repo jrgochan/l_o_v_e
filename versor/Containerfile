@@ -1,5 +1,7 @@
 # pin: python – https://hub.docker.com/_/python
 FROM python:3.12.8-bookworm
+# pin: uv – https://github.com/astral-sh/uv/pkgs/container/uv
+COPY --from=ghcr.io/astral-sh/uv:0.5 /uv /bin/uv
 
 WORKDIR /app
 
@@ -10,9 +12,13 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
   build-essential \
   && rm -rf /var/lib/apt/lists/*
 
+# Enable bytecode compilation
+ENV UV_COMPILE_BYTECODE=1
+ENV UV_LINK_MODE=copy
+
 # Install Python dependencies
-COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
+COPY pyproject.toml uv.lock ./
+RUN uv sync --frozen --no-install-project --no-dev --group versor
 
 # Copy application code
 COPY versor/app/ app/

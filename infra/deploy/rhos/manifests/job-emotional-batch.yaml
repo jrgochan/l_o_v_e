@@ -1,0 +1,46 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: love-scratch-pvc
+  namespace: love-stack
+spec:
+  accessModes:
+    - ReadWriteMany
+  storageClassName: crc-csi-hostpath-provisioner
+  resources:
+    requests:
+      storage: 1Gi
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: emotional-batch-processor
+  namespace: love-stack
+spec:
+  parallelism: 3
+  completions: 10
+  template:
+    metadata:
+      name: emotional-batch-processor
+    spec:
+      containers:
+      - name: batch-worker
+        image: image-registry.openshift-image-registry.svc:5000/love-stack/love-versor:latest
+        command: ["/bin/bash", "-c"]
+        args:
+        - |
+          echo "Starting OpenShift-native L.O.V.E. emotional batch job."
+          DATA_FILE="/scratch/data_${HOSTNAME}.txt"
+          echo "Processing batch data..." > $DATA_FILE
+          sleep 5
+          echo "Completed batch for pod $HOSTNAME"
+          cat $DATA_FILE
+        volumeMounts:
+        - name: scratch-volume
+          mountPath: /scratch
+      volumes:
+      - name: scratch-volume
+        persistentVolumeClaim:
+          claimName: love-scratch-pvc
+      restartPolicy: Never
+  backoffLimit: 4

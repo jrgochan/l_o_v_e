@@ -1,0 +1,145 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: slurm-cluster
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: slurm-shared-pvc
+  namespace: slurm-cluster
+spec:
+  accessModes:
+    - ReadWriteMany
+  storageClassName: crc-csi-hostpath-provisioner
+  resources:
+    requests:
+      storage: 1Gi
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: slurm-node
+  namespace: slurm-cluster
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: slurm
+  template:
+    metadata:
+      labels:
+        app: slurm
+    spec:
+      serviceAccountName: default
+      containers:
+      - name: slurm
+        image: image-registry.openshift-image-registry.svc:5000/slurm-cluster/slurm:latest
+        imagePullPolicy: Always
+        securityContext:
+          runAsUser: 0
+        volumeMounts:
+        - name: shared-data
+          mountPath: /shared
+        - name: entrypoint
+          mountPath: /usr/local/bin/docker-entrypoint.sh
+          subPath: docker-entrypoint.sh
+        - name: sbatch-script
+          mountPath: /etc/love-sbatch
+      volumes:
+      - name: shared-data
+        persistentVolumeClaim:
+          claimName: slurm-shared-pvc
+      - name: entrypoint
+        configMap:
+          name: slurm-entrypoint
+          defaultMode: 0777
+      - name: sbatch-script
+        configMap:
+          name: love-sbatch-script
+          defaultMode: 0777
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: slurm-entrypoint
+  namespace: slurm-cluster
+data:
+  docker-entrypoint.sh: |
+    #!/bin/bash
+
+    HOSTNAME=$(hostname)
+
+    echo "Generating /etc/slurm/slurm.conf for $HOSTNAME..."
+    cat <<EOF > /etc/slurm/slurm.conf
+    ClusterName=love-slurm
+    SlurmctldHost=$HOSTNAME
+    MpiDefault=none
+    ProctrackType=proctrack/pgid
+    ReturnToService=1
+    SlurmctldPidFile=/var/run/slurmctld.pid
+    SlurmctldPort=6817
+    SlurmdPidFile=/var/run/slurmd.pid
+    SlurmdPort=6818
+    SlurmdSpoolDir=/var/spool/slurmd
+    SlurmUser=root
+    StateSaveLocation=/var/spool/slurmctld
+    SwitchType=switch/none
+    TaskPlugin=task/none
+    NodeName=$HOSTNAME CPUs=$(nproc) Boards=1 SocketsPerBoard=1 CoresPerSocket=$(nproc) ThreadsPerCore=1 State=UNKNOWN
+    PartitionName=debug Nodes=ALL Default=YES MaxTime=INFINITE State=UP
+    EOF
+
+    echo "Generating /etc/slurm/cgroup.conf..."
+    cat <<EOF > /etc/slurm/cgroup.conf
+    CgroupPlugin=cgroup/v1
+    IgnoreSystemd=yes
+    CgroupAutomount=yes
+    ConstrainCores=no
+    ConstrainRAMSpace=no
+    ConstrainSwapSpace=no
+    EOF
+
+
+    echo "Starting munged..."
+    su -s /bin/bash munge -c "munged --force"
+
+    echo "Starting slurmctld..."
+    slurmctld -c
+
+    echo "Starting slurmd..."
+    slurmd -c
+
+    sleep 3
+    echo "--- slurmctld.log ---"
+    cat /var/log/slurm/slurmctld.log || true
+    echo "--- slurmd.log ---"
+    cat /var/log/slurm/slurmd.log || true
+
+    echo "Container ready. Sleeping indefinitely for debugging..."
+    sleep infinity
+
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: love-sbatch-script
+  namespace: slurm-cluster
+data:
+  process_emotions.sh: |
+    #!/bin/bash
+    #SBATCH --job-name=love_emotion_processing
+    #SBATCH --output=/shared/love_processing_%j.out
+    #SBATCH --error=/shared/love_processing_%j.err
+    #SBATCH --ntasks=1
+    #SBATCH --cpus-per-task=2
+    #SBATCH --time=00:10:00
+
+    echo "Starting L.O.V.E. HPC Emotion Processing Workflow on node \$(hostname)"
+    echo "Processing large scale node data..."
+    # Simulate processing L.O.V.E. emotional node data onto the parallel filesystem
+    echo "Simulated data matrix for emotional intelligence modeling" > /shared/emotional_data_\${SLURM_JOB_ID}.txt
+    sleep 5
+    echo "Emotion evaluation complete. Result written to /shared/emotional_data_\${SLURM_JOB_ID}.txt."
+    echo "Job Finished."

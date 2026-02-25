@@ -16,45 +16,47 @@ build_service() {
     echo "Building $svc_name..."
     echo "------------------------------------------------"
 
-    # Create BuildConfig if missing
-    if ! oc get bc "love-$svc_name" &> /dev/null; then
-        echo "Creating BuildConfig love-$svc_name..."
-        # Use binary build with Docker strategy
-        oc new-build --binary --strategy=docker --name="love-$svc_name"
-        # Enable local lookup so Deployments can just use image: love-svc:latest
-        oc set image-lookup "love-$svc_name"
+    echo "Preparing sparse build context..."
+    local build_context=""
+    local dockerfile_path=""
+
+    if [[ "$svc_name" == "versor" || "$svc_name" == "observer" || "$svc_name" == "listener" ]]; then
+        build_context=$(mktemp -d "/tmp/love-build-ctx-$svc_name-XXXXXX")
+
+        echo "Copying minimal dependencies to $build_context..."
+        cp -p "$ROOT_DIR/pyproject.toml" "$build_context/" || true
+        cp -p "$ROOT_DIR/uv.lock" "$build_context/" || true
+
+        mkdir -p "$build_context/infra/lib"
+        cp -R "$ROOT_DIR/infra/lib/python" "$build_context/infra/lib/python"
+
+        cp -R "$ROOT_DIR/$dir" "$build_context/$dir"
+
+        # Strip cache directories and local environment variables that might have accidentally been copied
+        rm -rf "$build_context/$dir/.venv" "$build_context/$dir/htmlcov" "$build_context/$dir/.mypy_cache" "$build_context/$dir/.pytest_cache" "$build_context/$dir/.env"
+
+        dockerfile_path="$dir/Containerfile"
+    else
+        build_context="$ROOT_DIR/$dir"
+        dockerfile_path="Containerfile"
     fi
 
-    # Patch to use Containerfile if Dockerfile is missing (runs for existing BCs too)
-    if [ -f "$ROOT_DIR/$dir/Containerfile" ]; then
-         echo "Configuring build to use Containerfile..."
-         oc patch bc "love-$svc_name" -p '{"spec":{"strategy":{"dockerStrategy":{"dockerfilePath":"Containerfile"}}}}'
-    fi
+    echo "Configuring build to use Containerfile..."
+    oc patch bc "love-$svc_name" -p '{"spec":{"strategy":{"dockerStrategy":{"dockerfilePath":"'"$dockerfile_path"'"}}}}'
 
-    echo "Starting build..."
-    # Prepare build args
-    local oc_build_args=""
+    echo "Starting OpenShift build from sparse directory..."
     if [ -n "$build_args" ]; then
-        # Parse "--build-arg KEY=VAL" into "--build-arg KEY=VAL"
-        # Since oc start-build also takes --build-arg, we pass them directly.
-        # Assuming BUILD_ARGS_STR is just passed through.
-        oc_build_args="$build_args"
+        # shellcheck disable=SC2086
+        oc start-build "love-$svc_name" --from-dir="$build_context" --follow $build_args
+    else
+        oc start-build "love-$svc_name" --from-dir="$build_context" --follow
     fi
 
-    # Trigger build
-    # We must be in the correct directory or pass --from-dir
-    # oc start-build expects --from-dir to point to local source
+    if [[ "$svc_name" == "versor" || "$svc_name" == "observer" || "$svc_name" == "listener" ]]; then
+        echo "Cleaning up temporary build context..."
+        rm -rf "$build_context"
+    fi
 
-    echo "Uploading source from $ROOT_DIR/$dir..."
-    # We execute from ROOT_DIR context but specify the subfolder via passing the entire context?
-    # Actually, Docker builds expect the build context.
-    # If Containerfile is in $dir/Containerfile, but it copies `app/` from the context...
-    # The Containerfile in versor copies `app/` relative to WORKDIR (which is ./).
-    # versor/Containerfile says `COPY app/ app/`.
-    # So the build context should be `versor/`.
-
-    # shellcheck disable=SC2086
-    oc start-build "love-$svc_name" --from-dir="$ROOT_DIR/$dir" --follow $oc_build_args
 }
 
 if [ -z "$SERVICE" ]; then

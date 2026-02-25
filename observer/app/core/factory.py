@@ -7,6 +7,7 @@ import structlog
 from asgi_correlation_id import CorrelationIdMiddleware
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from prometheus_fastapi_instrumentator import Instrumentator
 
 from app.api.routes import (
     admin,
@@ -165,4 +166,5 @@ def create_app() -> FastAPI:
             "health": "/health",
         }
 
+    Instrumentator().instrument(app).expose(app)
     return app

@@ -61,6 +61,10 @@ sync: ## Sync Python dependencies via uv
 lint: ## Run all quality checks (shell + python + typescript + swift)
 	@$(INFRA)/bin/lint-love-stack.sh
 
+.PHONY: scan
+scan: ## Run Trivy container image security scan
+	@$(INFRA)/bin/scan-images.sh
+
 .PHONY: lint-fix
 lint-fix: ## Auto-fix all quality issues
 	@$(INFRA)/bin/lint-love-stack.sh --fix

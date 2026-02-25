@@ -1,4 +1,12 @@
 apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: love-db
+  labels:
+    app: love-stack
+    component: database
+---
+apiVersion: v1
 kind: Service
 metadata:
   name: love-db
@@ -45,23 +53,24 @@ spec:
         app: love-stack
         component: database
     spec:
+      serviceAccountName: love-db
       containers:
         - name: postgres
-          image: quay.io/sclorg/postgresql-15-c9s
+          image: pgvector/pgvector:pg15
           ports:
             - containerPort: 5432
           env:
-            - name: POSTGRESQL_DATABASE
+            - name: POSTGRES_DB
               valueFrom:
                 configMapKeyRef:
                   name: love-config
                   key: DB_NAME
-            - name: POSTGRESQL_USER
+            - name: POSTGRES_USER
               valueFrom:
                 configMapKeyRef:
                   name: love-config
                   key: DB_USER
-            - name: POSTGRESQL_PASSWORD
+            - name: POSTGRES_PASSWORD
               valueFrom:
                 secretKeyRef:
                   name: love-secrets

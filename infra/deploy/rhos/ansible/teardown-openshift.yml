@@ -1,0 +1,21 @@
+---
+# =============================================================================
+# L.O.V.E. Stack — OpenShift Teardown Playbook
+# =============================================================================
+# Destroys the L.O.V.E. stack deployment on OpenShift.
+
+- name: Teardown L.O.V.E. from OpenShift
+  hosts: localhost
+  connection: local
+  gather_facts: false
+
+  vars:
+    project_name: love-stack
+
+  tasks:
+    - name: Ensure target namespace is deleted
+      kubernetes.core.k8s:
+        api_version: v1
+        kind: Namespace
+        name: "{{ project_name }}"
+        state: absent

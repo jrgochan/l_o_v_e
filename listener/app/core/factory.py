@@ -16,6 +16,7 @@ import structlog
 from asgi_correlation_id import CorrelationIdMiddleware
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from prometheus_fastapi_instrumentator import Instrumentator
 
 from app.config import settings
 
@@ -134,4 +135,5 @@ def create_app() -> FastAPI:
             },
         }
 
+    Instrumentator().instrument(app).expose(app)
     return app

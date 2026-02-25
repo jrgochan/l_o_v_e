@@ -1,0 +1,12 @@
+---
+- name: Read redis manifest
+  set_fact:
+    redis_manifest: "{{ lookup('file', playbook_dir + '/../manifests/redis.yaml') | from_yaml_all | list }}"
+
+- name: Deploy Redis components
+  kubernetes.core.k8s:
+    state: present
+    namespace: "{{ project_name }}"
+    definition: "{{ item }}"
+  loop: "{{ redis_manifest }}"
+  when: item is not none

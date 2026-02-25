@@ -1,0 +1,22 @@
+---
+- name: Deploy SLURM Cluster to OpenShift
+  hosts: localhost
+  gather_facts: false
+  tasks:
+    - name: Create slurm-cluster namespace
+      kubernetes.core.k8s:
+        name: slurm-cluster
+        api_version: v1
+        kind: Namespace
+        state: present
+
+    - name: Get current user ID for SCC
+      command: id -u
+      register: current_uid
+      changed_when: false
+
+    - name: Deploy SLURM Controller and Worker pods
+      kubernetes.core.k8s:
+        state: present
+        namespace: slurm-cluster
+        definition: "{{ lookup('file', '../slurm/slurm-manifests.yaml') | from_yaml_all }}"

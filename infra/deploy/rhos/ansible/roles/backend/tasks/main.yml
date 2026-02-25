@@ -1,0 +1,41 @@
+---
+# Backend services deployment
+
+- name: Build Observer service
+  command: "{{ playbook_dir }}/../02-build.sh observer"
+  register: build_observer_result
+  changed_when: "'Successfully pushed' in build_observer_result.stdout or 'Push successful' in build_observer_result.stdout"
+
+- name: Build Listener service
+  command: "{{ playbook_dir }}/../02-build.sh listener"
+  register: build_listener_result
+  changed_when: "'Successfully pushed' in build_listener_result.stdout or 'Push successful' in build_listener_result.stdout"
+
+- name: Build Versor service
+  command: "{{ playbook_dir }}/../02-build.sh versor"
+  register: build_versor_result
+  changed_when: "'Successfully pushed' in build_versor_result.stdout or 'Push successful' in build_versor_result.stdout"
+
+- name: Deploy Versor
+  kubernetes.core.k8s:
+    state: present
+    namespace: "{{ project_name }}"
+    definition: "{{ item }}"
+  loop: "{{ lookup('file', playbook_dir + '/../manifests/versor.yaml') | from_yaml_all | list }}"
+  when: item is not none
+
+- name: Deploy Observer
+  kubernetes.core.k8s:
+    state: present
+    namespace: "{{ project_name }}"
+    definition: "{{ item }}"
+  loop: "{{ lookup('file', playbook_dir + '/../manifests/observer.yaml') | from_yaml_all | list }}"
+  when: item is not none
+
+- name: Deploy Listener
+  kubernetes.core.k8s:
+    state: present
+    namespace: "{{ project_name }}"
+    definition: "{{ item }}"
+  loop: "{{ lookup('file', playbook_dir + '/../manifests/listener.yaml') | from_yaml_all | list }}"
+  when: item is not none

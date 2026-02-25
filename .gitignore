@@ -30,6 +30,9 @@ wheels/
 *.egg
 MANIFEST
 
+# Docs
+docs-build/
+
 # Virtual Environments
 venv/
 .venv/

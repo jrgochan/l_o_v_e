@@ -1,0 +1,47 @@
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: love-versor-monitor
+  namespace: love-stack
+  labels:
+    app: love-stack
+spec:
+  selector:
+    matchLabels:
+      app: love-versor
+  endpoints:
+  - port: "8001"
+    path: /metrics
+    interval: 15s
+---
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: love-observer-monitor
+  namespace: love-stack
+  labels:
+    app: love-stack
+spec:
+  selector:
+    matchLabels:
+      app: love-observer
+  endpoints:
+  - port: "8000"
+    path: /metrics
+    interval: 15s
+---
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: love-listener-monitor
+  namespace: love-stack
+  labels:
+    app: love-stack
+spec:
+  selector:
+    matchLabels:
+      app: love-listener
+  endpoints:
+  - port: "8002"
+    path: /metrics
+    interval: 15s

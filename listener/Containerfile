@@ -23,8 +23,9 @@ ENV UV_LINK_MODE=copy
 COPY pyproject.toml uv.lock ./
 RUN uv sync --frozen --no-install-project --no-dev --group listener
 
-# Download additional models
-RUN /app/.venv/bin/python -m spacy download en_core_web_sm
+# Download the NLP model using uv pip directly
+# Spacy's native downloader requires pip which isn't installed in our uv .venv
+RUN uv pip install https://github.com/explosion/spacy-models/releases/download/en_core_web_sm-3.8.0/en_core_web_sm-3.8.0-py3-none-any.whl
 
 # Copy application code
 COPY listener/app/ app/
