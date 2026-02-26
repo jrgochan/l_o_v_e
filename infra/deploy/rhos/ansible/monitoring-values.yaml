@@ -1,0 +1,63 @@
+# =============================================================================
+# kube-prometheus-stack — Helm Values Override for OpenShift (CRC)
+# =============================================================================
+# Used by monitoring.yml to customize the Prometheus + Grafana deployment
+# for local OpenShift Local (CRC) environments.
+
+defaultRules:
+  create: false
+
+prometheusOperator:
+  createCustomResource: false
+  tls:
+    enabled: false
+  admissionWebhooks:
+    enabled: false
+    patch:
+      enabled: false
+  # Satisfy OpenShift SCC by requesting RuntimeDefault seccomp
+  securityContext:
+    seccompProfile:
+      type: RuntimeDefault
+  containerSecurityContext:
+    seccompProfile:
+      type: RuntimeDefault
+
+prometheus:
+  prometheusSpec:
+    # Satisfy OpenShift SCC
+    securityContext:
+      seccompProfile:
+        type: RuntimeDefault
+    containerSecurityContext:
+      seccompProfile:
+        type: RuntimeDefault
+    serviceMonitorSelectorNilUsesHelmValues: false
+    podMonitorSelectorNilUsesHelmValues: false
+    resources:
+      requests:
+        memory: 512Mi
+
+grafana:
+  adminPassword: "prom-operator"  # NOTE: Demo-only — use a Secret in production
+  # Satisfy OpenShift SCC for Grafana
+  podSecurityContext:
+    seccompProfile:
+      type: RuntimeDefault
+  containerSecurityContext:
+    seccompProfile:
+      type: RuntimeDefault
+  # OpenShift complains about the default grafana seccomp profile
+  assertNoLeakedSecrets: false
+
+alertmanager:
+  enabled: false
+
+kubernetesServiceMonitors:
+  enabled: false
+
+kubeStateMetrics:
+  enabled: false
+
+nodeExporter:
+  enabled: false

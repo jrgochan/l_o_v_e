@@ -1,0 +1,12 @@
+---
+- name: Read ollama manifest
+  set_fact:
+    ollama_manifest: "{{ lookup('file', playbook_dir + '/../manifests/ollama.yaml') | from_yaml_all | list }}"
+
+- name: Deploy Ollama AI Service
+  kubernetes.core.k8s:
+    state: present
+    namespace: "{{ project_name }}"
+    definition: "{{ item }}"
+  loop: "{{ ollama_manifest }}"
+  when: item is not none

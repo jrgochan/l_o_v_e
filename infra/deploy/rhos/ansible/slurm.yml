@@ -10,11 +10,6 @@
         kind: Namespace
         state: present
 
-    - name: Get current user ID for SCC
-      command: id -u
-      register: current_uid
-      changed_when: false
-
     - name: Deploy SLURM Controller and Worker pods
       kubernetes.core.k8s:
         state: present

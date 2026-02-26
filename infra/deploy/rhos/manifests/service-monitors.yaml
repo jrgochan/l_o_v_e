@@ -8,7 +8,8 @@ metadata:
 spec:
   selector:
     matchLabels:
-      app: love-versor
+      app: love-stack
+      component: versor
   endpoints:
   - port: "8001"
     path: /metrics
@@ -24,7 +25,8 @@ metadata:
 spec:
   selector:
     matchLabels:
-      app: love-observer
+      app: love-stack
+      component: observer
   endpoints:
   - port: "8000"
     path: /metrics
@@ -40,7 +42,8 @@ metadata:
 spec:
   selector:
     matchLabels:
-      app: love-listener
+      app: love-stack
+      component: listener
   endpoints:
   - port: "8002"
     path: /metrics

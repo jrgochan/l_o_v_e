@@ -1,51 +1,120 @@
-# RHOS Deployment
+# RHOS Deployment — L.O.V.E. Stack on OpenShift
 
-Deploy the L.O.V.E. stack to Red Hat OpenShift (or Podman Desktop / CodeReady Containers).
+Deploy the L.O.V.E. emotional intelligence platform to Red Hat OpenShift (CRC or production cluster) using **Ansible Infrastructure-as-Code**.
 
 ## Prerequisites
 
-- `oc` CLI tool installed.
-- Logged into an OpenShift cluster (`oc login ...`).
-    - For CRC: Run `crc console --credentials` to get the `kubeadmin` password and login command.
-    - **Important:** Ensure CRC is running (`crc status`) before attempting to login.
-- Python 3.12 compatible container environment (OpenShift usually handles this if building from source with Docker strategy).
+| Tool | Purpose |
+|------|---------|
+| `crc` | OpenShift Local cluster ([install](https://developers.redhat.com/products/codeready-containers/overview)) |
+| `oc` | OpenShift CLI (bundled with CRC, or via `crc oc-env`) |
+| `ansible-playbook` | Ansible core (`pip install ansible` or `brew install ansible`) |
+| `kubernetes.core` | Ansible k8s collection (`ansible-galaxy collection install kubernetes.core`) |
+| `helm` | Helm CLI (required for observability stack only) |
+| `trivy` | Container security scanner (`brew install trivy`) — optional |
 
-## Usage
+Ensure CRC is running (`crc status`) and you are logged in before proceeding.
 
-Run the master deployment script:
+## Quick Start
 
 ```bash
-./deploy.sh
+# 1. Bootstrap the CRC environment (namespaces, oc login, dependency checks)
+./setup-crc-env.sh
+
+# 2. Deploy the full L.O.V.E. stack via Ansible
+cd ansible
+ansible-playbook deploy-openshift.yml
+
+# 3. (Optional) Deploy observability stack (Prometheus + Grafana)
+ansible-playbook monitoring.yml
+
+# 4. (Optional) Deploy SLURM HPC cluster
+ansible-playbook slurm.yml
 ```
 
-This will:
-1.  Initialize the project (`love-stack`) and secrets.
-2.  Build and deploy backend services (`versor`, `observer`, `listener`).
-3.  Deploy infrastructure (`postgres`, `redis`, `ollama`).
-4.  Capture the Observer route URL.
-5.  Build and deploy the frontend (`experience`) with the API URL injected.
+## Architecture
 
-## Manual Steps
+```
+infra/deploy/rhos/
+├── ansible/                        # Infrastructure-as-Code (primary deploy method)
+│   ├── ansible.cfg                 # Ansible configuration
+│   ├── deploy-openshift.yml        # Main deployment playbook
+│   ├── teardown-openshift.yml      # Full teardown playbook
+│   ├── monitoring.yml              # Prometheus + Grafana observability stack
+│   ├── monitoring-values.yaml      # Helm values for kube-prometheus-stack
+│   ├── slurm.yml                   # SLURM HPC cluster deployment
+│   └── roles/
+│       ├── namespace/              # Creates love-stack namespace
+│       ├── rbac/                   # Roles, RoleBindings, ServiceAccounts
+│       ├── network-policies/       # NetworkPolicy for namespace isolation
+│       ├── secrets/                # Secrets (DB_PASSWORD, SECRET_KEY) + ConfigMap
+│       ├── database/               # PostgreSQL (pgvector) deployment
+│       ├── redis/                  # Redis cache deployment
+│       ├── ollama/                 # Ollama AI service deployment
+│       ├── backend/                # Observer, Listener, Versor builds + deploys
+│       └── frontend/               # Experience (Next.js) build + deploy
+├── manifests/                      # Kubernetes YAML manifests
+│   ├── observer.yaml               # FastAPI API gateway
+│   ├── versor.yaml                 # Quaternion math engine
+│   ├── listener.yaml               # Audio processing service
+│   ├── experience.yaml             # Next.js frontend
+│   ├── postgres.yaml               # PostgreSQL + pgvector
+│   ├── redis.yaml                  # Redis cache
+│   ├── ollama.yaml                 # Ollama LLM service
+│   ├── service-monitors.yaml       # Prometheus ServiceMonitors
+│   ├── grafana-dashboard.yaml      # Custom Grafana dashboard
+│   └── job-emotional-batch.yaml    # HPC batch processing Job
+├── slurm/                          # SLURM HPC integration
+│   ├── Dockerfile                  # Rocky Linux + SLURM all-in-one image
+│   ├── docker-entrypoint.sh        # SLURM controller/worker startup
+│   └── slurm-manifests.yaml        # K8s resources for SLURM
+├── setup-crc-env.sh                # CRC bootstrap (checks, login, namespaces)
+├── cleanup-env.sh                  # Full environment teardown (DANGER ZONE)
+├── config.sh                       # Shared configuration variables
+├── 02-build.sh                     # OpenShift build helper (used by Ansible roles)
+└── README.md                       # This file
+```
 
-You can run individual phases:
+## Playbook Details
+
+### `deploy-openshift.yml` — Full Stack Deploy
+Deploys the complete L.O.V.E. stack in dependency order:
+1. **Namespace** → **RBAC** → **NetworkPolicies** → **Secrets/ConfigMap**
+2. **Database** → **Redis** → **Ollama**
+3. **Backend** (build + deploy observer, versor, listener)
+4. **Frontend** (build + deploy experience with injected API URLs)
+5. **Rollout verification** (waits for all deployments to become ready)
+
+### `monitoring.yml` — Observability Stack
+Deploys `kube-prometheus-stack` via Helm with OpenShift-compatible SCC overrides, then applies custom `ServiceMonitor` and `GrafanaDashboard` resources.
+
+### `slurm.yml` — HPC Cluster
+Deploys a single-node SLURM cluster demonstrating `sbatch` job submission workflows within OpenShift.
+
+## Teardown
 
 ```bash
-# 1. Init
-./01-init.sh
+# Full teardown via Ansible
+cd ansible
+ansible-playbook teardown-openshift.yml
 
-# 2. Build (all or specific service)
-./02-build.sh [service]
+# Or use the interactive cleanup script (asks for confirmation)
+./cleanup-env.sh
+```
 
-# 3. Deploy Infra
-./03-deploy-infra.sh
+## Security Scanning
 
-# 4. Deploy App (all or specific service)
-./04-deploy-app.sh [service]
+```bash
+# Scan all container images with Trivy (from repo root)
+make scan
 ```
 
 ## Configuration
 
-Edit `config.sh` to customize:
-- `PROJECT_NAME` (Namespace)
-- `DB_USER` / `DB_NAME`
-- Resource limits
+Edit [`config.sh`](config.sh) for shared constants (namespace, ports, resource limits).
+
+CORS origins and database credentials are managed via the `love-config` ConfigMap and `love-secrets` Secret, configured in the [`secrets` Ansible role](ansible/roles/secrets/tasks/main.yml).
+
+## Legacy Scripts
+
+The `01-init.sh`, `03-deploy-infra.sh`, and `04-deploy-app.sh` scripts are **deprecated** and retained for reference only. Use the Ansible playbooks for all deployments.

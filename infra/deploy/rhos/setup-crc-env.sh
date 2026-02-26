@@ -68,7 +68,7 @@ print_success "CRC cluster is running."
 # 3. Configure oc environment
 print_step "Configuring 'oc' CLI environment..."
 # shellcheck disable=SC2046
-eval $(crc oc-env)
+eval "$(crc oc-env)"
 print_success "Configured oc environment."
 
 # 4. Authenticate

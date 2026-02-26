@@ -52,7 +52,31 @@ spec:
           imagePullPolicy: Always
           ports:
             - containerPort: 8000
+          resources:
+            requests:
+              cpu: 100m
+              memory: 256Mi
+            limits:
+              cpu: "1"
+              memory: 1Gi
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 8000
+            initialDelaySeconds: 10
+            periodSeconds: 5
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 8000
+            initialDelaySeconds: 30
+            periodSeconds: 10
           env:
+            - name: SECRET_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: love-secrets
+                  key: SECRET_KEY
             - name: POSTGRES_HOST
               value: "love-db"
             - name: POSTGRES_PORT
@@ -75,7 +99,10 @@ spec:
             - name: DATABASE_URL
               value: "postgresql+asyncpg://$(POSTGRES_USER):$(POSTGRES_PASSWORD)@$(POSTGRES_HOST):$(POSTGRES_PORT)/$(POSTGRES_DB)"
             - name: ALLOWED_ORIGINS
-              value: '["http://localhost:3000", "http://127.0.0.1:3000", "http://localhost:19006", "http://love-experience-love-stack.apps-crc.testing"]'
+              valueFrom:
+                configMapKeyRef:
+                  name: love-config
+                  key: ALLOWED_ORIGINS
             - name: REDIS_HOST
               value: "love-redis"
             - name: REDIS_PORT

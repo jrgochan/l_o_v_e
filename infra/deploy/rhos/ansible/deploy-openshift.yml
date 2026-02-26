@@ -39,8 +39,32 @@
     - role: redis
       tags: setup
 
+    - role: ollama
+      tags: setup
+
     - role: backend
       tags: deploy
 
     - role: frontend
+      tags: deploy
+
+  post_tasks:
+    - name: Verify backend rollouts completed
+      ansible.builtin.shell: >
+        oc rollout status deployment/{{ item }} -n {{ project_name }} --timeout=120s
+      loop:
+        - love-observer
+        - love-versor
+        - love-listener
+      changed_when: false
+      tags: deploy
+
+    - name: Verify infrastructure rollouts completed
+      ansible.builtin.shell: >
+        oc rollout status deployment/{{ item }} -n {{ project_name }} --timeout=120s
+      loop:
+        - love-db
+        - love-redis
+        - love-experience
+      changed_when: false
       tags: deploy

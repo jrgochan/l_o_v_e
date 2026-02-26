@@ -31,8 +31,8 @@ if [ -z "$OBSERVER_HOST" ]; then
     sleep 5
     OBSERVER_HOST=$(oc get route love-observer -o jsonpath='{.spec.host}')
 fi
-# Prepend protocol
-OBSERVER_URL="https://$OBSERVER_HOST"
+# Prepend protocol (HTTP — TLS termination is disabled for local CRC)
+OBSERVER_URL="http://$OBSERVER_HOST"
 echo "Observer URL: $OBSERVER_URL"
 
 # 6. Build Frontend
@@ -49,5 +49,5 @@ echo "=================================================="
 echo "✅ Deployment Complete!"
 echo "Observer: $OBSERVER_URL"
 EXP_HOST=$(oc get route love-experience -o jsonpath='{.spec.host}')
-echo "Experience: https://$EXP_HOST"
+echo "Experience: http://$EXP_HOST"
 echo "=================================================="

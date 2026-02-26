@@ -38,12 +38,34 @@ spec:
           imagePullPolicy: Always
           ports:
             - containerPort: 8001
+          resources:
+            requests:
+              cpu: 100m
+              memory: 256Mi
+            limits:
+              cpu: "1"
+              memory: 1Gi
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 8001
+            initialDelaySeconds: 10
+            periodSeconds: 5
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 8001
+            initialDelaySeconds: 30
+            periodSeconds: 10
           env:
              # Add any specific env vars here
              - name: PYTHONUNBUFFERED
                value: "1"
              - name: ALLOWED_ORIGINS
-               value: '["http://localhost:3000", "http://127.0.0.1:3000", "http://localhost:19006", "http://love-experience-love-stack.apps-crc.testing"]'
+               valueFrom:
+                 configMapKeyRef:
+                   name: love-config
+                   key: ALLOWED_ORIGINS
 ---
 apiVersion: route.openshift.io/v1
 kind: Route

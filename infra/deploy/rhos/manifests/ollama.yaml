@@ -50,6 +50,23 @@ spec:
           image: ollama/ollama:latest
           ports:
             - containerPort: 11434
+          resources:
+            requests:
+              cpu: 200m
+              memory: 512Mi
+            limits:
+              cpu: "2"
+              memory: 4Gi
+          readinessProbe:
+            tcpSocket:
+              port: 11434
+            initialDelaySeconds: 15
+            periodSeconds: 10
+          livenessProbe:
+            tcpSocket:
+              port: 11434
+            initialDelaySeconds: 30
+            periodSeconds: 15
           env:
             - name: OLLAMA_HOST
               value: "0.0.0.0"

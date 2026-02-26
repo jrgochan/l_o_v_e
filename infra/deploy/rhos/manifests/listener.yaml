@@ -38,11 +38,33 @@ spec:
           imagePullPolicy: Always
           ports:
             - containerPort: 8002
+          resources:
+            requests:
+              cpu: 100m
+              memory: 256Mi
+            limits:
+              cpu: "1"
+              memory: 1Gi
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 8002
+            initialDelaySeconds: 10
+            periodSeconds: 5
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 8002
+            initialDelaySeconds: 30
+            periodSeconds: 10
           env:
              - name: OLLAMA_BASE_URL
                value: "http://love-ollama:11434"
              - name: ALLOWED_ORIGINS
-               value: '["http://localhost:3000", "http://127.0.0.1:3000", "http://localhost:19006", "http://love-experience-love-stack.apps-crc.testing"]'
+               valueFrom:
+                 configMapKeyRef:
+                   name: love-config
+                   key: ALLOWED_ORIGINS
 ---
 apiVersion: route.openshift.io/v1
 kind: Route
