@@ -11,7 +11,7 @@
 
 - name: Set Observer URL fact
   set_fact:
-    observer_url: "http://{{ observer_route.resources[0].spec.host }}"
+    observer_url: "https://{{ observer_route.resources[0].spec.host }}"
   when: observer_route.resources | length > 0
 
 - name: Build frontend service

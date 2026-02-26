@@ -79,3 +79,6 @@ spec:
     name: love-listener
   port:
     targetPort: 8002
+  tls:
+    termination: edge
+    insecureEdgeTerminationPolicy: Redirect

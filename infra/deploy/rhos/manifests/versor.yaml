@@ -80,3 +80,6 @@ spec:
     name: love-versor
   port:
     targetPort: 8001
+  tls:
+    termination: edge
+    insecureEdgeTerminationPolicy: Redirect
