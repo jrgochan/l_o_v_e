@@ -40,24 +40,37 @@ spec:
             - containerPort: 8002
           resources:
             requests:
-              cpu: 100m
-              memory: 256Mi
+              cpu: 200m
+              memory: 512Mi
             limits:
-              cpu: "1"
-              memory: 1Gi
+              cpu: "4"
+              memory: 4Gi
           readinessProbe:
             httpGet:
               path: /health
               port: 8002
-            initialDelaySeconds: 10
-            periodSeconds: 5
+            initialDelaySeconds: 60
+            periodSeconds: 15
+            timeoutSeconds: 5
+            failureThreshold: 6
           livenessProbe:
             httpGet:
               path: /health
               port: 8002
-            initialDelaySeconds: 30
-            periodSeconds: 10
+            initialDelaySeconds: 90
+            periodSeconds: 30
+            timeoutSeconds: 10
+            failureThreshold: 6
           env:
+             - name: SECRET_KEY
+               valueFrom:
+                 secretKeyRef:
+                   name: love-secrets
+                   key: SECRET_KEY
+             - name: OLLAMA_MODEL
+               value: "llama3.2"
+             - name: OBSERVER_URL
+               value: "http://love-observer:8000"
              - name: OLLAMA_BASE_URL
                value: "http://love-ollama:11434"
              - name: ALLOWED_ORIGINS

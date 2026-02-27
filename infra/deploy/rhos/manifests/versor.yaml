@@ -59,6 +59,11 @@ spec:
             periodSeconds: 10
           env:
              # Add any specific env vars here
+             - name: SECRET_KEY
+               valueFrom:
+                 secretKeyRef:
+                   name: love-secrets
+                   key: SECRET_KEY
              - name: PYTHONUNBUFFERED
                value: "1"
              - name: ALLOWED_ORIGINS

@@ -9,13 +9,60 @@
     namespace: "{{ project_name }}"
   register: observer_route
 
-- name: Set Observer URL fact
+- name: Get Listener Route Host
+  kubernetes.core.k8s_info:
+    api_version: route.openshift.io/v1
+    kind: Route
+    name: love-listener
+    namespace: "{{ project_name }}"
+  register: listener_route
+
+- name: Get Versor Route Host
+  kubernetes.core.k8s_info:
+    api_version: route.openshift.io/v1
+    kind: Route
+    name: love-versor
+    namespace: "{{ project_name }}"
+  register: versor_route
+
+- name: Set service URL facts
   set_fact:
     observer_url: "https://{{ observer_route.resources[0].spec.host }}"
-  when: observer_route.resources | length > 0
+    listener_url: "https://{{ listener_route.resources[0].spec.host }}"
+    versor_url: "https://{{ versor_route.resources[0].spec.host }}"
+  when:
+    - observer_route.resources | length > 0
+    - listener_route.resources | length > 0
+    - versor_route.resources | length > 0
 
-- name: Build frontend service
-  command: "{{ playbook_dir }}/../02-build.sh experience"
+- name: Build and deploy frontend with HTTPS backend URLs
+  shell: |
+    set -e
+    cd "{{ playbook_dir }}/.."
+    source ./config.sh
+    BUILD_CONTEXT="$PWD/../../../experience"
+
+    echo "Patching BuildConfig with HTTPS env vars and Containerfile path..."
+    oc patch bc love-experience --type=merge -p '{
+      "spec": {
+        "strategy": {
+          "dockerStrategy": {
+            "dockerfilePath": "Containerfile",
+            "env": [
+              {"name": "NEXT_PUBLIC_API_URL", "value": "{{ observer_url }}"},
+              {"name": "NEXT_PUBLIC_OBSERVER_URL", "value": "{{ observer_url }}"},
+              {"name": "NEXT_PUBLIC_LISTENER_URL", "value": "{{ listener_url }}"},
+              {"name": "NEXT_PUBLIC_VERSOR_URL", "value": "{{ versor_url }}"}
+            ]
+          }
+        }
+      }
+    }'
+
+    echo "Starting OpenShift build..."
+    oc start-build love-experience \
+      --from-dir="$BUILD_CONTEXT" \
+      --follow
   register: build_frontend_result
   changed_when: "'Successfully pushed' in build_frontend_result.stdout or 'Push successful' in build_frontend_result.stdout"
   when: observer_url is defined
