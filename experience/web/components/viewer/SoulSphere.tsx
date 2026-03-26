@@ -96,7 +96,9 @@ void main() {
       float n1 = snoise(position * 3.0);
       float n2 = snoise(position * 6.0 + vec3(17.0)) * 0.3;
       float combined = n1 + n2;
-      float stepVal = floor(combined * 8.0) / 8.0; // More facets, sharper geometry
+      // Depth → more facets: 8 at shallow, up to 16 at max depth
+      float facetCount = 8.0 + uDepthTopology * 8.0;
+      float stepVal = floor(combined * facetCount) / facetCount;
       // Stronger displacement for dramatic angular appearance
       displaced += normal * (stepVal * (0.15 + noiseAmp * 1.5));
       noiseVal = combined;
@@ -105,6 +107,9 @@ void main() {
       // Flowing wave motion
       float wave = sin(position.y * 4.0 + uTime * 2.0) * 0.5 +
                    cos(position.x * 4.0 + uTime * 1.5) * 0.5;
+      // Depth → additional wave harmonics for complex currents
+      wave += uDepthTopology * 0.3 * sin(position.z * 6.0 + uTime * 1.2);
+      wave += uDepthTopology * 0.15 * cos(position.y * 8.0 - uTime * 0.8);
       displaced += normal * (wave * (0.05 + noiseAmp * 0.5));
       noiseVal = wave;
   }
@@ -144,18 +149,21 @@ void main() {
   }
 
   // === BREATHING: velocity controls speed, coping controls regularity ===
-  float velocityAbs = abs(uVelocity);
-  float breathFreq = mix(3.14, 15.7, velocityAbs);  // 2s → 0.4s cycle
-  float breathAmp = mix(0.03, 0.08, velocityAbs);    // ±3% → ±8%
+  // Only breathe in organic modes (not Crystalline=3 or Glitch=6)
+  if (uMode != 3 && uMode != 6) {
+    float velocityAbs = abs(uVelocity);
+    float breathFreq = mix(3.14, 15.7, velocityAbs);  // 2s → 0.4s cycle
+    float breathAmp = mix(0.03, 0.08, velocityAbs);    // ±3% → ±8%
 
-  // Dysregulation: add harmonic distortion when coping < 0
-  float dysreg = max(0.0, -uCoping);
-  float breathWave = sin(uTime * breathFreq);
-  breathWave += dysreg * 0.3 * sin(uTime * breathFreq * 2.7);  // Odd harmonic
-  breathWave += dysreg * 0.15 * sin(uTime * breathFreq * 4.1); // Higher harmonic
-  breathWave = clamp(breathWave, -1.0, 1.0);
+    // Dysregulation: add harmonic distortion when coping < 0
+    float dysreg = max(0.0, -uCoping);
+    float breathWave = sin(uTime * breathFreq);
+    breathWave += dysreg * 0.3 * sin(uTime * breathFreq * 2.7);  // Odd harmonic
+    breathWave += dysreg * 0.15 * sin(uTime * breathFreq * 4.1); // Higher harmonic
+    breathWave = clamp(breathWave, -1.0, 1.0);
 
-  displaced += normal * breathWave * breathAmp;
+    displaced += normal * breathWave * breathAmp;
+  }
 
   // Pass noise value for coloring
   vNoise = noiseVal;
@@ -181,6 +189,7 @@ uniform float uOpacity;
 uniform vec3 uCameraPosition;
 uniform float uTime;
 uniform float uDepth; // Octonion: -1 (superficial) to +1 (profound)
+uniform float uNovelty; // Octonion: -1 (familiar) to +1 (novel)
 
 varying vec3 vNormal;
 varying vec3 vPosition;
@@ -273,6 +282,12 @@ void main() {
   float depthDim = max(0.0, -uDepth) * 0.3;  // Negative depth = matte
   litColor += litColor * depthGlow;           // Emissive boost
   litColor *= (1.0 - depthDim);               // Matte darkening
+
+  // ===== OCTONION: NOVELTY → CHROMATIC PULSE =====
+  // Novel emotions shimmer unexpectedly; familiar emotions are chromatically stable
+  float noveltyAbs = abs(uNovelty);
+  float noveltyPulse = noveltyAbs * sin(uTime * 4.0 + vPosition.x * 3.0) * 0.06;
+  litColor += litColor * noveltyPulse;
 
   gl_FragColor = vec4(litColor, alpha * uOpacity);
 }
@@ -383,6 +398,7 @@ export function SoulSphere() {
         uConnection: { value: 0 },
         uMode: { value: 0 },
         uDepth: { value: 0 },
+        uNovelty: { value: 0 },
         uVelocity: { value: 0 },
         uCoping: { value: 0 },
         uDepthTopology: { value: 0 },
@@ -394,20 +410,14 @@ export function SoulSphere() {
     });
   }, []);
 
-  // Update mode uniform when it changes
-  useFrame(() => {
-    if (materialRef.current) {
-      materialRef.current.uniforms.uMode.value = modeInt;
-      // Override standard valence mixing with our computed aggregate color
-      // By setting both Neg and Pos to the same color, mix() returns that color
-      materialRef.current.uniforms.uColorNeg.value.copy(aggregateColor);
-      materialRef.current.uniforms.uColorPos.value.copy(aggregateColor);
-    }
-  });
-
-  // Animation loop — lerp octonion + update all uniforms at 60fps
+  // Single unified animation loop — mode, color, lerp, uniforms at 60fps
   useFrame((state, delta) => {
     if (!materialRef.current) return;
+
+    // === MODE & COLOR (merged from separate useFrame for perf) ===
+    materialRef.current.uniforms.uMode.value = modeInt;
+    materialRef.current.uniforms.uColorNeg.value.copy(aggregateColor);
+    materialRef.current.uniforms.uColorPos.value.copy(aggregateColor);
 
     // Direct store access for 60fps performance without re-renders
     const currentVAC = useExperienceStore.getState().currentVAC;
@@ -423,13 +433,22 @@ export function SoulSphere() {
     const dampedVelocity = THREE.MathUtils.damp(octonionExt.velocity, octonionTarget.velocity, LAMBDA, delta);
     const dampedNovelty = THREE.MathUtils.damp(octonionExt.novelty, octonionTarget.novelty, LAMBDA, delta);
 
-    // Write back to store (direct set for perf — no React re-render triggered)
-    useExperienceStore.getState().setOctonionExtended({
-      depth: dampedDepth,
-      coping: dampedCoping,
-      velocity: dampedVelocity,
-      novelty: dampedNovelty,
-    });
+    // Only write to store when values have meaningfully changed (prevents 60fps thrashing)
+    const EPSILON = 0.001;
+    const changed =
+      Math.abs(dampedDepth - octonionExt.depth) > EPSILON ||
+      Math.abs(dampedCoping - octonionExt.coping) > EPSILON ||
+      Math.abs(dampedVelocity - octonionExt.velocity) > EPSILON ||
+      Math.abs(dampedNovelty - octonionExt.novelty) > EPSILON;
+
+    if (changed) {
+      useExperienceStore.getState().setOctonionExtended({
+        depth: dampedDepth,
+        coping: dampedCoping,
+        velocity: dampedVelocity,
+        novelty: dampedNovelty,
+      });
+    }
 
     // Scale time by animation speed
     materialRef.current.uniforms.uTime.value += delta * animationSpeed;
@@ -445,8 +464,10 @@ export function SoulSphere() {
     const effectiveVelocity = octonionEnabled ? dampedVelocity : currentVAC[1]; // arousal fallback
     const effectiveCoping = octonionEnabled ? dampedCoping : currentVAC[0];     // valence fallback
     const effectiveDepth = octonionEnabled ? dampedDepth : 0;
+    const effectiveNovelty = octonionEnabled ? dampedNovelty : 0;
 
     materialRef.current.uniforms.uDepth.value = effectiveDepth;
+    materialRef.current.uniforms.uNovelty.value = effectiveNovelty;
     materialRef.current.uniforms.uVelocity.value = effectiveVelocity;
     materialRef.current.uniforms.uCoping.value = effectiveCoping;
     materialRef.current.uniforms.uDepthTopology.value = Math.abs(effectiveDepth);

@@ -78,11 +78,11 @@ export function EmotionCloud({ enableFloatingLabels = false }: EmotionCloudProps
       (e) => selectedIds.has(e.id) || e.id === hoveredId
     );
 
-    // No selection → return to neutral
+    // No selection → snap to neutral immediately (no lerp delay on full clear)
     if (relevantEmotions.length === 0 || !relevantEmotions.some((e) => e.extended)) {
-      useExperienceStore.getState().setTargetOctonionExtended({
-        depth: 0, coping: 0, velocity: 0, novelty: 0,
-      });
+      const neutral = { depth: 0, coping: 0, velocity: 0, novelty: 0 };
+      useExperienceStore.getState().setOctonionExtended(neutral);
+      useExperienceStore.getState().setTargetOctonionExtended(neutral);
       return;
     }
 
