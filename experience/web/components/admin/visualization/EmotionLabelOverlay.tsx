@@ -8,6 +8,7 @@
 "use client";
 
 import { useVisualizationStore } from "@/stores/useVisualizationStore";
+import { useSettingsStore } from "@/stores/useSettingsStore";
 import { BRIDGE_EMOTIONS } from "@/types/visualization";
 import { resolveEmotionColor } from "@/utils/emotion-colors";
 import type { PathAnimationMode } from "@/types/visualization";
@@ -20,7 +21,7 @@ interface EmotionLabelOverlayProps {
 export function EmotionLabelOverlay({ labels }: EmotionLabelOverlayProps) {
   const selectedIds = useVisualizationStore((state) => state.selectedEmotionIds);
   const hoveredId = useVisualizationStore((state) => state.hoveredEmotionId);
-  const layers = useVisualizationStore((state) => state.layers);
+  const layers = useSettingsStore((state) => state.layers);
   const settings = useVisualizationStore((state) => state.settings);
   const mode = settings.pathAnimationMode;
 

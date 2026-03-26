@@ -1,7 +1,8 @@
 /**
- * Export Controls Component
+ * Export Controls — Compact Icon Row
  *
- * Provides export and screenshot functionality for the Atlas interface.
+ * 4 small icon buttons in a single row with tooltips.
+ * Saves ~120px vs the previous full-width button stack.
  */
 
 "use client";
@@ -17,9 +18,6 @@ export function ExportControls() {
   const computedPaths = useVisualizationStore((state) => state.computedPaths);
   const theme = useAdminTheme();
 
-  /**
-   * Export selected emotions and paths as JSON
-   */
   const exportJSON = () => {
     const selectedEmotions = allEmotions.filter((e) => selectedIds.has(e.id));
     const paths = Array.from(computedPaths.values());
@@ -61,31 +59,17 @@ export function ExportControls() {
     URL.revokeObjectURL(url);
   };
 
-  /**
-   * Export path metrics as CSV
-   */
   const exportCSV = () => {
     const paths = Array.from(computedPaths.values());
 
     const headers = [
-      "From",
-      "To",
-      "Distance",
-      "Difficulty",
-      "Time",
-      "Waypoints",
-      "Requires Bridge",
-      "Bridge Emotions",
+      "From", "To", "Distance", "Difficulty", "Time", "Waypoints",
+      "Requires Bridge", "Bridge Emotions",
     ];
     const rows = paths.map((p) => [
-      p.from.name,
-      p.to.name,
-      p.total_distance.toFixed(3),
-      p.difficulty,
-      p.estimated_time,
-      p.waypoints.length,
-      p.requires_bridge ? "Yes" : "No",
-      p.bridge_emotions?.join("; ") || "",
+      p.from.name, p.to.name, p.total_distance.toFixed(3), p.difficulty,
+      p.estimated_time, p.waypoints.length,
+      p.requires_bridge ? "Yes" : "No", p.bridge_emotions?.join("; ") || "",
     ]);
 
     const csv = [
@@ -102,9 +86,6 @@ export function ExportControls() {
     URL.revokeObjectURL(url);
   };
 
-  /**
-   * Copy current state to clipboard
-   */
   const copyToClipboard = async () => {
     const selectedEmotions = allEmotions.filter((e) => selectedIds.has(e.id));
     const paths = Array.from(computedPaths.values());
@@ -128,9 +109,6 @@ ${paths.map((p, i) => `${i + 1}. ${p.from.name} → ${p.to.name} (${p.difficulty
     }
   };
 
-  /**
-   * Generate shareable URL with current state
-   */
   const generateShareableURL = () => {
     const selectedEmotions = allEmotions.filter((e) => selectedIds.has(e.id));
     const emotionIds = selectedEmotions.map((e) => e.id).join(",");
@@ -142,45 +120,37 @@ ${paths.map((p, i) => `${i + 1}. ${p.from.name} → ${p.to.name} (${p.difficulty
     alert("Shareable URL copied to clipboard!");
   };
 
+  const hasSelection = selectedIds.size > 0;
+  const hasPaths = computedPaths.size > 0;
+
+  const actions = [
+    { icon: "📥", label: "Export JSON", onClick: exportJSON, disabled: !hasSelection },
+    { icon: "📊", label: "Export CSV", onClick: exportCSV, disabled: !hasPaths },
+    { icon: "📋", label: "Copy to Clipboard", onClick: copyToClipboard, disabled: !hasSelection },
+    { icon: "🔗", label: "Copy Share Link", onClick: generateShareableURL, disabled: !hasSelection },
+  ];
+
   return (
-    <div className="space-y-2">
-      <h3
-        className={`text-xs font-semibold uppercase tracking-wider ${theme.colors.text.secondary}`}
-      >
-        Export
-      </h3>
-
-      <button
-        onClick={exportJSON}
-        disabled={selectedIds.size === 0}
-        className={`w-full px-3 py-2 bg-blue-600 hover:bg-blue-500 disabled:bg-black/30 disabled:${theme.colors.text.muted} text-white text-sm ${theme.layout.borderRadius} transition`}
-      >
-        📥 Export JSON
-      </button>
-
-      <button
-        onClick={exportCSV}
-        disabled={computedPaths.size === 0}
-        className={`w-full px-3 py-2 bg-green-600 hover:bg-green-500 disabled:bg-black/30 disabled:${theme.colors.text.muted} text-white text-sm ${theme.layout.borderRadius} transition`}
-      >
-        📊 Export CSV
-      </button>
-
-      <button
-        onClick={copyToClipboard}
-        disabled={selectedIds.size === 0}
-        className={`w-full px-3 py-2 bg-purple-600 hover:bg-purple-500 disabled:bg-black/30 disabled:${theme.colors.text.muted} text-white text-sm ${theme.layout.borderRadius} transition`}
-      >
-        📋 Copy to Clipboard
-      </button>
-
-      <button
-        onClick={generateShareableURL}
-        disabled={selectedIds.size === 0}
-        className={`w-full px-3 py-2 bg-orange-600 hover:bg-orange-500 disabled:bg-black/30 disabled:${theme.colors.text.muted} text-white text-sm ${theme.layout.borderRadius} transition`}
-      >
-        🔗 Copy Share Link
-      </button>
+    <div className="flex gap-1.5">
+      {actions.map(({ icon, label, onClick, disabled }) => (
+        <button
+          key={label}
+          onClick={onClick}
+          disabled={disabled}
+          title={label}
+          className={`
+            flex-1 flex items-center justify-center
+            px-2 py-2 rounded-lg border text-sm
+            transition-all duration-200
+            ${disabled
+              ? `bg-black/10 border-white/5 ${theme.colors.text.muted} opacity-40 cursor-not-allowed`
+              : `bg-black/20 border-white/10 ${theme.colors.text.secondary} hover:bg-white/10 hover:border-white/20 hover:scale-105 active:scale-95`
+            }
+          `}
+        >
+          {icon}
+        </button>
+      ))}
     </div>
   );
 }

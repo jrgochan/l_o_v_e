@@ -10,6 +10,7 @@
 import { useThree, useFrame } from "@react-three/fiber";
 import * as THREE from "three";
 import { useVisualizationStore } from "@/stores/useVisualizationStore";
+import { useSettingsStore } from "@/stores/useSettingsStore";
 import type { Emotion } from "@/types/visualization";
 
 export interface LabelPosition {
@@ -29,7 +30,7 @@ export function EmotionLabelTracker({ onUpdate }: EmotionLabelTrackerProps) {
   const allEmotions = useVisualizationStore((state) => state.allEmotions);
   const selectedIds = useVisualizationStore((state) => state.selectedEmotionIds);
   const hoveredId = useVisualizationStore((state) => state.hoveredEmotionId);
-  const layers = useVisualizationStore((state) => state.layers);
+  const layers = useSettingsStore((state) => state.layers);
 
   // Update label positions every frame
   useFrame(() => {

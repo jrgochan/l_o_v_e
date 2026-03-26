@@ -345,7 +345,7 @@ export function OctonionLayers() {
   useFrame((state, delta) => {
     const { coping, velocity, novelty } =
       useExperienceStore.getState().octonionExtended;
-    const timeDelta = reducedMotion ? 0 : delta * animationSpeed;
+    const timeDelta = reducedMotion ? 0 : delta * animationSpeed * 0.5;
 
     // === COPING SHELL ===
     if (copingRef.current) {

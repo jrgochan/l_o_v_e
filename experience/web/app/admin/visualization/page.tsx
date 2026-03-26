@@ -116,7 +116,7 @@ const VisualizationAdminContent = () => {
   const [isInfoPanelExpanded, setIsInfoPanelExpanded] = useState(false);
   const [labelPositions, setLabelPositions] = useState<LabelPosition[]>([]);
 
-  const layers = useVisualizationStore((state) => state.layers);
+  const layers = useSettingsStore((state) => state.layers);
   const dataVisualizationMode = useVisualizationStore(
     (state) => state.settings.dataVisualizationMode
   );

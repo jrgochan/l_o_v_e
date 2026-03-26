@@ -11,6 +11,7 @@ import { useMemo } from "react";
 import { ThreeEvent } from "@react-three/fiber";
 import * as THREE from "three";
 import { useVisualizationStore } from "@/stores/useVisualizationStore";
+import { useSettingsStore } from "@/stores/useSettingsStore";
 import { useExperienceStore } from "@/stores/useExperienceStore";
 import { DIFFICULTY_COLORS } from "@/types/visualization";
 import { resolveEmotionColor } from "@/utils/emotion-colors";
@@ -22,7 +23,7 @@ import { WaypointMarker } from "./WaypointMarker";
 export function PathNetwork() {
   const computedPaths = useVisualizationStore((state) => state.computedPaths);
   const selectedIds = useVisualizationStore((state) => state.selectedEmotionIds);
-  const layers = useVisualizationStore((state) => state.layers);
+  const layers = useSettingsStore((state) => state.layers);
   const settings = useVisualizationStore((state) => state.settings);
   const transitionPath = useExperienceStore((state) => state.transitionPath);
 

@@ -152,14 +152,20 @@ void main() {
   // Only breathe in organic modes (not Crystalline=3 or Glitch=6)
   if (uMode != 3 && uMode != 6) {
     float velocityAbs = abs(uVelocity);
-    float breathFreq = mix(3.14, 15.7, velocityAbs);  // 2s → 0.4s cycle
-    float breathAmp = mix(0.03, 0.08, velocityAbs);    // ±3% → ±8%
+    // Lower frequencies → meditative rhythm, no visible stalling at peaks
+    float breathFreq = mix(1.2, 5.0, velocityAbs);   // ~5s → ~1.3s cycle
+    float breathAmp = mix(0.03, 0.08, velocityAbs);   // ±3% → ±8%
 
     // Dysregulation: add harmonic distortion when coping < 0
     float dysreg = max(0.0, -uCoping);
-    float breathWave = sin(uTime * breathFreq);
-    breathWave += dysreg * 0.3 * sin(uTime * breathFreq * 2.7);  // Odd harmonic
-    breathWave += dysreg * 0.15 * sin(uTime * breathFreq * 4.1); // Higher harmonic
+
+    // Smooth sine breathing
+    float phase = uTime * breathFreq;
+    float breathWave = sin(phase);
+
+    // Dysregulation harmonics: organic jitter layered on top
+    breathWave += dysreg * 0.3 * sin(phase * 2.7);
+    breathWave += dysreg * 0.15 * sin(phase * 4.1);
     breathWave = clamp(breathWave, -1.0, 1.0);
 
     displaced += normal * breathWave * breathAmp;
@@ -450,8 +456,8 @@ export function SoulSphere() {
       });
     }
 
-    // Scale time by animation speed
-    materialRef.current.uniforms.uTime.value += delta * animationSpeed;
+    // Scale time by animation speed (0.5 base rate so 1x is calm, 3x is energetic)
+    materialRef.current.uniforms.uTime.value += delta * animationSpeed * 0.5;
 
     // Core VAC uniforms
     materialRef.current.uniforms.uValence.value = currentVAC[0];

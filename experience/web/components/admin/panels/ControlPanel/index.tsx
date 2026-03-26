@@ -33,7 +33,6 @@ export function ControlPanel() {
   const selectedIds = useVisualizationStore((state) => state.selectedEmotionIds);
   const categoryFilters = useVisualizationStore((state) => state.categoryFilters);
   const settings = useVisualizationStore((state) => state.settings);
-  const layers = useVisualizationStore((state) => state.layers);
 
   // Store actions
   const toggleEmotion = useVisualizationStore((state) => state.toggleEmotion);
@@ -44,6 +43,8 @@ export function ControlPanel() {
   const disableAllCategories = useVisualizationStore((state) => state.disableAllCategories);
   const updateSetting = useVisualizationStore((state) => state.updateSetting);
   const toggleLayer = useVisualizationStore((state) => state.toggleLayer);
+  const settingsLayers = useSettingsStore((state) => state.layers);
+  const settingsUpdateLayer = useSettingsStore((state) => state.updateLayer);
 
   // Custom hooks
   const { searchQuery, setSearchQuery, filteredEmotions, hasActiveSearch } = useEmotionSearch({
@@ -166,13 +167,16 @@ export function ControlPanel() {
             {/* Layer Controls */}
             <LayerControls
               categoryFilters={categoryFilters}
-              layers={layers}
+              layers={settingsLayers}
               settings={settings}
               allCategoriesEnabled={allCategoriesEnabled}
               onToggleCategoryFilter={toggleCategoryFilter}
               onToggleAllCategories={toggleAllCategories}
               onUpdateSetting={updateSetting}
-              onToggleLayer={toggleLayer}
+              onToggleLayer={(layer) => {
+                settingsUpdateLayer(layer, !settingsLayers[layer]);
+                toggleLayer(layer); // Keep both stores in sync
+              }}
             />
 
             {/* Soul Sphere DJ Controls */}
