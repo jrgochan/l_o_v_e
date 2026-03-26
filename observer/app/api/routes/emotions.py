@@ -339,6 +339,11 @@ async def get_all_emotions(
                         if emotion.q_constant is not None
                         else [1.0, 0.0, 0.0, 0.0]
                     ),
+                    "extended_vector": (
+                        [float(x) for x in emotion.extended_vector]
+                        if emotion.extended_vector is not None
+                        else None
+                    ),
                     "color_hint": emotion.color_hint,
                     "movement_pattern": emotion.movement_pattern,
                 }
@@ -415,6 +420,11 @@ async def get_emotion_by_id(emotion_id: str, db: AsyncSession = Depends(get_db))
                 if emotion.q_constant is not None
                 else [1.0, 0.0, 0.0, 0.0]
             ),
+            "extended_vector": (
+                [float(x) for x in emotion.extended_vector]
+                if emotion.extended_vector is not None
+                else None
+            ),
             "color_hint": emotion.color_hint,
             "movement_pattern": emotion.movement_pattern,
         }
@@ -462,6 +472,11 @@ async def search_emotions(
                         float(emotion.vac_vector[1]),
                         float(emotion.vac_vector[2]),
                     ],
+                    "extended_vector": (
+                        [float(x) for x in emotion.extended_vector]
+                        if emotion.extended_vector is not None
+                        else None
+                    ),
                     "color_hint": emotion.color_hint,
                     "movement_pattern": emotion.movement_pattern,
                 }

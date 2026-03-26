@@ -33,6 +33,7 @@ export function VACTrajectoryPlot({ vacHistory }: VACTrajectoryPlotProps) {
     confidence: point.confidence,
     timestamp: point.timestamp,
     connection: point.vac.connection,
+    extended: point.extended,
   }));
 
   // Create SVG path string
@@ -119,6 +120,64 @@ export function VACTrajectoryPlot({ vacHistory }: VACTrajectoryPlotProps) {
         color: "text-yellow-400",
         message: "Arousal escalation detected",
       });
+    }
+
+    // ========== OCTONION-BASED PATTERNS ==========
+    const hasExtended = vacHistory.some((p) => p.extended);
+    if (hasExtended) {
+      // 🛡️ Coping Collapse — sudden drop in agency
+      for (let i = 0; i < vacHistory.length - 1; i++) {
+        const curr = vacHistory[i].extended?.coping ?? 0;
+        const next = vacHistory[i + 1].extended?.coping ?? 0;
+        if (curr - next > 0.5) {
+          patterns.push({
+            type: "coping_collapse",
+            icon: "🛡️",
+            color: "text-rose-400",
+            message: "Coping collapse: sudden loss of agency detected",
+          });
+          break;
+        }
+      }
+
+      // 🧊 Emotional Freezing — stuck/frozen velocity
+      const frozenCount = vacHistory.filter(
+        (p) => (p.extended?.velocity ?? 0) < -0.5
+      ).length;
+      if (frozenCount >= 3) {
+        patterns.push({
+          type: "emotional_freezing",
+          icon: "🧊",
+          color: "text-indigo-400",
+          message: "Emotional freezing: stuck pattern for " + frozenCount + " points",
+        });
+      }
+
+      // 🆕 Novel Distress — first-time difficult emotion
+      const novelDistress = vacHistory.some(
+        (p) => (p.extended?.novelty ?? 0) > 0.6 && p.vac.valence < -0.3
+      );
+      if (novelDistress) {
+        patterns.push({
+          type: "novel_distress",
+          icon: "🆕",
+          color: "text-amber-400",
+          message: "Novel distress: unfamiliar negative emotion detected",
+        });
+      }
+
+      // 🔄 Habitual Loop — familiar negative spiral
+      const habitualCount = vacHistory.filter(
+        (p) => (p.extended?.novelty ?? 0) < -0.5 && p.vac.valence < -0.2
+      ).length;
+      if (habitualCount >= 3) {
+        patterns.push({
+          type: "habitual_loop",
+          icon: "🔄",
+          color: "text-orange-400",
+          message: "Habitual loop: familiar negative pattern repeating",
+        });
+      }
     }
 
     return patterns;
@@ -215,16 +274,47 @@ export function VACTrajectoryPlot({ vacHistory }: VACTrajectoryPlotProps) {
             </marker>
           </defs>
 
-          {/* Trail path */}
-          <path
-            d={pathString}
-            fill="none"
-            stroke="url(#vac-trajectory-gradient)"
-            strokeWidth="0.8"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            opacity="0.6"
-          />
+          {/* Trail path — width encodes coping (if available) */}
+          {(() => {
+            const hasExtended = points.some(p => p.extended);
+            if (hasExtended) {
+              // Draw coping-width ribbon using polyline segments
+              return points.slice(0, -1).map((from, i) => {
+                const to = points[i + 1];
+                const copingFrom = from.extended?.coping ?? 0;
+                const copingTo = to.extended?.coping ?? 0;
+                const avgCoping = (copingFrom + copingTo) / 2;
+                // Width: 0.3 (helpless) to 2.0 (empowered)
+                const strokeWidth = 0.3 + ((avgCoping + 1) / 2) * 1.7;
+                const opacity = 0.4 + ((avgCoping + 1) / 2) * 0.4;
+                return (
+                  <line
+                    key={`ribbon-${i}`}
+                    x1={from.x}
+                    y1={from.y}
+                    x2={to.x}
+                    y2={to.y}
+                    stroke="#8B5CF6"
+                    strokeWidth={strokeWidth}
+                    strokeLinecap="round"
+                    opacity={opacity}
+                  />
+                );
+              });
+            }
+            // Fallback: original single path
+            return (
+              <path
+                d={pathString}
+                fill="none"
+                stroke="url(#vac-trajectory-gradient)"
+                strokeWidth="0.8"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                opacity="0.6"
+              />
+            );
+          })()}
 
           {/* Directional arrows */}
           {arrows.map((arrow, index) => (
@@ -296,6 +386,18 @@ export function VACTrajectoryPlot({ vacHistory }: VACTrajectoryPlotProps) {
             <div className="text-cyan-300 text-xs">
               C: {vacHistory[hoveredPoint].vac.connection.toFixed(2)}
             </div>
+            {vacHistory[hoveredPoint].extended && (
+              <div className="text-violet-300 text-xs border-t border-gray-700 pt-1 mt-1 space-y-0.5">
+                <div className="flex gap-2">
+                  <span>D: {vacHistory[hoveredPoint].extended!.depth.toFixed(2)}</span>
+                  <span>P: {vacHistory[hoveredPoint].extended!.coping.toFixed(2)}</span>
+                </div>
+                <div className="flex gap-2">
+                  <span>Ė: {vacHistory[hoveredPoint].extended!.velocity.toFixed(2)}</span>
+                  <span>N: {vacHistory[hoveredPoint].extended!.novelty.toFixed(2)}</span>
+                </div>
+              </div>
+            )}
           </div>
         )}
 
@@ -392,6 +494,37 @@ export function VACTrajectoryPlot({ vacHistory }: VACTrajectoryPlotProps) {
             {(vacHistory[vacHistory.length - 1].vac.arousal - vacHistory[0].vac.arousal).toFixed(2)}
           </span>
         </div>
+        {/* Extended dimension changes (if data available) */}
+        {vacHistory[0].extended && vacHistory[vacHistory.length - 1].extended && (
+          <>
+            <div>
+              <span className={theme.colors.text.muted}>Coping Change:</span>
+              <span
+                className={`ml-2 font-mono ${
+                  (vacHistory[vacHistory.length - 1].extended!.coping - vacHistory[0].extended!.coping) > 0
+                    ? "text-emerald-400"
+                    : "text-rose-400"
+                }`}
+              >
+                {(vacHistory[vacHistory.length - 1].extended!.coping - vacHistory[0].extended!.coping) > 0 ? "+" : ""}
+                {(vacHistory[vacHistory.length - 1].extended!.coping - vacHistory[0].extended!.coping).toFixed(2)}
+              </span>
+            </div>
+            <div>
+              <span className={theme.colors.text.muted}>Depth Change:</span>
+              <span
+                className={`ml-2 font-mono ${
+                  (vacHistory[vacHistory.length - 1].extended!.depth - vacHistory[0].extended!.depth) > 0
+                    ? "text-amber-400"
+                    : "text-gray-400"
+                }`}
+              >
+                {(vacHistory[vacHistory.length - 1].extended!.depth - vacHistory[0].extended!.depth) > 0 ? "+" : ""}
+                {(vacHistory[vacHistory.length - 1].extended!.depth - vacHistory[0].extended!.depth).toFixed(2)}
+              </span>
+            </div>
+          </>
+        )}
       </div>
 
       {/* Hover instructions */}

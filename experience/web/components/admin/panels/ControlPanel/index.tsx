@@ -19,6 +19,7 @@ import { CategoryBrowser } from "./CategoryBrowser";
 import { AnimationModeSelector } from "./AnimationModeSelector";
 import { LayerControls } from "./LayerControls";
 import { VisualSettingsPanel } from "./VisualSettingsPanel";
+import { OctonionControls } from "@/components/admin/settings/OctonionControls";
 import { useAdminTheme } from "@/hooks/admin/useAdminTheme";
 
 type TabType = "explore" | "view";
@@ -177,6 +178,11 @@ export function ControlPanel() {
             {/* Soul Sphere DJ Controls */}
             <div className={`pt-4 border-t ${theme.colors.border}`}>
               <VisualSettingsPanel />
+            </div>
+
+            {/* Octonion Extension Controls */}
+            <div className={`pt-4 border-t ${theme.colors.border}`}>
+              <OctonionControls />
             </div>
           </div>
         )}

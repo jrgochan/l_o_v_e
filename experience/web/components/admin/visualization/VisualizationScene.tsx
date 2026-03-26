@@ -3,6 +3,7 @@
  *
  * Main 3D scene that combines all visual elements:
  * - Soul Sphere (optional background)
+ * - Octonion Layers (optional concentric shells for 8D emotional state)
  * - Emotion Cloud (Dynamic emotion points)
  * - Path Network (transition paths)
  */
@@ -10,12 +11,18 @@
 "use client";
 
 import { SoulSphere } from "@/components/SoulSphere";
+import { OctonionLayers } from "@/components/viewer/OctonionLayers";
 import { EmotionCloud } from "./EmotionCloud";
 import { PathNetwork } from "./PathNetwork";
 import { useSettingsStore } from "@/stores/useSettingsStore";
 
 export function VisualizationScene() {
-  const { layers, showAxisLabels } = useSettingsStore();
+  const { layers, showAxisLabels, enableOctonionLayer, renderQuality } =
+    useSettingsStore();
+
+  // Octonion layers disabled on low quality for performance
+  const showOctonionLayers =
+    enableOctonionLayer && renderQuality !== "low" && layers.soulSphere;
 
   return (
     <group>
@@ -34,10 +41,16 @@ export function VisualizationScene() {
       )}
 
       {/* Optional: Background Soul Sphere for context (render second with depth write disabled) */}
-      {/* Optional: Background Soul Sphere for context (render second with depth write disabled) */}
       {layers.soulSphere && (
         <group scale={0.8} position={[0, 0, 0]} renderOrder={0}>
           <SoulSphere />
+        </group>
+      )}
+
+      {/* Octonion Concentric Shells (Coping, Velocity, Novelty) */}
+      {showOctonionLayers && (
+        <group scale={0.8} position={[0, 0, 0]}>
+          <OctonionLayers />
         </group>
       )}
 

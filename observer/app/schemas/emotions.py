@@ -15,6 +15,7 @@ class EmotionBase(BaseModel):
     definition: str
     movement_pattern: Optional[str] = None
     vac_vector: List[float] = Field(..., min_length=3, max_length=3)
+    extended_vector: Optional[List[float]] = Field(None, min_length=4, max_length=4)
     haptic_pattern_id: Optional[str] = None
     color_hint: Optional[str] = None
 
@@ -26,6 +27,7 @@ class EmotionUpdate(BaseModel):
     definition: Optional[str] = None
     movement_pattern: Optional[str] = None
     vac_vector: Optional[List[float]] = Field(None, min_length=3, max_length=3)
+    extended_vector: Optional[List[float]] = Field(None, min_length=4, max_length=4)
     haptic_pattern_id: Optional[str] = None
     color_hint: Optional[str] = None
 

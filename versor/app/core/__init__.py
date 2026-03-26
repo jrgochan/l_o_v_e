@@ -68,6 +68,24 @@ Example:
 """
 
 from .interpolation import ensure_shortest_path, generate_slerp_path, smooth_transition
+
+# Octonion extension (parallel to quaternion API)
+from .octonion import (
+    CLINICAL_NARRATIVES,
+    DIMENSION_NAMES,
+    FANO_TRIPLES,
+    Octonion,
+    detect_dominant_octonion_axis,
+    generate_octonion_insight,
+    octonion_angular_distance,
+    octonion_multiply,
+    vac_extended_to_octonion,
+)
+from .octonion_interpolation import (
+    ensure_shortest_path_oct,
+    generate_octonion_slerp_path,
+    octonion_slerp,
+)
 from .quaternion import Quaternion
 from .transitions import (
     angular_distance,
@@ -94,4 +112,17 @@ __all__ = [
     "ensure_shortest_path",
     "generate_slerp_path",
     "smooth_transition",
+    # Octonion extension
+    "Octonion",
+    "vac_extended_to_octonion",
+    "octonion_multiply",
+    "octonion_angular_distance",
+    "detect_dominant_octonion_axis",
+    "generate_octonion_insight",
+    "octonion_slerp",
+    "generate_octonion_slerp_path",
+    "ensure_shortest_path_oct",
+    "FANO_TRIPLES",
+    "DIMENSION_NAMES",
+    "CLINICAL_NARRATIVES",
 ]

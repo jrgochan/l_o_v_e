@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "source": "Bren\u00e9 Brown - Atlas of the Heart (2021)",
+  "source": "Brené Brown - Atlas of the Heart (2021)",
   "metadata": {
     "total_emotions": 87,
     "categories": 13,
@@ -19,7 +19,13 @@
         0.6,
         -0.2
       ],
-      "haptic_pattern_id": "TENSE_PULSE"
+      "haptic_pattern_id": "TENSE_PULSE",
+      "extended": {
+        "depth": 0.35,
+        "coping": -0.3,
+        "novelty": -0.3,
+        "velocity": 0.4
+      }
     },
     {
       "emotion_name": "Overwhelm",
@@ -30,7 +36,13 @@
         0.9,
         -0.3
       ],
-      "haptic_pattern_id": "HEAVY_THROB"
+      "haptic_pattern_id": "HEAVY_THROB",
+      "extended": {
+        "depth": 0.5,
+        "coping": -0.35,
+        "novelty": -0.2,
+        "velocity": 0.54
+      }
     },
     {
       "emotion_name": "Anxiety",
@@ -41,7 +53,13 @@
         0.7,
         -0.4
       ],
-      "haptic_pattern_id": "RAPID_PULSE"
+      "haptic_pattern_id": "RAPID_PULSE",
+      "extended": {
+        "depth": 0.4,
+        "coping": -0.35,
+        "novelty": -0.2,
+        "velocity": 0.42
+      }
     },
     {
       "emotion_name": "Fear",
@@ -52,7 +70,13 @@
         0.8,
         -0.5
       ],
-      "haptic_pattern_id": "SHARP_STRIKE"
+      "haptic_pattern_id": "SHARP_STRIKE",
+      "extended": {
+        "depth": 0.6,
+        "coping": -0.6,
+        "novelty": 0.2,
+        "velocity": 0.5
+      }
     },
     {
       "emotion_name": "Vulnerability",
@@ -63,7 +87,13 @@
         0.3,
         0.6
       ],
-      "haptic_pattern_id": "GENTLE_PULSE"
+      "haptic_pattern_id": "GENTLE_PULSE",
+      "extended": {
+        "depth": 0.4,
+        "coping": -0.25,
+        "novelty": -0.2,
+        "velocity": 0.15
+      }
     },
     {
       "emotion_name": "Worry",
@@ -74,7 +104,13 @@
         0.5,
         -0.3
       ],
-      "haptic_pattern_id": "TENSE_PULSE"
+      "haptic_pattern_id": "TENSE_PULSE",
+      "extended": {
+        "depth": 0.4,
+        "coping": -0.4,
+        "novelty": -0.2,
+        "velocity": 0.2
+      }
     },
     {
       "emotion_name": "Avoidance",
@@ -85,7 +121,13 @@
         -0.2,
         -0.4
       ],
-      "haptic_pattern_id": "TENSE_PULSE"
+      "haptic_pattern_id": "TENSE_PULSE",
+      "extended": {
+        "depth": 0.4,
+        "coping": -0.35,
+        "novelty": -0.2,
+        "velocity": -0.06
+      }
     },
     {
       "emotion_name": "Excitement",
@@ -96,7 +138,13 @@
         0.8,
         0.4
       ],
-      "haptic_pattern_id": "LIGHT_PULSE"
+      "haptic_pattern_id": "LIGHT_PULSE",
+      "extended": {
+        "depth": 0.3,
+        "coping": 0.6,
+        "novelty": 0.4,
+        "velocity": 0.7
+      }
     },
     {
       "emotion_name": "Dread",
@@ -107,7 +155,13 @@
         0.6,
         -0.5
       ],
-      "haptic_pattern_id": "HEAVY_THROB"
+      "haptic_pattern_id": "HEAVY_THROB",
+      "extended": {
+        "depth": 0.5,
+        "coping": -0.35,
+        "novelty": -0.2,
+        "velocity": 0.4
+      }
     },
     {
       "emotion_name": "Admiration",
@@ -118,7 +172,13 @@
         0.3,
         0.5
       ],
-      "haptic_pattern_id": "WARM_PULSE"
+      "haptic_pattern_id": "WARM_PULSE",
+      "extended": {
+        "depth": 0.5,
+        "coping": -0.3,
+        "novelty": -0.2,
+        "velocity": 0.24
+      }
     },
     {
       "emotion_name": "Envy",
@@ -129,7 +189,13 @@
         0.4,
         -0.6
       ],
-      "haptic_pattern_id": "TENSE_PULSE"
+      "haptic_pattern_id": "TENSE_PULSE",
+      "extended": {
+        "depth": 0.5,
+        "coping": -0.4,
+        "novelty": -0.2,
+        "velocity": 0.28
+      }
     },
     {
       "emotion_name": "Jealousy",
@@ -140,7 +206,13 @@
         0.7,
         -0.7
       ],
-      "haptic_pattern_id": "SHARP_STRIKE"
+      "haptic_pattern_id": "SHARP_STRIKE",
+      "extended": {
+        "depth": 0.6,
+        "coping": -0.4,
+        "novelty": -0.2,
+        "velocity": 0.44
+      }
     },
     {
       "emotion_name": "Resentment",
@@ -151,7 +223,13 @@
         0.5,
         -0.8
       ],
-      "haptic_pattern_id": "HEAVY_THROB"
+      "haptic_pattern_id": "HEAVY_THROB",
+      "extended": {
+        "depth": 0.6,
+        "coping": -0.4,
+        "novelty": -0.2,
+        "velocity": 0.35
+      }
     },
     {
       "emotion_name": "Schadenfreude",
@@ -162,7 +240,13 @@
         0.4,
         -0.7
       ],
-      "haptic_pattern_id": "SHARP_STRIKE"
+      "haptic_pattern_id": "SHARP_STRIKE",
+      "extended": {
+        "depth": 0.5,
+        "coping": -0.4,
+        "novelty": -0.2,
+        "velocity": 0.24
+      }
     },
     {
       "emotion_name": "Freudenfreude",
@@ -173,7 +257,13 @@
         0.5,
         0.9
       ],
-      "haptic_pattern_id": "LIGHT_PULSE"
+      "haptic_pattern_id": "LIGHT_PULSE",
+      "extended": {
+        "depth": 0.5,
+        "coping": -0.2,
+        "novelty": -0.2,
+        "velocity": 0.37
+      }
     },
     {
       "emotion_name": "Reverence",
@@ -184,7 +274,13 @@
         0.2,
         0.8
       ],
-      "haptic_pattern_id": "GENTLE_PULSE"
+      "haptic_pattern_id": "GENTLE_PULSE",
+      "extended": {
+        "depth": 0.8,
+        "coping": 0.5,
+        "novelty": 0.5,
+        "velocity": 0.1
+      }
     },
     {
       "emotion_name": "Disappointment",
@@ -195,7 +291,13 @@
         -0.3,
         0.0
       ],
-      "haptic_pattern_id": "HEAVY_THROB"
+      "haptic_pattern_id": "HEAVY_THROB",
+      "extended": {
+        "depth": 0.45,
+        "coping": -0.3,
+        "novelty": 0.1,
+        "velocity": -0.07
+      }
     },
     {
       "emotion_name": "Regret",
@@ -206,7 +308,13 @@
         -0.2,
         -0.3
       ],
-      "haptic_pattern_id": "HEAVY_THROB"
+      "haptic_pattern_id": "HEAVY_THROB",
+      "extended": {
+        "depth": 0.55,
+        "coping": -0.3,
+        "novelty": 0.1,
+        "velocity": -0.01
+      }
     },
     {
       "emotion_name": "Frustration",
@@ -217,7 +325,13 @@
         0.7,
         -0.2
       ],
-      "haptic_pattern_id": "SHARP_STRIKE"
+      "haptic_pattern_id": "SHARP_STRIKE",
+      "extended": {
+        "depth": 0.35,
+        "coping": -0.3,
+        "novelty": -0.4,
+        "velocity": 0.3
+      }
     },
     {
       "emotion_name": "Boredom",
@@ -228,7 +342,13 @@
         -0.8,
         -0.2
       ],
-      "haptic_pattern_id": "HEAVY_THROB"
+      "haptic_pattern_id": "HEAVY_THROB",
+      "extended": {
+        "depth": 0.1,
+        "coping": -0.2,
+        "novelty": -0.9,
+        "velocity": -0.8
+      }
     },
     {
       "emotion_name": "Discouragement",
@@ -239,7 +359,13 @@
         -0.4,
         -0.2
       ],
-      "haptic_pattern_id": "HEAVY_THROB"
+      "haptic_pattern_id": "HEAVY_THROB",
+      "extended": {
+        "depth": 0.45,
+        "coping": -0.3,
+        "novelty": 0.1,
+        "velocity": -0.06
+      }
     },
     {
       "emotion_name": "Resignation",
@@ -250,7 +376,13 @@
         -0.6,
         -0.5
       ],
-      "haptic_pattern_id": "HEAVY_THROB"
+      "haptic_pattern_id": "HEAVY_THROB",
+      "extended": {
+        "depth": 0.7,
+        "coping": -0.7,
+        "novelty": -0.7,
+        "velocity": -0.8
+      }
     },
     {
       "emotion_name": "Awe",
@@ -261,7 +393,13 @@
         0.5,
         0.8
       ],
-      "haptic_pattern_id": "GENTLE_PULSE"
+      "haptic_pattern_id": "GENTLE_PULSE",
+      "extended": {
+        "depth": 0.8,
+        "coping": 0.4,
+        "novelty": 0.7,
+        "velocity": 0.3
+      }
     },
     {
       "emotion_name": "Wonder",
@@ -272,7 +410,13 @@
         0.4,
         0.7
       ],
-      "haptic_pattern_id": "LIGHT_PULSE"
+      "haptic_pattern_id": "LIGHT_PULSE",
+      "extended": {
+        "depth": 0.7,
+        "coping": 0.5,
+        "novelty": 0.8,
+        "velocity": 0.3
+      }
     },
     {
       "emotion_name": "Confusion",
@@ -283,7 +427,13 @@
         0.3,
         -0.2
       ],
-      "haptic_pattern_id": "RAPID_PULSE"
+      "haptic_pattern_id": "RAPID_PULSE",
+      "extended": {
+        "depth": 0.4,
+        "coping": 0.0,
+        "novelty": -0.1,
+        "velocity": 0.18
+      }
     },
     {
       "emotion_name": "Curiosity",
@@ -294,7 +444,13 @@
         0.6,
         0.3
       ],
-      "haptic_pattern_id": "LIGHT_PULSE"
+      "haptic_pattern_id": "LIGHT_PULSE",
+      "extended": {
+        "depth": 0.4,
+        "coping": 0.0,
+        "novelty": -0.1,
+        "velocity": 0.38
+      }
     },
     {
       "emotion_name": "Surprise",
@@ -305,7 +461,13 @@
         0.8,
         0.0
       ],
-      "haptic_pattern_id": "SHARP_STRIKE"
+      "haptic_pattern_id": "SHARP_STRIKE",
+      "extended": {
+        "depth": 0.2,
+        "coping": 0.0,
+        "novelty": 0.8,
+        "velocity": 0.7
+      }
     },
     {
       "emotion_name": "Interest",
@@ -316,7 +478,13 @@
         0.5,
         0.2
       ],
-      "haptic_pattern_id": "LIGHT_PULSE"
+      "haptic_pattern_id": "LIGHT_PULSE",
+      "extended": {
+        "depth": 0.4,
+        "coping": 0.0,
+        "novelty": -0.1,
+        "velocity": 0.31
+      }
     },
     {
       "emotion_name": "Bittersweetness",
@@ -327,7 +495,13 @@
         -0.2,
         0.5
       ],
-      "haptic_pattern_id": "GENTLE_PULSE"
+      "haptic_pattern_id": "GENTLE_PULSE",
+      "extended": {
+        "depth": 0.4,
+        "coping": 0.0,
+        "novelty": -0.1,
+        "velocity": -0.1
+      }
     },
     {
       "emotion_name": "Nostalgia",
@@ -338,7 +512,13 @@
         -0.2,
         0.4
       ],
-      "haptic_pattern_id": "WARM_PULSE"
+      "haptic_pattern_id": "WARM_PULSE",
+      "extended": {
+        "depth": 0.7,
+        "coping": 0.1,
+        "novelty": -0.4,
+        "velocity": -0.2
+      }
     },
     {
       "emotion_name": "Amusement",
@@ -349,7 +529,13 @@
         0.4,
         0.3
       ],
-      "haptic_pattern_id": "LIGHT_PULSE"
+      "haptic_pattern_id": "LIGHT_PULSE",
+      "extended": {
+        "depth": 0.4,
+        "coping": 0.0,
+        "novelty": -0.1,
+        "velocity": 0.29
+      }
     },
     {
       "emotion_name": "Cognitive Dissonance",
@@ -360,7 +546,13 @@
         0.5,
         -0.3
       ],
-      "haptic_pattern_id": "TENSE_PULSE"
+      "haptic_pattern_id": "TENSE_PULSE",
+      "extended": {
+        "depth": 0.5,
+        "coping": -0.3,
+        "novelty": 0.6,
+        "velocity": 0.4
+      }
     },
     {
       "emotion_name": "Irony",
@@ -371,7 +563,13 @@
         0.2,
         0.0
       ],
-      "haptic_pattern_id": "LIGHT_PULSE"
+      "haptic_pattern_id": "LIGHT_PULSE",
+      "extended": {
+        "depth": 0.4,
+        "coping": 0.0,
+        "novelty": -0.1,
+        "velocity": 0.13
+      }
     },
     {
       "emotion_name": "Sarcasm",
@@ -382,7 +580,13 @@
         0.3,
         -0.2
       ],
-      "haptic_pattern_id": "SHARP_STRIKE"
+      "haptic_pattern_id": "SHARP_STRIKE",
+      "extended": {
+        "depth": 0.4,
+        "coping": 0.0,
+        "novelty": -0.1,
+        "velocity": 0.15
+      }
     },
     {
       "emotion_name": "Anguish",
@@ -393,7 +597,13 @@
         0.4,
         -0.5
       ],
-      "haptic_pattern_id": "HEAVY_THROB"
+      "haptic_pattern_id": "HEAVY_THROB",
+      "extended": {
+        "depth": 1.0,
+        "coping": -0.7,
+        "novelty": 0.3,
+        "velocity": 0.5
+      }
     },
     {
       "emotion_name": "Hopelessness",
@@ -404,7 +614,13 @@
         -0.5,
         -0.6
       ],
-      "haptic_pattern_id": "HEAVY_THROB"
+      "haptic_pattern_id": "HEAVY_THROB",
+      "extended": {
+        "depth": 0.95,
+        "coping": -1.0,
+        "novelty": -0.4,
+        "velocity": -0.7
+      }
     },
     {
       "emotion_name": "Despair",
@@ -415,7 +631,13 @@
         -0.6,
         -0.7
       ],
-      "haptic_pattern_id": "HEAVY_THROB"
+      "haptic_pattern_id": "HEAVY_THROB",
+      "extended": {
+        "depth": 1.0,
+        "coping": -1.0,
+        "novelty": -0.3,
+        "velocity": -0.6
+      }
     },
     {
       "emotion_name": "Sadness",
@@ -426,7 +648,13 @@
         -0.4,
         0.0
       ],
-      "haptic_pattern_id": "HEAVY_THROB"
+      "haptic_pattern_id": "HEAVY_THROB",
+      "extended": {
+        "depth": 0.7,
+        "coping": -0.3,
+        "novelty": -0.4,
+        "velocity": -0.3
+      }
     },
     {
       "emotion_name": "Grief",
@@ -437,7 +665,13 @@
         -0.4,
         0.5
       ],
-      "haptic_pattern_id": "HEARTBEAT"
+      "haptic_pattern_id": "HEARTBEAT",
+      "extended": {
+        "depth": 1.0,
+        "coping": -0.4,
+        "novelty": -0.3,
+        "velocity": -0.03
+      }
     },
     {
       "emotion_name": "Sorrow",
@@ -448,7 +682,13 @@
         -0.3,
         0.2
       ],
-      "haptic_pattern_id": "HEAVY_THROB"
+      "haptic_pattern_id": "HEAVY_THROB",
+      "extended": {
+        "depth": 0.5,
+        "coping": 0.0,
+        "novelty": -0.1,
+        "velocity": -0.04
+      }
     },
     {
       "emotion_name": "Melancholy",
@@ -459,7 +699,13 @@
         -0.6,
         0.3
       ],
-      "haptic_pattern_id": "GENTLE_PULSE"
+      "haptic_pattern_id": "GENTLE_PULSE",
+      "extended": {
+        "depth": 0.4,
+        "coping": 0.0,
+        "novelty": -0.1,
+        "velocity": -0.11
+      }
     },
     {
       "emotion_name": "Compassion",
@@ -470,7 +716,13 @@
         0.2,
         0.9
       ],
-      "haptic_pattern_id": "HEARTBEAT"
+      "haptic_pattern_id": "HEARTBEAT",
+      "extended": {
+        "depth": 0.8,
+        "coping": 0.7,
+        "novelty": 0.0,
+        "velocity": 0.1
+      }
     },
     {
       "emotion_name": "Pity",
@@ -481,7 +733,13 @@
         -0.1,
         -0.7
       ],
-      "haptic_pattern_id": "HEAVY_THROB"
+      "haptic_pattern_id": "HEAVY_THROB",
+      "extended": {
+        "depth": 0.4,
+        "coping": -0.1,
+        "novelty": -0.1,
+        "velocity": -0.01
+      }
     },
     {
       "emotion_name": "Empathy",
@@ -492,7 +750,13 @@
         0.1,
         0.8
       ],
-      "haptic_pattern_id": "HEARTBEAT"
+      "haptic_pattern_id": "HEARTBEAT",
+      "extended": {
+        "depth": 0.75,
+        "coping": 0.5,
+        "novelty": 0.1,
+        "velocity": 0.2
+      }
     },
     {
       "emotion_name": "Sympathy",
@@ -503,7 +767,13 @@
         0.0,
         0.3
       ],
-      "haptic_pattern_id": "WARM_PULSE"
+      "haptic_pattern_id": "WARM_PULSE",
+      "extended": {
+        "depth": 0.4,
+        "coping": 0.0,
+        "novelty": -0.1,
+        "velocity": 0.03
+      }
     },
     {
       "emotion_name": "Boundaries",
@@ -514,7 +784,13 @@
         0.2,
         0.7
       ],
-      "haptic_pattern_id": "GENTLE_PULSE"
+      "haptic_pattern_id": "GENTLE_PULSE",
+      "extended": {
+        "depth": 0.4,
+        "coping": 0.1,
+        "novelty": -0.1,
+        "velocity": 0.17
+      }
     },
     {
       "emotion_name": "Comparative Suffering",
@@ -525,7 +801,13 @@
         0.3,
         -0.6
       ],
-      "haptic_pattern_id": "TENSE_PULSE"
+      "haptic_pattern_id": "TENSE_PULSE",
+      "extended": {
+        "depth": 0.4,
+        "coping": -0.1,
+        "novelty": -0.1,
+        "velocity": 0.21
+      }
     },
     {
       "emotion_name": "Shame",
@@ -536,7 +818,13 @@
         -0.1,
         -1.0
       ],
-      "haptic_pattern_id": "HEAVY_THROB"
+      "haptic_pattern_id": "HEAVY_THROB",
+      "extended": {
+        "depth": 1.0,
+        "coping": -0.9,
+        "novelty": -0.2,
+        "velocity": 0.09
+      }
     },
     {
       "emotion_name": "Self-Compassion",
@@ -547,7 +835,13 @@
         -0.2,
         0.9
       ],
-      "haptic_pattern_id": "HEARTBEAT"
+      "haptic_pattern_id": "HEARTBEAT",
+      "extended": {
+        "depth": 0.85,
+        "coping": 0.8,
+        "novelty": 0.3,
+        "velocity": -0.01
+      }
     },
     {
       "emotion_name": "Guilt",
@@ -558,7 +852,13 @@
         0.2,
         -0.3
       ],
-      "haptic_pattern_id": "TENSE_PULSE"
+      "haptic_pattern_id": "TENSE_PULSE",
+      "extended": {
+        "depth": 0.7,
+        "coping": -0.4,
+        "novelty": -0.2,
+        "velocity": 0.19
+      }
     },
     {
       "emotion_name": "Embarrassment",
@@ -569,7 +869,13 @@
         0.5,
         -0.2
       ],
-      "haptic_pattern_id": "RAPID_PULSE"
+      "haptic_pattern_id": "RAPID_PULSE",
+      "extended": {
+        "depth": 0.6,
+        "coping": -0.4,
+        "novelty": -0.2,
+        "velocity": 0.31
+      }
     },
     {
       "emotion_name": "Humiliation",
@@ -580,7 +886,13 @@
         0.4,
         -0.9
       ],
-      "haptic_pattern_id": "HEAVY_THROB"
+      "haptic_pattern_id": "HEAVY_THROB",
+      "extended": {
+        "depth": 0.95,
+        "coping": -0.95,
+        "novelty": 0.1,
+        "velocity": 0.32
+      }
     },
     {
       "emotion_name": "Perfectionism",
@@ -591,7 +903,13 @@
         0.5,
         -0.6
       ],
-      "haptic_pattern_id": "TENSE_PULSE"
+      "haptic_pattern_id": "TENSE_PULSE",
+      "extended": {
+        "depth": 0.6,
+        "coping": -0.5,
+        "novelty": -0.2,
+        "velocity": 0.29
+      }
     },
     {
       "emotion_name": "Belonging",
@@ -602,7 +920,13 @@
         0.4,
         1.0
       ],
-      "haptic_pattern_id": "HEARTBEAT"
+      "haptic_pattern_id": "HEARTBEAT",
+      "extended": {
+        "depth": 0.75,
+        "coping": 0.7,
+        "novelty": -0.3,
+        "velocity": -0.1
+      }
     },
     {
       "emotion_name": "Fitting In",
@@ -613,7 +937,13 @@
         0.3,
         -0.3
       ],
-      "haptic_pattern_id": "TENSE_PULSE"
+      "haptic_pattern_id": "TENSE_PULSE",
+      "extended": {
+        "depth": 0.7,
+        "coping": 0.0,
+        "novelty": -0.1,
+        "velocity": 0.2
+      }
     },
     {
       "emotion_name": "Disconnection",
@@ -624,7 +954,13 @@
         -0.3,
         -0.7
       ],
-      "haptic_pattern_id": "HEAVY_THROB"
+      "haptic_pattern_id": "HEAVY_THROB",
+      "extended": {
+        "depth": 0.6,
+        "coping": -0.6,
+        "novelty": -0.3,
+        "velocity": -0.5
+      }
     },
     {
       "emotion_name": "Loneliness",
@@ -635,7 +971,13 @@
         -0.2,
         -0.9
       ],
-      "haptic_pattern_id": "HEAVY_THROB"
+      "haptic_pattern_id": "HEAVY_THROB",
+      "extended": {
+        "depth": 0.8,
+        "coping": -0.6,
+        "novelty": -0.3,
+        "velocity": -0.4
+      }
     },
     {
       "emotion_name": "Insecurity",
@@ -646,7 +988,13 @@
         0.4,
         -0.5
       ],
-      "haptic_pattern_id": "TENSE_PULSE"
+      "haptic_pattern_id": "TENSE_PULSE",
+      "extended": {
+        "depth": 0.7,
+        "coping": 0.0,
+        "novelty": -0.1,
+        "velocity": 0.26
+      }
     },
     {
       "emotion_name": "Invisibility",
@@ -657,7 +1005,13 @@
         -0.3,
         -0.8
       ],
-      "haptic_pattern_id": "HEAVY_THROB"
+      "haptic_pattern_id": "HEAVY_THROB",
+      "extended": {
+        "depth": 0.8,
+        "coping": -0.1,
+        "novelty": -0.1,
+        "velocity": -0.06
+      }
     },
     {
       "emotion_name": "Love",
@@ -668,7 +1022,13 @@
         0.3,
         1.0
       ],
-      "haptic_pattern_id": "HEARTBEAT"
+      "haptic_pattern_id": "HEARTBEAT",
+      "extended": {
+        "depth": 0.8,
+        "coping": 0.6,
+        "novelty": -0.3,
+        "velocity": 0.0
+      }
     },
     {
       "emotion_name": "Heartbreak",
@@ -679,7 +1039,13 @@
         0.4,
         0.3
       ],
-      "haptic_pattern_id": "HEARTBEAT"
+      "haptic_pattern_id": "HEARTBEAT",
+      "extended": {
+        "depth": 0.5,
+        "coping": 0.0,
+        "novelty": -0.1,
+        "velocity": 0.32
+      }
     },
     {
       "emotion_name": "Trust",
@@ -690,7 +1056,13 @@
         0.1,
         0.9
       ],
-      "haptic_pattern_id": "GENTLE_PULSE"
+      "haptic_pattern_id": "GENTLE_PULSE",
+      "extended": {
+        "depth": 0.65,
+        "coping": 0.7,
+        "novelty": -0.3,
+        "velocity": -0.2
+      }
     },
     {
       "emotion_name": "Betrayal",
@@ -701,7 +1073,13 @@
         0.6,
         -0.9
       ],
-      "haptic_pattern_id": "SHARP_STRIKE"
+      "haptic_pattern_id": "SHARP_STRIKE",
+      "extended": {
+        "depth": 0.5,
+        "coping": -0.1,
+        "novelty": -0.1,
+        "velocity": 0.42
+      }
     },
     {
       "emotion_name": "Flooding",
@@ -712,7 +1090,13 @@
         0.9,
         -0.7
       ],
-      "haptic_pattern_id": "RAPID_PULSE"
+      "haptic_pattern_id": "RAPID_PULSE",
+      "extended": {
+        "depth": 0.5,
+        "coping": -0.1,
+        "novelty": -0.1,
+        "velocity": 0.54
+      }
     },
     {
       "emotion_name": "Lovelessness",
@@ -723,7 +1107,13 @@
         -0.4,
         -0.8
       ],
-      "haptic_pattern_id": "HEAVY_THROB"
+      "haptic_pattern_id": "HEAVY_THROB",
+      "extended": {
+        "depth": 0.5,
+        "coping": -0.1,
+        "novelty": -0.1,
+        "velocity": -0.05
+      }
     },
     {
       "emotion_name": "Self-Trust",
@@ -734,7 +1124,13 @@
         0.1,
         0.8
       ],
-      "haptic_pattern_id": "GENTLE_PULSE"
+      "haptic_pattern_id": "GENTLE_PULSE",
+      "extended": {
+        "depth": 0.4,
+        "coping": 0.1,
+        "novelty": -0.1,
+        "velocity": 0.15
+      }
     },
     {
       "emotion_name": "Defensiveness",
@@ -745,7 +1141,13 @@
         0.6,
         -0.4
       ],
-      "haptic_pattern_id": "SHARP_STRIKE"
+      "haptic_pattern_id": "SHARP_STRIKE",
+      "extended": {
+        "depth": 0.4,
+        "coping": 0.0,
+        "novelty": -0.1,
+        "velocity": 0.34
+      }
     },
     {
       "emotion_name": "Hurt",
@@ -756,7 +1158,13 @@
         0.2,
         -0.3
       ],
-      "haptic_pattern_id": "HEAVY_THROB"
+      "haptic_pattern_id": "HEAVY_THROB",
+      "extended": {
+        "depth": 0.5,
+        "coping": 0.0,
+        "novelty": -0.1,
+        "velocity": 0.19
+      }
     },
     {
       "emotion_name": "Tenderness",
@@ -767,7 +1175,13 @@
         0.1,
         0.8
       ],
-      "haptic_pattern_id": "HEARTBEAT"
+      "haptic_pattern_id": "HEARTBEAT",
+      "extended": {
+        "depth": 0.4,
+        "coping": 0.1,
+        "novelty": -0.1,
+        "velocity": 0.15
+      }
     },
     {
       "emotion_name": "Warmth",
@@ -778,7 +1192,13 @@
         0.2,
         0.7
       ],
-      "haptic_pattern_id": "WARM_PULSE"
+      "haptic_pattern_id": "WARM_PULSE",
+      "extended": {
+        "depth": 0.4,
+        "coping": 0.1,
+        "novelty": -0.1,
+        "velocity": 0.19
+      }
     },
     {
       "emotion_name": "Joy",
@@ -789,7 +1209,13 @@
         0.7,
         0.8
       ],
-      "haptic_pattern_id": "LIGHT_PULSE"
+      "haptic_pattern_id": "LIGHT_PULSE",
+      "extended": {
+        "depth": 0.4,
+        "coping": 0.7,
+        "novelty": -0.4,
+        "velocity": 0.3
+      }
     },
     {
       "emotion_name": "Happiness",
@@ -800,7 +1226,13 @@
         0.5,
         0.5
       ],
-      "haptic_pattern_id": "WARM_PULSE"
+      "haptic_pattern_id": "WARM_PULSE",
+      "extended": {
+        "depth": 0.4,
+        "coping": 0.0,
+        "novelty": -0.1,
+        "velocity": 0.35
+      }
     },
     {
       "emotion_name": "Calm",
@@ -811,7 +1243,13 @@
         -0.7,
         0.4
       ],
-      "haptic_pattern_id": "GENTLE_PULSE"
+      "haptic_pattern_id": "GENTLE_PULSE",
+      "extended": {
+        "depth": 0.3,
+        "coping": 0.5,
+        "novelty": -0.5,
+        "velocity": -0.4
+      }
     },
     {
       "emotion_name": "Contentment",
@@ -822,7 +1260,13 @@
         -0.5,
         0.5
       ],
-      "haptic_pattern_id": "GENTLE_PULSE"
+      "haptic_pattern_id": "GENTLE_PULSE",
+      "extended": {
+        "depth": 0.4,
+        "coping": 0.5,
+        "novelty": -0.4,
+        "velocity": -0.3
+      }
     },
     {
       "emotion_name": "Gratitude",
@@ -833,7 +1277,13 @@
         0.3,
         0.9
       ],
-      "haptic_pattern_id": "HEARTBEAT"
+      "haptic_pattern_id": "HEARTBEAT",
+      "extended": {
+        "depth": 0.7,
+        "coping": 0.7,
+        "novelty": 0.0,
+        "velocity": 0.0
+      }
     },
     {
       "emotion_name": "Foreboding Joy",
@@ -844,7 +1294,13 @@
         0.6,
         -0.2
       ],
-      "haptic_pattern_id": "TENSE_PULSE"
+      "haptic_pattern_id": "TENSE_PULSE",
+      "extended": {
+        "depth": 0.4,
+        "coping": 0.0,
+        "novelty": -0.1,
+        "velocity": 0.38
+      }
     },
     {
       "emotion_name": "Relief",
@@ -855,7 +1311,13 @@
         -0.3,
         0.3
       ],
-      "haptic_pattern_id": "GENTLE_PULSE"
+      "haptic_pattern_id": "GENTLE_PULSE",
+      "extended": {
+        "depth": 0.4,
+        "coping": 0.5,
+        "novelty": 0.1,
+        "velocity": 0.4
+      }
     },
     {
       "emotion_name": "Tranquility",
@@ -866,7 +1328,13 @@
         -0.8,
         0.6
       ],
-      "haptic_pattern_id": "GENTLE_PULSE"
+      "haptic_pattern_id": "GENTLE_PULSE",
+      "extended": {
+        "depth": 0.4,
+        "coping": 0.1,
+        "novelty": -0.1,
+        "velocity": -0.15
+      }
     },
     {
       "emotion_name": "Anger",
@@ -877,7 +1345,13 @@
         0.8,
         -0.2
       ],
-      "haptic_pattern_id": "SHARP_STRIKE"
+      "haptic_pattern_id": "SHARP_STRIKE",
+      "extended": {
+        "depth": 0.5,
+        "coping": -0.2,
+        "novelty": -0.2,
+        "velocity": 0.6
+      }
     },
     {
       "emotion_name": "Contempt",
@@ -888,7 +1362,13 @@
         0.3,
         -0.8
       ],
-      "haptic_pattern_id": "SHARP_STRIKE"
+      "haptic_pattern_id": "SHARP_STRIKE",
+      "extended": {
+        "depth": 0.6,
+        "coping": -0.4,
+        "novelty": -0.1,
+        "velocity": 0.24
+      }
     },
     {
       "emotion_name": "Disgust",
@@ -899,7 +1379,13 @@
         0.5,
         -0.6
       ],
-      "haptic_pattern_id": "SHARP_STRIKE"
+      "haptic_pattern_id": "SHARP_STRIKE",
+      "extended": {
+        "depth": 0.5,
+        "coping": -0.2,
+        "novelty": -0.1,
+        "velocity": 0.3
+      }
     },
     {
       "emotion_name": "Hate",
@@ -910,7 +1396,13 @@
         0.6,
         -1.0
       ],
-      "haptic_pattern_id": "HEAVY_THROB"
+      "haptic_pattern_id": "HEAVY_THROB",
+      "extended": {
+        "depth": 0.6,
+        "coping": -0.4,
+        "novelty": -0.1,
+        "velocity": 0.43
+      }
     },
     {
       "emotion_name": "Self-Righteousness",
@@ -921,7 +1413,13 @@
         0.4,
         -0.7
       ],
-      "haptic_pattern_id": "SHARP_STRIKE"
+      "haptic_pattern_id": "SHARP_STRIKE",
+      "extended": {
+        "depth": 0.5,
+        "coping": -0.4,
+        "novelty": -0.1,
+        "velocity": 0.24
+      }
     },
     {
       "emotion_name": "Dehumanization",
@@ -932,7 +1430,13 @@
         0.4,
         -1.0
       ],
-      "haptic_pattern_id": "HEAVY_THROB"
+      "haptic_pattern_id": "HEAVY_THROB",
+      "extended": {
+        "depth": 0.6,
+        "coping": -0.4,
+        "novelty": -0.1,
+        "velocity": 0.34
+      }
     },
     {
       "emotion_name": "Pride",
@@ -943,7 +1447,13 @@
         0.6,
         0.6
       ],
-      "haptic_pattern_id": "WARM_PULSE"
+      "haptic_pattern_id": "WARM_PULSE",
+      "extended": {
+        "depth": 0.6,
+        "coping": 0.8,
+        "novelty": -0.1,
+        "velocity": 0.2
+      }
     },
     {
       "emotion_name": "Hubris",
@@ -954,7 +1464,13 @@
         0.6,
         -0.8
       ],
-      "haptic_pattern_id": "SHARP_STRIKE"
+      "haptic_pattern_id": "SHARP_STRIKE",
+      "extended": {
+        "depth": 0.55,
+        "coping": 0.0,
+        "novelty": -0.1,
+        "velocity": 0.4
+      }
     },
     {
       "emotion_name": "Humility",
@@ -965,7 +1481,13 @@
         -0.2,
         0.8
       ],
-      "haptic_pattern_id": "GENTLE_PULSE"
+      "haptic_pattern_id": "GENTLE_PULSE",
+      "extended": {
+        "depth": 0.55,
+        "coping": 0.2,
+        "novelty": -0.1,
+        "velocity": -0.01
+      }
     }
   ]
 }

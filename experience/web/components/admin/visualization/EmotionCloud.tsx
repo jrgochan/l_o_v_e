@@ -7,12 +7,13 @@
 
 "use client";
 
-import { useMemo } from "react";
+import { useMemo, useEffect } from "react";
 import { ThreeEvent } from "@react-three/fiber";
 import { Html } from "@react-three/drei";
 import * as THREE from "three";
 import { useVisualizationStore } from "@/stores/useVisualizationStore";
 import { useSettingsStore } from "@/stores/useSettingsStore";
+import { useExperienceStore } from "@/stores/useExperienceStore";
 import { BRIDGE_EMOTIONS } from "@/types/visualization";
 import { resolveEmotionColor } from "@/utils/emotion-colors";
 import type { Emotion, PathAnimationMode } from "@/types/visualization";
@@ -66,6 +67,52 @@ export function EmotionCloud({ enableFloatingLabels = false }: EmotionCloudProps
 
     return categoryEnabled && focusEnabled;
   });
+
+  // === REACTIVE SHELL BINDING ===
+  // Drive OctonionLayers from selected/hovered emotion atlas data
+  useEffect(() => {
+    if (!settings.enableOctonionLayer) return;
+
+    // Gather emotions to consider: selected + hovered
+    const relevantEmotions = allEmotions.filter(
+      (e) => selectedIds.has(e.id) || e.id === hoveredId
+    );
+
+    // No selection → return to neutral
+    if (relevantEmotions.length === 0 || !relevantEmotions.some((e) => e.extended)) {
+      useExperienceStore.getState().setTargetOctonionExtended({
+        depth: 0, coping: 0, velocity: 0, novelty: 0,
+      });
+      return;
+    }
+
+    const withExt = relevantEmotions.filter((e) => e.extended);
+    if (withExt.length === 0) return;
+
+    // Max-absolute for Depth, Velocity, Novelty (prevents washout)
+    let maxDepth = 0, maxVelocity = 0, maxNovelty = 0;
+    let copingSum = 0, minCoping = 1;
+
+    for (const e of withExt) {
+      const [d, p, v, n] = e.extended!;
+      if (Math.abs(d) > Math.abs(maxDepth)) maxDepth = d;
+      if (Math.abs(v) > Math.abs(maxVelocity)) maxVelocity = v;
+      if (Math.abs(n) > Math.abs(maxNovelty)) maxNovelty = n;
+      copingSum += p;
+      if (p < minCoping) minCoping = p;
+    }
+
+    // Coping: negativity-biased average (one overwhelmed emotion drags the system down)
+    const copingAvg = copingSum / withExt.length;
+    const copingBiased = copingAvg * (1 - 0.3 * Math.max(0, -minCoping));
+
+    useExperienceStore.getState().setTargetOctonionExtended({
+      depth: maxDepth,
+      coping: copingBiased,
+      velocity: maxVelocity,
+      novelty: maxNovelty,
+    });
+  }, [selectedIds, hoveredId, allEmotions, settings.enableOctonionLayer]);
 
   if (!layers.emotionPoints) {
     return null;
@@ -308,7 +355,7 @@ function EmotionSphere({
           <meshStandardMaterial
             color={color}
             emissive={color}
-            emissiveIntensity={isSelected ? 1.5 : isHovered ? 1.0 : 0.3}
+            emissiveIntensity={(isSelected ? 1.5 : isHovered ? 1.0 : 0.3) + (settings.enableOctonionLayer && emotion.extended ? emotion.extended[0] * 0.3 : 0)}
             transparent
             opacity={isSelected ? 1.0 : isHovered ? 0.9 : 0.7}
             metalness={0.3}
@@ -462,6 +509,11 @@ function FloatingEmotionLabel({
           <div className={`text-xs font-mono mt-0.5 ${labelStyle.vacClass}`}>
             [{emotion.vac.map((v) => v.toFixed(2)).join(", ")}]
           </div>
+          {emotion.extended && (
+            <div className="text-[9px] font-mono mt-0.5 text-violet-300/80">
+              D:{emotion.extended[0].toFixed(2)} P:{emotion.extended[1].toFixed(2)} Ė:{emotion.extended[2].toFixed(2)} N:{emotion.extended[3].toFixed(2)}
+            </div>
+          )}
         </>
       )}
     </div>

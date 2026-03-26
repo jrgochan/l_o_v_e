@@ -43,6 +43,10 @@ export interface TrajectoryPoint {
   valence?: number;
   arousal?: number;
   connection?: number;
+  depth?: number;
+  coping?: number;
+  velocity?: number;
+  novelty?: number;
   confidence?: number;
   elasticity?: number;
   context_metadata?: Record<string, unknown>;

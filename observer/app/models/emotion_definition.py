@@ -82,6 +82,9 @@ class EmotionDefinition(Base):
     # Semantic Embedding: dimension depends on embedding model
     semantic_embedding: Mapped[Any] = mapped_column(Vector(settings.EMBEDDING_DIMENSION))
 
+    # Extended Dimensions: 4-dimensional [Depth, Coping, Velocity, Novelty]
+    extended_vector: Mapped[Optional[Any]] = mapped_column(Vector(4), nullable=True)
+
     # Visualization Metadata
     haptic_pattern_id: Mapped[Optional[str]] = mapped_column(String(50))
     color_hint: Mapped[Optional[str]] = mapped_column(String(7))  # Hex color format
@@ -108,6 +111,7 @@ class EmotionDefinition(Base):
             "movement_pattern": self.movement_pattern,
             "vac_vector": list(self.vac_vector) if self.vac_vector else None,
             "q_constant": list(self.q_constant) if self.q_constant else None,
+            "extended_vector": list(self.extended_vector) if self.extended_vector else None,
             "haptic_pattern_id": self.haptic_pattern_id,
             "color_hint": self.color_hint,
             "created_at": self.created_at.isoformat() if self.created_at else None,

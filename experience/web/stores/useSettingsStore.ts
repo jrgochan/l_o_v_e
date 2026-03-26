@@ -127,6 +127,10 @@ interface SettingsState {
   showTransitionPath: boolean;
   animationSpeed: number;
 
+  // === OCTONION EXTENSION ===
+  enableOctonionLayer: boolean;
+  enableFanoPlaneRenders: boolean;
+
   // === ACTIONS ===
   setApiUrl: (service: ApiService, url: string) => void;
   setPollingEnabled: (enabled: boolean) => void;
@@ -241,6 +245,10 @@ const DEFAULT_VALUES = {
   showDebugInfo: false,
   showTransitionPath: true,
   animationSpeed: 1.0,
+
+  // Octonion Extension (opt-in, disabled by default)
+  enableOctonionLayer: false,
+  enableFanoPlaneRenders: false,
 
   // Development (OFF by default for clean console)
   development: {
@@ -375,7 +383,7 @@ export const useSettingsStore = create<SettingsState>()(
       exportSettings: () => {
         const state = get();
         const exportData = {
-          version: "1.0",
+          version: "1.1",
           timestamp: new Date().toISOString(),
           settings: {
             visual: {
@@ -410,6 +418,10 @@ export const useSettingsStore = create<SettingsState>()(
               highContrast: state.highContrast,
               fontSize: state.fontSize,
             },
+            octonion: {
+              enableOctonionLayer: state.enableOctonionLayer,
+              enableFanoPlaneRenders: state.enableFanoPlaneRenders,
+            },
           },
         };
         return JSON.stringify(exportData, null, 2);
@@ -426,10 +438,10 @@ export const useSettingsStore = create<SettingsState>()(
           }
 
           // Validate version compatibility
-          if (imported.version !== "1.0") {
+          if (imported.version !== "1.0" && imported.version !== "1.1") {
             logger.warn(
               "state",
-              `Settings version mismatch: expected 1.0, got ${imported.version}`
+              `Settings version mismatch: expected 1.0 or 1.1, got ${imported.version}`
             );
             // For now, proceed anyway - could add migration logic here
           }
@@ -471,7 +483,7 @@ export const useSettingsStore = create<SettingsState>()(
             return false;
           }
 
-          // Apply settings
+          // Apply settings (octonion section is optional for v1.0 backward compat)
           set({
             ...settings.visual,
             ...settings.behavior,
@@ -480,6 +492,7 @@ export const useSettingsStore = create<SettingsState>()(
             ...settings.chat,
             ...settings.keyboard,
             ...settings.accessibility,
+            ...(settings.octonion ?? {}),
           });
 
           logger.info("state", "Settings imported successfully");

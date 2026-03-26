@@ -48,6 +48,14 @@ export interface VAC {
   connection: number;
 }
 
+/** Octonion extension: 4 additional emotional appraisal dimensions (all [-1, 1]) */
+export interface ExtendedDimensions {
+  depth: number;    // Profound (+1) ↔ Superficial (-1)
+  coping: number;   // Empowered (+1) ↔ Helpless (-1)
+  velocity: number; // Rapid change (+1) ↔ Frozen (-1)
+  novelty: number;  // Novel (+1) ↔ Familiar (-1)
+}
+
 /**
  * Prosody Features - Acoustic Analysis Metrics
  *
@@ -278,6 +286,7 @@ export interface ChatMessage {
   transcription?: string;
   emotion_id?: string;
   vac_coordinates?: number[];
+  extended?: ExtendedDimensions;
   confidence?: number;
   tone_mode?: ToneMode;
   prosody?: ProsodyData;
@@ -342,6 +351,7 @@ export type ServerMessage =
       emotion: string;
       category: string;
       vac: VAC;
+      extended?: ExtendedDimensions;
       confidence: number;
       reasoning?: string;
       original_emotion?: string;
@@ -394,6 +404,7 @@ export interface SessionMetrics {
 export interface VACHistoryPoint {
   timestamp: Date;
   vac: VAC;
+  extended?: ExtendedDimensions;
   emotion: string;
   confidence: number;
 }
@@ -469,6 +480,7 @@ export interface DetectedEmotion {
   match_confidence?: number; // 0-1
   category: string;
   vac: VAC;
+  extended?: ExtendedDimensions;
   confidence: number;
   prominence: EmotionProminence;
   voice_alignment?: number;
@@ -486,6 +498,7 @@ export interface EmotionRelationship {
 
 export interface AggregateState {
   vac: VAC;
+  extended?: ExtendedDimensions;
   complexity_score: number;
   emotional_clarity: number;
   temporal_pattern: string;
@@ -598,6 +611,7 @@ export type DeepFeelingServerMessage =
   | {
       type: "aggregate_state";
       aggregate_vac: VAC;
+      aggregate_extended?: ExtendedDimensions;
       complexity_score: number;
       emotional_clarity: number;
       temporal_pattern: TemporalPattern;

@@ -8,6 +8,7 @@ import { adminApi } from "@/utils/api";
 import { AdminSession } from "@/types/admin";
 import { Loader2, ArrowLeft, Mic, AlertTriangle } from "lucide-react";
 import { AdminLayout } from "@/components/admin/layout/AdminLayout";
+import { ExtendedDimensionBars } from "@/components/admin/clinical/ExtendedDimensionBars";
 
 export default function AdminSessionDetailPage() {
   const searchParams = useSearchParams();
@@ -166,22 +167,37 @@ export default function AdminSessionDetailPage() {
 
                   {/* AI Analysis Data */}
                   {msg.emotion && (
-                    <div className="mt-3 pt-3 border-t border-gray-700/50 text-xs grid grid-cols-2 gap-4">
-                      <div>
-                        <span className="text-gray-500 uppercase tracking-wider block mb-0.5">
-                          Emotion
-                        </span>
-                        <span className="text-pink-300 font-medium">{msg.emotion.name}</span>
-                        <span className="text-gray-500 ml-1">({msg.emotion.category})</span>
+                    <div className="mt-3 pt-3 border-t border-gray-700/50 text-xs space-y-2">
+                      <div className="grid grid-cols-2 gap-4">
+                        <div>
+                          <span className="text-gray-500 uppercase tracking-wider block mb-0.5">
+                            Emotion
+                          </span>
+                          <span className="text-pink-300 font-medium">{msg.emotion.name}</span>
+                          <span className="text-gray-500 ml-1">({msg.emotion.category})</span>
+                        </div>
+                        <div>
+                          <span className="text-gray-500 uppercase tracking-wider block mb-0.5">
+                            Certainty
+                          </span>
+                          <span className="text-gray-300">
+                            {Math.round((msg.confidence || 0) * 100)}%
+                          </span>
+                        </div>
                       </div>
-                      <div>
-                        <span className="text-gray-500 uppercase tracking-wider block mb-0.5">
-                          Certainty
-                        </span>
-                        <span className="text-gray-300">
-                          {Math.round((msg.confidence || 0) * 100)}%
-                        </span>
-                      </div>
+                      {/* Octonion Extended Dimensions */}
+                      {msg.extended && (
+                        <div className="pt-2 border-t border-gray-700/30">
+                          <span className="text-gray-500 uppercase tracking-wider text-[10px] block mb-1.5">
+                            🔮 Extended Dimensions
+                          </span>
+                          <ExtendedDimensionBars
+                            extended={msg.extended}
+                            layout="compact"
+                            showValues={true}
+                          />
+                        </div>
+                      )}
                     </div>
                   )}
 

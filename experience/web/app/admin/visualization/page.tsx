@@ -51,6 +51,7 @@ import { useAdminTheme } from "@/hooks/admin/useAdminTheme";
 import { WaypointArrivalOverlay } from "@/components/WaypointArrivalOverlay";
 import { StrategyLibraryBrowser } from "@/components/strategy/StrategyLibraryBrowser";
 import { VisualizationHeader } from "@/components/admin/visualization/VisualizationHeader";
+import { FanoOverlay } from "@/components/admin/visualization/FanoOverlay";
 
 const VisualizationAdminContent = () => {
   // Load emotions and set up path calculator
@@ -123,6 +124,7 @@ const VisualizationAdminContent = () => {
   // Reactive settings for scene controls
   const autoRotate = useSettingsStore((state) => state.autoRotate);
   const renderQuality = useSettingsStore((state) => state.renderQuality);
+  const enableFanoPlane = useSettingsStore((state) => state.enableFanoPlaneRenders);
   const dpr: [number, number] =
     renderQuality === "high" ? [1, 2] : renderQuality === "medium" ? [1, 1.5] : [1, 1];
 
@@ -404,6 +406,10 @@ const VisualizationAdminContent = () => {
                 {layers.legend && <LegendOverlay />}
                 <EmotionLabelOverlay labels={labelPositions} />
               </div>
+              {/* Octonion Dimension Map HUD */}
+              {enableFanoPlane && renderQuality !== "low" && (
+                <FanoOverlay />
+              )}
             </div>
           </main>
         )}

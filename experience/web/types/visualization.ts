@@ -19,6 +19,7 @@ export interface Emotion {
   movement_pattern?: string | null;
   vac: [number, number, number]; // [Valence, Arousal, Connection];
   quaternion: Quaternion;
+  extended?: [number, number, number, number]; // [Depth, Coping, Velocity, Novelty]
   color_hint?: string;
   is_bridge?: boolean;
 }
@@ -223,6 +224,9 @@ export interface VisualizationSettings {
   pathAnimationMode: PathAnimationMode; // Visual style for paths and sphere
   showMotionIndicators: boolean; // Show orbital/reaching/recoil/stable rings
   dataVisualizationMode: boolean; // Show all emotions as mini spheres with VAC visualization
+  // === OCTONION EXTENSION ===
+  enableOctonionLayer: boolean; // Enable 8D Layered Soul (Depth, Coping, Velocity, Novelty shells)
+  enableFanoPlaneRenders: boolean; // Enable the Dimension Map HUD overlay
 }
 
 /**
@@ -323,6 +327,9 @@ export const DEFAULT_SETTINGS: VisualizationSettings = {
   pathAnimationMode: "subtle", // Default: therapeutic calm
   showMotionIndicators: true, // Show orbital/reaching/recoil/stable rings
   dataVisualizationMode: false, // Data visualization overlay disabled by default
+  // Octonion extension (opt-in, disabled by default for backward compatibility)
+  enableOctonionLayer: false,
+  enableFanoPlaneRenders: false,
 };
 
 /**

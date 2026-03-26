@@ -271,6 +271,17 @@ async def seed_emotions(
                     # Calculate quaternion
                     quaternion = await quaternion_builder.from_vac(emotion["vac"])
 
+                    # Build extended vector from JSON if present
+                    ext = emotion.get("extended")
+                    extended_vec = None
+                    if ext and isinstance(ext, dict):
+                        extended_vec = [
+                            ext.get("depth", 0.0),
+                            ext.get("coping", 0.0),
+                            ext.get("velocity", 0.0),
+                            ext.get("novelty", 0.0),
+                        ]
+
                     # Create database entry
                     emotion_entry = EmotionDefinition(
                         collection_id=collection.id,
@@ -280,6 +291,7 @@ async def seed_emotions(
                         vac_vector=emotion["vac"],
                         q_constant=quaternion,
                         semantic_embedding=embedding,
+                        extended_vector=extended_vec,
                         haptic_pattern_id=emotion.get("haptic_pattern_id"),
                         color_hint=emotion.get("color_hint"),
                         movement_pattern=emotion.get("movement_pattern")

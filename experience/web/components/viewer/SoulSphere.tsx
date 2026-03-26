@@ -22,6 +22,9 @@ precision highp float;
 
 uniform float uTime;
 uniform float uArousal;
+uniform float uVelocity;      // Octonion: -1 (still) to +1 (rapid change)
+uniform float uCoping;         // Octonion: -1 (helpless) to +1 (empowered)
+uniform float uDepthTopology;  // Octonion: 0 (surface) to 1 (profound, absolute)
 uniform int uMode; // 0:Subtle, 1:Dynamic, 2:Mystical, 3:Crystalline, 4:Luminous, 5:Liquid, 6:Glitch
 
 varying vec3 vNormal;
@@ -114,16 +117,45 @@ void main() {
       noiseVal = jitter;
   }
   else { // Standard Noise Modes (Subtle, Dynamic, Mystical, Luminous)
-      vec3 noisePos = position * noiseFreq + vec3(uTime * 0.15);
+      // === DEPTH TOPOLOGY: modulate noise by emotional depth ===
+      float depthAbs = uDepthTopology; // Already [0,1]
+      float noiseAmpMod = noiseAmp * (1.0 + depthAbs * 2.0);  // Up to 3x at max depth
+      float noiseFreqMod = noiseFreq * (1.0 + depthAbs * 0.5); // Slight freq increase
+
+      vec3 noisePos = position * noiseFreqMod + vec3(uTime * 0.15);
       float n1 = snoise(noisePos);
 
-      vec3 noisePos2 = position * noiseFreq * 2.0 + vec3(uTime * 0.1);
+      vec3 noisePos2 = position * noiseFreqMod * 2.0 + vec3(uTime * 0.1);
       float n2 = snoise(noisePos2) * 0.5;
 
       float combined = n1 + n2;
-      displaced += normal * (combined * noiseAmp);
+
+      // Third octave: only for deep emotions (gated at 0.4 for perf)
+      float n3 = 0.0;
+      if (depthAbs > 0.4) {
+          n3 = snoise(position * noiseFreqMod * 3.0 + vec3(uTime * 0.08)) * 0.25 * (depthAbs - 0.4) / 0.6;
+      }
+
+      // Low-frequency ocean swell (deep emotions only)
+      float swell = snoise(position * 0.8 + vec3(uTime * 0.05)) * depthAbs * 0.15;
+
+      displaced += normal * (combined * noiseAmpMod + swell + n3);
       noiseVal = combined;
   }
+
+  // === BREATHING: velocity controls speed, coping controls regularity ===
+  float velocityAbs = abs(uVelocity);
+  float breathFreq = mix(3.14, 15.7, velocityAbs);  // 2s → 0.4s cycle
+  float breathAmp = mix(0.03, 0.08, velocityAbs);    // ±3% → ±8%
+
+  // Dysregulation: add harmonic distortion when coping < 0
+  float dysreg = max(0.0, -uCoping);
+  float breathWave = sin(uTime * breathFreq);
+  breathWave += dysreg * 0.3 * sin(uTime * breathFreq * 2.7);  // Odd harmonic
+  breathWave += dysreg * 0.15 * sin(uTime * breathFreq * 4.1); // Higher harmonic
+  breathWave = clamp(breathWave, -1.0, 1.0);
+
+  displaced += normal * breathWave * breathAmp;
 
   // Pass noise value for coloring
   vNoise = noiseVal;
@@ -148,6 +180,7 @@ uniform vec3 uColorPos;
 uniform float uOpacity;
 uniform vec3 uCameraPosition;
 uniform float uTime;
+uniform float uDepth; // Octonion: -1 (superficial) to +1 (profound)
 
 varying vec3 vNormal;
 varying vec3 vPosition;
@@ -232,6 +265,14 @@ void main() {
   float diffuse = max(dot(normalize(vNormal), viewDir), 0.0);
   vec3 diffuseColor = finalColor * diffuse * 0.7;
   vec3 litColor = ambient + diffuseColor;
+
+  // ===== OCTONION: DEPTH → CORE LUMINANCE =====
+  // Deep feelings glow from within (emissive boost)
+  // Superficial feelings are matte/dim
+  float depthGlow = max(0.0, uDepth) * 0.4; // Positive depth = inner glow
+  float depthDim = max(0.0, -uDepth) * 0.3;  // Negative depth = matte
+  litColor += litColor * depthGlow;           // Emissive boost
+  litColor *= (1.0 - depthDim);               // Matte darkening
 
   gl_FragColor = vec4(litColor, alpha * uOpacity);
 }
@@ -340,11 +381,15 @@ export function SoulSphere() {
         uValence: { value: 0 },
         uArousal: { value: 0 },
         uConnection: { value: 0 },
-        uMode: { value: 0 }, // Initial mode
-        uColorNeg: { value: new THREE.Color("#FF4444") }, // Will be overridden
-        uColorPos: { value: new THREE.Color("#44FF44") }, // Will be overridden
+        uMode: { value: 0 },
+        uDepth: { value: 0 },
+        uVelocity: { value: 0 },
+        uCoping: { value: 0 },
+        uDepthTopology: { value: 0 },
+        uColorNeg: { value: new THREE.Color("#FF4444") },
+        uColorPos: { value: new THREE.Color("#44FF44") },
         uCameraPosition: { value: new THREE.Vector3(0, 0, 5) },
-        uOpacity: { value: 1.0 }, // Added opacity uniform
+        uOpacity: { value: 1.0 },
       },
     });
   }, []);
@@ -360,20 +405,51 @@ export function SoulSphere() {
     }
   });
 
-  // Animation loop
+  // Animation loop — lerp octonion + update all uniforms at 60fps
   useFrame((state, delta) => {
     if (!materialRef.current) return;
 
     // Direct store access for 60fps performance without re-renders
     const currentVAC = useExperienceStore.getState().currentVAC;
+    const octonionExt = useExperienceStore.getState().octonionExtended;
+    const octonionTarget = useExperienceStore.getState().targetOctonionExtended;
+    const octonionEnabled = useSettingsStore.getState().enableOctonionLayer;
+
+    // === LERP: Smoothly interpolate octonionExtended toward target ===
+    // damp(current, target, lambda, delta) — lambda=3 gives ~1s settle
+    const LAMBDA = 3.0;
+    const dampedDepth = THREE.MathUtils.damp(octonionExt.depth, octonionTarget.depth, LAMBDA, delta);
+    const dampedCoping = THREE.MathUtils.damp(octonionExt.coping, octonionTarget.coping, LAMBDA, delta);
+    const dampedVelocity = THREE.MathUtils.damp(octonionExt.velocity, octonionTarget.velocity, LAMBDA, delta);
+    const dampedNovelty = THREE.MathUtils.damp(octonionExt.novelty, octonionTarget.novelty, LAMBDA, delta);
+
+    // Write back to store (direct set for perf — no React re-render triggered)
+    useExperienceStore.getState().setOctonionExtended({
+      depth: dampedDepth,
+      coping: dampedCoping,
+      velocity: dampedVelocity,
+      novelty: dampedNovelty,
+    });
 
     // Scale time by animation speed
     materialRef.current.uniforms.uTime.value += delta * animationSpeed;
 
-    // Update uniforms from store for ANIMATION (noise, pulse), not color
+    // Core VAC uniforms
     materialRef.current.uniforms.uValence.value = currentVAC[0];
     materialRef.current.uniforms.uArousal.value = currentVAC[1];
     materialRef.current.uniforms.uConnection.value = currentVAC[2];
+
+    // === OCTONION UNIFORMS ===
+    // When octonion is enabled: use extended dimensions
+    // When disabled: fallback to VAC (arousal→velocity, valence→coping)
+    const effectiveVelocity = octonionEnabled ? dampedVelocity : currentVAC[1]; // arousal fallback
+    const effectiveCoping = octonionEnabled ? dampedCoping : currentVAC[0];     // valence fallback
+    const effectiveDepth = octonionEnabled ? dampedDepth : 0;
+
+    materialRef.current.uniforms.uDepth.value = effectiveDepth;
+    materialRef.current.uniforms.uVelocity.value = effectiveVelocity;
+    materialRef.current.uniforms.uCoping.value = effectiveCoping;
+    materialRef.current.uniforms.uDepthTopology.value = Math.abs(effectiveDepth);
 
     // Update opacity
     materialRef.current.uniforms.uOpacity.value = sphereOpacity;

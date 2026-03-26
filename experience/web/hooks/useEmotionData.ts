@@ -104,6 +104,7 @@ export function useEmotionData() {
           definition: emotion.definition,
           vac: vac || [0, 0, 0],
           quaternion: emotion.quaternion,
+          extended: emotion.extended_vector || undefined,
           color_hint: emotion.color_hint,
           movement_pattern: emotion.movement_pattern,
           is_bridge: isBridge,

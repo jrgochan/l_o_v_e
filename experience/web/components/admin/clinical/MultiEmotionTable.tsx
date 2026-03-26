@@ -14,6 +14,7 @@
 
 import React, { useState, useMemo } from "react";
 import { EmotionMappingBadge } from "../emotion-display/EmotionMappingBadge";
+import { ExtendedDimensionBars } from "./ExtendedDimensionBars";
 import type { DetectedEmotion } from "@/types/chat";
 import { useAdminTheme } from "@/hooks/admin/useAdminTheme";
 
@@ -125,6 +126,10 @@ export function MultiEmotionTable({
       "Valence",
       "Arousal",
       "Connection",
+      "Depth",
+      "Coping",
+      "Velocity",
+      "Novelty",
       "Voice Match",
       "Prominence",
       "Mapping Method",
@@ -136,6 +141,10 @@ export function MultiEmotionTable({
       e.vac.valence.toFixed(3),
       e.vac.arousal.toFixed(3),
       e.vac.connection.toFixed(3),
+      e.extended?.depth?.toFixed(3) ?? "N/A",
+      e.extended?.coping?.toFixed(3) ?? "N/A",
+      e.extended?.velocity?.toFixed(3) ?? "N/A",
+      e.extended?.novelty?.toFixed(3) ?? "N/A",
       e.voice_alignment ? (e.voice_alignment * 100).toFixed(1) + "%" : "N/A",
       e.prominence,
       e.match_method || "exact",
@@ -568,6 +577,21 @@ export function MultiEmotionTable({
                               </div>
                             </div>
                           </div>
+
+                          {/* Octonion Extended Dimensions */}
+                          {emotion.extended && (
+                            <div className={`pt-3 border-t ${theme.colors.border}`}>
+                              <div className="text-xs text-violet-300 mb-2 flex items-center gap-1.5">
+                                <span>🔮</span>
+                                <span className="font-semibold">Extended Dimensions (Octonion)</span>
+                              </div>
+                              <ExtendedDimensionBars
+                                extended={emotion.extended}
+                                layout="full"
+                                showValues={true}
+                              />
+                            </div>
+                          )}
                         </div>
                       </td>
                     </tr>

@@ -28,6 +28,7 @@ export interface ObserverEmotionResponse {
     definition: string;
     vac: [number, number, number];
     quaternion: [number, number, number, number];
+    extended_vector?: [number, number, number, number]; // [Depth, Coping, Velocity, Novelty]
     color_hint?: string;
     movement_pattern?: string;
   }>;

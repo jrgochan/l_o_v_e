@@ -6,6 +6,7 @@
  * - Emotion name and category
  * - Definition text
  * - VAC coordinates
+ * - Emotional Fingerprint (7D radar)
  * - Bridge emotion indicator
  *
  * Uses CharacterSphere and PreviewSphere from Phase 2.
@@ -16,6 +17,7 @@
 
 import { CharacterSphere } from "@/components/admin/spheres/CharacterSphere";
 import { PreviewSphere } from "@/components/admin/spheres/PreviewSphere";
+import { EmotionalFingerprint } from "@/components/admin/clinical/EmotionalFingerprint";
 import { BRIDGE_EMOTIONS } from "@/types/visualization";
 import { resolveEmotionColor } from "@/utils/emotion-colors";
 import { useAdminTheme } from "@/hooks/admin/useAdminTheme";
@@ -129,6 +131,51 @@ export function EmotionDetails({ emotion, isHovered = false, animationMode }: Em
                 {emotion.vac[2].toFixed(3)}
               </div>
             </div>
+          </div>
+        </div>
+
+        {/* Emotional Fingerprint Radar */}
+        <div className={`pt-3 border-t ${theme.colors.border}`}>
+          <h4
+            className={`text-xs font-semibold uppercase tracking-wider mb-2 ${theme.colors.text.muted} flex items-center gap-1.5`}
+          >
+            <span>🔮</span> Emotional Fingerprint
+          </h4>
+          <div className="flex justify-center">
+            <EmotionalFingerprint
+              vac={{
+                valence: emotion.vac[0],
+                arousal: emotion.vac[1],
+                connection: emotion.vac[2],
+              }}
+              extended={emotion.extended ? {
+                depth: emotion.extended[0],
+                coping: emotion.extended[1],
+                velocity: emotion.extended[2],
+                novelty: emotion.extended[3],
+              } : undefined}
+              size={180}
+              showLabels={true}
+              showValues={true}
+            />
+          </div>
+          {/* Axis Legend */}
+          <div className="mt-2 grid grid-cols-4 gap-x-2 gap-y-0.5 text-[9px] font-mono px-1">
+            {[
+              { sym: "V", name: "Valence", color: "#34d399" },
+              { sym: "A", name: "Arousal", color: "#f97316" },
+              { sym: "C", name: "Connection", color: "#38bdf8" },
+              { sym: "D", name: "Depth", color: "#fbbf24" },
+              { sym: "P", name: "Coping", color: "#4ade80" },
+              { sym: "Ė", name: "Velocity", color: "#818cf8" },
+              { sym: "N", name: "Novelty", color: "#a78bfa" },
+            ].map((a) => (
+              <div key={a.sym} className="flex items-center gap-1 opacity-70">
+                <span className="w-1.5 h-1.5 rounded-full flex-shrink-0" style={{ backgroundColor: a.color }} />
+                <span style={{ color: a.color }} className="font-bold">{a.sym}</span>
+                <span className="text-gray-400 truncate">{a.name}</span>
+              </div>
+            ))}
           </div>
         </div>
       </div>

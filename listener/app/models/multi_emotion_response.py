@@ -59,6 +59,21 @@ from pydantic import BaseModel, Field, field_validator
 from app.models.vac_response import VACVector
 
 
+class ExtendedDimensions(BaseModel):
+    """Octonion extension dimensions (4 additional emotional appraisal axes)."""
+
+    depth: float = Field(
+        default=0.0, ge=-1.0, le=1.0, description="Profound (+1) ↔ Superficial (-1)"
+    )
+    coping: float = Field(
+        default=0.0, ge=-1.0, le=1.0, description="Empowered (+1) ↔ Helpless (-1)"
+    )
+    velocity: float = Field(
+        default=0.0, ge=-1.0, le=1.0, description="Rapid change (+1) ↔ Stillness (-1)"
+    )
+    novelty: float = Field(default=0.0, ge=-1.0, le=1.0, description="Novel (+1) ↔ Familiar (-1)")
+
+
 class DetectedEmotionResponse(BaseModel):
     """Individual emotion detected in multi-emotion analysis.
 
@@ -79,6 +94,9 @@ class DetectedEmotionResponse(BaseModel):
     )
     category: str = Field(..., description="Category of the emotion")
     vac: VACVector = Field(..., description="VAC coordinates for this emotion")
+    extended: Optional[ExtendedDimensions] = Field(
+        default=None, description="Extended octonion dimensions (depth, coping, velocity, novelty)"
+    )
     confidence: float = Field(..., ge=0.0, le=1.0, description="Detection confidence (0-1)")
     prominence: str = Field(..., description="'primary', 'secondary', or 'underlying'")
 
@@ -147,6 +165,10 @@ class MultiEmotionAnalysisResponse(BaseModel):
         default_factory=list, description="Relationships between emotions"
     )
     aggregate_vac: VACVector = Field(..., description="Weighted average VAC from all emotions")
+    aggregate_extended: Optional[ExtendedDimensions] = Field(
+        default=None,
+        description="Weighted average of extended dimensions from all emotions",
+    )
     complexity_score: float = Field(
         ..., ge=0.0, le=1.0, description="Emotional complexity (0=simple, 1=complex)"
     )

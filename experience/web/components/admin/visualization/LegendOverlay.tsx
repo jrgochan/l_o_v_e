@@ -8,6 +8,7 @@
 
 import { useState } from "react";
 import { useVisualizationStore } from "@/stores/useVisualizationStore";
+import { useSettingsStore } from "@/stores/useSettingsStore";
 import { DIFFICULTY_COLORS } from "@/types/visualization";
 import { useAdminTheme } from "@/hooks/admin/useAdminTheme";
 
@@ -15,6 +16,7 @@ export function LegendOverlay() {
   const [isExpanded, setIsExpanded] = useState(false);
   const theme = useAdminTheme();
   const categoryFilters = useVisualizationStore((state) => state.categoryFilters);
+  const enableOctonionLayer = useSettingsStore((s) => s.enableOctonionLayer);
 
   const enabledCategories = Array.from(categoryFilters.values()).filter((cat) => cat.enabled);
 
@@ -78,6 +80,45 @@ export function LegendOverlay() {
               <span className={`text-xs ${theme.colors.text.secondary}`}>Bridge Emotion</span>
             </div>
           </div>
+
+          {/* Octonion Layers Legend */}
+          {enableOctonionLayer && (
+            <div className={`mt-4 pt-4 border-t ${theme.colors.border}`}>
+              <h4 className={`text-xs font-semibold text-violet-400 mb-2`}>
+                🔮 Octonion Layers
+              </h4>
+              <div className="space-y-2">
+                <div className="flex items-start gap-2">
+                  <div className="w-3 h-3 rounded-full mt-0.5 flex-shrink-0" style={{ background: "linear-gradient(135deg, #22c55e, #991b1b)" }} />
+                  <div>
+                    <span className={`text-xs font-medium ${theme.colors.text.secondary}`}>Coping Shell</span>
+                    <p className="text-[10px] text-gray-500 leading-tight">Emerald = empowered, Cracked red = helpless</p>
+                  </div>
+                </div>
+                <div className="flex items-start gap-2">
+                  <div className="w-3 h-3 rounded-full mt-0.5 flex-shrink-0" style={{ background: "linear-gradient(135deg, #38bdf8, #f97316)" }} />
+                  <div>
+                    <span className={`text-xs font-medium ${theme.colors.text.secondary}`}>Velocity Particles</span>
+                    <p className="text-[10px] text-gray-500 leading-tight">Orange orbiting = rapid change, Blue dormant = frozen</p>
+                  </div>
+                </div>
+                <div className="flex items-start gap-2">
+                  <div className="w-3 h-3 rounded-full mt-0.5 flex-shrink-0" style={{ background: "linear-gradient(135deg, #8b5cf6, #22d3ee)" }} />
+                  <div>
+                    <span className={`text-xs font-medium ${theme.colors.text.secondary}`}>Novelty Aura</span>
+                    <p className="text-[10px] text-gray-500 leading-tight">Iridescent shimmer = novel, Warm amber = familiar</p>
+                  </div>
+                </div>
+                <div className="flex items-start gap-2">
+                  <div className="w-3 h-3 rounded-full mt-0.5 flex-shrink-0 bg-white/20 border border-white/30" />
+                  <div>
+                    <span className={`text-xs font-medium ${theme.colors.text.secondary}`}>Depth Glow</span>
+                    <p className="text-[10px] text-gray-500 leading-tight">Brighter emissive = deeper emotional significance</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
       )}
     </div>

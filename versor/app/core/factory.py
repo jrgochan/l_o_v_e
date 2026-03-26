@@ -85,10 +85,13 @@ def create_app() -> FastAPI:
     configure_tracing(app, service_name="versor")
 
     # ── Routers ──────────────────────────────────────────────
-    from app.api.routes import calculate, slerp  # pylint: disable=import-outside-toplevel
+    from app.api.routes import calculate  # pylint: disable=import-outside-toplevel
+    from app.api.routes import slerp  # pylint: disable=import-outside-toplevel
+    from app.api.routes import octonion as oct_routes  # pylint: disable=import-outside-toplevel
 
     app.include_router(calculate.router, prefix="/versor", tags=["Calculation"])
     app.include_router(slerp.router, prefix="/versor", tags=["Interpolation"])
+    app.include_router(oct_routes.router, prefix="/versor", tags=["Octonion"])
 
     # ── Root & Health endpoints ──────────────────────────────
     @app.get("/", tags=["Root"])
@@ -103,6 +106,8 @@ def create_app() -> FastAPI:
                 "health": "/health",
                 "calculate": "/versor/calculate",
                 "slerp": "/versor/slerp",
+                "oct_calculate": "/versor/oct/calculate",
+                "oct_slerp": "/versor/oct/slerp",
             },
         }
 

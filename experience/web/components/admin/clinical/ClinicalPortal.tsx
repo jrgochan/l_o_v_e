@@ -22,6 +22,7 @@ import {
   type TrajectoryPoint,
 } from "@/utils/clinicianApi";
 import { EmergencyStop } from "./EmergencyStop";
+import { EmotionalFingerprint } from "./EmotionalFingerprint";
 import {
   Activity,
   AlertTriangle,
@@ -628,30 +629,61 @@ function ClientDetailView({
         </div>
       </div>
 
-      {/* Stats row */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-        <div className={`rounded-lg border ${theme.colors.border} bg-black/20 p-3 text-center`}>
-          <p className={`text-2xl font-bold ${theme.colors.text.primary}`}>{sessions.length}</p>
-          <p className={`text-xs ${theme.colors.text.muted}`}>Sessions</p>
+      {/* Stats row + Fingerprint */}
+      <div className="grid grid-cols-1 md:grid-cols-[1fr_auto] gap-4">
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+          <div className={`rounded-lg border ${theme.colors.border} bg-black/20 p-3 text-center`}>
+            <p className={`text-2xl font-bold ${theme.colors.text.primary}`}>{sessions.length}</p>
+            <p className={`text-xs ${theme.colors.text.muted}`}>Sessions</p>
+          </div>
+          <div className={`rounded-lg border ${theme.colors.border} bg-black/20 p-3 text-center`}>
+            <p className={`text-2xl font-bold ${theme.colors.text.primary}`}>{trajectory.length}</p>
+            <p className={`text-xs ${theme.colors.text.muted}`}>Data Points</p>
+          </div>
+          <div className={`rounded-lg border ${theme.colors.border} bg-black/20 p-3 text-center`}>
+            <p className={`text-2xl font-bold ${theme.colors.text.primary}`}>
+              {latestEmotion?.emotion_name || "—"}
+            </p>
+            <p className={`text-xs ${theme.colors.text.muted}`}>Latest Emotion</p>
+          </div>
+          <div className={`rounded-lg border ${theme.colors.border} bg-black/20 p-3 text-center`}>
+            <p
+              className={`text-2xl font-bold ${avgValence >= 0 ? "text-green-400" : "text-red-400"}`}
+            >
+              {avgValence.toFixed(2)}
+            </p>
+            <p className={`text-xs ${theme.colors.text.muted}`}>Avg. Valence</p>
+          </div>
         </div>
-        <div className={`rounded-lg border ${theme.colors.border} bg-black/20 p-3 text-center`}>
-          <p className={`text-2xl font-bold ${theme.colors.text.primary}`}>{trajectory.length}</p>
-          <p className={`text-xs ${theme.colors.text.muted}`}>Data Points</p>
-        </div>
-        <div className={`rounded-lg border ${theme.colors.border} bg-black/20 p-3 text-center`}>
-          <p className={`text-2xl font-bold ${theme.colors.text.primary}`}>
-            {latestEmotion?.emotion_name || "—"}
-          </p>
-          <p className={`text-xs ${theme.colors.text.muted}`}>Latest Emotion</p>
-        </div>
-        <div className={`rounded-lg border ${theme.colors.border} bg-black/20 p-3 text-center`}>
-          <p
-            className={`text-2xl font-bold ${avgValence >= 0 ? "text-green-400" : "text-red-400"}`}
-          >
-            {avgValence.toFixed(2)}
-          </p>
-          <p className={`text-xs ${theme.colors.text.muted}`}>Avg. Valence</p>
-        </div>
+
+        {/* Emotional Fingerprint Radar */}
+        {latestEmotion && latestEmotion.valence !== undefined && (
+          <div className={`rounded-lg border ${theme.colors.border} bg-black/20 p-3 flex flex-col items-center`}>
+            <p className={`text-[10px] font-semibold uppercase tracking-wider mb-1 ${theme.colors.text.muted}`}>
+              🔮 Emotional Fingerprint
+            </p>
+            <EmotionalFingerprint
+              vac={{
+                valence: latestEmotion.valence ?? 0,
+                arousal: latestEmotion.arousal ?? 0,
+                connection: latestEmotion.connection ?? 0,
+              }}
+              extended={
+                latestEmotion.depth !== undefined
+                  ? {
+                      depth: latestEmotion.depth ?? 0,
+                      coping: latestEmotion.coping ?? 0,
+                      velocity: latestEmotion.velocity ?? 0,
+                      novelty: latestEmotion.novelty ?? 0,
+                    }
+                  : undefined
+              }
+              size={160}
+              showLabels={true}
+              showValues={true}
+            />
+          </div>
+        )}
       </div>
 
       {/* Detail tabs */}

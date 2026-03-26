@@ -460,6 +460,13 @@ class MultiEmotionAnalysis(Base):
         JSONB
     )  # Discrepancy calculations and clinical flags
 
+    # Octonion Extension — 4 additional emotional dimensions
+    # Stored as JSONB: {"depth": float, "coping": float, "velocity": float, "novelty": float}
+    # All values in [-1.0, 1.0]. Nullable for backward compat with existing data.
+    octonion_extended: Mapped[Optional[Dict[str, Any]]] = mapped_column(
+        JSONB, nullable=True, default=None
+    )
+
     created_at: Mapped[datetime] = mapped_column(server_default=func.now(), index=True)
 
     # Relationships
@@ -513,6 +520,8 @@ class MultiEmotionAnalysis(Base):
             "content_only_data": self.content_only_data,
             "voice_only_data": self.voice_only_data,
             "discrepancy_metrics": self.discrepancy_metrics,
+            # Octonion extension (may be None for pre-octonion records)
+            "octonion_extended": self.octonion_extended,
         }
 
         if include_emotions and self.detected_emotions:

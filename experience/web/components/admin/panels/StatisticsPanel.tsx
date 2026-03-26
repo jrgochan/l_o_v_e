@@ -12,13 +12,39 @@ import { DIFFICULTY_COLORS } from "@/types/visualization";
 import { useLoadCachedPaths } from "@/hooks/useLoadCachedPaths";
 import { useStatistics } from "@/hooks/admin/useStatistics";
 import { useAdminTheme } from "@/hooks/admin/useAdminTheme";
+import { useSettingsStore } from "@/stores/useSettingsStore";
+import { useVisualizationStore } from "@/stores/useVisualizationStore";
+import { useMemo } from "react";
 
 export function StatisticsPanel() {
   const { stats, loading, error, isClearing, clearCache } = useStatistics();
   const theme = useAdminTheme();
+  const enableOctonionLayer = useSettingsStore((s) => s.enableOctonionLayer);
+  const allEmotions = useVisualizationStore((s) => s.allEmotions);
 
   // Get performance metrics from cache loading
   const { loadTime, error: loadError } = useLoadCachedPaths();
+
+  // Compute extended dimension distributions
+  const extendedStats = useMemo(() => {
+    if (!enableOctonionLayer) return null;
+    const withExt = allEmotions.filter((e) => e.extended);
+    if (withExt.length === 0) return null;
+
+    const dims = ["Depth", "Coping", "Velocity", "Novelty"] as const;
+    const colors = ["#f59e0b", "#22c55e", "#38bdf8", "#8b5cf6"];
+    const syms = ["D", "P", "Ė", "N"];
+
+    return dims.map((name, idx) => {
+      const values = withExt.map((e) => e.extended![idx]);
+      const min = Math.min(...values);
+      const max = Math.max(...values);
+      const mean = values.reduce((a, b) => a + b, 0) / values.length;
+      // Normalize for bar width: map from [-1,1] to [0,100]
+      const barMean = ((mean + 1) / 2) * 100;
+      return { name, sym: syms[idx], color: colors[idx], min, max, mean, barMean, count: values.length };
+    });
+  }, [enableOctonionLayer, allEmotions]);
 
   if (loading && !stats) {
     return (
@@ -219,6 +245,49 @@ export function StatisticsPanel() {
           </div>
         </div>
       </section>
+
+      {/* Extended Dimension Distribution (Octonion) */}
+      {extendedStats && (
+        <section
+          className={`bg-black/20 border border-violet-800/30 ${theme.layout.borderRadius} p-4 transition-colors duration-500`}
+        >
+          <h3 className="text-sm font-semibold mb-3 text-violet-400 flex items-center gap-2">
+            🔮 Extended Dimensions
+            <span className="text-[10px] text-violet-300/60 font-normal">
+              {extendedStats[0].count} emotions
+            </span>
+          </h3>
+          <div className="space-y-3">
+            {extendedStats.map((dim) => (
+              <div key={dim.sym} className="space-y-1">
+                <div className="flex items-center justify-between text-xs">
+                  <span className="font-medium" style={{ color: dim.color }}>
+                    {dim.sym} {dim.name}
+                  </span>
+                  <span className="font-mono text-gray-400">
+                    μ={dim.mean >= 0 ? "+" : ""}{dim.mean.toFixed(2)}
+                    <span className="text-gray-600 ml-1.5">
+                      [{dim.min >= 0 ? "+" : ""}{dim.min.toFixed(2)}, {dim.max >= 0 ? "+" : ""}{dim.max.toFixed(2)}]
+                    </span>
+                  </span>
+                </div>
+                <div className={`relative w-full h-2.5 bg-black/40 rounded-full border ${theme.colors.border} overflow-hidden`}>
+                  <div className="absolute left-1/2 top-0 bottom-0 w-px bg-gray-600 z-10" />
+                  <div
+                    className="absolute top-0 h-full rounded-full transition-all duration-500"
+                    style={{
+                      backgroundColor: dim.color,
+                      opacity: 0.7,
+                      left: dim.mean >= 0 ? "50%" : `${dim.barMean}%`,
+                      width: `${Math.abs(dim.mean) * 50}%`,
+                    }}
+                  />
+                </div>
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
 
       {/* Cache Management */}
       <section

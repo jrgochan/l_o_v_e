@@ -369,6 +369,16 @@ export function PathDetailsOverlay() {
                                 <span style={{ color: getVacComponentColor(item.vac[2], "C") }}>
                                   C:{item.vac[2].toFixed(2)}
                                 </span>
+                                {/* Extended dimensions from atlas data */}
+                                {(() => {
+                                  const emotionObj = allEmotions.find((e) => e.name === item.emotion);
+                                  if (!emotionObj?.extended) return null;
+                                  return (
+                                    <span className="text-violet-300/70 ml-0.5">
+                                      D:{emotionObj.extended[0].toFixed(1)} P:{emotionObj.extended[1].toFixed(1)}
+                                    </span>
+                                  );
+                                })()}
                               </span>
                             )}
                           </div>

@@ -29,6 +29,21 @@ interface ExperienceStore {
   isAnimating: boolean;
   angularVelocity: number;
 
+  // Octonion extended dimensions (Phase 2)
+  octonionExtended: {
+    depth: number;    // -1 (superficial) to +1 (profound)
+    coping: number;   // -1 (helpless) to +1 (empowered)
+    velocity: number; // -1 (stillness) to +1 (rapid change)
+    novelty: number;  // -1 (familiar) to +1 (novel)
+  };
+  // Target for smooth interpolation (set by UI, lerped toward by render loop)
+  targetOctonionExtended: {
+    depth: number;
+    coping: number;
+    velocity: number;
+    novelty: number;
+  };
+
   // Transition path (for 3D visualization)
   transitionPath: TransitionPathResponse | null;
   showPath: boolean;
@@ -80,6 +95,8 @@ interface ExperienceStore {
   pauseSession: () => void;
   resumeSession: () => void;
   addSessionNote: (note: string) => void;
+  setOctonionExtended: (ext: Partial<ExperienceStore["octonionExtended"]>) => void;
+  setTargetOctonionExtended: (ext: Partial<ExperienceStore["targetOctonionExtended"]>) => void;
   reset: () => void;
 }
 
@@ -95,6 +112,8 @@ export const useExperienceStore = create<ExperienceStore>((set) => ({
   showPath: false,
   activeJourney: null,
   activeSession: null,
+  octonionExtended: { depth: 0, coping: 0, velocity: 0, novelty: 0 },
+  targetOctonionExtended: { depth: 0, coping: 0, velocity: 0, novelty: 0 },
 
   // Set target state (with automatic quaternion conversion if not provided)
   setTarget: (vac, quaternion) => {
@@ -315,6 +334,16 @@ export const useExperienceStore = create<ExperienceStore>((set) => ({
     });
   },
 
+  setOctonionExtended: (ext) =>
+    set((state) => ({
+      octonionExtended: { ...state.octonionExtended, ...ext },
+    })),
+
+  setTargetOctonionExtended: (ext) =>
+    set((state) => ({
+      targetOctonionExtended: { ...state.targetOctonionExtended, ...ext },
+    })),
+
   // Reset to neutral
   reset: () => {
     // Clear journey and session from localStorage
@@ -337,6 +366,8 @@ export const useExperienceStore = create<ExperienceStore>((set) => ({
       flyoverSpeed: 1.0,
       flyoverProgress: 0,
       flyoverCurrentWaypointIndex: -1,
+      octonionExtended: { depth: 0, coping: 0, velocity: 0, novelty: 0 },
+      targetOctonionExtended: { depth: 0, coping: 0, velocity: 0, novelty: 0 },
     });
   },
 }));

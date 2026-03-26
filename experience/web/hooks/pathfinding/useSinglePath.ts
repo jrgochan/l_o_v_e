@@ -60,8 +60,9 @@ export function useSinglePath() {
           logger.info("hooks", `Path computation aborted: ${from.name} → ${to.name}`);
           return;
         }
-        logger.error("hooks", `Error computing path ${from.name} → ${to.name}`, err);
-        throw err;
+        // Log but don't throw — path computation failures are non-fatal
+        // (e.g. emotion graph not cached for this collection)
+        logger.warn("hooks", `Path computation failed (non-fatal): ${from.name} → ${to.name}`, err);
       }
     },
     [addComputedPath]
