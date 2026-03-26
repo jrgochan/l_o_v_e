@@ -11,7 +11,7 @@ import { useState } from "react";
 import { useVisualizationStore } from "@/stores/useVisualizationStore";
 import { useAdminTheme } from "@/hooks/admin/useAdminTheme";
 
-type TabType = "model" | "usage" | "shortcuts" | "concepts";
+type TabType = "model" | "octonion" | "usage" | "shortcuts" | "concepts";
 
 interface HelpModalProps {
   onClose: () => void;
@@ -50,7 +50,7 @@ export function HelpModal({ onClose }: HelpModalProps) {
 
         {/* Tab Navigation */}
         <div className={`flex border-b ${theme.colors.border} ${theme.colors.background}`}>
-          {(["model", "usage", "shortcuts", "concepts"] as const).map((tab) => (
+          {(["model", "octonion", "usage", "shortcuts", "concepts"] as const).map((tab) => (
             <button
               key={tab}
               onClick={() => setActiveTab(tab)}
@@ -60,7 +60,8 @@ export function HelpModal({ onClose }: HelpModalProps) {
                   : `${theme.colors.text.secondary} ${theme.colors.hover}`
               }`}
             >
-              {tab === "model" && "🧠 VAC Model & Soul Sphere"}
+              {tab === "model" && "🧠 VAC Model"}
+              {tab === "octonion" && "🔮 8D Octonion"}
               {tab === "usage" && "🎯 How to Use"}
               {tab === "shortcuts" && "⌨️ Shortcuts"}
               {tab === "concepts" && "🌟 Key Concepts"}
@@ -71,6 +72,7 @@ export function HelpModal({ onClose }: HelpModalProps) {
         {/* Content */}
         <div className={`flex-1 overflow-y-auto p-6 ${theme.colors.background}`}>
           {activeTab === "model" && <ModelTab />}
+          {activeTab === "octonion" && <OctonionTab />}
           {activeTab === "usage" && <UsageTab />}
           {activeTab === "shortcuts" && <ShortcutsTab />}
           {activeTab === "concepts" && <ConceptsTab />}
@@ -227,6 +229,199 @@ function ModelTab() {
               No endorsement by these researchers is implied. This system represents an experimental
               attempt to operationalize their insights and was co-created through collaborative
               human-AI generation over 3.5 months.
+            </p>
+          </div>
+        </div>
+      </section>
+    </div>
+  );
+}
+
+function OctonionTab() {
+  const theme = useAdminTheme();
+  return (
+    <div className={`prose prose-invert max-w-none space-y-6 ${theme.colors.text.secondary}`}>
+      <section>
+        <h3 className={`text-xl font-bold ${theme.colors.text.primary} mb-3`}>
+          8D Octonion Emotional Modeling
+        </h3>
+        <div
+          className={`bg-black/20 border ${theme.colors.border} rounded-lg p-4 space-y-2 ${theme.colors.text.secondary}`}
+        >
+          <p>
+            The <strong className={theme.colors.text.primary}>Octonion Layer</strong> extends the
+            standard 3D VAC model into <strong className={theme.colors.text.primary}>8 dimensions</strong> using
+            octonion mathematics (hypercomplex numbers on the 7-sphere S⁷).
+          </p>
+          <p>
+            This is grounded in the clinical observation that emotions like &quot;grief&quot; and
+            &quot;despair&quot; may share similar VAC coordinates, but differ profoundly in
+            how <em>deeply held</em> they are, whether the person feels <em>agency</em>, and
+            whether the state is <em>novel</em> or <em>chronic</em>.
+          </p>
+        </div>
+      </section>
+
+      <section>
+        <h3 className={`text-xl font-bold ${theme.colors.text.primary} mb-3`}>
+          The 4 Extended Dimensions
+        </h3>
+        <div className={`bg-black/20 border ${theme.colors.border} rounded-lg p-4 space-y-3`}>
+          <p className={theme.colors.text.secondary}>
+            Beyond <strong className={theme.colors.text.primary}>Valence (V)</strong>,{" "}
+            <strong className={theme.colors.text.primary}>Arousal (A)</strong>, and{" "}
+            <strong className={theme.colors.text.primary}>Connection (C)</strong>, the
+            octonion model adds:
+          </p>
+
+          <div className="grid grid-cols-2 gap-3 mt-4">
+            <div className="bg-black/40 border border-amber-500/30 rounded p-3">
+              <h4 className="font-semibold text-amber-400 mb-1">D — Depth</h4>
+              <p className="text-xs text-amber-200/60 mb-1">Profound (+1) ↔ Superficial (-1)</p>
+              <p className={`text-sm ${theme.colors.text.secondary}`}>
+                How deeply held is this feeling? A surface frustration vs. a core wound.
+                Drives <strong className={theme.colors.text.primary}>surface topology</strong> on the Soul Sphere.
+              </p>
+            </div>
+            <div className="bg-black/40 border border-emerald-500/30 rounded p-3">
+              <h4 className="font-semibold text-emerald-400 mb-1">P — Coping</h4>
+              <p className="text-xs text-emerald-200/60 mb-1">Empowered (+1) ↔ Helpless (-1)</p>
+              <p className={`text-sm ${theme.colors.text.secondary}`}>
+                Your sense of agency. &quot;I&apos;ve got this&quot; vs. &quot;I can&apos;t do
+                anything.&quot; Drives the <strong className={theme.colors.text.primary}>Coping Shell</strong>
+                {" "}— emerald when empowered, cracked red when helpless.
+              </p>
+            </div>
+            <div className="bg-black/40 border border-indigo-500/30 rounded p-3">
+              <h4 className="font-semibold text-indigo-400 mb-1">Ė — Velocity</h4>
+              <p className="text-xs text-indigo-200/60 mb-1">Rapid change (+1) ↔ Stillness (-1)</p>
+              <p className={`text-sm ${theme.colors.text.secondary}`}>
+                How fast your emotional state is shifting. Drives the Soul Sphere&apos;s{" "}
+                <strong className={theme.colors.text.primary}>breathing rhythm</strong> and{" "}
+                <strong className={theme.colors.text.primary}>orbiting particle field</strong>.
+              </p>
+            </div>
+            <div className="bg-black/40 border border-violet-500/30 rounded p-3">
+              <h4 className="font-semibold text-violet-400 mb-1">N — Novelty</h4>
+              <p className="text-xs text-violet-200/60 mb-1">Novel (+1) ↔ Familiar (-1)</p>
+              <p className={`text-sm ${theme.colors.text.secondary}`}>
+                Is this a new experience or a worn groove? Drives the outer{" "}
+                <strong className={theme.colors.text.primary}>Novelty Aura</strong>
+                {" "}— iridescent shimmer for novel states, warm amber for familiar ones.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section>
+        <h3 className={`text-xl font-bold ${theme.colors.text.primary} mb-3`}>
+          Visual Layers
+        </h3>
+        <div className={`bg-black/20 border ${theme.colors.border} rounded-lg p-4 space-y-3`}>
+          <p>When octonion mode is enabled, the Soul Sphere gains three concentric layers:</p>
+          <div className="space-y-2 text-sm">
+            <div className="flex items-start gap-3">
+              <span className="text-2xl mt-[-2px]">🫧</span>
+              <div>
+                <strong className="text-violet-400">Outer: Novelty Aura</strong>
+                <p className={theme.colors.text.muted}>
+                  Iridescent shimmer (novel) or warm amber glow (familiar). High novelty = vivid, low = barely visible.
+                </p>
+              </div>
+            </div>
+            <div className="flex items-start gap-3">
+              <span className="text-2xl mt-[-2px]">✨</span>
+              <div>
+                <strong className="text-indigo-400">Middle: Velocity Particles</strong>
+                <p className={theme.colors.text.muted}>
+                  Orbiting particles that accelerate with emotional velocity. Blue (still) → orange (rapid). Frozen at zero.
+                </p>
+              </div>
+            </div>
+            <div className="flex items-start gap-3">
+              <span className="text-2xl mt-[-2px]">🛡️</span>
+              <div>
+                <strong className="text-emerald-400">Inner: Coping Shell</strong>
+                <p className={theme.colors.text.muted}>
+                  Translucent crystalline shield. Solid emerald when empowered, cracked hot-orange when helpless.
+                  Breathes in sympathy with the core sphere.
+                </p>
+              </div>
+            </div>
+            <div className="flex items-start gap-3">
+              <span className="text-2xl mt-[-2px]">🔮</span>
+              <div>
+                <strong className="text-amber-400">Core: Depth Topology</strong>
+                <p className={theme.colors.text.muted}>
+                  The Soul Sphere itself warps — shallow emotions are smooth, deep emotions develop complex terrain
+                  (3-octave fractal noise + ocean swell). Deep feelings also glow from within.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section>
+        <h3 className={`text-xl font-bold ${theme.colors.text.primary} mb-3`}>
+          How to Toggle
+        </h3>
+        <div className={`bg-black/20 border ${theme.colors.border} rounded-lg p-4 space-y-3`}>
+          <div className="space-y-2 text-sm">
+            <p>
+              <strong className={theme.colors.text.primary}>1.</strong> Open{" "}
+              <strong className={theme.colors.primary}>Settings</strong> (⚙️ gear icon in bottom-left, or press{" "}
+              <kbd className={`px-2 py-0.5 bg-black/40 border ${theme.colors.border} rounded font-mono text-xs`}>⌘,</kbd>)
+            </p>
+            <p>
+              <strong className={theme.colors.text.primary}>2.</strong> Find the{" "}
+              <strong className="text-violet-400">🔮 Octonion Emotional Layer</strong> section
+            </p>
+            <p>
+              <strong className={theme.colors.text.primary}>3.</strong> Toggle{" "}
+              <strong className={theme.colors.primary}>&quot;Layered Soul&quot;</strong> to enable/disable
+              the concentric shells
+            </p>
+            <p>
+              <strong className={theme.colors.text.primary}>4.</strong> Toggle{" "}
+              <strong className={theme.colors.primary}>&quot;Dimension Map&quot;</strong> to show/hide
+              the Fano Plane HUD (7D interaction overlay)
+            </p>
+          </div>
+          <div className="bg-violet-900/20 border border-violet-500/30 rounded p-3 mt-2">
+            <p className="text-violet-300 text-sm">
+              <strong>💡 Performance note:</strong> The octonion layer adds 3 transparent shells + 200
+              particles. On lower-end devices, you can disable it with no loss of core VAC functionality.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <section>
+        <h3 className={`text-xl font-bold ${theme.colors.text.primary} mb-3`}>
+          The Math: Why Octonions?
+        </h3>
+        <div className={`bg-black/20 border ${theme.colors.border} rounded-lg p-4 space-y-3 text-sm`}>
+          <p>
+            The existing VAC model uses <strong className={theme.colors.text.primary}>quaternions</strong> (4D) to
+            represent 3 emotional dimensions on S³. Extending to 7 dimensions requires jumping
+            to <strong className={theme.colors.text.primary}>octonions</strong> (8D) — there is no
+            5D, 6D, or 7D normed division algebra (by the <em>Hurwitz theorem</em>).
+          </p>
+          <p>
+            Octonion SLERP (Spherical Linear Interpolation) on S⁷ provides{" "}
+            <strong className={theme.colors.text.primary}>smooth, constant-velocity transitions</strong> between
+            emotional states — ensuring that no matter how many dimensions change simultaneously,
+            the path through emotional space remains geometrically optimal.
+          </p>
+          <div className="bg-blue-900/20 border border-blue-500/30 rounded p-3">
+            <p className="italic text-blue-300">
+              The 7 imaginary axes of the octonion obey the{" "}
+              <strong className="text-blue-200">Fano plane</strong> multiplication rules, creating
+              a beautiful algebraic structure where each dimension interacts with exactly 2 others
+              (e.g., Valence × Arousal → Depth). These are not arbitrary — they encode clinically
+              meaningful relationships.
             </p>
           </div>
         </div>
