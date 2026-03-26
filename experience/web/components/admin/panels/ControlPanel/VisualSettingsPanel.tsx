@@ -84,6 +84,54 @@ export function VisualSettingsPanel() {
         </div>
       </div>
 
+      {/* Breathing Intensity — only when octonion is on */}
+      {settings.enableOctonionLayer && (
+        <div className="space-y-1">
+          <div className="flex justify-between items-center">
+            <span className={`text-xs ${theme.colors.text.muted}`}>Breathing</span>
+            <span className="text-xs font-mono text-white">
+              {settings.breathingIntensity.toFixed(1)}x
+            </span>
+          </div>
+          <input
+            type="range"
+            min="0"
+            max="3.0"
+            step="0.1"
+            value={settings.breathingIntensity}
+            onChange={(e) => settings.updateVisualSetting("breathingIntensity", parseFloat(e.target.value))}
+            className="w-full h-1.5 bg-black/30 rounded-lg appearance-none cursor-pointer accent-emerald-500"
+          />
+          <p className={`text-[10px] ${theme.colors.text.muted}`}>
+            {settings.breathingIntensity === 0 ? "Frozen" : settings.breathingIntensity === 1 ? "Data-driven" : "Amplified"}
+          </p>
+        </div>
+      )}
+
+      {/* Topology Intensity — only when octonion is on */}
+      {settings.enableOctonionLayer && (
+        <div className="space-y-1">
+          <div className="flex justify-between items-center">
+            <span className={`text-xs ${theme.colors.text.muted}`}>Topology</span>
+            <span className="text-xs font-mono text-white">
+              {settings.topologyIntensity.toFixed(1)}x
+            </span>
+          </div>
+          <input
+            type="range"
+            min="0"
+            max="2.0"
+            step="0.1"
+            value={settings.topologyIntensity}
+            onChange={(e) => settings.updateVisualSetting("topologyIntensity", parseFloat(e.target.value))}
+            className="w-full h-1.5 bg-black/30 rounded-lg appearance-none cursor-pointer accent-amber-500"
+          />
+          <p className={`text-[10px] ${theme.colors.text.muted}`}>
+            {settings.topologyIntensity === 0 ? "Smooth sphere" : settings.topologyIntensity === 1 ? "Data-driven" : "Exaggerated"}
+          </p>
+        </div>
+      )}
+
       {/* Auto-Rotate Toggle */}
       <button
         onClick={() => settings.toggleAutoRotate()}

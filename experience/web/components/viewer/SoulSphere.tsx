@@ -461,6 +461,9 @@ export function SoulSphere() {
     // === OCTONION UNIFORMS ===
     // When octonion is enabled: use extended dimensions
     // When disabled: fallback to VAC (arousal→velocity, valence→coping)
+    const breathMul = useSettingsStore.getState().breathingIntensity;
+    const topoMul = useSettingsStore.getState().topologyIntensity;
+
     const effectiveVelocity = octonionEnabled ? dampedVelocity : currentVAC[1]; // arousal fallback
     const effectiveCoping = octonionEnabled ? dampedCoping : currentVAC[0];     // valence fallback
     const effectiveDepth = octonionEnabled ? dampedDepth : 0;
@@ -468,9 +471,11 @@ export function SoulSphere() {
 
     materialRef.current.uniforms.uDepth.value = effectiveDepth;
     materialRef.current.uniforms.uNovelty.value = effectiveNovelty;
-    materialRef.current.uniforms.uVelocity.value = effectiveVelocity;
+    // Breathing intensity multiplier: 0=frozen, 1=normal, 3=amplified
+    materialRef.current.uniforms.uVelocity.value = effectiveVelocity * breathMul;
     materialRef.current.uniforms.uCoping.value = effectiveCoping;
-    materialRef.current.uniforms.uDepthTopology.value = Math.abs(effectiveDepth);
+    // Topology intensity multiplier: 0=smooth, 1=normal, 2=exaggerated
+    materialRef.current.uniforms.uDepthTopology.value = Math.abs(effectiveDepth) * topoMul;
 
     // Update opacity
     materialRef.current.uniforms.uOpacity.value = sphereOpacity;

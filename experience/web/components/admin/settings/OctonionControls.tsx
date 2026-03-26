@@ -85,7 +85,6 @@ export function OctonionControls() {
         </div>
       )}
 
-      {/* Layered Soul Toggle */}
       <div className={isLowQuality ? "opacity-40 pointer-events-none" : ""}>
         <Toggle
           checked={enableOctonionLayer}
@@ -102,6 +101,33 @@ export function OctonionControls() {
           )}
         </p>
       </div>
+
+      {/* Individual Shell Toggles — only visible when master is on */}
+      {enableOctonionLayer && !isLowQuality && (
+        <div className="ml-3 pl-3 border-l border-violet-700/30 space-y-1.5">
+          {([
+            { key: "showCopingShell" as const, label: "🛡️ Coping Shell", desc: "Emerald shield / cracked when helpless" },
+            { key: "showVelocityParticles" as const, label: "✨ Velocity Particles", desc: "Orbiting field driven by Ė" },
+            { key: "showNoveltyAura" as const, label: "🫧 Novelty Aura", desc: "Outer iridescent shimmer" },
+          ]).map(({ key, label, desc }) => (
+            <label
+              key={key}
+              className={`flex items-center gap-2 cursor-pointer group ${theme.colors.text.secondary} hover:${theme.colors.text.primary}`}
+            >
+              <input
+                type="checkbox"
+                checked={useSettingsStore.getState()[key]}
+                onChange={(e) => updateVisualSetting(key, e.target.checked)}
+                className="rounded border-violet-500/30 bg-transparent w-3.5 h-3.5"
+              />
+              <div className="min-w-0">
+                <span className="text-[11px] font-medium">{label}</span>
+                <p className={`text-[10px] ${theme.colors.text.muted} leading-tight`}>{desc}</p>
+              </div>
+            </label>
+          ))}
+        </div>
+      )}
 
       {/* Dimension Map Toggle */}
       <div className={isLowQuality ? "opacity-40 pointer-events-none" : ""}>

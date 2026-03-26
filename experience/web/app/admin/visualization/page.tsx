@@ -52,6 +52,7 @@ import { WaypointArrivalOverlay } from "@/components/WaypointArrivalOverlay";
 import { StrategyLibraryBrowser } from "@/components/strategy/StrategyLibraryBrowser";
 import { VisualizationHeader } from "@/components/admin/visualization/VisualizationHeader";
 import { FanoOverlay } from "@/components/admin/visualization/FanoOverlay";
+import { LiveDimensionHUD } from "@/components/admin/visualization/LiveDimensionHUD";
 
 const VisualizationAdminContent = () => {
   // Load emotions and set up path calculator
@@ -410,6 +411,8 @@ const VisualizationAdminContent = () => {
               {enableFanoPlane && renderQuality !== "low" && (
                 <FanoOverlay />
               )}
+              {/* Octonion Live Readout HUD */}
+              <LiveDimensionHUD />
             </div>
           </main>
         )}

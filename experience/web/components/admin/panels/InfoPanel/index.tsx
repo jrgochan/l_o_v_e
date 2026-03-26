@@ -22,6 +22,7 @@ import { PathDetails } from "./PathDetails";
 import { PathComparison } from "./PathComparison";
 import { PathSummaryList } from "./PathSummaryList";
 import { ActionSuggestions } from "./ActionSuggestions";
+import { DimensionComparison } from "@/components/admin/clinical/DimensionComparison";
 import { useAdminTheme } from "@/hooks/admin/useAdminTheme";
 
 export function InfoPanel() {
@@ -111,6 +112,22 @@ export function InfoPanel() {
                   focusedEmotionId={focusedEmotionId}
                 />
               ) : null}
+
+              {/* Extended Dimension Comparison — 2 emotions selected */}
+              {selectedEmotions.length === 2 &&
+                selectedEmotions[0].extended &&
+                selectedEmotions[1].extended && (
+                  <DimensionComparison
+                    emotionA={{
+                      name: selectedEmotions[0].name,
+                      extended: selectedEmotions[0].extended,
+                    }}
+                    emotionB={{
+                      name: selectedEmotions[1].name,
+                      extended: selectedEmotions[1].extended,
+                    }}
+                  />
+                )}
 
               {/* Path Details */}
               {displayPath && (

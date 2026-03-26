@@ -130,6 +130,11 @@ interface SettingsState {
   // === OCTONION EXTENSION ===
   enableOctonionLayer: boolean;
   enableFanoPlaneRenders: boolean;
+  showCopingShell: boolean;
+  showVelocityParticles: boolean;
+  showNoveltyAura: boolean;
+  breathingIntensity: number;  // 0 = frozen, 1 = data-driven, 3 = amplified
+  topologyIntensity: number;   // 0 = smooth, 1 = data-driven, 2 = exaggerated
 
   // === ACTIONS ===
   setApiUrl: (service: ApiService, url: string) => void;
@@ -249,6 +254,11 @@ const DEFAULT_VALUES = {
   // Octonion Extension (opt-in, disabled by default)
   enableOctonionLayer: false,
   enableFanoPlaneRenders: false,
+  showCopingShell: true,
+  showVelocityParticles: true,
+  showNoveltyAura: true,
+  breathingIntensity: 1.0,
+  topologyIntensity: 1.0,
 
   // Development (OFF by default for clean console)
   development: {
@@ -421,6 +431,11 @@ export const useSettingsStore = create<SettingsState>()(
             octonion: {
               enableOctonionLayer: state.enableOctonionLayer,
               enableFanoPlaneRenders: state.enableFanoPlaneRenders,
+              showCopingShell: state.showCopingShell,
+              showVelocityParticles: state.showVelocityParticles,
+              showNoveltyAura: state.showNoveltyAura,
+              breathingIntensity: state.breathingIntensity,
+              topologyIntensity: state.topologyIntensity,
             },
           },
         };

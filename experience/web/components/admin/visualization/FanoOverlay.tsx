@@ -15,7 +15,7 @@
 
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect, useRef } from "react";
 import { useExperienceStore } from "@/stores/useExperienceStore";
 
 /** Dimension definition */
@@ -95,6 +95,20 @@ export function FanoOverlay() {
   // Read current emotional state
   const currentVAC = useExperienceStore((s) => s.currentVAC);
   const octonionExt = useExperienceStore((s) => s.octonionExtended);
+
+  // Breathing pulse phase — ticks for animation sync
+  const [breathPhase, setBreathPhase] = useState(0);
+  const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
+  useEffect(() => {
+    // Update breath phase at ~30fps
+    timerRef.current = setInterval(() => {
+      setBreathPhase((p) => p + 0.05);
+    }, 33);
+    return () => {
+      if (timerRef.current) clearInterval(timerRef.current);
+    };
+  }, []);
 
   // Compute dimension values
   const dimValues = useMemo(() => {
@@ -205,17 +219,43 @@ export function FanoOverlay() {
             // Pulse radius: more active = larger
             const nodeR = 8 + absVal * 4;
 
+            // === BREATHING SYNC for Velocity node (id=6) ===
+            const isVelocityNode = dim.id === 6;
+            const velocityAbs = Math.abs(dimValues[6] || 0);
+            const breathFreq = 3.14 + velocityAbs * 12.56; // Match SoulSphere breathing
+            const breathPulse = isVelocityNode
+              ? Math.sin(breathPhase * breathFreq) * velocityAbs * 3
+              : 0;
+
+            // === CRACK RING for Coping node (id=5) when negative ===
+            const isCopingNode = dim.id === 5;
+            const copingVal = dimValues[5] || 0;
+            const copingNeg = Math.max(0, -copingVal); // 0..1 when helpless
+
+            const effectiveR = nodeR + breathPulse;
+
             return (
               <g key={dim.id}>
                 {/* Glow */}
                 <circle
-                  cx={dim.x} cy={dim.y} r={nodeR + 3}
+                  cx={dim.x} cy={dim.y} r={effectiveR + 3}
                   fill={dim.color}
-                  fillOpacity={absVal * 0.15}
+                  fillOpacity={absVal * 0.15 + (isVelocityNode ? Math.abs(breathPulse) * 0.05 : 0)}
                 />
+                {/* Crack ring — coping helplessness indicator */}
+                {isCopingNode && copingNeg > 0.1 && (
+                  <circle
+                    cx={dim.x} cy={dim.y} r={effectiveR + 1}
+                    fill="none"
+                    stroke="#ef4444"
+                    strokeWidth={copingNeg * 2}
+                    strokeOpacity={copingNeg * 0.7}
+                    strokeDasharray={`${2 + copingNeg * 3} ${4 - copingNeg * 2}`}
+                  />
+                )}
                 {/* Core */}
                 <circle
-                  cx={dim.x} cy={dim.y} r={nodeR}
+                  cx={dim.x} cy={dim.y} r={effectiveR}
                   fill="black"
                   stroke={dim.color}
                   strokeWidth={1.5}
