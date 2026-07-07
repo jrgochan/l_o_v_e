@@ -11,7 +11,7 @@ on:
 jobs:
   analyze:
     name: Analyze (${{ matrix.language }})
-    runs-on: ${{ (matrix.language == 'swift' && 'macos-latest') || 'ubuntu-latest' }}
+    runs-on: ubuntu-latest
     permissions:
       actions: read
       contents: read
@@ -25,9 +25,8 @@ jobs:
           build-mode: none
         - language: python
           build-mode: none
-        - language: swift
-          build-mode: autobuild
         # Excluded: 'c-cpp' (Metal/GPU shaders, not scannable by CodeQL autobuild)
+        # Excluded: 'swift' (exploratory, expensive macOS runners)
         # Excluded: 'rust' (minimal usage, can re-enable if needed)
 
     steps:
