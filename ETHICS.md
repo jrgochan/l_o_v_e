@@ -55,8 +55,8 @@ If you fork this, extend it, build something new with it — I'd love to hear ab
 And if you're building something in the emotion space, I'd gently ask you to think about the ethics of what you're creating. Emotional data is some of the most intimate information a person can generate. Treat it with the care it deserves.
 
 Build things that help people understand themselves better.
-Don't build things that help corporations understand people better.
+Be wary of building things that help others understand people without their knowledge.
 
 ---
 
-*— Jason*
+*— Jason, with Claude*
