@@ -4,9 +4,9 @@ version = "0.1.0"
 description = "L.O.V.E. Stack - Listener, Observer, Versor, Experience"
 requires-python = ">=3.12"
 readme = "README.md"
-license = { text = "MIT" }
+license = { text = "Apache-2.0" }
 authors = [
-    { name = "L.O.V.E. Team", email = "love@example.com" }
+    { name = "Jason Gochanour", email = "jrgochan@proton.me" }
 ]
 
 # Shared Dependencies across all modules
