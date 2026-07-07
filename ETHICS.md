@@ -37,18 +37,16 @@ The Apache 2.0 license includes an explicit patent grant. That means: **if you u
 
 ## On Making a Living
 
-I'll be honest about this too. I'd love to make money from the years of work I've put into this. I have bills. I have a life. Building this wasn't free.
+I'm a developer between jobs who built something I believe in. I'd love for this work to eventually help cover a mortgage and groceries, but I'm not going to charge for it. Emotion software shouldn't have a paywall.
 
-But I refuse to build a business on selling people's emotions. I thought about it. I tried to find a way. And every path that led to monetizing emotion data felt wrong in a way I couldn't talk myself out of.
+So here's the deal: **this is free. It's open. It's yours to use.**
 
-So here's what I landed on: **this is free. It's open. It's yours to use.**
-
-If it helps you, and you're in a position to give back, I'd be grateful:
+If it helps you and you're in a position to give back, I'd be grateful:
 
 - ☕ [**Buy Me a Coffee**](https://buymeacoffee.com/jrgochan)
 - 💜 [**GitHub Sponsors**](https://github.com/sponsors/jrgochan)
 
-No pressure. No guilt. No paywalled features. Just a link, and a hope that open-hearted work can sustain itself.
+If not, use it freely. That's the whole deal.
 
 ## A Note to Builders
 
