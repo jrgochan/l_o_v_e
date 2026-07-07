@@ -152,6 +152,8 @@ VAC coordinates are converted to quaternions for smooth 3D interpolation and vis
 ## 🤝 Contributing
 Each module is independently maintained. See module-specific `README.md` files for guidelines.
 
+Questions, ideas, or just want to say hi? Reach out at **jrgochan@proton.me**.
+
 ## 🧭 Ethics
 This project is open-sourced with intention. Emotion software should be a commons, not a commodity.
 
