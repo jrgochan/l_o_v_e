@@ -1,5 +1,9 @@
 # L.O.V.E. Stack
 
+[![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
+[![Buy Me a Coffee](https://img.shields.io/badge/Buy_Me_a_Coffee-FFDD00?logo=buy-me-a-coffee&logoColor=black)](https://buymeacoffee.com/jrgochan)
+[![GitHub Sponsors](https://img.shields.io/badge/Sponsor-💜-ea4aaa)](https://github.com/sponsors/jrgochan)
+
 **L**istener-**O**bserver-**V**ersor-**E**xperience: A multi-modal emotional intelligence platform using the VAC (Valence-Arousal-Connection) model with quaternion mathematics for 3D visualization.
 
 ## 🏗️ Architecture
@@ -148,11 +152,31 @@ VAC coordinates are converted to quaternions for smooth 3D interpolation and vis
 ## 🤝 Contributing
 Each module is independently maintained. See module-specific `README.md` files for guidelines.
 
+## 🧭 Ethics
+This project is open-sourced with intention. Emotion software should be a commons, not a commodity.
+
+Please read [**ETHICS.md**](ETHICS.md) for the full statement on what this project is for, what it's not for, and why it's free.
+
+## 💜 Support This Project
+
+The L.O.V.E. Stack is free and open-source. If it helps you and you're in a position to give back:
+
+- ☕ [**Buy Me a Coffee**](https://buymeacoffee.com/jrgochan)
+- 💜 [**GitHub Sponsors**](https://github.com/sponsors/jrgochan)
+
+No pressure. No paywalled features. Just gratitude.
+
 ## 📄 License
-See individual module LICENSE files.
+
+Licensed under the [Apache License 2.0](LICENSE).
 
 ## 🛡️ Intellectual Property
+
 The VAC (Valence-Arousal-Connection) model and quaternion-based emotional mapping system are the subject of **U.S. Provisional Patent Application No. 63/962,600**.
+
+The patent exists for **defensive protection** — to ensure these methods remain open and can't be locked away by someone else. The Apache 2.0 license includes an explicit patent grant: if you use this software, you have a license to practice the patented methods.
+
+See [ETHICS.md](ETHICS.md) for more on this.
 
 ---
 **Built with ❤️ for understanding emotional intelligence through geometric transformation.**
