@@ -61,4 +61,4 @@ Don't build things that help corporations understand people better.
 
 ---
 
-*— Jeremy*
+*— Jason*
