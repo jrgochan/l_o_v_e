@@ -17,9 +17,7 @@ class DiscoveryEngine:
         """Docstring."""
         self.session = session
 
-    async def get_problematic_transitions(
-        self, limit: int = 10
-    ) -> List[Dict[str, Any]]:
+    async def get_problematic_transitions(self, limit: int = 10) -> List[Dict[str, Any]]:
         """Get hardest transitions from cache.
 
         Useful for research and identifying challenging patterns.
@@ -85,9 +83,7 @@ class DiscoveryEngine:
 
         # Suggest triangle completions
         if len(selected_emotions) == 2:
-            triangle_suggestions = await self._suggest_triangle_completion(
-                selected_emotions
-            )
+            triangle_suggestions = await self._suggest_triangle_completion(selected_emotions)
             suggestions.extend(triangle_suggestions[:2])
 
         # Suggest opposite emotions
@@ -96,9 +92,7 @@ class DiscoveryEngine:
 
         return suggestions[:limit]
 
-    async def _suggest_bridges(
-        self, selected_emotions: List[UUID]
-    ) -> List[Dict[str, Any]]:
+    async def _suggest_bridges(self, selected_emotions: List[UUID]) -> List[Dict[str, Any]]:
         """Suggest bridge emotions that aren't selected."""
         bridge_names = [
             "Vulnerability",
@@ -145,16 +139,12 @@ class DiscoveryEngine:
             for row in rows
         ]
 
-    async def _suggest_triangle_completion(
-        self, _selected_two: List[UUID]
-    ) -> List[Dict[str, Any]]:
+    async def _suggest_triangle_completion(self, _selected_two: List[UUID]) -> List[Dict[str, Any]]:
         """Suggest third emotion to form an interesting triangle."""
         # Simplified - just return empty for now to avoid errors
         return []
 
-    async def _suggest_opposites(
-        self, _selected_emotions: List[UUID]
-    ) -> List[Dict[str, Any]]:
+    async def _suggest_opposites(self, _selected_emotions: List[UUID]) -> List[Dict[str, Any]]:
         """Suggest emotions that are opposite in VAC space."""
         # Simplified - just return empty for now
         return []

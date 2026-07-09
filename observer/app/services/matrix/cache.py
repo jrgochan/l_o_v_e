@@ -24,8 +24,7 @@ class CacheManager:
     def calculate_vac_hash(self, from_vac: List[float], to_vac: List[float]) -> str:
         """Calculate hash of VAC coordinates for cache invalidation."""
         vac_string = (
-            f"{from_vac[0]},{from_vac[1]},{from_vac[2]}|"
-            f"{to_vac[0]},{to_vac[1]},{to_vac[2]}"
+            f"{from_vac[0]},{from_vac[1]},{from_vac[2]}|" f"{to_vac[0]},{to_vac[1]},{to_vac[2]}"
         )
         return hashlib.sha256(vac_string.encode()).hexdigest()
 
