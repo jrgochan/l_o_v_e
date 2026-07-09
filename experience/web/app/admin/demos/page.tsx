@@ -59,19 +59,17 @@ const DEMO_JOURNEYS: DemoJourney[] = [
     color: "rose",
     description:
       "A patient presents as calm and neutral. Traditional VAC analysis sees nothing alarming. But the octonion extended dimensions reveal profound depth, collapsed coping, frozen velocity, and deeply familiar patterns — classic masked depression.",
-    clinicalQuestion:
-      "How do you detect distress when someone has learned to appear 'fine'?",
+    clinicalQuestion: "How do you detect distress when someone has learned to appear 'fine'?",
     steps: [
       {
         label: "Opening",
         speaker: "patient",
-        text: '"Yeah, I\'m doing okay. Everything\'s been pretty normal."',
+        text: "\"Yeah, I'm doing okay. Everything's been pretty normal.\"",
         emotion: "Contentment",
         vac: { valence: 0.1, arousal: -0.2, connection: 0.1 },
         extended: { depth: 0.2, coping: 0.1, velocity: 0.0, novelty: -0.1 },
         vacOnly: "Neutral-positive. Low arousal. Calm and content. ✅",
-        octonionInsight:
-          "Shallow engagement, neutral coping. Nothing unusual yet.",
+        octonionInsight: "Shallow engagement, neutral coping. Nothing unusual yet.",
       },
       {
         label: "Mid-session",
@@ -87,7 +85,7 @@ const DEMO_JOURNEYS: DemoJourney[] = [
       {
         label: "Key moment",
         speaker: "patient",
-        text: '"I guess nothing really changes. But that\'s fine. I\'m used to it."',
+        text: "\"I guess nothing really changes. But that's fine. I'm used to it.\"",
         emotion: "Numbness",
         vac: { valence: -0.05, arousal: -0.35, connection: 0.0 },
         extended: {
@@ -96,8 +94,7 @@ const DEMO_JOURNEYS: DemoJourney[] = [
           velocity: -0.9,
           novelty: -0.8,
         },
-        vacOnly:
-          "Barely negative. Low energy. Looks like mild tiredness. No alert triggered.",
+        vacOnly: "Barely negative. Low energy. Looks like mild tiredness. No alert triggered.",
         octonionInsight:
           '🔴 CRISIS INDICATORS: Depth +0.8 (profoundly felt), Coping -0.7 (helpless), Velocity -0.9 (completely frozen), Novelty -0.8 (deeply habitual). This is clinical depression hiding behind a "fine" mask.',
       },
@@ -128,8 +125,7 @@ const DEMO_JOURNEYS: DemoJourney[] = [
     color: "blue",
     description:
       "Two patients present with identical VAC coordinates — both deeply sad with low energy and high connection. But one is experiencing acute loss for the first time, and the other has been stuck in chronic grief for years. The octonion dimensions reveal completely different clinical pictures requiring opposite interventions.",
-    clinicalQuestion:
-      "When two patients look identical in 3D, how do you tell them apart?",
+    clinicalQuestion: "When two patients look identical in 3D, how do you tell them apart?",
     steps: [
       {
         label: "Patient A: Acute Loss",
@@ -138,15 +134,14 @@ const DEMO_JOURNEYS: DemoJourney[] = [
         emotion: "Acute Grief",
         vac: { valence: -0.8, arousal: -0.3, connection: 0.7 },
         extended: { depth: 0.9, coping: -0.4, velocity: 0.3, novelty: 0.8 },
-        vacOnly:
-          "Deep sadness, low energy, high connection. Grief response. Standard protocol.",
+        vacOnly: "Deep sadness, low energy, high connection. Grief response. Standard protocol.",
         octonionInsight:
           "NOVEL GRIEF: Novelty +0.8 → this is entirely new territory. Velocity +0.3 → emotions are actively shifting (processing). Coping -0.4 → struggling but not collapsed. Needs: acute support, normalization, space to process.",
       },
       {
         label: "Patient B: Chronic Grief",
         speaker: "patient",
-        text: '"It\'s been three years since she passed. I still can\'t... I\'m still here."',
+        text: "\"It's been three years since she passed. I still can't... I'm still here.\"",
         emotion: "Chronic Grief",
         vac: { valence: -0.8, arousal: -0.3, connection: 0.7 },
         extended: {
@@ -155,8 +150,7 @@ const DEMO_JOURNEYS: DemoJourney[] = [
           velocity: -0.8,
           novelty: -0.9,
         },
-        vacOnly:
-          "Deep sadness, low energy, high connection. Grief response. Same as Patient A.",
+        vacOnly: "Deep sadness, low energy, high connection. Grief response. Same as Patient A.",
         octonionInsight:
           "⚠️ FROZEN GRIEF: Identical VAC but Novelty -0.9 → this is deeply familiar, worn groove. Velocity -0.8 → frozen, no emotional movement. Same coping score but completely different context. Needs: pattern-breaking, meaning-making, and potentially complicated grief therapy.",
       },
@@ -181,13 +175,12 @@ const DEMO_JOURNEYS: DemoJourney[] = [
     color: "emerald",
     description:
       "A patient moves from paralyzing anxiety to genuine empowerment over a session. While VAC shows a positive trajectory, it's the Coping dimension that reveals the real therapeutic arc — from helpless to agency to empowered.",
-    clinicalQuestion:
-      "How do you measure whether therapy is actually building agency?",
+    clinicalQuestion: "How do you measure whether therapy is actually building agency?",
     steps: [
       {
         label: "Anxiety onset",
         speaker: "patient",
-        text: '"I can\'t do this presentation. I\'ll freeze. Everyone will see I\'m a fraud."',
+        text: "\"I can't do this presentation. I'll freeze. Everyone will see I'm a fraud.\"",
         emotion: "Anxiety",
         vac: { valence: -0.6, arousal: 0.8, connection: -0.2 },
         extended: {
@@ -196,8 +189,7 @@ const DEMO_JOURNEYS: DemoJourney[] = [
           velocity: 0.3,
           novelty: 0.2,
         },
-        vacOnly:
-          "High negative arousal, low valence. Anxiety pattern. Not unusual.",
+        vacOnly: "High negative arousal, low valence. Anxiety pattern. Not unusual.",
         octonionInsight:
           "Coping -0.8 → feels completely helpless. This is the baseline. The key question is: can we move this number?",
       },
@@ -229,15 +221,14 @@ const DEMO_JOURNEYS: DemoJourney[] = [
           velocity: 0.4,
           novelty: 0.1,
         },
-        vacOnly:
-          "Positive shift, moderate arousal. Valence improved. Good progress.",
+        vacOnly: "Positive shift, moderate arousal. Valence improved. Good progress.",
         octonionInsight:
           "🎯 Coping crossed zero → now POSITIVE at +0.4. They've moved from helpless to agentic. Novelty dropped (familiar competence returning). This is the therapeutic turning point.",
       },
       {
         label: "Integration",
         speaker: "patient",
-        text: '"I\'m going to do this. And if I stumble, I\'ll handle it."',
+        text: "\"I'm going to do this. And if I stumble, I'll handle it.\"",
         emotion: "Confidence",
         vac: { valence: 0.7, arousal: 0.3, connection: 0.8 },
         extended: {
@@ -260,9 +251,7 @@ const DEMO_JOURNEYS: DemoJourney[] = [
 
 export default function OctonionDemoPage() {
   const theme = useAdminTheme();
-  const [selectedJourney, setSelectedJourney] = useState<DemoJourney | null>(
-    null
-  );
+  const [selectedJourney, setSelectedJourney] = useState<DemoJourney | null>(null);
   const [currentStep, setCurrentStep] = useState(0);
   const [isAutoPlaying, setIsAutoPlaying] = useState(false);
 
@@ -294,8 +283,9 @@ export default function OctonionDemoPage() {
   React.useEffect(() => {
     if (!isAutoPlaying || !selectedJourney) return;
     if (currentStep >= selectedJourney.steps.length - 1) {
-      setIsAutoPlaying(false);
-      return;
+      // Use setTimeout to avoid synchronous setState in effect
+      const stopTimer = setTimeout(() => setIsAutoPlaying(false), 0);
+      return () => clearTimeout(stopTimer);
     }
     const timer = setTimeout(() => {
       setCurrentStep((s) => s + 1);
@@ -310,16 +300,13 @@ export default function OctonionDemoPage() {
       <div className="max-w-6xl mx-auto p-6 space-y-8">
         {/* Header */}
         <div>
-          <h1
-            className={`text-2xl font-bold ${theme.colors.text.primary} flex items-center gap-3`}
-          >
+          <h1 className={`text-2xl font-bold ${theme.colors.text.primary} flex items-center gap-3`}>
             <span className="text-3xl">🔮</span>
             Octonion Demo Journeys
           </h1>
           <p className={`text-sm mt-2 ${theme.colors.text.secondary} max-w-2xl`}>
-            Three clinical scenarios demonstrating why 8-dimensional emotional
-            modeling reveals insights that 3D VAC alone cannot. Each journey
-            shows the same data through both lenses.
+            Three clinical scenarios demonstrating why 8-dimensional emotional modeling reveals
+            insights that 3D VAC alone cannot. Each journey shows the same data through both lenses.
           </p>
         </div>
 
@@ -338,9 +325,7 @@ export default function OctonionDemoPage() {
                 >
                   {journey.title}
                 </h3>
-                <p className={`text-xs ${theme.colors.text.muted} mb-3`}>
-                  {journey.subtitle}
-                </p>
+                <p className={`text-xs ${theme.colors.text.muted} mb-3`}>{journey.subtitle}</p>
                 <p className={`text-sm ${theme.colors.text.secondary} mb-4`}>
                   {journey.description}
                 </p>
@@ -350,9 +335,7 @@ export default function OctonionDemoPage() {
                   <p className={`text-xs font-medium text-${journey.color}-400`}>
                     Clinical Question
                   </p>
-                  <p
-                    className={`text-sm italic ${theme.colors.text.secondary} mt-1`}
-                  >
+                  <p className={`text-sm italic ${theme.colors.text.secondary} mt-1`}>
                     {journey.clinicalQuestion}
                   </p>
                 </div>
@@ -360,9 +343,7 @@ export default function OctonionDemoPage() {
                   <span className={`text-xs ${theme.colors.text.muted}`}>
                     {journey.steps.length} steps
                   </span>
-                  <span className={`text-xs text-${journey.color}-400`}>
-                    → Start Journey
-                  </span>
+                  <span className={`text-xs text-${journey.color}-400`}>→ Start Journey</span>
                 </div>
               </button>
             ))}
@@ -429,9 +410,7 @@ export default function OctonionDemoPage() {
                 </button>
                 <button
                   onClick={handleNext}
-                  disabled={
-                    currentStep === selectedJourney.steps.length - 1
-                  }
+                  disabled={currentStep === selectedJourney.steps.length - 1}
                   className={`p-2 rounded-lg border ${theme.colors.border} transition disabled:opacity-30`}
                 >
                   <ChevronRight className="w-4 h-4 text-gray-400" />
@@ -445,9 +424,7 @@ export default function OctonionDemoPage() {
               </div>
               <span className={`text-xs font-mono ${theme.colors.text.muted}`}>
                 Step {currentStep + 1} / {selectedJourney.steps.length}:{" "}
-                <span className={theme.colors.text.secondary}>
-                  {step?.label}
-                </span>
+                <span className={theme.colors.text.secondary}>{step?.label}</span>
               </span>
             </div>
 
@@ -465,9 +442,7 @@ export default function OctonionDemoPage() {
                   >
                     <div className="flex items-center gap-2 mb-2">
                       <span className="text-xs font-semibold uppercase tracking-wider text-violet-400">
-                        {step.speaker === "patient"
-                          ? "🗣️ Patient"
-                          : "📋 Narrator"}
+                        {step.speaker === "patient" ? "🗣️ Patient" : "📋 Narrator"}
                       </span>
                       <span
                         className={`text-xs px-2 py-0.5 rounded-full bg-violet-500/20 text-violet-300`}
@@ -477,9 +452,7 @@ export default function OctonionDemoPage() {
                     </div>
                     <p
                       className={`text-lg leading-relaxed ${
-                        step.speaker === "patient"
-                          ? "italic text-gray-200"
-                          : "text-gray-300"
+                        step.speaker === "patient" ? "italic text-gray-200" : "text-gray-300"
                       }`}
                     >
                       {step.text}
@@ -489,34 +462,24 @@ export default function OctonionDemoPage() {
                   {/* VAC-Only vs Octonion side-by-side */}
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     {/* VAC-Only reading */}
-                    <div
-                      className={`p-4 rounded-xl border border-gray-700/50 bg-gray-900/30`}
-                    >
+                    <div className={`p-4 rounded-xl border border-gray-700/50 bg-gray-900/30`}>
                       <h4 className="text-xs font-bold uppercase tracking-wider text-gray-400 mb-2 flex items-center gap-1.5">
                         <span>📐</span> 3D VAC Analysis
                       </h4>
-                      <p className={`text-sm ${theme.colors.text.secondary}`}>
-                        {step.vacOnly}
-                      </p>
+                      <p className={`text-sm ${theme.colors.text.secondary}`}>{step.vacOnly}</p>
                     </div>
 
                     {/* Octonion reading */}
-                    <div
-                      className={`p-4 rounded-xl border border-violet-700/50 bg-violet-950/20`}
-                    >
+                    <div className={`p-4 rounded-xl border border-violet-700/50 bg-violet-950/20`}>
                       <h4 className="text-xs font-bold uppercase tracking-wider text-violet-400 mb-2 flex items-center gap-1.5">
                         <span>🔮</span> 8D Octonion Insight
                       </h4>
-                      <p className="text-sm text-violet-100/80">
-                        {step.octonionInsight}
-                      </p>
+                      <p className="text-sm text-violet-100/80">{step.octonionInsight}</p>
                     </div>
                   </div>
 
                   {/* Extended Dimensions Bars (full layout) */}
-                  <div
-                    className={`p-4 rounded-xl border ${theme.colors.border} bg-black/20`}
-                  >
+                  <div className={`p-4 rounded-xl border ${theme.colors.border} bg-black/20`}>
                     <h4
                       className={`text-xs font-bold uppercase tracking-wider mb-3 ${theme.colors.text.muted}`}
                     >
@@ -547,12 +510,8 @@ export default function OctonionDemoPage() {
                     showValues={true}
                     animated={true}
                   />
-                  <div
-                    className={`mt-4 text-center text-xs ${theme.colors.text.muted}`}
-                  >
-                    <span className="text-violet-400 font-semibold">
-                      {step.emotion}
-                    </span>
+                  <div className={`mt-4 text-center text-xs ${theme.colors.text.muted}`}>
+                    <span className="text-violet-400 font-semibold">{step.emotion}</span>
                     <br />
                     Step {currentStep + 1}: {step.label}
                   </div>

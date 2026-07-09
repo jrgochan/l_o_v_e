@@ -19,10 +19,10 @@ interface DimensionConfig {
   key: keyof ExtendedDimensions;
   label: string;
   symbol: string;
-  colorPositive: string;   // Tailwind bg class for positive fill
-  colorNegative: string;   // Tailwind bg class for negative fill
-  glowPositive: string;    // CSS shadow for positive glow
-  glowNegative: string;    // CSS shadow for negative glow
+  colorPositive: string; // Tailwind bg class for positive fill
+  colorNegative: string; // Tailwind bg class for negative fill
+  glowPositive: string; // CSS shadow for positive glow
+  glowNegative: string; // CSS shadow for negative glow
   positiveLabel: string;
   negativeLabel: string;
 }
@@ -116,14 +116,7 @@ export function ExtendedDimensionBars({
     <div className={`space-y-2 ${className}`}>
       {DIMENSIONS.map((dim) => {
         const value = extended[dim.key];
-        return (
-          <FullBar
-            key={dim.key}
-            dim={dim}
-            value={value}
-            showTooltips={showTooltips}
-          />
-        );
+        return <FullBar key={dim.key} dim={dim} value={value} showTooltips={showTooltips} />;
       })}
     </div>
   );
@@ -148,7 +141,11 @@ function CompactBar({
   return (
     <div
       className="flex items-center gap-1.5 group"
-      title={showTooltips ? `${dim.label}: ${value >= 0 ? dim.positiveLabel : dim.negativeLabel} (${value >= 0 ? "+" : ""}${value.toFixed(2)})` : undefined}
+      title={
+        showTooltips
+          ? `${dim.label}: ${value >= 0 ? dim.positiveLabel : dim.negativeLabel} (${value >= 0 ? "+" : ""}${value.toFixed(2)})`
+          : undefined
+      }
     >
       {/* Symbol */}
       <span className="text-[10px] font-bold font-mono text-gray-400 w-3 text-right flex-shrink-0">
@@ -203,14 +200,15 @@ function FullBar({
     magnitude < 0.2
       ? "Neutral"
       : magnitude < 0.5
-        ? isPositive ? `Somewhat ${dim.positiveLabel.toLowerCase()}` : `Somewhat ${dim.negativeLabel.toLowerCase()}`
-        : isPositive ? dim.positiveLabel : dim.negativeLabel;
+        ? isPositive
+          ? `Somewhat ${dim.positiveLabel.toLowerCase()}`
+          : `Somewhat ${dim.negativeLabel.toLowerCase()}`
+        : isPositive
+          ? dim.positiveLabel
+          : dim.negativeLabel;
 
   return (
-    <div
-      className="space-y-1"
-      title={showTooltips ? `${dim.label}: ${interpretation}` : undefined}
-    >
+    <div className="space-y-1" title={showTooltips ? `${dim.label}: ${interpretation}` : undefined}>
       {/* Labels */}
       <div className="flex items-center justify-between text-[10px]">
         <div className="flex items-center gap-1.5">
@@ -219,8 +217,11 @@ function FullBar({
         </div>
         <div className="flex items-center gap-2">
           <span className="text-gray-500 italic">{interpretation}</span>
-          <span className={`font-mono font-semibold ${isPositive ? "text-gray-200" : "text-gray-400"}`}>
-            {value >= 0 ? "+" : ""}{value.toFixed(2)}
+          <span
+            className={`font-mono font-semibold ${isPositive ? "text-gray-200" : "text-gray-400"}`}
+          >
+            {value >= 0 ? "+" : ""}
+            {value.toFixed(2)}
           </span>
         </div>
       </div>

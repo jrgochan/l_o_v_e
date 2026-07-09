@@ -17,12 +17,10 @@ import { PathNetwork } from "./PathNetwork";
 import { useSettingsStore } from "@/stores/useSettingsStore";
 
 export function VisualizationScene() {
-  const { layers, showAxisLabels, enableOctonionLayer, renderQuality } =
-    useSettingsStore();
+  const { layers, showAxisLabels, enableOctonionLayer, renderQuality } = useSettingsStore();
 
   // Octonion layers disabled on low quality for performance
-  const showOctonionLayers =
-    enableOctonionLayer && renderQuality !== "low" && layers.soulSphere;
+  const showOctonionLayers = enableOctonionLayer && renderQuality !== "low" && layers.soulSphere;
 
   return (
     <group>

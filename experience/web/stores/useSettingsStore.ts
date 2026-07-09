@@ -133,8 +133,8 @@ interface SettingsState {
   showCopingShell: boolean;
   showVelocityParticles: boolean;
   showNoveltyAura: boolean;
-  breathingIntensity: number;  // 0 = frozen, 1 = data-driven, 3 = amplified
-  topologyIntensity: number;   // 0 = smooth, 1 = data-driven, 2 = exaggerated
+  breathingIntensity: number; // 0 = frozen, 1 = data-driven, 3 = amplified
+  topologyIntensity: number; // 0 = smooth, 1 = data-driven, 2 = exaggerated
 
   // === ACTIONS ===
   setApiUrl: (service: ApiService, url: string) => void;

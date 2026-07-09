@@ -42,7 +42,16 @@ export function StatisticsPanel() {
       const mean = values.reduce((a, b) => a + b, 0) / values.length;
       // Normalize for bar width: map from [-1,1] to [0,100]
       const barMean = ((mean + 1) / 2) * 100;
-      return { name, sym: syms[idx], color: colors[idx], min, max, mean, barMean, count: values.length };
+      return {
+        name,
+        sym: syms[idx],
+        color: colors[idx],
+        min,
+        max,
+        mean,
+        barMean,
+        count: values.length,
+      };
     });
   }, [enableOctonionLayer, allEmotions]);
 
@@ -265,13 +274,18 @@ export function StatisticsPanel() {
                     {dim.sym} {dim.name}
                   </span>
                   <span className="font-mono text-gray-400">
-                    μ={dim.mean >= 0 ? "+" : ""}{dim.mean.toFixed(2)}
+                    μ={dim.mean >= 0 ? "+" : ""}
+                    {dim.mean.toFixed(2)}
                     <span className="text-gray-600 ml-1.5">
-                      [{dim.min >= 0 ? "+" : ""}{dim.min.toFixed(2)}, {dim.max >= 0 ? "+" : ""}{dim.max.toFixed(2)}]
+                      [{dim.min >= 0 ? "+" : ""}
+                      {dim.min.toFixed(2)}, {dim.max >= 0 ? "+" : ""}
+                      {dim.max.toFixed(2)}]
                     </span>
                   </span>
                 </div>
-                <div className={`relative w-full h-2.5 bg-black/40 rounded-full border ${theme.colors.border} overflow-hidden`}>
+                <div
+                  className={`relative w-full h-2.5 bg-black/40 rounded-full border ${theme.colors.border} overflow-hidden`}
+                >
                   <div className="absolute left-1/2 top-0 bottom-0 w-px bg-gray-600 z-10" />
                   <div
                     className="absolute top-0 h-full rounded-full transition-all duration-500"

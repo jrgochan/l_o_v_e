@@ -5,9 +5,9 @@ fastapi==0.115.6
 uvicorn[standard]==0.34.0
 pydantic==2.12.5
 pydantic-settings==2.7.0
-PyJWT==2.10.1
-cryptography==44.0.0
-python-multipart==0.0.22
+PyJWT==2.13.0
+cryptography==48.0.1
+python-multipart==0.0.30
 
 # Scientific Computing
 numpy==2.3.1

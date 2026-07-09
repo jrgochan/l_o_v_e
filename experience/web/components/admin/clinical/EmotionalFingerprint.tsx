@@ -19,8 +19,8 @@ interface RadarAxis {
   label: string;
   symbol: string;
   value: number;
-  color: string;       // Hex color for the axis
-  glowColor: string;   // Glow hex
+  color: string; // Hex color for the axis
+  glowColor: string; // Glow hex
 }
 
 interface EmotionalFingerprintProps {
@@ -46,15 +46,67 @@ export function EmotionalFingerprint({
   animated = true,
   className = "",
 }: EmotionalFingerprintProps) {
-  const axes: RadarAxis[] = useMemo(() => [
-    { key: "valence",    label: "Valence",    symbol: "V", value: vac.valence,             color: "#34d399", glowColor: "#34d399" },
-    { key: "arousal",    label: "Arousal",    symbol: "A", value: vac.arousal,             color: "#f97316", glowColor: "#f97316" },
-    { key: "connection", label: "Connection", symbol: "C", value: vac.connection,          color: "#38bdf8", glowColor: "#38bdf8" },
-    { key: "depth",      label: "Depth",      symbol: "D", value: extended?.depth ?? 0,    color: "#fbbf24", glowColor: "#fbbf24" },
-    { key: "coping",     label: "Coping",     symbol: "P", value: extended?.coping ?? 0,   color: "#4ade80", glowColor: "#4ade80" },
-    { key: "velocity",   label: "Velocity",   symbol: "Ė", value: extended?.velocity ?? 0, color: "#818cf8", glowColor: "#818cf8" },
-    { key: "novelty",    label: "Novelty",    symbol: "N", value: extended?.novelty ?? 0,  color: "#a78bfa", glowColor: "#a78bfa" },
-  ], [vac, extended]);
+  const axes: RadarAxis[] = useMemo(
+    () => [
+      {
+        key: "valence",
+        label: "Valence",
+        symbol: "V",
+        value: vac.valence,
+        color: "#34d399",
+        glowColor: "#34d399",
+      },
+      {
+        key: "arousal",
+        label: "Arousal",
+        symbol: "A",
+        value: vac.arousal,
+        color: "#f97316",
+        glowColor: "#f97316",
+      },
+      {
+        key: "connection",
+        label: "Connection",
+        symbol: "C",
+        value: vac.connection,
+        color: "#38bdf8",
+        glowColor: "#38bdf8",
+      },
+      {
+        key: "depth",
+        label: "Depth",
+        symbol: "D",
+        value: extended?.depth ?? 0,
+        color: "#fbbf24",
+        glowColor: "#fbbf24",
+      },
+      {
+        key: "coping",
+        label: "Coping",
+        symbol: "P",
+        value: extended?.coping ?? 0,
+        color: "#4ade80",
+        glowColor: "#4ade80",
+      },
+      {
+        key: "velocity",
+        label: "Velocity",
+        symbol: "Ė",
+        value: extended?.velocity ?? 0,
+        color: "#818cf8",
+        glowColor: "#818cf8",
+      },
+      {
+        key: "novelty",
+        label: "Novelty",
+        symbol: "N",
+        value: extended?.novelty ?? 0,
+        color: "#a78bfa",
+        glowColor: "#a78bfa",
+      },
+    ],
+    [vac, extended]
+  );
 
   const cx = size / 2;
   const cy = size / 2;
@@ -92,12 +144,7 @@ export function EmotionalFingerprint({
 
   return (
     <div className={`relative ${className}`} style={{ width: size, height: size }}>
-      <svg
-        viewBox={`0 0 ${size} ${size}`}
-        width={size}
-        height={size}
-        className="overflow-visible"
-      >
+      <svg viewBox={`0 0 ${size} ${size}`} width={size} height={size} className="overflow-visible">
         <defs>
           {/* Radial gradient for the data area */}
           <radialGradient id={gradientId} cx="50%" cy="50%" r="50%">
@@ -211,39 +258,43 @@ export function EmotionalFingerprint({
       </svg>
 
       {/* Labels (positioned outside the SVG for crisp text) */}
-      {showLabels && axes.map((axis, i) => {
-        const angle = startAngle + i * angleStep;
-        const labelRadius = maxRadius + (showValues ? 28 : 18);
-        const x = cx + labelRadius * Math.cos(angle);
-        const y = cy + labelRadius * Math.sin(angle);
-        const isActive = Math.abs(axis.value) > 0.3;
+      {showLabels &&
+        axes.map((axis, i) => {
+          const angle = startAngle + i * angleStep;
+          const labelRadius = maxRadius + (showValues ? 28 : 18);
+          const x = cx + labelRadius * Math.cos(angle);
+          const y = cy + labelRadius * Math.sin(angle);
+          const isActive = Math.abs(axis.value) > 0.3;
 
-        return (
-          <div
-            key={axis.key}
-            className="absolute pointer-events-none"
-            style={{
-              left: x,
-              top: y,
-              transform: "translate(-50%, -50%)",
-            }}
-          >
-            <div className={`text-center whitespace-nowrap ${isActive ? "opacity-100" : "opacity-50"}`}>
+          return (
+            <div
+              key={axis.key}
+              className="absolute pointer-events-none"
+              style={{
+                left: x,
+                top: y,
+                transform: "translate(-50%, -50%)",
+              }}
+            >
               <div
-                className="text-[10px] font-bold font-mono"
-                style={{ color: isActive ? axis.color : "#6b7280" }}
+                className={`text-center whitespace-nowrap ${isActive ? "opacity-100" : "opacity-50"}`}
               >
-                {axis.symbol}
-              </div>
-              {showValues && (
-                <div className="text-[9px] font-mono text-gray-400">
-                  {axis.value >= 0 ? "+" : ""}{axis.value.toFixed(1)}
+                <div
+                  className="text-[10px] font-bold font-mono"
+                  style={{ color: isActive ? axis.color : "#6b7280" }}
+                >
+                  {axis.symbol}
                 </div>
-              )}
+                {showValues && (
+                  <div className="text-[9px] font-mono text-gray-400">
+                    {axis.value >= 0 ? "+" : ""}
+                    {axis.value.toFixed(1)}
+                  </div>
+                )}
+              </div>
             </div>
-          </div>
-        );
-      })}
+          );
+        })}
     </div>
   );
 }

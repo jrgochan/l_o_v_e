@@ -148,12 +148,16 @@ export function EmotionDetails({ emotion, isHovered = false, animationMode }: Em
                 arousal: emotion.vac[1],
                 connection: emotion.vac[2],
               }}
-              extended={emotion.extended ? {
-                depth: emotion.extended[0],
-                coping: emotion.extended[1],
-                velocity: emotion.extended[2],
-                novelty: emotion.extended[3],
-              } : undefined}
+              extended={
+                emotion.extended
+                  ? {
+                      depth: emotion.extended[0],
+                      coping: emotion.extended[1],
+                      velocity: emotion.extended[2],
+                      novelty: emotion.extended[3],
+                    }
+                  : undefined
+              }
               size={180}
               showLabels={true}
               showValues={true}
@@ -171,8 +175,13 @@ export function EmotionDetails({ emotion, isHovered = false, animationMode }: Em
               { sym: "N", name: "Novelty", color: "#a78bfa" },
             ].map((a) => (
               <div key={a.sym} className="flex items-center gap-1 opacity-70">
-                <span className="w-1.5 h-1.5 rounded-full flex-shrink-0" style={{ backgroundColor: a.color }} />
-                <span style={{ color: a.color }} className="font-bold">{a.sym}</span>
+                <span
+                  className="w-1.5 h-1.5 rounded-full flex-shrink-0"
+                  style={{ backgroundColor: a.color }}
+                />
+                <span style={{ color: a.color }} className="font-bold">
+                  {a.sym}
+                </span>
                 <span className="text-gray-400 truncate">{a.name}</span>
               </div>
             ))}

@@ -15,10 +15,38 @@ import { useExperienceStore } from "@/stores/useExperienceStore";
 import { useSettingsStore } from "@/stores/useSettingsStore";
 
 const DIMS = [
-  { key: "depth" as const, symbol: "D", label: "Depth", pos: "text-amber-400", neg: "text-amber-700", bg: "bg-amber-" },
-  { key: "coping" as const, symbol: "P", label: "Coping", pos: "text-emerald-400", neg: "text-rose-400", bg: "bg-emerald-" },
-  { key: "velocity" as const, symbol: "Ė", label: "Velocity", pos: "text-sky-400", neg: "text-indigo-400", bg: "bg-sky-" },
-  { key: "novelty" as const, symbol: "N", label: "Novelty", pos: "text-violet-400", neg: "text-orange-400", bg: "bg-violet-" },
+  {
+    key: "depth" as const,
+    symbol: "D",
+    label: "Depth",
+    pos: "text-amber-400",
+    neg: "text-amber-700",
+    bg: "bg-amber-",
+  },
+  {
+    key: "coping" as const,
+    symbol: "P",
+    label: "Coping",
+    pos: "text-emerald-400",
+    neg: "text-rose-400",
+    bg: "bg-emerald-",
+  },
+  {
+    key: "velocity" as const,
+    symbol: "Ė",
+    label: "Velocity",
+    pos: "text-sky-400",
+    neg: "text-indigo-400",
+    bg: "bg-sky-",
+  },
+  {
+    key: "novelty" as const,
+    symbol: "N",
+    label: "Novelty",
+    pos: "text-violet-400",
+    neg: "text-orange-400",
+    bg: "bg-violet-",
+  },
 ] as const;
 
 export function LiveDimensionHUD() {
@@ -32,7 +60,8 @@ export function LiveDimensionHUD() {
 
     let last = 0;
     const tick = (time: number) => {
-      if (time - last > 100) { // 10fps
+      if (time - last > 100) {
+        // 10fps
         const ext = useExperienceStore.getState().octonionExtended;
         setValues({ ...ext });
         last = time;
@@ -47,8 +76,12 @@ export function LiveDimensionHUD() {
 
   if (!enabled) return null;
 
-  const isActive = Math.abs(values.depth) + Math.abs(values.coping) +
-    Math.abs(values.velocity) + Math.abs(values.novelty) > 0.01;
+  const isActive =
+    Math.abs(values.depth) +
+      Math.abs(values.coping) +
+      Math.abs(values.velocity) +
+      Math.abs(values.novelty) >
+    0.01;
 
   return (
     <div
@@ -62,7 +95,9 @@ export function LiveDimensionHUD() {
           <span className="text-[9px] uppercase tracking-widest text-violet-400/80 font-semibold">
             🔮 Live
           </span>
-          <span className={`w-1.5 h-1.5 rounded-full ${isActive ? "bg-violet-400 animate-pulse" : "bg-gray-600"}`} />
+          <span
+            className={`w-1.5 h-1.5 rounded-full ${isActive ? "bg-violet-400 animate-pulse" : "bg-gray-600"}`}
+          />
         </div>
 
         {/* Bars */}
@@ -85,19 +120,28 @@ export function LiveDimensionHUD() {
                     left: isPos ? "50%" : `${50 - mag * 50}%`,
                     width: `${mag * 50}%`,
                     backgroundColor: isPos
-                      ? dim.key === "depth" ? "#fbbf24"
-                      : dim.key === "coping" ? "#34d399"
-                      : dim.key === "velocity" ? "#38bdf8"
-                      : "#a78bfa"
-                      : dim.key === "depth" ? "#b45309"
-                      : dim.key === "coping" ? "#fb7185"
-                      : dim.key === "velocity" ? "#818cf8"
-                      : "#fb923c",
+                      ? dim.key === "depth"
+                        ? "#fbbf24"
+                        : dim.key === "coping"
+                          ? "#34d399"
+                          : dim.key === "velocity"
+                            ? "#38bdf8"
+                            : "#a78bfa"
+                      : dim.key === "depth"
+                        ? "#b45309"
+                        : dim.key === "coping"
+                          ? "#fb7185"
+                          : dim.key === "velocity"
+                            ? "#818cf8"
+                            : "#fb923c",
                   }}
                 />
               </div>
-              <span className={`text-[9px] font-mono w-7 text-right ${isPos ? "text-gray-300" : "text-gray-500"}`}>
-                {val >= 0 ? "+" : ""}{val.toFixed(2)}
+              <span
+                className={`text-[9px] font-mono w-7 text-right ${isPos ? "text-gray-300" : "text-gray-500"}`}
+              >
+                {val >= 0 ? "+" : ""}
+                {val.toFixed(2)}
               </span>
             </div>
           );

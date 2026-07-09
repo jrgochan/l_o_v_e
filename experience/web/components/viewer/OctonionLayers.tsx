@@ -190,7 +190,6 @@ void main() {
 }
 `;
 
-
 // ═══════════════════════════════════════════════════════════════════
 // NOVELTY AURA — Outer ethereal glow
 // ═══════════════════════════════════════════════════════════════════
@@ -281,14 +280,8 @@ export function OctonionLayers() {
   const showNoveltyAura = useSettingsStore((s) => s.showNoveltyAura);
 
   // Geometries (shared, memoized)
-  const copingGeometry = useMemo(
-    () => new THREE.IcosahedronGeometry(1.0, 12),
-    []
-  );
-  const auraGeometry = useMemo(
-    () => new THREE.IcosahedronGeometry(1.0, 8),
-    []
-  );
+  const copingGeometry = useMemo(() => new THREE.IcosahedronGeometry(1.0, 12), []);
+  const auraGeometry = useMemo(() => new THREE.IcosahedronGeometry(1.0, 8), []);
 
   // Coping shell material
   const copingMaterial = useMemo(
@@ -333,18 +326,13 @@ export function OctonionLayers() {
   const particlePositions = useMemo(() => generateParticlePositions(), []);
   const particleGeometry = useMemo(() => {
     const geo = new THREE.BufferGeometry();
-    geo.setAttribute(
-      "position",
-      new THREE.BufferAttribute(particlePositions, 3)
-    );
+    geo.setAttribute("position", new THREE.BufferAttribute(particlePositions, 3));
     return geo;
   }, [particlePositions]);
 
-
   // Animation loop — all layers update here at 60fps
   useFrame((state, delta) => {
-    const { coping, velocity, novelty } =
-      useExperienceStore.getState().octonionExtended;
+    const { coping, velocity, novelty } = useExperienceStore.getState().octonionExtended;
     const timeDelta = reducedMotion ? 0 : delta * animationSpeed * 0.5;
 
     // === COPING SHELL ===
@@ -352,18 +340,14 @@ export function OctonionLayers() {
       copingRef.current.uniforms.uCoping.value = coping;
       copingRef.current.uniforms.uTime.value += timeDelta;
       copingRef.current.uniforms.uVelocity.value = velocity;
-      copingRef.current.uniforms.uCameraPosition.value.copy(
-        state.camera.position
-      );
+      copingRef.current.uniforms.uCameraPosition.value.copy(state.camera.position);
     }
 
     // === NOVELTY AURA ===
     if (auraRef.current) {
       auraRef.current.uniforms.uNovelty.value = novelty;
       auraRef.current.uniforms.uTime.value += timeDelta;
-      auraRef.current.uniforms.uCameraPosition.value.copy(
-        state.camera.position
-      );
+      auraRef.current.uniforms.uCameraPosition.value.copy(state.camera.position);
     }
 
     // === VELOCITY PARTICLES ===
@@ -423,12 +407,7 @@ export function OctonionLayers() {
 
       {/* Velocity Particle Field (renderOrder 1) */}
       {showVelocityParticles && (
-        <points
-          ref={particlesRef}
-          geometry={particleGeometry}
-          scale={1.8}
-          renderOrder={1}
-        >
+        <points ref={particlesRef} geometry={particleGeometry} scale={1.8} renderOrder={1}>
           <pointsMaterial
             ref={particleMaterialRef}
             size={0.02}

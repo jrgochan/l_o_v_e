@@ -31,10 +31,10 @@ interface ExperienceStore {
 
   // Octonion extended dimensions (Phase 2)
   octonionExtended: {
-    depth: number;    // -1 (superficial) to +1 (profound)
-    coping: number;   // -1 (helpless) to +1 (empowered)
+    depth: number; // -1 (superficial) to +1 (profound)
+    coping: number; // -1 (helpless) to +1 (empowered)
     velocity: number; // -1 (stillness) to +1 (rapid change)
-    novelty: number;  // -1 (familiar) to +1 (novel)
+    novelty: number; // -1 (familiar) to +1 (novel)
   };
   // Target for smooth interpolation (set by UI, lerped toward by render loop)
   targetOctonionExtended: {

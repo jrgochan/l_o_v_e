@@ -64,7 +64,11 @@ export function SliderControl({
         <span className={`text-xs ${theme.colors.text.muted}`}>{label}</span>
         <span
           className="text-xs font-mono text-white/80 cursor-default"
-          title={defaultValue !== undefined ? `Double-click slider to reset to ${formatValue ? formatValue(defaultValue) : defaultValue}` : undefined}
+          title={
+            defaultValue !== undefined
+              ? `Double-click slider to reset to ${formatValue ? formatValue(defaultValue) : defaultValue}`
+              : undefined
+          }
         >
           {displayValue}
         </span>
@@ -87,9 +91,7 @@ export function SliderControl({
 
       {/* Description */}
       {description && (
-        <p className={`text-[10px] ${theme.colors.text.muted} leading-tight`}>
-          {description}
-        </p>
+        <p className={`text-[10px] ${theme.colors.text.muted} leading-tight`}>{description}</p>
       )}
 
       {/* Inline styles for the range thumb (cross-browser) */}
@@ -101,7 +103,7 @@ export function SliderControl({
           height: 12px;
           border-radius: 50%;
           background: white;
-          box-shadow: 0 1px 4px rgba(0,0,0,0.4);
+          box-shadow: 0 1px 4px rgba(0, 0, 0, 0.4);
           cursor: pointer;
           transition: transform 0.15s ease;
         }
@@ -118,7 +120,7 @@ export function SliderControl({
           border-radius: 50%;
           background: white;
           border: none;
-          box-shadow: 0 1px 4px rgba(0,0,0,0.4);
+          box-shadow: 0 1px 4px rgba(0, 0, 0, 0.4);
           cursor: pointer;
         }
         .slider-control::-moz-range-track {

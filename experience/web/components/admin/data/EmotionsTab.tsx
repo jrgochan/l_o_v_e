@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef, useCallback } from "react";
 import { adminApi } from "@/utils/api";
 import { Emotion, EmotionUpdate } from "@/types/admin";
 import { Loader2, Download, Upload, Save, AlertTriangle } from "lucide-react";
@@ -19,11 +19,7 @@ export function EmotionsTab() {
   // File input ref for import
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  useEffect(() => {
-    fetchEmotions();
-  }, []);
-
-  const fetchEmotions = async () => {
+  const fetchEmotions = useCallback(async () => {
     try {
       setLoading(true);
       const data = await adminApi.getEmotions();
@@ -35,7 +31,11 @@ export function EmotionsTab() {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
+
+  useEffect(() => {
+    fetchEmotions();
+  }, [fetchEmotions]);
 
   const handleEdit = (emotion: Emotion) => {
     setEditingId(emotion.id);

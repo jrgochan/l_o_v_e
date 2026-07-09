@@ -29,7 +29,7 @@ const NEW_DIMENSIONS = [
     name: "Coping",
     symbol: "P",
     range: "Empowered ↔ Helpless",
-    description: "Your sense of control. \"I've got this\" vs. \"I can't do anything.\"",
+    description: 'Your sense of control. "I\'ve got this" vs. "I can\'t do anything."',
     color: "text-emerald-400",
     bgColor: "bg-emerald-900/20",
   },
@@ -105,11 +105,23 @@ export function OctonionControls() {
       {/* Individual Shell Toggles — only visible when master is on */}
       {enableOctonionLayer && !isLowQuality && (
         <div className="ml-3 pl-3 border-l border-violet-700/30 space-y-1.5">
-          {([
-            { key: "showCopingShell" as const, label: "🛡️ Coping Shell", desc: "Emerald shield / cracked when helpless" },
-            { key: "showVelocityParticles" as const, label: "✨ Velocity Particles", desc: "Orbiting field driven by Ė" },
-            { key: "showNoveltyAura" as const, label: "🫧 Novelty Aura", desc: "Outer iridescent shimmer" },
-          ]).map(({ key, label, desc }) => (
+          {[
+            {
+              key: "showCopingShell" as const,
+              label: "🛡️ Coping Shell",
+              desc: "Emerald shield / cracked when helpless",
+            },
+            {
+              key: "showVelocityParticles" as const,
+              label: "✨ Velocity Particles",
+              desc: "Orbiting field driven by Ė",
+            },
+            {
+              key: "showNoveltyAura" as const,
+              label: "🫧 Novelty Aura",
+              desc: "Outer iridescent shimmer",
+            },
+          ].map(({ key, label, desc }) => (
             <label
               key={key}
               className={`flex items-center gap-2 cursor-pointer group ${theme.colors.text.secondary} hover:${theme.colors.text.primary}`}
@@ -158,9 +170,9 @@ export function OctonionControls() {
         <div className="space-y-2 animate-in fade-in slide-in-from-top-1 duration-200">
           <p className={`text-[11px] leading-relaxed ${theme.colors.text.muted}`}>
             The original Soul Sphere captures <em>what</em> you feel (Valence),{" "}
-            <em>how energized</em> you are (Arousal), and <em>how connected</em>{" "}
-            you feel (Connection). The Octonion extension adds four new
-            dimensions for a richer emotional portrait:
+            <em>how energized</em> you are (Arousal), and <em>how connected</em> you feel
+            (Connection). The Octonion extension adds four new dimensions for a richer emotional
+            portrait:
           </p>
 
           <div className="space-y-1.5">
@@ -176,9 +188,7 @@ export function OctonionControls() {
                 </span>
                 <div className="min-w-0">
                   <div className="flex items-center gap-2">
-                    <span className={`text-[11px] font-medium ${dim.color}`}>
-                      {dim.name}
-                    </span>
+                    <span className={`text-[11px] font-medium ${dim.color}`}>{dim.name}</span>
                     <span className="text-[9px] text-gray-500">{dim.range}</span>
                   </div>
                   <p className="text-[10px] text-gray-400 leading-tight mt-0.5">
@@ -190,9 +200,8 @@ export function OctonionControls() {
           </div>
 
           <p className="text-[10px] text-gray-500 italic">
-            These 7 imaginary dimensions form an octonion on the 7-sphere (S⁷),
-            enabling geometric interpolation (SLERP) for smooth emotional
-            transitions.
+            These 7 imaginary dimensions form an octonion on the 7-sphere (S⁷), enabling geometric
+            interpolation (SLERP) for smooth emotional transitions.
           </p>
         </div>
       )}

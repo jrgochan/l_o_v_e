@@ -4,7 +4,7 @@
 # FastAPI & Server
 fastapi==0.115.6
 uvicorn[standard]==0.34.0
-python-multipart==0.0.22
+python-multipart==0.0.30
 
 # Audio Transcription (Local)
 openai-whisper==20250625
@@ -17,11 +17,11 @@ soundfile==0.13.0
 praat-parselmouth==0.4.7
 
 # LLM & NLP (Local)
-langchain==0.3.14
-langchain-community==0.3.14
+langchain==0.3.30
+langchain-community==0.3.27
 ollama==0.6.1
 spacy==3.7.2
-transformers==4.48.0
+transformers==5.3.0
 langchain-google-vertexai==2.0.0
 
 # Core AI - Explicit version pinning for Python 3.12 compatibility
@@ -35,8 +35,8 @@ redis==5.2.1
 # Data Models & Validation
 pydantic==2.12.5
 pydantic-settings==2.7.0
-PyJWT==2.10.1
-cryptography==44.0.0
+PyJWT==2.13.0
+cryptography==48.0.1
 
 # HTTP Client
 aiofiles==24.1.0

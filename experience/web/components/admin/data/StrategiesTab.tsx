@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useRef, Fragment } from "react";
+import { useEffect, useState, useRef, Fragment, useCallback } from "react";
 import { adminApi } from "@/utils/api";
 import { TransitionStrategy, StrategyUpdate } from "@/types/admin";
 import {
@@ -30,11 +30,7 @@ export function StrategiesTab() {
   // File input ref for import
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  useEffect(() => {
-    fetchStrategies();
-  }, []);
-
-  const fetchStrategies = async () => {
+  const fetchStrategies = useCallback(async () => {
     try {
       setLoading(true);
       const data = await adminApi.getStrategies();
@@ -45,7 +41,11 @@ export function StrategiesTab() {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
+
+  useEffect(() => {
+    fetchStrategies();
+  }, [fetchStrategies]);
 
   const toggleExpand = (id: string) => {
     const newExpanded = new Set(expandedIds);

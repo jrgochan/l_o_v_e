@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { Plus, Edit2, Trash2, Save, X, RefreshCw } from "lucide-react";
 import { adminApi } from "@/utils/api";
 import { BootstrapData, BootstrapDataCreate } from "@/types/admin";
@@ -20,12 +20,7 @@ export default function BootstrapTab() {
     "challenge_pattern",
   ];
 
-  useEffect(() => {
-    loadData();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [filterType]);
-
-  const loadData = async () => {
+  const loadData = useCallback(async () => {
     setLoading(true);
     try {
       const type = filterType === "all" ? undefined : filterType;
@@ -38,7 +33,11 @@ export default function BootstrapTab() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [filterType]);
+
+  useEffect(() => {
+    loadData();
+  }, [loadData]);
 
   const handleEdit = (item: BootstrapData) => {
     setCurrentEdit({ ...item });

@@ -408,9 +408,7 @@ const VisualizationAdminContent = () => {
                 <EmotionLabelOverlay labels={labelPositions} />
               </div>
               {/* Octonion Dimension Map HUD */}
-              {enableFanoPlane && renderQuality !== "low" && (
-                <FanoOverlay />
-              )}
+              {enableFanoPlane && renderQuality !== "low" && <FanoOverlay />}
               {/* Octonion Live Readout HUD */}
               <LiveDimensionHUD />
             </div>

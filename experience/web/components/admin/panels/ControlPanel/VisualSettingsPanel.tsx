@@ -127,8 +127,10 @@ export function VisualSettingsPanel() {
         }`}
       >
         <span className="flex items-center gap-1.5">
-          <span className={`transition-transform duration-500 inline-block ${settings.autoRotate ? "animate-spin" : ""}`}
-                style={settings.autoRotate ? { animationDuration: "3s" } : undefined}>
+          <span
+            className={`transition-transform duration-500 inline-block ${settings.autoRotate ? "animate-spin" : ""}`}
+            style={settings.autoRotate ? { animationDuration: "3s" } : undefined}
+          >
             🌀
           </span>
           Auto-Rotate

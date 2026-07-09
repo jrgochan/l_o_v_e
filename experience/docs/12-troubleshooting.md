@@ -144,9 +144,7 @@ npm start -- --reset-cache
 const material = new THREE.ShaderMaterial({
   vertexShader,
   fragmentShader,
-  uniforms: {
-    /* ... */
-  },
+  uniforms: {/* ... */},
 });
 
 // Add error listener
@@ -330,9 +328,7 @@ float simpleNoise(vec3 p) {
 ```typescript
 useEffect(() => {
   const geometry = new THREE.IcosahedronGeometry(1, 20);
-  const material = new THREE.ShaderMaterial({
-    /* ... */
-  });
+  const material = new THREE.ShaderMaterial({/* ... */});
 
   return () => {
     geometry.dispose();

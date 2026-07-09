@@ -583,7 +583,9 @@ export function MultiEmotionTable({
                             <div className={`pt-3 border-t ${theme.colors.border}`}>
                               <div className="text-xs text-violet-300 mb-2 flex items-center gap-1.5">
                                 <span>🔮</span>
-                                <span className="font-semibold">Extended Dimensions (Octonion)</span>
+                                <span className="font-semibold">
+                                  Extended Dimensions (Octonion)
+                                </span>
                               </div>
                               <ExtendedDimensionBars
                                 extended={emotion.extended}

@@ -61,10 +61,7 @@ export type QuaternionTuple = [number, number, number, number];
 
 export type HapticMode = "normal" | "quiet";
 export type ColorblindMode =
-  | "default"
-  | "deuteranopia"
-  | "protanopia"
-  | "tritanopia";
+  "default" | "deuteranopia" | "protanopia" | "tritanopia";
 
 interface EmotionalMetrics {
   angularDistance: number; // Current rotation distance (radians)

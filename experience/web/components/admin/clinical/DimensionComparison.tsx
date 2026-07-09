@@ -22,10 +22,38 @@ interface DimensionComparisonProps {
 }
 
 const DIMS = [
-  { symbol: "D", label: "Depth", posLabel: "Profound", negLabel: "Surface", posColor: "#fbbf24", negColor: "#b45309" },
-  { symbol: "P", label: "Coping", posLabel: "Empowered", negLabel: "Helpless", posColor: "#34d399", negColor: "#fb7185" },
-  { symbol: "Ė", label: "Velocity", posLabel: "Shifting", negLabel: "Frozen", posColor: "#38bdf8", negColor: "#818cf8" },
-  { symbol: "N", label: "Novelty", posLabel: "Novel", negLabel: "Familiar", posColor: "#a78bfa", negColor: "#fb923c" },
+  {
+    symbol: "D",
+    label: "Depth",
+    posLabel: "Profound",
+    negLabel: "Surface",
+    posColor: "#fbbf24",
+    negColor: "#b45309",
+  },
+  {
+    symbol: "P",
+    label: "Coping",
+    posLabel: "Empowered",
+    negLabel: "Helpless",
+    posColor: "#34d399",
+    negColor: "#fb7185",
+  },
+  {
+    symbol: "Ė",
+    label: "Velocity",
+    posLabel: "Shifting",
+    negLabel: "Frozen",
+    posColor: "#38bdf8",
+    negColor: "#818cf8",
+  },
+  {
+    symbol: "N",
+    label: "Novelty",
+    posLabel: "Novel",
+    negLabel: "Familiar",
+    posColor: "#a78bfa",
+    negColor: "#fb923c",
+  },
 ];
 
 const DIVERGENCE_THRESHOLD = 0.4; // Flag when delta > 0.4
@@ -75,7 +103,9 @@ export function DimensionComparison({ emotionA, emotionB }: DimensionComparisonP
         return (
           <div key={dim.symbol} className="flex items-center gap-1">
             {/* Symbol */}
-            <span className={`text-[10px] font-bold font-mono w-4 text-right ${isDivergent ? "text-amber-400" : "text-gray-500"}`}>
+            <span
+              className={`text-[10px] font-bold font-mono w-4 text-right ${isDivergent ? "text-amber-400" : "text-gray-500"}`}
+            >
               {dim.symbol}
             </span>
 
@@ -93,11 +123,11 @@ export function DimensionComparison({ emotionA, emotionB }: DimensionComparisonP
             </div>
 
             {/* Delta badge */}
-            <span className={`text-[9px] font-mono w-6 text-center rounded ${
-              isDivergent
-                ? "bg-amber-900/40 text-amber-300 font-semibold"
-                : "text-gray-600"
-            }`}>
+            <span
+              className={`text-[9px] font-mono w-6 text-center rounded ${
+                isDivergent ? "bg-amber-900/40 text-amber-300 font-semibold" : "text-gray-600"
+              }`}
+            >
               {delta.toFixed(1)}
             </span>
 
@@ -115,7 +145,9 @@ export function DimensionComparison({ emotionA, emotionB }: DimensionComparisonP
             </div>
 
             {/* Divergence indicator */}
-            <span className={`w-4 text-center ${isDivergent ? "text-amber-400" : "text-transparent"}`}>
+            <span
+              className={`w-4 text-center ${isDivergent ? "text-amber-400" : "text-transparent"}`}
+            >
               ⚠
             </span>
           </div>

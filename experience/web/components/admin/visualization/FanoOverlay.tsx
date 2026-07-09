@@ -49,13 +49,69 @@ const CY = 90;
 const R = 65;
 
 const DIMENSIONS: Dimension[] = [
-  { id: 1, name: "Valence",    symbol: "V",  color: "#2DD4BF", negColor: "#6B7280", x: CX + R * Math.sin(0),            y: CY - R * Math.cos(0) },
-  { id: 2, name: "Arousal",    symbol: "A",  color: "#F59E0B", negColor: "#92400E", x: CX + R * Math.sin(Math.PI * 2/7), y: CY - R * Math.cos(Math.PI * 2/7) },
-  { id: 3, name: "Connection", symbol: "C",  color: "#A855F7", negColor: "#6B21A8", x: CX + R * Math.sin(Math.PI * 4/7), y: CY - R * Math.cos(Math.PI * 4/7) },
-  { id: 4, name: "Depth",      symbol: "D",  color: "#EAB308", negColor: "#78350F", x: CX + R * Math.sin(Math.PI * 6/7), y: CY - R * Math.cos(Math.PI * 6/7) },
-  { id: 5, name: "Coping",     symbol: "P",  color: "#22C55E", negColor: "#EF4444", x: CX + R * Math.sin(Math.PI * 8/7), y: CY - R * Math.cos(Math.PI * 8/7) },
-  { id: 6, name: "Velocity",   symbol: "Ė",  color: "#38BDF8", negColor: "#1E3A5F", x: CX + R * Math.sin(Math.PI * 10/7), y: CY - R * Math.cos(Math.PI * 10/7) },
-  { id: 7, name: "Novelty",    symbol: "N",  color: "#8B5CF6", negColor: "#4C1D95", x: CX + R * Math.sin(Math.PI * 12/7), y: CY - R * Math.cos(Math.PI * 12/7) },
+  {
+    id: 1,
+    name: "Valence",
+    symbol: "V",
+    color: "#2DD4BF",
+    negColor: "#6B7280",
+    x: CX + R * Math.sin(0),
+    y: CY - R * Math.cos(0),
+  },
+  {
+    id: 2,
+    name: "Arousal",
+    symbol: "A",
+    color: "#F59E0B",
+    negColor: "#92400E",
+    x: CX + R * Math.sin((Math.PI * 2) / 7),
+    y: CY - R * Math.cos((Math.PI * 2) / 7),
+  },
+  {
+    id: 3,
+    name: "Connection",
+    symbol: "C",
+    color: "#A855F7",
+    negColor: "#6B21A8",
+    x: CX + R * Math.sin((Math.PI * 4) / 7),
+    y: CY - R * Math.cos((Math.PI * 4) / 7),
+  },
+  {
+    id: 4,
+    name: "Depth",
+    symbol: "D",
+    color: "#EAB308",
+    negColor: "#78350F",
+    x: CX + R * Math.sin((Math.PI * 6) / 7),
+    y: CY - R * Math.cos((Math.PI * 6) / 7),
+  },
+  {
+    id: 5,
+    name: "Coping",
+    symbol: "P",
+    color: "#22C55E",
+    negColor: "#EF4444",
+    x: CX + R * Math.sin((Math.PI * 8) / 7),
+    y: CY - R * Math.cos((Math.PI * 8) / 7),
+  },
+  {
+    id: 6,
+    name: "Velocity",
+    symbol: "Ė",
+    color: "#38BDF8",
+    negColor: "#1E3A5F",
+    x: CX + R * Math.sin((Math.PI * 10) / 7),
+    y: CY - R * Math.cos((Math.PI * 10) / 7),
+  },
+  {
+    id: 7,
+    name: "Novelty",
+    symbol: "N",
+    color: "#8B5CF6",
+    negColor: "#4C1D95",
+    x: CX + R * Math.sin((Math.PI * 12) / 7),
+    y: CY - R * Math.cos((Math.PI * 12) / 7),
+  },
 ];
 
 const FANO_TRIPLES: FanoTriple[] = [
@@ -71,17 +127,26 @@ const FANO_TRIPLES: FanoTriple[] = [
 /** Semantic description based on value */
 function getSemanticLabel(id: number, val: number): string {
   const abs = Math.abs(val);
-  const intensity = abs < 0.2 ? "Neutral" : abs < 0.5 ? "Mild" : abs < 0.75 ? "Moderate" : "Intense";
+  const intensity =
+    abs < 0.2 ? "Neutral" : abs < 0.5 ? "Mild" : abs < 0.75 ? "Moderate" : "Intense";
 
   switch (id) {
-    case 1: return val >= 0 ? `${intensity} positive` : `${intensity} negative`;
-    case 2: return val >= 0 ? `${intensity} activation` : `${intensity} calm`;
-    case 3: return val >= 0 ? `${intensity} bonding` : `${intensity} isolation`;
-    case 4: return val >= 0 ? `${intensity} processing` : `${intensity} surface`;
-    case 5: return val >= 0 ? `${intensity} resilience` : `${intensity} overwhelm`;
-    case 6: return val >= 0 ? `${intensity} acceleration` : `${intensity} deceleration`;
-    case 7: return val >= 0 ? `${intensity} novelty` : `${intensity} familiarity`;
-    default: return "";
+    case 1:
+      return val >= 0 ? `${intensity} positive` : `${intensity} negative`;
+    case 2:
+      return val >= 0 ? `${intensity} activation` : `${intensity} calm`;
+    case 3:
+      return val >= 0 ? `${intensity} bonding` : `${intensity} isolation`;
+    case 4:
+      return val >= 0 ? `${intensity} processing` : `${intensity} surface`;
+    case 5:
+      return val >= 0 ? `${intensity} resilience` : `${intensity} overwhelm`;
+    case 6:
+      return val >= 0 ? `${intensity} acceleration` : `${intensity} deceleration`;
+    case 7:
+      return val >= 0 ? `${intensity} novelty` : `${intensity} familiarity`;
+    default:
+      return "";
   }
 }
 
@@ -92,27 +157,48 @@ function getDimensionValue(
   ext: { depth: number; coping: number; velocity: number; novelty: number }
 ): number {
   switch (id) {
-    case 1: return vac[0];
-    case 2: return vac[1];
-    case 3: return vac[2];
-    case 4: return ext.depth;
-    case 5: return ext.coping;
-    case 6: return ext.velocity;
-    case 7: return ext.novelty;
-    default: return 0;
+    case 1:
+      return vac[0];
+    case 2:
+      return vac[1];
+    case 3:
+      return vac[2];
+    case 4:
+      return ext.depth;
+    case 5:
+      return ext.coping;
+    case 6:
+      return ext.velocity;
+    case 7:
+      return ext.novelty;
+    default:
+      return 0;
   }
 }
 
 /** Chevron marker along a line (directional flow) */
-function FlowChevron({ x, y, angle, color, opacity }: {
-  x: number; y: number; angle: number; color: string; opacity: number;
+function FlowChevron({
+  x,
+  y,
+  angle,
+  color,
+  opacity,
+}: {
+  x: number;
+  y: number;
+  angle: number;
+  color: string;
+  opacity: number;
 }) {
   const size = 3;
   const rad = (angle * Math.PI) / 180;
   // Three points of the chevron
   const tip = { x: x + Math.cos(rad) * size, y: y + Math.sin(rad) * size };
   const left = { x: x + Math.cos(rad + 2.5) * size * 0.8, y: y + Math.sin(rad + 2.5) * size * 0.8 };
-  const right = { x: x + Math.cos(rad - 2.5) * size * 0.8, y: y + Math.sin(rad - 2.5) * size * 0.8 };
+  const right = {
+    x: x + Math.cos(rad - 2.5) * size * 0.8,
+    y: y + Math.sin(rad - 2.5) * size * 0.8,
+  };
 
   return (
     <polyline
@@ -219,7 +305,11 @@ export function FanoOverlay() {
           <defs>
             {DIMENSIONS.map((dim) => (
               <radialGradient key={`grad-${dim.id}`} id={`nodeGrad-${dim.id}`}>
-                <stop offset="0%" stopColor={dimValues[dim.id] >= 0 ? dim.color : dim.negColor} stopOpacity={Math.abs(dimValues[dim.id]) * 0.6} />
+                <stop
+                  offset="0%"
+                  stopColor={dimValues[dim.id] >= 0 ? dim.color : dim.negColor}
+                  stopOpacity={Math.abs(dimValues[dim.id]) * 0.6}
+                />
                 <stop offset="100%" stopColor="black" stopOpacity={0.9} />
               </radialGradient>
             ))}
@@ -257,7 +347,8 @@ export function FanoOverlay() {
             const activity =
               (Math.abs(dimValues[triple.i]) +
                 Math.abs(dimValues[triple.j]) +
-                Math.abs(dimValues[triple.k])) / 3;
+                Math.abs(dimValues[triple.k])) /
+              3;
 
             const isHovered = hoveredTriple === triple;
 
@@ -272,7 +363,10 @@ export function FanoOverlay() {
               <g key={`${triple.i}-${triple.j}-${triple.k}`}>
                 {/* i → j line */}
                 <line
-                  x1={di.x} y1={di.y} x2={dj.x} y2={dj.y}
+                  x1={di.x}
+                  y1={di.y}
+                  x2={dj.x}
+                  y2={dj.y}
                   stroke={isHovered ? "#fff" : dk.color}
                   strokeWidth={isHovered ? 2 : 1}
                   strokeOpacity={isHovered ? 0.9 : 0.15 + activity * 0.35}
@@ -282,7 +376,10 @@ export function FanoOverlay() {
                 />
                 {/* j → k line */}
                 <line
-                  x1={dj.x} y1={dj.y} x2={dk.x} y2={dk.y}
+                  x1={dj.x}
+                  y1={dj.y}
+                  x2={dk.x}
+                  y2={dk.y}
                   stroke={isHovered ? "#fff" : di.color}
                   strokeWidth={isHovered ? 2 : 1}
                   strokeOpacity={isHovered ? 0.9 : 0.15 + activity * 0.35}
@@ -292,7 +389,10 @@ export function FanoOverlay() {
                 />
                 {/* k → i line */}
                 <line
-                  x1={dk.x} y1={dk.y} x2={di.x} y2={di.y}
+                  x1={dk.x}
+                  y1={dk.y}
+                  x2={di.x}
+                  y2={di.y}
                   stroke={isHovered ? "#fff" : dj.color}
                   strokeWidth={isHovered ? 2 : 1}
                   strokeOpacity={isHovered ? 0.9 : 0.15 + activity * 0.35}
@@ -305,13 +405,15 @@ export function FanoOverlay() {
                 {activity > 0.2 && (
                   <>
                     <FlowChevron
-                      x={midIJ.x} y={midIJ.y}
+                      x={midIJ.x}
+                      y={midIJ.y}
                       angle={angleIJ}
                       color={dk.color}
                       opacity={0.1 + activity * 0.4}
                     />
                     <FlowChevron
-                      x={midJK.x} y={midJK.y}
+                      x={midJK.x}
+                      y={midJK.y}
                       angle={angleJK}
                       color={di.color}
                       opacity={0.1 + activity * 0.4}
@@ -353,14 +455,18 @@ export function FanoOverlay() {
               >
                 {/* Outer glow */}
                 <circle
-                  cx={dim.x} cy={dim.y} r={effectiveR + 3}
+                  cx={dim.x}
+                  cy={dim.y}
+                  r={effectiveR + 3}
                   fill={dim.color}
                   fillOpacity={absVal * 0.15 + (isVelocityNode ? Math.abs(breathPulse) * 0.05 : 0)}
                 />
                 {/* Hover highlight ring */}
                 {isNodeHovered && (
                   <circle
-                    cx={dim.x} cy={dim.y} r={effectiveR + 5}
+                    cx={dim.x}
+                    cy={dim.y}
+                    r={effectiveR + 5}
                     fill="none"
                     stroke="white"
                     strokeWidth={1}
@@ -370,7 +476,9 @@ export function FanoOverlay() {
                 {/* Crack ring — coping helplessness */}
                 {isCopingNode && copingNeg > 0.1 && (
                   <circle
-                    cx={dim.x} cy={dim.y} r={effectiveR + 1}
+                    cx={dim.x}
+                    cy={dim.y}
+                    r={effectiveR + 1}
                     fill="none"
                     stroke="#ef4444"
                     strokeWidth={copingNeg * 2}
@@ -380,7 +488,9 @@ export function FanoOverlay() {
                 )}
                 {/* Core — gradient filled */}
                 <circle
-                  cx={dim.x} cy={dim.y} r={effectiveR}
+                  cx={dim.x}
+                  cy={dim.y}
+                  r={effectiveR}
                   fill={`url(#nodeGrad-${dim.id})`}
                   stroke={dim.color}
                   strokeWidth={isNodeHovered ? 2 : 1.5}
@@ -388,7 +498,8 @@ export function FanoOverlay() {
                 />
                 {/* Symbol label */}
                 <text
-                  x={dim.x} y={dim.y - 1}
+                  x={dim.x}
+                  y={dim.y - 1}
                   textAnchor="middle"
                   dominantBaseline="central"
                   fill={dim.color}
@@ -400,7 +511,8 @@ export function FanoOverlay() {
                 </text>
                 {/* Live value label — small number below symbol */}
                 <text
-                  x={dim.x} y={dim.y + 6}
+                  x={dim.x}
+                  y={dim.y + 6}
                   textAnchor="middle"
                   dominantBaseline="central"
                   fill={dim.color}
@@ -408,7 +520,8 @@ export function FanoOverlay() {
                   fontFamily="monospace"
                   opacity={0.6 + absVal * 0.4}
                 >
-                  {val >= 0 ? "+" : ""}{val.toFixed(1)}
+                  {val >= 0 ? "+" : ""}
+                  {val.toFixed(1)}
                 </text>
               </g>
             );
@@ -426,7 +539,8 @@ export function FanoOverlay() {
             {getSemanticLabel(hoveredDim.id, dimValues[hoveredDim.id])}
           </p>
           <p className="text-[9px] font-mono text-gray-500">
-            {dimValues[hoveredDim.id] >= 0 ? "+" : ""}{dimValues[hoveredDim.id].toFixed(3)}
+            {dimValues[hoveredDim.id] >= 0 ? "+" : ""}
+            {dimValues[hoveredDim.id].toFixed(3)}
           </p>
         </div>
       )}
@@ -434,9 +548,7 @@ export function FanoOverlay() {
       {/* Line Hover Tooltip */}
       {hoveredTriple && !hoveredDim && (
         <div className="px-3 pb-1.5 text-center border-b border-white/5">
-          <p className="text-[9px] text-violet-300 font-medium">
-            {hoveredTriple.narrative}
-          </p>
+          <p className="text-[9px] text-violet-300 font-medium">{hoveredTriple.narrative}</p>
         </div>
       )}
 
@@ -460,37 +572,51 @@ export function FanoOverlay() {
               {/* SVG gradient bar */}
               <svg width="100%" height="6" className="flex-1">
                 {/* Track background */}
-                <rect x="0" y="0" width="100%" height="6" rx="2"
-                  fill="rgba(255,255,255,0.04)" />
+                <rect x="0" y="0" width="100%" height="6" rx="2" fill="rgba(255,255,255,0.04)" />
                 {/* Center line (zero point) */}
-                <line x1="50%" y1="0" x2="50%" y2="6"
-                  stroke="rgba(255,255,255,0.12)" strokeWidth="0.5" />
+                <line
+                  x1="50%"
+                  y1="0"
+                  x2="50%"
+                  y2="6"
+                  stroke="rgba(255,255,255,0.12)"
+                  strokeWidth="0.5"
+                />
                 {/* Value bar — extends from center */}
                 {val >= 0 ? (
                   <rect
-                    x="50%" y="0.5"
-                    width={`${absVal * 50}%`} height="5" rx="1.5"
+                    x="50%"
+                    y="0.5"
+                    width={`${absVal * 50}%`}
+                    height="5"
+                    rx="1.5"
                     fill={dim.color}
                     opacity={0.5 + absVal * 0.5}
                   />
                 ) : (
                   <rect
-                    x={`${50 - absVal * 50}%`} y="0.5"
-                    width={`${absVal * 50}%`} height="5" rx="1.5"
+                    x={`${50 - absVal * 50}%`}
+                    y="0.5"
+                    width={`${absVal * 50}%`}
+                    height="5"
+                    rx="1.5"
                     fill={dim.negColor}
                     opacity={0.5 + absVal * 0.5}
                   />
                 )}
                 {/* Position marker */}
                 <circle
-                  cx={`${normalized * 100}%`} cy="3" r="2"
+                  cx={`${normalized * 100}%`}
+                  cy="3"
+                  r="2"
                   fill="white"
                   fillOpacity={0.3 + absVal * 0.5}
                 />
               </svg>
               {/* Numeric value */}
               <span className="text-[8px] text-gray-400 w-7 text-right tabular-nums font-mono flex-shrink-0">
-                {val >= 0 ? "+" : ""}{val.toFixed(1)}
+                {val >= 0 ? "+" : ""}
+                {val.toFixed(1)}
               </span>
             </div>
           );

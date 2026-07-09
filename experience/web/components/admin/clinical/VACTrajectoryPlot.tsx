@@ -141,9 +141,7 @@ export function VACTrajectoryPlot({ vacHistory }: VACTrajectoryPlotProps) {
       }
 
       // 🧊 Emotional Freezing — stuck/frozen velocity
-      const frozenCount = vacHistory.filter(
-        (p) => (p.extended?.velocity ?? 0) < -0.5
-      ).length;
+      const frozenCount = vacHistory.filter((p) => (p.extended?.velocity ?? 0) < -0.5).length;
       if (frozenCount >= 3) {
         patterns.push({
           type: "emotional_freezing",
@@ -276,7 +274,7 @@ export function VACTrajectoryPlot({ vacHistory }: VACTrajectoryPlotProps) {
 
           {/* Trail path — width encodes coping (if available) */}
           {(() => {
-            const hasExtended = points.some(p => p.extended);
+            const hasExtended = points.some((p) => p.extended);
             if (hasExtended) {
               // Draw coping-width ribbon using polyline segments
               return points.slice(0, -1).map((from, i) => {
@@ -501,26 +499,42 @@ export function VACTrajectoryPlot({ vacHistory }: VACTrajectoryPlotProps) {
               <span className={theme.colors.text.muted}>Coping Change:</span>
               <span
                 className={`ml-2 font-mono ${
-                  (vacHistory[vacHistory.length - 1].extended!.coping - vacHistory[0].extended!.coping) > 0
+                  vacHistory[vacHistory.length - 1].extended!.coping -
+                    vacHistory[0].extended!.coping >
+                  0
                     ? "text-emerald-400"
                     : "text-rose-400"
                 }`}
               >
-                {(vacHistory[vacHistory.length - 1].extended!.coping - vacHistory[0].extended!.coping) > 0 ? "+" : ""}
-                {(vacHistory[vacHistory.length - 1].extended!.coping - vacHistory[0].extended!.coping).toFixed(2)}
+                {vacHistory[vacHistory.length - 1].extended!.coping -
+                  vacHistory[0].extended!.coping >
+                0
+                  ? "+"
+                  : ""}
+                {(
+                  vacHistory[vacHistory.length - 1].extended!.coping -
+                  vacHistory[0].extended!.coping
+                ).toFixed(2)}
               </span>
             </div>
             <div>
               <span className={theme.colors.text.muted}>Depth Change:</span>
               <span
                 className={`ml-2 font-mono ${
-                  (vacHistory[vacHistory.length - 1].extended!.depth - vacHistory[0].extended!.depth) > 0
+                  vacHistory[vacHistory.length - 1].extended!.depth -
+                    vacHistory[0].extended!.depth >
+                  0
                     ? "text-amber-400"
                     : "text-gray-400"
                 }`}
               >
-                {(vacHistory[vacHistory.length - 1].extended!.depth - vacHistory[0].extended!.depth) > 0 ? "+" : ""}
-                {(vacHistory[vacHistory.length - 1].extended!.depth - vacHistory[0].extended!.depth).toFixed(2)}
+                {vacHistory[vacHistory.length - 1].extended!.depth - vacHistory[0].extended!.depth >
+                0
+                  ? "+"
+                  : ""}
+                {(
+                  vacHistory[vacHistory.length - 1].extended!.depth - vacHistory[0].extended!.depth
+                ).toFixed(2)}
               </span>
             </div>
           </>

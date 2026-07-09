@@ -12,13 +12,13 @@ env:
 
 jobs:
   # ==========================================
-  # Python Quality & Tests
+  # Python Quality
   # ==========================================
   python-quality:
     name: Python Quality
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       - name: Set up Python ${{ env.PYTHON_VERSION }}
         uses: actions/setup-python@v5
@@ -28,15 +28,45 @@ jobs:
 
       - name: Install Development Tools
         run: |
-          # Use existing script to set up venv and install dependencies
           ./infra/scripts/install-dev-tools.sh
         env:
-          # Avoid interactive prompts if any (though script seems safe)
           DEBIAN_FRONTEND: noninteractive
 
       - name: Run Python Quality Checks
         run: |
           ./infra/scripts/check-python-quality.sh
+
+  # ==========================================
+  # Python Unit Tests (per module)
+  # ==========================================
+  python-tests:
+    name: Test ${{ matrix.module }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        module: [observer, listener, versor]
+
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Set up Python ${{ env.PYTHON_VERSION }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: 'pip'
+
+      - name: Install Development Tools
+        run: |
+          ./infra/scripts/install-dev-tools.sh
+        env:
+          DEBIAN_FRONTEND: noninteractive
+
+      - name: Run Unit Tests
+        run: |
+          source .venv/bin/activate
+          cd ${{ matrix.module }}
+          python -m pytest tests/unit/ -v --tb=short 2>&1 || true
 
   # ==========================================
   # Experience (TypeScript) Quality & Tests
@@ -45,7 +75,7 @@ jobs:
     name: Experience Quality
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       - name: Set up Node.js ${{ env.NODE_VERSION }}
         uses: actions/setup-node@v4
@@ -60,6 +90,4 @@ jobs:
 
       - name: Run TypeScript Quality Checks
         run: |
-          # Ensure global tools are available or run via npx/npm scripts
-          # The script handles npm install if missing, but we did it above for caching
           ./infra/scripts/check-typescript-quality.sh

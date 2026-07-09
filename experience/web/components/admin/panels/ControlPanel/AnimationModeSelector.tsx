@@ -89,8 +89,13 @@ export function AnimationModeSelector({ currentMode, onModeChange }: AnimationMo
 
   return (
     <section>
-      <h2 className={`text-xs font-semibold uppercase tracking-wider mb-2 ${theme.colors.text.secondary}`}>
-        🎨 Animation <span className={`text-[10px] ${theme.colors.text.muted} normal-case tracking-normal`}>Press M</span>
+      <h2
+        className={`text-xs font-semibold uppercase tracking-wider mb-2 ${theme.colors.text.secondary}`}
+      >
+        🎨 Animation{" "}
+        <span className={`text-[10px] ${theme.colors.text.muted} normal-case tracking-normal`}>
+          Press M
+        </span>
       </h2>
       <div className="grid grid-cols-3 gap-1.5">
         {MODES.map(({ key, icon, label, desc, activeRing, activeBg }) => {
@@ -104,14 +109,17 @@ export function AnimationModeSelector({ currentMode, onModeChange }: AnimationMo
                 flex flex-col items-center gap-0.5 px-1.5 py-2
                 rounded-lg text-center transition-all duration-200
                 border
-                ${isActive
-                  ? `${activeBg} ${activeRing} ring-1 border-white/20 shadow-lg`
-                  : `bg-black/20 border-white/5 ${theme.colors.text.muted} hover:bg-white/5 hover:border-white/10`
+                ${
+                  isActive
+                    ? `${activeBg} ${activeRing} ring-1 border-white/20 shadow-lg`
+                    : `bg-black/20 border-white/5 ${theme.colors.text.muted} hover:bg-white/5 hover:border-white/10`
                 }
               `}
             >
               <span className="text-base leading-none">{icon}</span>
-              <span className={`text-[10px] font-medium leading-tight ${isActive ? "text-white" : ""}`}>
+              <span
+                className={`text-[10px] font-medium leading-tight ${isActive ? "text-white" : ""}`}
+              >
                 {label}
               </span>
             </button>

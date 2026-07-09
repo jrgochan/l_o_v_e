@@ -63,13 +63,24 @@ export function ExportControls() {
     const paths = Array.from(computedPaths.values());
 
     const headers = [
-      "From", "To", "Distance", "Difficulty", "Time", "Waypoints",
-      "Requires Bridge", "Bridge Emotions",
+      "From",
+      "To",
+      "Distance",
+      "Difficulty",
+      "Time",
+      "Waypoints",
+      "Requires Bridge",
+      "Bridge Emotions",
     ];
     const rows = paths.map((p) => [
-      p.from.name, p.to.name, p.total_distance.toFixed(3), p.difficulty,
-      p.estimated_time, p.waypoints.length,
-      p.requires_bridge ? "Yes" : "No", p.bridge_emotions?.join("; ") || "",
+      p.from.name,
+      p.to.name,
+      p.total_distance.toFixed(3),
+      p.difficulty,
+      p.estimated_time,
+      p.waypoints.length,
+      p.requires_bridge ? "Yes" : "No",
+      p.bridge_emotions?.join("; ") || "",
     ]);
 
     const csv = [
@@ -127,7 +138,12 @@ ${paths.map((p, i) => `${i + 1}. ${p.from.name} → ${p.to.name} (${p.difficulty
     { icon: "📥", label: "Export JSON", onClick: exportJSON, disabled: !hasSelection },
     { icon: "📊", label: "Export CSV", onClick: exportCSV, disabled: !hasPaths },
     { icon: "📋", label: "Copy to Clipboard", onClick: copyToClipboard, disabled: !hasSelection },
-    { icon: "🔗", label: "Copy Share Link", onClick: generateShareableURL, disabled: !hasSelection },
+    {
+      icon: "🔗",
+      label: "Copy Share Link",
+      onClick: generateShareableURL,
+      disabled: !hasSelection,
+    },
   ];
 
   return (
@@ -142,9 +158,10 @@ ${paths.map((p, i) => `${i + 1}. ${p.from.name} → ${p.to.name} (${p.difficulty
             flex-1 flex items-center justify-center
             px-2 py-2 rounded-lg border text-sm
             transition-all duration-200
-            ${disabled
-              ? `bg-black/10 border-white/5 ${theme.colors.text.muted} opacity-40 cursor-not-allowed`
-              : `bg-black/20 border-white/10 ${theme.colors.text.secondary} hover:bg-white/10 hover:border-white/20 hover:scale-105 active:scale-95`
+            ${
+              disabled
+                ? `bg-black/10 border-white/5 ${theme.colors.text.muted} opacity-40 cursor-not-allowed`
+                : `bg-black/20 border-white/10 ${theme.colors.text.secondary} hover:bg-white/10 hover:border-white/20 hover:scale-105 active:scale-95`
             }
           `}
         >

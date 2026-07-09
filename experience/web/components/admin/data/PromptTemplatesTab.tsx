@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import {
   PromptTemplate,
   PromptTemplateCreate,
@@ -31,12 +31,7 @@ export function PromptTemplatesTab() {
     "insight_generation",
   ];
 
-  useEffect(() => {
-    loadPrompts();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectedFunction]);
-
-  const loadPrompts = async () => {
+  const loadPrompts = useCallback(async () => {
     setLoading(true);
     setError(null);
     try {
@@ -49,7 +44,11 @@ export function PromptTemplatesTab() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [selectedFunction]);
+
+  useEffect(() => {
+    loadPrompts();
+  }, [loadPrompts]);
 
   const handleCreate = () => {
     setCurrentPrompt({

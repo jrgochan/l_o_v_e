@@ -51,12 +51,7 @@ export type WaypointCommand =
  * Command item types
  */
 export type CommandItemType =
-  | "emotion"
-  | "category"
-  | "action"
-  | "quick-action"
-  | "journey-action"
-  | "waypoint";
+  "emotion" | "category" | "action" | "quick-action" | "journey-action" | "waypoint";
 
 /**
  * Base command item

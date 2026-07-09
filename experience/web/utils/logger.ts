@@ -15,13 +15,7 @@
 
 export type LogLevel = "debug" | "info" | "warn" | "error";
 export type LogCategory =
-  | "websocket"
-  | "api"
-  | "hooks"
-  | "rendering"
-  | "state"
-  | "user-interaction"
-  | "general";
+  "websocket" | "api" | "hooks" | "rendering" | "state" | "user-interaction" | "general";
 
 interface LogEntry {
   timestamp: Date;

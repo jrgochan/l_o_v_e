@@ -434,10 +434,30 @@ export function SoulSphere() {
     // === LERP: Smoothly interpolate octonionExtended toward target ===
     // damp(current, target, lambda, delta) — lambda=3 gives ~1s settle
     const LAMBDA = 3.0;
-    const dampedDepth = THREE.MathUtils.damp(octonionExt.depth, octonionTarget.depth, LAMBDA, delta);
-    const dampedCoping = THREE.MathUtils.damp(octonionExt.coping, octonionTarget.coping, LAMBDA, delta);
-    const dampedVelocity = THREE.MathUtils.damp(octonionExt.velocity, octonionTarget.velocity, LAMBDA, delta);
-    const dampedNovelty = THREE.MathUtils.damp(octonionExt.novelty, octonionTarget.novelty, LAMBDA, delta);
+    const dampedDepth = THREE.MathUtils.damp(
+      octonionExt.depth,
+      octonionTarget.depth,
+      LAMBDA,
+      delta
+    );
+    const dampedCoping = THREE.MathUtils.damp(
+      octonionExt.coping,
+      octonionTarget.coping,
+      LAMBDA,
+      delta
+    );
+    const dampedVelocity = THREE.MathUtils.damp(
+      octonionExt.velocity,
+      octonionTarget.velocity,
+      LAMBDA,
+      delta
+    );
+    const dampedNovelty = THREE.MathUtils.damp(
+      octonionExt.novelty,
+      octonionTarget.novelty,
+      LAMBDA,
+      delta
+    );
 
     // Only write to store when values have meaningfully changed (prevents 60fps thrashing)
     const EPSILON = 0.001;
@@ -471,7 +491,7 @@ export function SoulSphere() {
     const topoMul = useSettingsStore.getState().topologyIntensity;
 
     const effectiveVelocity = octonionEnabled ? dampedVelocity : currentVAC[1]; // arousal fallback
-    const effectiveCoping = octonionEnabled ? dampedCoping : currentVAC[0];     // valence fallback
+    const effectiveCoping = octonionEnabled ? dampedCoping : currentVAC[0]; // valence fallback
     const effectiveDepth = octonionEnabled ? dampedDepth : 0;
     const effectiveNovelty = octonionEnabled ? dampedNovelty : 0;
 

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import { ModelAssignment } from "@/types/admin";
 import { adminApi } from "@/utils/api";
 import { RefreshCw, Save, AlertTriangle, Cpu } from "lucide-react";
@@ -22,11 +22,7 @@ export default function AiModelsTab() {
     "mistral:7b",
   ];
 
-  useEffect(() => {
-    fetchModels();
-  }, []);
-
-  const fetchModels = async () => {
+  const fetchModels = useCallback(async () => {
     try {
       setLoading(true);
       const data = await adminApi.getAiModels();
@@ -37,7 +33,11 @@ export default function AiModelsTab() {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
+
+  useEffect(() => {
+    fetchModels();
+  }, [fetchModels]);
 
   const handleEdit = (assignment: ModelAssignment) => {
     setEditingFunction(assignment.function);

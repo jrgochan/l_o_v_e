@@ -74,9 +74,7 @@ export function EmotionCloud({ enableFloatingLabels = false }: EmotionCloudProps
     if (!settings.enableOctonionLayer) return;
 
     // Gather emotions to consider: selected + hovered
-    const relevantEmotions = allEmotions.filter(
-      (e) => selectedIds.has(e.id) || e.id === hoveredId
-    );
+    const relevantEmotions = allEmotions.filter((e) => selectedIds.has(e.id) || e.id === hoveredId);
 
     // No selection → snap to neutral immediately (no lerp delay on full clear)
     if (relevantEmotions.length === 0 || !relevantEmotions.some((e) => e.extended)) {
@@ -90,8 +88,11 @@ export function EmotionCloud({ enableFloatingLabels = false }: EmotionCloudProps
     if (withExt.length === 0) return;
 
     // Max-absolute for Depth, Velocity, Novelty (prevents washout)
-    let maxDepth = 0, maxVelocity = 0, maxNovelty = 0;
-    let copingSum = 0, minCoping = 1;
+    let maxDepth = 0,
+      maxVelocity = 0,
+      maxNovelty = 0;
+    let copingSum = 0,
+      minCoping = 1;
 
     for (const e of withExt) {
       const [d, p, v, n] = e.extended!;
@@ -355,7 +356,10 @@ function EmotionSphere({
           <meshStandardMaterial
             color={color}
             emissive={color}
-            emissiveIntensity={(isSelected ? 1.5 : isHovered ? 1.0 : 0.3) + (settings.enableOctonionLayer && emotion.extended ? emotion.extended[0] * 0.3 : 0)}
+            emissiveIntensity={
+              (isSelected ? 1.5 : isHovered ? 1.0 : 0.3) +
+              (settings.enableOctonionLayer && emotion.extended ? emotion.extended[0] * 0.3 : 0)
+            }
             transparent
             opacity={isSelected ? 1.0 : isHovered ? 0.9 : 0.7}
             metalness={0.3}
@@ -511,7 +515,8 @@ function FloatingEmotionLabel({
           </div>
           {emotion.extended && (
             <div className="text-[9px] font-mono mt-0.5 text-violet-300/80">
-              D:{emotion.extended[0].toFixed(2)} P:{emotion.extended[1].toFixed(2)} Ė:{emotion.extended[2].toFixed(2)} N:{emotion.extended[3].toFixed(2)}
+              D:{emotion.extended[0].toFixed(2)} P:{emotion.extended[1].toFixed(2)} Ė:
+              {emotion.extended[2].toFixed(2)} N:{emotion.extended[3].toFixed(2)}
             </div>
           )}
         </>

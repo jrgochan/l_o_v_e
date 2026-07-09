@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import { ClinicalAlert } from "@/types/admin";
 import { adminApi } from "@/utils/api";
 import { RefreshCw, AlertTriangle, Activity, Filter } from "lucide-react";
@@ -13,12 +13,7 @@ export default function ClinicalAlertsTab() {
   const [filterLevel, setFilterLevel] = useState<string>("all");
   const [selectedAlert, setSelectedAlert] = useState<ClinicalAlert | null>(null);
 
-  useEffect(() => {
-    fetchAlerts();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [page, filterLevel]);
-
-  const fetchAlerts = async () => {
+  const fetchAlerts = useCallback(async () => {
     try {
       setLoading(true);
       const data = await adminApi.getClinicalAlerts(page, 50, filterLevel);
@@ -29,7 +24,11 @@ export default function ClinicalAlertsTab() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [page, filterLevel]);
+
+  useEffect(() => {
+    fetchAlerts();
+  }, [fetchAlerts]);
 
   const getSeverityColor = (level: string) => {
     switch (level) {

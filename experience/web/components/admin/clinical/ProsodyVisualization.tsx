@@ -8,7 +8,7 @@
 
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { logger } from "@/utils/logger";
 import type { ProsodyData } from "@/types/chat";
 import { useAdminTheme } from "@/hooks/admin/useAdminTheme";
@@ -82,14 +82,16 @@ export function ProsodyVisualization({ prosody, audioBlob }: ProsodyVisualizatio
     extractWaveform();
   }, [audioBlob, prosody]);
 
-  // Early return if no prosody data
-  if (!prosody) return null;
-
-  const { pitch_mean, pitch_std, energy, rate } = prosody;
+  // Extract prosody values (with fallbacks for when prosody is null)
+  const pitch_mean = prosody?.pitch_mean;
+  const pitch_std = prosody?.pitch_std;
+  const energy = prosody?.energy;
+  const rate = prosody?.rate;
 
   // Generate synthetic waveform bars based on energy and pitch variability
   // Used as fallback when no audio blob available
-  const generateSyntheticWaveform = () => {
+  // Uses deterministic noise (no Math.random) to satisfy React's purity requirements
+  const syntheticWaveform = useMemo(() => {
     const bars = [];
     const barCount = 40;
     const baseEnergy = energy || 0.5;
@@ -98,19 +100,22 @@ export function ProsodyVisualization({ prosody, audioBlob }: ProsodyVisualizatio
     for (let i = 0; i < barCount; i++) {
       // Create a wave-like pattern
       const wave = Math.sin((i / barCount) * Math.PI * 3) * 0.3;
-      // Add some randomness based on variability
-      const noise = (Math.random() - 0.5) * variability;
+      // Deterministic noise based on index (produces organic-looking variation)
+      const noise = (((Math.sin(i * 12.9898 + 78.233) * 43758.5453) % 1) - 0.5) * variability;
       // Calculate bar height (0-100)
       const height = Math.max(5, Math.min(100, (baseEnergy + wave + noise) * 100));
       bars.push(height);
     }
 
     return bars;
-  };
+  }, [energy, pitch_std]);
 
   // Use real waveform if available, otherwise generate synthetic
-  const waveform = waveformData.length > 0 ? waveformData : generateSyntheticWaveform();
+  const waveform = waveformData.length > 0 ? waveformData : syntheticWaveform;
   const isRealWaveform = waveformData.length > 0;
+
+  // Early return if no prosody data
+  if (!prosody) return null;
 
   // Determine energy level interpretation
   const getEnergyLevel = () => {

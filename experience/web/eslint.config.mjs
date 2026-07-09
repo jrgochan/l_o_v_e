@@ -8,6 +8,15 @@ const eslintConfig = defineConfig([
   ...nextVitals,
   ...nextTs,
   {
+    // Production code: downgrade overly strict React 19 rules
+    rules: {
+      // This rule flags valid async setState patterns (loading states inside fetch effects).
+      // Our data-fetching useEffect patterns follow the React docs recommendation.
+      // See: https://react.dev/reference/react/useEffect#fetching-data-with-effects
+      "react-hooks/set-state-in-effect": "warn",
+    },
+  },
+  {
     files: ["**/__tests__/**/*.{ts,tsx}", "**/*.test.{ts,tsx}"],
     languageOptions: {
       globals: {

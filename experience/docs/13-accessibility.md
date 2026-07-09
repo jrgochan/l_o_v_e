@@ -17,10 +17,7 @@ The default color palette (crimson to cyan) is problematic for users with red-gr
 ```typescript
 // In useExperienceStore.ts
 export type ColorblindMode =
-  | "default"
-  | "deuteranopia"
-  | "protanopia"
-  | "tritanopia";
+  "default" | "deuteranopia" | "protanopia" | "tritanopia";
 
 interface UserPreferences {
   colorblindMode: ColorblindMode;

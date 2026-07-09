@@ -318,9 +318,7 @@ Prevent memory leaks by cleaning up Three.js objects:
 ```typescript
 useEffect(() => {
   const geometry = new THREE.IcosahedronGeometry(1, 20);
-  const material = new THREE.ShaderMaterial({
-    /* ... */
-  });
+  const material = new THREE.ShaderMaterial({/* ... */});
 
   return () => {
     geometry.dispose();

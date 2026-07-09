@@ -4,7 +4,6 @@ import asyncio
 import logging
 
 import typer
-
 from app.database import AsyncSessionLocal
 from app.services.chat.service import ChatService
 from app.services.chat.types import (
@@ -38,7 +37,9 @@ async def verify_mapping_logic() -> None:
 
         # 1. Create a test session
         logger.info("Creating test session...")
-        session = await service.create_session(user_id="test_verifier", tone_preference="warm")
+        session = await service.create_session(
+            user_id="test_verifier", tone_preference="warm"
+        )
 
         try:
             # 2. Test Single Analysis Message
@@ -61,7 +62,7 @@ async def verify_mapping_logic() -> None:
 
             logger.info("Stored Original Name: %s", msg.original_emotion_name)
 
-            assert (
+            assert (  # nosec B101
                 msg.original_emotion_name == original_emotion
             ), f"Expected {original_emotion}, got {msg.original_emotion_name}"
 

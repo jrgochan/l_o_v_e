@@ -544,35 +544,92 @@ export function WaypointDetailModal({
                 const [d, p, ev, n] = currentEmotion.extended;
                 const prevExt = prevEmotion?.extended;
                 const dimLabels = [
-                  { name: "Depth", sym: "D", val: d, prev: prevExt?.[0], color: "text-amber-400", desc: d > 0.6 ? "Core / existential" : d > 0.3 ? "Moderate significance" : "Surface-level" },
-                  { name: "Coping", sym: "P", val: p, prev: prevExt?.[1], color: "text-emerald-400", desc: p > 0.3 ? "Sense of agency" : p > -0.3 ? "Uncertain control" : "Helplessness" },
-                  { name: "Velocity", sym: "Ė", val: ev, prev: prevExt?.[2], color: "text-sky-400", desc: ev > 0.3 ? "Rapid state change" : ev > -0.3 ? "Gradual movement" : "Frozen / stuck" },
-                  { name: "Novelty", sym: "N", val: n, prev: prevExt?.[3], color: "text-violet-400", desc: n > 0.3 ? "Unfamiliar territory" : n > -0.3 ? "Somewhat familiar" : "Deeply familiar" },
+                  {
+                    name: "Depth",
+                    sym: "D",
+                    val: d,
+                    prev: prevExt?.[0],
+                    color: "text-amber-400",
+                    desc:
+                      d > 0.6
+                        ? "Core / existential"
+                        : d > 0.3
+                          ? "Moderate significance"
+                          : "Surface-level",
+                  },
+                  {
+                    name: "Coping",
+                    sym: "P",
+                    val: p,
+                    prev: prevExt?.[1],
+                    color: "text-emerald-400",
+                    desc:
+                      p > 0.3 ? "Sense of agency" : p > -0.3 ? "Uncertain control" : "Helplessness",
+                  },
+                  {
+                    name: "Velocity",
+                    sym: "Ė",
+                    val: ev,
+                    prev: prevExt?.[2],
+                    color: "text-sky-400",
+                    desc:
+                      ev > 0.3
+                        ? "Rapid state change"
+                        : ev > -0.3
+                          ? "Gradual movement"
+                          : "Frozen / stuck",
+                  },
+                  {
+                    name: "Novelty",
+                    sym: "N",
+                    val: n,
+                    prev: prevExt?.[3],
+                    color: "text-violet-400",
+                    desc:
+                      n > 0.3
+                        ? "Unfamiliar territory"
+                        : n > -0.3
+                          ? "Somewhat familiar"
+                          : "Deeply familiar",
+                  },
                 ];
                 return (
                   <section>
-                    <h3 className={`text-lg font-semibold mb-3 ${theme.colors.text.primary} flex items-center gap-2`}>
+                    <h3
+                      className={`text-lg font-semibold mb-3 ${theme.colors.text.primary} flex items-center gap-2`}
+                    >
                       🔮 Extended Dimensions
-                      <span className="text-xs text-violet-400 bg-violet-900/30 px-2 py-0.5 rounded border border-violet-700/50">Octonion</span>
+                      <span className="text-xs text-violet-400 bg-violet-900/30 px-2 py-0.5 rounded border border-violet-700/50">
+                        Octonion
+                      </span>
                     </h3>
-                    <div className={`bg-black/20 ${theme.layout.borderRadius} p-4 space-y-3 border border-violet-800/30`}>
+                    <div
+                      className={`bg-black/20 ${theme.layout.borderRadius} p-4 space-y-3 border border-violet-800/30`}
+                    >
                       <div className="grid grid-cols-2 gap-3">
                         {dimLabels.map((dim) => {
                           const delta = dim.prev !== undefined ? dim.val - dim.prev : null;
                           return (
-                            <div key={dim.sym} className={`bg-black/30 p-3 ${theme.layout.borderRadius} border ${theme.colors.border}`}>
+                            <div
+                              key={dim.sym}
+                              className={`bg-black/30 p-3 ${theme.layout.borderRadius} border ${theme.colors.border}`}
+                            >
                               <div className="flex items-center justify-between mb-1">
                                 <span className={`text-xs font-bold ${dim.color}`}>
                                   {dim.sym} {dim.name}
                                 </span>
                                 <span className={`font-mono font-bold ${dim.color}`}>
-                                  {dim.val >= 0 ? "+" : ""}{dim.val.toFixed(2)}
+                                  {dim.val >= 0 ? "+" : ""}
+                                  {dim.val.toFixed(2)}
                                 </span>
                               </div>
                               <p className={`text-xs ${theme.colors.text.muted}`}>{dim.desc}</p>
                               {delta !== null && (
-                                <p className={`text-[10px] mt-1 font-mono ${delta > 0.05 ? "text-green-400" : delta < -0.05 ? "text-red-400" : "text-gray-500"}`}>
-                                  {delta > 0 ? "↑" : delta < 0 ? "↓" : "→"} {delta >= 0 ? "+" : ""}{delta.toFixed(2)} from prev
+                                <p
+                                  className={`text-[10px] mt-1 font-mono ${delta > 0.05 ? "text-green-400" : delta < -0.05 ? "text-red-400" : "text-gray-500"}`}
+                                >
+                                  {delta > 0 ? "↑" : delta < 0 ? "↓" : "→"} {delta >= 0 ? "+" : ""}
+                                  {delta.toFixed(2)} from prev
                                 </p>
                               )}
                             </div>

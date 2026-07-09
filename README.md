@@ -1,6 +1,8 @@
 # L.O.V.E. Stack
 
 [![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
+[![Unified CI](https://github.com/jrgochan/l_o_v_e/actions/workflows/ci.yml/badge.svg)](https://github.com/jrgochan/l_o_v_e/actions/workflows/ci.yml)
+[![CodeQL](https://github.com/jrgochan/l_o_v_e/actions/workflows/codeql.yml/badge.svg)](https://github.com/jrgochan/l_o_v_e/actions/workflows/codeql.yml)
 [![GitHub Sponsors](https://img.shields.io/badge/Sponsor-💜-ea4aaa)](https://github.com/sponsors/jrgochan)
 
 **L**istener-**O**bserver-**V**ersor-**E**xperience: A multi-modal emotional intelligence platform using the VAC (Valence-Arousal-Connection) model with quaternion mathematics for 3D visualization.

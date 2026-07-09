@@ -33,14 +33,14 @@ interface LayerControlsProps {
 
 /** Layer metadata: icon, human label, optional keyboard shortcut */
 const LAYER_META: Record<string, { icon: string; label: string; shortcut?: string }> = {
-  soulSphere:      { icon: "🔮", label: "Soul Sphere",      shortcut: "S" },
-  emotionPoints:   { icon: "📍", label: "Emotion Points"              },
-  emotionLabels:   { icon: "🏷️", label: "Labels",           shortcut: "L" },
-  transitionPaths: { icon: "🛤️", label: "Paths",            shortcut: "Space" },
-  waypoints:       { icon: "📌", label: "Waypoints"                   },
-  bridgeHighlight: { icon: "⭐", label: "Bridge Highlight"            },
-  legend:          { icon: "📊", label: "Legend",            shortcut: "G" },
-  cinematicOverlay:{ icon: "🎬", label: "Cinematic Overlay"           },
+  soulSphere: { icon: "🔮", label: "Soul Sphere", shortcut: "S" },
+  emotionPoints: { icon: "📍", label: "Emotion Points" },
+  emotionLabels: { icon: "🏷️", label: "Labels", shortcut: "L" },
+  transitionPaths: { icon: "🛤️", label: "Paths", shortcut: "Space" },
+  waypoints: { icon: "📌", label: "Waypoints" },
+  bridgeHighlight: { icon: "⭐", label: "Bridge Highlight" },
+  legend: { icon: "📊", label: "Legend", shortcut: "G" },
+  cinematicOverlay: { icon: "🎬", label: "Cinematic Overlay" },
 };
 
 /** Collapsible section header */
@@ -65,12 +65,21 @@ function SectionHeader({
         className="flex items-center gap-1.5 cursor-pointer group flex-1"
         role="button"
         tabIndex={0}
-        onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); onToggle(); } }}
+        onKeyDown={(e) => {
+          if (e.key === "Enter" || e.key === " ") {
+            e.preventDefault();
+            onToggle();
+          }
+        }}
       >
-        <span className={`text-xs transition-transform duration-200 ${expanded ? "rotate-90" : ""}`}>
+        <span
+          className={`text-xs transition-transform duration-200 ${expanded ? "rotate-90" : ""}`}
+        >
           ▸
         </span>
-        <span className={`text-xs font-semibold uppercase tracking-wider ${theme.colors.text.secondary} group-hover:${theme.colors.text.primary}`}>
+        <span
+          className={`text-xs font-semibold uppercase tracking-wider ${theme.colors.text.secondary} group-hover:${theme.colors.text.primary}`}
+        >
           {icon} {title}
         </span>
       </div>
@@ -99,8 +108,7 @@ export function LayerControls({
     export: false,
   });
 
-  const toggle = (key: string) =>
-    setExpandedSections((prev) => ({ ...prev, [key]: !prev[key] }));
+  const toggle = (key: string) => setExpandedSections((prev) => ({ ...prev, [key]: !prev[key] }));
 
   return (
     <>
@@ -113,7 +121,10 @@ export function LayerControls({
           onToggle={() => toggle("visibility")}
           trailing={
             <button
-              onClick={(e) => { e.stopPropagation(); onToggleAllCategories(); }}
+              onClick={(e) => {
+                e.stopPropagation();
+                onToggleAllCategories();
+              }}
               className={`text-[10px] px-1.5 py-0.5 rounded ${theme.colors.primary} hover:bg-white/5 transition`}
             >
               {allCategoriesEnabled ? "Hide All" : "Show All"}
@@ -220,7 +231,9 @@ export function LayerControls({
                     {meta.label}
                   </span>
                   {meta.shortcut && (
-                    <kbd className={`text-[9px] px-1.5 py-0.5 rounded bg-black/40 border ${theme.colors.border} ${theme.colors.text.muted} font-mono flex-shrink-0`}>
+                    <kbd
+                      className={`text-[9px] px-1.5 py-0.5 rounded bg-black/40 border ${theme.colors.border} ${theme.colors.text.muted} font-mono flex-shrink-0`}
+                    >
                       {meta.shortcut}
                     </kbd>
                   )}

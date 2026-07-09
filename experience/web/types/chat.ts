@@ -50,10 +50,10 @@ export interface VAC {
 
 /** Octonion extension: 4 additional emotional appraisal dimensions (all [-1, 1]) */
 export interface ExtendedDimensions {
-  depth: number;    // Profound (+1) ↔ Superficial (-1)
-  coping: number;   // Empowered (+1) ↔ Helpless (-1)
+  depth: number; // Profound (+1) ↔ Superficial (-1)
+  coping: number; // Empowered (+1) ↔ Helpless (-1)
   velocity: number; // Rapid change (+1) ↔ Frozen (-1)
-  novelty: number;  // Novel (+1) ↔ Familiar (-1)
+  novelty: number; // Novel (+1) ↔ Familiar (-1)
 }
 
 /**
@@ -243,11 +243,7 @@ export interface InsightData {
     timestamp: string;
     level: "critical" | "warning" | "attention" | "stable";
     type:
-      | "high_arousal"
-      | "voice_mismatch"
-      | "low_confidence"
-      | "pattern_concern"
-      | "voice_quality";
+      "high_arousal" | "voice_mismatch" | "low_confidence" | "pattern_concern" | "voice_quality";
     message: string;
     suggestion?: string;
     triggered_by: AlertTriggerData;

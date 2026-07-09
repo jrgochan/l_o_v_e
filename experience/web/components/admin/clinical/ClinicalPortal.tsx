@@ -658,8 +658,12 @@ function ClientDetailView({
 
         {/* Emotional Fingerprint Radar */}
         {latestEmotion && latestEmotion.valence !== undefined && (
-          <div className={`rounded-lg border ${theme.colors.border} bg-black/20 p-3 flex flex-col items-center`}>
-            <p className={`text-[10px] font-semibold uppercase tracking-wider mb-1 ${theme.colors.text.muted}`}>
+          <div
+            className={`rounded-lg border ${theme.colors.border} bg-black/20 p-3 flex flex-col items-center`}
+          >
+            <p
+              className={`text-[10px] font-semibold uppercase tracking-wider mb-1 ${theme.colors.text.muted}`}
+            >
               🔮 Emotional Fingerprint
             </p>
             <EmotionalFingerprint

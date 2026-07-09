@@ -332,7 +332,7 @@ export function PathDetailsOverlay() {
                   (style, item) =>
                     item && (
                       <animated.div
-                        style={style}
+                        style={style as unknown as React.CSSProperties}
                         className="flex items-center gap-2 w-full max-w-full"
                       >
                         {/* Colored Badge - REPURPOSED FOR CATEGORY NUMBER */}
@@ -371,11 +371,14 @@ export function PathDetailsOverlay() {
                                 </span>
                                 {/* Extended dimensions from atlas data */}
                                 {(() => {
-                                  const emotionObj = allEmotions.find((e) => e.name === item.emotion);
+                                  const emotionObj = allEmotions.find(
+                                    (e) => e.name === item.emotion
+                                  );
                                   if (!emotionObj?.extended) return null;
                                   return (
                                     <span className="text-violet-300/70 ml-0.5">
-                                      D:{emotionObj.extended[0].toFixed(1)} P:{emotionObj.extended[1].toFixed(1)}
+                                      D:{emotionObj.extended[0].toFixed(1)} P:
+                                      {emotionObj.extended[1].toFixed(1)}
                                     </span>
                                   );
                                 })()}
