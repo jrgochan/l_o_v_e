@@ -51,15 +51,13 @@ def load_bootstrap_data() -> Dict[str, Any]:
 
 async def check_bootstrap_table_exists(session) -> bool:
     """Check if bootstrap_data table exists."""
-    query = text(
-        """
+    query = text("""
         SELECT EXISTS (
             SELECT FROM information_schema.tables
             WHERE table_schema = 'public'
             AND table_name = 'bootstrap_data'
         );
-    """
-    )
+    """)
     result = await session.execute(query)
     return result.scalar()
 
@@ -68,8 +66,7 @@ async def create_bootstrap_table(session) -> bool:
     """Create bootstrap_data table if it doesn't exist."""
     try:
         # Create table
-        create_table_sql = text(
-            """
+        create_table_sql = text("""
             CREATE TABLE IF NOT EXISTS bootstrap_data (
                 id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
                 data_type VARCHAR(50) NOT NULL,
@@ -80,23 +77,18 @@ async def create_bootstrap_table(session) -> bool:
                 updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
                 UNIQUE(data_type, data_category)
             )
-        """
-        )
+        """)
         await session.execute(create_table_sql)
 
         # Create indexes separately
-        create_index1_sql = text(
-            """
+        create_index1_sql = text("""
             CREATE INDEX IF NOT EXISTS idx_bootstrap_data_type ON bootstrap_data(data_type)
-        """
-        )
+        """)
         await session.execute(create_index1_sql)
 
-        create_index2_sql = text(
-            """
+        create_index2_sql = text("""
             CREATE INDEX IF NOT EXISTS idx_bootstrap_data_category ON bootstrap_data(data_category)
-        """
-        )
+        """)
         await session.execute(create_index2_sql)
 
         await session.commit()
@@ -120,12 +112,13 @@ async def insert_or_update_bootstrap_data(
     """Insert or update bootstrap data record."""
     try:
         if dry_run:
-            print(f"    🔍 DRY RUN: Would upsert {data_type}/{data_category or 'default'}")
+            print(
+                f"    🔍 DRY RUN: Would upsert {data_type}/{data_category or 'default'}"
+            )
             return True, "Dry run"
 
         # Upsert using ON CONFLICT
-        upsert_sql = text(
-            """
+        upsert_sql = text("""
             INSERT INTO bootstrap_data (id, data_type, data_category, content, version)
             VALUES (:id, :data_type, :data_category, :content, :version)
             ON CONFLICT (data_type, data_category)
@@ -134,8 +127,7 @@ async def insert_or_update_bootstrap_data(
                 version = EXCLUDED.version,
                 updated_at = CURRENT_TIMESTAMP
             RETURNING id;
-        """
-        )
+        """)
 
         result = await session.execute(
             upsert_sql,
@@ -276,14 +268,12 @@ async def verify_bootstrap_data(session) -> Dict[str, Any]:
 
     try:
         # Count by data_type
-        query = text(
-            """
+        query = text("""
             SELECT data_type, COUNT(*) as count
             FROM bootstrap_data
             GROUP BY data_type
             ORDER BY data_type;
-        """
-        )
+        """)
         result = await session.execute(query)
         rows = result.fetchall()
 
@@ -296,13 +286,11 @@ async def verify_bootstrap_data(session) -> Dict[str, Any]:
         print(f"\nTotal bootstrap records: {total}")
 
         # Get version info
-        query = text(
-            """
+        query = text("""
             SELECT DISTINCT version
             FROM bootstrap_data
             ORDER BY version;
-        """
-        )
+        """)
         result = await session.execute(query)
         versions = [row[0] for row in result.fetchall()]
 
@@ -359,7 +347,9 @@ async def main(dry_run: bool = False, verify_only: bool = False):
         print(f"  Common challenges: {len(data['common_challenges']['challenges'])}")
 
         # Seed all bootstrap data
-        success_count, fail_count = await seed_bootstrap_patterns(session, data, dry_run=dry_run)
+        success_count, fail_count = await seed_bootstrap_patterns(
+            session, data, dry_run=dry_run
+        )
 
         # Summary
         print(f"\n{'='*60}")
@@ -377,10 +367,14 @@ async def main(dry_run: bool = False, verify_only: bool = False):
             print("✅ SUCCESS: Bootstrap pattern data seeded!")
             print(f"{'='*60}")
             print("\nNext steps:")
-            print("1. Verify bootstrap data: python scripts/seed_bootstrap_data.py --verify-only")
+            print(
+                "1. Verify bootstrap data: python scripts/seed_bootstrap_data.py --verify-only"
+            )
             print("2. Integrate with strategy recommender service")
             print("3. Test with new user (no history) scenarios")
-            print("\nNOTE: Bootstrap data provides baseline recommendations for cold-start users.")
+            print(
+                "\nNOTE: Bootstrap data provides baseline recommendations for cold-start users."
+            )
         else:
             print(f"\n🔍 Dry run complete. Run without --dry-run to actually seed.")
 

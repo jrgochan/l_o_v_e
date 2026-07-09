@@ -21,8 +21,7 @@ depends_on: Union[str, Sequence[str], None] = None
 
 def upgrade() -> None:
     # --- New: audit_log table (may already exist from db_init) ---
-    op.execute(
-        """
+    op.execute("""
         CREATE TABLE IF NOT EXISTS audit_log (
             id UUID NOT NULL PRIMARY KEY,
             event_type VARCHAR(100) NOT NULL,
@@ -32,9 +31,10 @@ def upgrade() -> None:
             ip_address VARCHAR(45),
             "timestamp" TIMESTAMP WITH TIME ZONE DEFAULT now() NOT NULL
         )
-    """
+    """)
+    op.execute(
+        "CREATE INDEX IF NOT EXISTS ix_audit_log_event_type ON audit_log (event_type)"
     )
-    op.execute("CREATE INDEX IF NOT EXISTS ix_audit_log_event_type ON audit_log (event_type)")
     op.execute(
         "CREATE INDEX IF NOT EXISTS idx_audit_log_actor_time ON audit_log (actor_id, timestamp DESC)"
     )
@@ -43,7 +43,9 @@ def upgrade() -> None:
     )
 
     # --- Users table: new columns for self-service ---
-    op.add_column("users", sa.Column("deleted_at", sa.DateTime(timezone=True), nullable=True))
+    op.add_column(
+        "users", sa.Column("deleted_at", sa.DateTime(timezone=True), nullable=True)
+    )
     op.add_column(
         "users",
         sa.Column(

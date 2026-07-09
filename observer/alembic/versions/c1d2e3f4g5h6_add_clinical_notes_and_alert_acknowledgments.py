@@ -19,8 +19,7 @@ depends_on: Union[str, Sequence[str], None] = None
 
 def upgrade() -> None:
     # --- clinical_notes table ---
-    op.execute(
-        """
+    op.execute("""
         CREATE TABLE IF NOT EXISTS clinical_notes (
             id UUID NOT NULL PRIMARY KEY,
             clinician_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
@@ -31,8 +30,7 @@ def upgrade() -> None:
             created_at TIMESTAMP WITH TIME ZONE DEFAULT now() NOT NULL,
             updated_at TIMESTAMP WITH TIME ZONE DEFAULT now() NOT NULL
         )
-    """
-    )
+    """)
     op.execute(
         "CREATE INDEX IF NOT EXISTS ix_clinical_notes_clinician_id ON clinical_notes (clinician_id)"
     )
@@ -42,8 +40,7 @@ def upgrade() -> None:
     op.execute("CREATE INDEX IF NOT EXISTS ix_clinical_notes_category ON clinical_notes (category)")
 
     # --- alert_acknowledgments table ---
-    op.execute(
-        """
+    op.execute("""
         CREATE TABLE IF NOT EXISTS alert_acknowledgments (
             id UUID NOT NULL PRIMARY KEY,
             alert_id UUID NOT NULL UNIQUE REFERENCES clinical_alerts(id) ON DELETE CASCADE,
@@ -52,8 +49,7 @@ def upgrade() -> None:
             response_note TEXT,
             acknowledged_at TIMESTAMP WITH TIME ZONE DEFAULT now() NOT NULL
         )
-    """
-    )
+    """)
     op.execute(
         "CREATE INDEX IF NOT EXISTS ix_alert_acknowledgments_alert_id ON alert_acknowledgments (alert_id)"
     )

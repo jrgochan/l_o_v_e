@@ -17,13 +17,14 @@ class DiscoveryEngine:
         """Docstring."""
         self.session = session
 
-    async def get_problematic_transitions(self, limit: int = 10) -> List[Dict[str, Any]]:
+    async def get_problematic_transitions(
+        self, limit: int = 10
+    ) -> List[Dict[str, Any]]:
         """Get hardest transitions from cache.
 
         Useful for research and identifying challenging patterns.
         """
-        stmt = text(
-            """
+        stmt = text("""
             SELECT
                 pmc.from_emotion_id,
                 pmc.to_emotion_id,
@@ -41,8 +42,7 @@ class DiscoveryEngine:
             WHERE pmc.difficulty = 'difficult'
             ORDER BY pmc.distance DESC
             LIMIT :limit
-        """
-        )
+        """)
 
         result = await self.session.execute(stmt, {"limit": limit})
         rows = result.fetchall()
@@ -85,7 +85,9 @@ class DiscoveryEngine:
 
         # Suggest triangle completions
         if len(selected_emotions) == 2:
-            triangle_suggestions = await self._suggest_triangle_completion(selected_emotions)
+            triangle_suggestions = await self._suggest_triangle_completion(
+                selected_emotions
+            )
             suggestions.extend(triangle_suggestions[:2])
 
         # Suggest opposite emotions
@@ -94,7 +96,9 @@ class DiscoveryEngine:
 
         return suggestions[:limit]
 
-    async def _suggest_bridges(self, selected_emotions: List[UUID]) -> List[Dict[str, Any]]:
+    async def _suggest_bridges(
+        self, selected_emotions: List[UUID]
+    ) -> List[Dict[str, Any]]:
         """Suggest bridge emotions that aren't selected."""
         bridge_names = [
             "Vulnerability",
@@ -111,24 +115,20 @@ class DiscoveryEngine:
             selected_ids = [str(eid) for eid in selected_emotions]
 
         # Note: Using emotion_definitions table, correct per model definition
-        stmt = text(
-            """
+        stmt = text("""
             SELECT id, emotion_name, category
             FROM emotion_definitions
             WHERE emotion_name = ANY(:bridge_names)
-            """
-        )
+            """)
         params: Dict[str, Any] = {"bridge_names": bridge_names}
 
         if selected_ids:
-            stmt = text(
-                """
+            stmt = text("""
                 SELECT id, emotion_name, category
                 FROM emotion_definitions
                 WHERE emotion_name = ANY(:bridge_names)
                   AND id != ALL(:selected_ids)
-                """
-            )
+                """)
             params["selected_ids"] = selected_ids
 
         result = await self.session.execute(stmt, params)
@@ -145,12 +145,16 @@ class DiscoveryEngine:
             for row in rows
         ]
 
-    async def _suggest_triangle_completion(self, _selected_two: List[UUID]) -> List[Dict[str, Any]]:
+    async def _suggest_triangle_completion(
+        self, _selected_two: List[UUID]
+    ) -> List[Dict[str, Any]]:
         """Suggest third emotion to form an interesting triangle."""
         # Simplified - just return empty for now to avoid errors
         return []
 
-    async def _suggest_opposites(self, _selected_emotions: List[UUID]) -> List[Dict[str, Any]]:
+    async def _suggest_opposites(
+        self, _selected_emotions: List[UUID]
+    ) -> List[Dict[str, Any]]:
         """Suggest emotions that are opposite in VAC space."""
         # Simplified - just return empty for now
         return []

@@ -19,8 +19,7 @@ depends_on: Union[str, Sequence[str], None] = None
 
 def upgrade() -> None:
     # Table may already exist in the DB — use IF NOT EXISTS.
-    op.execute(
-        """
+    op.execute("""
         CREATE TABLE IF NOT EXISTS consent_records (
             id UUID NOT NULL PRIMARY KEY,
             user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
@@ -31,9 +30,10 @@ def upgrade() -> None:
             ip_address VARCHAR(45),
             notes TEXT
         )
-    """
+    """)
+    op.execute(
+        "CREATE INDEX IF NOT EXISTS ix_consent_records_user_id ON consent_records (user_id)"
     )
-    op.execute("CREATE INDEX IF NOT EXISTS ix_consent_records_user_id ON consent_records (user_id)")
     op.execute(
         "CREATE INDEX IF NOT EXISTS ix_consent_records_consent_type ON consent_records (consent_type)"
     )

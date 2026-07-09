@@ -29,8 +29,7 @@ def upgrade() -> None:
     """Create session_analytics table."""
 
     # Create session_analytics table
-    op.execute(
-        """
+    op.execute("""
         CREATE TABLE IF NOT EXISTS session_analytics (
             id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
             session_id UUID NOT NULL UNIQUE REFERENCES chat_sessions(id) ON DELETE CASCADE,
@@ -48,18 +47,22 @@ def upgrade() -> None:
             created_at TIMESTAMP NOT NULL DEFAULT NOW(),
             updated_at TIMESTAMP NOT NULL DEFAULT NOW()
         )
-    """
-    )
+    """)
 
     # Create indexes
     op.execute(
-        "CREATE UNIQUE INDEX idx_session_analytics_session " "ON session_analytics(session_id)"
+        "CREATE UNIQUE INDEX idx_session_analytics_session "
+        "ON session_analytics(session_id)"
     )
 
-    op.execute("CREATE INDEX idx_session_analytics_start_time " "ON session_analytics(start_time)")
+    op.execute(
+        "CREATE INDEX idx_session_analytics_start_time "
+        "ON session_analytics(start_time)"
+    )
 
     op.execute(
-        "CREATE INDEX idx_session_analytics_emotion_count " "ON session_analytics(emotion_count)"
+        "CREATE INDEX idx_session_analytics_emotion_count "
+        "ON session_analytics(emotion_count)"
     )
 
     op.execute(

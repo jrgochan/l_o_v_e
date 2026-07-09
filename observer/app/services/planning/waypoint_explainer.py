@@ -265,7 +265,9 @@ class WaypointExplainer:
             )
 
         # Fall back to algorithmic generation
-        logger.debug("Generating fallback explanation for %s", waypoint_emotion.emotion_name)
+        logger.debug(
+            "Generating fallback explanation for %s", waypoint_emotion.emotion_name
+        )
         return await self._generate_fallback_explanation(
             waypoint_emotion, previous_emotion, next_emotion
         )
@@ -277,8 +279,7 @@ class WaypointExplainer:
 
         Tries exact emotion match first, then category-level patterns.
         """
-        stmt = text(
-            """
+        stmt = text("""
             SELECT
                 psychological_purpose,
                 why_this_order,
@@ -296,8 +297,7 @@ class WaypointExplainer:
               AND waypoint_emotion_id = :waypoint_id
             ORDER BY priority DESC
             LIMIT 1
-        """
-        )
+        """)
 
         result = await self.session.execute(
             stmt, {"from_id": from_id, "to_id": to_id, "waypoint_id": waypoint_id}
@@ -330,7 +330,9 @@ class WaypointExplainer:
     ) -> Dict[str, Any]:
         """Format template data with computed VAC analysis."""
         # Calculate VAC analysis (always computed, even with templates)
-        vac_analysis = await self._analyze_vac_shifts(previous.vac_vector, waypoint.vac_vector)
+        vac_analysis = await self._analyze_vac_shifts(
+            previous.vac_vector, waypoint.vac_vector
+        )
 
         return {
             "psychological_purpose": template["psychological_purpose"],
@@ -339,13 +341,17 @@ class WaypointExplainer:
                 "from_emotion": previous.emotion_name,
                 "what_changed": template["previous_what_changed"] or [],
                 "why_necessary": template["previous_why_necessary"] or "",
-                "research": self._extract_first_citation(template["research_citations"]),
+                "research": self._extract_first_citation(
+                    template["research_citations"]
+                ),
             },
             "next_context": {
                 "to_emotion": next_emotion.emotion_name,
                 "what_this_enables": template["next_what_enabled"] or [],
                 "preparation": template["next_how_prepares"] or "",
-                "research": self._extract_first_citation(template["research_citations"]),
+                "research": self._extract_first_citation(
+                    template["research_citations"]
+                ),
             },
             "readiness_signs": template["readiness_signs"] or [],
             "warning_signs": template["warning_signs"] or [],
@@ -362,7 +368,9 @@ class WaypointExplainer:
 
         Uses VAC analysis and heuristics to create meaningful explanations.
         """
-        vac_analysis = await self._analyze_vac_shifts(previous.vac_vector, waypoint.vac_vector)
+        vac_analysis = await self._analyze_vac_shifts(
+            previous.vac_vector, waypoint.vac_vector
+        )
 
         # Generate purpose based on VAC shifts
         purpose = self._generate_purpose_from_vac(waypoint, vac_analysis)
@@ -419,7 +427,9 @@ class WaypointExplainer:
         return {
             "valence_shift": {
                 "delta": round(valence_delta, 3),
-                "direction": self._describe_direction(valence_delta, "positive", "negative"),
+                "direction": self._describe_direction(
+                    valence_delta, "positive", "negative"
+                ),
                 "interpretation": self._interpret_valence_shift(valence_delta),
                 "psychological_meaning": self._explain_valence_meaning(valence_delta),
             },
@@ -435,11 +445,15 @@ class WaypointExplainer:
                     connection_delta, "more connected", "less connected"
                 ),
                 "interpretation": self._interpret_connection_shift(connection_delta),
-                "psychological_meaning": self._explain_connection_meaning(connection_delta),
+                "psychological_meaning": self._explain_connection_meaning(
+                    connection_delta
+                ),
             },
         }
 
-    def _describe_direction(self, delta: float, positive_term: str, negative_term: str) -> str:
+    def _describe_direction(
+        self, delta: float, positive_term: str, negative_term: str
+    ) -> str:
         """Describe direction of shift."""
         if abs(delta) < 0.05:
             return "stable"
@@ -485,7 +499,9 @@ class WaypointExplainer:
     def _explain_arousal_meaning(self, delta: float) -> str:
         """Explain psychological meaning of arousal shift."""
         if delta < -0.2:
-            return "Arousal regulation enables complex emotional processing and reflection"
+            return (
+                "Arousal regulation enables complex emotional processing and reflection"
+            )
         if delta > 0.2:
             return "Increased activation prepares for engagement and action"
 
@@ -585,22 +601,30 @@ class WaypointExplainer:
 
         # High arousal warnings
         if waypoint.vac_vector[1] > 0.7:
-            warnings.append("⚠️ If feeling overwhelmed: Take time to regulate before proceeding")
+            warnings.append(
+                "⚠️ If feeling overwhelmed: Take time to regulate before proceeding"
+            )
 
         # Low connection warnings
         if waypoint.vac_vector[2] < -0.5:
-            warnings.append("⚠️ If feeling very isolated: Reach out for support before continuing")
+            warnings.append(
+                "⚠️ If feeling very isolated: Reach out for support before continuing"
+            )
 
         # Negative valence warnings
         if waypoint.vac_vector[0] < -0.7:
-            warnings.append("⚠️ If experiencing intense distress: Consider professional support")
+            warnings.append(
+                "⚠️ If experiencing intense distress: Consider professional support"
+            )
 
         # General
         warnings.append("⚠️ Move at your own pace - there's no rush")
 
         return warnings
 
-    def _extract_first_citation(self, citations: Optional[List[Any]]) -> Optional[Dict[str, Any]]:
+    def _extract_first_citation(
+        self, citations: Optional[List[Any]]
+    ) -> Optional[Dict[str, Any]]:
         """Extract first research citation from list."""
         if isinstance(citations, list) and len(citations) > 0:
             return cast(Dict[str, Any], citations[0])

@@ -26,8 +26,7 @@ def upgrade() -> None:
     """Create waypoint_explanation_templates table."""
 
     # Create the main table
-    op.execute(
-        """
+    op.execute("""
         CREATE TABLE IF NOT EXISTS waypoint_explanation_templates (
             id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
             from_emotion_id UUID REFERENCES atlas_definitions(id) ON DELETE CASCADE,
@@ -51,8 +50,7 @@ def upgrade() -> None:
             priority INTEGER DEFAULT 100,
             UNIQUE (from_emotion_id, to_emotion_id, waypoint_emotion_id)
         )
-    """
-    )
+    """)
 
     # Create indexes for performance
     op.execute(
@@ -61,7 +59,8 @@ def upgrade() -> None:
     )
 
     op.execute(
-        "CREATE INDEX idx_waypoint_templates_to " "ON waypoint_explanation_templates(to_emotion_id)"
+        "CREATE INDEX idx_waypoint_templates_to "
+        "ON waypoint_explanation_templates(to_emotion_id)"
     )
 
     op.execute(

@@ -30,8 +30,7 @@ class JobManager:
         completed_at: Optional[datetime] = None,
     ) -> None:
         """Update computation job status."""
-        stmt = text(
-            """
+        stmt = text("""
             UPDATE path_computation_jobs
             SET status = :status,
             total_paths = :total,
@@ -40,8 +39,7 @@ class JobManager:
             error_message = :error,
             completed_at = :completed_at
             WHERE job_id = :job_id
-        """
-        )
+        """)
 
         await self.session.execute(
             stmt,
@@ -59,8 +57,7 @@ class JobManager:
     async def create_job(self, total_paths: int, user_id: Optional[str] = None) -> UUID:
         """Create a new computation job."""
         job_id = uuid4()
-        stmt = text(
-            """
+        stmt = text("""
             INSERT INTO path_computation_jobs (
                 job_id,
                 status,
@@ -78,8 +75,7 @@ class JobManager:
                 NOW(),
                 :user_id
             )
-        """
-        )
+        """)
         await self.session.execute(
             stmt, {"job_id": job_id, "total": total_paths, "user_id": user_id}
         )
@@ -87,8 +83,7 @@ class JobManager:
 
     async def get_job_status(self, job_id: UUID) -> Optional[Dict[str, Any]]:
         """Get job status."""
-        stmt = text(
-            """
+        stmt = text("""
             SELECT
                 status,
                 total_paths,
@@ -99,8 +94,7 @@ class JobManager:
                 error_message
             FROM path_computation_jobs
             WHERE job_id = :job_id
-        """
-        )
+        """)
         result = await self.session.execute(stmt, {"job_id": job_id})
         row = result.fetchone()
 

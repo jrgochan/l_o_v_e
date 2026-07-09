@@ -17,10 +17,11 @@ class SpatialAnalyzer:
         """Docstring."""
         self.session = session
 
-    async def get_similar_emotions(self, emotion_id: UUID, limit: int = 5) -> List[Dict[str, Any]]:
+    async def get_similar_emotions(
+        self, emotion_id: UUID, limit: int = 5
+    ) -> List[Dict[str, Any]]:
         """Find emotions similar in VAC space."""
-        stmt = text(
-            """
+        stmt = text("""
             SELECT
                 e.id,
                 e.emotion_name as name,
@@ -33,10 +34,11 @@ class SpatialAnalyzer:
             WHERE e.id != :emotion_id
             ORDER BY distance ASC
             LIMIT :limit
-        """
-        )
+        """)
 
-        result = await self.session.execute(stmt, {"emotion_id": emotion_id, "limit": limit})
+        result = await self.session.execute(
+            stmt, {"emotion_id": emotion_id, "limit": limit}
+        )
 
         rows = result.fetchall()
 
@@ -58,7 +60,9 @@ class SpatialAnalyzer:
                     "category": row[2],
                     "vac": [float(vac_list[0]), float(vac_list[1]), float(vac_list[2])],
                     "distance": round(float(row[4]), 3),
-                    "reason": (f"Very close in VAC space (distance: {round(float(row[4]), 2)})"),
+                    "reason": (
+                        f"Very close in VAC space (distance: {round(float(row[4]), 2)})"
+                    ),
                 }
             )
 
