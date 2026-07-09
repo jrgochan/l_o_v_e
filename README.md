@@ -1,7 +1,6 @@
 # L.O.V.E. Stack
 
 [![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
-[![Buy Me a Coffee](https://img.shields.io/badge/Buy_Me_a_Coffee-FFDD00?logo=buy-me-a-coffee&logoColor=black)](https://buymeacoffee.com/jrgochan)
 [![GitHub Sponsors](https://img.shields.io/badge/Sponsor-💜-ea4aaa)](https://github.com/sponsors/jrgochan)
 
 **L**istener-**O**bserver-**V**ersor-**E**xperience: A multi-modal emotional intelligence platform using the VAC (Valence-Arousal-Connection) model with quaternion mathematics for 3D visualization.
@@ -163,7 +162,6 @@ Please read [**ETHICS.md**](ETHICS.md) for the full statement on what this proje
 
 The L.O.V.E. Stack is free and open-source. If it helps you and you're in a position to give back:
 
-- ☕ [**Buy Me a Coffee**](https://buymeacoffee.com/jrgochan)
 - 💜 [**GitHub Sponsors**](https://github.com/sponsors/jrgochan)
 
 No pressure. No paywalled features. Just gratitude.

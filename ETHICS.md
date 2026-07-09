@@ -43,7 +43,6 @@ So here's the deal: **this is free. It's open. It's yours to use.**
 
 If it helps you and you're in a position to give back, I'd be grateful:
 
-- ☕ [**Buy Me a Coffee**](https://buymeacoffee.com/jrgochan)
 - 💜 [**GitHub Sponsors**](https://github.com/sponsors/jrgochan)
 
 If not, use it freely. That's the whole deal.
