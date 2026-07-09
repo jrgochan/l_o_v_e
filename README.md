@@ -4,6 +4,7 @@
 [![Unified CI](https://github.com/jrgochan/l_o_v_e/actions/workflows/ci.yml/badge.svg)](https://github.com/jrgochan/l_o_v_e/actions/workflows/ci.yml)
 [![CodeQL](https://github.com/jrgochan/l_o_v_e/actions/workflows/codeql.yml/badge.svg)](https://github.com/jrgochan/l_o_v_e/actions/workflows/codeql.yml)
 [![GitHub Sponsors](https://img.shields.io/badge/Sponsor-💜-ea4aaa)](https://github.com/sponsors/jrgochan)
+[![Buy Me a Coffee](https://img.shields.io/badge/Buy_Me_A_Coffee-☕-FFDD00)](https://buymeacoffee.com/jrgochan)
 
 **L**istener-**O**bserver-**V**ersor-**E**xperience: A multi-modal emotional intelligence platform using the VAC (Valence-Arousal-Connection) model with quaternion mathematics for 3D visualization.
 
@@ -165,6 +166,7 @@ Please read [**ETHICS.md**](ETHICS.md) for the full statement on what this proje
 The L.O.V.E. Stack is free and open-source. If it helps you and you're in a position to give back:
 
 - 💜 [**GitHub Sponsors**](https://github.com/sponsors/jrgochan)
+- ☕ [**Buy Me a Coffee**](https://buymeacoffee.com/jrgochan)
 
 No pressure. No paywalled features. Just gratitude.
 

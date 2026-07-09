@@ -25,12 +25,12 @@ repos:
     hooks:
       - id: black
         name: black
-        entry: bash -c 'source .venv/bin/activate && black "$@"' --
+        entry: .venv/bin/black --config pyproject.toml
         language: system
         types: [python]
       - id: isort
         name: isort
-        entry: bash -c 'source .venv/bin/activate && isort --settings-file pyproject.toml "$@"' --
+        entry: .venv/bin/isort --settings-file pyproject.toml
         language: system
         types: [python]
 
