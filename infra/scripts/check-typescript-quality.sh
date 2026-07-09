@@ -117,9 +117,9 @@ else
     print_warning "npm audit: Vulnerabilities found (run 'npm audit fix')"
 fi
 
-# === 5. Build Test ===
-print_info "Running build test..."
-if run_in_module "experience" "npm run build"; then
+# === 5. Build Test (web only — desktop requires Rust/system deps) ===
+print_info "Running build test (web)..."
+if run_in_module "experience" "npm run build --workspace=web"; then
     print_success "Build: Success"
 else
     print_error "Build: Failed"

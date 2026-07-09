@@ -20,8 +20,7 @@ def interpret_arousal_warm(arousal: float) -> str:
     if arousal > -0.7:
         return "Your energy is quite low right now - you might feel tired or depleted"
     return (
-        "You're in a very low-energy state - your system might be shutting down "
-        "to protect you"
+        "You're in a very low-energy state - your system might be shutting down " "to protect you"
     )
 
 
@@ -43,9 +42,7 @@ def interpret_connection_warm(connection: float) -> str:
     if connection > 0.7:
         return "You feel deeply connected - to yourself, others, or your values"
     if connection > 0.3:
-        return (
-            "There's a sense of connection present - you're not entirely alone in this"
-        )
+        return "There's a sense of connection present - you're not entirely alone in this"
     if connection > -0.3:
         return "Connection feels neutral right now"
     if connection > -0.7:
@@ -278,8 +275,7 @@ def generate_gentle_invitations(
             {
                 "type": "suggestion",
                 "text": (
-                    "You might try placing a hand on your heart and taking three "
-                    "slow breaths"
+                    "You might try placing a hand on your heart and taking three " "slow breaths"
                 ),
             }
         )
@@ -305,16 +301,12 @@ def generate_warm_summary_structured(
             "emotional_tone": interpret_valence_warm(vac_data["valence"]),
             "connection_quality": interpret_connection_warm(vac_data["connection"]),
         },
-        "gentle_invitations": generate_gentle_invitations(
-            emotion["name"], vac_data, message_count
-        ),
+        "gentle_invitations": generate_gentle_invitations(emotion["name"], vac_data, message_count),
     }
 
     # Add voice observations if available
     if prosody_data:
-        structured["voice_observations"] = generate_voice_observations_warm(
-            prosody_data, vac_data
-        )
+        structured["voice_observations"] = generate_voice_observations_warm(prosody_data, vac_data)
 
     return structured
 

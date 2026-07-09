@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 """Clean up the final 6 unused imports"""
+
 from pathlib import Path
 
 fixes = [

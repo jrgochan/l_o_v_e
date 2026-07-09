@@ -15,11 +15,12 @@ from datetime import datetime
 from typing import Any, Dict, Optional
 from uuid import UUID, uuid4
 
-from app.core.settings import settings
-from app.database import Base
 from pgvector.sqlalchemy import Vector
 from sqlalchemy import Boolean, ForeignKey, String, Text, UniqueConstraint, func
 from sqlalchemy.orm import Mapped, mapped_column, relationship
+
+from app.core.settings import settings
+from app.database import Base
 
 
 class EmotionCollection(Base):
@@ -34,9 +35,7 @@ class EmotionCollection(Base):
     is_active: Mapped[bool] = mapped_column(Boolean, default=True)
 
     created_at: Mapped[datetime] = mapped_column(server_default=func.now())
-    updated_at: Mapped[datetime] = mapped_column(
-        server_default=func.now(), onupdate=func.now()
-    )
+    updated_at: Mapped[datetime] = mapped_column(server_default=func.now(), onupdate=func.now())
 
     def __repr__(self) -> str:
         """Represent the object as a string."""
@@ -58,18 +57,14 @@ class EmotionDefinition(Base):
 
     # Composite unique constraint: emotion name must be unique per collection
     __table_args__ = (
-        UniqueConstraint(
-            "collection_id", "emotion_name", name="uq_collection_emotion_name"
-        ),
+        UniqueConstraint("collection_id", "emotion_name", name="uq_collection_emotion_name"),
     )
 
     # Primary Key
     id: Mapped[UUID] = mapped_column(primary_key=True, default=uuid4)
 
     # Collection Link
-    collection_id: Mapped[UUID] = mapped_column(
-        ForeignKey("emotion_collections.id"), index=True
-    )
+    collection_id: Mapped[UUID] = mapped_column(ForeignKey("emotion_collections.id"), index=True)
 
     # Emotion Identity
     emotion_name: Mapped[str] = mapped_column(String(100), index=True)
@@ -85,9 +80,7 @@ class EmotionDefinition(Base):
     q_constant: Mapped[Any] = mapped_column(Vector(4))
 
     # Semantic Embedding: dimension depends on embedding model
-    semantic_embedding: Mapped[Any] = mapped_column(
-        Vector(settings.EMBEDDING_DIMENSION)
-    )
+    semantic_embedding: Mapped[Any] = mapped_column(Vector(settings.EMBEDDING_DIMENSION))
 
     # Extended Dimensions: 4-dimensional [Depth, Coping, Velocity, Novelty]
     extended_vector: Mapped[Optional[Any]] = mapped_column(Vector(4), nullable=True)
@@ -98,9 +91,7 @@ class EmotionDefinition(Base):
 
     # Timestamps
     created_at: Mapped[datetime] = mapped_column(server_default=func.now())
-    updated_at: Mapped[datetime] = mapped_column(
-        server_default=func.now(), onupdate=func.now()
-    )
+    updated_at: Mapped[datetime] = mapped_column(server_default=func.now(), onupdate=func.now())
 
     # Relationships
     collection: Mapped["EmotionCollection"] = relationship()
@@ -120,9 +111,7 @@ class EmotionDefinition(Base):
             "movement_pattern": self.movement_pattern,
             "vac_vector": list(self.vac_vector) if self.vac_vector else None,
             "q_constant": list(self.q_constant) if self.q_constant else None,
-            "extended_vector": (
-                list(self.extended_vector) if self.extended_vector else None
-            ),
+            "extended_vector": (list(self.extended_vector) if self.extended_vector else None),
             "haptic_pattern_id": self.haptic_pattern_id,
             "color_hint": self.color_hint,
             "created_at": self.created_at.isoformat() if self.created_at else None,

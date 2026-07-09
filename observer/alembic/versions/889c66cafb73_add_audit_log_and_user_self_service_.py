@@ -34,9 +34,7 @@ def upgrade() -> None:
         )
     """
     )
-    op.execute(
-        "CREATE INDEX IF NOT EXISTS ix_audit_log_event_type ON audit_log (event_type)"
-    )
+    op.execute("CREATE INDEX IF NOT EXISTS ix_audit_log_event_type ON audit_log (event_type)")
     op.execute(
         "CREATE INDEX IF NOT EXISTS idx_audit_log_actor_time ON audit_log (actor_id, timestamp DESC)"
     )
@@ -45,9 +43,7 @@ def upgrade() -> None:
     )
 
     # --- Users table: new columns for self-service ---
-    op.add_column(
-        "users", sa.Column("deleted_at", sa.DateTime(timezone=True), nullable=True)
-    )
+    op.add_column("users", sa.Column("deleted_at", sa.DateTime(timezone=True), nullable=True))
     op.add_column(
         "users",
         sa.Column(

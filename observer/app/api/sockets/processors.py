@@ -15,6 +15,8 @@ from typing import Any, Dict, List, Optional, Tuple, cast
 from uuid import UUID
 
 import httpx
+from sqlalchemy.exc import SQLAlchemyError
+
 from app.api.sockets.manager import manager
 from app.api.sockets.protocol import send_progress
 from app.api.sockets.types import MessageContext
@@ -29,7 +31,6 @@ from app.services.chat.types import (
 )
 from app.services.insights import InsightGenerationRequest, InsightGenerator
 from app.types.audio import AudioFeatures, AudioTransactionResult
-from sqlalchemy.exc import SQLAlchemyError
 
 logger = logging.getLogger(__name__)
 
@@ -197,9 +198,7 @@ class MessageProcessor:
             )
             await send_progress(context.session_id, "three_way", "complete", 90)
 
-        await self._save_multi_emotion_analysis(
-            db_session_id, user_msg_id, analysis_result
-        )
+        await self._save_multi_emotion_analysis(db_session_id, user_msg_id, analysis_result)
 
         if primary:
             # Construct proxy analysis result for the primary emotion
@@ -310,9 +309,7 @@ class MessageProcessor:
                 )
                 await chat_service.save_multi_emotion_analysis(multi_emotion_context)
         except SQLAlchemyError as db_error:
-            logger.error(
-                "Failed to save multi-emotion analysis: %s", db_error, exc_info=True
-            )
+            logger.error("Failed to save multi-emotion analysis: %s", db_error, exc_info=True)
 
 
 class TextProcessor(MessageProcessor):
@@ -329,9 +326,7 @@ class TextProcessor(MessageProcessor):
         start_time = time.time()
         await send_progress(context.session_id, "started", "started", 0)
 
-        db_session_id, user_msg = await self._save_text_message_transaction(
-            context, content
-        )
+        db_session_id, user_msg = await self._save_text_message_transaction(context, content)
 
         await manager.send_message(
             context.session_id,
@@ -473,9 +468,7 @@ class AudioProcessor(MessageProcessor):
             await send_progress(context.session_id, "uploading", "uploading_audio", 10)
 
             async with httpx.AsyncClient(timeout=300.0) as client:
-                features = await self._extract_audio_features(
-                    client, audio_path, context, headers
-                )
+                features = await self._extract_audio_features(client, audio_path, context, headers)
 
                 if features.transcription:
                     await manager.send_message(
@@ -603,9 +596,7 @@ class AudioProcessor(MessageProcessor):
                 "session_id": context.session_id,
             }
 
-            response = await client.post(
-                extract_url, files=files, data=data, headers=headers
-            )
+            response = await client.post(extract_url, files=files, data=data, headers=headers)
 
             if response.status_code != 200:
                 logger.error("Feature extraction failed: %s", response.text)
@@ -631,9 +622,7 @@ class AudioProcessor(MessageProcessor):
                 "text": features.transcription or "",
                 "user_id": context.user.identifier,
                 "session_id": context.session_id,
-                "prosody_data_json": (
-                    json.dumps(features.prosody) if features.prosody else None
-                ),
+                "prosody_data_json": (json.dumps(features.prosody) if features.prosody else None),
             }
             url = f"{settings.LISTENER_API_URL}/listener/analyze-multi-emotion"
             response = await client.post(url, data=analyze_data, headers=headers)
