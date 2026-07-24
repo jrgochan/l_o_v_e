@@ -21,6 +21,7 @@ from app.api.routes import (
     emotions,
     health,
     history,
+    journal,
     matrix,
     prompts,
     recommendations,
@@ -153,6 +154,7 @@ def create_app() -> FastAPI:
     app.include_router(admin.router, prefix="/admin", tags=["Admin"])
     app.include_router(clinician.router, prefix="/clinician", tags=["Clinician"])
     app.include_router(consent.router, prefix="/consent", tags=["Consent"])
+    app.include_router(journal.router, prefix="/journal", tags=["Life Journal"])
     app.include_router(prompts.router, prefix="/observer", tags=["AI Prompts"])
 
     @app.get("/", tags=["Root"])

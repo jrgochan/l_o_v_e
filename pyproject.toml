@@ -237,3 +237,7 @@ omit = ["*/tests/*", "*/migrations/*", "*/__init__.py"]
 [tool.coverage.report]
 precision = 2
 skip_empty = true
+
+[tool.bandit]
+exclude_dirs = ["tests", "migrations", "venv", ".venv"]
+skips = ["B101"]  # assert_used (standard in pytest test code)
