@@ -34,6 +34,7 @@ import { PathDetailsOverlay } from "@/components/PathDetailsOverlay";
 import { SphereDebugOverlay } from "@/components/admin/debug/SphereDebugOverlay";
 import { useZenKeyboardShortcuts } from "@/hooks/interaction/useZenKeyboardShortcuts";
 import { WaypointArrivalOverlay } from "@/components/WaypointArrivalOverlay";
+import { JournalPanel } from "@/components/journal";
 
 // Helper Component to isolate VAC updates/re-renders
 function LiveVACDisplay() {
@@ -179,6 +180,9 @@ export default function ZenExperience() {
       {/* Zen Mode Path Details Overlay (Beautiful UX) */}
       {settings.layers.transitionPaths && <PathDetailsOverlay />}
       <WaypointArrivalOverlay />
+
+      {/* Life Journal Panel (slide-out, toggle with J key) */}
+      <JournalPanel />
     </div>
   );
 }

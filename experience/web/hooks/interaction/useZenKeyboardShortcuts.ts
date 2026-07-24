@@ -2,6 +2,7 @@ import { useEffect, Dispatch, SetStateAction } from "react";
 import type { Emotion } from "@/types";
 import type { TransitionPathResponse } from "@love/experience-shared";
 import { useExperienceStore } from "@/stores/useExperienceStore";
+import { useJournalStore } from "@/stores/useJournalStore";
 import { useSettingsStore } from "@/stores/useSettingsStore";
 import type { PathAnimationMode } from "@/types/visualization";
 
@@ -69,6 +70,12 @@ export function useZenKeyboardShortcuts({
           // Toggle Flyover (Alternative)
           if (!e.ctrlKey && !e.metaKey && transitionPath) {
             setIsFlying(!isFlying);
+          }
+          break;
+        case "j":
+          // Toggle Life Journal
+          if (!e.ctrlKey && !e.metaKey) {
+            useJournalStore.getState().togglePanel();
           }
           break;
         case "a":

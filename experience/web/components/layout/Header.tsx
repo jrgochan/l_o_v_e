@@ -6,6 +6,8 @@ import { useAuthStore } from "@/stores/authStore";
 import { AuthModal } from "@/components/auth/AuthModal";
 import { Settings } from "@/components/Settings";
 import { UserRole } from "@/types/auth";
+import { BookOpen } from "lucide-react";
+import { useJournalStore } from "@/stores/useJournalStore";
 
 import { useAdminTheme } from "@/hooks/admin/useAdminTheme";
 
@@ -98,6 +100,15 @@ export function Header({ showAuth = true }: HeaderProps) {
           <span className={`text-sm font-medium ${theme.colors.text.primary}`}>Admin Panel</span>
         </Link>
       )}
+
+      {/* Life Journal toggle */}
+      <button
+        onClick={() => useJournalStore.getState().togglePanel()}
+        className={`border rounded-full backdrop-blur-sm flex items-center justify-center w-10 h-10 transition-colors ${theme.colors.background} ${theme.colors.border} hover:bg-white/10`}
+        title="Life Journal (J)"
+      >
+        <BookOpen size={16} className={theme.colors.text.secondary} />
+      </button>
 
       {/* Settings Component (existing) - styled as icon button */}
       <div
