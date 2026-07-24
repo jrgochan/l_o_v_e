@@ -37,6 +37,7 @@ function AdminLayoutContent({ children }: { children: React.ReactNode }) {
         { label: "Sessions", href: "/admin/sessions", icon: "💬" },
         { label: "Atlas Visualization", href: "/admin/visualization", icon: "🌌" },
         { label: "Data Management", href: "/admin/data", icon: "💾" },
+        { label: "Life Journal", href: "/admin/journal", icon: "📓" },
         { label: "Octonion Demos", href: "/admin/demos", icon: "🔮" },
       ];
 

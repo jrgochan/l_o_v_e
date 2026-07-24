@@ -19,6 +19,8 @@ from fastapi import APIRouter
 
 from app.api.routes.admin.data import *  # noqa: F401, F403
 from app.api.routes.admin.data import router as _data_router
+from app.api.routes.admin.journal import *  # noqa: F401, F403
+from app.api.routes.admin.journal import router as _journal_router
 from app.api.routes.admin.strategies import *  # noqa: F401, F403
 from app.api.routes.admin.strategies import _process_strategy_import  # noqa: F401
 from app.api.routes.admin.strategies import router as _strategies_router
@@ -35,3 +37,4 @@ router.include_router(_users_router)
 router.include_router(_visualization_router)
 router.include_router(_strategies_router)
 router.include_router(_data_router)
+router.include_router(_journal_router)
