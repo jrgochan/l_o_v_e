@@ -97,8 +97,10 @@ async def event_stats(
         await db.execute(select(func.count(LifeEvent.id)))  # pylint: disable=not-callable
     ).scalar() or 0
 
-    # Events today
-    today_start = datetime.now(timezone.utc).replace(hour=0, minute=0, second=0, microsecond=0)
+    # Events today (strip tzinfo to match TIMESTAMP WITHOUT TIME ZONE column)
+    today_start = datetime.now(timezone.utc).replace(
+        hour=0, minute=0, second=0, microsecond=0, tzinfo=None
+    )
     today_count = (
         await db.execute(
             select(func.count(LifeEvent.id)).where(  # pylint: disable=not-callable
