@@ -176,7 +176,7 @@ async def list_all_correlations(
     offset: int = 0,
 ) -> Any:
     """List correlations across all users."""
-    from app.models.life_event import (  # pylint: disable=import-outside-toplevel
+    from app.models.emotion_event_correlation import (  # pylint: disable=import-outside-toplevel
         EmotionEventCorrelation,
     )
 
@@ -232,7 +232,7 @@ async def correlation_stats(
     _current_admin: Annotated[User, Depends(get_current_admin)],
 ) -> Any:
     """Aggregate correlation statistics."""
-    from app.models.life_event import (  # pylint: disable=import-outside-toplevel
+    from app.models.emotion_event_correlation import (  # pylint: disable=import-outside-toplevel
         EmotionEventCorrelation,
     )
 
