@@ -98,6 +98,15 @@ class Settings(LoveBaseSettings):  # type: ignore
     NATS_MAX_RECONNECTS: int = Field(default=60)
 
     # ============================================================================
+    # INTEGRATIONS — External data sources
+    # ============================================================================
+
+    OPENWEATHERMAP_API_KEY: str = Field(default="")
+    DEFAULT_LOCATION_CITY: str = Field(default="")
+    DEFAULT_LOCATION_LAT: str = Field(default="")
+    DEFAULT_LOCATION_LON: str = Field(default="")
+
+    # ============================================================================
     # SECURITY
     # ============================================================================
 

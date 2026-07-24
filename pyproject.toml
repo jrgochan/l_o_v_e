@@ -31,6 +31,8 @@ dependencies = [
     "prometheus-fastapi-instrumentator>=7.0.0",
     # Messaging — NATS JetStream (stack-wide)
     "nats-py>=2.9.0",
+    # Integrations — iCal parsing
+    "icalendar>=7.0.0",
 ]
 
 [dependency-groups]

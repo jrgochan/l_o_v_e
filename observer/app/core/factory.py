@@ -21,6 +21,7 @@ from app.api.routes import (
     emotions,
     health,
     history,
+    integrations,
     journal,
     matrix,
     prompts,
@@ -110,6 +111,24 @@ async def lifespan(_app_instance: FastAPI) -> AsyncGenerator[None, None]:
                 msg="NATS unavailable — streaming features disabled",
             )
 
+    # Register integration adapters
+    from app.services.integrations.adapters.daylight import (  # pylint: disable=import-outside-toplevel
+        DaylightAdapter,
+    )
+    from app.services.integrations.adapters.ical import (  # pylint: disable=import-outside-toplevel
+        ICalAdapter,
+    )
+    from app.services.integrations.adapters.weather import (  # pylint: disable=import-outside-toplevel
+        OpenWeatherMapAdapter,
+    )
+    from app.services.integrations.registry import (  # pylint: disable=import-outside-toplevel
+        adapter_registry,
+    )
+
+    adapter_registry.register(ICalAdapter())
+    adapter_registry.register(OpenWeatherMapAdapter())
+    adapter_registry.register(DaylightAdapter())
+
     # Startup
     logger = structlog.get_logger()
     logger.info("application_startup", version=settings.API_VERSION)
@@ -181,6 +200,7 @@ def create_app() -> FastAPI:
     app.include_router(clinician.router, prefix="/clinician", tags=["Clinician"])
     app.include_router(consent.router, prefix="/consent", tags=["Consent"])
     app.include_router(journal.router, prefix="/journal", tags=["Life Journal"])
+    app.include_router(integrations.router, prefix="/journal/integrations", tags=["Integrations"])
     app.include_router(prompts.router, prefix="/observer", tags=["AI Prompts"])
 
     @app.get("/", tags=["Root"])

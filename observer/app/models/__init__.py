@@ -11,6 +11,7 @@ from app.models.consent_record import ConsentRecord
 from app.models.emotion_definition import EmotionCollection, EmotionDefinition
 from app.models.emotion_event_correlation import EmotionEventCorrelation
 from app.models.field_visibility_policy import FieldVisibilityPolicy
+from app.models.integration_credential import IntegrationCredential
 from app.models.life_event import LifeEvent
 from app.models.message_relationship import MessageRelationship
 from app.models.model_assignment import ModelAssignment
@@ -51,6 +52,7 @@ __all__ = [
     "EmotionGoal",
     "EmotionRelationship",
     "FieldVisibilityPolicy",
+    "IntegrationCredential",
     "JourneyWaypoint",
     "LifeEvent",
     "ModelAssignment",

@@ -193,6 +193,57 @@ _register(
     )
 )
 
+# ── Integrations ──────────────────────────────────────────────────────────
+
+_register(
+    ConsentPolicy(
+        key="integration_ical",
+        title="iCal Calendar Import",
+        description=(
+            "L.O.V.E. will import events from your uploaded .ics calendar "
+            "file (titles, times, and duration) to correlate scheduled "
+            "activities with your emotional states. Imported events are "
+            "stored in your account and can be deleted at any time."
+        ),
+        version="1.0",
+        required=False,
+        category="integration",
+    )
+)
+
+_register(
+    ConsentPolicy(
+        key="integration_weather",
+        title="Weather Data Integration",
+        description=(
+            "L.O.V.E. will fetch current weather conditions for your "
+            "configured city (temperature, humidity, conditions, daylight "
+            "hours) to discover how environmental factors affect your mood. "
+            "Only city-level location is used — no GPS coordinates are "
+            "stored or transmitted."
+        ),
+        version="1.0",
+        required=False,
+        category="integration",
+    )
+)
+
+_register(
+    ConsentPolicy(
+        key="integration_daylight",
+        title="Daylight & Seasonal Tracking",
+        description=(
+            "L.O.V.E. will track daily sunrise, sunset, and daylight hours "
+            "for your configured location. This helps discover seasonal "
+            "patterns in your emotional wellbeing (e.g., Seasonal Affective "
+            "Disorder). Uses approximate coordinates only."
+        ),
+        version="1.0",
+        required=False,
+        category="integration",
+    )
+)
+
 
 # ---------------------------------------------------------------------------
 # Helpers
