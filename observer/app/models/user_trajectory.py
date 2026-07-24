@@ -403,7 +403,8 @@ from uuid import UUID, uuid4
 
 from pgvector.sqlalchemy import Vector
 from sqlalchemy import Float, ForeignKey, Text, func
-from sqlalchemy.dialects.postgresql import JSONB
+from sqlalchemy.dialects.postgresql import ARRAY, JSONB
+from sqlalchemy.dialects.postgresql import UUID as UUID_PG
 from sqlalchemy.orm import Mapped, mapped_column
 
 from app.core.settings import settings
@@ -456,6 +457,11 @@ class UserTrajectory(Base):
     # Example: {"context": "work", "trigger": "meeting", "location": "office"}
     context_metadata: Mapped[Dict[str, Any]] = mapped_column(JSONB, default=dict)
 
+    # Life Journal cross-reference: IDs of life events associated with this state
+    associated_event_ids: Mapped[Optional[Any]] = mapped_column(
+        ARRAY(UUID_PG), nullable=True, default=list
+    )
+
     def __repr__(self) -> str:
         """Represent the object as a string."""
         return (
@@ -479,6 +485,9 @@ class UserTrajectory(Base):
             "elasticity_metric": self.elasticity_metric,
             "rigidity_score": self.rigidity_score,
             "context_metadata": self.context_metadata,
+            "associated_event_ids": (
+                [str(eid) for eid in self.associated_event_ids] if self.associated_event_ids else []
+            ),
         }
 
 

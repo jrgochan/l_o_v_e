@@ -9,6 +9,9 @@ from app.models.clinical_alert import ClinicalAlert
 from app.models.clinical_note import ClinicalNote
 from app.models.consent_record import ConsentRecord
 from app.models.emotion_definition import EmotionCollection, EmotionDefinition
+from app.models.emotion_event_correlation import EmotionEventCorrelation
+from app.models.field_visibility_policy import FieldVisibilityPolicy
+from app.models.life_event import LifeEvent
 from app.models.message_relationship import MessageRelationship
 from app.models.model_assignment import ModelAssignment
 from app.models.multi_emotion_analysis import (
@@ -38,6 +41,7 @@ __all__ = [
     "ConsentRecord",
     "EmotionCollection",
     "EmotionDefinition",
+    "EmotionEventCorrelation",
     "BootstrapData",
     "CategoryTransition",
     "ChatMessage",
@@ -46,7 +50,9 @@ __all__ = [
     "DetectedEmotion",
     "EmotionGoal",
     "EmotionRelationship",
+    "FieldVisibilityPolicy",
     "JourneyWaypoint",
+    "LifeEvent",
     "ModelAssignment",
     "MessageRelationship",
     "MultiEmotionAnalysis",

@@ -153,6 +153,46 @@ _register(
     )
 )
 
+# ── Life Journal ──────────────────────────────────────────────────────────
+
+_register(
+    ConsentPolicy(
+        key="life_journal",
+        title="Life Journal & Event Tracking",
+        description=(
+            "L.O.V.E.'s Life Journal allows you to log life events — such as "
+            "activities, sleep, meals, work, and social interactions — alongside "
+            "your emotional data. Events you log are stored securely in your "
+            "account and used to provide richer context for your emotional "
+            "journey. You may export or delete any or all life events at any "
+            "time. This consent covers manual event logging only; each "
+            "integration (calendars, wearables) requires its own separate consent."
+        ),
+        version="1.0",
+        required=False,
+        category="data",
+    )
+)
+
+_register(
+    ConsentPolicy(
+        key="life_journal_correlations",
+        title="Emotion-Event Correlation Analysis",
+        description=(
+            "When enabled, L.O.V.E. will analyze patterns between your life "
+            "events and emotional states to discover correlations. For example: "
+            "'Your anxiety tends to increase within 90 minutes of caffeine intake.' "
+            "Correlations are computed using statistical methods and are always "
+            "shown with their evidence (sample size, confidence). You can confirm "
+            "or dismiss any discovered correlation, and you may disable this "
+            "analysis at any time."
+        ),
+        version="1.0",
+        required=False,
+        category="data",
+    )
+)
+
 
 # ---------------------------------------------------------------------------
 # Helpers
