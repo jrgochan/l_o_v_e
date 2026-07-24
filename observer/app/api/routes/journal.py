@@ -290,3 +290,62 @@ async def list_correlations(
         "correlations": [c.to_dict() for c in correlations],
         "total": len(correlations),
     }
+
+
+# ---------------------------------------------------------------------------
+# Correlation Analysis Trigger
+# ---------------------------------------------------------------------------
+
+
+@router.post("/correlations/analyze")
+async def analyze_correlations(
+    current_user: Annotated[User, Depends(get_current_active_user)],
+    db: Annotated[AsyncSession, Depends(get_db)],
+    request: Request,
+) -> Any:
+    """Manually trigger correlation analysis for the current user.
+
+    Runs all enabled algorithms (currently: temporal proximity) and
+    persists any discovered correlations. Results are also published
+    to the NATS stream if connected.
+
+    This is useful for testing and for users who want immediate
+    analysis after logging a batch of events.
+    """
+    from app.services.correlation.engine import CorrelationEngine
+
+    ip = request.client.host if request.client else None
+    engine = CorrelationEngine(db)
+    results = await engine.run_analysis(current_user.id, ip_address=ip)
+    await db.commit()
+
+    return results
+
+
+# ---------------------------------------------------------------------------
+# Stream Status
+# ---------------------------------------------------------------------------
+
+
+@router.get("/stream/status")
+async def stream_status(
+    current_user: Annotated[User, Depends(get_current_active_user)],
+) -> Any:
+    """Check NATS JetStream connection status."""
+    from app.core.settings import settings
+
+    if not settings.NATS_ENABLED:
+        return {
+            "nats_enabled": False,
+            "connected": False,
+            "message": "NATS streaming is not enabled",
+        }
+
+    from app.services.stream.client import nats_client
+
+    return {
+        "nats_enabled": True,
+        "connected": nats_client.is_connected,
+        "stream_name": settings.NATS_STREAM_NAME,
+        "nats_url": settings.NATS_URL,
+    }

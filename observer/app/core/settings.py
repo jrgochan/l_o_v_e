@@ -87,6 +87,17 @@ class Settings(LoveBaseSettings):  # type: ignore
         return self.LISTENER_URL
 
     # ============================================================================
+    # NATS JETSTREAM — Stack-wide messaging and event streaming
+    # ============================================================================
+
+    NATS_URL: str = Field(default="nats://localhost:4222")
+    NATS_ENABLED: bool = Field(default=False)
+    NATS_STREAM_NAME: str = Field(default="JOURNAL")
+    NATS_CONNECT_TIMEOUT: int = Field(default=5)
+    NATS_RECONNECT_DELAY: float = Field(default=1.0)
+    NATS_MAX_RECONNECTS: int = Field(default=60)
+
+    # ============================================================================
     # SECURITY
     # ============================================================================
 

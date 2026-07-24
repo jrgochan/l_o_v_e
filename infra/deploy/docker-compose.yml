@@ -18,13 +18,19 @@ services:
       timeout: 5s
       retries: 5
 
-  # Redis Cache
-  redis:
-    image: redis:7-alpine
+  # NATS — Stack-wide messaging, streaming, and work queues
+  # Replaces Redis for pub/sub, job queues, and event streaming.
+  # JetStream provides persistent, replayable streams for the Life Journal.
+  nats:
+    image: nats:2-alpine
+    command: ["--js", "--sd", "/data", "-m", "8222"]
     ports:
-      - "6379:6379"
+      - "4222:4222"   # Client connections
+      - "8222:8222"   # HTTP monitoring
+    volumes:
+      - nats_data:/data
     healthcheck:
-      test: ["CMD", "redis-cli", "ping"]
+      test: ["CMD", "wget", "--spider", "-q", "http://localhost:8222/healthz"]
       interval: 10s
       timeout: 3s
       retries: 5
@@ -39,7 +45,7 @@ services:
     depends_on:
       postgres:
         condition: service_healthy
-      redis:
+      nats:
         condition: service_healthy
     environment:
       - DB_HOST=postgres
@@ -47,7 +53,7 @@ services:
       - DB_NAME=love_db
       - DB_USER=love_user
       - DB_PASSWORD=love_password
-      - REDIS_URL=redis://redis:6379
+      - NATS_URL=nats://nats:4222
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8001/health"]
       interval: 10s
@@ -64,7 +70,7 @@ services:
     depends_on:
       postgres:
         condition: service_healthy
-      redis:
+      nats:
         condition: service_healthy
       versor:
         condition: service_healthy
@@ -74,7 +80,8 @@ services:
       - DB_NAME=love_db
       - DB_USER=love_user
       - DB_PASSWORD=love_password
-      - REDIS_URL=redis://redis:6379
+      - NATS_URL=nats://nats:4222
+      - NATS_ENABLED=true
       - VERSOR_URL=http://versor:8001
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
@@ -90,12 +97,12 @@ services:
     ports:
       - "8002:8002"
     depends_on:
-      redis:
+      nats:
         condition: service_healthy
       observer:
         condition: service_healthy
     environment:
-      - REDIS_URL=redis://redis:6379
+      - NATS_URL=nats://nats:4222
       - OBSERVER_URL=http://observer:8000
       - AI_PROVIDER=${AI_PROVIDER:-ollama}
     healthcheck:
@@ -153,3 +160,4 @@ services:
 
 volumes:
   postgres_data:
+  nats_data:

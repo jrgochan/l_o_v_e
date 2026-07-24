@@ -90,12 +90,38 @@ async def lifespan(_app_instance: FastAPI) -> AsyncGenerator[None, None]:
 
     event_bus.subscribe_all(audit_log_handler)
 
+    # NATS JetStream (when enabled)
+    if settings.NATS_ENABLED:
+        from app.services.stream.bridge import (  # pylint: disable=import-outside-toplevel
+            EventBusBridge,
+        )
+        from app.services.stream.client import (  # pylint: disable=import-outside-toplevel
+            nats_client,
+        )
+
+        try:
+            await nats_client.connect()
+            EventBusBridge.register()
+        except Exception:
+            # Log but don't crash — NATS is optional
+            logger_startup = structlog.get_logger()
+            logger_startup.warning(
+                "nats_connection_failed",
+                msg="NATS unavailable — streaming features disabled",
+            )
+
     # Startup
     logger = structlog.get_logger()
     logger.info("application_startup", version=settings.API_VERSION)
     await init_db()
     yield
     # Shutdown
+    if settings.NATS_ENABLED:
+        from app.services.stream.client import (  # pylint: disable=import-outside-toplevel
+            nats_client,
+        )
+
+        await nats_client.disconnect()
     logger.info("application_shutdown")
     await close_db()
 

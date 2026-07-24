@@ -29,6 +29,8 @@ dependencies = [
     "opentelemetry-instrumentation-fastapi>=0.46b0",
     "opentelemetry-exporter-otlp-proto-grpc>=1.25.0",
     "prometheus-fastapi-instrumentator>=7.0.0",
+    # Messaging — NATS JetStream (stack-wide)
+    "nats-py>=2.9.0",
 ]
 
 [dependency-groups]
